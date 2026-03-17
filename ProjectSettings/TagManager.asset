@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Desk
+    uniqueID: 3219767485
+    locked: 0
+  - name: Monitor
+    uniqueID: 4005359925
+    locked: 0
+  - name: Connections
+    uniqueID: 303906983
+    locked: 0
+  - name: Network
+    uniqueID: 206092083
+    locked: 0
+  - name: Packets
+    uniqueID: 1342465535
+    locked: 0
+  - name: UI
+    uniqueID: 1506858753
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  m_RenderingLayers:
+  - Default
