@@ -40,6 +40,17 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "trace")
+        {
+            if (parts.Length >= 2)
+            {
+                result.type = CommandType.Trace;
+                result.packetId = parts[1];
+            }
+
+            return result;
+        }
+
         if (verb == "block")
         {
             if (parts.Length >= 4 && parts[2] == "@")

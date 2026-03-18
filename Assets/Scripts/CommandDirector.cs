@@ -45,6 +45,16 @@ public class CommandDirector : MonoBehaviour
                 StartDeepScan(command.packetId);
                 return;
 
+            case CommandType.Trace:
+                if (string.IsNullOrWhiteSpace(command.packetId))
+                {
+                    Log("usage: trace <packet>");
+                    return;
+                }
+
+                StartTrace(command.packetId);
+                return;
+
             case CommandType.Block:
                 if (string.IsNullOrWhiteSpace(command.packetId) || string.IsNullOrWhiteSpace(command.nodeId))
                 {
@@ -132,6 +142,31 @@ public class CommandDirector : MonoBehaviour
         operations.Add(scan);
 
         Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
+    }
+
+    private void StartTrace(string packetId, int durationTicks = 4)
+    {
+        PacketView packet = networkRuntime.GetPacket(packetId);
+
+        if (packet == null)
+        {
+            Log($"trace failed: packet {packetId} not found");
+            return;
+        }
+
+        TraceOperation trace = new TraceOperation
+        {
+            id = nextScanId,
+            displayId = $"trace{nextScanId}",
+            packetId = packetId,
+            remainingTicks = durationTicks,
+            totalTicks = durationTicks
+        };
+
+        nextScanId++;
+        operations.Add(trace);
+
+        Log($"{trace.displayId} started: {packetId} ({durationTicks}s)");
     }
 
     private void StartDeepScan(string packetId, int durationTicks = 10)
@@ -224,13 +259,17 @@ public class CommandDirector : MonoBehaviour
             if (operations[i] is ScanOperation scan)
             {
                 hasScans = true;
-                sb
-                .AppendLine(scan.GetOperationsLine());
+                sb.AppendLine(scan.GetOperationsLine());
             }
             if (operations[i] is DeepScanOperation deepScan)
             {
                 hasScans = true;
                 sb.AppendLine(deepScan.GetOperationsLine());
+            }
+            if (operations[i] is TraceOperation trace)
+            {
+                hasScans = true;
+                sb.AppendLine(trace.GetOperationsLine());
             }
         }
 

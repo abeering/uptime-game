@@ -152,7 +152,7 @@ public class PacketView : MonoBehaviour
         Color bodyColor = visible switch
         {
             VisibleClass.Unknown => Color.gray,
-            VisibleClass.Benign => Color.white,
+            VisibleClass.Benign => Color.green,
             VisibleClass.Suspicious => Color.yellow,
             VisibleClass.Threat => Color.red,
             VisibleClass.Priority => Color.cyan,
