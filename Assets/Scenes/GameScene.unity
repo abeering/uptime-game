@@ -3392,6 +3392,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OperationsPanelController
   operationsText: {fileID: 1344099319}
   commandDirector: {fileID: 838780728}
+  networkRuntime: {fileID: 1878212259}
 --- !u!1 &1072276950
 GameObject:
   m_ObjectHideFlags: 0

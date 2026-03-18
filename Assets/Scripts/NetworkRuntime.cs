@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,4 +52,23 @@ public class NetworkRuntime : MonoBehaviour
         nodes.TryGetValue(id, out var node);
         return node;
     }
+
+    public void AppendOperationsPanel(StringBuilder sb)
+    {
+        sb.AppendLine("THREATS");
+        bool hasThreats = false;
+
+        foreach (var packet in packets.Values)
+        {
+            if (packet.IsKnownThreat())
+            {
+                hasThreats = true;
+                sb.AppendLine(packet.GetOperationsLine());
+            }
+        }
+
+        if (!hasThreats)
+            sb.AppendLine("none");
+    }
+
 }

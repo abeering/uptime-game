@@ -119,6 +119,21 @@ public class PacketView : MonoBehaviour
         ResetAdvanceTimer();
     }
 
+    public bool IsTrueThreat()
+    {
+        return trueClass == PacketClass.Threat;
+    }
+
+    public bool IsVisibleThreat()
+    {
+        return GetVisibleClass() == VisibleClass.Threat;
+    }
+
+    public bool IsKnownThreat()
+    {
+        return IsTrueThreat() && IsVisibleThreat();
+    }
+
     public VisibleClass GetVisibleClass()
     {
         if (intelLevel == IntelLevel.None)
@@ -316,5 +331,10 @@ public class PacketView : MonoBehaviour
     {
         intelLevel = IntelLevel.DeepScanned;
         RefreshVisuals();
+    }
+
+    public  string GetOperationsLine()
+    {
+        return $"{packetId} - {trueClass}/{trueKind} - {GetVisibleClass()} - src={sourceAddress} dest={GetDestinationName()}";
     }
 }

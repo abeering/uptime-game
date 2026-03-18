@@ -247,10 +247,8 @@ public class CommandDirector : MonoBehaviour
         Log($"cancel failed: {operationId} not found");
     }
 
-    public string GetOperationsDisplayText()
+    public void AppendOperationsPanel(StringBuilder sb)
     {
-        StringBuilder sb = new StringBuilder();
-
         sb.AppendLine("SCANS");
         bool hasScans = false;
 
@@ -291,8 +289,6 @@ public class CommandDirector : MonoBehaviour
 
         if (!hasBlocks)
             sb.AppendLine("none");
-
-        return sb.ToString();
     }
 
     public void Log(string message)
