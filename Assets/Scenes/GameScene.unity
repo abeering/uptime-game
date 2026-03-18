@@ -5037,9 +5037,11 @@ MonoBehaviour:
   ticksPerSpawnIntervalStep: 200
   spawnIntervalJitter: 5
   openingGraceTicks: 10
-  startingMalwareChance: 0.05
+  startingMalwareChance: 0.1
   maxMalwareChance: 0.18
   malwareChanceRampPerTick: 0.001
+  suspiciousBenignChance: 0.15
+  suspiciousThreatChance: 0.5
   minBaseMoveInterval: 1
   maxBaseMoveInterval: 3
   maxSpawnsPerTick: 1

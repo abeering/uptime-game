@@ -2,6 +2,7 @@ public enum CommandType
 {
     Unknown,
     Scan,
+    DeepScan,
     Block,
     Cancel
 }

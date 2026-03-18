@@ -35,6 +35,16 @@ public class CommandDirector : MonoBehaviour
                 StartScan(command.packetId);
                 return;
 
+            case CommandType.DeepScan:
+                if (string.IsNullOrWhiteSpace(command.packetId))
+                {
+                    Log("usage: deepscan <packet>");
+                    return;
+                }
+
+                StartDeepScan(command.packetId);
+                return;
+
             case CommandType.Block:
                 if (string.IsNullOrWhiteSpace(command.packetId) || string.IsNullOrWhiteSpace(command.nodeId))
                 {
@@ -99,7 +109,7 @@ public class CommandDirector : MonoBehaviour
         }
     }
 
-    private void StartScan(string packetId, int durationTicks = 3)
+    private void StartScan(string packetId, int durationTicks = 4)
     {
         PacketView packet = networkRuntime.GetPacket(packetId);
 
@@ -113,6 +123,31 @@ public class CommandDirector : MonoBehaviour
         {
             id = nextScanId,
             displayId = $"scan{nextScanId}",
+            packetId = packetId,
+            remainingTicks = durationTicks,
+            totalTicks = durationTicks
+        };
+
+        nextScanId++;
+        operations.Add(scan);
+
+        Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
+    }
+
+    private void StartDeepScan(string packetId, int durationTicks = 10)
+    {
+        PacketView packet = networkRuntime.GetPacket(packetId);
+
+        if (packet == null)
+        {
+            Log($"deepscan failed: packet {packetId} not found");
+            return;
+        }
+
+        DeepScanOperation scan = new DeepScanOperation
+        {
+            id = nextScanId,
+            displayId = $"deepscan{nextScanId}",
             packetId = packetId,
             remainingTicks = durationTicks,
             totalTicks = durationTicks
@@ -189,7 +224,13 @@ public class CommandDirector : MonoBehaviour
             if (operations[i] is ScanOperation scan)
             {
                 hasScans = true;
-                sb.AppendLine(scan.GetOperationsLine());
+                sb
+                .AppendLine(scan.GetOperationsLine());
+            }
+            if (operations[i] is DeepScanOperation deepScan)
+            {
+                hasScans = true;
+                sb.AppendLine(deepScan.GetOperationsLine());
             }
         }
 

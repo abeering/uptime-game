@@ -14,21 +14,22 @@ public class TrafficDirector : MonoBehaviour
     public RouteStep[] routeToCache;
 
     [Header("Spawn Cadence")]
+
     // Average ticks between spawns at the start of the run.
     // Larger = calmer opening.
     [Min(1)] public int startingSpawnIntervalTicks = 10;
 
     // Minimum allowed interval between spawns later in the run.
     // Lower = more intense late game.
-    [Min(1)] public int minSpawnIntervalTicks = 3;
+    [Min(1)] public int minSpawnIntervalTicks = 5;
 
     // How many ticks it takes to reduce interval by 1.
     // Controls how quickly difficulty ramps.
-    [Min(1)] public int ticksPerSpawnIntervalStep = 25;
+    [Min(1)] public int ticksPerSpawnIntervalStep = 200;
 
     // Random variation applied to each scheduled spawn interval.
     // Prevents perfectly predictable rhythm.
-    [Min(0)] public int spawnIntervalJitter = 2;
+    [Min(0)] public int spawnIntervalJitter = 5;
 
     // Optional grace period before spawning begins.
     [Min(0)] public int openingGraceTicks = 5;
@@ -48,6 +49,32 @@ public class TrafficDirector : MonoBehaviour
     // This controls how quickly the run shifts from "traffic management"
     // to "incident response."
     public float malwareChanceRampPerTick = 0.001f;
+
+
+    [Header("Quick Scan Presentation")]
+
+    // Among TRUE BENIGN packets, chance that a quick scan will flag them as SUSPICIOUS.
+    //
+    // This creates "false positives" — traffic that looks odd but is actually safe.
+    // These are important because they:
+    // - give the player a reason to deep scan
+    // - prevent the scan system from feeling perfectly reliable
+    // - introduce doubt into otherwise safe traffic
+    [Range(0f, 1f)] public float suspiciousBenignChance = 0.15f;
+
+
+    // Among TRUE THREAT packets, chance that a quick scan will ONLY show SUSPICIOUS
+    // instead of immediately revealing them as a THREAT.
+    //
+    // Higher values mean:
+    // - more ambiguity
+    // - more need for deep scans
+    // - slower, more investigative gameplay
+    //
+    // Lower values mean:
+    // - threats are more obvious
+    // - faster, more reactive gameplay
+    [Range(0f, 1f)] public float suspiciousThreatChance = 0.5f;
 
 
     [Header("Packet Move Interval")]
@@ -167,17 +194,45 @@ public class TrafficDirector : MonoBehaviour
     private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance)
     {
         bool isMalware = Random.value < malwareChance;
-        PacketKind kind = isMalware ? PacketKind.Malware : PacketKind.Normal;
+
+        PacketClass pClass;
+        PacketKind pKind = PacketKind.None;
+        QuickScanClass quickClass;
+
+        if (!isMalware)
+        {
+            pClass = PacketClass.Benign;
+            quickClass = Random.value < suspiciousBenignChance
+                ? QuickScanClass.Suspicious
+                : QuickScanClass.Benign;
+        }
+        else
+        {
+            pClass = PacketClass.Threat;
+
+            float roll = Random.value;
+
+            if (roll < 0.4f) pKind = PacketKind.Virus;
+            else if (roll < 0.7f) pKind = PacketKind.Worm;
+            else if (roll < 0.9f) pKind = PacketKind.Spyware;
+            else pKind = PacketKind.Ddos;
+
+            quickClass = Random.value < suspiciousThreatChance
+                ? QuickScanClass.Suspicious
+                : QuickScanClass.Threat;
+        }
 
         int baseMoveInterval = Random.Range(minBaseMoveInterval, maxBaseMoveInterval + 1);
-
         RouteStep[] route = ChooseRoute();
 
         return new SpawnPlan
         {
             spawnTick = currentTick,
             packetId = GetNextPacketId(),
-            kind = kind,
+            packetClass = pClass,
+            packetKind = pKind,
+            quickScanClass = quickClass,
+            sourceAddress = GenerateSourceAddress(),
             baseSpeed = baseMoveInterval,
             route = route
         };
@@ -251,7 +306,15 @@ public class TrafficDirector : MonoBehaviour
         }
 
         PacketView packet = Instantiate(packetPrefab, packetsRoot);
-        packet.Initialize(plan.packetId, plan.kind, plan.baseSpeed, plan.route);
+        packet.Initialize(
+            plan.packetId,
+            plan.packetClass,
+            plan.packetKind,
+            plan.quickScanClass,
+            plan.sourceAddress,
+            plan.baseSpeed,
+            plan.route
+        );
         activePackets.Add(packet);
         networkRuntime.RegisterPacket(packet);
         packet.OnReachedNode += (p, node) =>
@@ -262,7 +325,7 @@ public class TrafficDirector : MonoBehaviour
         if (logSpawns)
         {
             Debug.Log(
-                $"Spawned {plan.packetId} kind={plan.kind} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
+                $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} quickScanClass={plan.quickScanClass} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
             );
         }
     }
@@ -319,5 +382,10 @@ public class TrafficDirector : MonoBehaviour
         }
 
         return availablePacketIds.Dequeue();
+    }
+
+    private string GenerateSourceAddress()
+    {
+        return $"{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}";
     }
 }

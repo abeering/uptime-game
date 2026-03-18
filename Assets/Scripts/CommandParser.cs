@@ -29,6 +29,17 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "deepscan")
+        {
+            if (parts.Length >= 2)
+            {
+                result.type = CommandType.DeepScan;
+                result.packetId = parts[1];
+            }
+
+            return result;
+        }
+
         if (verb == "block")
         {
             if (parts.Length >= 4 && parts[2] == "@")

@@ -1,12 +1,14 @@
-using System;
-using UnityEngine;
-
-[Serializable]
 public class SpawnPlan
 {
     public int spawnTick;
     public string packetId;
-    public PacketKind kind;
-    public int baseSpeed = 1;
+
+    public PacketClass packetClass;
+    public PacketKind packetKind;
+    public QuickScanClass quickScanClass;
+
+    public string sourceAddress;
+
+    public int baseSpeed;
     public RouteStep[] route;
 }
