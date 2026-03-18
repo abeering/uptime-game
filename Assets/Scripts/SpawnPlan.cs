@@ -5,7 +5,7 @@ public class SpawnPlan
 
     public PacketClass packetClass;
     public PacketKind packetKind;
-    public QuickScanClass quickScanClass;
+    public int scanDifficulty;
 
     public string sourceAddress;
 

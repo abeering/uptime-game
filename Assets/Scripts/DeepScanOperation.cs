@@ -38,7 +38,10 @@ public class DeepScanOperation : Operation
             packet.ApplyDeepScan();
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} complete: {packet.packetId} = {packet.quickScanClass} source={packet.sourceAddress} destination={packet.GetDestinationName()}");
+            context.Log(
+                $"{displayId} complete: {packet.packetId} = {packet.trueClass}/{packet.trueKind} (100%) " +
+                $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
+            );
         }
     }
 

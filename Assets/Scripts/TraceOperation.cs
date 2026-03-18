@@ -35,10 +35,9 @@ public class TraceOperation : Operation
         if (remainingTicks <= 0)
         {
             state = TraceState.Completed;
-            packet.ApplyScan();
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} complete: {packet.packetId} = {packet.quickScanClass} source={packet.sourceAddress} destination={packet.GetDestinationName()}");
+            context.Log($"{displayId} complete: {packet.packetId} = source={packet.sourceAddress} destination={packet.GetDestinationName()}");
         }
     }
 

@@ -35,10 +35,13 @@ public class ScanOperation : Operation
         if (remainingTicks <= 0)
         {
             state = ScanState.Completed;
-            packet.ApplyScan();
+            packet.ApplyQuickScan();
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} complete: {packet.packetId} = {packet.quickScanClass} source={packet.sourceAddress} destination={packet.GetDestinationName()}");
+            context.Log(
+                $"{displayId} complete: {packet.packetId} = {packet.GetVisibleClass()} [{packet.GetConfidenceText()} confidence] " +
+                $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
+            );
         }
     }
 

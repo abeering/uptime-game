@@ -50,33 +50,6 @@ public class TrafficDirector : MonoBehaviour
     // to "incident response."
     public float malwareChanceRampPerTick = 0.001f;
 
-
-    [Header("Quick Scan Presentation")]
-
-    // Among TRUE BENIGN packets, chance that a quick scan will flag them as SUSPICIOUS.
-    //
-    // This creates "false positives" — traffic that looks odd but is actually safe.
-    // These are important because they:
-    // - give the player a reason to deep scan
-    // - prevent the scan system from feeling perfectly reliable
-    // - introduce doubt into otherwise safe traffic
-    [Range(0f, 1f)] public float suspiciousBenignChance = 0.15f;
-
-
-    // Among TRUE THREAT packets, chance that a quick scan will ONLY show SUSPICIOUS
-    // instead of immediately revealing them as a THREAT.
-    //
-    // Higher values mean:
-    // - more ambiguity
-    // - more need for deep scans
-    // - slower, more investigative gameplay
-    //
-    // Lower values mean:
-    // - threats are more obvious
-    // - faster, more reactive gameplay
-    [Range(0f, 1f)] public float suspiciousThreatChance = 0.5f;
-
-
     [Header("Packet Move Interval")]
 
     // Fastest possible packet movement interval.
@@ -88,6 +61,10 @@ public class TrafficDirector : MonoBehaviour
     // Higher = slower packet.
     // Wider ranges create more variety, but too much variety can feel noisy.
     [Min(1)] public int maxBaseMoveInterval = 3;
+
+    [Header("Scan Difficulty")]
+    [Range(0, 100)] public int minScanDifficulty = 10;
+    [Range(0, 100)] public int maxScanDifficulty = 40;
 
 
     [Header("Burst Control")]
@@ -195,14 +172,10 @@ public class TrafficDirector : MonoBehaviour
 
         PacketClass pClass;
         PacketKind pKind = PacketKind.None;
-        QuickScanClass quickClass;
 
         if (!isMalware)
         {
             pClass = PacketClass.Benign;
-            quickClass = Random.value < suspiciousBenignChance
-                ? QuickScanClass.Suspicious
-                : QuickScanClass.Benign;
         }
         else
         {
@@ -214,13 +187,10 @@ public class TrafficDirector : MonoBehaviour
             else if (roll < 0.7f) pKind = PacketKind.Worm;
             else if (roll < 0.9f) pKind = PacketKind.Spyware;
             else pKind = PacketKind.Ddos;
-
-            quickClass = Random.value < suspiciousThreatChance
-                ? QuickScanClass.Suspicious
-                : QuickScanClass.Threat;
         }
 
         int baseMoveInterval = Random.Range(minBaseMoveInterval, maxBaseMoveInterval + 1);
+        int scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1);
         RouteStep[] route = ChooseRoute();
 
         return new SpawnPlan
@@ -229,7 +199,7 @@ public class TrafficDirector : MonoBehaviour
             packetId = GetNextPacketId(),
             packetClass = pClass,
             packetKind = pKind,
-            quickScanClass = quickClass,
+            scanDifficulty = scanDifficulty,
             sourceAddress = GenerateSourceAddress(),
             baseSpeed = baseMoveInterval,
             route = route
@@ -308,9 +278,9 @@ public class TrafficDirector : MonoBehaviour
             plan.packetId,
             plan.packetClass,
             plan.packetKind,
-            plan.quickScanClass,
             plan.sourceAddress,
             plan.baseSpeed,
+            plan.scanDifficulty,
             plan.route
         );
         activePackets.Add(packet);
@@ -323,7 +293,7 @@ public class TrafficDirector : MonoBehaviour
         if (logSpawns)
         {
             Debug.Log(
-                $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} quickScanClass={plan.quickScanClass} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
+                $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
             );
         }
     }

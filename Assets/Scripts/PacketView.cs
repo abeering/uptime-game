@@ -24,14 +24,6 @@ public enum PacketKind
     FileTransfer
 }
 
-public enum QuickScanClass
-{
-    Benign,
-    Suspicious,
-    Threat,
-    Priority
-}
-
 public enum IntelLevel
 {
     None,
@@ -43,7 +35,6 @@ public enum VisibleClass
 {
     Unknown,
     Benign,
-    Suspicious,
     Threat,
     Priority
 }
@@ -53,10 +44,9 @@ public class PacketView : MonoBehaviour
     public string packetId = "a";
     public string PacketId => packetId;
 
-
     [Header("Packet Behavior")]
     [Min(1)]
-    public int baseSpeed = 1; // ticks per step before edge latency
+    public int baseSpeed = 1;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -71,15 +61,16 @@ public class PacketView : MonoBehaviour
     [Header("Packet Type")]
     public PacketClass trueClass;
     public PacketKind trueKind;
-    public QuickScanClass quickScanClass;
-    public IntelLevel intelLevel = IntelLevel.None;
     public string sourceAddress;
+
+    [Header("Intel")]
+    public IntelLevel intelLevel = IntelLevel.None;
+    [Range(0, 100)] public int confidencePercent = 0;
+    [Range(0, 100)] public int scanDifficulty = 25;
+    public PacketClass reportedClass = PacketClass.Benign;
 
     [Header("Visuals")]
     public SpriteRenderer spriteRenderer;
-
-    public Color normalColor = Color.white;
-    public Color malwareColor = Color.red;
 
     public event Action<PacketView, NodeView> OnReachedNode;
     public event Action<PacketView, string> OnRemoved;
@@ -89,19 +80,22 @@ public class PacketView : MonoBehaviour
         string newPacketId,
         PacketClass newClass,
         PacketKind newKind,
-        QuickScanClass newQuickScanClass,
         string newSourceAddress,
         int newBaseSpeed,
+        int newScanDifficulty,
         RouteStep[] newRoute
     )
     {
         packetId = newPacketId;
         trueClass = newClass;
         trueKind = newKind;
-        quickScanClass = newQuickScanClass;
         sourceAddress = newSourceAddress;
+        scanDifficulty = Mathf.Clamp(newScanDifficulty, 0, 100);
 
+        reportedClass = PacketClass.Benign;
+        confidencePercent = 0;
         intelLevel = IntelLevel.None;
+
         baseSpeed = Mathf.Max(1, newBaseSpeed);
         route = newRoute;
 
@@ -131,27 +125,30 @@ public class PacketView : MonoBehaviour
 
     public bool IsKnownThreat()
     {
-        return IsTrueThreat() && IsVisibleThreat();
+        return GetVisibleClass() == VisibleClass.Threat;
+    }
+
+    public int GetClassConfidence()
+    {
+        return confidencePercent;
+    }
+
+    public string GetConfidenceText()
+    {
+        return $"{confidencePercent}%";
+    }
+
+    public bool IsFullyIdentified()
+    {
+        return confidencePercent >= 100;
     }
 
     public VisibleClass GetVisibleClass()
     {
-        if (intelLevel == IntelLevel.None)
+        if (confidencePercent <= 0)
             return VisibleClass.Unknown;
 
-        if (intelLevel == IntelLevel.Scanned)
-        {
-            return quickScanClass switch
-            {
-                QuickScanClass.Benign => VisibleClass.Benign,
-                QuickScanClass.Suspicious => VisibleClass.Suspicious,
-                QuickScanClass.Threat => VisibleClass.Threat,
-                QuickScanClass.Priority => VisibleClass.Priority,
-                _ => VisibleClass.Unknown
-            };
-        }
-
-        return trueClass switch
+        return reportedClass switch
         {
             PacketClass.Benign => VisibleClass.Benign,
             PacketClass.Threat => VisibleClass.Threat,
@@ -164,23 +161,91 @@ public class PacketView : MonoBehaviour
     {
         VisibleClass visible = GetVisibleClass();
 
-        Color bodyColor = visible switch
+        Color identityColor = visible switch
         {
             VisibleClass.Unknown => Color.gray,
             VisibleClass.Benign => Color.green,
-            VisibleClass.Suspicious => Color.yellow,
             VisibleClass.Threat => Color.red,
             VisibleClass.Priority => Color.cyan,
             _ => Color.white
         };
 
+        float confidence01 = Mathf.Clamp01(confidencePercent / 100f);
+
+        Color bodyColor = visible == VisibleClass.Unknown
+            ? Color.gray
+            : Color.Lerp(Color.gray, identityColor, confidence01);
+
         if (spriteRenderer != null)
             spriteRenderer.color = bodyColor;
-        }
+    }
 
     private void RefreshVisuals()
     {
         ApplyVisuals();
+    }
+
+    public void ApplyQuickScan()
+    {
+        PacketClass newReportedClass = RollReportedClass();
+        int newConfidence = RollConfidence(newReportedClass);
+
+        reportedClass = newReportedClass;
+        confidencePercent = Mathf.Clamp(newConfidence, 1, 99);
+
+        if (intelLevel < IntelLevel.Scanned)
+            intelLevel = IntelLevel.Scanned;
+
+        RefreshVisuals();
+    }
+
+    public void ApplyDeepScan()
+    {
+        reportedClass = trueClass;
+        confidencePercent = 100;
+        intelLevel = IntelLevel.DeepScanned;
+        RefreshVisuals();
+    }
+
+    private PacketClass RollReportedClass()
+    {
+        float difficulty01 = Mathf.Clamp01(scanDifficulty / 100f);
+
+        float correctChance = Mathf.Lerp(0.95f, 0.60f, difficulty01);
+        bool isCorrect = UnityEngine.Random.value < correctChance;
+
+        if (isCorrect)
+            return trueClass;
+
+        return trueClass switch
+        {
+            PacketClass.Benign => UnityEngine.Random.value < 0.85f ? PacketClass.Threat : PacketClass.Priority,
+            PacketClass.Threat => UnityEngine.Random.value < 0.90f ? PacketClass.Benign : PacketClass.Priority,
+            PacketClass.Priority => UnityEngine.Random.value < 0.50f ? PacketClass.Benign : PacketClass.Threat,
+            _ => trueClass
+        };
+    }
+
+    private int RollConfidence(PacketClass newReportedClass)
+    {
+        float difficulty01 = Mathf.Clamp01(scanDifficulty / 100f);
+        bool isCorrect = newReportedClass == trueClass;
+
+        int minConfidence;
+        int maxConfidence;
+
+        if (isCorrect)
+        {
+            minConfidence = Mathf.RoundToInt(Mathf.Lerp(70f, 30f, difficulty01));
+            maxConfidence = Mathf.RoundToInt(Mathf.Lerp(95f, 65f, difficulty01));
+        }
+        else
+        {
+            minConfidence = Mathf.RoundToInt(Mathf.Lerp(5f, 20f, difficulty01));
+            maxConfidence = Mathf.RoundToInt(Mathf.Lerp(25f, 55f, difficulty01));
+        }
+
+        return UnityEngine.Random.Range(minConfidence, maxConfidence + 1);
     }
 
     public void Tick()
@@ -319,22 +384,14 @@ public class PacketView : MonoBehaviour
         OnRemoved?.Invoke(this, reason);
     }
 
-    public void ApplyScan()
+    public string GetOperationsLine()
     {
-        if (intelLevel < IntelLevel.Scanned)
-            intelLevel = IntelLevel.Scanned;
+        if (confidencePercent <= 0)
+            return $"{packetId} - Unknown - src={sourceAddress} dest={GetDestinationName()}";
 
-        RefreshVisuals();
-    }
+        if (intelLevel < IntelLevel.DeepScanned)
+            return $"{packetId} - {reportedClass} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
 
-    public void ApplyDeepScan()
-    {
-        intelLevel = IntelLevel.DeepScanned;
-        RefreshVisuals();
-    }
-
-    public  string GetOperationsLine()
-    {
-        return $"{packetId} - {trueClass}/{trueKind} - {GetVisibleClass()} - src={sourceAddress} dest={GetDestinationName()}";
+        return $"{packetId} - {trueClass}/{trueKind} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
     }
 }
