@@ -394,4 +394,13 @@ public class PacketView : MonoBehaviour
 
         return $"{packetId} - {trueClass}/{trueKind} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
     }
+
+    public void SetVisualSortOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+
+        if (label != null)
+            label.sortingOrder = order;
+    }
 }
