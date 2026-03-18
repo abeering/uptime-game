@@ -32,6 +32,9 @@ public class DeepScanOperation : Operation
             return;
         }
 
+        float progress01 = 1f - ((float)remainingTicks / totalTicks);
+        packet.UpdateScanVisual(progress01);
+
         if (remainingTicks <= 0)
         {
             state = DeepScanState.Completed;
@@ -42,6 +45,7 @@ public class DeepScanOperation : Operation
                 $"{displayId} complete: {packet.packetId} = {packet.trueClass}/{packet.trueKind} (100%) " +
                 $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
             );
+            packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
         }
     }
 
@@ -56,6 +60,11 @@ public class DeepScanOperation : Operation
             isFinished = true;
             lingerTicksRemaining = 3;
             context.Log($"{displayId} failed: {packetId} removed ({reason})");
+            PacketView packet = context.networkRuntime.GetPacket(packetId);
+            if (packet != null)
+            {
+                packet.FailScanVisual("deep scan failed");
+            }
         }
     }
 
@@ -73,6 +82,11 @@ public class DeepScanOperation : Operation
         isFinished = true;
         lingerTicksRemaining = 3;
         context.Log($"{displayId} cancelled");
+        PacketView packet = context.networkRuntime.GetPacket(packetId);
+        if (packet != null)
+        {
+            packet.CancelScanVisual("deep scan cancelled");
+        }
     }
 
     public override string GetOperationsLine()

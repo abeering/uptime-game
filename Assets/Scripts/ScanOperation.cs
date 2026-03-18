@@ -32,6 +32,9 @@ public class ScanOperation : Operation
             return;
         }
 
+        float progress01 = 1f - ((float)remainingTicks / totalTicks);
+        packet.UpdateScanVisual(progress01);
+
         if (remainingTicks <= 0)
         {
             state = ScanState.Completed;
@@ -42,6 +45,7 @@ public class ScanOperation : Operation
                 $"{displayId} complete: {packet.packetId} = {packet.GetVisibleClass()} [{packet.GetConfidenceText()} confidence] " +
                 $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
             );
+            packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
         }
     }
 
@@ -56,6 +60,11 @@ public class ScanOperation : Operation
             isFinished = true;
             lingerTicksRemaining = 3;
             context.Log($"{displayId} failed: {packetId} removed ({reason})");
+            PacketView packet = context.networkRuntime.GetPacket(packetId);
+            if (packet != null)
+            {
+                packet.FailScanVisual("scan failed");
+            }
         }
     }
 
@@ -73,6 +82,11 @@ public class ScanOperation : Operation
         isFinished = true;
         lingerTicksRemaining = 3;
         context.Log($"{displayId} cancelled");
+        PacketView packet = context.networkRuntime.GetPacket(packetId);
+        if (packet != null)
+        {
+            packet.CancelScanVisual("scan cancelled");
+        }
     }
 
     public override string GetOperationsLine()

@@ -151,6 +151,9 @@ public class CommandDirector : MonoBehaviour
         nextScanId++;
         operations.Add(scan);
 
+        packet.BeginQuickScanVisual();
+        packet.UpdateScanVisual(0f);
+
         Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
     }
 
@@ -200,6 +203,9 @@ public class CommandDirector : MonoBehaviour
 
         nextScanId++;
         operations.Add(scan);
+
+        packet.BeginDeepScanVisual();
+        packet.UpdateScanVisual(0f);
 
         Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
     }

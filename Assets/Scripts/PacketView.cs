@@ -71,6 +71,7 @@ public class PacketView : MonoBehaviour
     public PacketClass reportedClass = PacketClass.Benign;
 
     [Header("Visuals")]
+    public PacketScanVisual scanVisual;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
 
@@ -432,6 +433,42 @@ public class PacketView : MonoBehaviour
 
         if (borderRenderer != null)
             borderRenderer.sortingOrder = order - 1;
+    }
+
+    public void BeginQuickScanVisual()
+    {
+        if (scanVisual != null)
+            scanVisual.BeginQuickScan();
+    }
+
+    public void BeginDeepScanVisual()
+    {
+        if (scanVisual != null)
+            scanVisual.BeginDeepScan();
+    }
+
+    public void UpdateScanVisual(float progress01)
+    {
+        if (scanVisual != null)
+            scanVisual.SetScanProgress(progress01);
+    }
+
+    public void CompleteScanVisual(string text)
+    {
+        if (scanVisual != null)
+            scanVisual.CompleteScan(text);
+    }
+
+    public void FailScanVisual(string text = "scan failed")
+    {
+        if (scanVisual != null)
+            scanVisual.FailScan(text);
+    }
+
+    public void CancelScanVisual(string text = "cancelled")
+    {
+        if (scanVisual != null)
+            scanVisual.CancelScan(text);
     }
 
 }
