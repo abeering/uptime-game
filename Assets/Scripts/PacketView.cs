@@ -47,6 +47,7 @@ public class PacketView : MonoBehaviour
     [Header("Packet Behavior")]
     [Min(1)]
     public int baseSpeed = 1;
+    public int boostCount = 0;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -98,6 +99,7 @@ public class PacketView : MonoBehaviour
         intelLevel = IntelLevel.None;
 
         baseSpeed = Mathf.Max(1, newBaseSpeed);
+        boostCount = 0;
         route = newRoute;
 
         RefreshVisuals();
@@ -112,6 +114,16 @@ public class PacketView : MonoBehaviour
 
         SnapToCurrentPosition();
         ResetAdvanceTimer();
+    }
+
+    public bool IsPriority()
+    {
+        return trueClass == PacketClass.Priority;
+    }
+
+    public bool IsVisiblePriority()
+    {
+        return GetVisibleClass() == VisibleClass.Priority;
     }
 
     public bool IsTrueThreat()
@@ -206,6 +218,20 @@ public class PacketView : MonoBehaviour
         confidencePercent = 100;
         intelLevel = IntelLevel.DeepScanned;
         RefreshVisuals();
+    }
+
+    public bool TryBoost()
+    {
+        if (!IsPriority())
+            return false;
+
+        if (baseSpeed <= 1)
+            return false;
+
+        baseSpeed = Mathf.Max(1, baseSpeed - 1);
+        boostCount++;
+        ResetAdvanceTimer();
+        return true;
     }
 
     private PacketClass RollReportedClass()

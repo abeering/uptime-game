@@ -50,6 +50,17 @@ public class TrafficDirector : MonoBehaviour
     // to "incident response."
     public float malwareChanceRampPerTick = 0.001f;
 
+    [Header("Priority Ramp")]
+
+    // Chance that a newly spawned packet is priority traffic at the start of the run.
+    [Range(0f, 1f)] public float startingPriorityChance = 0.10f;
+
+    // Hard cap on priority traffic ratio.
+    [Range(0f, 1f)] public float maxPriorityChance = 0.20f;
+
+    // Amount added to priority chance every tick.
+    public float priorityChanceRampPerTick = 0.00025f;
+
     [Header("Packet Move Interval")]
 
     // Fastest possible packet movement interval.
@@ -131,8 +142,9 @@ public class TrafficDirector : MonoBehaviour
             return;
 
         float malwareChance = GetCurrentMalwareChance(currentTick);
+        float priorityChance = GetCurrentPriorityChance(currentTick);
 
-        QueueSpawnPlan(BuildProceduralPlan(currentTick, malwareChance));
+        QueueSpawnPlan(BuildProceduralPlan(currentTick, malwareChance, priorityChance));
 
         ScheduleNextSpawn(currentTick);
     }
@@ -142,6 +154,14 @@ public class TrafficDirector : MonoBehaviour
         return Mathf.Min(
             maxMalwareChance,
             startingMalwareChance + (malwareChanceRampPerTick * currentTick)
+        );
+    }
+
+    private float GetCurrentPriorityChance(int currentTick)
+    {
+        return Mathf.Min(
+            maxPriorityChance,
+            startingPriorityChance + (priorityChanceRampPerTick * currentTick)
         );
     }
 
@@ -166,30 +186,48 @@ public class TrafficDirector : MonoBehaviour
         }
     }
 
-    private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance)
+    private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance, float priorityChance)
     {
-        bool isMalware = Random.value < malwareChance;
+        float clampedMalwareChance = Mathf.Clamp01(malwareChance);
+        float clampedPriorityChance = Mathf.Clamp(priorityChance, 0f, 1f - clampedMalwareChance);
+
+        float roll = Random.value;
 
         PacketClass pClass;
         PacketKind pKind = PacketKind.None;
 
-        if (!isMalware)
-        {
-            pClass = PacketClass.Benign;
-        }
-        else
+        if (roll < clampedMalwareChance)
         {
             pClass = PacketClass.Threat;
 
-            float roll = Random.value;
+            float kindRoll = Random.value;
 
-            if (roll < 0.4f) pKind = PacketKind.Virus;
-            else if (roll < 0.7f) pKind = PacketKind.Worm;
-            else if (roll < 0.9f) pKind = PacketKind.Spyware;
+            if (kindRoll < 0.4f) pKind = PacketKind.Virus;
+            else if (kindRoll < 0.7f) pKind = PacketKind.Worm;
+            else if (kindRoll < 0.9f) pKind = PacketKind.Spyware;
             else pKind = PacketKind.Ddos;
+        }
+        else if (roll < clampedMalwareChance + clampedPriorityChance)
+        {
+            pClass = PacketClass.Priority;
+
+            float kindRoll = Random.value;
+
+            if (kindRoll < 0.4f) pKind = PacketKind.Auth;
+            else if (kindRoll < 0.75f) pKind = PacketKind.Control;
+            else pKind = PacketKind.FileTransfer;
+        }
+        else
+        {
+            pClass = PacketClass.Benign;
         }
 
         int baseMoveInterval = Random.Range(minBaseMoveInterval, maxBaseMoveInterval + 1);
+
+        // Priority traffic trends slightly faster before boost.
+        if (pClass == PacketClass.Priority)
+            baseMoveInterval = Mathf.Max(minBaseMoveInterval, baseMoveInterval - 1);
+
         int scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1);
         RouteStep[] route = ChooseRoute();
 

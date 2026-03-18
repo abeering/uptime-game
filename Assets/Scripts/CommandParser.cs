@@ -74,6 +74,17 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "boost")
+        {
+            if (parts.Length >= 2)
+            {
+                result.type = CommandType.Boost;
+                result.packetId = parts[1];
+            }
+
+            return result;
+        }
+
         return result;
     }
 }

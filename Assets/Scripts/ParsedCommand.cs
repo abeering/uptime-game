@@ -5,7 +5,8 @@ public enum CommandType
     DeepScan,
     Trace,
     Block,
-    Cancel
+    Cancel,
+    Boost
 }
 
 public class ParsedCommand

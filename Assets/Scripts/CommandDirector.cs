@@ -75,6 +75,16 @@ public class CommandDirector : MonoBehaviour
                 CancelOperation(command.operationId);
                 return;
 
+            case CommandType.Boost:
+                if (string.IsNullOrWhiteSpace(command.packetId))
+                {
+                    Log("usage: boost <packet>");
+                    return;
+                }
+
+                StartBoost(command.packetId);
+                return;
+
             default:
                 Log("unknown command");
                 return;
@@ -223,6 +233,33 @@ public class CommandDirector : MonoBehaviour
         operations.Add(block);
 
         Log($"{block.displayId} armed: {packetId} @ {nodeId}");
+    }
+
+    private void StartBoost(string packetId)
+    {
+        PacketView packet = networkRuntime.GetPacket(packetId);
+
+        if (packet == null)
+        {
+            Log($"boost failed: packet {packetId} not found");
+            return;
+        }
+
+        if (!packet.IsVisiblePriority())
+        {
+            Log($"boost failed: {packetId} is not identified as priority");
+            return;
+        }
+
+        int previousSpeed = packet.baseSpeed;
+
+        if (!packet.TryBoost())
+        {
+            Log($"boost failed: {packetId} cannot move faster");
+            return;
+        }
+
+        Log($"boost complete: {packetId} speed {previousSpeed} -> {packet.baseSpeed}");
     }
 
     private void CancelOperation(string operationId)
