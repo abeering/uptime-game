@@ -104,7 +104,7 @@ public class TrafficDirector : MonoBehaviour
     private readonly List<SpawnPlan> queuedPlans = new();
     private readonly List<PacketView> activePackets = new();
 
-    private readonly Queue<string> availablePacketIds = new();
+    private readonly List<string> availablePacketIds = new();
     private int ticksUntilNextSpawn = 0;
 
     private void Awake()
@@ -121,15 +121,13 @@ public class TrafficDirector : MonoBehaviour
     {
         availablePacketIds.Clear();
 
-        // for (int num = 0; num <= 9; num++)
-        // {
+        for (int num = 0; num <= 9; num++)
+        {
             for (char letter = 'a'; letter <= 'z'; letter++)            
             {
-                // availablePacketIds.Enqueue($"{letter}{num}");
-                availablePacketIds.Enqueue($"{letter}");
-
+                availablePacketIds.Add($"{letter}{num}");
             }
-        // }
+        }
     }
 
     public void QueueSpawnPlan(SpawnPlan plan)
@@ -368,7 +366,7 @@ public class TrafficDirector : MonoBehaviour
         packet.NotifyRemoved(reason);
         networkRuntime.UnregisterPacket(packet);
         activePackets.Remove(packet);
-        availablePacketIds.Enqueue(packet.packetId);
+        availablePacketIds.Add(packet.packetId);
 
         Destroy(packet.gameObject);
     }
@@ -381,7 +379,12 @@ public class TrafficDirector : MonoBehaviour
             return "??";
         }
 
-        return availablePacketIds.Dequeue();
+        int index = Random.Range(0, availablePacketIds.Count);
+        string id = availablePacketIds[index];
+
+        availablePacketIds.RemoveAt(index);
+
+        return id;
     }
 
     private string GenerateSourceAddress()
