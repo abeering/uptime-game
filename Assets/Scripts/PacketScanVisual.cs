@@ -16,6 +16,16 @@ public class PacketScanVisual : MonoBehaviour
     public float ringRadius = 0.42f;
     public float ringWidth = 0.04f;
 
+    [Header("Completion")]
+    public float completeHoldDuration = 0.5f;
+    public float completePulseSpeed = 8f;
+    public float completePulseAmount = 0.12f;
+
+    private bool isHoldingComplete = false;
+    private float completeHoldTimer = 0f;
+    private string pendingResultText = "";
+    private Color pendingResultColor = Color.white;
+
     [Header("Colors")]
     public Color quickScanColor = Color.green;
     public Color deepScanColor = Color.cyan;
@@ -35,6 +45,10 @@ public class PacketScanVisual : MonoBehaviour
     private float resultTimer = 0f;
     private Vector3 resultStartLocalPos;
     private Color resultBaseColor;
+
+    private float displayedProgress01 = 0f;
+    private float targetProgress01 = 0f;
+    public float fillLerpSpeed = 8f;
 
     private void Awake()
     {
@@ -59,15 +73,68 @@ public class PacketScanVisual : MonoBehaviour
 
     private void Update()
     {
+        displayedProgress01 = Mathf.Lerp(
+            displayedProgress01,
+            targetProgress01,
+            Time.deltaTime * fillLerpSpeed
+        );
+
+        if (scanVisible)
+            SetRingProgress(displayedProgress01);
+
+        UpdateRingAnimation();
         UpdateResultLabel();
+    }
+
+    private void UpdateRingAnimation()
+    {
+        if (ringRenderer == null)
+            return;
+
+        if (isHoldingComplete)
+        {
+            completeHoldTimer += Time.deltaTime;
+
+            float pulse = 1f + Mathf.Sin(Time.time * completePulseSpeed) * completePulseAmount;
+            ringRenderer.widthMultiplier = pulse;
+
+            if (completeHoldTimer >= completeHoldDuration)
+            {
+                isHoldingComplete = false;
+                ringRenderer.widthMultiplier = 1f;
+                HideRing();
+                ShowResult(pendingResultText, pendingResultColor);
+            }
+
+            return;
+        }
+
+        ringRenderer.widthMultiplier = 1f;
+
+        if (!scanVisible)
+            return;
+
+        displayedProgress01 = Mathf.Lerp(
+            displayedProgress01,
+            targetProgress01,
+            Time.deltaTime * fillLerpSpeed
+        );
+
+        SetRingProgress(displayedProgress01);
     }
 
     public void BeginQuickScan()
     {
         activeMode = PacketScanVisualMode.QuickScan;
-        SetRingProgress(0f);
+        displayedProgress01 = 0f;
+        targetProgress01 = 0f;
         scanVisible = true;
+        isHoldingComplete = false;
+        completeHoldTimer = 0f;
+        pendingResultText = "";
+        pendingResultColor = Color.white;
         ApplyRingColor(quickScanColor);
+        SetRingProgress(0f);
     }
 
     public void BeginDeepScan()
@@ -75,23 +142,27 @@ public class PacketScanVisual : MonoBehaviour
         activeMode = PacketScanVisualMode.DeepScan;
         SetRingProgress(0f);
         scanVisible = true;
+        isHoldingComplete = false;
+        completeHoldTimer = 0f;
+        pendingResultText = "";
+        pendingResultColor = Color.white;
         ApplyRingColor(deepScanColor);
-    }
-
-    public void SetScanProgress(float progress01)
-    {
-        if (!scanVisible)
-            return;
-        float eased = Mathf.SmoothStep(0f, 1f, progress01);
-        SetRingProgress(eased);
     }
 
     public void CompleteScan(string text)
     {
         Color resultColor = GetModeColor();
+
+        displayedProgress01 = 1f;
+        targetProgress01 = 1f;
+        activeProgress01 = 1f;
+
         SetRingProgress(1f);
-        HideRing();
-        ShowResult(text, resultColor);
+
+        pendingResultText = text;
+        pendingResultColor = resultColor;
+        isHoldingComplete = true;
+        completeHoldTimer = 0f;
     }
 
     public void FailScan(string text = "scan failed")
@@ -104,6 +175,11 @@ public class PacketScanVisual : MonoBehaviour
     {
         HideRing();
         ShowResult(text, Color.gray);
+    }
+
+    public void SetScanProgress(float progress01)
+    {
+        targetProgress01 = Mathf.Clamp01(progress01);
     }
 
     private void SetRingProgress(float progress01)
@@ -137,17 +213,24 @@ public class PacketScanVisual : MonoBehaviour
 
     private Vector3 GetCirclePoint(float angle01)
     {
-        float angleRad = (-90f - (angle01 * 360f)) * Mathf.Deg2Rad;
-        return new Vector3(Mathf.Cos(angleRad) * ringRadius, Mathf.Sin(angleRad) * ringRadius, 0f);
+        float angleRad = (90f - (angle01 * 360f)) * Mathf.Deg2Rad;
+        return new Vector3(Mathf.Cos(angleRad) * ringRadius, Mathf.Sin(angleRad) * ringRadius, -0.1f);
     }
 
     private void HideRing()
     {
         scanVisible = false;
         activeMode = PacketScanVisualMode.None;
+        isHoldingComplete = false;
+        completeHoldTimer = 0f;
+
+        displayedProgress01 = 0f;
+        targetProgress01 = 0f;
+        activeProgress01 = 0f;
 
         if (ringRenderer != null)
         {
+            ringRenderer.widthMultiplier = 1f;
             ringRenderer.positionCount = 0;
             ringRenderer.enabled = false;
         }

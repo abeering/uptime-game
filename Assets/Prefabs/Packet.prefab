@@ -286,7 +286,7 @@ MonoBehaviour:
   ringRenderer: {fileID: 5515945663095332467}
   ringSegments: 48
   ringRadius: 1
-  ringWidth: 0.05
+  ringWidth: 0.1
   quickScanColor: {r: 0, g: 1, b: 0, a: 1}
   deepScanColor: {r: 0, g: 1, b: 1, a: 1}
   failedColor: {r: 1, g: 0, b: 0, a: 1}
@@ -294,6 +294,7 @@ MonoBehaviour:
   resultLocalOffset: {x: 0, y: -1.5, z: 0}
   resultRiseDistance: 0.08
   resultDuration: 3
+  fillLerpSpeed: 8
 --- !u!1 &3197505971808517719
 GameObject:
   m_ObjectHideFlags: 0
