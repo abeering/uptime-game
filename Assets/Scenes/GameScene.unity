@@ -5041,10 +5041,10 @@ MonoBehaviour:
   startingMalwareChance: 0.1
   maxMalwareChance: 0.18
   malwareChanceRampPerTick: 0.001
-  suspiciousBenignChance: 0.15
-  suspiciousThreatChance: 0.5
   minBaseMoveInterval: 1
   maxBaseMoveInterval: 3
+  minScanDifficulty: 10
+  maxScanDifficulty: 40
   maxSpawnsPerTick: 1
   logSpawns: 1
   logRampValues: 0
@@ -6298,6 +6298,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1878212258}
   - component: {fileID: 1878212259}
+  - component: {fileID: 1878212260}
   m_Layer: 0
   m_Name: NetworkRuntime
   m_TagString: Untagged
@@ -6332,6 +6333,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4938c79b072b74a46bb6fd6746739fcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkRuntime
+--- !u!114 &1878212260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878212257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 407f8a5276f55404c832d402d987b0d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PacketOverlapCoordinator
+  overlapDistance: 0.35
+  cycleInterval: 0.75
+  baseSortOrder: 10
+  topBoost: 10
 --- !u!1 &1922250889
 GameObject:
   m_ObjectHideFlags: 0

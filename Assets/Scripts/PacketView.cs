@@ -71,6 +71,7 @@ public class PacketView : MonoBehaviour
 
     [Header("Visuals")]
     public SpriteRenderer spriteRenderer;
+    public SpriteRenderer borderRenderer;
 
     public event Action<PacketView, NodeView> OnReachedNode;
     public event Action<PacketView, string> OnRemoved;
@@ -402,5 +403,9 @@ public class PacketView : MonoBehaviour
 
         if (label != null)
             label.sortingOrder = order;
+
+        if (borderRenderer != null)
+            borderRenderer.sortingOrder = order - 1;
     }
+
 }
