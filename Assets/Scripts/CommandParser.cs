@@ -85,6 +85,23 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "spawn")
+        {
+            if (parts.Length >= 5
+                && Enum.TryParse(parts[1], true, out PacketClass packetClass)
+                && Enum.TryParse(parts[2], true, out PacketKind packetKind))
+            {
+                result.type = CommandType.Spawn;
+                result.packetClass = packetClass;
+                result.packetKind = packetKind;
+
+                result.routeNodeIds = new string[parts.Length - 3];
+                Array.Copy(parts, 3, result.routeNodeIds, 0, result.routeNodeIds.Length);
+            }
+
+            return result;
+        }
+
         return result;
     }
 }

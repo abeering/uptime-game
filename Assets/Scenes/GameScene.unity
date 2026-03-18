@@ -532,6 +532,13 @@ MonoBehaviour:
   isEntryPoint: 0
   isExternal: 0
   isCritical: 0
+  visualRenderer: {fileID: 1871421101}
+  labelText: {fileID: 1488048328}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &354062866
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +930,13 @@ MonoBehaviour:
   isEntryPoint: 0
   isExternal: 0
   isCritical: 1
+  visualRenderer: {fileID: 578637477}
+  labelText: {fileID: 2126531735}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &468341938
 GameObject:
   m_ObjectHideFlags: 0
@@ -1172,6 +1186,13 @@ MonoBehaviour:
   isEntryPoint: 0
   isExternal: 0
   isCritical: 0
+  visualRenderer: {fileID: 629246446}
+  labelText: {fileID: 414576768}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1881,6 +1902,13 @@ MonoBehaviour:
   isEntryPoint: 1
   isExternal: 1
   isCritical: 0
+  visualRenderer: {fileID: 1206106677}
+  labelText: {fileID: 1442704954}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &678758264
 GameObject:
   m_ObjectHideFlags: 0
@@ -4971,6 +4999,13 @@ MonoBehaviour:
   isEntryPoint: 0
   isExternal: 0
   isCritical: 0
+  visualRenderer: {fileID: 1072276952}
+  labelText: {fileID: 570644010}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &1482744059
 GameObject:
   m_ObjectHideFlags: 0
@@ -5041,6 +5076,9 @@ MonoBehaviour:
   startingMalwareChance: 0.1
   maxMalwareChance: 0.18
   malwareChanceRampPerTick: 0.001
+  startingPriorityChance: 0.1
+  maxPriorityChance: 0.2
+  priorityChanceRampPerTick: 0.00025
   minBaseMoveInterval: 1
   maxBaseMoveInterval: 3
   minScanDifficulty: 10
@@ -6085,6 +6123,13 @@ MonoBehaviour:
   isEntryPoint: 1
   isExternal: 1
   isCritical: 0
+  visualRenderer: {fileID: 1941270288}
+  labelText: {fileID: 1020849038}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &1793014876
 GameObject:
   m_ObjectHideFlags: 0
@@ -6596,6 +6641,13 @@ MonoBehaviour:
   isEntryPoint: 0
   isExternal: 0
   isCritical: 0
+  visualRenderer: {fileID: 1085699638}
+  labelText: {fileID: 1760422387}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
+  normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
+  infectionType: 0
 --- !u!1 &2027853056
 GameObject:
   m_ObjectHideFlags: 0

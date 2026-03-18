@@ -85,6 +85,16 @@ public class CommandDirector : MonoBehaviour
                 StartBoost(command.packetId);
                 return;
 
+            case CommandType.Spawn:
+                if (command.routeNodeIds == null || command.routeNodeIds.Length < 2)
+                {
+                    Log("usage: spawn <class> <kind> <node1> <node2> [node3...]");
+                    return;
+                }
+
+                StartSpawn(command.packetClass, command.packetKind, command.routeNodeIds);
+                return;
+
             default:
                 Log("unknown command");
                 return;
@@ -127,6 +137,21 @@ public class CommandDirector : MonoBehaviour
         {
             operations[i].OnPacketRemoved(packetId, reason, this);
         }
+    }
+
+    private void StartSpawn(PacketClass packetClass, PacketKind packetKind, string[] routeNodeIds)
+    {
+        if (trafficDirector == null)
+        {
+            Log("spawn failed: no traffic director");
+            return;
+        }
+
+        bool success = trafficDirector.DebugSpawnPacket(packetClass, packetKind, routeNodeIds, out string message);
+        Log(message);
+
+        if (!success)
+            return;
     }
 
     private void StartScan(string packetId, int durationTicks = 4)

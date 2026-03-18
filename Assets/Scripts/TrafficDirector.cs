@@ -321,6 +321,7 @@ public class TrafficDirector : MonoBehaviour
             plan.scanDifficulty,
             plan.route
         );
+        packet.OnReachedNode += HandlePacketReachedNode;
         activePackets.Add(packet);
         networkRuntime.RegisterPacket(packet);
         packet.OnReachedNode += (p, node) =>
@@ -333,6 +334,35 @@ public class TrafficDirector : MonoBehaviour
             Debug.Log(
                 $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
             );
+        }
+    }
+
+    private void HandlePacketReachedNode(PacketView packet, NodeView node)
+    {
+        if (packet == null || node == null)
+            return;
+
+        if (node.BlocksTraffic())
+        {
+            if (logSpawns)
+                Debug.Log($"[TrafficDirector] {packet.packetId} blocked at {node.nodeId}");
+
+            RemovePacket(packet, "blocked");
+            return;
+        }
+
+        if (packet.IsTrueThreat())
+        {
+            var infection = InfectionRules.FromPacketKind(packet.trueKind);
+            if (infection != InfectionType.None)
+            {
+                if (logSpawns)
+                    Debug.Log($"[TrafficDirector] {packet.packetId} infected node {node.nodeId} with {infection}");
+
+                node.ApplyInfection(infection);
+                RemovePacket(packet, "infected");
+                return;
+            }
         }
     }
 
@@ -349,6 +379,9 @@ public class TrafficDirector : MonoBehaviour
             }
 
             packet.Tick();
+
+            if (packet == null || packet.isRemoved)
+                continue;
 
             if (packet.hasArrived)
             {
@@ -398,5 +431,109 @@ public class TrafficDirector : MonoBehaviour
     private string GenerateSourceAddress()
     {
         return $"{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}";
+    }
+
+    public bool DebugSpawnPacket(PacketClass packetClass, PacketKind packetKind, string[] routeNodeIds, out string message)
+    {
+        message = "";
+
+        if (routeNodeIds == null || routeNodeIds.Length < 2)
+        {
+            message = "spawn failed: need at least 2 node ids";
+            return false;
+        }
+
+        RouteStep[] route = BuildRouteFromNodeIds(routeNodeIds);
+
+        if (route == null || route.Length == 0)
+        {
+            message = "spawn failed: invalid route";
+            return false;
+        }
+
+        SpawnPlan plan = new SpawnPlan
+        {
+            spawnTick = 0,
+            packetId = GetNextPacketId(),
+            packetClass = packetClass,
+            packetKind = packetKind,
+            scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1),
+            sourceAddress = routeNodeIds[0],
+            baseSpeed = minBaseMoveInterval,
+            route = route
+        };
+
+        if (packetClass == PacketClass.Priority)
+            plan.baseSpeed = Mathf.Max(minBaseMoveInterval, plan.baseSpeed - 1);
+
+        SpawnPacket(plan);
+
+        message = $"spawned {plan.packetId}: {packetClass}/{packetKind} on {string.Join(" -> ", routeNodeIds)}";
+        return true;
+    }
+
+    private RouteStep[] BuildRouteFromNodeIds(string[] routeNodeIds)
+    {
+        List<RouteStep> builtRoute = new();
+
+        for (int i = 0; i < routeNodeIds.Length - 1; i++)
+        {
+            string fromId = routeNodeIds[i];
+            string toId = routeNodeIds[i + 1];
+
+            NodeView fromNode = networkRuntime.GetNode(fromId);
+            NodeView toNode = networkRuntime.GetNode(toId);
+
+            if (fromNode == null || toNode == null)
+            {
+                Debug.LogWarning($"[TrafficDirector] invalid node in debug route: {fromId} -> {toId}");
+                return null;
+            }
+
+            ConnectionView connection = FindConnectionBetween(fromNode, toNode);
+
+            if (connection == null)
+            {
+                Debug.LogWarning($"[TrafficDirector] no connection between {fromId} and {toId}");
+                return null;
+            }
+
+            bool aToB;
+            if (connection.nodeA == fromNode && connection.nodeB == toNode)
+                aToB = true;
+            else if (connection.nodeB == fromNode && connection.nodeA == toNode)
+                aToB = false;
+            else
+                return null;
+
+            builtRoute.Add(new RouteStep
+            {
+                connection = connection,
+                aToB = aToB
+            });
+        }
+
+        return builtRoute.ToArray();
+    }
+
+    private ConnectionView FindConnectionBetween(NodeView fromNode, NodeView toNode)
+    {
+        ConnectionView[] connections = FindObjectsOfType<ConnectionView>();
+
+        for (int i = 0; i < connections.Length; i++)
+        {
+            ConnectionView connection = connections[i];
+
+            if (connection == null)
+                continue;
+
+            bool matchesForward = connection.nodeA == fromNode && connection.nodeB == toNode;
+            bool matchesReverse = connection.nodeB == fromNode && connection.nodeA == toNode;
+
+            if (matchesForward || matchesReverse)
+                return connection;
+        }
+
+        return null;
     }
 }

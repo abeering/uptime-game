@@ -8,7 +8,16 @@ public class NetworkRuntime : MonoBehaviour
     private Dictionary<string, PacketView> packets = new();
     private Dictionary<string, NodeView> nodes = new();
 
-    // ---- PACKETS ----
+    private void Awake()
+    {
+        // register all nodes in the scene
+        NodeView[] nodes = FindObjectsOfType<NodeView>();
+
+        foreach (var node in nodes)
+        {
+            node.Initialize(this);
+        }
+    }
 
     public void RegisterPacket(PacketView packet)
     {

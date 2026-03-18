@@ -6,7 +6,8 @@ public enum CommandType
     Trace,
     Block,
     Cancel,
-    Boost
+    Boost,
+    Spawn
 }
 
 public class ParsedCommand
@@ -16,4 +17,9 @@ public class ParsedCommand
     public string nodeId;
     public string operationId;
     public string rawText;
+
+    // for Spawn
+    public PacketClass packetClass = PacketClass.Benign;
+    public PacketKind packetKind = PacketKind.None;
+    public string[] routeNodeIds;
 }

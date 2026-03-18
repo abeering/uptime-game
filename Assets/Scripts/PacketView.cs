@@ -56,6 +56,7 @@ public class PacketView : MonoBehaviour
     public bool movingAToB = true;
     public bool hasArrived = false;
     public TMPro.TextMeshPro label;
+    public bool isRemoved { get; private set; }
 
     [HideInInspector] public RouteStep[] route;
 
@@ -307,6 +308,10 @@ public class PacketView : MonoBehaviour
             if (reachedNode != null)
             {
                 OnReachedNode?.Invoke(this, reachedNode);
+
+                if (isRemoved)
+                    return;
+
                 Debug.Log($"[Runtime] reached node {reachedNode.nodeId}");
             }
 
@@ -409,6 +414,10 @@ public class PacketView : MonoBehaviour
 
     public void NotifyRemoved(string reason)
     {
+        if (isRemoved)
+            return;
+
+        isRemoved = true;
         OnRemoved?.Invoke(this, reason);
     }
 
