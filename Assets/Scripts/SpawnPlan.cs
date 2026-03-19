@@ -11,4 +11,5 @@ public class SpawnPlan
 
     public int baseSpeed;
     public RouteStep[] route;
+    public bool startsQuickScanned;
 }

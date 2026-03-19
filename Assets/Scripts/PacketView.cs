@@ -87,7 +87,8 @@ public class PacketView : MonoBehaviour
         string newSourceAddress,
         int newBaseSpeed,
         int newScanDifficulty,
-        RouteStep[] newRoute
+        RouteStep[] newRoute,
+        bool startsQuickScanned = false
     )
     {
         packetId = newPacketId;
@@ -116,6 +117,11 @@ public class PacketView : MonoBehaviour
 
         SnapToCurrentPosition();
         ResetAdvanceTimer();
+
+        if (startsQuickScanned)
+            ApplyQuickScan();
+        else
+            RefreshVisuals();
     }
 
     public bool IsPriority()

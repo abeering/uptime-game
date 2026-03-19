@@ -34,6 +34,11 @@ public class TrafficDirector : MonoBehaviour
     // Optional grace period before spawning begins.
     [Min(0)] public int openingGraceTicks = 5;
 
+    [Header("Spawn Intel")]
+
+    // Chance that a newly spawned packet starts with quickscan intel
+    // instead of fully unknown.
+    [Range(0f, 1f)] public float startingQuickScanChance = 0.0f;
 
     [Header("Threat Ramp")]
 
@@ -190,6 +195,7 @@ public class TrafficDirector : MonoBehaviour
     {
         float clampedMalwareChance = Mathf.Clamp01(malwareChance);
         float clampedPriorityChance = Mathf.Clamp(priorityChance, 0f, 1f - clampedMalwareChance);
+        bool startsQuickScanned = Random.value < startingQuickScanChance;
 
         float roll = Random.value;
 
@@ -240,7 +246,8 @@ public class TrafficDirector : MonoBehaviour
             scanDifficulty = scanDifficulty,
             sourceAddress = GenerateSourceAddress(),
             baseSpeed = baseMoveInterval,
-            route = route
+            route = route,
+            startsQuickScanned = startsQuickScanned
         };
     }
 
@@ -319,7 +326,8 @@ public class TrafficDirector : MonoBehaviour
             plan.sourceAddress,
             plan.baseSpeed,
             plan.scanDifficulty,
-            plan.route
+            plan.route,
+            plan.startsQuickScanned
         );
         packet.OnReachedNode += HandlePacketReachedNode;
         activePackets.Add(packet);
@@ -460,7 +468,8 @@ public class TrafficDirector : MonoBehaviour
             scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1),
             sourceAddress = routeNodeIds[0],
             baseSpeed = minBaseMoveInterval,
-            route = route
+            route = route,
+            startsQuickScanned = false
         };
 
         if (packetClass == PacketClass.Priority)
