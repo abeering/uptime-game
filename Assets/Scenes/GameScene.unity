@@ -343,6 +343,7 @@ Transform:
   - {fileID: 1482744060}
   - {fileID: 1878212258}
   - {fileID: 838780727}
+  - {fileID: 598726295}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &192042489
@@ -1677,6 +1678,118 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &598726294
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 598726295}
+  - component: {fileID: 598726296}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &598726295
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598726294}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.78427, y: 0.11343, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 167012417}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &598726296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598726294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab0c9e8faaff2fc4eae3897bf493dbbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  sfxSourcePrefab: {fileID: 4309772391047084770, guid: fa99b699d9b21ad409a69517124302f9, type: 3}
+  pooledSourceCount: 8
+  sfxMasterVolume: 1
+  commandAccepted:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: 567c2f6e4541ac245941734ce99e0674, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
+  commandRejected:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: 4754b81ce67feb44b9fb6f71a33a1784, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
+  click:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: 4dacedf2ac31b2b4bb4f41da949a4f45, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
+  scanStarted:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  operationComplete:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: 67ceba0f7e50b2b49a8c5b907b8ea706, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
+  operationFailed:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  threatIdentified:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: 4da4703766262794a80619a5501132c9, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
+  infectionStarted:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  nodeRecovered:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  alert:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -5074,8 +5187,8 @@ MonoBehaviour:
   spawnIntervalJitter: 5
   openingGraceTicks: 10
   startingQuickScanChance: 0.25
-  startingMalwareChance: 0.1
-  maxMalwareChance: 0.18
+  startingMalwareChance: 0.15
+  maxMalwareChance: 0.33
   malwareChanceRampPerTick: 0.001
   startingPriorityChance: 0.1
   maxPriorityChance: 0.2

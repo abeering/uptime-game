@@ -15,11 +15,19 @@ public class CommandDirector : MonoBehaviour
     private int nextScanId = 1;
     private int nextBlockId = 1;
 
+    private AudioManager audioManager;
+    public AudioManager AudioManager => audioManager;
+
+    void Awake() {
+        audioManager = AudioManager.Instance;
+    }
+
     public void Execute(ParsedCommand command)
     {
         if (command == null)
         {
             Log("ERROR null command");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
@@ -29,6 +37,7 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
                     Log("ERROR usage: scan <packet>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -39,6 +48,7 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
                     Log("ERROR usage: deepscan <packet>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -49,6 +59,7 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
                     Log("ERROR usage: trace <packet>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -59,6 +70,7 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.packetId) || string.IsNullOrWhiteSpace(command.nodeId))
                 {
                     Log("ERROR usage: block <packet> @ <node>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -69,6 +81,7 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.operationId))
                 {
                     Log("ERROR usage: cancel <operationId>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -79,8 +92,10 @@ public class CommandDirector : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
                     Log("ERROR usage: boost <packet>");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
+
 
                 StartBoost(command.packetId);
                 return;
@@ -89,6 +104,7 @@ public class CommandDirector : MonoBehaviour
                 if (command.routeNodeIds == null || command.routeNodeIds.Length < 2)
                 {
                     Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...]");
+                    audioManager?.PlayCommandRejected();
                     return;
                 }
 
@@ -97,6 +113,7 @@ public class CommandDirector : MonoBehaviour
 
             default:
                 Log("ERROR unknown command");
+                audioManager?.PlayCommandRejected();
                 return;
         }
     }
@@ -144,6 +161,7 @@ public class CommandDirector : MonoBehaviour
         if (trafficDirector == null)
         {
             Log("SPAWN failed: no traffic director");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
@@ -161,6 +179,7 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
         {
             Log($"SCAN failed: packet {packetId} not found");
+            AudioManager.Instance?.PlayCommandRejected();
             return;
         }
 
@@ -179,6 +198,7 @@ public class CommandDirector : MonoBehaviour
         packet.BeginQuickScanVisual();
         packet.UpdateScanVisual(0f);
 
+        AudioManager.Instance?.PlayCommandAccepted();
         Log($"SCAN started: {packetId} ({durationTicks}s)");
     }
 
@@ -189,6 +209,7 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
         {
             Log($"TRACE failed: packet {packetId} not found");
+            AudioManager.Instance?.PlayCommandRejected();
             return;
         }
 
@@ -204,6 +225,7 @@ public class CommandDirector : MonoBehaviour
         nextScanId++;
         operations.Add(trace);
 
+        AudioManager.Instance?.PlayCommandAccepted();
         Log($"TRACE started: {packetId} ({durationTicks}s)");
     }
 
@@ -214,6 +236,7 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
         {
             Log($"DEEPSCAN failed: packet {packetId} not found");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
@@ -232,6 +255,7 @@ public class CommandDirector : MonoBehaviour
         packet.BeginDeepScanVisual();
         packet.UpdateScanVisual(0f);
 
+        audioManager?.PlayCommandAccepted();
         Log($"DEEPSCAN started: {packetId} ({durationTicks}s)");
     }
 
@@ -243,12 +267,14 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
         {
             Log($"BLOCK failed: packet {packetId} not found");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
         if (node == null)
         {
             Log($"BLOCK failed: node {nodeId} not found");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
@@ -263,6 +289,7 @@ public class CommandDirector : MonoBehaviour
         nextBlockId++;
         operations.Add(block);
 
+        audioManager?.PlayCommandAccepted();
         Log($"BLOCK {block.displayId} armed: {packetId} @ {nodeId}");
     }
 
@@ -273,12 +300,14 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
         {
             Log($"BOOST failed: packet {packetId} not found");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
         if (!packet.IsVisiblePriority())
         {
             Log($"BOOST failed: {packetId} is not identified as priority");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
@@ -287,9 +316,11 @@ public class CommandDirector : MonoBehaviour
         if (!packet.TryBoost())
         {
             Log($"BOOST failed: {packetId} cannot move faster");
+            audioManager?.PlayCommandRejected();
             return;
         }
 
+        audioManager?.PlayCommandAccepted();
         Log($"BOOST complete: {packetId} speed {previousSpeed} -> {packet.baseSpeed}");
     }
 
@@ -305,14 +336,17 @@ public class CommandDirector : MonoBehaviour
             if (!op.CanCancel())
             {
                 Log($"CANCEL failed: {op.displayId} cannot be cancelled");
+                audioManager?.PlayCommandRejected();
                 return;
             }
 
+            audioManager?.PlayCommandAccepted();
             op.Cancel(this);
             return;
         }
 
         Log($"CANCEL failed: {operationId} not found");
+        audioManager?.PlayCommandRejected();
     }
 
     public void AppendOperationsPanel(StringBuilder sb)

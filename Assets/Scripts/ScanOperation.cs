@@ -45,6 +45,12 @@ public class ScanOperation : Operation
                 $"INTEL {packet.packetId} = {packet.GetVisibleClass()} [{packet.GetConfidenceText()} confidence]"
             );
             packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
+            if(packet.IsKnownThreat())
+            {
+                context.AudioManager?.PlayThreatIdentified();
+            } else {
+                context.AudioManager?.PlayOperationComplete();
+            }
         }
     }
 

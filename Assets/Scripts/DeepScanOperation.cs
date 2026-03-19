@@ -45,6 +45,12 @@ public class DeepScanOperation : Operation
                 $"INTEL {packet.packetId} = {packet.trueClass}/{packet.trueKind} (100%)"
             );
             packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
+            if(packet.IsTrueThreat())
+            {
+                context.AudioManager?.PlayThreatIdentified();
+            } else {
+                context.AudioManager?.PlayOperationComplete();
+            }
         }
     }
 

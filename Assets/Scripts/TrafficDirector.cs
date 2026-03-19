@@ -8,6 +8,7 @@ public class TrafficDirector : MonoBehaviour
     public Transform packetsRoot;
     public NetworkRuntime networkRuntime;
     public CommandDirector commandDirector;
+    private AudioManager audioManager;
 
     [Header("Routes")]
     public RouteStep[] routeToDb;
@@ -103,6 +104,7 @@ public class TrafficDirector : MonoBehaviour
     private void Awake()
     {
         InitializePacketIdPool();
+        audioManager = AudioManager.Instance;
     }
 
     private void Start()
@@ -336,6 +338,7 @@ public class TrafficDirector : MonoBehaviour
         {
             commandDirector.NotifyPacketReachedNode(p, node);
         };
+        audioManager?.PlayClick();
 
         if (logSpawns)
         {
