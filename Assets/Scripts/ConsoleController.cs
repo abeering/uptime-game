@@ -22,7 +22,7 @@ public class ConsoleController : MonoBehaviour
         if (commandDirector != null)
             commandDirector.OnLogMessage += HandleCommandLog;
 
-        AppendLine("console ready");
+        AppendLine("CONSOLE ready");
         FocusInput();
     }
 
@@ -44,8 +44,6 @@ public class ConsoleController : MonoBehaviour
             FocusInput();
             return;
         }
-
-        AppendLine($"> {raw}");
 
         ParsedCommand parsed = CommandParser.Parse(raw);
         commandDirector.Execute(parsed);

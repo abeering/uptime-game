@@ -28,7 +28,7 @@ public class ScanOperation : Operation
         {
             state = ScanState.Failed;
             isFinished = true;
-            context.Log($"{displayId} failed: {packetId} no longer exists");
+            context.Log($"SCAN {displayId} failed: {packetId} no longer exists");
             return;
         }
 
@@ -42,8 +42,7 @@ public class ScanOperation : Operation
             isFinished = true;
             lingerTicksRemaining = 3;
             context.Log(
-                $"{displayId} complete: {packet.packetId} = {packet.GetVisibleClass()} [{packet.GetConfidenceText()} confidence] " +
-                $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
+                $"INTEL {packet.packetId} = {packet.GetVisibleClass()} [{packet.GetConfidenceText()} confidence]"
             );
             packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
         }
@@ -59,7 +58,7 @@ public class ScanOperation : Operation
             state = ScanState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} failed: {packetId} removed ({reason})");
+            context.Log($"SCAN {displayId} failed: {packetId} removed ({reason})");
             PacketView packet = context.networkRuntime.GetPacket(packetId);
             if (packet != null)
             {
@@ -81,7 +80,7 @@ public class ScanOperation : Operation
         state = ScanState.Cancelled;
         isFinished = true;
         lingerTicksRemaining = 3;
-        context.Log($"{displayId} cancelled");
+        context.Log($"SCAN {displayId} cancelled");
         PacketView packet = context.networkRuntime.GetPacket(packetId);
         if (packet != null)
         {

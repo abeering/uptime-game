@@ -28,7 +28,7 @@ public class DeepScanOperation : Operation
         {
             state = DeepScanState.Failed;
             isFinished = true;
-            context.Log($"{displayId} failed: {packetId} no longer exists");
+            context.Log($"DEEPSCAN {displayId} failed: {packetId} no longer exists");
             return;
         }
 
@@ -42,8 +42,7 @@ public class DeepScanOperation : Operation
             isFinished = true;
             lingerTicksRemaining = 3;
             context.Log(
-                $"{displayId} complete: {packet.packetId} = {packet.trueClass}/{packet.trueKind} (100%) " +
-                $"source={packet.sourceAddress} destination={packet.GetDestinationName()}"
+                $"INTEL {packet.packetId} = {packet.trueClass}/{packet.trueKind} (100%)"
             );
             packet.CompleteScanVisual($"{packet.GetVisibleClass()} {packet.GetConfidenceText()}");
         }
@@ -59,7 +58,7 @@ public class DeepScanOperation : Operation
             state = DeepScanState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} failed: {packetId} removed ({reason})");
+            context.Log($"DEEPSCAN {displayId} failed: {packetId} removed ({reason})");
             PacketView packet = context.networkRuntime.GetPacket(packetId);
             if (packet != null)
             {
@@ -81,7 +80,7 @@ public class DeepScanOperation : Operation
         state = DeepScanState.Cancelled;
         isFinished = true;
         lingerTicksRemaining = 3;
-        context.Log($"{displayId} cancelled");
+        context.Log($"DEEPSCAN {displayId} cancelled");
         PacketView packet = context.networkRuntime.GetPacket(packetId);
         if (packet != null)
         {

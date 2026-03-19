@@ -19,7 +19,7 @@ public class CommandDirector : MonoBehaviour
     {
         if (command == null)
         {
-            Log("error: null command");
+            Log("ERROR null command");
             return;
         }
 
@@ -28,7 +28,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Scan:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("usage: scan <packet>");
+                    Log("ERROR usage: scan <packet>");
                     return;
                 }
 
@@ -38,7 +38,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.DeepScan:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("usage: deepscan <packet>");
+                    Log("ERROR usage: deepscan <packet>");
                     return;
                 }
 
@@ -48,7 +48,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Trace:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("usage: trace <packet>");
+                    Log("ERROR usage: trace <packet>");
                     return;
                 }
 
@@ -58,7 +58,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Block:
                 if (string.IsNullOrWhiteSpace(command.packetId) || string.IsNullOrWhiteSpace(command.nodeId))
                 {
-                    Log("usage: block <packet> @ <node>");
+                    Log("ERROR usage: block <packet> @ <node>");
                     return;
                 }
 
@@ -68,7 +68,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Cancel:
                 if (string.IsNullOrWhiteSpace(command.operationId))
                 {
-                    Log("usage: cancel <operationId>");
+                    Log("ERROR usage: cancel <operationId>");
                     return;
                 }
 
@@ -78,7 +78,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Boost:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("usage: boost <packet>");
+                    Log("ERROR usage: boost <packet>");
                     return;
                 }
 
@@ -88,7 +88,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Spawn:
                 if (command.routeNodeIds == null || command.routeNodeIds.Length < 2)
                 {
-                    Log("usage: spawn <class> <kind> <node1> <node2> [node3...]");
+                    Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...]");
                     return;
                 }
 
@@ -96,7 +96,7 @@ public class CommandDirector : MonoBehaviour
                 return;
 
             default:
-                Log("unknown command");
+                Log("ERROR unknown command");
                 return;
         }
     }
@@ -143,7 +143,7 @@ public class CommandDirector : MonoBehaviour
     {
         if (trafficDirector == null)
         {
-            Log("spawn failed: no traffic director");
+            Log("SPAWN failed: no traffic director");
             return;
         }
 
@@ -160,7 +160,7 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"scan failed: packet {packetId} not found");
+            Log($"SCAN failed: packet {packetId} not found");
             return;
         }
 
@@ -179,7 +179,7 @@ public class CommandDirector : MonoBehaviour
         packet.BeginQuickScanVisual();
         packet.UpdateScanVisual(0f);
 
-        Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
+        Log($"SCAN started: {packetId} ({durationTicks}s)");
     }
 
     private void StartTrace(string packetId, int durationTicks = 4)
@@ -188,7 +188,7 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"trace failed: packet {packetId} not found");
+            Log($"TRACE failed: packet {packetId} not found");
             return;
         }
 
@@ -204,7 +204,7 @@ public class CommandDirector : MonoBehaviour
         nextScanId++;
         operations.Add(trace);
 
-        Log($"{trace.displayId} started: {packetId} ({durationTicks}s)");
+        Log($"TRACE started: {packetId} ({durationTicks}s)");
     }
 
     private void StartDeepScan(string packetId, int durationTicks = 10)
@@ -213,7 +213,7 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"deepscan failed: packet {packetId} not found");
+            Log($"DEEPSCAN failed: packet {packetId} not found");
             return;
         }
 
@@ -232,7 +232,7 @@ public class CommandDirector : MonoBehaviour
         packet.BeginDeepScanVisual();
         packet.UpdateScanVisual(0f);
 
-        Log($"{scan.displayId} started: {packetId} ({durationTicks}s)");
+        Log($"DEEPSCAN started: {packetId} ({durationTicks}s)");
     }
 
     private void StartBlock(string packetId, string nodeId)
@@ -242,13 +242,13 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"block failed: packet {packetId} not found");
+            Log($"BLOCK failed: packet {packetId} not found");
             return;
         }
 
         if (node == null)
         {
-            Log($"block failed: node {nodeId} not found");
+            Log($"BLOCK failed: node {nodeId} not found");
             return;
         }
 
@@ -263,7 +263,7 @@ public class CommandDirector : MonoBehaviour
         nextBlockId++;
         operations.Add(block);
 
-        Log($"{block.displayId} armed: {packetId} @ {nodeId}");
+        Log($"BLOCK {block.displayId} armed: {packetId} @ {nodeId}");
     }
 
     private void StartBoost(string packetId)
@@ -272,13 +272,13 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"boost failed: packet {packetId} not found");
+            Log($"BOOST failed: packet {packetId} not found");
             return;
         }
 
         if (!packet.IsVisiblePriority())
         {
-            Log($"boost failed: {packetId} is not identified as priority");
+            Log($"BOOST failed: {packetId} is not identified as priority");
             return;
         }
 
@@ -286,11 +286,11 @@ public class CommandDirector : MonoBehaviour
 
         if (!packet.TryBoost())
         {
-            Log($"boost failed: {packetId} cannot move faster");
+            Log($"BOOST failed: {packetId} cannot move faster");
             return;
         }
 
-        Log($"boost complete: {packetId} speed {previousSpeed} -> {packet.baseSpeed}");
+        Log($"BOOST complete: {packetId} speed {previousSpeed} -> {packet.baseSpeed}");
     }
 
     private void CancelOperation(string operationId)
@@ -304,7 +304,7 @@ public class CommandDirector : MonoBehaviour
 
             if (!op.CanCancel())
             {
-                Log($"cancel failed: {op.displayId} cannot be cancelled");
+                Log($"CANCEL failed: {op.displayId} cannot be cancelled");
                 return;
             }
 
@@ -312,7 +312,7 @@ public class CommandDirector : MonoBehaviour
             return;
         }
 
-        Log($"cancel failed: {operationId} not found");
+        Log($"CANCEL failed: {operationId} not found");
     }
 
     public void AppendOperationsPanel(StringBuilder sb)
