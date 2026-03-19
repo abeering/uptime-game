@@ -7,6 +7,8 @@
 [Ll]ogs/
 [Mm]emoryCaptures/
 UserSettings/
+*.zip
+*.zip.meta
 
 # Asset meta data should be kept
 # (do not ignore .meta files in Assets/Packages/ProjectSettings)
