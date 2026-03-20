@@ -1,5 +1,7 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public enum PacketClass
 {
@@ -41,8 +43,9 @@ public enum VisibleClass
 
 public class PacketView : MonoBehaviour
 {
-    public string packetId = "a";
+    public string packetId = "a1";
     public string PacketId => packetId;
+    public string visiblePacketId = "a1";
 
     [Header("Packet Behavior")]
     [Min(1)]
@@ -80,6 +83,9 @@ public class PacketView : MonoBehaviour
     public event Action<PacketView, string> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
 
+    // keywords 
+    public List<IPacketKeyword> keywords = new();
+
     public void Initialize(
         string newPacketId,
         PacketClass newClass,
@@ -92,6 +98,8 @@ public class PacketView : MonoBehaviour
     )
     {
         packetId = newPacketId;
+        visiblePacketId = newPacketId;
+
         trueClass = newClass;
         trueKind = newKind;
         sourceAddress = newSourceAddress;
@@ -108,7 +116,7 @@ public class PacketView : MonoBehaviour
         RefreshVisuals();
 
         if (label != null)
-            label.text = newPacketId;
+            label.text = visiblePacketId;
 
         routeIndex = 0;
         currentStep = 0;
@@ -122,6 +130,11 @@ public class PacketView : MonoBehaviour
             ApplyQuickScan();
         else
             RefreshVisuals();
+    }
+
+    public bool HasKeyword<T>() where T : IPacketKeyword
+    {
+        return keywords.Any(k => k is T);
     }
 
     public bool IsPriority()
@@ -283,10 +296,15 @@ public class PacketView : MonoBehaviour
         return UnityEngine.Random.Range(minConfidence, maxConfidence + 1);
     }
 
-    public void Tick()
+    public void Tick(KeywordContext context)
     {
         if (hasArrived || route == null || route.Length == 0)
             return;
+
+        foreach (var keyword in keywords)
+        {
+            keyword.OnTick(this, context);
+        }
 
         ticksUntilAdvance--;
 
@@ -436,6 +454,14 @@ public class PacketView : MonoBehaviour
             return $"{packetId} - {reportedClass} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
 
         return $"{packetId} - {trueClass}/{trueKind} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
+    }
+
+    public void SetVisiblePacketId(string newVisiblePacketId)
+    {
+        visiblePacketId = newVisiblePacketId;
+
+        if (label != null)
+            label.text = visiblePacketId;
     }
 
     public void SetVisualSortOrder(int order)

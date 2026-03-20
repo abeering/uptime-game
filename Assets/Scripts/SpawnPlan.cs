@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class SpawnPlan
 {
     public int spawnTick;
@@ -12,4 +14,6 @@ public class SpawnPlan
     public int baseSpeed;
     public RouteStep[] route;
     public bool startsQuickScanned;
+
+    public List<IPacketKeyword> keywords = new();
 }

@@ -331,6 +331,7 @@ public class TrafficDirector : MonoBehaviour
             plan.route,
             plan.startsQuickScanned
         );
+        packet.keywords.AddRange(plan.keywords);
         packet.OnReachedNode += HandlePacketReachedNode;
         activePackets.Add(packet);
         networkRuntime.RegisterPacket(packet);
@@ -379,6 +380,8 @@ public class TrafficDirector : MonoBehaviour
 
     private void TickActivePackets()
     {
+        var context = new KeywordContext(networkRuntime, commandDirector, Time.deltaTime);
+
         for (int i = activePackets.Count - 1; i >= 0; i--)
         {
             PacketView packet = activePackets[i];
@@ -389,7 +392,7 @@ public class TrafficDirector : MonoBehaviour
                 continue;
             }
 
-            packet.Tick();
+            packet.Tick(context);
 
             if (packet == null || packet.isRemoved)
                 continue;
@@ -474,6 +477,9 @@ public class TrafficDirector : MonoBehaviour
             route = route,
             startsQuickScanned = false
         };
+
+        // add keywords 
+        plan.keywords.Add(new MutatingKeyword(3));
 
         if (packetClass == PacketClass.Priority)
             plan.baseSpeed = Mathf.Max(minBaseMoveInterval, plan.baseSpeed - 1);
