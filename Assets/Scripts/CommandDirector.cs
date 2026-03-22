@@ -45,17 +45,6 @@ public class CommandDirector : MonoBehaviour
                 StartScan(command.packetId);
                 return;
 
-            case CommandType.DeepScan:
-                if (string.IsNullOrWhiteSpace(command.packetId))
-                {
-                    Log("ERROR usage: deepscan <packet>");
-                    audioManager?.PlayCommandRejected();
-                    return;
-                }
-
-                StartDeepScan(command.packetId);
-                return;
-
             case CommandType.Trace:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
@@ -194,21 +183,6 @@ public class CommandDirector : MonoBehaviour
 
         scanDirector.StartScan(packet);
 
-        // ScanOperation scan = new ScanOperation
-        // {
-        //     id = nextScanId,
-        //     displayId = $"scan{nextScanId}",
-        //     packetId = packetId,
-        //     remainingTicks = durationTicks,
-        //     totalTicks = durationTicks
-        // };
-
-        // nextScanId++;
-        // operations.Add(scan);
-
-        // packet.BeginQuickScanVisual();
-        // packet.UpdateScanVisual(0f);
-
         AudioManager.Instance?.PlayCommandAccepted();
         Log($"SCAN started: {packetId} ({durationTicks}s)");
     }
@@ -238,36 +212,6 @@ public class CommandDirector : MonoBehaviour
 
         AudioManager.Instance?.PlayCommandAccepted();
         Log($"TRACE started: {packetId} ({durationTicks}s)");
-    }
-
-    private void StartDeepScan(string packetId, int durationTicks = 10)
-    {
-        PacketView packet = networkRuntime.GetPacket(packetId);
-
-        if (packet == null)
-        {
-            Log($"DEEPSCAN failed: packet {packetId} not found");
-            audioManager?.PlayCommandRejected();
-            return;
-        }
-
-        DeepScanOperation scan = new DeepScanOperation
-        {
-            id = nextScanId,
-            displayId = $"deepscan{nextScanId}",
-            packetId = packetId,
-            remainingTicks = durationTicks,
-            totalTicks = durationTicks
-        };
-
-        nextScanId++;
-        operations.Add(scan);
-
-        packet.BeginDeepScanVisual();
-        packet.UpdateScanVisual(0f);
-
-        audioManager?.PlayCommandAccepted();
-        Log($"DEEPSCAN started: {packetId} ({durationTicks}s)");
     }
 
     private void StartBlock(string packetId, string nodeId)

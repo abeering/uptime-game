@@ -144,9 +144,9 @@ public class PacketView : MonoBehaviour
         ResetAdvanceTimer();
 
         if (startsQuickScanned)
-            ApplyQuickScan();
+            SetInitialScanState(ScanStage.Probable, RollReportedClass());
         else
-            RefreshVisuals();
+            ResetProgressiveScanState();
     }
 
     public void ResetProgressiveScanState()
@@ -154,6 +154,13 @@ public class PacketView : MonoBehaviour
         scanStage = ScanStage.Unknown;
         scanTicksIntoStage = 0;
         isActivelyScanned = false;
+
+        // keep intel fields coherent with Unknown
+        reportedClass = PacketClass.Benign;
+        confidencePercent = 0;
+        intelLevel = IntelLevel.None;
+
+        RefreshVisuals();
     }
 
     public bool CanAdvanceScanStage()
@@ -267,6 +274,45 @@ public class PacketView : MonoBehaviour
     public void SetActivelyScanned(bool value)
     {
         isActivelyScanned = value;
+        RefreshVisuals();
+    }
+
+    public void SetInitialScanState(ScanStage stage, PacketClass initialReportedClass, int ticksIntoStage = 0)
+    {
+        scanStage = stage;
+        isActivelyScanned = false;
+
+        switch (stage)
+        {
+            case ScanStage.Unknown:
+                reportedClass = PacketClass.Benign;
+                confidencePercent = 0;
+                intelLevel = IntelLevel.None;
+                break;
+
+            case ScanStage.Probable:
+                reportedClass = initialReportedClass;
+                confidencePercent = 35;
+                intelLevel = IntelLevel.Scanned;
+                break;
+
+            case ScanStage.Likely:
+                reportedClass = initialReportedClass;
+                confidencePercent = 70;
+                intelLevel = IntelLevel.Scanned;
+                break;
+
+            case ScanStage.Confirmed:
+                reportedClass = trueClass;
+                confidencePercent = 100;
+                intelLevel = IntelLevel.DeepScanned;
+                break;
+        }
+
+        int required = GetTicksRequiredForNextScanStage();
+        scanTicksIntoStage = Mathf.Clamp(ticksIntoStage, 0, Mathf.Max(0, required - 1));
+
+        RefreshVisuals();
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword
@@ -302,16 +348,6 @@ public class PacketView : MonoBehaviour
     public int GetClassConfidence()
     {
         return confidencePercent;
-    }
-
-    public string GetConfidenceText()
-    {
-        return $"{confidencePercent}%";
-    }
-
-    public bool IsFullyIdentified()
-    {
-        return confidencePercent >= 100;
     }
 
     public VisibleClass GetVisibleClass()
@@ -354,28 +390,34 @@ public class PacketView : MonoBehaviour
     private void RefreshVisuals()
     {
         ApplyVisuals();
+        RefreshScanVisual();
     }
 
-    public void ApplyQuickScan()
+    private void RefreshScanVisual()
     {
-        PacketClass newReportedClass = RollReportedClass();
-        int newConfidence = RollConfidence(newReportedClass);
+        if (scanVisual == null)
+            return;
 
-        reportedClass = newReportedClass;
-        confidencePercent = Mathf.Clamp(newConfidence, 1, 99);
+        if (!isActivelyScanned)
+        {
+            scanVisual.HideScanVisual();
+            return;
+        }
 
-        if (intelLevel < IntelLevel.Scanned)
-            intelLevel = IntelLevel.Scanned;
+        if (scanStage == ScanStage.Confirmed)
+        {
+            scanVisual.HideScanVisual();
+            return;
+        }
 
-        RefreshVisuals();
-    }
+        ScanStage visualStage = scanStage == ScanStage.Unknown
+            ? ScanStage.Probable
+            : scanStage;
 
-    public void ApplyDeepScan()
-    {
-        reportedClass = trueClass;
-        confidencePercent = 100;
-        intelLevel = IntelLevel.DeepScanned;
-        RefreshVisuals();
+        scanVisual.ShowProgressiveScan(
+            visualStage,
+            GetScanStageProgress01()
+        );
     }
 
     public bool TryBoost()
@@ -613,40 +655,16 @@ public class PacketView : MonoBehaviour
             borderRenderer.sortingOrder = order - 1;
     }
 
-    public void BeginQuickScanVisual()
+    private Color GetVisibleIdentityColor()
     {
-        if (scanVisual != null)
-            scanVisual.BeginQuickScan();
-    }
-
-    public void BeginDeepScanVisual()
-    {
-        if (scanVisual != null)
-            scanVisual.BeginDeepScan();
-    }
-
-    public void UpdateScanVisual(float progress01)
-    {
-        if (scanVisual != null)
-            scanVisual.SetScanProgress(progress01);
-    }
-
-    public void CompleteScanVisual(string text)
-    {
-        if (scanVisual != null)
-            scanVisual.CompleteScan(text);
-    }
-
-    public void FailScanVisual(string text = "scan failed")
-    {
-        if (scanVisual != null)
-            scanVisual.FailScan(text);
-    }
-
-    public void CancelScanVisual(string text = "cancelled")
-    {
-        if (scanVisual != null)
-            scanVisual.CancelScan(text);
+        return GetVisibleClass() switch
+        {
+            VisibleClass.Unknown => Color.gray,
+            VisibleClass.Benign => Color.green,
+            VisibleClass.Threat => Color.red,
+            VisibleClass.Priority => Color.cyan,
+            _ => Color.white
+        };
     }
 
 }

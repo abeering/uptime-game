@@ -252,6 +252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacketView
   packetId: a
+  visiblePacketId: a1
   baseSpeed: 1
   boostCount: 0
   routeIndex: 0
@@ -268,6 +269,9 @@ MonoBehaviour:
   confidencePercent: 0
   scanDifficulty: 25
   reportedClass: 0
+  scanStage: 0
+  scanTicksIntoStage: 0
+  isActivelyScanned: 0
   scanVisual: {fileID: 5004352954912364169}
   spriteRenderer: {fileID: 665827891915246429}
   borderRenderer: {fileID: 6535546156096995785}
@@ -285,19 +289,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PacketScanVisual
   ringRenderer: {fileID: 5515945663095332467}
   ringSegments: 48
-  ringRadius: 1
-  ringWidth: 0.1
+  scanColor: {r: 0.3160377, g: 1, b: 0.36743194, a: 1}
+  probableWidth: 0.025
+  likelyWidth: 0.045
+  confirmedWidth: 0.065
+  probableRadius: 1
+  likelyRadius: 0.72
+  confirmedRadius: 0.56
+  progressUnitsPerSecond: 0.3
+  radiusUnitsPerSecond: 3.5
+  widthUnitsPerSecond: 0.2
   completeHoldDuration: 0.5
   completePulseSpeed: 8
   completePulseAmount: 0.12
-  quickScanColor: {r: 0, g: 1, b: 0, a: 1}
-  deepScanColor: {r: 0, g: 1, b: 1, a: 1}
   failedColor: {r: 1, g: 0, b: 0, a: 1}
   resultLabel: {fileID: 4883879407096075129}
   resultLocalOffset: {x: 0, y: -1.5, z: 0}
   resultRiseDistance: 0.08
   resultDuration: 3
-  fillLerpSpeed: 8
 --- !u!1 &3197505971808517719
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,7 +413,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: asdfsdf
+  m_text: ScanResultText
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
