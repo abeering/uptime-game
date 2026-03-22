@@ -41,6 +41,14 @@ public enum VisibleClass
     Priority
 }
 
+public enum ScanStage
+{
+    Unknown = 0,
+    Probable = 1,
+    Likely = 2,
+    Confirmed = 3
+}
+
 public class PacketView : MonoBehaviour
 {
     public string packetId = "a1";
@@ -73,6 +81,11 @@ public class PacketView : MonoBehaviour
     [Range(0, 100)] public int confidencePercent = 0;
     [Range(0, 100)] public int scanDifficulty = 25;
     public PacketClass reportedClass = PacketClass.Benign;
+
+    [Header("Progressive Scan")]
+    public ScanStage scanStage = ScanStage.Unknown;
+    [Min(0)] public int scanTicksIntoStage = 0;
+    public bool isActivelyScanned = false;
 
     [Header("Visuals")]
     public PacketScanVisual scanVisual;
@@ -109,6 +122,10 @@ public class PacketView : MonoBehaviour
         confidencePercent = 0;
         intelLevel = IntelLevel.None;
 
+        scanStage = ScanStage.Unknown;
+        scanTicksIntoStage = 0;
+        isActivelyScanned = false;
+
         baseSpeed = Mathf.Max(1, newBaseSpeed);
         boostCount = 0;
         route = newRoute;
@@ -130,6 +147,126 @@ public class PacketView : MonoBehaviour
             ApplyQuickScan();
         else
             RefreshVisuals();
+    }
+
+    public void ResetProgressiveScanState()
+    {
+        scanStage = ScanStage.Unknown;
+        scanTicksIntoStage = 0;
+        isActivelyScanned = false;
+    }
+
+    public bool CanAdvanceScanStage()
+    {
+        return scanStage < ScanStage.Confirmed;
+    }
+
+    public int GetTicksRequiredForNextScanStage()
+    {
+        // Simple first-pass rule:
+        // harder packets take more ticks per stage.
+        //
+        // scanDifficulty is currently 0..100 in your model.
+        // This maps roughly to:
+        //   0   -> 2 ticks
+        //   25  -> 3 ticks
+        //   50  -> 4 ticks
+        //   75  -> 5 ticks
+        //   100 -> 6 ticks
+        //
+        // Easy to reason about, easy to tune later.
+        return 2 + Mathf.CeilToInt(scanDifficulty / 25f);
+    }
+
+    public float GetScanStageProgress01()
+    {
+        if (!CanAdvanceScanStage())
+            return 1f;
+
+        int requiredTicks = GetTicksRequiredForNextScanStage();
+        if (requiredTicks <= 0)
+            return 1f;
+
+        return Mathf.Clamp01((float)scanTicksIntoStage / requiredTicks);
+    }
+
+    public void AddScanTicks(int ticks)
+    {
+        if (ticks <= 0)
+            return;
+
+        if (!CanAdvanceScanStage())
+            return;
+
+        scanTicksIntoStage += ticks;
+
+        while (CanAdvanceScanStage())
+        {
+            int ticksRequired = GetTicksRequiredForNextScanStage();
+
+            if (scanTicksIntoStage < ticksRequired)
+                break;
+
+            scanTicksIntoStage -= ticksRequired;
+            AdvanceScanStage();
+        }
+
+        if (!CanAdvanceScanStage())
+            scanTicksIntoStage = 0;
+
+        RefreshVisuals();
+    }
+
+    private void AdvanceScanStage()
+    {
+        if (!CanAdvanceScanStage())
+            return;
+
+        scanStage = (ScanStage)((int)scanStage + 1);
+        ApplyScanStageEffects();
+    }
+
+    private void ApplyScanStageEffects()
+    {
+        switch (scanStage)
+        {
+            case ScanStage.Unknown:
+                intelLevel = IntelLevel.None;
+                confidencePercent = 0;
+                break;
+
+            case ScanStage.Probable:
+            {
+                PacketClass probableClass = RollReportedClass();
+
+                reportedClass = probableClass;
+                confidencePercent = Mathf.Max(confidencePercent, 35);
+
+                if (intelLevel < IntelLevel.Scanned)
+                    intelLevel = IntelLevel.Scanned;
+
+                break;
+            }
+
+            case ScanStage.Likely:
+                confidencePercent = Mathf.Max(confidencePercent, 70);
+
+                if (intelLevel < IntelLevel.Scanned)
+                    intelLevel = IntelLevel.Scanned;
+
+                break;
+
+            case ScanStage.Confirmed:
+                reportedClass = trueClass;
+                confidencePercent = 100;
+                intelLevel = IntelLevel.DeepScanned;
+                break;
+        }
+    }
+
+    public void SetActivelyScanned(bool value)
+    {
+        isActivelyScanned = value;
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword

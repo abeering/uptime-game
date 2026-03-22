@@ -7,6 +7,7 @@ public class CommandDirector : MonoBehaviour
 {
     public NetworkRuntime networkRuntime;
     public TrafficDirector trafficDirector;
+    public ScanDirector scanDirector;
 
     public event Action<string> OnLogMessage;
 
@@ -120,6 +121,9 @@ public class CommandDirector : MonoBehaviour
 
     public void Tick()
     {
+        if (scanDirector != null)
+            scanDirector.Tick();
+
         for (int i = 0; i < operations.Count; i++)
         {
             operations[i].Tick(this);
@@ -150,6 +154,11 @@ public class CommandDirector : MonoBehaviour
 
     public void NotifyPacketRemoved(string packetId, string reason)
     {
+        PacketView packet = networkRuntime.GetPacket(packetId);
+        
+        if (scanDirector != null)
+            scanDirector.RemovePacket(packet);
+
         for (int i = 0; i < operations.Count; i++)
         {
             operations[i].OnPacketRemoved(packetId, reason, this);
@@ -183,20 +192,22 @@ public class CommandDirector : MonoBehaviour
             return;
         }
 
-        ScanOperation scan = new ScanOperation
-        {
-            id = nextScanId,
-            displayId = $"scan{nextScanId}",
-            packetId = packetId,
-            remainingTicks = durationTicks,
-            totalTicks = durationTicks
-        };
+        scanDirector.StartScan(packet);
 
-        nextScanId++;
-        operations.Add(scan);
+        // ScanOperation scan = new ScanOperation
+        // {
+        //     id = nextScanId,
+        //     displayId = $"scan{nextScanId}",
+        //     packetId = packetId,
+        //     remainingTicks = durationTicks,
+        //     totalTicks = durationTicks
+        // };
 
-        packet.BeginQuickScanVisual();
-        packet.UpdateScanVisual(0f);
+        // nextScanId++;
+        // operations.Add(scan);
+
+        // packet.BeginQuickScanVisual();
+        // packet.UpdateScanVisual(0f);
 
         AudioManager.Instance?.PlayCommandAccepted();
         Log($"SCAN started: {packetId} ({durationTicks}s)");
@@ -351,32 +362,6 @@ public class CommandDirector : MonoBehaviour
 
     public void AppendOperationsPanel(StringBuilder sb)
     {
-        sb.AppendLine("SCANS");
-        bool hasScans = false;
-
-        for (int i = 0; i < operations.Count; i++)
-        {
-            if (operations[i] is ScanOperation scan)
-            {
-                hasScans = true;
-                sb.AppendLine(scan.GetOperationsLine());
-            }
-            if (operations[i] is DeepScanOperation deepScan)
-            {
-                hasScans = true;
-                sb.AppendLine(deepScan.GetOperationsLine());
-            }
-            if (operations[i] is TraceOperation trace)
-            {
-                hasScans = true;
-                sb.AppendLine(trace.GetOperationsLine());
-            }
-        }
-
-        if (!hasScans)
-            sb.AppendLine("none");
-
-        sb.AppendLine();
         sb.AppendLine("BLOCKS");
         bool hasBlocks = false;
 
