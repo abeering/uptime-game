@@ -289,11 +289,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PacketScanVisual
   ringRenderer: {fileID: 5515945663095332467}
   ringSegments: 48
-  scanColor: {r: 0.3160377, g: 1, b: 0.36743194, a: 1}
+  scanColor: {r: 0.246707, g: 0.42722934, b: 0.8301887, a: 1}
   probableWidth: 0.025
   likelyWidth: 0.045
   confirmedWidth: 0.065
-  probableRadius: 1
+  probableRadius: 0.9
   likelyRadius: 0.72
   confirmedRadius: 0.56
   progressUnitsPerSecond: 0.3

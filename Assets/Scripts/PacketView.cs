@@ -390,7 +390,7 @@ public class PacketView : MonoBehaviour
     private void RefreshVisuals()
     {
         ApplyVisuals();
-        RefreshScanVisual();
+        // RefreshScanVisual();
     }
 
     private void RefreshScanVisual()
@@ -414,10 +414,10 @@ public class PacketView : MonoBehaviour
             ? ScanStage.Probable
             : scanStage;
 
-        scanVisual.ShowProgressiveScan(
-            visualStage,
-            GetScanStageProgress01()
-        );
+        // scanVisual.ShowProgressiveScan(
+        //     visualStage,
+        //     GetScanStageProgress01()
+        // );
     }
 
     public bool TryBoost()
