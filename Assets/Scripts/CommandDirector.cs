@@ -21,6 +21,8 @@ public class CommandDirector : MonoBehaviour
 
     void Awake() {
         audioManager = AudioManager.Instance;
+        if (scanDirector != null)
+            scanDirector.SetCommandDirector(this);
     }
 
     public void Execute(ParsedCommand command)

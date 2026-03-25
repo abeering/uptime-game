@@ -103,6 +103,7 @@ public class PacketView : MonoBehaviour
     public event Action<PacketView, NodeView> OnReachedNode;
     public event Action<PacketView, string> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
+    public event Action<PacketView, ScanStage, ScanStage> OnScanStageChanged;
 
     // keywords 
     public List<IPacketKeyword> keywords = new();
@@ -158,116 +159,101 @@ public class PacketView : MonoBehaviour
             ResetProgressiveScanState();
     }
 
-    public void ResetProgressiveScanState()
-    {
-        scanStage = ScanStage.Unknown;
-        scanTicksIntoStage = 0;
-        isActivelyScanned = false;
-
-        // keep intel fields coherent with Unknown
-        reportedClass = PacketClass.Benign;
-        confidencePercent = 0;
-        intelLevel = IntelLevel.None;
-
-        RefreshVisuals();
-        HideScanTag();
-    }
-
     public bool CanAdvanceScanStage()
     {
         return scanStage < ScanStage.Confirmed;
     }
 
-    public int GetTicksRequiredForNextScanStage()
+    public float GetScanProgressPerTick(int baseScanDurationTicks)
     {
-        // Simple first-pass rule:
-        // harder packets take more ticks per stage.
-        //
-        // scanDifficulty is currently 0..100 in your model.
-        // This maps roughly to:
-        //   0   -> 2 ticks
-        //   25  -> 3 ticks
-        //   50  -> 4 ticks
-        //   75  -> 5 ticks
-        //   100 -> 6 ticks
-        //
-        // Easy to reason about, easy to tune later.
-        return 2 + Mathf.CeilToInt(scanDifficulty / 25f);
-    }
-
-    public float GetScanStageProgress01()
-    {
-        if (!CanAdvanceScanStage())
+        if (baseScanDurationTicks <= 0)
             return 1f;
 
-        int requiredTicks = GetTicksRequiredForNextScanStage();
-        if (requiredTicks <= 0)
+        float difficultyMultiplier = GetScanDifficultyMultiplier();
+        float effectiveDurationTicks = baseScanDurationTicks * difficultyMultiplier;
+
+        if (effectiveDurationTicks <= 0f)
             return 1f;
 
-        return Mathf.Clamp01((float)scanTicksIntoStage / requiredTicks);
+        return 1f / effectiveDurationTicks;
     }
 
-    public void AddScanTicks(int ticks)
+    public float GetScanDifficultyMultiplier()
     {
-        if (ticks <= 0)
+        float difficulty01 = Mathf.Clamp01(scanDifficulty / 100f);
+
+        // First-pass mapping:
+        // easy packets scan faster than baseline
+        // hard packets scan slower than baseline
+        //
+        // difficulty 0   -> 0.65x duration
+        // difficulty 25  -> 0.8625x duration
+        // difficulty 50  -> 1.075x duration
+        // difficulty 75  -> 1.2875x duration
+        // difficulty 100 -> 1.5x duration
+        return Mathf.Lerp(0.65f, 1.5f, difficulty01);
+    }
+
+    public void AddScanProgress(float progress01)
+    {
+        if (progress01 <= 0f)
             return;
 
-        if (!CanAdvanceScanStage())
+        if (scanStage == ScanStage.Confirmed)
             return;
 
-        scanTicksIntoStage += ticks;
+        float oldConfidence01 = GetScanConfidence01();
+        ScanStage oldStage = scanStage;
 
-        while (CanAdvanceScanStage())
+        float newConfidence01 = Mathf.Clamp01(oldConfidence01 + progress01);
+        confidencePercent = Mathf.RoundToInt(newConfidence01 * 100f);
+
+        RecomputeScanStageFromConfidence();
+
+        if (scanStage != oldStage)
         {
-            int ticksRequired = GetTicksRequiredForNextScanStage();
-
-            if (scanTicksIntoStage < ticksRequired)
-                break;
-
-            scanTicksIntoStage -= ticksRequired;
-            AdvanceScanStage();
+            ApplyScanStageEffects(oldStage, scanStage);
+            OnScanStageChanged?.Invoke(this, oldStage, scanStage);
         }
-
-        if (!CanAdvanceScanStage())
-            scanTicksIntoStage = 0;
 
         RefreshVisuals();
     }
 
-    private void AdvanceScanStage()
+    private void RecomputeScanStageFromConfidence()
     {
-        if (!CanAdvanceScanStage())
-            return;
+        float confidence01 = GetScanConfidence01();
 
-        scanStage = (ScanStage)((int)scanStage + 1);
-        ApplyScanStageEffects();
+        // Phase 1 thresholds:
+        // simple on purpose so we can invert the architecture cleanly first.
+        if (confidence01 >= 1f)
+            scanStage = ScanStage.Confirmed;
+        else if (confidence01 >= 0.55f)
+            scanStage = ScanStage.Likely;
+        else if (confidence01 >= 0.20f)
+            scanStage = ScanStage.Probable;
+        else
+            scanStage = ScanStage.Unknown;
     }
 
-    private void ApplyScanStageEffects()
+    private void ApplyScanStageEffects(ScanStage oldStage, ScanStage newStage)
     {
-        switch (scanStage)
+        switch (newStage)
         {
             case ScanStage.Unknown:
                 intelLevel = IntelLevel.None;
-                confidencePercent = 0;
+                reportedClass = PacketClass.Benign;
                 break;
 
             case ScanStage.Probable:
-            {
-                PacketClass probableClass = RollReportedClass();
-
-                reportedClass = probableClass;
-                confidencePercent = Mathf.Max(confidencePercent, 35);
+                if (oldStage < ScanStage.Probable)
+                    reportedClass = RollReportedClass();
 
                 if (intelLevel < IntelLevel.Scanned)
                     intelLevel = IntelLevel.Scanned;
 
                 break;
-            }
 
             case ScanStage.Likely:
-                confidencePercent = Mathf.Max(confidencePercent, 70);
-
                 if (intelLevel < IntelLevel.Scanned)
                     intelLevel = IntelLevel.Scanned;
 
@@ -279,6 +265,34 @@ public class PacketView : MonoBehaviour
                 intelLevel = IntelLevel.DeepScanned;
                 break;
         }
+    }
+
+    public void ResetProgressiveScanState()
+    {
+        scanStage = ScanStage.Unknown;
+        scanTicksIntoStage = 0;
+        isActivelyScanned = false;
+
+        reportedClass = PacketClass.Benign;
+        confidencePercent = 0;
+        intelLevel = IntelLevel.None;
+
+        RefreshVisuals();
+        HideScanTag();
+    }
+
+    public float GetScanStageProgress01()
+    {
+        float confidence01 = GetScanConfidence01();
+
+        return scanStage switch
+        {
+            ScanStage.Unknown   => Mathf.InverseLerp(0.00f, 0.20f, confidence01),
+            ScanStage.Probable  => Mathf.InverseLerp(0.20f, 0.55f, confidence01),
+            ScanStage.Likely    => Mathf.InverseLerp(0.55f, 1.00f, confidence01),
+            ScanStage.Confirmed => 1f,
+            _ => 0f
+        };
     }
 
     public void SetActivelyScanned(bool value)
@@ -315,13 +329,13 @@ public class PacketView : MonoBehaviour
 
             case ScanStage.Probable:
                 reportedClass = initialReportedClass;
-                confidencePercent = 35;
+                confidencePercent = 20;
                 intelLevel = IntelLevel.Scanned;
                 break;
 
             case ScanStage.Likely:
                 reportedClass = initialReportedClass;
-                confidencePercent = 70;
+                confidencePercent = 55;
                 intelLevel = IntelLevel.Scanned;
                 break;
 
@@ -332,9 +346,7 @@ public class PacketView : MonoBehaviour
                 break;
         }
 
-        int required = GetTicksRequiredForNextScanStage();
-        scanTicksIntoStage = Mathf.Clamp(ticksIntoStage, 0, Mathf.Max(0, required - 1));
-
+        scanTicksIntoStage = 0;
         RefreshVisuals();
     }
 
@@ -393,6 +405,30 @@ public class PacketView : MonoBehaviour
     public float GetScanConfidence01()
     {
         return Mathf.Clamp01(confidencePercent / 100f);
+    }
+
+    public float GetCurrentStageStartConfidence01()
+    {
+        return scanStage switch
+        {
+            ScanStage.Unknown => 0.00f,
+            ScanStage.Probable => 0.20f,
+            ScanStage.Likely => 0.55f,
+            ScanStage.Confirmed => 1.00f,
+            _ => 0.00f
+        };
+    }
+
+    public float GetCurrentStageEndConfidence01()
+    {
+        return scanStage switch
+        {
+            ScanStage.Unknown => 0.20f,
+            ScanStage.Probable => 0.55f,
+            ScanStage.Likely => 1.00f,
+            ScanStage.Confirmed => 1.00f,
+            _ => 1.00f
+        };
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword
