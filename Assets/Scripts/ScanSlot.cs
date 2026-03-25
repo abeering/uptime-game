@@ -29,8 +29,10 @@ public class ScanSlot
 
     public void Clear()
     {
-        if (target != null)
+        if (target != null){
             target.SetActivelyScanned(false);
+            target.HideScanTag();
+        }
 
         target = null;
         assignedTick = -1;

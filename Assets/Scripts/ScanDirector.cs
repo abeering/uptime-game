@@ -50,12 +50,27 @@ public class ScanDirector : MonoBehaviour
         if (emptySlot != null)
         {
             emptySlot.Assign(packet, tickCounter);
+            RefreshActiveScanTags();
             return;
         }
 
-        ScanSlot oldestSlot = FindOldestSlot();
-        if (oldestSlot != null)
-            oldestSlot.Assign(packet, tickCounter);
+        ScanSlot replacementSlot = GetReplacementCandidateSlot();
+        if (replacementSlot != null)
+            replacementSlot.Assign(packet, tickCounter);
+
+        RefreshActiveScanTags();
+    }
+
+    private void RefreshActiveScanTags()
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            ScanSlot slot = slots[i];
+            if (slot == null || slot.target == null)
+                continue;
+
+            slot.target.RefreshScanTag(this);
+        }
     }
 
     public void RemovePacket(PacketView packet)
@@ -64,8 +79,10 @@ public class ScanDirector : MonoBehaviour
             return;
 
         ScanSlot slot = FindSlotForPacket(packet);
-        if (slot != null)
+        if (slot != null){
             slot.Clear();
+            RefreshActiveScanTags();
+        }
     }
 
     public IReadOnlyList<ScanSlot> GetSlots()
@@ -110,12 +127,14 @@ public class ScanDirector : MonoBehaviour
             if (packet == null)
             {
                 slot.Clear();
+                RefreshActiveScanTags();
                 continue;
             }
 
             if (!packet.CanAdvanceScanStage())
             {
                 slot.Clear();
+                RefreshActiveScanTags();
                 continue;
             }
 
@@ -125,8 +144,11 @@ public class ScanDirector : MonoBehaviour
             {
                 AddCompletedEntry(packet);
                 slot.Clear();
+                RefreshActiveScanTags();
             }
         }
+
+        RefreshActiveScanTags();
     }
 
     private void TickCompletedEntries()
@@ -164,6 +186,23 @@ public class ScanDirector : MonoBehaviour
         return ticksPerScanAdvanceDual;
     }
 
+    public bool WouldBeDropped(PacketView packet)
+    {
+        if (packet == null)
+            return false;
+
+        ScanSlot candidate = GetReplacementCandidateSlot();
+        return candidate != null && candidate.target == packet;
+    }
+
+    public bool IsPacketActivelyScanned(PacketView packet)
+    {
+        if (packet == null)
+            return false;
+
+        return FindSlotForPacket(packet) != null;
+    }
+
     private ScanSlot FindEmptySlot()
     {
         for (int i = 0; i < slots.Count; i++)
@@ -186,6 +225,11 @@ public class ScanDirector : MonoBehaviour
         return null;
     }
 
+    private ScanSlot GetReplacementCandidateSlot()
+    {
+        return FindOldestSlot();
+    }
+
     private ScanSlot FindOldestSlot()
     {
         ScanSlot oldest = null;
@@ -203,32 +247,131 @@ public class ScanDirector : MonoBehaviour
         return oldest;
     }
 
+    private string GetStageShortLabel(ScanStage stage)
+    {
+        return stage switch
+        {
+            ScanStage.Unknown => "UNKN",
+            ScanStage.Probable => "PROB",
+            ScanStage.Likely => "LKLY",
+            ScanStage.Confirmed => "CONF",
+            _ => "----"
+        };
+    }
+
+    private string GetVisibleClassShortLabel(PacketView packet)
+    {
+        if (packet == null)
+            return "----";
+
+        return packet.GetVisibleClass() switch
+        {
+            VisibleClass.Unknown => "UNKN",
+            VisibleClass.Benign => "BEN ",
+            VisibleClass.Threat => "THRT",
+            VisibleClass.Priority => "PRIO",
+            _ => "----"
+        };
+    }
+
+    private string GetPacketClassShortLabel(PacketClass packetClass)
+    {
+        return packetClass switch
+        {
+            PacketClass.Benign => "BEN ",
+            PacketClass.Threat => "THRT",
+            PacketClass.Priority => "PRIO",
+            _ => "----"
+        };
+    }
+
+    private int GetEtaTicksToNextStage(PacketView packet, int activeCount)
+    {
+        if (packet == null || !packet.CanAdvanceScanStage())
+            return 0;
+
+        int ticksPerAdvance = GetTicksPerAdvance(activeCount);
+        if (ticksPerAdvance <= 0)
+            ticksPerAdvance = 1;
+
+        int requiredStageTicks = packet.GetTicksRequiredForNextScanStage();
+        int remainingStageTicks = Mathf.Max(0, requiredStageTicks - packet.scanTicksIntoStage);
+
+        return remainingStageTicks * ticksPerAdvance;
+    }
+
     public void AppendOperationsPanel(StringBuilder sb)
     {
         sb.AppendLine("SCANS");
 
-        for (int i = 0; i < completedEntries.Count; i++)
+        int activeCount = GetActiveScanCount();
+
+        if (completedEntries.Count > 0)
         {
-            var entry = completedEntries[i];
-            sb.AppendLine($"completed: {entry.packetId} {entry.finalStage}");
+            sb.AppendLine("recent:");
+
+            for (int i = 0; i < completedEntries.Count; i++)
+            {
+                var entry = completedEntries[i];
+                sb.AppendLine(
+                    $"  {entry.packetId.PadRight(6)}  {GetStageShortLabel(entry.finalStage)}  {GetPacketClassShortLabel(entry.reportedClass)}  [■■■]"
+                );
+            }
+
+            sb.AppendLine();
         }
 
         for (int i = 0; i < slots.Count; i++)
         {
-            var slot = slots[i];
+            ScanSlot slot = slots[i];
 
             if (slot.IsEmpty())
             {
-                sb.AppendLine($"[scan {i + 1}] empty");
+                sb.AppendLine($"S{i + 1}  empty");
                 continue;
             }
 
-            var p = slot.target;
-            int required = p.GetTicksRequiredForNextScanStage();
+            PacketView p = slot.target;
+
+            if (p == null)
+            {
+                sb.AppendLine($"S{i + 1}  null");
+                continue;
+            }
+
+            bool willBeDropped = WouldBeDropped(p);
+
+            string bar = ScanBarFormatter.BuildOperationsScanBar(
+                p.GetScanDisplayStageIndex(),
+                p.GetScanConfidence01(),
+                p.IsScanComplete(),
+                willBeDropped,
+                activeStageChar: '='
+            );
+
+            string stageLabel = GetStageShortLabel(p.scanStage);
+            string classLabel = GetVisibleClassShortLabel(p);
+
             int current = p.scanTicksIntoStage;
+            int required = p.GetTicksRequiredForNextScanStage();
+            int etaTicks = GetEtaTicksToNextStage(p, activeCount);
+
+            string stageTicksText = p.IsScanComplete()
+                ? "--/--"
+                : $"{current}/{required}";
+
+            string etaText = p.IsScanComplete()
+                ? "--"
+                : etaTicks.ToString();
 
             sb.AppendLine(
-                $"[scan {i + 1}] {p.packetId} {p.scanStage} → ({current}/{required})"
+                $"S{i + 1}  " +
+                $"{p.packetId.PadRight(6)}  " +
+                $"{stageLabel}  " +
+                $"{classLabel}  " +
+                $"{bar.PadRight(12)}  " +
+                $"STG {stageTicksText.PadLeft(5)}  " +
+                $"ETA {etaText}"
             );
         }
     }

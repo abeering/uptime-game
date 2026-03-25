@@ -60,13 +60,16 @@ public class PacketView : MonoBehaviour
     public int baseSpeed = 1;
     public int boostCount = 0;
 
+    [Header("Labels")]
+    public TMPro.TextMeshPro label;
+    public TMPro.TextMeshPro scanTagLabel;
+
     [Header("Debug State")]
     public int routeIndex = 0;
     public int currentStep = 0;
     public int ticksUntilAdvance = 0;
     public bool movingAToB = true;
     public bool hasArrived = false;
-    public TMPro.TextMeshPro label;
     public bool isRemoved { get; private set; }
 
     [HideInInspector] public RouteStep[] route;
@@ -83,11 +86,16 @@ public class PacketView : MonoBehaviour
     public PacketClass reportedClass = PacketClass.Benign;
 
     [Header("Progressive Scan")]
+    public Color scanBorderColor = Color.green;
     public ScanStage scanStage = ScanStage.Unknown;
     [Min(0)] public int scanTicksIntoStage = 0;
     public bool isActivelyScanned = false;
 
     [Header("Visuals")]
+    public Color unknownColor = Color.gray;
+    public Color benignColor = Color.green;
+    public Color threatColor = Color.red;
+    public Color priorityColor = Color.cyan;
     public PacketScanVisual scanVisual;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
@@ -130,6 +138,7 @@ public class PacketView : MonoBehaviour
         boostCount = 0;
         route = newRoute;
 
+        HideScanTag();
         RefreshVisuals();
 
         if (label != null)
@@ -161,6 +170,7 @@ public class PacketView : MonoBehaviour
         intelLevel = IntelLevel.None;
 
         RefreshVisuals();
+        HideScanTag();
     }
 
     public bool CanAdvanceScanStage()
@@ -277,6 +287,19 @@ public class PacketView : MonoBehaviour
         RefreshVisuals();
     }
 
+    public bool IsScanComplete()
+    {
+        return scanStage == ScanStage.Confirmed;
+    }
+
+    public int GetScanDisplayStageIndex()
+    {
+        // Unknown = 0 → first stage active
+        // Probable = 1 → second stage active
+        // Likely = 2 → third stage active
+        return Mathf.Clamp((int)scanStage, 0, 2);
+    }
+
     public void SetInitialScanState(ScanStage stage, PacketClass initialReportedClass, int ticksIntoStage = 0)
     {
         scanStage = stage;
@@ -313,6 +336,63 @@ public class PacketView : MonoBehaviour
         scanTicksIntoStage = Mathf.Clamp(ticksIntoStage, 0, Mathf.Max(0, required - 1));
 
         RefreshVisuals();
+    }
+
+    public void HideScanTag()
+    {
+        if (scanTagLabel == null)
+            return;
+
+        scanTagLabel.text = "";
+        scanTagLabel.gameObject.SetActive(false);
+        ToggleScanBorder(false);
+    }
+
+    public void ToggleScanBorder(bool show)
+    {
+        if (borderRenderer == null)
+            return;
+            
+        if(show){
+            borderRenderer.color = scanBorderColor;
+        } else {
+            borderRenderer.color = Color.black;
+        }
+    }
+
+    public void RefreshScanTag(ScanDirector scanDirector)
+    {
+        if (scanTagLabel == null || scanDirector == null)
+            return;
+
+        if (!scanDirector.IsPacketActivelyScanned(this))
+        {
+            HideScanTag();
+            return;
+        }
+
+        scanTagLabel.gameObject.SetActive(true);
+        ToggleScanBorder(true);
+
+        bool blinkOn = Mathf.FloorToInt(Time.time * 4f) % 2 == 0;
+        // TODO - tie blinks to ticks 
+        // char activeStageChar = blinkOn ? '▣' : '□';
+        char activeStageChar = '=';
+
+        bool willBeDropped = scanDirector.WouldBeDropped(this);
+
+        scanTagLabel.text = ScanBarFormatter.BuildWorldScanTag(
+            GetScanDisplayStageIndex(),
+            GetScanConfidence01(),
+            IsScanComplete(),
+            willBeDropped,
+            activeStageChar: activeStageChar
+        );
+    }
+
+    public float GetScanConfidence01()
+    {
+        return Mathf.Clamp01(confidencePercent / 100f);
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword
@@ -370,10 +450,10 @@ public class PacketView : MonoBehaviour
 
         Color identityColor = visible switch
         {
-            VisibleClass.Unknown => Color.gray,
-            VisibleClass.Benign => Color.green,
-            VisibleClass.Threat => Color.red,
-            VisibleClass.Priority => Color.cyan,
+            VisibleClass.Unknown => unknownColor,
+            VisibleClass.Benign => benignColor,
+            VisibleClass.Threat => threatColor,
+            VisibleClass.Priority => priorityColor,
             _ => Color.white
         };
 
@@ -390,7 +470,7 @@ public class PacketView : MonoBehaviour
     private void RefreshVisuals()
     {
         ApplyVisuals();
-        // RefreshScanVisual();
+        RefreshScanVisual();
     }
 
     private void RefreshScanVisual()
