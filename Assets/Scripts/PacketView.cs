@@ -68,7 +68,7 @@ public class PacketView : MonoBehaviour
     public int routeIndex = 0;
     public int currentStep = 0;
     public int ticksUntilAdvance = 0;
-    public bool movingAToB = true;
+    // public bool movingAToB = true; NECESSARY?
     public bool hasArrived = false;
     public bool isRemoved { get; private set; }
 
@@ -425,11 +425,6 @@ public class PacketView : MonoBehaviour
         return GetVisibleClass() == VisibleClass.Threat;
     }
 
-    public int GetClassConfidence()
-    {
-        return confidencePercent;
-    }
-
     public VisibleClass GetVisibleClass()
     {
         if (confidencePercent <= 0)
@@ -531,28 +526,6 @@ public class PacketView : MonoBehaviour
             PacketClass.Priority => UnityEngine.Random.value < 0.50f ? PacketClass.Benign : PacketClass.Threat,
             _ => trueClass
         };
-    }
-
-    private int RollConfidence(PacketClass newReportedClass)
-    {
-        float difficulty01 = Mathf.Clamp01(scanDifficulty / 100f);
-        bool isCorrect = newReportedClass == trueClass;
-
-        int minConfidence;
-        int maxConfidence;
-
-        if (isCorrect)
-        {
-            minConfidence = Mathf.RoundToInt(Mathf.Lerp(70f, 30f, difficulty01));
-            maxConfidence = Mathf.RoundToInt(Mathf.Lerp(95f, 65f, difficulty01));
-        }
-        else
-        {
-            minConfidence = Mathf.RoundToInt(Mathf.Lerp(5f, 20f, difficulty01));
-            maxConfidence = Mathf.RoundToInt(Mathf.Lerp(25f, 55f, difficulty01));
-        }
-
-        return UnityEngine.Random.Range(minConfidence, maxConfidence + 1);
     }
 
     public void Tick(KeywordContext context)
@@ -733,18 +706,6 @@ public class PacketView : MonoBehaviour
 
         if (borderRenderer != null)
             borderRenderer.sortingOrder = order - 1;
-    }
-
-    private Color GetVisibleIdentityColor()
-    {
-        return GetVisibleClass() switch
-        {
-            VisibleClass.Unknown => Color.gray,
-            VisibleClass.Benign => Color.green,
-            VisibleClass.Threat => Color.red,
-            VisibleClass.Priority => Color.cyan,
-            _ => Color.white
-        };
     }
 
 }
