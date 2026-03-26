@@ -2598,8 +2598,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16
-  m_fontSizeBase: 16
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2860,8 +2860,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3663,9 +3663,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScanDirector
   maxActiveScans: 2
-  ticksPerScanAdvanceSingle: 1
-  ticksPerScanAdvanceDual: 2
-  completedScanLingerTicks: 3
+  baseScanDurationTicksSingle: 30
+  baseScanDurationTicksDual: 45
+  completedScanLingerTicks: 10
 --- !u!1 &1619617192
 GameObject:
   m_ObjectHideFlags: 0

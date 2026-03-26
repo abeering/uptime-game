@@ -66,6 +66,7 @@ public class ScanDirector : MonoBehaviour
         if (replacementSlot != null)
         {
             UnsubscribeFromPacket(replacementSlot.target);
+            AddCompletedEntry(replacementSlot.target);
             SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
         }
@@ -352,26 +353,56 @@ public class ScanDirector : MonoBehaviour
         return Mathf.CeilToInt(remaining / gainPerTick);
     }
 
+    private string GetStageRichLabel(ScanStage stage)
+    {
+        string shortLabel = GetStageShortLabel(stage);
+
+        return stage switch
+        {
+            ScanStage.Unknown   => $"<color=#888888>{shortLabel}</color>",
+            ScanStage.Probable  => $"<color=#FFD166><b>{shortLabel}</b></color>",
+            ScanStage.Likely    => $"<color=#7CFF6B><b>{shortLabel}</b></color>",
+            ScanStage.Confirmed => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            _ => shortLabel
+        };
+    }
+
+    private string GetVisibleClassRichLabel(PacketView packet)
+    {
+        if (packet == null)
+            return "----";
+
+        string shortLabel = GetVisibleClassShortLabel(packet);
+
+        return packet.GetVisibleClass() switch
+        {
+            VisibleClass.Unknown  => $"<color=#888888>{shortLabel}</color>",
+            VisibleClass.Benign   => $"<color=#B7FFB7><b>{shortLabel}</b></color>",
+            VisibleClass.Threat   => $"<color=#FF6B6B><b>{shortLabel}</b></color>",
+            VisibleClass.Priority => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            _ => shortLabel
+        };
+    }
+
+    private string GetPacketClassRichLabel(PacketClass packetClass)
+    {
+        string shortLabel = GetPacketClassShortLabel(packetClass);
+
+        return packetClass switch
+        {
+            PacketClass.Benign   => $"<color=#B7FFB7><b>{shortLabel}</b></color>",
+            PacketClass.Threat   => $"<color=#FF6B6B><b>{shortLabel}</b></color>",
+            PacketClass.Priority => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            _ => shortLabel
+        };
+    }
+
     public void AppendOperationsPanel(StringBuilder sb)
     {
-        sb.AppendLine("SCANS");
-
         int activeCount = GetActiveScanCount();
 
-        if (completedEntries.Count > 0)
-        {
-            sb.AppendLine("recent:");
-
-            for (int i = 0; i < completedEntries.Count; i++)
-            {
-                var entry = completedEntries[i];
-                sb.AppendLine(
-                    $"  {entry.packetId.PadRight(6)}  {GetStageShortLabel(entry.finalStage)}  {GetPacketClassShortLabel(entry.reportedClass)}  [■■■]"
-                );
-            }
-
-            sb.AppendLine();
-        }
+        sb.AppendLine("<b>SCANS</b>   " + activeCount + " / " + maxActiveScans);
+        sb.AppendLine();
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -379,7 +410,7 @@ public class ScanDirector : MonoBehaviour
 
             if (slot.IsEmpty())
             {
-                sb.AppendLine($"S{i + 1}  empty");
+                sb.AppendLine($"S{i + 1}  <color=#AAAAAA88>empty</color>");
                 continue;
             }
 
@@ -387,7 +418,7 @@ public class ScanDirector : MonoBehaviour
 
             if (p == null)
             {
-                sb.AppendLine($"S{i + 1}  null");
+                sb.AppendLine($"S{i + 1}  <color=#AAAAAA88>null</color>");
                 continue;
             }
 
@@ -401,29 +432,48 @@ public class ScanDirector : MonoBehaviour
                 activeStageChar: '='
             );
 
-            string stageLabel = GetStageShortLabel(p.scanStage);
-            string classLabel = GetVisibleClassShortLabel(p);
+            string stageLabel = GetStageRichLabel(p.scanStage);
+            string classLabel = GetVisibleClassRichLabel(p);
 
             int etaTicks = GetEtaTicksToNextStage(p, activeCount);
 
-            int currentPct = Mathf.RoundToInt(p.GetScanStageProgress01() * 100f);
-            string stageTicksText = p.IsScanComplete()
-                ? "--/--"
-                : $"{currentPct,2}%";
+            int currentPct = Mathf.RoundToInt(p.GetScanConfidence01() * 100f);
+            string percentText = p.IsScanComplete()
+                ? "100%"
+                : $"{currentPct}%";
 
             string etaText = p.IsScanComplete()
                 ? "--"
                 : etaTicks.ToString();
 
+            string dropMarker = willBeDropped ? "  <b>!</b>" : "";
+
             sb.AppendLine(
-                $"S{i + 1}  " +
-                $"{p.packetId.PadRight(6)}  " +
-                $"{stageLabel}  " +
-                $"{classLabel}  " +
-                $"{bar.PadRight(12)}  " +
-                $"PRG {stageTicksText.PadLeft(5)}  " +
-                $"ETA {etaText}"
+                $"S{i + 1}  <b>{p.packetId}</b>  {stageLabel}  {classLabel}{dropMarker}"
             );
+            sb.AppendLine(
+                $"    {bar.PadRight(12)}  {percentText.PadLeft(4)}  ETA {etaText}"
+            );
+            sb.AppendLine();
+        }
+
+        if (completedEntries.Count > 0)
+        {
+            sb.AppendLine("<color=#AAAAAA88>recent</color>");
+
+            for (int i = 0; i < completedEntries.Count; i++)
+            {
+                var entry = completedEntries[i];
+
+                string finalStage = GetStageRichLabel(entry.finalStage);
+                string finalClass = GetPacketClassRichLabel(entry.reportedClass);
+
+                sb.AppendLine(
+                    $"  {entry.packetId.PadRight(6)}  {finalStage}  {finalClass}  [■■■]"
+                );
+            }
+
+            sb.AppendLine();
         }
     }
 
