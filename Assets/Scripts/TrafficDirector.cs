@@ -335,10 +335,6 @@ public class TrafficDirector : MonoBehaviour
         packet.OnReachedNode += HandlePacketReachedNode;
         activePackets.Add(packet);
         networkRuntime.RegisterPacket(packet);
-        packet.OnReachedNode += (p, node) =>
-        {
-            commandDirector.NotifyPacketReachedNode(p, node);
-        };
         audioManager?.PlayClick();
 
         if (logSpawns)
@@ -351,9 +347,20 @@ public class TrafficDirector : MonoBehaviour
 
     private void HandlePacketReachedNode(PacketView packet, NodeView node)
     {
-        if (packet == null || node == null)
+        if (packet == null || node == null || packet.isRemoved)
             return;
 
+        // 1) Player / command intercepts resolve first.
+        if (commandDirector != null)
+        {
+            if(commandDirector.ResolvePacketArrivalIntercepts(packet, node))
+                return;
+
+            if (packet.isRemoved)
+                return;
+        }
+
+        // 2) Passive node traffic denial / blackout.
         if (node.BlocksTraffic())
         {
             if (logSpawns)
@@ -363,6 +370,7 @@ public class TrafficDirector : MonoBehaviour
             return;
         }
 
+        // 3) Packet arrival payloads (infection for now).
         if (packet.IsTrueThreat())
         {
             var infection = InfectionRules.FromPacketKind(packet.trueKind);

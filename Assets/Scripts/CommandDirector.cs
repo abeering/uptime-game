@@ -132,15 +132,27 @@ public class CommandDirector : MonoBehaviour
         }
     }
 
-    public void NotifyPacketReachedNode(PacketView packet, NodeView node)
+    public bool ResolvePacketArrivalIntercepts(PacketView packet, NodeView node)
     {
+        if (packet == null || node == null)
+            return false;
+
         for (int i = 0; i < operations.Count; i++)
         {
-            if (operations[i] is BlockOperation block)
+            var op = operations[i];
+            if (op == null || op.isFinished)
+                continue;
+
+            if (op is BlockOperation block)
             {
                 block.TryTrigger(packet, node, this);
+
+                if (packet.isRemoved)
+                    return true;
             }
         }
+
+        return false;
     }
 
     public void NotifyPacketRemoved(string packetId, string reason)
