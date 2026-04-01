@@ -582,6 +582,11 @@ public class PacketView : MonoBehaviour
         AdvanceOneStep();
     }
 
+    public virtual BlockResolution HandleBlocked(NodeView node)
+    {
+        return BlockResolution.Remove("blocked", "blocked");
+    }
+
     private void AdvanceOneStep()
     {
         ConnectionView edge = GetCurrentConnection();

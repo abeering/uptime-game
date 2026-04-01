@@ -38,20 +38,30 @@ public class BlockOperation : Operation
         if (isFinished || state != BlockState.Armed)
             return;
 
-        if (!string.Equals(packet.packetId, packetId, System.StringComparison.OrdinalIgnoreCase))
+        if (packet == null || reachedNode == null || context == null)
             return;
 
-        if (reachedNode == null)
+        if (!string.Equals(packet.packetId, packetId, System.StringComparison.OrdinalIgnoreCase))
             return;
 
         if (!string.Equals(reachedNode.nodeId, nodeId, System.StringComparison.OrdinalIgnoreCase))
             return;
 
+        var resolution = packet.HandleBlocked(reachedNode);
+
+        if (resolution.shouldRemove)
+        {
+            context.trafficDirector.RemovePacket(
+                packet,
+                string.IsNullOrWhiteSpace(resolution.removeReason) ? "blocked" : resolution.removeReason
+            );
+        }
+
         state = BlockState.Triggered;
         isFinished = true;
-        lingerTicksRemaining = 3;
-        context.Log($"{displayId} triggered: {packet.packetId} blocked at {nodeId}");
-        context.trafficDirector.RemovePacket(packet, "blocked");
+
+        var verb = string.IsNullOrWhiteSpace(resolution.logText) ? "blocked" : resolution.logText;
+        context.Log($"{displayId} triggered: {verb} {packetId} @ {nodeId}");
     }
 
     public override bool CanCancel()
