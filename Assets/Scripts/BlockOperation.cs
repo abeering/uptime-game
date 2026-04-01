@@ -29,7 +29,7 @@ public class BlockOperation : Operation
             state = BlockState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"{displayId} failed: {packetId} removed ({reason})");
+            context.LogBlockFailed(displayId, packetId, $"removed ({reason})");
         }
     }
 
@@ -61,7 +61,7 @@ public class BlockOperation : Operation
         isFinished = true;
 
         var verb = string.IsNullOrWhiteSpace(resolution.logText) ? "blocked" : resolution.logText;
-        context.Log($"{displayId} triggered: {verb} {packetId} @ {nodeId}");
+        context.LogBlockTriggered(displayId, packetId, nodeId, verb);
     }
 
     public override bool CanCancel()
@@ -76,7 +76,7 @@ public class BlockOperation : Operation
         lingerTicksRemaining = 3;
         state = BlockState.Cancelled;
         isFinished = true;
-        context.Log($"{displayId} cancelled");
+        context.LogBlockCancelled(displayId);
     }
 
     public override string GetOperationsLine()

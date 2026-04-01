@@ -12,7 +12,10 @@ public class ScanDirector : MonoBehaviour
     public int baseScanDurationTicksDual = 45;
 
     [Header("Completion")]
-    [Min(0)] public int completedScanLingerTicks = 3;
+    [Min(0)] public int completedScanLingerTicks = 8;
+
+    [Header("UI Theme")]
+    [SerializeField] private ScanLogTheme logTheme = new();
 
     private CommandDirector commandDirector;
 
@@ -140,19 +143,7 @@ public class ScanDirector : MonoBehaviour
         if (packet == null || newStage == ScanStage.Unknown)
             return;
 
-        string classLabel = packet.GetVisibleClass() switch
-        {
-            VisibleClass.Unknown => "Unknown",
-            VisibleClass.Benign => "Benign",
-            VisibleClass.Threat => "Threat",
-            VisibleClass.Priority => "Priority",
-            _ => "Unknown"
-        };
-
-        if (newStage == ScanStage.Confirmed)
-            commandDirector?.Log($"SCAN {packet.packetId} confirmed as {classLabel}");
-        else
-            commandDirector?.Log($"SCAN {packet.packetId} now {newStage} ({classLabel})");
+        commandDirector?.LogIntelStageChange(packet, newStage);
     }
 
     private void TickActiveScans()
@@ -299,10 +290,10 @@ public class ScanDirector : MonoBehaviour
     {
         return stage switch
         {
-            ScanStage.Unknown => "UNKN",
-            ScanStage.Probable => "PROB",
-            ScanStage.Likely => "LKLY",
-            ScanStage.Confirmed => "CONF",
+            ScanStage.Unknown => "UNKNOWN",
+            ScanStage.Probable => "PROBABLE",
+            ScanStage.Likely => "LIKELY",
+            ScanStage.Confirmed => "CONFIRMED",
             _ => "----"
         };
     }
@@ -314,10 +305,10 @@ public class ScanDirector : MonoBehaviour
 
         return packet.GetVisibleClass() switch
         {
-            VisibleClass.Unknown => "UNKN",
-            VisibleClass.Benign => "BEN ",
-            VisibleClass.Threat => "THRT",
-            VisibleClass.Priority => "PRIO",
+            VisibleClass.Unknown => "UNKNOWN",
+            VisibleClass.Benign => "BENIGN",
+            VisibleClass.Threat => "THREAT",
+            VisibleClass.Priority => "PRIORITY",
             _ => "----"
         };
     }
@@ -326,9 +317,9 @@ public class ScanDirector : MonoBehaviour
     {
         return packetClass switch
         {
-            PacketClass.Benign => "BEN ",
-            PacketClass.Threat => "THRT",
-            PacketClass.Priority => "PRIO",
+            PacketClass.Benign => "BENIGN",
+            PacketClass.Threat => "THREAT",
+            PacketClass.Priority => "PRIORITY",
             _ => "----"
         };
     }
@@ -359,10 +350,10 @@ public class ScanDirector : MonoBehaviour
 
         return stage switch
         {
-            ScanStage.Unknown   => $"<color=#888888>{shortLabel}</color>",
-            ScanStage.Probable  => $"<color=#FFD166><b>{shortLabel}</b></color>",
-            ScanStage.Likely    => $"<color=#7CFF6B><b>{shortLabel}</b></color>",
-            ScanStage.Confirmed => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            ScanStage.Unknown   => RichTextUtil.Colorize(shortLabel, logTheme.stageUnknown),
+            ScanStage.Probable  => RichTextUtil.Colorize(shortLabel, logTheme.stageProbable, true),
+            ScanStage.Likely    => RichTextUtil.Colorize(shortLabel, logTheme.stageLikely, true),
+            ScanStage.Confirmed => RichTextUtil.Colorize(shortLabel, logTheme.stageConfirmed, true),
             _ => shortLabel
         };
     }
@@ -376,10 +367,10 @@ public class ScanDirector : MonoBehaviour
 
         return packet.GetVisibleClass() switch
         {
-            VisibleClass.Unknown  => $"<color=#888888>{shortLabel}</color>",
-            VisibleClass.Benign   => $"<color=#B7FFB7><b>{shortLabel}</b></color>",
-            VisibleClass.Threat   => $"<color=#FF6B6B><b>{shortLabel}</b></color>",
-            VisibleClass.Priority => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            VisibleClass.Unknown  => RichTextUtil.Colorize(shortLabel, logTheme.classUnknown),
+            VisibleClass.Benign   => RichTextUtil.Colorize(shortLabel, logTheme.classBenign, true),
+            VisibleClass.Threat   => RichTextUtil.Colorize(shortLabel, logTheme.classThreat, true),
+            VisibleClass.Priority => RichTextUtil.Colorize(shortLabel, logTheme.classPriority, true),
             _ => shortLabel
         };
     }
@@ -390,11 +381,31 @@ public class ScanDirector : MonoBehaviour
 
         return packetClass switch
         {
-            PacketClass.Benign   => $"<color=#B7FFB7><b>{shortLabel}</b></color>",
-            PacketClass.Threat   => $"<color=#FF6B6B><b>{shortLabel}</b></color>",
-            PacketClass.Priority => $"<color=#66CCFF><b>{shortLabel}</b></color>",
+            PacketClass.Benign   => RichTextUtil.Colorize(shortLabel, logTheme.classBenign, true),
+            PacketClass.Threat   => RichTextUtil.Colorize(shortLabel, logTheme.classThreat, true),
+            PacketClass.Priority => RichTextUtil.Colorize(shortLabel, logTheme.classPriority, true),
             _ => shortLabel
         };
+    }
+
+    public ScanLogTheme GetLogTheme()
+    {
+        return logTheme;
+    }
+
+    public string GetStageShortLabelPublic(ScanStage stage)
+    {
+        return GetStageShortLabel(stage);
+    }
+
+    public string GetVisibleClassShortLabelPublic(PacketView packet)
+    {
+        return GetVisibleClassShortLabel(packet);
+    }
+
+    public string GetPacketClassShortLabelPublic(PacketClass packetClass)
+    {
+        return GetPacketClassShortLabel(packetClass);
     }
 
     public void AppendOperationsPanel(StringBuilder sb)
@@ -410,7 +421,7 @@ public class ScanDirector : MonoBehaviour
 
             if (slot.IsEmpty())
             {
-                sb.AppendLine($"S{i + 1}  <color=#AAAAAA88>empty</color>");
+                sb.AppendLine($"S{i + 1}  {RichTextUtil.Colorize("empty", logTheme.muted)}");
                 continue;
             }
 
@@ -418,7 +429,7 @@ public class ScanDirector : MonoBehaviour
 
             if (p == null)
             {
-                sb.AppendLine($"S{i + 1}  <color=#AAAAAA88>null</color>");
+                sb.AppendLine($"S{i + 1}  {RichTextUtil.Colorize("null", logTheme.muted)}");
                 continue;
             }
 
@@ -459,7 +470,7 @@ public class ScanDirector : MonoBehaviour
 
         if (completedEntries.Count > 0)
         {
-            sb.AppendLine("<color=#AAAAAA88>recent</color>");
+            sb.AppendLine(RichTextUtil.Colorize("recent", logTheme.muted));
 
             for (int i = 0; i < completedEntries.Count; i++)
             {

@@ -28,7 +28,7 @@ public class TraceOperation : Operation
         {
             state = TraceState.Failed;
             isFinished = true;
-            context.Log($"TRACE {displayId} failed: {packetId} no longer exists");
+            context.LogTraceFailed(displayId, packetId, "no longer exists");
             return;
         }
 
@@ -37,7 +37,7 @@ public class TraceOperation : Operation
             state = TraceState.Completed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"INTEL {packet.packetId} = source={packet.sourceAddress} destination={packet.GetDestinationName()}");
+            context.LogTraceReveal(packet);
         }
     }
 
@@ -51,7 +51,7 @@ public class TraceOperation : Operation
             state = TraceState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.Log($"TRACE {displayId} failed: {packetId} removed ({reason})");
+            context.LogTraceFailed(displayId, packetId, $"removed ({reason})");
         }
     }
 
@@ -68,7 +68,7 @@ public class TraceOperation : Operation
         state = TraceState.Cancelled;
         isFinished = true;
         lingerTicksRemaining = 3;
-        context.Log($"TRACE {displayId} cancelled");
+        context.LogTraceCancelled(displayId);
     }
 
     public override string GetOperationsLine()

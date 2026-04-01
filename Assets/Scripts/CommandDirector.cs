@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+public enum ConsoleLogPrefix
+{
+    Intel,
+    Block,
+    Flow,
+    Error
+}
+
 public class CommandDirector : MonoBehaviour
 {
     public NetworkRuntime networkRuntime;
@@ -23,6 +31,278 @@ public class CommandDirector : MonoBehaviour
         audioManager = AudioManager.Instance;
         if (scanDirector != null)
             scanDirector.SetCommandDirector(this);
+    }
+
+    private ScanLogTheme GetConsoleTheme()
+    {
+        if (scanDirector != null && scanDirector.GetLogTheme() != null)
+            return scanDirector.GetLogTheme();
+
+        return null;
+    }
+
+    private Color GetStageColor(ScanStage stage)
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme == null)
+        {
+            return stage switch
+            {
+                ScanStage.Unknown => new Color(0.53f, 0.53f, 0.53f, 1f),
+                ScanStage.Probable => new Color(1.00f, 0.82f, 0.40f, 1f),
+                ScanStage.Likely => new Color(0.49f, 1.00f, 0.42f, 1f),
+                ScanStage.Confirmed => new Color(0.40f, 0.80f, 1.00f, 1f),
+                _ => Color.white
+            };
+        }
+
+        return stage switch
+        {
+            ScanStage.Unknown => theme.stageUnknown,
+            ScanStage.Probable => theme.stageProbable,
+            ScanStage.Likely => theme.stageLikely,
+            ScanStage.Confirmed => theme.stageConfirmed,
+            _ => Color.white
+        };
+    }
+
+    private Color GetVisibleClassColor(VisibleClass visibleClass)
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme == null)
+        {
+            return visibleClass switch
+            {
+                VisibleClass.Unknown => new Color(0.53f, 0.53f, 0.53f, 1f),
+                VisibleClass.Benign => new Color(0.72f, 1.00f, 0.72f, 1f),
+                VisibleClass.Threat => new Color(1.00f, 0.42f, 0.42f, 1f),
+                VisibleClass.Priority => new Color(0.40f, 0.80f, 1.00f, 1f),
+                _ => Color.white
+            };
+        }
+
+        return visibleClass switch
+        {
+            VisibleClass.Unknown => theme.classUnknown,
+            VisibleClass.Benign => theme.classBenign,
+            VisibleClass.Threat => theme.classThreat,
+            VisibleClass.Priority => theme.classPriority,
+            _ => Color.white
+        };
+    }
+
+    private Color GetPacketClassColor(PacketClass packetClass)
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme == null)
+        {
+            return packetClass switch
+            {
+                PacketClass.Benign => new Color(0.72f, 1.00f, 0.72f, 1f),
+                PacketClass.Threat => new Color(1.00f, 0.42f, 0.42f, 1f),
+                PacketClass.Priority => new Color(0.40f, 0.80f, 1.00f, 1f),
+                _ => Color.white
+            };
+        }
+
+        return packetClass switch
+        {
+            PacketClass.Benign => theme.classBenign,
+            PacketClass.Threat => theme.classThreat,
+            PacketClass.Priority => theme.classPriority,
+            _ => Color.white
+        };
+    }
+
+    private Color GetMutedColor()
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme != null)
+            return theme.muted;
+
+        return new Color(0.67f, 0.67f, 0.67f, 0.53f);
+    }
+
+    private Color GetFailureColor()
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme != null)
+            return theme.classThreat;
+
+        return new Color(1.00f, 0.42f, 0.42f, 1f);
+    }
+
+    private Color GetSuccessColor()
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme != null)
+            return theme.classBenign;
+
+        return new Color(0.72f, 1.00f, 0.72f, 1f);
+    }
+
+    public string FormatPrefix(ConsoleLogPrefix prefix)
+    {
+        string text = prefix switch
+        {
+            ConsoleLogPrefix.Intel => "INTEL",
+            ConsoleLogPrefix.Block => "BLOCK",
+            ConsoleLogPrefix.Flow => "FLOW",
+            ConsoleLogPrefix.Error => "ERROR",
+            _ => "LOG"
+        };
+
+        return RichTextUtil.Colorize(text, GetMutedColor(), true);
+    }
+
+    public string FormatPacketId(string packetId)
+    {
+        if (string.IsNullOrWhiteSpace(packetId))
+            return "----";
+
+        return $"<b>{packetId}</b>";
+    }
+
+    public string FormatPacketId(PacketView packet)
+    {
+        if (packet == null)
+            return "----";
+
+        return FormatPacketId(packet.packetId);
+    }
+
+    public string FormatStage(ScanStage stage)
+    {
+        string label = scanDirector != null
+            ? scanDirector.GetStageShortLabelPublic(stage)
+            : stage.ToString().ToUpperInvariant();
+
+        bool bold = stage != ScanStage.Unknown;
+        return RichTextUtil.Colorize(label, GetStageColor(stage), bold);
+    }
+
+    public string FormatVisibleClass(PacketView packet)
+    {
+        if (packet == null)
+            return "----";
+
+        string label = scanDirector != null
+            ? scanDirector.GetVisibleClassShortLabelPublic(packet)
+            : packet.GetVisibleClass().ToString().ToUpperInvariant();
+
+        bool bold = packet.GetVisibleClass() != VisibleClass.Unknown;
+        return RichTextUtil.Colorize(label, GetVisibleClassColor(packet.GetVisibleClass()), bold);
+    }
+
+    public string FormatPacketClass(PacketClass packetClass)
+    {
+        string label = scanDirector != null
+            ? scanDirector.GetPacketClassShortLabelPublic(packetClass)
+            : packetClass.ToString().ToUpperInvariant();
+
+        return RichTextUtil.Colorize(label, GetPacketClassColor(packetClass), true);
+    }
+
+    public string FormatMuted(string text, bool bold = false)
+    {
+        return RichTextUtil.Colorize(text, GetMutedColor(), bold);
+    }
+
+    public string FormatFailure(string text)
+    {
+        return RichTextUtil.Colorize(text.ToUpperInvariant(), GetFailureColor(), true);
+    }
+
+    public string FormatSuccess(string text)
+    {
+        return RichTextUtil.Colorize(text.ToUpperInvariant(), GetSuccessColor(), true);
+    }
+
+    public void LogIntelStageChange(PacketView packet, ScanStage newStage)
+    {
+        if (packet == null || newStage == ScanStage.Unknown)
+            return;
+
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        string packetId = FormatPacketId(packet);
+        string stageLabel = FormatStage(newStage);
+        string classLabel = FormatVisibleClass(packet);
+
+        if (newStage == ScanStage.Confirmed)
+            Log($"{prefix}  {packetId}  {stageLabel}  {classLabel}");
+        else
+            Log($"{prefix}  {packetId}  {stageLabel}  ({classLabel})");
+    }
+
+    public void LogTraceStarted(string packetId, int durationTicks)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        Log($"{prefix}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"started ({durationTicks}s)")}");
+    }
+
+    public void LogTraceReveal(PacketView packet)
+    {
+        if (packet == null)
+            return;
+
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        string packetId = FormatPacketId(packet);
+        Log($"{prefix}  {packetId}  <b>TRACE</b>  source={packet.sourceAddress}  destination={packet.GetDestinationName()}");
+    }
+
+    public void LogTraceFailed(string displayId, string packetId, string reason)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        Log($"{prefix}  <b>{displayId}</b>  {FormatFailure("trace failed")}  {FormatPacketId(packetId)}  {reason}");
+    }
+
+    public void LogTraceCancelled(string displayId)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        Log($"{prefix}  <b>{displayId}</b>  {FormatMuted("TRACE CANCELLED", true)}");
+    }
+
+    public void LogBlockArmed(string displayId, string packetId, string nodeId)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Block);
+        Log($"{prefix}  <b>{displayId}</b>  {FormatMuted("ARMED", true)}  {FormatPacketId(packetId)}  @ {nodeId}");
+    }
+
+    public void LogBlockTriggered(string displayId, string packetId, string nodeId, string verb)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Block);
+        string action = string.IsNullOrWhiteSpace(verb) ? "BLOCKED" : verb.ToUpperInvariant();
+        Log($"{prefix}  <b>{displayId}</b>  {FormatFailure(action)}  {FormatPacketId(packetId)}  @ {nodeId}");
+    }
+
+    public void LogBlockFailed(string displayId, string packetId, string reason)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Block);
+        Log($"{prefix}  <b>{displayId}</b>  {FormatFailure("failed")}  {FormatPacketId(packetId)}  {reason}");
+    }
+
+    public void LogBlockCancelled(string displayId)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Block);
+        Log($"{prefix}  <b>{displayId}</b>  {FormatMuted("CANCELLED", true)}");
+    }
+
+    public void LogScanStarted(string packetId, int durationTicks)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        Log($"{prefix}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"started ({durationTicks}s)")}");
+    }
+
+    public void LogBoostApplied(string packetId)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Flow);
+        Log($"{prefix}  {FormatPacketId(packetId)}  <b>BOOST</b>");
+    }
+
+    public void LogCommandError(string message)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Error);
+        Log($"{prefix}  {FormatFailure("FAILED")}  {message}");
     }
 
     public void Execute(ParsedCommand command)
@@ -190,7 +470,7 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"SCAN failed: packet {packetId} not found");
+            LogCommandError($"scan failed: {packetId} not found");
             AudioManager.Instance?.PlayCommandRejected();
             return;
         }
@@ -198,7 +478,7 @@ public class CommandDirector : MonoBehaviour
         scanDirector.StartScan(packet);
 
         AudioManager.Instance?.PlayCommandAccepted();
-        Log($"SCAN started: {packetId} ({durationTicks}s)");
+        LogScanStarted(packetId, durationTicks);
     }
 
     private void StartTrace(string packetId, int durationTicks = 4)
@@ -225,7 +505,7 @@ public class CommandDirector : MonoBehaviour
         operations.Add(trace);
 
         AudioManager.Instance?.PlayCommandAccepted();
-        Log($"TRACE started: {packetId} ({durationTicks}s)");
+        LogTraceStarted(packetId, durationTicks);
     }
 
     private void StartBlock(string packetId, string nodeId)
@@ -259,7 +539,7 @@ public class CommandDirector : MonoBehaviour
         operations.Add(block);
 
         audioManager?.PlayCommandAccepted();
-        Log($"BLOCK {block.displayId} armed: {packetId} @ {nodeId}");
+        LogBlockArmed(block.displayId, packetId, nodeId);
     }
 
     private void StartBoost(string packetId)
@@ -268,7 +548,7 @@ public class CommandDirector : MonoBehaviour
 
         if (packet == null)
         {
-            Log($"BOOST failed: packet {packetId} not found");
+            LogCommandError($"boost failed: {packetId} not found");
             audioManager?.PlayCommandRejected();
             return;
         }
@@ -290,7 +570,7 @@ public class CommandDirector : MonoBehaviour
         }
 
         audioManager?.PlayCommandAccepted();
-        Log($"BOOST complete: {packetId} speed {previousSpeed} -> {packet.baseSpeed}");
+        LogBoostApplied(packetId);
     }
 
     private void CancelOperation(string operationId)
