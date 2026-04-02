@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -62,22 +61,18 @@ public class NetworkRuntime : MonoBehaviour
         return node;
     }
 
-    public void AppendOperationsPanel(StringBuilder sb)
+    public List<PacketView> GetKnownThreatPackets()
     {
-        sb.AppendLine("THREATS");
-        bool hasThreats = false;
+        List<PacketView> knownThreats = new();
 
         foreach (var packet in packets.Values)
         {
-            if (packet.IsKnownThreat())
-            {
-                hasThreats = true;
-                sb.AppendLine(packet.GetOperationsLine());
-            }
+            if (packet != null && packet.IsKnownThreat())
+                knownThreats.Add(packet);
         }
 
-        if (!hasThreats)
-            sb.AppendLine("none");
+        knownThreats.Sort((a, b) => string.CompareOrdinal(a.packetId, b.packetId));
+        return knownThreats;
     }
 
 }

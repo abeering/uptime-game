@@ -16,11 +16,11 @@ public class OperationsPanelController : MonoBehaviour
             return;
 
         StringBuilder sb = new StringBuilder();
-        scanDirector.AppendOperationsPanel(sb); 
+        scanDirector.AppendOperationsPanel(sb);
         sb.AppendLine();
         commandDirector.AppendOperationsPanel(sb);
         sb.AppendLine();
-        networkRuntime.AppendOperationsPanel(sb);
+        scanDirector.AppendKnownThreatsSection(sb, networkRuntime);
         operationsText.text = sb.ToString();
     }
 }

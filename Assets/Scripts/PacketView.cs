@@ -287,7 +287,7 @@ public class PacketView : MonoBehaviour
                 break;
         }
     }
-    
+
     public void ResetProgressiveScanState()
     {
         scanStage = ScanStage.Unknown;
@@ -821,6 +821,36 @@ public class PacketView : MonoBehaviour
             return $"{packetId} - {reportedClass} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
 
         return $"{packetId} - {trueClass}/{trueKind} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
+    }
+
+    public string BuildOperationsIntelSummary()
+    {
+        List<string> parts = new();
+
+        if (knowsKind && revealedKind != PacketKind.None)
+            parts.Add($"kind={revealedKind}");
+
+        if (knowsInfectionType && revealedInfectionType != InfectionType.None)
+            parts.Add($"infection={revealedInfectionType}");
+
+        if (revealedKeywordCount > 0)
+            parts.Add($"keywords={BuildRevealedKeywordSummary()}");
+
+        return string.Join("  ", parts);
+    }
+
+    public string BuildRevealedKeywordSummary()
+    {
+        if (keywords == null || keywords.Count == 0 || revealedKeywordCount <= 0)
+            return "none";
+
+        int count = Mathf.Clamp(revealedKeywordCount, 0, keywords.Count);
+        var names = new List<string>(count);
+
+        for (int i = 0; i < count; i++)
+            names.Add(GetKeywordDisplayName(keywords[i]));
+
+        return "[" + string.Join(", ", names) + "]";
     }
 
     public void SetVisiblePacketId(string newVisiblePacketId)

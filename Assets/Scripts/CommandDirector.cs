@@ -624,20 +624,40 @@ public class CommandDirector : MonoBehaviour
 
     public void AppendOperationsPanel(StringBuilder sb)
     {
-        sb.AppendLine("BLOCKS");
+        ScanLogTheme theme = GetConsoleTheme();
+        Color mutedColor = theme != null
+            ? theme.muted
+            : new Color(0.67f, 0.67f, 0.67f, 0.53f);
+
+        Color armedColor = theme != null
+            ? theme.classBenign
+            : new Color(0.72f, 1.00f, 0.72f, 1f);
+
+        sb.AppendLine("<b>BLOCKS</b>");
+
         bool hasBlocks = false;
+        int blockIndex = 1;
 
         for (int i = 0; i < operations.Count; i++)
         {
-            if (operations[i] is BlockOperation block)
-            {
-                hasBlocks = true;
-                sb.AppendLine(block.GetOperationsLine());
-            }
+            if (operations[i] is not BlockOperation block)
+                continue;
+
+            hasBlocks = true;
+
+            sb.AppendLine($"B{blockIndex}  <b>{block.displayId}</b>  target=<b>{block.packetId}</b>  @ {block.nodeId}");
+
+            if (block.isFinished)
+                sb.AppendLine($"    {RichTextUtil.Colorize("finished", mutedColor)}");
+            else
+                sb.AppendLine($"    {RichTextUtil.Colorize("armed", armedColor, true)}");
+
+            sb.AppendLine();
+            blockIndex++;
         }
 
         if (!hasBlocks)
-            sb.AppendLine("none");
+            sb.AppendLine(RichTextUtil.Colorize("none", mutedColor));
     }
 
     public void Log(string message)

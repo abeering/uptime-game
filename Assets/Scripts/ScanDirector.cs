@@ -499,5 +499,43 @@ public class ScanDirector : MonoBehaviour
             sb.AppendLine();
         }
     }
+    
+    public void AppendKnownThreatsSection(StringBuilder sb, NetworkRuntime networkRuntime)
+    {
+        sb.AppendLine("<b>KNOWN THREATS</b>");
+
+        if (networkRuntime == null)
+        {
+            sb.AppendLine(RichTextUtil.Colorize("none", logTheme.muted));
+            return;
+        }
+
+        List<PacketView> knownThreats = networkRuntime.GetKnownThreatPackets();
+
+        if (knownThreats.Count == 0)
+        {
+            sb.AppendLine(RichTextUtil.Colorize("none", logTheme.muted));
+            return;
+        }
+
+        for (int i = 0; i < knownThreats.Count; i++)
+        {
+            PacketView packet = knownThreats[i];
+            if (packet == null)
+                continue;
+
+            string stageLabel = GetStageRichLabel(packet.scanStage);
+            string classLabel = GetVisibleClassRichLabel(packet);
+
+            sb.AppendLine($"T{i + 1}  <b>{packet.packetId}</b>  {stageLabel}  {classLabel}");
+            sb.AppendLine($"    src={packet.sourceAddress}  dest={packet.GetDestinationName()}");
+
+            string intelSummary = packet.BuildOperationsIntelSummary();
+            if (!string.IsNullOrWhiteSpace(intelSummary))
+                sb.AppendLine($"    {intelSummary}");
+
+            sb.AppendLine();
+        }
+    }
 
 }
