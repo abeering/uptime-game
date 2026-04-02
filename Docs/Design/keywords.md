@@ -183,3 +183,7 @@ To validate the keyword system, implement:
 - How does `help <keyword>` scale with partial information?
 
 ---
+
+
+### other good names 
+- noisy 
