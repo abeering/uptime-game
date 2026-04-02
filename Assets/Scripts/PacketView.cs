@@ -520,12 +520,13 @@ public class PacketView : MonoBehaviour
         if (keyword == null)
             return "Unknown";
 
-        string name = keyword.GetType().Name;
+        if (!string.IsNullOrWhiteSpace(keyword.DisplayName))
+            return keyword.DisplayName;
 
-        if (name.EndsWith("Keyword"))
-            name = name.Substring(0, name.Length - "Keyword".Length);
+        if (!string.IsNullOrWhiteSpace(keyword.KeywordId))
+            return keyword.KeywordId;
 
-        return name;
+        return "Unknown";
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword
@@ -578,6 +579,26 @@ public class PacketView : MonoBehaviour
             PacketClass.Priority => VisibleClass.Priority,
             _ => VisibleClass.Unknown
         };
+    }
+
+    public List<string> GetRevealedKeywordIds()
+    {
+        var ids = new List<string>();
+
+        if (keywords == null || keywords.Count == 0 || revealedKeywordCount <= 0)
+            return ids;
+
+        int count = Mathf.Clamp(revealedKeywordCount, 0, keywords.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (keywords[i] == null || string.IsNullOrWhiteSpace(keywords[i].KeywordId))
+                continue;
+
+            ids.Add(keywords[i].KeywordId);
+        }
+
+        return ids;
     }
 
     private void ApplyVisuals()

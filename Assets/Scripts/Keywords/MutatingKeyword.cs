@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class MutatingKeyword : IPacketKeyword
 {
+    public string KeywordId => "mutating";
+    public string DisplayName => "Mutating";
+    public string Description => "Changes its visible packet ID every few ticks, making it harder to track reliably.";
+    
     private readonly int ticksPerMutation;
     private int ticksRemaining;
 
