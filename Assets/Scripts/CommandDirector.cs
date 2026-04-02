@@ -399,12 +399,22 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Spawn:
                 if (command.routeNodeIds == null || command.routeNodeIds.Length < 2)
                 {
-                    Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...]");
+                    Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...] [kw:name] [inf:type]");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
 
-                StartSpawn(command.packetClass, command.packetKind, command.routeNodeIds);
+                StartSpawn(
+                    command.packetClass,
+                    command.packetKind,
+                    command.routeNodeIds,
+                    command.spawnKeywordSpecs,
+                    command.spawnInfectionOverride
+                );
+                return;
+
+            case CommandType.AutoSpawn:
+                SetAutoSpawn(command.autoSpawnMode);
                 return;
 
             default:
@@ -472,7 +482,12 @@ public class CommandDirector : MonoBehaviour
         }
     }
 
-    private void StartSpawn(PacketClass packetClass, PacketKind packetKind, string[] routeNodeIds)
+    private void StartSpawn(
+        PacketClass packetClass,
+        PacketKind packetKind,
+        string[] routeNodeIds,
+        List<string> keywordSpecs,
+        InfectionType? infectionOverride)
     {
         if (trafficDirector == null)
         {
@@ -481,11 +496,24 @@ public class CommandDirector : MonoBehaviour
             return;
         }
 
-        bool success = trafficDirector.DebugSpawnPacket(packetClass, packetKind, routeNodeIds, out string message);
+        bool success = trafficDirector.DebugSpawnPacket(
+            packetClass,
+            packetKind,
+            routeNodeIds,
+            keywordSpecs,
+            infectionOverride,
+            out string message
+        );
+
         Log(message);
 
         if (!success)
+        {
+            audioManager?.PlayCommandRejected();
             return;
+        }
+
+        audioManager?.PlayCommandAccepted();
     }
 
     private void StartScan(string packetId, int durationTicks = 4)
@@ -658,6 +686,46 @@ public class CommandDirector : MonoBehaviour
 
         if (!hasBlocks)
             sb.AppendLine(RichTextUtil.Colorize("none", mutedColor));
+    }
+
+    private void SetAutoSpawn(string mode)
+    {
+        if (trafficDirector == null)
+        {
+            Log("AUTOSPAWN failed: no traffic director");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(mode))
+        {
+            Log($"AUTOSPAWN is {(trafficDirector.autoSpawnEnabled ? "ON" : "OFF")}");
+            return;
+        }
+
+        mode = mode.ToLowerInvariant();
+
+        if (mode == "on")
+        {
+            trafficDirector.autoSpawnEnabled = true;
+        }
+        else if (mode == "off")
+        {
+            trafficDirector.autoSpawnEnabled = false;
+        }
+        else if (mode == "toggle")
+        {
+            trafficDirector.autoSpawnEnabled = !trafficDirector.autoSpawnEnabled;
+        }
+        else
+        {
+            Log("ERROR usage: autospawn [on|off|toggle]");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        Log($"AUTOSPAWN {(trafficDirector.autoSpawnEnabled ? "ENABLED" : "DISABLED")}");
+        audioManager?.PlayCommandAccepted();
     }
 
     public void Log(string message)

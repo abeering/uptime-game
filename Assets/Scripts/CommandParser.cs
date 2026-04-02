@@ -2,6 +2,41 @@ using System;
 
 public static class CommandParser
 {
+    private static bool IsSpawnModifierToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
+
+        return token.StartsWith("kw:", StringComparison.OrdinalIgnoreCase)
+            || token.StartsWith("inf:", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void ParseSpawnModifierToken(string token, ParsedCommand result)
+    {
+        if (string.IsNullOrWhiteSpace(token) || result == null)
+            return;
+
+        if (token.StartsWith("kw:", StringComparison.OrdinalIgnoreCase))
+        {
+            string spec = token.Substring(3).Trim();
+
+            if (!string.IsNullOrWhiteSpace(spec))
+                result.spawnKeywordSpecs.Add(spec);
+
+            return;
+        }
+
+        if (token.StartsWith("inf:", StringComparison.OrdinalIgnoreCase))
+        {
+            string raw = token.Substring(4).Trim();
+
+            if (Enum.TryParse(raw, true, out InfectionType infectionType))
+                result.spawnInfectionOverride = infectionType;
+
+            return;
+        }
+    }
+
     public static ParsedCommand Parse(string raw)
     {
         ParsedCommand result = new ParsedCommand();
@@ -95,10 +130,28 @@ public static class CommandParser
                 result.packetClass = packetClass;
                 result.packetKind = packetKind;
 
-                result.routeNodeIds = new string[parts.Length - 3];
-                Array.Copy(parts, 3, result.routeNodeIds, 0, result.routeNodeIds.Length);
+                var routeNodes = new System.Collections.Generic.List<string>();
+
+                for (int i = 3; i < parts.Length; i++)
+                {
+                    string token = parts[i];
+
+                    if (IsSpawnModifierToken(token))
+                        ParseSpawnModifierToken(token, result);
+                    else
+                        routeNodes.Add(token);
+                }
+
+                result.routeNodeIds = routeNodes.ToArray();
             }
 
+            return result;
+        }
+
+        if (verb == "autospawn")
+        {
+            result.type = CommandType.AutoSpawn;
+            result.autoSpawnMode = parts.Length >= 2 ? parts[1] : null;
             return result;
         }
 

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public enum CommandType
 {
     Unknown,
@@ -7,7 +9,8 @@ public enum CommandType
     Block,
     Cancel,
     Boost,
-    Spawn
+    Spawn,
+    AutoSpawn
 }
 
 public class ParsedCommand
@@ -22,4 +25,10 @@ public class ParsedCommand
     public PacketClass packetClass = PacketClass.Benign;
     public PacketKind packetKind = PacketKind.None;
     public string[] routeNodeIds;
+
+    // for autospawn / disable spawn 
+    public string autoSpawnMode;
+
+    public List<string> spawnKeywordSpecs = new();
+    public InfectionType? spawnInfectionOverride = null;
 }

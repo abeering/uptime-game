@@ -94,6 +94,7 @@ public class TrafficDirector : MonoBehaviour
     [Header("Debug")]
     public bool logSpawns = true;
     public bool logRampValues = false;
+    public bool autoSpawnEnabled = true;
 
     private readonly List<SpawnPlan> queuedPlans = new();
     private readonly List<PacketView> activePackets = new();
@@ -133,8 +134,12 @@ public class TrafficDirector : MonoBehaviour
 
     public void ProcessTick(int currentTick)
     {
-        UpdateScheduledSpawns(currentTick);
-        SpawnDuePlans(currentTick);
+        if (autoSpawnEnabled)
+        {
+            UpdateScheduledSpawns(currentTick);
+            SpawnDuePlans(currentTick);
+        }
+
         TickActivePackets();
     }
 
@@ -249,7 +254,8 @@ public class TrafficDirector : MonoBehaviour
             sourceAddress = GenerateSourceAddress(),
             baseSpeed = baseMoveInterval,
             route = route,
-            startsQuickScanned = startsQuickScanned
+            startsQuickScanned = startsQuickScanned,
+            infectionOverride = null
         };
     }
 
@@ -329,7 +335,8 @@ public class TrafficDirector : MonoBehaviour
             plan.baseSpeed,
             plan.scanDifficulty,
             plan.route,
-            plan.startsQuickScanned
+            plan.startsQuickScanned,
+            plan.infectionOverride
         );
         packet.keywords.AddRange(plan.keywords);
         packet.OnReachedNode += HandlePacketReachedNode;
@@ -373,7 +380,8 @@ public class TrafficDirector : MonoBehaviour
         // 3) Packet arrival payloads (infection for now).
         if (packet.IsTrueThreat())
         {
-            var infection = InfectionRules.FromPacketKind(packet.trueKind);
+            InfectionType infection = packet.GetEffectiveInfectionType();
+
             if (infection != InfectionType.None)
             {
                 if (logSpawns)
@@ -455,7 +463,13 @@ public class TrafficDirector : MonoBehaviour
         return $"{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}";
     }
 
-    public bool DebugSpawnPacket(PacketClass packetClass, PacketKind packetKind, string[] routeNodeIds, out string message)
+    public bool DebugSpawnPacket(
+        PacketClass packetClass,
+        PacketKind packetKind,
+        string[] routeNodeIds,
+        List<string> keywordSpecs,
+        InfectionType? infectionOverride,
+        out string message)
     {
         message = "";
 
@@ -473,6 +487,13 @@ public class TrafficDirector : MonoBehaviour
             return false;
         }
 
+        List<IPacketKeyword> builtKeywords = SpawnKeywordFactory.BuildMany(keywordSpecs, out string keywordError);
+        if (builtKeywords == null)
+        {
+            message = $"spawn failed: {keywordError}";
+            return false;
+        }
+
         SpawnPlan plan = new SpawnPlan
         {
             spawnTick = 0,
@@ -483,18 +504,26 @@ public class TrafficDirector : MonoBehaviour
             sourceAddress = routeNodeIds[0],
             baseSpeed = minBaseMoveInterval,
             route = route,
-            startsQuickScanned = false
+            startsQuickScanned = false,
+            infectionOverride = infectionOverride
         };
-
-        // add keywords 
-        plan.keywords.Add(new MutatingKeyword(3));
 
         if (packetClass == PacketClass.Priority)
             plan.baseSpeed = Mathf.Max(minBaseMoveInterval, plan.baseSpeed - 1);
 
+        plan.keywords.AddRange(builtKeywords);
+
         SpawnPacket(plan);
 
-        message = $"spawned {plan.packetId}: {packetClass}/{packetKind} on {string.Join(" -> ", routeNodeIds)}";
+        string keywordSummary = (keywordSpecs != null && keywordSpecs.Count > 0)
+            ? $" kw=[{string.Join(", ", keywordSpecs)}]"
+            : "";
+
+        string infectionSummary = infectionOverride.HasValue
+            ? $" inf={infectionOverride.Value}"
+            : "";
+
+        message = $"spawned {plan.packetId}: {packetClass}/{packetKind}{infectionSummary}{keywordSummary} on {string.Join(" -> ", routeNodeIds)}";
         return true;
     }
 

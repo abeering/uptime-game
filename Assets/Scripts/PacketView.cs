@@ -84,6 +84,7 @@ public class PacketView : MonoBehaviour
     [Header("Packet Type")]
     public PacketClass trueClass;
     public PacketKind trueKind;
+    public InfectionType? infectionOverride = null;
     public string sourceAddress;
 
     [Header("Intel")]
@@ -131,7 +132,8 @@ public class PacketView : MonoBehaviour
         int newBaseSpeed,
         int newScanDifficulty,
         RouteStep[] newRoute,
-        bool startsQuickScanned = false
+        bool startsQuickScanned = false,
+        InfectionType? newInfectionOverride = null
     )
     {
         packetId = newPacketId;
@@ -140,6 +142,7 @@ public class PacketView : MonoBehaviour
         trueClass = newClass;
         trueKind = newKind;
         sourceAddress = newSourceAddress;
+        infectionOverride = newInfectionOverride;
         scanDifficulty = Mathf.Clamp(newScanDifficulty, 0, 100);
 
         reportedClass = PacketClass.Benign;
@@ -485,7 +488,7 @@ public class PacketView : MonoBehaviour
         if (knowsInfectionType)
             return;
 
-        InfectionType infectionType = InfectionRules.FromPacketKind(trueKind);
+        InfectionType infectionType = GetEffectiveInfectionType();
         if (infectionType == InfectionType.None)
             return;
 
@@ -553,6 +556,14 @@ public class PacketView : MonoBehaviour
     public bool IsKnownThreat()
     {
         return GetVisibleClass() == VisibleClass.Threat;
+    }
+
+    public InfectionType GetEffectiveInfectionType()
+    {
+        if (infectionOverride.HasValue)
+            return infectionOverride.Value;
+
+        return InfectionRules.FromPacketKind(trueKind);
     }
 
     public VisibleClass GetVisibleClass()

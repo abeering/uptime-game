@@ -15,5 +15,6 @@ public class SpawnPlan
     public RouteStep[] route;
     public bool startsQuickScanned;
 
+    public InfectionType? infectionOverride = null;
     public List<IPacketKeyword> keywords = new();
 }
