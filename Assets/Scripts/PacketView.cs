@@ -49,6 +49,13 @@ public enum ScanStage
     Confirmed = 3
 }
 
+public enum IntelRevealType
+{
+    Kind,
+    InfectionType,
+    Keyword
+}
+
 public class PacketView : MonoBehaviour
 {
     public string packetId = "a1";
@@ -85,6 +92,13 @@ public class PacketView : MonoBehaviour
     [Range(0, 100)] public int scanDifficulty = 25;
     public PacketClass reportedClass = PacketClass.Benign;
 
+    [Header("Revealed Intel")]
+    public bool knowsKind = false;
+    public PacketKind revealedKind = PacketKind.None;
+    public bool knowsInfectionType = false;
+    public InfectionType revealedInfectionType = InfectionType.None;
+    [Min(0)] public int revealedKeywordCount = 0;
+
     [Header("Progressive Scan")]
     public Color scanBorderColor = Color.green;
     public ScanStage scanStage = ScanStage.Unknown;
@@ -104,6 +118,7 @@ public class PacketView : MonoBehaviour
     public event Action<PacketView, string> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
     public event Action<PacketView, ScanStage, ScanStage> OnScanStageChanged;
+    public event Action<PacketView, IntelRevealType, string> OnIntelRevealed;
 
     // keywords 
     public List<IPacketKeyword> keywords = new();
@@ -130,6 +145,7 @@ public class PacketView : MonoBehaviour
         reportedClass = PacketClass.Benign;
         confidencePercent = 0;
         intelLevel = IntelLevel.None;
+        ResetRevealedIntel();
 
         scanStage = ScanStage.Unknown;
         scanTicksIntoStage = 0;
@@ -257,16 +273,21 @@ public class PacketView : MonoBehaviour
                 if (intelLevel < IntelLevel.Scanned)
                     intelLevel = IntelLevel.Scanned;
 
+                RevealKind();
                 break;
 
             case ScanStage.Confirmed:
                 reportedClass = trueClass;
                 confidencePercent = 100;
                 intelLevel = IntelLevel.DeepScanned;
+
+                RevealKind();
+                RevealInfectionType();
+                RevealAllKeywords();
                 break;
         }
     }
-
+    
     public void ResetProgressiveScanState()
     {
         scanStage = ScanStage.Unknown;
@@ -277,8 +298,19 @@ public class PacketView : MonoBehaviour
         confidencePercent = 0;
         intelLevel = IntelLevel.None;
 
+        ResetRevealedIntel();
+
         RefreshVisuals();
         HideScanTag();
+    }
+
+    private void ResetRevealedIntel()
+    {
+        knowsKind = false;
+        revealedKind = PacketKind.None;
+        knowsInfectionType = false;
+        revealedInfectionType = InfectionType.None;
+        revealedKeywordCount = 0;
     }
 
     public float GetScanStageProgress01()
@@ -318,6 +350,10 @@ public class PacketView : MonoBehaviour
     {
         scanStage = stage;
         isActivelyScanned = false;
+        reportedClass = PacketClass.Benign;
+        confidencePercent = 0;
+        intelLevel = IntelLevel.None;
+        ResetRevealedIntel();
 
         switch (stage)
         {
@@ -429,6 +465,64 @@ public class PacketView : MonoBehaviour
             ScanStage.Confirmed => 1.00f,
             _ => 1.00f
         };
+    }
+
+    private void RevealKind()
+    {
+        if (knowsKind)
+            return;
+
+        if (trueKind == PacketKind.None)
+            return;
+
+        knowsKind = true;
+        revealedKind = trueKind;
+        OnIntelRevealed?.Invoke(this, IntelRevealType.Kind, revealedKind.ToString());
+    }
+
+    private void RevealInfectionType()
+    {
+        if (knowsInfectionType)
+            return;
+
+        InfectionType infectionType = InfectionRules.FromPacketKind(trueKind);
+        if (infectionType == InfectionType.None)
+            return;
+
+        knowsInfectionType = true;
+        revealedInfectionType = infectionType;
+        OnIntelRevealed?.Invoke(this, IntelRevealType.InfectionType, revealedInfectionType.ToString());
+    }
+
+    private void RevealAllKeywords()
+    {
+        while (revealedKeywordCount < keywords.Count)
+            RevealNextKeyword();
+    }
+
+    private void RevealNextKeyword()
+    {
+        if (revealedKeywordCount < 0 || revealedKeywordCount >= keywords.Count)
+            return;
+
+        IPacketKeyword keyword = keywords[revealedKeywordCount];
+        revealedKeywordCount++;
+
+        string keywordName = GetKeywordDisplayName(keyword);
+        OnIntelRevealed?.Invoke(this, IntelRevealType.Keyword, keywordName);
+    }
+
+    private string GetKeywordDisplayName(IPacketKeyword keyword)
+    {
+        if (keyword == null)
+            return "Unknown";
+
+        string name = keyword.GetType().Name;
+
+        if (name.EndsWith("Keyword"))
+            name = name.Substring(0, name.Length - "Keyword".Length);
+
+        return name;
     }
 
     public bool HasKeyword<T>() where T : IPacketKeyword

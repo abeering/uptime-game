@@ -234,6 +234,30 @@ public class CommandDirector : MonoBehaviour
             Log($"{prefix}  {packetId}  {stageLabel}  ({classLabel})");
     }
 
+    public void LogIntelReveal(PacketView packet, IntelRevealType revealType, string revealedValue)
+    {
+        if (packet == null || string.IsNullOrWhiteSpace(revealedValue))
+            return;
+
+        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        string packetId = FormatPacketId(packet);
+
+        switch (revealType)
+        {
+            case IntelRevealType.Kind:
+                Log($"{prefix}  {packetId}  <b>KIND</b>  {revealedValue}");
+                break;
+
+            case IntelRevealType.InfectionType:
+                Log($"{prefix}  {packetId}  <b>INFECTION</b>  {revealedValue}");
+                break;
+
+            case IntelRevealType.Keyword:
+                Log($"{prefix}  {packetId}  <b>KEYWORD</b>  {revealedValue}");
+                break;
+        }
+    }
+
     public void LogTraceStarted(string packetId, int durationTicks)
     {
         string prefix = FormatPrefix(ConsoleLogPrefix.Intel);

@@ -128,6 +128,9 @@ public class ScanDirector : MonoBehaviour
 
         packet.OnScanStageChanged -= HandlePacketScanStageChanged;
         packet.OnScanStageChanged += HandlePacketScanStageChanged;
+
+        packet.OnIntelRevealed -= HandlePacketIntelRevealed;
+        packet.OnIntelRevealed += HandlePacketIntelRevealed;
     }
 
     private void UnsubscribeFromPacket(PacketView packet)
@@ -136,6 +139,7 @@ public class ScanDirector : MonoBehaviour
             return;
 
         packet.OnScanStageChanged -= HandlePacketScanStageChanged;
+        packet.OnIntelRevealed -= HandlePacketIntelRevealed;
     }
 
     private void HandlePacketScanStageChanged(PacketView packet, ScanStage oldStage, ScanStage newStage)
@@ -144,6 +148,14 @@ public class ScanDirector : MonoBehaviour
             return;
 
         commandDirector?.LogIntelStageChange(packet, newStage);
+    }
+
+    private void HandlePacketIntelRevealed(PacketView packet, IntelRevealType revealType, string revealedValue)
+    {
+        if (packet == null || string.IsNullOrWhiteSpace(revealedValue))
+            return;
+
+        commandDirector?.LogIntelReveal(packet, revealType, revealedValue);
     }
 
     private void TickActiveScans()
