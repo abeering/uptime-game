@@ -21,9 +21,9 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Color normalLabelColor = Color.black;
 
     [Header("Infection")]
-    private NodeInfectionInstance activeInfection;
-    public bool IsInfected => activeInfection != null;
-
+    private readonly System.Collections.Generic.List<NodeInfectionInstance> activeInfections = new();
+    public bool IsInfected => activeInfections.Count > 0;
+    
     private void Awake()
     {
         if (visualRenderer == null)
@@ -53,39 +53,71 @@ public class NodeView : MonoBehaviour
 
     public void ApplyInfection(InfectionType type)
     {
-        if (activeInfection != null)
+        if (type == InfectionType.None)
             return;
+
+        // prevent duplicate types (Phase 6A rule)
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            if (activeInfections[i].Type == type)
+                return;
+        }
 
         var instance = InfectionFactory.Create(type);
         if (instance == null)
             return;
 
         instance.Initialize(this);
-        activeInfection = instance;
+        activeInfections.Add(instance);
 
-        activeInfection.OnApplied();
+        instance.OnApplied();
         RefreshVisuals();
     }
 
     public void ClearInfection()
     {
-        if (activeInfection == null)
+        if (activeInfections.Count == 0)
             return;
 
-        activeInfection.OnRemoved();
-        activeInfection = null;
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            activeInfections[i].OnRemoved();
+        }
 
+        activeInfections.Clear();
         RefreshVisuals();
     }
 
     public bool BlocksTraffic()
     {
-        return activeInfection != null && activeInfection.BlocksTraffic();
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            if (activeInfections[i].BlocksTraffic())
+                return true;
+        }
+
+        return false;
     }
 
     private void RefreshVisuals()
     {
-        var infectionType = activeInfection?.Type ?? InfectionType.None;
+        InfectionType infectionType = InfectionType.None;
+
+        // prioritize blackout if present
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            if (activeInfections[i].Type == InfectionType.Blackout)
+            {
+                infectionType = InfectionType.Blackout;
+                break;
+            }
+        }
+
+        // fallback to first infection if any
+        if (infectionType == InfectionType.None && activeInfections.Count > 0)
+        {
+            infectionType = activeInfections[0].Type;
+        }
 
         if (visualRenderer != null)
         {
