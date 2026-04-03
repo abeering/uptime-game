@@ -70,6 +70,11 @@ public class NetworkRuntime : MonoBehaviour
         return node;
     }
 
+    public System.Collections.Generic.List<NodeView> GetAllNodes()
+    {
+        return new System.Collections.Generic.List<NodeView>(nodes.Values);
+    }
+
     public List<PacketView> GetKnownThreatPackets()
     {
         List<PacketView> knownThreats = new();

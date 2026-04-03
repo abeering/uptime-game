@@ -29,7 +29,7 @@ public class ParsedCommand
     public PacketKind packetKind = PacketKind.None;
     public string[] routeNodeIds;
     public List<string> spawnKeywordSpecs = new();
-    public InfectionType? spawnInfectionOverride = null;
+    public InfectionType? spawnInfectionType = null;
     public InfectionTargetRule? spawnInfectionTargetRule = null;
     public int spawnInfectionNthNode = 1;
     public bool spawnAllowAlreadyInfectedNode = false;

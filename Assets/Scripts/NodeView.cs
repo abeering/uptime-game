@@ -51,27 +51,56 @@ public class NodeView : MonoBehaviour
         runtime.RegisterNode(this);
     }
 
+    public void Tick(InfectionContext context)
+    {
+        TickInfections(context);
+    }
+
+    public void TickInfections(InfectionContext context)
+    {
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            activeInfections[i].OnTick(context);
+        }
+    }
+
+    public bool CanAcceptInfection(InfectionPayload payload)
+    {
+        if (payload == null || payload.type == InfectionType.None)
+            return false;
+
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            if (activeInfections[i].Type == payload.type)
+                return false;
+        }
+
+        return true;
+    }
+
+    public bool ApplyInfection(InfectionPayload payload)
+    {
+        if (!CanAcceptInfection(payload))
+            return false;
+
+        var instance = InfectionFactory.Create(payload);
+        if (instance == null)
+            return false;
+
+        instance.Initialize(this, payload);
+        activeInfections.Add(instance);
+
+        instance.OnApplied();
+        RefreshVisuals();
+        return true;
+    }
+
     public void ApplyInfection(InfectionType type)
     {
         if (type == InfectionType.None)
             return;
 
-        // prevent duplicate types (Phase 6A rule)
-        for (int i = 0; i < activeInfections.Count; i++)
-        {
-            if (activeInfections[i].Type == type)
-                return;
-        }
-
-        var instance = InfectionFactory.Create(type);
-        if (instance == null)
-            return;
-
-        instance.Initialize(this);
-        activeInfections.Add(instance);
-
-        instance.OnApplied();
-        RefreshVisuals();
+        ApplyInfection(new InfectionPayload(type));
     }
 
     public void ClearInfection()

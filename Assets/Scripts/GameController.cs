@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
 
     [Header("References")]
     public TrafficDirector trafficDirector;
+    public NodeDirector nodeDirector;
     public CommandDirector commandDirector;
 
     private int tickCount = 0;
@@ -42,8 +43,11 @@ public class GameController : MonoBehaviour
         if (trafficDirector != null)
             trafficDirector.ProcessTick(tickCount);
 
+        if (nodeDirector != null)
+            nodeDirector.ProcessTick(tickCount);
+
         if (commandDirector != null)
-            commandDirector.Tick();
+            commandDirector.ProcessTick();
     }
 
     [ContextMenu("Refresh All Connections")]

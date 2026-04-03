@@ -33,7 +33,7 @@ public static class CommandParser
             string raw = token.Substring(4).Trim();
 
             if (Enum.TryParse(raw, true, out InfectionType infectionType))
-                result.spawnInfectionOverride = infectionType;
+                result.spawnInfectionType = infectionType;
 
             return;
         }

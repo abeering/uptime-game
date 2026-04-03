@@ -300,7 +300,6 @@ public class TrafficDirector : MonoBehaviour
             baseSpeed = baseMoveInterval,
             route = route,
             startsQuickScanned = startsQuickScanned,
-            infectionOverride = null,
             infections = pClass == PacketClass.Threat
                 ? BuildDefaultInfectionsForKind(pKind)
                 : new List<InfectionPayload>()
@@ -384,7 +383,7 @@ public class TrafficDirector : MonoBehaviour
             plan.scanDifficulty,
             plan.route,
             plan.startsQuickScanned,
-            plan.infectionOverride,
+            null,
             plan.infections
         );
         packet.keywords.AddRange(plan.keywords);
@@ -442,9 +441,12 @@ public class TrafficDirector : MonoBehaviour
                 if (logSpawns)
                     Debug.Log($"[TrafficDirector] {packet.packetId} infected node {node.nodeId} with {payload.type}");
 
-                node.ApplyInfection(payload.type);
-                RemovePacket(packet, "infected");
-                return;
+                bool applied = node.ApplyInfection(payload);
+                if (applied)
+                {
+                    RemovePacket(packet, "infected");
+                    return;
+                }
             }
         }
     }
@@ -523,7 +525,7 @@ public class TrafficDirector : MonoBehaviour
         PacketKind packetKind,
         string[] routeNodeIds,
         List<string> keywordSpecs,
-        InfectionType? infectionOverride,
+        InfectionType? infectionType,
         InfectionTargetRule? infectionTargetRule,
         int infectionNthNode,
         bool allowAlreadyInfectedNode,
@@ -563,9 +565,8 @@ public class TrafficDirector : MonoBehaviour
             baseSpeed = minBaseMoveInterval,
             route = route,
             startsQuickScanned = false,
-            infectionOverride = infectionOverride,
             infections = BuildOverrideInfections(
-                infectionOverride,
+                infectionType,
                 infectionTargetRule,
                 infectionNthNode,
                 allowAlreadyInfectedNode
@@ -584,7 +585,7 @@ public class TrafficDirector : MonoBehaviour
             : "";
 
         string infectionSummary = "";
-        if (infectionOverride.HasValue)
+        if (infectionType.HasValue)
         {
             string ruleSummary = "";
 
@@ -611,7 +612,7 @@ public class TrafficDirector : MonoBehaviour
             }
 
             string reinfectSummary = allowAlreadyInfectedNode ? " reinfect=true" : "";
-            infectionSummary = $" inf={infectionOverride.Value}{ruleSummary}{reinfectSummary}";
+            infectionSummary = $" inf={infectionType.Value}{ruleSummary}{reinfectSummary}";
         }
 
         message = $"spawned {plan.packetId}: {packetClass}/{packetKind}{infectionSummary}{keywordSummary} on {string.Join(" -> ", routeNodeIds)}";

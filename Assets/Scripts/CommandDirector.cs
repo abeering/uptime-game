@@ -429,7 +429,7 @@ public class CommandDirector : MonoBehaviour
                     command.packetKind,
                     command.routeNodeIds,
                     command.spawnKeywordSpecs,
-                    command.spawnInfectionOverride,
+                    command.spawnInfectionType,
                     command.spawnInfectionTargetRule,
                     command.spawnInfectionNthNode,
                     command.spawnAllowAlreadyInfectedNode
@@ -447,7 +447,7 @@ public class CommandDirector : MonoBehaviour
         }
     }
 
-    public void Tick()
+    public void ProcessTick()
     {
         if (scanDirector != null)
             scanDirector.Tick();
@@ -510,7 +510,7 @@ public class CommandDirector : MonoBehaviour
         PacketKind packetKind,
         string[] routeNodeIds,
         List<string> keywordSpecs,
-        InfectionType? infectionOverride,
+        InfectionType? infectionType,
         InfectionTargetRule? infectionTargetRule,
         int infectionNthNode,
         bool allowAlreadyInfectedNode)
@@ -527,7 +527,7 @@ public class CommandDirector : MonoBehaviour
             packetKind,
             routeNodeIds,
             keywordSpecs,
-            infectionOverride,
+            infectionType,
             infectionTargetRule,
             infectionNthNode,
             allowAlreadyInfectedNode,
