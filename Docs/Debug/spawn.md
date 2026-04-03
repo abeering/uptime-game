@@ -1,0 +1,1 @@
+spawn threat virus ext1 fw web cache inf:blackout infrule:nth:2
