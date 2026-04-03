@@ -85,7 +85,6 @@ public class PacketView : MonoBehaviour
     [Header("Packet Type")]
     public PacketClass trueClass;
     public PacketKind trueKind;
-    public InfectionType? infectionOverride = null; // compatibility bridge for debug spawn + transition
     public List<InfectionPayload> infections = new();
     public string sourceAddress;
 
@@ -135,7 +134,6 @@ public class PacketView : MonoBehaviour
         int newScanDifficulty,
         RouteStep[] newRoute,
         bool startsQuickScanned = false,
-        InfectionType? newInfectionOverride = null,
         List<InfectionPayload> newInfections = null
     )
     {
@@ -145,7 +143,6 @@ public class PacketView : MonoBehaviour
         trueClass = newClass;
         trueKind = newKind;
         sourceAddress = newSourceAddress;
-        infectionOverride = newInfectionOverride;
         infections = newInfections != null
             ? new List<InfectionPayload>(newInfections)
             : new List<InfectionPayload>();
@@ -496,9 +493,6 @@ public class PacketView : MonoBehaviour
 
         InfectionType infectionType = GetPrimaryInfectionType();
 
-        if (infectionType == InfectionType.None && infectionOverride.HasValue)
-            infectionType = infectionOverride.Value;
-
         if (infectionType == InfectionType.None)
             infectionType = InfectionRules.FromPacketKind(trueKind);
 
@@ -589,22 +583,6 @@ public class PacketView : MonoBehaviour
     {
         InfectionPayload payload = GetPrimaryInfectionPayload();
         return payload != null ? payload.type : InfectionType.None;
-    }
-
-    public InfectionType GetEffectiveInfectionType()
-    {
-        // Bridge behavior:
-        // 1) Prefer explicit payloads
-        // 2) Fall back to old debug override
-        // 3) Fall back to legacy PacketKind mapping
-        InfectionType payloadType = GetPrimaryInfectionType();
-        if (payloadType != InfectionType.None)
-            return payloadType;
-
-        if (infectionOverride.HasValue)
-            return infectionOverride.Value;
-
-        return InfectionRules.FromPacketKind(trueKind);
     }
 
     public VisibleClass GetVisibleClass()

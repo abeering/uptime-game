@@ -507,7 +507,6 @@ public class TrafficDirector : MonoBehaviour
             plan.scanDifficulty,
             plan.route,
             plan.startsQuickScanned,
-            null,
             plan.infections
         );
         packet.keywords.AddRange(plan.keywords);
@@ -555,7 +554,7 @@ public class TrafficDirector : MonoBehaviour
 
             if (payload == null)
             {
-                InfectionType fallbackType = packet.GetEffectiveInfectionType();
+                InfectionType fallbackType = InfectionRules.FromPacketKind(packet.trueKind);
                 if (fallbackType != InfectionType.None)
                     payload = new InfectionPayload(fallbackType);
             }
