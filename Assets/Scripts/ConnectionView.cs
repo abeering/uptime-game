@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 [ExecuteAlways]
 public class ConnectionView : MonoBehaviour
@@ -16,9 +17,33 @@ public class ConnectionView : MonoBehaviour
 
     public LineRenderer lineRenderer;
 
+    [Header("Label")]
+    public TextMeshPro edgeLabel;
+    public float labelAlongEdge = 0.5f;
+    public float labelNormalOffset = 0.18f;
+    public bool rotateLabelWithEdge = true;
+    public int labelSortingOrder = 5;
+
+    [Header("Latency Modifiers")]
+    [Min(0)] public int throttleAmount = 0;
+
+    [Header("Label Colors")]
+    public Color baseLabelColor = new(0.67f, 0.67f, 0.67f, 0.53f);
+    public Color modifiedLabelColor = new(0.72f, 1.00f, 0.72f, 0.95f);
+
+    public int EffectiveLatency => Mathf.Max(1, latency + throttleAmount);
+
+    private void Awake()
+    {
+        EnsureEdgeLabel();
+        RefreshVisuals();
+    }
+
     private void Reset()
     {
         lineRenderer = GetComponent<LineRenderer>();
+        EnsureEdgeLabel();
+        RefreshVisuals();
     }
 
     private void OnValidate()
@@ -26,7 +51,8 @@ public class ConnectionView : MonoBehaviour
         if (lineRenderer == null)
             lineRenderer = GetComponent<LineRenderer>();
 
-        RefreshLine();
+        EnsureEdgeLabel();
+        RefreshVisuals();
     }
 
     public void RefreshLine()
@@ -37,6 +63,8 @@ public class ConnectionView : MonoBehaviour
         lineRenderer.positionCount = 2;
         lineRenderer.SetPosition(0, nodeA.transform.position);
         lineRenderer.SetPosition(1, nodeB.transform.position);
+
+        RefreshLabel();
     }
 
     public Vector3 GetWorldPositionAtStep(int step, bool aToB)
@@ -62,4 +90,93 @@ public class ConnectionView : MonoBehaviour
     {
         return aToB ? nodeB : nodeA;
     }
+
+    public void RefreshVisuals()
+    {
+        RefreshLine();
+        RefreshLabel();
+    }
+
+    public void SetThrottle(int amount)
+    {
+        throttleAmount = Mathf.Max(0, amount);
+        RefreshLabel();
+    }
+
+    public void ClearThrottle()
+    {
+        throttleAmount = 0;
+        RefreshLabel();
+    }
+
+    private void EnsureEdgeLabel()
+    {
+        if (edgeLabel != null)
+            return;
+
+        Transform existing = transform.Find("EdgeLabel");
+        if (existing != null)
+        {
+            edgeLabel = existing.GetComponent<TextMeshPro>();
+            if (edgeLabel != null)
+                return;
+        }
+
+        GameObject go = new GameObject("EdgeLabel");
+        go.transform.SetParent(transform, false);
+
+        edgeLabel = go.AddComponent<TextMeshPro>();
+        edgeLabel.alignment = TextAlignmentOptions.Center;
+        edgeLabel.fontSize = 2.2f;
+        edgeLabel.text = "";
+        edgeLabel.sortingOrder = labelSortingOrder;
+        edgeLabel.color = baseLabelColor;
+    }
+
+    public void RefreshLabel()
+    {
+        if (edgeLabel == null || nodeA == null || nodeB == null)
+            return;
+
+        Vector3 a = nodeA.transform.position;
+        Vector3 b = nodeB.transform.position;
+
+        Vector3 dir = (b - a);
+        if (dir.sqrMagnitude <= 0.0001f)
+            return;
+
+        Vector3 dirNorm = dir.normalized;
+        Vector3 normal = new Vector3(-dirNorm.y, dirNorm.x, 0f);
+
+        float t = Mathf.Clamp01(labelAlongEdge);
+        Vector3 basePos = Vector3.Lerp(a, b, t);
+        edgeLabel.transform.position = basePos + (normal * labelNormalOffset);
+
+        if (rotateLabelWithEdge)
+        {
+            float angle = Mathf.Atan2(dirNorm.y, dirNorm.x) * Mathf.Rad2Deg;
+
+            if (angle > 90f || angle < -90f)
+                angle += 180f;
+
+            edgeLabel.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
+        else
+        {
+            edgeLabel.transform.rotation = Quaternion.identity;
+        }
+
+        bool modified = throttleAmount > 0;
+        edgeLabel.color = modified ? modifiedLabelColor : baseLabelColor;
+        edgeLabel.sortingOrder = labelSortingOrder;
+        edgeLabel.text = BuildLatencyLabel();
+    }
+
+    private string BuildLatencyLabel()
+    {
+        return throttleAmount > 0
+            ? $"L{latency}+{throttleAmount}"
+            : $"L{latency}";
+    }
+
 }

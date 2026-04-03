@@ -786,7 +786,7 @@ public class PacketView : MonoBehaviour
             return;
         }
 
-        ticksUntilAdvance = Mathf.Max(1, baseSpeed * edge.latency);
+        ticksUntilAdvance = Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
     }
 
     public void SnapToCurrentPosition()
