@@ -721,7 +721,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &354062866
 GameObject:
   m_ObjectHideFlags: 0
@@ -1481,7 +1480,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &468341938
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1735,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2746,7 +2743,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &678758264
 GameObject:
   m_ObjectHideFlags: 0
@@ -6310,7 +6306,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &1482744059
 GameObject:
   m_ObjectHideFlags: 0
@@ -7635,7 +7630,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &1793014876
 GameObject:
   m_ObjectHideFlags: 0
@@ -8153,7 +8147,6 @@ MonoBehaviour:
   blackoutColor: {r: 0.45, g: 0.1, b: 0.1, a: 1}
   infectedLabelColor: {r: 1, g: 0.8, b: 0.8, a: 1}
   normalLabelColor: {r: 0, g: 0, b: 0, a: 1}
-  infectionType: 0
 --- !u!1 &2027853056
 GameObject:
   m_ObjectHideFlags: 0
