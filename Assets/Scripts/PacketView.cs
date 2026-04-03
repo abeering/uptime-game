@@ -757,6 +757,25 @@ public class PacketView : MonoBehaviour
         ResetAdvanceTimer();
     }
 
+    public void AdvanceMultipleSteps(int stepCount)
+    {
+        if (stepCount <= 0 || hasArrived || isRemoved)
+            return;
+
+        for (int i = 0; i < stepCount; i++)
+        {
+            AdvanceOneStep();
+
+            if (hasArrived || isRemoved)
+                return;
+        }
+    }
+
+    public void ForceAdvanceTimer(int ticks)
+    {
+        ticksUntilAdvance = Mathf.Max(1, ticks);
+    }
+
     private void ResetAdvanceTimer()
     {
         ConnectionView edge = GetCurrentConnection();

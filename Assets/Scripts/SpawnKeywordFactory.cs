@@ -24,11 +24,58 @@ public static class SpawnKeywordFactory
             case "mutate":
             {
                 int ticksPerMutation = 3;
-
                 if (parts.Length >= 2 && int.TryParse(parts[1], out int parsedTicks))
                     ticksPerMutation = Mathf.Max(1, parsedTicks);
 
                 keyword = new MutatingKeyword(ticksPerMutation);
+                return true;
+            }
+
+            case "jittery":
+            case "jitter":
+            {
+                int jitterAmount = 1;
+
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int parsedJitter))
+                    jitterAmount = Mathf.Max(1, parsedJitter);
+
+                keyword = new JitteryKeyword(jitterAmount);
+                return true;
+            }
+
+            case "surging":
+            case "surge":
+            {
+                int stallTicks = 2;
+                int burstTicks = 2;
+                int burstMoveInterval = 1;
+
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int parsedStall))
+                    stallTicks = Mathf.Max(1, parsedStall);
+
+                if (parts.Length >= 3 && int.TryParse(parts[2], out int parsedBurstTicks))
+                    burstTicks = Mathf.Max(1, parsedBurstTicks);
+
+                if (parts.Length >= 4 && int.TryParse(parts[3], out int parsedBurstMoveInterval))
+                    burstMoveInterval = Mathf.Max(1, parsedBurstMoveInterval);
+
+                keyword = new SurgingKeyword(stallTicks, burstTicks, burstMoveInterval);
+                return true;
+            }
+
+            case "desynced":
+            case "desync":
+            {
+                int stallTicks = 2;
+                int teleportSteps = 3;
+
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int parsedStall))
+                    stallTicks = Mathf.Max(1, parsedStall);
+
+                if (parts.Length >= 3 && int.TryParse(parts[2], out int parsedTeleportSteps))
+                    teleportSteps = Mathf.Max(1, parsedTeleportSteps);
+
+                keyword = new DesyncedKeyword(stallTicks, teleportSteps);
                 return true;
             }
 
