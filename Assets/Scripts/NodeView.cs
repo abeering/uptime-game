@@ -21,14 +21,8 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Color normalLabelColor = Color.black;
 
     [Header("Infection")]
-    [SerializeField] private InfectionType infectionType = InfectionType.None;
-
-    public bool IsInfected => infectionType != InfectionType.None;
-
-    public InfectionType GetInfection()
-    {
-        return infectionType;
-    }
+    private NodeInfectionInstance activeInfection;
+    public bool IsInfected => activeInfection != null;
 
     private void Awake()
     {
@@ -59,33 +53,40 @@ public class NodeView : MonoBehaviour
 
     public void ApplyInfection(InfectionType type)
     {
-        if (type == InfectionType.None)
+        if (activeInfection != null)
             return;
 
-        if (infectionType != InfectionType.None)
+        var instance = InfectionFactory.Create(type);
+        if (instance == null)
             return;
 
-        infectionType = type;
+        instance.Initialize(this);
+        activeInfection = instance;
 
-        Debug.Log($"[Node] {nodeId} infected with {type}");
+        activeInfection.OnApplied();
         RefreshVisuals();
     }
 
     public void ClearInfection()
     {
-        infectionType = InfectionType.None;
+        if (activeInfection == null)
+            return;
 
-        Debug.Log($"[Node] {nodeId} cleaned");
+        activeInfection.OnRemoved();
+        activeInfection = null;
+
         RefreshVisuals();
     }
 
     public bool BlocksTraffic()
     {
-        return infectionType == InfectionType.Blackout;
+        return activeInfection != null && activeInfection.BlocksTraffic();
     }
 
     private void RefreshVisuals()
     {
+        var infectionType = activeInfection?.Type ?? InfectionType.None;
+
         if (visualRenderer != null)
         {
             switch (infectionType)
