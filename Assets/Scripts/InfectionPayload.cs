@@ -5,6 +5,7 @@ public class InfectionPayload
 {
     public InfectionType type = InfectionType.None;
     public InfectionApplicationRules rules = new();
+    public InfectionParameters parameters = new();
 
     public InfectionPayload() { }
 
@@ -12,5 +13,6 @@ public class InfectionPayload
     {
         this.type = type;
         this.rules = new InfectionApplicationRules();
+        this.parameters = new InfectionParameters();
     }
 }

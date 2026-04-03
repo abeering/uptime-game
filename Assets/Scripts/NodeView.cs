@@ -16,7 +16,6 @@ public class NodeView : MonoBehaviour
 
     [Header("Colors")]
     [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color blackoutColor = new Color(0.45f, 0.1f, 0.1f);
     [SerializeField] private Color infectedLabelColor = new Color(1f, 0.8f, 0.8f);
     [SerializeField] private Color normalLabelColor = Color.black;
 
@@ -130,50 +129,31 @@ public class NodeView : MonoBehaviour
 
     private void RefreshVisuals()
     {
-        InfectionType infectionType = InfectionType.None;
+        Color displayColor = normalColor;
+        int tintCount = 0;
 
-        // prioritize blackout if present
         for (int i = 0; i < activeInfections.Count; i++)
         {
-            if (activeInfections[i].Type == InfectionType.Blackout)
-            {
-                infectionType = InfectionType.Blackout;
-                break;
-            }
-        }
+            Color? tint = activeInfections[i].GetNodeTintColor();
+            if (!tint.HasValue)
+                continue;
 
-        // fallback to first infection if any
-        if (infectionType == InfectionType.None && activeInfections.Count > 0)
-        {
-            infectionType = activeInfections[0].Type;
+            tintCount++;
+            float lerpAmount = 1f / tintCount;
+            displayColor = Color.Lerp(displayColor, tint.Value, lerpAmount);
         }
 
         if (visualRenderer != null)
         {
-            switch (infectionType)
-            {
-                case InfectionType.Blackout:
-                    visualRenderer.color = blackoutColor;
-                    break;
-
-                default:
-                    visualRenderer.color = normalColor;
-                    break;
-            }
+            visualRenderer.color = displayColor;
         }
 
         if (labelText != null)
         {
-            switch (infectionType)
-            {
-                case InfectionType.Blackout:
-                    labelText.color = infectedLabelColor;
-                    break;
-
-                default:
-                    labelText.color = normalLabelColor;
-                    break;
-            }
+            labelText.color = activeInfections.Count > 0
+                ? infectedLabelColor
+                : normalLabelColor;
         }
     }
+    
 }

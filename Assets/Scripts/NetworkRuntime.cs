@@ -135,4 +135,23 @@ public class NetworkRuntime : MonoBehaviour
         return null;
     }
 
+    public List<ConnectionView> GetConnectionsForNode(NodeView node)
+    {
+        List<ConnectionView> results = new();
+
+        if (node == null)
+            return results;
+
+        foreach (var connection in connections.Values)
+        {
+            if (connection == null)
+                continue;
+
+            if (connection.nodeA == node || connection.nodeB == node)
+                results.Add(connection);
+        }
+
+        return results;
+    }
+
 }

@@ -132,13 +132,54 @@ public class TrafficDirector : MonoBehaviour
         queuedPlans.Add(plan);
     }
 
+    public void QueueInfectionSpawnAtTick(
+        int spawnTick,
+        NodeView sourceNode,
+        RouteStep[] route,
+        PacketClass packetClass = PacketClass.Threat,
+        PacketKind packetKind = PacketKind.Virus,
+        List<InfectionPayload> infections = null,
+        int? baseSpeedOverride = null,
+        int? scanDifficultyOverride = null)
+    {
+        if (sourceNode == null || route == null || route.Length == 0)
+            return;
+
+        List<InfectionPayload> resolvedInfections = infections != null
+            ? new List<InfectionPayload>(infections)
+            : BuildDefaultInfectionsForKind(packetKind);
+
+        SpawnPlan plan = new SpawnPlan
+        {
+            spawnTick = spawnTick,
+            packetId = GetNextPacketId(),
+            packetClass = packetClass,
+            packetKind = packetKind,
+            scanDifficulty = scanDifficultyOverride ?? Mathf.RoundToInt((minScanDifficulty + maxScanDifficulty) * 0.5f),
+            sourceAddress = sourceNode.nodeId,
+            baseSpeed = baseSpeedOverride ?? minBaseMoveInterval,
+            route = CloneRoute(route),
+            startsQuickScanned = false,
+            infections = resolvedInfections
+        };
+
+        QueueSpawnPlan(plan);
+
+        if (logSpawns)
+        {
+            Debug.Log($"[TrafficDirector] queued infection spawn {plan.packetId} from {sourceNode.nodeId} for tick {spawnTick}");
+        }
+    }
+
     public void ProcessTick(int currentTick)
     {
         if (autoSpawnEnabled)
         {
             UpdateScheduledSpawns(currentTick);
-            SpawnDuePlans(currentTick);
         }
+
+        // Always process queued plans, even when scheduled autospawn is disabled.
+        SpawnDuePlans(currentTick);
 
         TickActivePackets();
     }
@@ -205,10 +246,11 @@ public class TrafficDirector : MonoBehaviour
         if (type == InfectionType.None)
             return new List<InfectionPayload>();
 
-        return new List<InfectionPayload>
-        {
-            new InfectionPayload(type)
-        };
+        InfectionPayload payload = new InfectionPayload(type);
+
+        ApplyDefaultInfectionParametersForKind(kind, payload);
+
+        return new List<InfectionPayload> { payload };
     }
 
     private List<InfectionPayload> BuildOverrideInfections(InfectionType? infectionOverride)
@@ -216,10 +258,8 @@ public class TrafficDirector : MonoBehaviour
         if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
             return new List<InfectionPayload>();
 
-        return new List<InfectionPayload>
-        {
-            new InfectionPayload(infectionOverride.Value)
-        };
+        InfectionPayload payload = new InfectionPayload(infectionOverride.Value);
+        return new List<InfectionPayload> { payload };
     }
 
     private List<InfectionPayload> BuildOverrideInfections(
@@ -241,6 +281,23 @@ public class TrafficDirector : MonoBehaviour
         };
 
         return new List<InfectionPayload> { payload };
+    }
+
+    private void ApplyDefaultInfectionParametersForKind(PacketKind kind, InfectionPayload payload)
+    {
+        if (payload == null)
+            return;
+
+        switch (payload.type)
+        {
+            case InfectionType.Spawner:
+                payload.parameters.spawner.cadenceTicks = 8;
+                payload.parameters.spawner.burstSize = 1;
+                payload.parameters.spawner.spawnKind = PacketKind.Virus;
+                payload.parameters.spawner.scanDifficulty = 35;
+                payload.parameters.spawner.baseSpeedOverride = minBaseMoveInterval;
+                break;
+        }
     }
 
     private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance, float priorityChance)

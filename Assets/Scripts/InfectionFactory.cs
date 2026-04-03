@@ -8,6 +8,7 @@ public static class InfectionFactory
         return payload.type switch
         {
             InfectionType.Blackout => new BlackoutInfectionInstance(),
+            InfectionType.Spawner => new SpawnerInfectionInstance(),
             _ => null
         };
     }
