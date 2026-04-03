@@ -10,7 +10,8 @@ public enum CommandType
     Cancel,
     Boost,
     Spawn,
-    AutoSpawn
+    AutoSpawn,
+    Throttle
 }
 
 public class ParsedCommand
@@ -20,15 +21,16 @@ public class ParsedCommand
     public string nodeId;
     public string operationId;
     public string rawText;
+    public string connectionId;
+    public int throttleAmount;
 
     // for Spawn
     public PacketClass packetClass = PacketClass.Benign;
     public PacketKind packetKind = PacketKind.None;
     public string[] routeNodeIds;
+    public List<string> spawnKeywordSpecs = new();
+    public InfectionType? spawnInfectionOverride = null;
 
     // for autospawn / disable spawn 
     public string autoSpawnMode;
-
-    public List<string> spawnKeywordSpecs = new();
-    public InfectionType? spawnInfectionOverride = null;
 }

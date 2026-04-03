@@ -6,15 +6,24 @@ public class NetworkRuntime : MonoBehaviour
 {
     private Dictionary<string, PacketView> packets = new();
     private Dictionary<string, NodeView> nodes = new();
+    private Dictionary<string, ConnectionView> connections = new();
 
     private void Awake()
     {
         // register all nodes in the scene
-        NodeView[] nodes = FindObjectsOfType<NodeView>();
+        NodeView[] sceneNodes = FindObjectsOfType<NodeView>();
 
-        foreach (var node in nodes)
+        foreach (var node in sceneNodes)
         {
             node.Initialize(this);
+        }
+
+        // register all connections in the scene
+        ConnectionView[] sceneConnections = FindObjectsOfType<ConnectionView>();
+
+        foreach (var connection in sceneConnections)
+        {
+            RegisterConnection(connection);
         }
     }
 
@@ -73,6 +82,52 @@ public class NetworkRuntime : MonoBehaviour
 
         knownThreats.Sort((a, b) => string.CompareOrdinal(a.packetId, b.packetId));
         return knownThreats;
+    }
+
+    public void RegisterConnection(ConnectionView connection)
+    {
+        if (connection == null || string.IsNullOrEmpty(connection.connectionId))
+            return;
+
+        connections[connection.connectionId] = connection;
+    }
+
+    public void UnregisterConnection(ConnectionView connection)
+    {
+        if (connection == null || string.IsNullOrEmpty(connection.connectionId))
+            return;
+
+        if (connections.TryGetValue(connection.connectionId, out var existing) && existing == connection)
+            connections.Remove(connection.connectionId);
+    }
+
+    public ConnectionView GetConnection(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return null;
+
+        connections.TryGetValue(id, out var connection);
+        return connection;
+    }
+
+    public ConnectionView FindConnectionBetween(NodeView fromNode, NodeView toNode)
+    {
+        if (fromNode == null || toNode == null)
+            return null;
+
+        foreach (var connection in connections.Values)
+        {
+            if (connection == null)
+                continue;
+
+            bool matchesForward = connection.nodeA == fromNode && connection.nodeB == toNode;
+            bool matchesReverse = connection.nodeB == fromNode && connection.nodeA == toNode;
+
+            if (matchesForward || matchesReverse)
+                return connection;
+        }
+
+        return null;
     }
 
 }

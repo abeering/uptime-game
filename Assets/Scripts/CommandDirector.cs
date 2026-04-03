@@ -329,6 +329,15 @@ public class CommandDirector : MonoBehaviour
         Log($"{prefix}  {FormatFailure("FAILED")}  {message}");
     }
 
+    public void LogThrottleApplied(ConnectionView connection, int amount)
+    {
+        string prefix = FormatPrefix(ConsoleLogPrefix.Flow);
+        string edgeId = connection != null ? connection.connectionId : "----";
+        string value = connection != null ? $"L{connection.latency}+{amount}" : amount.ToString();
+
+        Log($"{prefix}  <b>{edgeId}</b>  <b>THROTTLE</b>  {FormatMuted(value)}");
+    }
+
     public void Execute(ParsedCommand command)
     {
         if (command == null)
@@ -394,6 +403,17 @@ public class CommandDirector : MonoBehaviour
 
 
                 StartBoost(command.packetId);
+                return;
+
+            case CommandType.Throttle:
+                if (string.IsNullOrWhiteSpace(command.connectionId))
+                {
+                    Log("ERROR usage: throttle <connection> <amount>");
+                    audioManager?.PlayCommandRejected();
+                    return;
+                }
+
+                StartThrottle(command.connectionId, command.throttleAmount);
                 return;
 
             case CommandType.Spawn:
@@ -623,6 +643,32 @@ public class CommandDirector : MonoBehaviour
 
         audioManager?.PlayCommandAccepted();
         LogBoostApplied(packetId);
+    }
+
+    private void StartThrottle(string connectionId, int amount)
+    {
+        ConnectionView connection = networkRuntime != null
+            ? networkRuntime.GetConnection(connectionId)
+            : null;
+
+        if (connection == null)
+        {
+            LogCommandError($"throttle failed: {connectionId} not found");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        if (amount < 0)
+        {
+            LogCommandError($"throttle failed: amount must be >= 0");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        connection.SetThrottle(amount);
+
+        audioManager?.PlayCommandAccepted();
+        LogThrottleApplied(connection, amount);
     }
 
     private void CancelOperation(string operationId)

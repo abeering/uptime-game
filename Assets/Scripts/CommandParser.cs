@@ -155,6 +155,18 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "throttle")
+        {
+            if (parts.Length >= 3 && int.TryParse(parts[2], out int amount))
+            {
+                result.type = CommandType.Throttle;
+                result.connectionId = parts[1];
+                result.throttleAmount = amount;
+            }
+
+            return result;
+        }
+
         return result;
     }
 }

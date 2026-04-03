@@ -573,22 +573,10 @@ public class TrafficDirector : MonoBehaviour
 
     private ConnectionView FindConnectionBetween(NodeView fromNode, NodeView toNode)
     {
-        ConnectionView[] connections = FindObjectsOfType<ConnectionView>();
+        if (networkRuntime == null)
+            return null;
 
-        for (int i = 0; i < connections.Length; i++)
-        {
-            ConnectionView connection = connections[i];
-
-            if (connection == null)
-                continue;
-
-            bool matchesForward = connection.nodeA == fromNode && connection.nodeB == toNode;
-            bool matchesReverse = connection.nodeB == fromNode && connection.nodeA == toNode;
-
-            if (matchesForward || matchesReverse)
-                return connection;
-        }
-
-        return null;
+        return networkRuntime.FindConnectionBetween(fromNode, toNode);
     }
+
 }
