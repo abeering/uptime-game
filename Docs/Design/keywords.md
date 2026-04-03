@@ -28,12 +28,12 @@ Keywords should be:
 
 Affects only the packet itself.
 
-#### Mutating (Obfuscated)
+#### Mutating (Obfuscated) - DONE 
 - Changes its ID every N ticks
 - Effectively unscannable or unreliable scan results
 - Encourages blocking at node instead of inspection
 
-#### Desynced
+#### Desynced - DONE
 - Does not follow normal tick timing
 - Moves or updates irregularly
 
@@ -187,3 +187,22 @@ To validate the keyword system, implement:
 
 ### other good names 
 - noisy 
+
+
+### random idea pastebin
+Examples
+1. “Congesting”
+
+increases latency on current edge
+
+2. “Optimizing”
+
+decreases latency
+
+3. “Corrupting”
+
+increases latency permanently on edge
+
+4. “Radiating”
+
+affects nearby edges
