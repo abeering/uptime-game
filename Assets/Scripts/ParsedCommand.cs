@@ -33,6 +33,7 @@ public class ParsedCommand
     public InfectionTargetRule? spawnInfectionTargetRule = null;
     public int spawnInfectionNthNode = 1;
     public bool spawnAllowAlreadyInfectedNode = false;
+    public Dictionary<string, string> spawnInfectionParams = new();
 
     // for autospawn / disable spawn 
     public string autoSpawnMode;

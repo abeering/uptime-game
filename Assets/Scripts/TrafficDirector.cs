@@ -266,7 +266,8 @@ public class TrafficDirector : MonoBehaviour
         InfectionType? infectionOverride,
         InfectionTargetRule? targetRule,
         int nthNode,
-        bool allowAlreadyInfectedNode)
+        bool allowAlreadyInfectedNode,
+        Dictionary<string, string> infectionParams)
     {
         if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
             return new List<InfectionPayload>();
@@ -279,6 +280,8 @@ public class TrafficDirector : MonoBehaviour
             nthNode = Mathf.Max(1, nthNode),
             allowAlreadyInfectedNode = allowAlreadyInfectedNode
         };
+
+        ApplyDebugInfectionParams(payload, infectionParams);
 
         return new List<InfectionPayload> { payload };
     }
@@ -298,6 +301,70 @@ public class TrafficDirector : MonoBehaviour
                 payload.parameters.spawner.baseSpeedOverride = minBaseMoveInterval;
                 break;
         }
+    }
+
+    private void ApplyDebugInfectionParams(InfectionPayload payload, Dictionary<string, string> rawParams)
+    {
+        if (payload == null || rawParams == null || rawParams.Count == 0)
+            return;
+
+        switch (payload.type)
+        {
+            case InfectionType.Spawner:
+                ApplySpawnerDebugParams(payload.parameters.spawner, rawParams);
+                break;
+
+            case InfectionType.Blackout:
+                // no params yet
+                break;
+        }
+    }
+
+    private void ApplySpawnerDebugParams(SpawnerInfectionParameters parameters, Dictionary<string, string> rawParams)
+    {
+        if (parameters == null || rawParams == null)
+            return;
+
+        if (TryGetInt(rawParams, "spawner.cadence", out int cadence))
+            parameters.cadenceTicks = cadence;
+
+        if (TryGetInt(rawParams, "spawner.burst", out int burst))
+            parameters.burstSize = burst;
+
+        if (TryGetEnum(rawParams, "spawner.spawnkind", out PacketKind spawnKind))
+            parameters.spawnKind = spawnKind;
+
+        if (TryGetInt(rawParams, "spawner.scandifficulty", out int scanDifficulty))
+            parameters.scanDifficulty = scanDifficulty;
+
+        if (TryGetInt(rawParams, "spawner.basespeed", out int baseSpeed))
+            parameters.baseSpeedOverride = baseSpeed;
+    }
+
+    private bool TryGetInt(Dictionary<string, string> rawParams, string key, out int value)
+    {
+        value = 0;
+
+        if (rawParams == null || string.IsNullOrWhiteSpace(key))
+            return false;
+
+        if (!rawParams.TryGetValue(key.ToLowerInvariant(), out string rawValue))
+            return false;
+
+        return int.TryParse(rawValue, out value);
+    }
+
+    private bool TryGetEnum<TEnum>(Dictionary<string, string> rawParams, string key, out TEnum value) where TEnum : struct
+    {
+        value = default;
+
+        if (rawParams == null || string.IsNullOrWhiteSpace(key))
+            return false;
+
+        if (!rawParams.TryGetValue(key.ToLowerInvariant(), out string rawValue))
+            return false;
+
+        return System.Enum.TryParse(rawValue, true, out value);
     }
 
     private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance, float priorityChance)
@@ -586,6 +653,7 @@ public class TrafficDirector : MonoBehaviour
         InfectionTargetRule? infectionTargetRule,
         int infectionNthNode,
         bool allowAlreadyInfectedNode,
+        Dictionary<string, string> infectionParams,
         out string message)
     {
         message = "";
@@ -626,7 +694,8 @@ public class TrafficDirector : MonoBehaviour
                 infectionType,
                 infectionTargetRule,
                 infectionNthNode,
-                allowAlreadyInfectedNode
+                allowAlreadyInfectedNode,
+                infectionParams
             )
         };
 
@@ -672,7 +741,19 @@ public class TrafficDirector : MonoBehaviour
             infectionSummary = $" inf={infectionType.Value}{ruleSummary}{reinfectSummary}";
         }
 
-        message = $"spawned {plan.packetId}: {packetClass}/{packetKind}{infectionSummary}{keywordSummary} on {string.Join(" -> ", routeNodeIds)}";
+        string infectionParamSummary = "";
+        if (infectionParams != null && infectionParams.Count > 0)
+        {
+            List<string> parts = new();
+            foreach (var kvp in infectionParams)
+            {
+                parts.Add($"{kvp.Key}={kvp.Value}");
+            }
+
+            infectionParamSummary = $" infp=[{string.Join(", ", parts)}]";
+        }
+
+        message = $"spawned {plan.packetId}: {packetClass}/{packetKind}{infectionSummary}{infectionParamSummary}{keywordSummary} on {string.Join(" -> ", routeNodeIds)}";
         return true;
     }
 

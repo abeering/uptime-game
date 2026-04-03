@@ -10,7 +10,30 @@ public static class CommandParser
         return token.StartsWith("kw:", StringComparison.OrdinalIgnoreCase)
             || token.StartsWith("inf:", StringComparison.OrdinalIgnoreCase)
             || token.StartsWith("infrule:", StringComparison.OrdinalIgnoreCase)
-            || token.StartsWith("infallowreinfect:", StringComparison.OrdinalIgnoreCase);
+            || token.StartsWith("infallowreinfect:", StringComparison.OrdinalIgnoreCase)
+            || token.StartsWith("infp:", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void ParseSpawnInfectionParamToken(string token, ParsedCommand result)
+    {
+        if (string.IsNullOrWhiteSpace(token) || result == null)
+            return;
+
+        string raw = token.Substring("infp:".Length).Trim();
+        if (string.IsNullOrWhiteSpace(raw))
+            return;
+
+        int equalsIndex = raw.IndexOf('=');
+        if (equalsIndex <= 0 || equalsIndex >= raw.Length - 1)
+            return;
+
+        string key = raw.Substring(0, equalsIndex).Trim().ToLowerInvariant();
+        string value = raw.Substring(equalsIndex + 1).Trim();
+
+        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+            return;
+
+        result.spawnInfectionParams[key] = value;
     }
 
     private static void ParseSpawnModifierToken(string token, ParsedCommand result)
@@ -87,6 +110,12 @@ public static class CommandParser
             if (bool.TryParse(raw, out bool allow))
                 result.spawnAllowAlreadyInfectedNode = allow;
 
+            return;
+        }
+
+        if (token.StartsWith("infp:", StringComparison.OrdinalIgnoreCase))
+        {
+            ParseSpawnInfectionParamToken(token, result);
             return;
         }
     }
