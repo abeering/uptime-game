@@ -15,6 +15,7 @@ public class SpawnPlan
     public RouteStep[] route;
     public bool startsQuickScanned;
 
-    public InfectionType? infectionOverride = null;
+    public InfectionType? infectionOverride = null; // compatibility bridge for debug spawn / legacy paths
+    public List<InfectionPayload> infections = new();
     public List<IPacketKeyword> keywords = new();
 }

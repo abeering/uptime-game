@@ -8,7 +8,9 @@ public static class CommandParser
             return false;
 
         return token.StartsWith("kw:", StringComparison.OrdinalIgnoreCase)
-            || token.StartsWith("inf:", StringComparison.OrdinalIgnoreCase);
+            || token.StartsWith("inf:", StringComparison.OrdinalIgnoreCase)
+            || token.StartsWith("infrule:", StringComparison.OrdinalIgnoreCase)
+            || token.StartsWith("infallowreinfect:", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void ParseSpawnModifierToken(string token, ParsedCommand result)
@@ -32,6 +34,58 @@ public static class CommandParser
 
             if (Enum.TryParse(raw, true, out InfectionType infectionType))
                 result.spawnInfectionOverride = infectionType;
+
+            return;
+        }
+
+        if (token.StartsWith("infrule:", StringComparison.OrdinalIgnoreCase))
+        {
+            string raw = token.Substring(8).Trim();
+            string[] parts = raw.Split(':', StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 0)
+                return;
+
+            string ruleName = parts[0].Trim().ToLowerInvariant();
+
+            switch (ruleName)
+            {
+                case "first":
+                    result.spawnInfectionTargetRule = InfectionTargetRule.FirstReachedNode;
+                    result.spawnInfectionNthNode = 1;
+                    return;
+
+                case "nth":
+                    result.spawnInfectionTargetRule = InfectionTargetRule.NthReachedNode;
+
+                    if (parts.Length >= 2 && int.TryParse(parts[1], out int parsedNth))
+                        result.spawnInfectionNthNode = Math.Max(1, parsedNth);
+                    else
+                        result.spawnInfectionNthNode = 1;
+
+                    return;
+
+                case "any":
+                    result.spawnInfectionTargetRule = InfectionTargetRule.AnyReachedNode;
+                    result.spawnInfectionNthNode = 1;
+                    return;
+
+                case "destination":
+                case "dest":
+                    result.spawnInfectionTargetRule = InfectionTargetRule.DestinationNode;
+                    result.spawnInfectionNthNode = 1;
+                    return;
+            }
+
+            return;
+        }
+
+        if (token.StartsWith("infallowreinfect:", StringComparison.OrdinalIgnoreCase))
+        {
+            string raw = token.Substring("infallowreinfect:".Length).Trim();
+
+            if (bool.TryParse(raw, out bool allow))
+                result.spawnAllowAlreadyInfectedNode = allow;
 
             return;
         }

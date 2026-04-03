@@ -419,7 +419,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Spawn:
                 if (command.routeNodeIds == null || command.routeNodeIds.Length < 2)
                 {
-                    Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...] [kw:name] [inf:type]");
+                    Log("ERROR usage: spawn <class> <kind> <node1> <node2> [node3...] [kw:name] [inf:type] [infrule:first|nth:N|any|destination] [infallowreinfect:true|false]");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
@@ -429,7 +429,10 @@ public class CommandDirector : MonoBehaviour
                     command.packetKind,
                     command.routeNodeIds,
                     command.spawnKeywordSpecs,
-                    command.spawnInfectionOverride
+                    command.spawnInfectionOverride,
+                    command.spawnInfectionTargetRule,
+                    command.spawnInfectionNthNode,
+                    command.spawnAllowAlreadyInfectedNode
                 );
                 return;
 
@@ -507,7 +510,10 @@ public class CommandDirector : MonoBehaviour
         PacketKind packetKind,
         string[] routeNodeIds,
         List<string> keywordSpecs,
-        InfectionType? infectionOverride)
+        InfectionType? infectionOverride,
+        InfectionTargetRule? infectionTargetRule,
+        int infectionNthNode,
+        bool allowAlreadyInfectedNode)
     {
         if (trafficDirector == null)
         {
@@ -522,6 +528,9 @@ public class CommandDirector : MonoBehaviour
             routeNodeIds,
             keywordSpecs,
             infectionOverride,
+            infectionTargetRule,
+            infectionNthNode,
+            allowAlreadyInfectedNode,
             out string message
         );
 

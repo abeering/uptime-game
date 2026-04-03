@@ -198,6 +198,51 @@ public class TrafficDirector : MonoBehaviour
         }
     }
 
+    private List<InfectionPayload> BuildDefaultInfectionsForKind(PacketKind kind)
+    {
+        InfectionType type = InfectionRules.FromPacketKind(kind);
+
+        if (type == InfectionType.None)
+            return new List<InfectionPayload>();
+
+        return new List<InfectionPayload>
+        {
+            new InfectionPayload(type)
+        };
+    }
+
+    private List<InfectionPayload> BuildOverrideInfections(InfectionType? infectionOverride)
+    {
+        if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
+            return new List<InfectionPayload>();
+
+        return new List<InfectionPayload>
+        {
+            new InfectionPayload(infectionOverride.Value)
+        };
+    }
+
+    private List<InfectionPayload> BuildOverrideInfections(
+        InfectionType? infectionOverride,
+        InfectionTargetRule? targetRule,
+        int nthNode,
+        bool allowAlreadyInfectedNode)
+    {
+        if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
+            return new List<InfectionPayload>();
+
+        InfectionPayload payload = new InfectionPayload(infectionOverride.Value);
+
+        payload.rules = new InfectionApplicationRules
+        {
+            targetRule = targetRule ?? InfectionTargetRule.FirstReachedNode,
+            nthNode = Mathf.Max(1, nthNode),
+            allowAlreadyInfectedNode = allowAlreadyInfectedNode
+        };
+
+        return new List<InfectionPayload> { payload };
+    }
+
     private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance, float priorityChance)
     {
         float clampedMalwareChance = Mathf.Clamp01(malwareChance);
@@ -255,7 +300,10 @@ public class TrafficDirector : MonoBehaviour
             baseSpeed = baseMoveInterval,
             route = route,
             startsQuickScanned = startsQuickScanned,
-            infectionOverride = null
+            infectionOverride = null,
+            infections = pClass == PacketClass.Threat
+                ? BuildDefaultInfectionsForKind(pKind)
+                : new List<InfectionPayload>()
         };
     }
 
@@ -336,7 +384,8 @@ public class TrafficDirector : MonoBehaviour
             plan.scanDifficulty,
             plan.route,
             plan.startsQuickScanned,
-            plan.infectionOverride
+            plan.infectionOverride,
+            plan.infections
         );
         packet.keywords.AddRange(plan.keywords);
         packet.OnReachedNode += HandlePacketReachedNode;
@@ -377,17 +426,23 @@ public class TrafficDirector : MonoBehaviour
             return;
         }
 
-        // 3) Packet arrival payloads (infection for now).
         if (packet.IsTrueThreat())
         {
-            InfectionType infection = packet.GetEffectiveInfectionType();
+            InfectionPayload payload = packet.GetPrimaryInfectionPayload();
 
-            if (infection != InfectionType.None)
+            if (payload == null)
+            {
+                InfectionType fallbackType = packet.GetEffectiveInfectionType();
+                if (fallbackType != InfectionType.None)
+                    payload = new InfectionPayload(fallbackType);
+            }
+
+            if (payload != null && InfectionRuleEvaluator.CanApply(packet, node, payload))
             {
                 if (logSpawns)
-                    Debug.Log($"[TrafficDirector] {packet.packetId} infected node {node.nodeId} with {infection}");
+                    Debug.Log($"[TrafficDirector] {packet.packetId} infected node {node.nodeId} with {payload.type}");
 
-                node.ApplyInfection(infection);
+                node.ApplyInfection(payload.type);
                 RemovePacket(packet, "infected");
                 return;
             }
@@ -469,6 +524,9 @@ public class TrafficDirector : MonoBehaviour
         string[] routeNodeIds,
         List<string> keywordSpecs,
         InfectionType? infectionOverride,
+        InfectionTargetRule? infectionTargetRule,
+        int infectionNthNode,
+        bool allowAlreadyInfectedNode,
         out string message)
     {
         message = "";
@@ -505,7 +563,13 @@ public class TrafficDirector : MonoBehaviour
             baseSpeed = minBaseMoveInterval,
             route = route,
             startsQuickScanned = false,
-            infectionOverride = infectionOverride
+            infectionOverride = infectionOverride,
+            infections = BuildOverrideInfections(
+                infectionOverride,
+                infectionTargetRule,
+                infectionNthNode,
+                allowAlreadyInfectedNode
+            )
         };
 
         if (packetClass == PacketClass.Priority)
@@ -519,9 +583,36 @@ public class TrafficDirector : MonoBehaviour
             ? $" kw=[{string.Join(", ", keywordSpecs)}]"
             : "";
 
-        string infectionSummary = infectionOverride.HasValue
-            ? $" inf={infectionOverride.Value}"
-            : "";
+        string infectionSummary = "";
+        if (infectionOverride.HasValue)
+        {
+            string ruleSummary = "";
+
+            if (infectionTargetRule.HasValue)
+            {
+                switch (infectionTargetRule.Value)
+                {
+                    case InfectionTargetRule.FirstReachedNode:
+                        ruleSummary = " rule=first";
+                        break;
+
+                    case InfectionTargetRule.NthReachedNode:
+                        ruleSummary = $" rule=nth:{Mathf.Max(1, infectionNthNode)}";
+                        break;
+
+                    case InfectionTargetRule.AnyReachedNode:
+                        ruleSummary = " rule=any";
+                        break;
+
+                    case InfectionTargetRule.DestinationNode:
+                        ruleSummary = " rule=destination";
+                        break;
+                }
+            }
+
+            string reinfectSummary = allowAlreadyInfectedNode ? " reinfect=true" : "";
+            infectionSummary = $" inf={infectionOverride.Value}{ruleSummary}{reinfectSummary}";
+        }
 
         message = $"spawned {plan.packetId}: {packetClass}/{packetKind}{infectionSummary}{keywordSummary} on {string.Join(" -> ", routeNodeIds)}";
         return true;

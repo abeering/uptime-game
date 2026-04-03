@@ -75,6 +75,7 @@ public class PacketView : MonoBehaviour
     public int routeIndex = 0;
     public int currentStep = 0;
     public int ticksUntilAdvance = 0;
+    public int nodesReachedCount = 0;
     // public bool movingAToB = true; NECESSARY?
     public bool hasArrived = false;
     public bool isRemoved { get; private set; }
@@ -84,7 +85,8 @@ public class PacketView : MonoBehaviour
     [Header("Packet Type")]
     public PacketClass trueClass;
     public PacketKind trueKind;
-    public InfectionType? infectionOverride = null;
+    public InfectionType? infectionOverride = null; // compatibility bridge for debug spawn + transition
+    public List<InfectionPayload> infections = new();
     public string sourceAddress;
 
     [Header("Intel")]
@@ -133,7 +135,8 @@ public class PacketView : MonoBehaviour
         int newScanDifficulty,
         RouteStep[] newRoute,
         bool startsQuickScanned = false,
-        InfectionType? newInfectionOverride = null
+        InfectionType? newInfectionOverride = null,
+        List<InfectionPayload> newInfections = null
     )
     {
         packetId = newPacketId;
@@ -143,6 +146,9 @@ public class PacketView : MonoBehaviour
         trueKind = newKind;
         sourceAddress = newSourceAddress;
         infectionOverride = newInfectionOverride;
+        infections = newInfections != null
+            ? new List<InfectionPayload>(newInfections)
+            : new List<InfectionPayload>();
         scanDifficulty = Mathf.Clamp(newScanDifficulty, 0, 100);
 
         reportedClass = PacketClass.Benign;
@@ -488,7 +494,14 @@ public class PacketView : MonoBehaviour
         if (knowsInfectionType)
             return;
 
-        InfectionType infectionType = GetEffectiveInfectionType();
+        InfectionType infectionType = GetPrimaryInfectionType();
+
+        if (infectionType == InfectionType.None && infectionOverride.HasValue)
+            infectionType = infectionOverride.Value;
+
+        if (infectionType == InfectionType.None)
+            infectionType = InfectionRules.FromPacketKind(trueKind);
+
         if (infectionType == InfectionType.None)
             return;
 
@@ -559,8 +572,35 @@ public class PacketView : MonoBehaviour
         return GetVisibleClass() == VisibleClass.Threat;
     }
 
+    public bool HasInfections()
+    {
+        return infections != null && infections.Count > 0;
+    }
+
+    public InfectionPayload GetPrimaryInfectionPayload()
+    {
+        if (!HasInfections())
+            return null;
+
+        return infections[0];
+    }
+
+    public InfectionType GetPrimaryInfectionType()
+    {
+        InfectionPayload payload = GetPrimaryInfectionPayload();
+        return payload != null ? payload.type : InfectionType.None;
+    }
+
     public InfectionType GetEffectiveInfectionType()
     {
+        // Bridge behavior:
+        // 1) Prefer explicit payloads
+        // 2) Fall back to old debug override
+        // 3) Fall back to legacy PacketKind mapping
+        InfectionType payloadType = GetPrimaryInfectionType();
+        if (payloadType != InfectionType.None)
+            return payloadType;
+
         if (infectionOverride.HasValue)
             return infectionOverride.Value;
 
@@ -730,6 +770,7 @@ public class PacketView : MonoBehaviour
 
             if (reachedNode != null)
             {
+                nodesReachedCount++;
                 OnReachedNode?.Invoke(this, reachedNode);
 
                 if (isRemoved)
