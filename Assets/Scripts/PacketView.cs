@@ -494,9 +494,6 @@ public class PacketView : MonoBehaviour
         InfectionType infectionType = GetPrimaryInfectionType();
 
         if (infectionType == InfectionType.None)
-            infectionType = InfectionRules.FromPacketKind(trueKind);
-
-        if (infectionType == InfectionType.None)
             return;
 
         knowsInfectionType = true;

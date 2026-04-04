@@ -9,6 +9,7 @@ public static class InfectionFactory
         {
             InfectionType.Blackout => new BlackoutInfectionInstance(),
             InfectionType.Spawner => new SpawnerInfectionInstance(),
+            InfectionType.Throttle => new ThrottleInfectionInstance(),
             _ => null
         };
     }

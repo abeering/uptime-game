@@ -241,7 +241,7 @@ public class TrafficDirector : MonoBehaviour
 
     private List<InfectionPayload> BuildDefaultInfectionsForKind(PacketKind kind)
     {
-        InfectionType type = InfectionRules.FromPacketKind(kind);
+        InfectionType type = InfectionRules.RollDefaultInfectionType(kind);
 
         if (type == InfectionType.None)
             return new List<InfectionPayload>();
@@ -300,6 +300,10 @@ public class TrafficDirector : MonoBehaviour
                 payload.parameters.spawner.scanDifficulty = 35;
                 payload.parameters.spawner.baseSpeedOverride = minBaseMoveInterval;
                 break;
+
+            case InfectionType.Throttle:
+                payload.parameters.throttle.latencyPenalty = 1;
+                break;
         }
     }
 
@@ -314,10 +318,23 @@ public class TrafficDirector : MonoBehaviour
                 ApplySpawnerDebugParams(payload.parameters.spawner, rawParams);
                 break;
 
+            case InfectionType.Throttle:
+                ApplyThrottleDebugParams(payload.parameters.throttle, rawParams);
+                break;
+
             case InfectionType.Blackout:
                 // no params yet
                 break;
         }
+    }
+
+    private void ApplyThrottleDebugParams(ThrottleInfectionParameters parameters, Dictionary<string, string> rawParams)
+    {
+        if (parameters == null || rawParams == null)
+            return;
+
+        if (TryGetInt(rawParams, "throttle.latencypenalty", out int latencyPenalty))
+            parameters.latencyPenalty = Mathf.Max(0, latencyPenalty);
     }
 
     private void ApplySpawnerDebugParams(SpawnerInfectionParameters parameters, Dictionary<string, string> rawParams)
@@ -554,9 +571,12 @@ public class TrafficDirector : MonoBehaviour
 
             if (payload == null)
             {
-                InfectionType fallbackType = InfectionRules.FromPacketKind(packet.trueKind);
+                InfectionType fallbackType = InfectionRules.RollDefaultInfectionType(packet.trueKind);
                 if (fallbackType != InfectionType.None)
+                {
                     payload = new InfectionPayload(fallbackType);
+                    ApplyDefaultInfectionParametersForKind(packet.trueKind, payload);
+                }
             }
 
             if (payload != null && InfectionRuleEvaluator.CanApply(packet, node, payload))

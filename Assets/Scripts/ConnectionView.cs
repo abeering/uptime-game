@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
 
 [ExecuteAlways]
@@ -25,13 +26,14 @@ public class ConnectionView : MonoBehaviour
     public int labelSortingOrder = 5;
 
     [Header("Latency Modifiers")]
-    [Min(0)] public int throttleAmount = 0;
+    private readonly Dictionary<string, int> latencyModifiers = new();
+    private const string ManualThrottleSourceId = "command:throttle";
 
     [Header("Label Colors")]
     public Color baseLabelColor = new(0.67f, 0.67f, 0.67f, 0.53f);
     public Color modifiedLabelColor = new(0.72f, 1.00f, 0.72f, 0.95f);
 
-    public int EffectiveLatency => Mathf.Max(1, latency + throttleAmount);
+    public int EffectiveLatency => Mathf.Max(1, latency + GetTotalLatencyModifier());
 
     private void Awake()
     {
@@ -99,14 +101,48 @@ public class ConnectionView : MonoBehaviour
 
     public void SetThrottle(int amount)
     {
-        throttleAmount = Mathf.Max(0, amount);
-        RefreshLabel();
+        AddLatencyModifier(ManualThrottleSourceId, Mathf.Max(0, amount));
     }
 
     public void ClearThrottle()
     {
-        throttleAmount = 0;
+        RemoveLatencyModifier(ManualThrottleSourceId);
+    }
+
+    public void AddLatencyModifier(string sourceId, int amount)
+    {
+        if (string.IsNullOrWhiteSpace(sourceId))
+            return;
+
+        latencyModifiers[sourceId] = Mathf.Max(0, amount);
         RefreshLabel();
+    }
+
+    public void RemoveLatencyModifier(string sourceId)
+    {
+        if (string.IsNullOrWhiteSpace(sourceId))
+            return;
+
+        if (latencyModifiers.Remove(sourceId))
+            RefreshLabel();
+    }
+
+    public int GetLatencyModifier(string sourceId)
+    {
+        if (string.IsNullOrWhiteSpace(sourceId))
+            return 0;
+
+        return latencyModifiers.TryGetValue(sourceId, out int amount) ? amount : 0;
+    }
+
+    public int GetTotalLatencyModifier()
+    {
+        int total = 0;
+
+        foreach (var kvp in latencyModifiers)
+            total += Mathf.Max(0, kvp.Value);
+
+        return total;
     }
 
     private void EnsureEdgeLabel()
@@ -166,7 +202,7 @@ public class ConnectionView : MonoBehaviour
             edgeLabel.transform.rotation = Quaternion.identity;
         }
 
-        bool modified = throttleAmount > 0;
+        bool modified = GetTotalLatencyModifier() > 0;
         edgeLabel.color = modified ? modifiedLabelColor : baseLabelColor;
         edgeLabel.sortingOrder = labelSortingOrder;
         edgeLabel.text = BuildLatencyLabel();
@@ -174,8 +210,10 @@ public class ConnectionView : MonoBehaviour
 
     private string BuildLatencyLabel()
     {
-        return throttleAmount > 0
-            ? $"L{latency}+{throttleAmount}"
+        int modifier = GetTotalLatencyModifier();
+
+        return modifier > 0
+            ? $"L{latency}+{modifier}"
             : $"L{latency}";
     }
 
