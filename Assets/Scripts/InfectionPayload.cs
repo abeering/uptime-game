@@ -15,4 +15,10 @@ public class InfectionPayload
         this.rules = new InfectionApplicationRules();
         this.parameters = new InfectionParameters();
     }
+
+    public override string ToString()
+    {
+        return $"{type} | params: {parameters} | rules: {rules}";
+    }
+    
 }

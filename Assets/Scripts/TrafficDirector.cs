@@ -310,6 +310,8 @@ public class TrafficDirector : MonoBehaviour
                 // no params yet
                 break;
         }
+
+        Debug.Log($"[InfectionPayload][MODIFIED][infp] {payload}");
     }
 
     private void ApplyThrottleDebugParams(ThrottleInfectionParameters parameters, Dictionary<string, string> rawParams)

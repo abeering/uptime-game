@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class InfectionFactory
 {
     public static InfectionPayload CreateDefaultPayload(InfectionType type)
@@ -15,6 +17,8 @@ public static class InfectionFactory
         //
         // Intended long-term precedence:
         // baseline payload defaults < profile/scaler adjustments < explicit spawn/debug overrides
+
+        Debug.Log($"[InfectionPayload][CREATE] {payload}");
 
         return payload;
     }

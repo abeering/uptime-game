@@ -86,6 +86,8 @@ public class NodeView : MonoBehaviour
         if (instance == null)
             return false;
 
+        Debug.Log($"[Node][{nodeId}] applying infection: {payload}");
+
         instance.Initialize(this, payload);
         activeInfections.Add(instance);
 

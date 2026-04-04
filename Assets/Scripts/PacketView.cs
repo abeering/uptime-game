@@ -179,6 +179,15 @@ public class PacketView : MonoBehaviour
             SetInitialScanState(ScanStage.Probable, RollReportedClass());
         else
             ResetProgressiveScanState();
+
+        // debug output 
+        if (infections != null && infections.Count > 0)
+        {
+            for (int i = 0; i < infections.Count; i++)
+            {
+                Debug.Log($"[Packet][{packetId}] attached payload {i}: {infections[i]}");
+            }
+        }
     }
 
     public bool CanAdvanceScanStage()
