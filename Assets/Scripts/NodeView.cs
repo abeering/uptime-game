@@ -99,7 +99,8 @@ public class NodeView : MonoBehaviour
         if (type == InfectionType.None)
             return;
 
-        ApplyInfection(new InfectionPayload(type));
+        // ApplyInfection(new InfectionPayload(type));
+        ApplyInfection(InfectionFactory.CreateDefaultPayload(type));
     }
 
     public void ClearInfection()
@@ -155,5 +156,5 @@ public class NodeView : MonoBehaviour
                 : normalLabelColor;
         }
     }
-    
+
 }

@@ -246,11 +246,11 @@ public class TrafficDirector : MonoBehaviour
         if (type == InfectionType.None)
             return new List<InfectionPayload>();
 
-        InfectionPayload payload = new InfectionPayload(type);
+        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(type);
 
-        ApplyDefaultInfectionParametersForKind(kind, payload);
-
-        return new List<InfectionPayload> { payload };
+        return payload != null
+            ? new List<InfectionPayload> { payload }
+            : new List<InfectionPayload>();
     }
 
     private List<InfectionPayload> BuildOverrideInfections(InfectionType? infectionOverride)
@@ -258,8 +258,11 @@ public class TrafficDirector : MonoBehaviour
         if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
             return new List<InfectionPayload>();
 
-        InfectionPayload payload = new InfectionPayload(infectionOverride.Value);
-        return new List<InfectionPayload> { payload };
+        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(infectionOverride.Value);
+
+        return payload != null
+            ? new List<InfectionPayload> { payload }
+            : new List<InfectionPayload>();
     }
 
     private List<InfectionPayload> BuildOverrideInfections(
@@ -272,7 +275,9 @@ public class TrafficDirector : MonoBehaviour
         if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
             return new List<InfectionPayload>();
 
-        InfectionPayload payload = new InfectionPayload(infectionOverride.Value);
+        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(infectionOverride.Value);
+        if (payload == null)
+            return new List<InfectionPayload>();
 
         payload.rules = new InfectionApplicationRules
         {
@@ -284,27 +289,6 @@ public class TrafficDirector : MonoBehaviour
         ApplyDebugInfectionParams(payload, infectionParams);
 
         return new List<InfectionPayload> { payload };
-    }
-
-    private void ApplyDefaultInfectionParametersForKind(PacketKind kind, InfectionPayload payload)
-    {
-        if (payload == null)
-            return;
-
-        switch (payload.type)
-        {
-            case InfectionType.Spawner:
-                payload.parameters.spawner.cadenceTicks = 8;
-                payload.parameters.spawner.burstSize = 1;
-                payload.parameters.spawner.spawnKind = PacketKind.Virus;
-                payload.parameters.spawner.scanDifficulty = 35;
-                payload.parameters.spawner.baseSpeedOverride = minBaseMoveInterval;
-                break;
-
-            case InfectionType.Throttle:
-                payload.parameters.throttle.latencyPenalty = 1;
-                break;
-        }
     }
 
     private void ApplyDebugInfectionParams(InfectionPayload payload, Dictionary<string, string> rawParams)
@@ -568,18 +552,10 @@ public class TrafficDirector : MonoBehaviour
         if (packet.IsTrueThreat())
         {
             InfectionPayload payload = packet.GetPrimaryInfectionPayload();
-
             if (payload == null)
-            {
-                InfectionType fallbackType = InfectionRules.RollDefaultInfectionType(packet.trueKind);
-                if (fallbackType != InfectionType.None)
-                {
-                    payload = new InfectionPayload(fallbackType);
-                    ApplyDefaultInfectionParametersForKind(packet.trueKind, payload);
-                }
-            }
+                return;
 
-            if (payload != null && InfectionRuleEvaluator.CanApply(packet, node, payload))
+            if (InfectionRuleEvaluator.CanApply(packet, node, payload))
             {
                 if (logSpawns)
                     Debug.Log($"[TrafficDirector] {packet.packetId} infected node {node.nodeId} with {payload.type}");
