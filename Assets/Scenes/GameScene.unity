@@ -8265,6 +8265,7 @@ MonoBehaviour:
   consoleCanvas: {fileID: 1922250890}
   collapsedHeight: 200
   expandedHeight: 420
+  titleText: {fileID: 756168958}
 --- !u!1 &2126531733
 GameObject:
   m_ObjectHideFlags: 0
