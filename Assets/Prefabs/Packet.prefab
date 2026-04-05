@@ -563,6 +563,14 @@ MonoBehaviour:
   borderRenderer: {fileID: 6535546156096995785}
   visualLaneIndex: 0
   visualLaneConnection: {fileID: 0}
+  laneConvergeStartT: 0.14
+  laneConvergeEndT: 0.86
+  enableSpeedTail: 1
+  tailMinLength: 0.06
+  tailMaxLength: 0.32
+  tailWidth: 0.045
+  tailAlpha: 0.28
+  tailRearOffset: 0.15
 --- !u!114 &5004352954912364169
 MonoBehaviour:
   m_ObjectHideFlags: 0

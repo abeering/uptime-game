@@ -122,6 +122,16 @@ public class PacketView : MonoBehaviour
     [SerializeField, Range(0f, 0.45f)] private float laneConvergeStartT = 0.14f;
     [SerializeField, Range(0.55f, 1f)] private float laneConvergeEndT = 0.86f;
 
+    [Header("Speed Tail")]
+    [SerializeField] private bool enableSpeedTail = true;
+    [SerializeField] private float tailMinLength = 0.06f;
+    [SerializeField] private float tailMaxLength = 0.32f;
+    [SerializeField] private float tailWidth = 0.045f;
+    [SerializeField] private float tailAlpha = 0.28f;
+    [SerializeField] private float tailRearOffset = 0.15f;
+
+    private LineRenderer speedTail;
+
     public event Action<PacketView, NodeView> OnReachedNode;
     public event Action<PacketView, string> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
@@ -701,6 +711,152 @@ public class PacketView : MonoBehaviour
         // );
     }
 
+    private void EnsureSpeedTail()
+    {
+        if (!enableSpeedTail || speedTail != null)
+            return;
+
+        GameObject tailObj = new GameObject("SpeedTail");
+        tailObj.transform.SetParent(transform, false);
+        tailObj.transform.localPosition = Vector3.zero;
+        tailObj.transform.localRotation = Quaternion.identity;
+        tailObj.transform.localScale = Vector3.one;
+
+        speedTail = tailObj.AddComponent<LineRenderer>();
+        speedTail.useWorldSpace = true;
+        speedTail.positionCount = 2;
+        speedTail.alignment = LineAlignment.View;
+        speedTail.textureMode = LineTextureMode.Stretch;
+        speedTail.numCapVertices = 2;
+        speedTail.numCornerVertices = 0;
+        speedTail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        speedTail.receiveShadows = false;
+        speedTail.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
+        speedTail.widthMultiplier = tailWidth;
+
+        Material mat = new Material(Shader.Find("Sprites/Default"));
+        speedTail.material = mat;
+
+        Color baseColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
+        Color tailColor = new Color(baseColor.r, baseColor.g, baseColor.b, tailAlpha);
+
+        if (spriteRenderer != null)
+        {
+            speedTail.sortingLayerID = spriteRenderer.sortingLayerID;
+            speedTail.sortingOrder = spriteRenderer.sortingOrder - 1;
+        }
+
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[]
+            {
+                new GradientColorKey(tailColor, 0f),
+                new GradientColorKey(tailColor, 1f)
+            },
+            new GradientAlphaKey[]
+            {
+                new GradientAlphaKey(tailAlpha, 0f),
+                new GradientAlphaKey(0f, 1f)
+            }
+        );
+
+        speedTail.colorGradient = gradient;
+        speedTail.enabled = false;
+    }
+
+    private void UpdateSpeedTail()
+    {
+        if (!enableSpeedTail)
+            return;
+
+        EnsureSpeedTail();
+
+        if (speedTail == null)
+            return;
+
+        ConnectionView edge = GetCurrentConnection();
+        if (edge == null || hasArrived || isRemoved)
+        {
+            speedTail.enabled = false;
+            return;
+        }
+
+        Vector3 moveDir = GetCurrentTravelDirection();
+        if (moveDir.sqrMagnitude <= 0.0001f)
+        {
+            speedTail.enabled = false;
+            return;
+        }
+
+        float tailLength = GetSpeedTailLength(edge);
+        Vector3 center = transform.position;
+        Vector3 head = center - (moveDir * tailRearOffset);
+        Vector3 tail = head - (moveDir * tailLength);
+
+        speedTail.enabled = true;
+        speedTail.SetPosition(0, head);
+        speedTail.SetPosition(1, tail);
+
+        if (spriteRenderer != null)
+        {
+            Color baseColor = spriteRenderer.color;
+            Color tailColor = new Color(baseColor.r, baseColor.g, baseColor.b, tailAlpha);
+
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[]
+                {
+                    new GradientColorKey(tailColor, 0f),
+                    new GradientColorKey(tailColor, 1f)
+                },
+                new GradientAlphaKey[]
+                {
+                    new GradientAlphaKey(tailAlpha, 0f),
+                    new GradientAlphaKey(0f, 1f)
+                }
+            );
+
+            speedTail.colorGradient = gradient;
+        }
+    }
+
+    private Vector3 GetCurrentTravelDirection()
+    {
+        ConnectionView edge = GetCurrentConnection();
+        if (edge == null || edge.nodeA == null || edge.nodeB == null)
+            return Vector3.right;
+
+        Vector3 from = IsMovingAToB() ? edge.nodeA.transform.position : edge.nodeB.transform.position;
+        Vector3 to = IsMovingAToB() ? edge.nodeB.transform.position : edge.nodeA.transform.position;
+
+        Vector3 dir = (to - from);
+        if (dir.sqrMagnitude <= 0.0001f)
+            return Vector3.right;
+
+        return dir.normalized;
+    }
+
+    private float GetSpeedTailLength(ConnectionView edge)
+    {
+        if (edge == null)
+            return tailMinLength;
+
+        float effectiveInterval = Mathf.Max(1f, GetEffectiveMoveInterval(edge));
+
+        // Smaller move interval = faster packet = longer tail.
+        float normalizedFastness = Mathf.InverseLerp(6f, 1f, effectiveInterval);
+
+        return Mathf.Lerp(tailMinLength, tailMaxLength, normalizedFastness);
+    }
+
+    private int GetEffectiveMoveInterval(ConnectionView edge)
+    {
+        if (edge == null)
+            return baseSpeed;
+
+        return Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
+    }
+
     public bool TryBoost()
     {
         if (!IsPriority())
@@ -839,10 +995,15 @@ public class PacketView : MonoBehaviour
     {
         ConnectionView edge = GetCurrentConnection();
         if (edge == null)
+        {
+            if (speedTail != null)
+                speedTail.enabled = false;
             return;
+        }
 
         RefreshVisualLaneAssignment();
         transform.position = GetCurrentVisualPosition();
+        UpdateSpeedTail();
     }
 
     public RouteStep GetCurrentRouteStep()
