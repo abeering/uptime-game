@@ -15,6 +15,16 @@ public class ConsoleController : MonoBehaviour
     [Header("Settings")]
     public int maxHistoryLines = 30;
 
+    [Header("Expand / Collapse")]
+    public RectTransform consoleCanvas;
+    public float collapsedHeight = 200f;
+    public float expandedHeight = 420f;
+
+    [Header("Title Bar")]
+    public TMP_Text titleText;
+
+    private bool isExpanded = false;
+
     private readonly List<string> historyLines = new();
 
     private void Start()
@@ -22,14 +32,68 @@ public class ConsoleController : MonoBehaviour
         if (commandDirector != null)
             commandDirector.OnLogMessage += HandleCommandLog;
 
+        ApplyConsoleHeight();
+        UpdateTitle();
         AppendLine("CONSOLE ready");
         FocusInput();
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current == null)
+            return;
+
+        if (Keyboard.current.tabKey.wasPressedThisFrame)
+        {
+            ToggleConsoleExpanded();
+        }
     }
 
     private void OnDestroy()
     {
         if (commandDirector != null)
             commandDirector.OnLogMessage -= HandleCommandLog;
+    }
+
+    private void ToggleConsoleExpanded()
+    {
+        isExpanded = !isExpanded;
+        ApplyConsoleHeight();
+        UpdateTitle();
+        RefreshHistoryScrollToBottom();
+        FocusInput();
+    }
+
+    private void ApplyConsoleHeight()
+    {
+        if (consoleCanvas == null)
+            return;
+
+        float targetHeight = isExpanded ? expandedHeight : collapsedHeight;
+        consoleCanvas.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, targetHeight);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(consoleCanvas);
+        Canvas.ForceUpdateCanvases();
+    }
+
+    private void UpdateTitle()
+    {
+        if (titleText == null)
+            return;
+
+        string arrow = isExpanded ? "▲" : "▼";
+        titleText.text = $"{arrow} console";
+        
+    }
+
+    private void RefreshHistoryScrollToBottom()
+    {
+        if (historyScrollRect == null || historyText == null)
+            return;
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(historyText.rectTransform);
+        Canvas.ForceUpdateCanvases();
+        historyScrollRect.verticalNormalizedPosition = 0f;
     }
 
     public void SubmitCurrentInput()
@@ -67,12 +131,7 @@ public class ConsoleController : MonoBehaviour
         if (historyText != null)
             historyText.text = string.Join("\n", historyLines);
 
-        if (historyScrollRect != null && historyText != null)
-        {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(historyText.rectTransform);
-            Canvas.ForceUpdateCanvases();
-            historyScrollRect.verticalNormalizedPosition = 0f;
-        }
+        RefreshHistoryScrollToBottom();
     }
 
     private void FocusInput()

@@ -423,35 +423,46 @@ public class PacketView : MonoBehaviour
         }
     }
 
+    // TODO temporary RefreshScanTag until crosshair project - hide scan tag, show border 
     public void RefreshScanTag(ScanDirector scanDirector)
     {
-        if (scanTagLabel == null || scanDirector == null)
-            return;
-
-        if (!scanDirector.IsPacketActivelyScanned(this))
+        if (scanTagLabel != null)
         {
-            HideScanTag();
-            return;
+            scanTagLabel.text = "";
+            scanTagLabel.gameObject.SetActive(false);
         }
-
-        scanTagLabel.gameObject.SetActive(true);
-        ToggleScanBorder(true);
-
-        bool blinkOn = Mathf.FloorToInt(Time.time * 4f) % 2 == 0;
-        // TODO - tie blinks to ticks 
-        // char activeStageChar = blinkOn ? '▣' : '□';
-        char activeStageChar = '=';
-
-        bool willBeDropped = scanDirector.WouldBeDropped(this);
-
-        scanTagLabel.text = ScanBarFormatter.BuildWorldScanTag(
-            GetScanDisplayStageIndex(),
-            GetScanConfidence01(),
-            IsScanComplete(),
-            willBeDropped,
-            activeStageChar: activeStageChar
-        );
     }
+
+    // TODO - bring back when we do crosshair scan 
+    // public void RefreshScanTag(ScanDirector scanDirector)
+    // {
+    //     if (scanTagLabel == null || scanDirector == null)
+    //         return;
+
+    //     if (!scanDirector.IsPacketActivelyScanned(this))
+    //     {
+    //         HideScanTag();
+    //         return;
+    //     }
+
+    //     scanTagLabel.gameObject.SetActive(true);
+    //     ToggleScanBorder(true);
+
+    //     bool blinkOn = Mathf.FloorToInt(Time.time * 4f) % 2 == 0;
+    //     // TODO - tie blinks to ticks 
+    //     // char activeStageChar = blinkOn ? '▣' : '□';
+    //     char activeStageChar = '=';
+
+    //     bool willBeDropped = scanDirector.WouldBeDropped(this);
+
+    //     scanTagLabel.text = ScanBarFormatter.BuildWorldScanTag(
+    //         GetScanDisplayStageIndex(),
+    //         GetScanConfidence01(),
+    //         IsScanComplete(),
+    //         willBeDropped,
+    //         activeStageChar: activeStageChar
+    //     );
+    // }
 
     public float GetScanConfidence01()
     {
