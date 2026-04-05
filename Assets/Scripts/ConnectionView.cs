@@ -83,6 +83,20 @@ public class ConnectionView : MonoBehaviour
         return Vector3.Lerp(start, end, t);
     }
 
+    public Vector3 GetLaneNormal()
+    {
+        if (nodeA == null || nodeB == null)
+            return Vector3.up;
+
+        Vector3 dir = nodeB.transform.position - nodeA.transform.position;
+
+        if (dir.sqrMagnitude <= 0.0001f)
+            return Vector3.up;
+
+        Vector3 dirNorm = dir.normalized;
+        return new Vector3(-dirNorm.y, dirNorm.x, 0f);
+    }
+
     public NodeView GetStartNode(bool aToB)
     {
         return aToB ? nodeA : nodeB;

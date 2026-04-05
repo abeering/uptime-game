@@ -154,4 +154,23 @@ public class NetworkRuntime : MonoBehaviour
         return results;
     }
 
+    public List<PacketView> GetPacketsOnConnection(ConnectionView connection)
+    {
+        List<PacketView> results = new();
+
+        if (connection == null)
+            return results;
+
+        foreach (var packet in packets.Values)
+        {
+            if (packet == null || packet.isRemoved || packet.hasArrived)
+                continue;
+
+            if (packet.GetCurrentConnection() == connection)
+                results.Add(packet);
+        }
+
+        return results;
+    }
+
 }

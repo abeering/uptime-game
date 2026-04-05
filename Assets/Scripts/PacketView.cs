@@ -116,6 +116,12 @@ public class PacketView : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
 
+    [Header("Visual Lanes")]
+    [SerializeField] private int visualLaneIndex = 0;
+    [SerializeField] private ConnectionView visualLaneConnection;
+    [SerializeField, Range(0f, 0.45f)] private float laneConvergeStartT = 0.14f;
+    [SerializeField, Range(0.55f, 1f)] private float laneConvergeEndT = 0.86f;
+
     public event Action<PacketView, NodeView> OnReachedNode;
     public event Action<PacketView, string> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
@@ -172,6 +178,9 @@ public class PacketView : MonoBehaviour
         ticksUntilAdvance = 0;
         hasArrived = false;
 
+        visualLaneIndex = 0;
+        visualLaneConnection = null;
+        RefreshVisualLaneAssignment();
         SnapToCurrentPosition();
         ResetAdvanceTimer();
 
@@ -787,6 +796,7 @@ public class PacketView : MonoBehaviour
 
             currentStep = 0;
             edge = GetCurrentConnection();
+            RefreshVisualLaneAssignment();
         }
 
         SnapToCurrentPosition();
@@ -831,7 +841,8 @@ public class PacketView : MonoBehaviour
         if (edge == null)
             return;
 
-        transform.position = edge.GetWorldPositionAtStep(currentStep, IsMovingAToB());
+        RefreshVisualLaneAssignment();
+        transform.position = GetCurrentVisualPosition();
     }
 
     public RouteStep GetCurrentRouteStep()
@@ -861,6 +872,80 @@ public class PacketView : MonoBehaviour
             return $"{packetId}: arrived";
 
         return $"{packetId}: {edge.connectionId} step {currentStep}/{edge.lengthSteps}, next move in {ticksUntilAdvance}";
+    }
+
+    public int GetVisualLaneIndex()
+    {
+        return visualLaneIndex;
+    }
+
+    private void RefreshVisualLaneAssignment()
+    {
+        ConnectionView currentConnection = GetCurrentConnection();
+
+        if (currentConnection == null)
+        {
+            visualLaneConnection = null;
+            visualLaneIndex = 0;
+            return;
+        }
+
+        if (visualLaneConnection == currentConnection)
+            return;
+
+        visualLaneConnection = currentConnection;
+
+        if (PacketLaneCoordinator.Instance != null)
+            visualLaneIndex = PacketLaneCoordinator.Instance.AssignLaneForEdge(this, currentConnection);
+        else
+            visualLaneIndex = 0;
+    }
+
+    private float GetCurrentEdgeProgress01()
+    {
+        ConnectionView edge = GetCurrentConnection();
+        if (edge == null || edge.lengthSteps <= 0)
+            return 0f;
+
+        return Mathf.Clamp01((float)currentStep / edge.lengthSteps);
+    }
+
+    private float GetLaneConvergenceWeight()
+    {
+        float t = GetCurrentEdgeProgress01();
+
+        if (laneConvergeStartT >= laneConvergeEndT)
+            return 1f;
+
+        if (t <= laneConvergeStartT)
+        {
+            return Mathf.InverseLerp(0f, laneConvergeStartT, t);
+        }
+
+        if (t >= laneConvergeEndT)
+        {
+            return 1f - Mathf.InverseLerp(laneConvergeEndT, 1f, t);
+        }
+
+        return 1f;
+    }
+
+    private Vector3 GetCurrentVisualPosition()
+    {
+        ConnectionView edge = GetCurrentConnection();
+        if (edge == null)
+            return transform.position;
+
+        Vector3 basePosition = edge.GetWorldPositionAtStep(currentStep, IsMovingAToB());
+
+        if (PacketLaneCoordinator.Instance == null)
+            return basePosition;
+
+        Vector3 laneNormal = edge.GetLaneNormal();
+        float laneOffset = PacketLaneCoordinator.Instance.GetLaneOffsetWorld(visualLaneIndex);
+        float convergenceWeight = GetLaneConvergenceWeight();
+
+        return basePosition + (laneNormal * laneOffset * convergenceWeight);
     }
 
     public NodeView GetDestination()
