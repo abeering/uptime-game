@@ -16,6 +16,20 @@ public class GameController : MonoBehaviour
 
     private int tickCount = 0;
 
+    public static GameController Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("[GameController] Duplicate instance found, destroying newest.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
     private void Start()
     {
         RefreshAllConnections();

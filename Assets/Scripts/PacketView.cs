@@ -122,6 +122,17 @@ public class PacketView : MonoBehaviour
     [SerializeField, Range(0f, 0.45f)] private float laneConvergeStartT = 0.14f;
     [SerializeField, Range(0.55f, 1f)] private float laneConvergeEndT = 0.86f;
 
+    [Header("Step Easing")]
+    [SerializeField] private bool enableStepEasing = true;
+    [SerializeField, Range(0.05f, 0.75f)] private float stepEaseFraction = 0.35f;
+    [SerializeField] private float minStepEaseDuration = 0.04f;
+
+    private Vector3 visualStepFromPosition;
+    private Vector3 visualStepToPosition;
+    private float visualStepEaseElapsed = 0f;
+    private float visualStepEaseDuration = 0f;
+    private bool isStepEasing = false;
+
     [Header("Speed Tail")]
     [SerializeField] private bool enableSpeedTail = true;
     [SerializeField] private float tailMinLength = 0.06f;
@@ -192,6 +203,7 @@ public class PacketView : MonoBehaviour
         visualLaneConnection = null;
         RefreshVisualLaneAssignment();
         SnapToCurrentPosition();
+        StopStepEase();
         ResetAdvanceTimer();
 
         if (startsQuickScanned)
@@ -207,6 +219,12 @@ public class PacketView : MonoBehaviour
                 Debug.Log($"[Packet][{packetId}] attached payload {i}: {infections[i]}");
             }
         }
+    }
+
+    private void Update()
+    {
+        UpdateStepEaseVisual();
+        UpdateSpeedTail();
     }
 
     public bool CanAdvanceScanStage()
@@ -849,14 +867,6 @@ public class PacketView : MonoBehaviour
         return Mathf.Lerp(tailMinLength, tailMaxLength, normalizedFastness);
     }
 
-    private int GetEffectiveMoveInterval(ConnectionView edge)
-    {
-        if (edge == null)
-            return baseSpeed;
-
-        return Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
-    }
-
     public bool TryBoost()
     {
         if (!IsPriority())
@@ -919,8 +929,11 @@ public class PacketView : MonoBehaviour
         if (edge == null)
         {
             hasArrived = true;
+            StopStepEase();
             return;
         }
+
+        Vector3 previousVisualPosition = GetCurrentVisualPosition();
 
         currentStep++;
 
@@ -945,6 +958,7 @@ public class PacketView : MonoBehaviour
             {
                 hasArrived = true;
                 currentStep = edge.lengthSteps;
+                StopStepEase();
                 SnapToCurrentPosition();
                 OnRouteCompleted?.Invoke(this);
                 return;
@@ -956,6 +970,14 @@ public class PacketView : MonoBehaviour
         }
 
         SnapToCurrentPosition();
+        Vector3 newVisualPosition = transform.position;
+
+        if (enableStepEasing && edge != null)
+        {
+            BeginStepEase(previousVisualPosition, newVisualPosition, edge);
+            transform.position = previousVisualPosition;
+        }
+
         ResetAdvanceTimer();
     }
 
@@ -1002,8 +1024,88 @@ public class PacketView : MonoBehaviour
         }
 
         RefreshVisualLaneAssignment();
-        transform.position = GetCurrentVisualPosition();
-        UpdateSpeedTail();
+
+        Vector3 snapped = GetCurrentVisualPosition();
+        transform.position = snapped;
+
+        if (!isStepEasing)
+        {
+            visualStepFromPosition = snapped;
+            visualStepToPosition = snapped;
+        }
+    }
+
+    private float GetCurrentTickDurationSeconds()
+    {
+        if (GameController.Instance == null)
+            return 1f;
+
+        return Mathf.Max(0.01f, GameController.Instance.tickIntervalSeconds);
+    }
+
+    private int GetEffectiveMoveInterval(ConnectionView edge)
+    {
+        if (edge == null)
+            return baseSpeed;
+
+        return Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
+    }
+
+    private float GetCurrentMoveIntervalSeconds(ConnectionView edge)
+    {
+        int moveIntervalTicks = GetEffectiveMoveInterval(edge);
+        return moveIntervalTicks * GetCurrentTickDurationSeconds();
+    }
+
+    private void BeginStepEase(Vector3 fromPosition, Vector3 toPosition, ConnectionView edge)
+    {
+        visualStepFromPosition = fromPosition;
+        visualStepToPosition = toPosition;
+        visualStepEaseElapsed = 0f;
+
+        float moveIntervalSeconds = GetCurrentMoveIntervalSeconds(edge);
+        visualStepEaseDuration = Mathf.Max(
+            minStepEaseDuration,
+            moveIntervalSeconds * stepEaseFraction
+        );
+
+        isStepEasing = true;
+    }
+
+    private void StopStepEase()
+    {
+        isStepEasing = false;
+        visualStepEaseElapsed = 0f;
+        visualStepEaseDuration = 0f;
+        visualStepFromPosition = transform.position;
+        visualStepToPosition = transform.position;
+    }
+
+    private void UpdateStepEaseVisual()
+    {
+        if (!enableStepEasing || !isStepEasing)
+            return;
+
+        if (isRemoved || hasArrived)
+        {
+            StopStepEase();
+            return;
+        }
+
+        if (visualStepEaseDuration <= 0.0001f)
+        {
+            transform.position = visualStepToPosition;
+            StopStepEase();
+            return;
+        }
+
+        visualStepEaseElapsed += Time.deltaTime;
+        float t = Mathf.Clamp01(visualStepEaseElapsed / visualStepEaseDuration);
+
+        transform.position = Vector3.Lerp(visualStepFromPosition, visualStepToPosition, t);
+
+        if (t >= 1f)
+            StopStepEase();
     }
 
     public RouteStep GetCurrentRouteStep()

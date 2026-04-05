@@ -3596,7 +3596,7 @@ MonoBehaviour:
   connectionId: web-api
   nodeA: {fileID: 499011553}
   nodeB: {fileID: 1458914002}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 917976139}
   edgeLabel: {fileID: 437932659}
@@ -3765,7 +3765,7 @@ MonoBehaviour:
   connectionId: web-api
   nodeA: {fileID: 499011553}
   nodeB: {fileID: 2007623128}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 920254130}
   edgeLabel: {fileID: 1677048279}
@@ -4092,7 +4092,7 @@ MonoBehaviour:
   connectionId: api-db
   nodeA: {fileID: 1458914002}
   nodeB: {fileID: 450786688}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 986924967}
   edgeLabel: {fileID: 879499751}
@@ -4327,7 +4327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1724beb2f2f67fc40bf53785c4226980, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameController
-  tickIntervalSeconds: 1
+  tickIntervalSeconds: 0.5
   autoStart: 1
   logTicks: 0
   trafficDirector: {fileID: 1482744061}
@@ -5455,7 +5455,7 @@ MonoBehaviour:
   connectionId: api-cache
   nodeA: {fileID: 1458914002}
   nodeB: {fileID: 2007623128}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 1300403343}
   edgeLabel: {fileID: 551233964}
@@ -5624,7 +5624,7 @@ MonoBehaviour:
   connectionId: fw-web
   nodeA: {fileID: 320119370}
   nodeB: {fileID: 499011553}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 1304317588}
   edgeLabel: {fileID: 1114328284}
@@ -6843,7 +6843,7 @@ MonoBehaviour:
   connectionId: api-cache
   nodeA: {fileID: 1458914002}
   nodeB: {fileID: 1772769342}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 1505571452}
   edgeLabel: {fileID: 34296926}
@@ -7315,7 +7315,7 @@ MonoBehaviour:
   connectionId: ext-fw
   nodeA: {fileID: 670178137}
   nodeB: {fileID: 320119370}
-  lengthSteps: 10
+  lengthSteps: 20
   latency: 2
   lineRenderer: {fileID: 1638192323}
   edgeLabel: {fileID: 370984517}
