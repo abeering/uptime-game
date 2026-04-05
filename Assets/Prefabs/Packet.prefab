@@ -352,7 +352,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 797289549477322624}
@@ -442,19 +442,30 @@ MonoBehaviour:
   routeIndex: 0
   currentStep: 0
   ticksUntilAdvance: 0
-  movingAToB: 1
+  nodesReachedCount: 0
   hasArrived: 0
   route: []
   trueClass: 0
   trueKind: 0
+  infections: []
   sourceAddress: 
   intelLevel: 0
   confidencePercent: 0
   scanDifficulty: 25
   reportedClass: 0
+  knowsKind: 0
+  revealedKind: 0
+  knowsInfectionType: 0
+  revealedInfectionType: 0
+  revealedKeywordCount: 0
+  scanBorderColor: {r: 0, g: 1, b: 0, a: 1}
   scanStage: 0
   scanTicksIntoStage: 0
   isActivelyScanned: 0
+  unknownColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  benignColor: {r: 0, g: 1, b: 0, a: 1}
+  threatColor: {r: 1, g: 0, b: 0, a: 1}
+  priorityColor: {r: 0, g: 1, b: 1, a: 1}
   scanVisual: {fileID: 5004352954912364169}
   spriteRenderer: {fileID: 665827891915246429}
   borderRenderer: {fileID: 6535546156096995785}
