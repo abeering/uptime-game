@@ -41,7 +41,7 @@ public class ScanDirector : MonoBehaviour
         slots.Clear();
 
         for (int i = 0; i < maxActiveScans; i++)
-            slots.Add(new ScanSlot(i));
+            slots.Add(new ScanSlot(i, logTheme));
     }
 
     public void Tick()
@@ -277,7 +277,7 @@ public class ScanDirector : MonoBehaviour
         return null;
     }
 
-    private ScanSlot FindSlotForPacket(PacketView packet)
+    public ScanSlot FindSlotForPacket(PacketView packet)
     {
         for (int i = 0; i < slots.Count; i++)
         {

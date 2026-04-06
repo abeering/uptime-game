@@ -70,6 +70,7 @@ public class PacketView : MonoBehaviour
     [Header("Labels")]
     public TMPro.TextMeshPro label;
     public TMPro.TextMeshPro scanTagLabel;
+    [SerializeField] private SpriteRenderer scanTagBackgroundRenderer;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -124,6 +125,10 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float scanPulseScaleMax = 1.28f;
     private Vector3 borderBaseScale = Vector3.one;
     private Vector3 pulseBaseScale = Vector3.one;
+
+    [Header("Scan Tag Visuals")]
+    [SerializeField] private float scanTagBackgroundAlpha = 0.92f;
+    [SerializeField] private Color scanTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
 
     [Header("Visual Lanes")]
     [SerializeField] private int visualLaneIndex = 0;
@@ -401,28 +406,24 @@ public class PacketView : MonoBehaviour
         ToggleScanBorder(value);
 
         if (!value)
-        {
-            if (scanTagLabel != null)
-            {
-                scanTagLabel.text = "";
-                scanTagLabel.gameObject.SetActive(false);
-            }
-        }
-        else
-        {
-            RefreshActiveScanTagText();
-        }
+            HideActiveScanTag();
 
         RefreshVisuals();
     }
 
-    public void SetActiveScanSlot(int slotIndex)
+    public void ShowActiveScanTag(ScanSlot slot)
     {
-        activeScanSlotIndex = slotIndex;
-        RefreshActiveScanTagText();
+        if (slot == null)
+        {
+            HideActiveScanTag();
+            return;
+        }
+
+        activeScanSlotIndex = slot.slotIndex;
+        ApplyActiveScanTag(slot);
     }
 
-    public void ClearActiveScanSlot()
+    public void HideActiveScanTag()
     {
         activeScanSlotIndex = -1;
 
@@ -431,23 +432,38 @@ public class PacketView : MonoBehaviour
             scanTagLabel.text = "";
             scanTagLabel.gameObject.SetActive(false);
         }
+
+        if (scanTagBackgroundRenderer != null)
+        {
+            scanTagBackgroundRenderer.enabled = false;
+            scanTagBackgroundRenderer.color = Color.clear;
+        }
     }
 
-    private void RefreshActiveScanTagText()
+    private void ApplyActiveScanTag(ScanSlot slot)
     {
         if (scanTagLabel == null)
             return;
 
-        if (!isActivelyScanned || activeScanSlotIndex < 0)
+        if (!isActivelyScanned || slot == null)
         {
-            scanTagLabel.text = "";
-            scanTagLabel.gameObject.SetActive(false);
+            HideActiveScanTag();
             return;
         }
 
+        activeScanSlotIndex = slot.slotIndex;
+
         scanTagLabel.gameObject.SetActive(true);
-        int pct = Mathf.RoundToInt(confidencePercent);
-        scanTagLabel.text = ScanBarFormatter.BuildWorldSlotTag(activeScanSlotIndex + 1, pct);
+        scanTagLabel.color = scanTagTextColor;
+        scanTagLabel.text = $"S{slot.slotIndex + 1}";
+
+        if (scanTagBackgroundRenderer != null)
+        {
+            Color bg = slot.GetThemeColor();
+            bg.a = scanTagBackgroundAlpha;
+            scanTagBackgroundRenderer.enabled = true;
+            scanTagBackgroundRenderer.color = bg;
+        }
     }
 
     public bool IsScanComplete()
@@ -532,15 +548,8 @@ public class PacketView : MonoBehaviour
     public void HideScanTag()
     {
         isActivelyScanned = false;
-        activeScanSlotIndex = -1;
-
-        if (scanTagLabel != null)
-        {
-            scanTagLabel.text = "";
-            scanTagLabel.gameObject.SetActive(false);
-        }
-
         ToggleScanBorder(false);
+        HideActiveScanTag();
     }
 
     public void ToggleScanBorder(bool show)
@@ -589,22 +598,14 @@ public class PacketView : MonoBehaviour
         if (scanTagLabel == null)
             return;
 
-        if (!isActivelyScanned || activeScanSlotIndex < 0)
+        if (!isActivelyScanned)
         {
-            scanTagLabel.text = "";
-            scanTagLabel.gameObject.SetActive(false);
+            HideActiveScanTag();
             return;
         }
 
-        scanTagLabel.gameObject.SetActive(true);
-
-        int pct = Mathf.RoundToInt(confidencePercent);
-        string text = $"S{activeScanSlotIndex + 1} {pct}%";
-
-        if (scanDirector != null && scanDirector.WouldBeDropped(this))
-            text += " !";
-
-        scanTagLabel.text = text;
+        ScanSlot slot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
+        ApplyActiveScanTag(slot);
     }
 
     public float GetScanConfidence01()
@@ -806,7 +807,6 @@ public class PacketView : MonoBehaviour
     {
         ApplyVisuals();
         RefreshScanVisual();
-        RefreshActiveScanTagText();
     }
 
     private void RefreshScanVisual()
@@ -1413,6 +1413,18 @@ public class PacketView : MonoBehaviour
 
         if (borderRenderer != null)
             borderRenderer.sortingOrder = order - 1;
+
+        if (scanPulseRenderer != null)
+            scanPulseRenderer.sortingOrder = order - 2;
+
+        if (scanTagBackgroundRenderer != null)
+            scanTagBackgroundRenderer.sortingOrder = order + 1;
+
+        if (scanTagLabel != null)
+            scanTagLabel.sortingOrder = order + 2;
+
+        if (speedTail != null)
+            speedTail.sortingOrder = order - 3;
     }
 
 }

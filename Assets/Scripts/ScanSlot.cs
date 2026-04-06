@@ -6,14 +6,32 @@ public class ScanSlot
     public PacketView target;
     public int assignedTick = -1;
 
-    public ScanSlot(int newSlotIndex)
+    private readonly ScanLogTheme theme;
+
+    public ScanSlot(int newSlotIndex, ScanLogTheme logTheme)
     {
         slotIndex = newSlotIndex;
+        theme = logTheme;
     }
 
     public bool IsEmpty()
     {
         return target == null;
+    }
+
+    public Color GetThemeColor()
+    {
+        if (theme == null)
+            return Color.white;
+
+        return slotIndex switch
+        {
+            0 => theme.slot1,
+            1 => theme.slot2,
+            2 => theme.slot3,
+            3 => theme.slot4,
+            _ => theme.muted
+        };
     }
 
     public void Assign(PacketView packet, int currentTick)
@@ -26,7 +44,7 @@ public class ScanSlot
         if (target != null)
         {
             target.SetActivelyScanned(true);
-            target.SetActiveScanSlot(slotIndex);
+            target.ShowActiveScanTag(this);
         }
     }
 
@@ -34,9 +52,7 @@ public class ScanSlot
     {
         if (target != null)
         {
-            target.ClearActiveScanSlot();
             target.SetActivelyScanned(false);
-            target.HideScanTag();
         }
 
         target = null;
