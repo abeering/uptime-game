@@ -20,6 +20,10 @@ public class ConsoleController : MonoBehaviour
     public float collapsedHeight = 200f;
     public float expandedHeight = 420f;
 
+    [Header("Scan Panel Docking")]
+    public RectTransform scanPanelCanvas;
+    public float scanPanelGap = 0f;
+
     [Header("Title Bar")]
     public TMP_Text titleText;
 
@@ -72,8 +76,28 @@ public class ConsoleController : MonoBehaviour
         float targetHeight = isExpanded ? expandedHeight : collapsedHeight;
         consoleCanvas.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, targetHeight);
 
+        UpdateScanPanelDock(targetHeight);
+
         LayoutRebuilder.ForceRebuildLayoutImmediate(consoleCanvas);
+
+        if (scanPanelCanvas != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(scanPanelCanvas);
+
         Canvas.ForceUpdateCanvases();
+    }
+
+    private void UpdateScanPanelDock(float consoleHeight)
+    {
+        if (scanPanelCanvas == null || consoleCanvas == null)
+            return;
+
+        float scaledConsoleHeight = consoleHeight * consoleCanvas.localScale.y;
+        float scaledGap = scanPanelGap * consoleCanvas.localScale.y;
+
+        Vector3 pos = scanPanelCanvas.localPosition;
+        pos.x = consoleCanvas.localPosition.x;
+        pos.y = consoleCanvas.localPosition.y + scaledConsoleHeight + scaledGap;
+        scanPanelCanvas.localPosition = pos;
     }
 
     private void UpdateTitle()
