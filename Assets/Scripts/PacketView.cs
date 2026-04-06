@@ -447,7 +447,7 @@ public class PacketView : MonoBehaviour
 
         scanTagLabel.gameObject.SetActive(true);
         int pct = Mathf.RoundToInt(confidencePercent);
-        scanTagLabel.text = $"S{activeScanSlotIndex + 1} {pct}%";
+        scanTagLabel.text = ScanBarFormatter.BuildWorldSlotTag(activeScanSlotIndex + 1, pct);
     }
 
     public bool IsScanComplete()

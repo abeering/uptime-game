@@ -16,6 +16,12 @@ public class ScanLogTheme
     public Color classThreat = new(1.00f, 0.42f, 0.42f, 1f);
     public Color classPriority = new(0.40f, 0.80f, 1.00f, 1f);
 
+    [Header("Scan Slots")]
+    public Color slot1 = new(0.25f, 1.00f, 0.25f, 1f);
+    public Color slot2 = new(0.30f, 0.85f, 1.00f, 1f);
+    public Color slot3 = new(1.00f, 0.70f, 0.30f, 1f);
+    public Color slot4 = new(1.00f, 0.45f, 0.80f, 1f);
+
     [Header("Misc")]
     public Color muted = new(0.67f, 0.67f, 0.67f, 0.53f);
 }

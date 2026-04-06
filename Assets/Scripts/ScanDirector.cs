@@ -27,10 +27,10 @@ public class ScanDirector : MonoBehaviour
     {
         public int slotIndex;
         public string packetId;
-        public string bar;
+        public ScanStage stage;
+        public VisibleClass visibleClass;
+        public string barText;
         public string percentText;
-        public string stageText;
-        public string classText;
         public string kindText;
         public int lingerTicks;
         public bool wasReplacementCandidate;
@@ -216,11 +216,11 @@ public class ScanDirector : MonoBehaviour
                 {
                     slotIndex = i,
                     packetId = packet.packetId,
-                    bar = bar,
+                    stage = packet.scanStage,
+                    visibleClass = packet.GetVisibleClass(),
+                    barText = bar,
                     percentText = "100%",
-                    stageText = GetStageShortLabel(packet.scanStage),
-                    classText = GetVisibleClassShortLabel(packet),
-                    kindText = GetKindSuffix(packet),
+                    kindText = GetKindLine(packet),
                     lingerTicks = completionLingerTicks,
                     wasReplacementCandidate = willBeDropped
                 });
@@ -290,6 +290,9 @@ public class ScanDirector : MonoBehaviour
 
     private ScanSlot GetReplacementCandidateSlot()
     {
+        if (FindEmptySlot() != null)
+            return null;
+
         return FindOldestSlot();
     }
 
@@ -328,6 +331,18 @@ public class ScanDirector : MonoBehaviour
             return "----";
 
         return packet.GetVisibleClass() switch
+        {
+            VisibleClass.Unknown => "UNKNOWN",
+            VisibleClass.Benign => "BENIGN",
+            VisibleClass.Threat => "THREAT",
+            VisibleClass.Priority => "PRIORITY",
+            _ => "----"
+        };
+    }
+
+    private string GetVisibleClassShortLabel(VisibleClass visibleClass)
+    {
+        return visibleClass switch
         {
             VisibleClass.Unknown => "UNKNOWN",
             VisibleClass.Benign => "BENIGN",
@@ -432,145 +447,198 @@ public class ScanDirector : MonoBehaviour
         return GetPacketClassShortLabel(packetClass);
     }
 
+    private ScanPanelRowData BuildEmptyRow(int slotIndex)
+    {
+        return new ScanPanelRowData
+        {
+            slotIndex = slotIndex,
+            state = ScanPanelRowState.Empty,
+            packetId = "--",
+            barText = "[---]",
+            percentText = "--%",
+            etaText = "--",
+            stage = ScanStage.Unknown,
+            visibleClass = VisibleClass.Unknown,
+            showDone = false,
+            willBeDropped = false,
+            secondaryIntelLine = null
+        };
+    }
+
+    private ScanPanelRowData BuildLingerRow(ActiveScanCompletion linger)
+    {
+        if (linger == null)
+            return null;
+
+        return new ScanPanelRowData
+        {
+            slotIndex = linger.slotIndex,
+            state = ScanPanelRowState.CompletedLinger,
+            packetId = linger.packetId,
+            barText = linger.barText,
+            percentText = linger.percentText,
+            etaText = "--",
+            stage = linger.stage,
+            visibleClass = linger.visibleClass,
+            showDone = true,
+            willBeDropped = linger.wasReplacementCandidate,
+            // TODO 
+            // secondaryIntelLine = GetKindLine(linger)
+            secondaryIntelLine = null
+        };
+    }
+
+    private ScanPanelRowData BuildActiveRow(int slotIndex, PacketView p, int activeCount)
+    {
+        bool willBeDropped = WouldBeDropped(p);
+
+        string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
+            p.GetScanDisplayStageIndex(),
+            p.GetScanConfidence01(),
+            p.IsScanComplete(),
+            false,
+            activeStageChar: '='
+        );
+
+        int currentPct = Mathf.RoundToInt(p.GetScanConfidence01() * 100f);
+        string percentText = p.IsScanComplete() ? "100%" : $"{currentPct}%";
+
+        int etaTicks = GetEtaTicksToNextStage(p, activeCount);
+        string etaText = p.IsScanComplete() ? "--" : etaTicks.ToString();
+
+        return new ScanPanelRowData
+        {
+            slotIndex = slotIndex,
+            state = ScanPanelRowState.Active,
+            packetId = p.packetId,
+            barText = bar,
+            percentText = percentText,
+            etaText = etaText,
+            stage = p.scanStage,
+            visibleClass = p.GetVisibleClass(),
+            showDone = false,
+            willBeDropped = willBeDropped,
+            // TODO Fix 
+            // secondaryIntelLine = GetKindLine(p)
+            secondaryIntelLine = null
+        };
+    }
+
+    private ScanPanelRowData BuildRowForSlot(int slotIndex, int activeCount)
+    {
+        ActiveScanCompletion linger = completionLinger.Find(c => c.slotIndex == slotIndex);
+        if (linger != null)
+            return BuildLingerRow(linger);
+
+        ScanSlot slot = slots[slotIndex];
+        if (slot == null || slot.IsEmpty() || slot.target == null)
+            return BuildEmptyRow(slotIndex);
+
+        return BuildActiveRow(slotIndex, slot.target, activeCount);
+    }
+
+    // this has to do a weird thing to maintain alignment, we colorize the ! alpha=0 inside Colorize()
+    // so we are double coloring, but its necessary for alignment
+    private string FormatWarnPrefix(bool showWarning)
+    {
+        string glyph = showWarning
+            ? "!"
+            : "<color=#FFFFFF00>!</color>";
+
+        return RichTextUtil.Colorize($"{glyph} ", logTheme.stageProbable, true);
+    }
+
+    private void AppendFormattedScanRow(StringBuilder sb, ScanPanelRowData row)
+    {
+        string warnPrefix = FormatWarnPrefix(row.willBeDropped);
+        string slotTag = FormatInlineSlotTag(row.slotIndex);
+
+        if (row.state == ScanPanelRowState.Empty)
+        {
+            sb.Append(warnPrefix);
+            sb.Append(" ");
+            sb.Append(slotTag);
+            sb.Append(" ");
+            sb.Append(ColorizeMutedPadded(PadRightSafe(row.packetId, 3)));
+            sb.Append("  ");
+            sb.Append(ColorizeMutedPadded(PadRightSafe(row.barText, 5)));
+            sb.Append("  ");
+            sb.Append(ColorizeMutedPadded(PadLeftSafe(row.percentText, 4)));
+            sb.Append("  ");
+            sb.Append(ColorizeMuted("ETA"));
+            sb.Append(" ");
+            sb.Append(ColorizeMuted(PadLeftSafe(row.etaText, 2)));
+            sb.Append("  ");
+            sb.Append(ColorizeMutedPadded(PadRightSafe("empty", 9)));
+            sb.AppendLine();
+            return;
+        }
+
+        string stageText = ColorizeStagePadded(
+            row.stage,
+            PadRightSafe(GetStageShortLabel(row.stage), 9)
+        );
+
+        string classText = ColorizeVisibleClassPadded(
+            row.visibleClass,
+            PadRightSafe(GetVisibleClassShortLabel(row.visibleClass), 8)
+        );
+
+        sb.Append(warnPrefix);
+        sb.Append(" ");
+        sb.Append(slotTag);
+        sb.Append(" ");
+        sb.Append(PadRightSafe(row.packetId, 3));
+        sb.Append("  ");
+        sb.Append(PadRightSafe(row.barText, 5));
+        sb.Append("  ");
+        sb.Append(PadLeftSafe(row.percentText, 4));
+        sb.Append("  ");
+
+        if (row.showDone)
+        {
+            sb.Append(ColorizeMuted("DONE", true));
+            sb.Append(" ");
+            sb.Append("  ");
+        }
+        else
+        {
+            sb.Append(ColorizeMuted("ETA"));
+            sb.Append(" ");
+            sb.Append(PadLeftSafe(row.etaText, 2));
+            sb.Append("  ");
+        }
+
+        sb.Append(stageText);
+        sb.Append(" ");
+        sb.Append(classText);
+        sb.AppendLine();
+
+        if (!string.IsNullOrWhiteSpace(row.secondaryIntelLine))
+        {
+            sb.Append("  ");   // warning col + spacer
+            sb.Append("    "); // [S1]
+            sb.Append(" ");    // spacer after tag
+            sb.Append("    "); // packet id area
+            sb.Append(ColorizeVisibleClassPadded(
+                row.visibleClass,
+                row.secondaryIntelLine.Trim()
+            ));
+            sb.AppendLine();
+        }
+    }
+
     public void AppendScanPanel(StringBuilder sb)
     {
         int activeCount = GetActiveScanCount();
 
         for (int i = 0; i < slots.Count; i++)
         {
-            ScanSlot slot = slots[i];
-
-            // Check completion linger first
-            ActiveScanCompletion linger = completionLinger.Find(c => c.slotIndex == i);
-
-            if (linger != null)
-            {
-                string lingerPrefix = linger.wasReplacementCandidate ? "!" : " ";
-
-                string lingerStageRaw = PadRightSafe(linger.stageText, 9);
-                string lingerClassRaw = PadRightSafe(linger.classText, 8);
-
-                // If linger.stageText / classText are already raw labels:
-                string lingerStageText = ColorizeStagePadded(
-                    Enum.TryParse(linger.stageText, true, out ScanStage parsedStage) ? parsedStage : ScanStage.Unknown,
-                    lingerStageRaw
-                );
-
-                string lingerClassText = ColorizeVisibleClassPadded(
-                    linger.classText switch
-                    {
-                        "BENIGN" => VisibleClass.Benign,
-                        "THREAT" => VisibleClass.Threat,
-                        "PRIORITY" => VisibleClass.Priority,
-                        _ => VisibleClass.Unknown
-                    },
-                    lingerClassRaw
-                );
-
-                sb.Append(lingerPrefix);
-                sb.Append($"<b>{PadRightSafe($"S{linger.slotIndex + 1}", 3)}</b>");
-                sb.Append(" ");
-                sb.Append($"<b>{PadRightSafe(linger.packetId, 3)}</b>");
-                sb.Append("  ");
-                sb.Append($"<b>{PadRightSafe(linger.bar, 6)}</b>");
-                sb.Append("  ");
-                sb.Append($"<b>{PadLeftSafe(linger.percentText, 4)}</b>");
-                sb.Append("  ");
-                sb.Append(ColorizeMuted("DONE", true));
-                sb.Append(" ");
-                sb.Append(lingerStageText);
-                sb.Append(" ");
-                sb.Append(lingerClassText);
-
-                if (!string.IsNullOrWhiteSpace(linger.kindText))
-                {
-                    sb.Append(" ");
-                    sb.Append(ColorizeMuted(linger.kindText.Trim()));
-                }
-
-                sb.AppendLine();
+            ScanPanelRowData row = BuildRowForSlot(i, activeCount);
+            if (row == null)
                 continue;
-            }
 
-            if (slot.IsEmpty() || slot.target == null)
-            {
-                string slotText = PadRightSafe($"S{i + 1}", 3);
-                string idText = PadRightSafe("--", 3);
-                string barText = PadRightSafe("[---]", 6);
-                string pctText = PadLeftSafe("--%", 4);
-                string etaLabel = ColorizeMuted("ETA");
-                string etaValue = ColorizeMuted(PadLeftSafe("--", 2));
-                string emptyText = ColorizeMutedPadded(PadRightSafe("empty", 9));
-
-                sb.Append(" ");
-                sb.Append($"<b>{slotText}</b>");
-                sb.Append(" ");
-                sb.Append(ColorizeMutedPadded(idText));
-                sb.Append("  ");
-                sb.Append(ColorizeMutedPadded(barText));
-                sb.Append("  ");
-                sb.Append(ColorizeMutedPadded(pctText));
-                sb.Append("  ");
-                sb.Append(etaLabel);
-                sb.Append(" ");
-                sb.Append(etaValue);
-                sb.Append("  ");
-                sb.Append(emptyText);
-                sb.AppendLine();
-                continue;
-            }
-
-            PacketView p = slot.target;
-
-            bool willBeDropped = WouldBeDropped(p);
-
-            string rowPrefix = willBeDropped ? "!" : " ";
-
-            string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
-                p.GetScanDisplayStageIndex(),
-                p.GetScanConfidence01(),
-                p.IsScanComplete(),
-                willBeDropped,
-                activeStageChar: '='
-            );
-
-            int currentPct = Mathf.RoundToInt(p.GetScanConfidence01() * 100f);
-            string percentText = p.IsScanComplete() ? "100%" : $"{currentPct}%";
-
-            int etaTicks = GetEtaTicksToNextStage(p, activeCount);
-            string etaText = p.IsScanComplete() ? "--" : etaTicks.ToString();
-
-            string stageRaw = PadRightSafe(GetStageShortLabel(p.scanStage), 9);
-            string classRaw = PadRightSafe(GetVisibleClassShortLabel(p), 8);
-
-            string stageText = ColorizeStagePadded(p.scanStage, stageRaw);
-            string classText = ColorizeVisibleClassPadded(p.GetVisibleClass(), classRaw);
-            string kindSuffix = GetKindSuffix(p);
-
-            sb.Append(rowPrefix);
-            sb.Append($"<b>{PadRightSafe($"S{i + 1}", 3)}</b>");
-            sb.Append(" ");
-            sb.Append($"<b>{PadRightSafe(p.packetId, 3)}</b>");
-            sb.Append("  ");
-            sb.Append($"<b>{PadRightSafe(bar, 6)}</b>");
-            sb.Append("  ");
-            sb.Append($"<b>{PadLeftSafe(percentText, 4)}</b>");
-            sb.Append("  ");
-            sb.Append(ColorizeMuted("ETA"));
-            sb.Append(" ");
-            sb.Append($"<b>{PadLeftSafe(etaText, 2)}</b>");
-            sb.Append("  ");
-            sb.Append(stageText);
-            sb.Append(" ");
-            sb.Append(classText);
-
-            if (!string.IsNullOrWhiteSpace(kindSuffix))
-            {
-                sb.Append(" ");
-                sb.Append(ColorizeMuted(kindSuffix.Trim()));
-            }
-
-            sb.AppendLine();
+            AppendFormattedScanRow(sb, row);
         }
     }
 
@@ -617,12 +685,63 @@ public class ScanDirector : MonoBehaviour
         }
     }
 
-    private string GetKindSuffix(PacketView p)
+    private enum ScanPanelRowState
     {
-        if (p == null || !p.knowsKind)
+        Empty,
+        Active,
+        CompletedLinger
+    }
+
+    private class ScanPanelRowData
+    {
+        public int slotIndex;
+        public ScanPanelRowState state;
+
+        public string packetId;
+        public string barText;
+        public string percentText;
+        public string etaText;
+
+        public ScanStage stage;
+        public VisibleClass visibleClass;
+
+        public bool showDone;
+        public bool willBeDropped;
+
+        public string secondaryIntelLine;
+    }
+
+    private Color GetSlotColor(int slotIndex)
+    {
+        return slotIndex switch
+        {
+            0 => logTheme.slot1,
+            1 => logTheme.slot2,
+            2 => logTheme.slot3,
+            3 => logTheme.slot4,
+            _ => logTheme.muted
+        };
+    }
+
+    private string FormatInlineSlotTag(int slotIndex)
+    {
+        return RichTextUtil.Colorize($"[S{slotIndex + 1}]", GetSlotColor(slotIndex), true);
+    }
+
+    private string GetKindLine(PacketView p)
+    {
+        if (p == null || !p.knowsKind || p.revealedKind == PacketKind.None)
             return "";
 
-        return $" ({p.revealedKind.ToString().ToUpperInvariant()})";
+        return p.revealedKind.ToString();
+    }
+
+    private string GetKindLine(ActiveScanCompletion linger)
+    {
+        if (linger == null || string.IsNullOrWhiteSpace(linger.kindText))
+            return "";
+
+        return linger.kindText;
     }
 
     private static string PadRightSafe(string value, int width)
@@ -651,7 +770,7 @@ public class ScanDirector : MonoBehaviour
     {
         return stage switch
         {
-            ScanStage.Unknown   => RichTextUtil.Colorize(paddedLabel, logTheme.stageUnknown),
+            ScanStage.Unknown   => RichTextUtil.Colorize(paddedLabel, logTheme.stageUnknown, true),
             ScanStage.Probable  => RichTextUtil.Colorize(paddedLabel, logTheme.stageProbable, true),
             ScanStage.Likely    => RichTextUtil.Colorize(paddedLabel, logTheme.stageLikely, true),
             ScanStage.Confirmed => RichTextUtil.Colorize(paddedLabel, logTheme.stageConfirmed, true),
@@ -663,7 +782,7 @@ public class ScanDirector : MonoBehaviour
     {
         return visibleClass switch
         {
-            VisibleClass.Unknown  => RichTextUtil.Colorize(paddedLabel, logTheme.classUnknown),
+            VisibleClass.Unknown  => RichTextUtil.Colorize(paddedLabel, logTheme.classUnknown, true),
             VisibleClass.Benign   => RichTextUtil.Colorize(paddedLabel, logTheme.classBenign, true),
             VisibleClass.Threat   => RichTextUtil.Colorize(paddedLabel, logTheme.classThreat, true),
             VisibleClass.Priority => RichTextUtil.Colorize(paddedLabel, logTheme.classPriority, true),
