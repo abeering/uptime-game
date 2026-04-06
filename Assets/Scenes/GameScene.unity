@@ -3602,11 +3602,11 @@ RectTransform:
   - {fileID: 409105181}
   m_Father: {fileID: 419062964}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 350, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 1.75, y: 0.5}
+  m_SizeDelta: {x: 600, y: 65}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &908552821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3700,9 +3700,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScanDirector
   maxActiveScans: 2
-  baseScanDurationTicksSingle: 30
-  baseScanDurationTicksDual: 45
-  completedScanLingerTicks: 3
+  baseScanDurationTicksSingle: 60
+  baseScanDurationTicksDual: 90
   logTheme:
     stageUnknown: {r: 0.53, g: 0.53, b: 0.53, a: 1}
     stageProbable: {r: 1, g: 0.82, b: 0.4, a: 1}
@@ -4656,10 +4655,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 908552820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -300, y: -32.5}
+  m_SizeDelta: {x: 600, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1037435976
 MonoBehaviour:
@@ -7904,11 +7903,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 908552820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -12, y: -14}
+  m_SizeDelta: {x: 580, y: 45}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &1713623887
 MonoBehaviour:
   m_ObjectHideFlags: 0

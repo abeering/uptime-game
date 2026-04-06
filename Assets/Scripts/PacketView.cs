@@ -106,6 +106,7 @@ public class PacketView : MonoBehaviour
     public ScanStage scanStage = ScanStage.Unknown;
     [Min(0)] public int scanTicksIntoStage = 0;
     public bool isActivelyScanned = false;
+    [SerializeField] private int activeScanSlotIndex = -1;
 
     [Header("Visuals")]
     public Color unknownColor = Color.gray;
@@ -399,13 +400,54 @@ public class PacketView : MonoBehaviour
         isActivelyScanned = value;
         ToggleScanBorder(value);
 
-        if (!value && scanTagLabel != null)
+        if (!value)
+        {
+            if (scanTagLabel != null)
+            {
+                scanTagLabel.text = "";
+                scanTagLabel.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            RefreshActiveScanTagText();
+        }
+
+        RefreshVisuals();
+    }
+
+    public void SetActiveScanSlot(int slotIndex)
+    {
+        activeScanSlotIndex = slotIndex;
+        RefreshActiveScanTagText();
+    }
+
+    public void ClearActiveScanSlot()
+    {
+        activeScanSlotIndex = -1;
+
+        if (scanTagLabel != null)
         {
             scanTagLabel.text = "";
             scanTagLabel.gameObject.SetActive(false);
         }
+    }
 
-        RefreshVisuals();
+    private void RefreshActiveScanTagText()
+    {
+        if (scanTagLabel == null)
+            return;
+
+        if (!isActivelyScanned || activeScanSlotIndex < 0)
+        {
+            scanTagLabel.text = "";
+            scanTagLabel.gameObject.SetActive(false);
+            return;
+        }
+
+        scanTagLabel.gameObject.SetActive(true);
+        int pct = Mathf.RoundToInt(confidencePercent);
+        scanTagLabel.text = $"S{activeScanSlotIndex + 1} {pct}%";
     }
 
     public bool IsScanComplete()
@@ -490,6 +532,7 @@ public class PacketView : MonoBehaviour
     public void HideScanTag()
     {
         isActivelyScanned = false;
+        activeScanSlotIndex = -1;
 
         if (scanTagLabel != null)
         {
@@ -543,65 +586,26 @@ public class PacketView : MonoBehaviour
 
     public void RefreshScanTag(ScanDirector scanDirector)
     {
-        if (scanTagLabel != null)
+        if (scanTagLabel == null)
+            return;
+
+        if (!isActivelyScanned || activeScanSlotIndex < 0)
         {
             scanTagLabel.text = "";
             scanTagLabel.gameObject.SetActive(false);
-        }
-
-        if (scanDirector == null)
-        {
-            if (isActivelyScanned)
-                HideScanTag();
             return;
         }
 
-        bool shouldBeActive = scanDirector.IsPacketActivelyScanned(this);
+        scanTagLabel.gameObject.SetActive(true);
 
-        if (shouldBeActive == isActivelyScanned)
-            return;
+        int pct = Mathf.RoundToInt(confidencePercent);
+        string text = $"S{activeScanSlotIndex + 1} {pct}%";
 
-        isActivelyScanned = shouldBeActive;
+        if (scanDirector != null && scanDirector.WouldBeDropped(this))
+            text += " !";
 
-        if (!isActivelyScanned)
-        {
-            HideScanTag();
-            return;
-        }
-
-        ToggleScanBorder(true);
+        scanTagLabel.text = text;
     }
-
-    // TODO - bring back when we do crosshair scan 
-    // public void RefreshScanTag(ScanDirector scanDirector)
-    // {
-    //     if (scanTagLabel == null || scanDirector == null)
-    //         return;
-
-    //     if (!scanDirector.IsPacketActivelyScanned(this))
-    //     {
-    //         HideScanTag();
-    //         return;
-    //     }
-
-    //     scanTagLabel.gameObject.SetActive(true);
-    //     ToggleScanBorder(true);
-
-    //     bool blinkOn = Mathf.FloorToInt(Time.time * 4f) % 2 == 0;
-    //     // TODO - tie blinks to ticks 
-    //     // char activeStageChar = blinkOn ? '▣' : '□';
-    //     char activeStageChar = '=';
-
-    //     bool willBeDropped = scanDirector.WouldBeDropped(this);
-
-    //     scanTagLabel.text = ScanBarFormatter.BuildWorldScanTag(
-    //         GetScanDisplayStageIndex(),
-    //         GetScanConfidence01(),
-    //         IsScanComplete(),
-    //         willBeDropped,
-    //         activeStageChar: activeStageChar
-    //     );
-    // }
 
     public float GetScanConfidence01()
     {
@@ -802,6 +806,7 @@ public class PacketView : MonoBehaviour
     {
         ApplyVisuals();
         RefreshScanVisual();
+        RefreshActiveScanTagText();
     }
 
     private void RefreshScanVisual()

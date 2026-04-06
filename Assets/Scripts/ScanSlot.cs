@@ -24,12 +24,17 @@ public class ScanSlot
         assignedTick = currentTick;
 
         if (target != null)
+        {
             target.SetActivelyScanned(true);
+            target.SetActiveScanSlot(slotIndex);
+        }
     }
 
     public void Clear()
     {
-        if (target != null){
+        if (target != null)
+        {
+            target.ClearActiveScanSlot();
             target.SetActivelyScanned(false);
             target.HideScanTag();
         }

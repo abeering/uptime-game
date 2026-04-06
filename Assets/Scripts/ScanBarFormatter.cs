@@ -74,6 +74,12 @@ public static class ScanBarFormatter
         return $"{bar}\n{detail}";
     }
 
+    public static string BuildWorldSlotTag(int slotNumber, int confidencePercent)
+    {
+        confidencePercent = Mathf.Clamp(confidencePercent, 0, 100);
+        return $"S{slotNumber} {confidencePercent,3}%";
+    }
+
     private static string BuildBarOnly(
         int stageIndex,
         bool isComplete,

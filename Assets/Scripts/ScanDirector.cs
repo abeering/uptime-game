@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
+using System;
 
 public class ScanDirector : MonoBehaviour
 {
@@ -11,18 +12,29 @@ public class ScanDirector : MonoBehaviour
     public int baseScanDurationTicksSingle = 30;
     public int baseScanDurationTicksDual = 45;
 
-    [Header("Completion")]
-    [Min(0)] public int completedScanLingerTicks = 8;
-
     [Header("UI Theme")]
     [SerializeField] private ScanLogTheme logTheme = new();
 
     private CommandDirector commandDirector;
 
     private readonly List<ScanSlot> slots = new();
-    private readonly List<CompletedScanEntry> completedEntries = new();
+    private readonly List<ActiveScanCompletion> completionLinger = new();
+    private const int completionLingerTicks = 6;
 
     private int tickCounter = 0;
+
+    private class ActiveScanCompletion
+    {
+        public int slotIndex;
+        public string packetId;
+        public string bar;
+        public string percentText;
+        public string stageText;
+        public string classText;
+        public string kindText;
+        public int lingerTicks;
+        public bool wasReplacementCandidate;
+    }
 
     void Awake()
     {
@@ -69,9 +81,8 @@ public class ScanDirector : MonoBehaviour
         if (replacementSlot != null)
         {
             UnsubscribeFromPacket(replacementSlot.target);
-            AddCompletedEntry(replacementSlot.target);
-            SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
+            SubscribeToPacket(packet);
         }
 
         RefreshActiveScanTags();
@@ -165,7 +176,6 @@ public class ScanDirector : MonoBehaviour
             return;
 
         int baseDurationTicks = GetBaseScanDurationTicks(activeCount);
-
         if (baseDurationTicks <= 0)
             baseDurationTicks = 1;
 
@@ -179,15 +189,12 @@ public class ScanDirector : MonoBehaviour
             if (packet == null)
             {
                 slot.Clear();
-                RefreshActiveScanTags();
                 continue;
             }
 
             if (!packet.CanAdvanceScanStage())
             {
-                UnsubscribeFromPacket(packet);
                 slot.Clear();
-                RefreshActiveScanTags();
                 continue;
             }
 
@@ -195,10 +202,31 @@ public class ScanDirector : MonoBehaviour
 
             if (!packet.CanAdvanceScanStage())
             {
-                AddCompletedEntry(packet);
+                bool willBeDropped = WouldBeDropped(packet);
+
+                string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
+                    packet.GetScanDisplayStageIndex(),
+                    packet.GetScanConfidence01(),
+                    true,
+                    false,
+                    activeStageChar: '='
+                );
+
+                completionLinger.Add(new ActiveScanCompletion
+                {
+                    slotIndex = i,
+                    packetId = packet.packetId,
+                    bar = bar,
+                    percentText = "100%",
+                    stageText = GetStageShortLabel(packet.scanStage),
+                    classText = GetVisibleClassShortLabel(packet),
+                    kindText = GetKindSuffix(packet),
+                    lingerTicks = completionLingerTicks,
+                    wasReplacementCandidate = willBeDropped
+                });
+
                 UnsubscribeFromPacket(packet);
                 slot.Clear();
-                RefreshActiveScanTags();
             }
         }
 
@@ -207,29 +235,13 @@ public class ScanDirector : MonoBehaviour
 
     private void TickCompletedEntries()
     {
-        for (int i = completedEntries.Count - 1; i >= 0; i--)
+        for (int i = completionLinger.Count - 1; i >= 0; i--)
         {
-            completedEntries[i].lingerTicksRemaining--;
+            completionLinger[i].lingerTicks--;
 
-            if (completedEntries[i].lingerTicksRemaining <= 0)
-                completedEntries.RemoveAt(i);
+            if (completionLinger[i].lingerTicks <= 0)
+                completionLinger.RemoveAt(i);
         }
-    }
-
-    private void AddCompletedEntry(PacketView packet)
-    {
-        if (packet == null)
-            return;
-
-        completedEntries.Add(new CompletedScanEntry(
-            packet.packetId,
-            packet.scanStage,
-            packet.reportedClass,
-            completedScanLingerTicks
-        ));
-
-        while (completedEntries.Count > 4)
-            completedEntries.RemoveAt(0);
     }
 
     private int GetBaseScanDurationTicks(int activeCount)
@@ -428,21 +440,91 @@ public class ScanDirector : MonoBehaviour
         {
             ScanSlot slot = slots[i];
 
-            if (slot.IsEmpty())
+            // Check completion linger first
+            ActiveScanCompletion linger = completionLinger.Find(c => c.slotIndex == i);
+
+            if (linger != null)
             {
-                sb.AppendLine($"S{i + 1}  {RichTextUtil.Colorize("empty", logTheme.muted)}");
+                string lingerPrefix = linger.wasReplacementCandidate ? "!" : " ";
+
+                string lingerStageRaw = PadRightSafe(linger.stageText, 9);
+                string lingerClassRaw = PadRightSafe(linger.classText, 8);
+
+                // If linger.stageText / classText are already raw labels:
+                string lingerStageText = ColorizeStagePadded(
+                    Enum.TryParse(linger.stageText, true, out ScanStage parsedStage) ? parsedStage : ScanStage.Unknown,
+                    lingerStageRaw
+                );
+
+                string lingerClassText = ColorizeVisibleClassPadded(
+                    linger.classText switch
+                    {
+                        "BENIGN" => VisibleClass.Benign,
+                        "THREAT" => VisibleClass.Threat,
+                        "PRIORITY" => VisibleClass.Priority,
+                        _ => VisibleClass.Unknown
+                    },
+                    lingerClassRaw
+                );
+
+                sb.Append(lingerPrefix);
+                sb.Append($"<b>{PadRightSafe($"S{linger.slotIndex + 1}", 3)}</b>");
+                sb.Append(" ");
+                sb.Append($"<b>{PadRightSafe(linger.packetId, 3)}</b>");
+                sb.Append("  ");
+                sb.Append($"<b>{PadRightSafe(linger.bar, 6)}</b>");
+                sb.Append("  ");
+                sb.Append($"<b>{PadLeftSafe(linger.percentText, 4)}</b>");
+                sb.Append("  ");
+                sb.Append(ColorizeMuted("DONE", true));
+                sb.Append(" ");
+                sb.Append(lingerStageText);
+                sb.Append(" ");
+                sb.Append(lingerClassText);
+
+                if (!string.IsNullOrWhiteSpace(linger.kindText))
+                {
+                    sb.Append(" ");
+                    sb.Append(ColorizeMuted(linger.kindText.Trim()));
+                }
+
+                sb.AppendLine();
+                continue;
+            }
+
+            if (slot.IsEmpty() || slot.target == null)
+            {
+                string slotText = PadRightSafe($"S{i + 1}", 3);
+                string idText = PadRightSafe("--", 3);
+                string barText = PadRightSafe("[---]", 6);
+                string pctText = PadLeftSafe("--%", 4);
+                string etaLabel = ColorizeMuted("ETA");
+                string etaValue = ColorizeMuted(PadLeftSafe("--", 2));
+                string emptyText = ColorizeMutedPadded(PadRightSafe("empty", 9));
+
+                sb.Append(" ");
+                sb.Append($"<b>{slotText}</b>");
+                sb.Append(" ");
+                sb.Append(ColorizeMutedPadded(idText));
+                sb.Append("  ");
+                sb.Append(ColorizeMutedPadded(barText));
+                sb.Append("  ");
+                sb.Append(ColorizeMutedPadded(pctText));
+                sb.Append("  ");
+                sb.Append(etaLabel);
+                sb.Append(" ");
+                sb.Append(etaValue);
+                sb.Append("  ");
+                sb.Append(emptyText);
+                sb.AppendLine();
                 continue;
             }
 
             PacketView p = slot.target;
 
-            if (p == null)
-            {
-                sb.AppendLine($"S{i + 1}  {RichTextUtil.Colorize("null", logTheme.muted)}");
-                continue;
-            }
-
             bool willBeDropped = WouldBeDropped(p);
+
+            string rowPrefix = willBeDropped ? "!" : " ";
 
             string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
                 p.GetScanDisplayStageIndex(),
@@ -452,44 +534,40 @@ public class ScanDirector : MonoBehaviour
                 activeStageChar: '='
             );
 
-            string stageLabel = GetStageRichLabel(p.scanStage);
-            string classLabel = GetVisibleClassRichLabel(p);
+            int currentPct = Mathf.RoundToInt(p.GetScanConfidence01() * 100f);
+            string percentText = p.IsScanComplete() ? "100%" : $"{currentPct}%";
 
             int etaTicks = GetEtaTicksToNextStage(p, activeCount);
+            string etaText = p.IsScanComplete() ? "--" : etaTicks.ToString();
 
-            int currentPct = Mathf.RoundToInt(p.GetScanConfidence01() * 100f);
-            string percentText = p.IsScanComplete()
-                ? "100%"
-                : $"{currentPct}%";
+            string stageRaw = PadRightSafe(GetStageShortLabel(p.scanStage), 9);
+            string classRaw = PadRightSafe(GetVisibleClassShortLabel(p), 8);
 
-            string etaText = p.IsScanComplete()
-                ? "--"
-                : etaTicks.ToString();
+            string stageText = ColorizeStagePadded(p.scanStage, stageRaw);
+            string classText = ColorizeVisibleClassPadded(p.GetVisibleClass(), classRaw);
+            string kindSuffix = GetKindSuffix(p);
 
-            string dropMarker = willBeDropped ? "  <b>!</b>" : "";
+            sb.Append(rowPrefix);
+            sb.Append($"<b>{PadRightSafe($"S{i + 1}", 3)}</b>");
+            sb.Append(" ");
+            sb.Append($"<b>{PadRightSafe(p.packetId, 3)}</b>");
+            sb.Append("  ");
+            sb.Append($"<b>{PadRightSafe(bar, 6)}</b>");
+            sb.Append("  ");
+            sb.Append($"<b>{PadLeftSafe(percentText, 4)}</b>");
+            sb.Append("  ");
+            sb.Append(ColorizeMuted("ETA"));
+            sb.Append(" ");
+            sb.Append($"<b>{PadLeftSafe(etaText, 2)}</b>");
+            sb.Append("  ");
+            sb.Append(stageText);
+            sb.Append(" ");
+            sb.Append(classText);
 
-            sb.AppendLine(
-                $"S{i + 1}  <b>{p.packetId}</b>  {stageLabel}  {classLabel}{dropMarker}"
-            );
-            sb.AppendLine(
-                $"    {bar.PadRight(8)}  {percentText.PadLeft(4)}  ETA {etaText}"
-            );
-        }
-
-        if (completedEntries.Count > 0)
-        {
-            sb.AppendLine(RichTextUtil.Colorize("recent", logTheme.muted));
-
-            for (int i = 0; i < completedEntries.Count; i++)
+            if (!string.IsNullOrWhiteSpace(kindSuffix))
             {
-                var entry = completedEntries[i];
-
-                string finalStage = GetStageRichLabel(entry.finalStage);
-                string finalClass = GetPacketClassRichLabel(entry.reportedClass);
-
-                sb.AppendLine(
-                    $"  {entry.packetId.PadRight(6)}  {finalStage}  {finalClass}  [■■■]"
-                );
+                sb.Append(" ");
+                sb.Append(ColorizeMuted(kindSuffix.Trim()));
             }
 
             sb.AppendLine();
@@ -537,6 +615,60 @@ public class ScanDirector : MonoBehaviour
 
             sb.AppendLine();
         }
+    }
+
+    private string GetKindSuffix(PacketView p)
+    {
+        if (p == null || !p.knowsKind)
+            return "";
+
+        return $" ({p.revealedKind.ToString().ToUpperInvariant()})";
+    }
+
+    private static string PadRightSafe(string value, int width)
+    {
+        value ??= "";
+        return value.Length >= width ? value.Substring(0, width) : value.PadRight(width);
+    }
+
+    private static string PadLeftSafe(string value, int width)
+    {
+        value ??= "";
+        return value.Length >= width ? value.Substring(0, width) : value.PadLeft(width);
+    }
+
+    private string ColorizeMuted(string text, bool bold = false)
+    {
+        return RichTextUtil.Colorize(text, logTheme.muted, bold);
+    }
+
+    private string ColorizeMutedPadded(string paddedLabel, bool bold = false)
+    {
+        return RichTextUtil.Colorize(paddedLabel, logTheme.muted, bold);
+    }
+
+    private string ColorizeStagePadded(ScanStage stage, string paddedLabel)
+    {
+        return stage switch
+        {
+            ScanStage.Unknown   => RichTextUtil.Colorize(paddedLabel, logTheme.stageUnknown),
+            ScanStage.Probable  => RichTextUtil.Colorize(paddedLabel, logTheme.stageProbable, true),
+            ScanStage.Likely    => RichTextUtil.Colorize(paddedLabel, logTheme.stageLikely, true),
+            ScanStage.Confirmed => RichTextUtil.Colorize(paddedLabel, logTheme.stageConfirmed, true),
+            _ => paddedLabel
+        };
+    }
+
+    private string ColorizeVisibleClassPadded(VisibleClass visibleClass, string paddedLabel)
+    {
+        return visibleClass switch
+        {
+            VisibleClass.Unknown  => RichTextUtil.Colorize(paddedLabel, logTheme.classUnknown),
+            VisibleClass.Benign   => RichTextUtil.Colorize(paddedLabel, logTheme.classBenign, true),
+            VisibleClass.Threat   => RichTextUtil.Colorize(paddedLabel, logTheme.classThreat, true),
+            VisibleClass.Priority => RichTextUtil.Colorize(paddedLabel, logTheme.classPriority, true),
+            _ => paddedLabel
+        };
     }
 
 }
