@@ -244,6 +244,10 @@ public class CommandDirector : MonoBehaviour
 
         switch (revealType)
         {
+            case IntelRevealType.Class:
+                Log($"{prefix}  {packetId}  <b>CLASS</b>  {revealedValue}");
+                break;
+
             case IntelRevealType.Kind:
                 Log($"{prefix}  {packetId}  <b>KIND</b>  {revealedValue}");
                 break;
@@ -254,6 +258,14 @@ public class CommandDirector : MonoBehaviour
 
             case IntelRevealType.Keyword:
                 Log($"{prefix}  {packetId}  <b>KEYWORD</b>  {revealedValue}");
+                break;
+
+            case IntelRevealType.Source:
+                Log($"{prefix}  {packetId}  <b>SOURCE</b>  {revealedValue}");
+                break;
+
+            case IntelRevealType.Destination:
+                Log($"{prefix}  {packetId}  <b>DEST</b>  {revealedValue}");
                 break;
         }
     }

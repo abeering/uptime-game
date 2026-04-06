@@ -51,9 +51,12 @@ public enum ScanStage
 
 public enum IntelRevealType
 {
+    Class,
     Kind,
     InfectionType,
-    Keyword
+    Keyword,
+    Source,
+    Destination
 }
 
 public class PacketView : MonoBehaviour
@@ -96,10 +99,21 @@ public class PacketView : MonoBehaviour
     public PacketClass reportedClass = PacketClass.Benign;
 
     [Header("Revealed Intel")]
+    public bool knowsClass = false;
+    public PacketClass revealedClass = PacketClass.Benign;
+
     public bool knowsKind = false;
     public PacketKind revealedKind = PacketKind.None;
+
     public bool knowsInfectionType = false;
     public InfectionType revealedInfectionType = InfectionType.None;
+
+    public bool knowsSource = false;
+    public string revealedSource = null;
+
+    public bool knowsDestination = false;
+    public string revealedDestination = null;
+
     [Min(0)] public int revealedKeywordCount = 0;
 
     [Header("Progressive Scan")]
@@ -330,7 +344,8 @@ public class PacketView : MonoBehaviour
         {
             case ScanStage.Unknown:
                 intelLevel = IntelLevel.None;
-                reportedClass = PacketClass.Benign;
+                // why are we doing this
+                // reportedClass = PacketClass.Benign;
                 break;
 
             case ScanStage.Probable:
@@ -340,6 +355,7 @@ public class PacketView : MonoBehaviour
                 if (intelLevel < IntelLevel.Scanned)
                     intelLevel = IntelLevel.Scanned;
 
+                RevealClass();
                 break;
 
             case ScanStage.Likely:
@@ -354,6 +370,7 @@ public class PacketView : MonoBehaviour
                 confidencePercent = 100;
                 intelLevel = IntelLevel.DeepScanned;
 
+                RefreshRevealedClass(trueClass);
                 RevealKind();
                 RevealInfectionType();
                 RevealAllKeywords();
@@ -379,10 +396,21 @@ public class PacketView : MonoBehaviour
 
     private void ResetRevealedIntel()
     {
+        knowsClass = false;
+        revealedClass = PacketClass.Benign;
+
         knowsKind = false;
         revealedKind = PacketKind.None;
+
         knowsInfectionType = false;
         revealedInfectionType = InfectionType.None;
+
+        knowsSource = false;
+        revealedSource = null;
+
+        knowsDestination = false;
+        revealedDestination = null;
+
         revealedKeywordCount = 0;
     }
 
@@ -683,6 +711,54 @@ public class PacketView : MonoBehaviour
         OnIntelRevealed?.Invoke(this, IntelRevealType.Keyword, keywordName);
     }
 
+    private void RevealClass()
+    {
+        if (knowsClass)
+            return;
+
+        knowsClass = true;
+        revealedClass = reportedClass;
+        OnIntelRevealed?.Invoke(this, IntelRevealType.Class, revealedClass.ToString());
+    }
+
+    private void RefreshRevealedClass(PacketClass packetClass)
+    {
+        bool changed = !knowsClass || revealedClass != packetClass;
+
+        knowsClass = true;
+        revealedClass = packetClass;
+
+        if (changed)
+            OnIntelRevealed?.Invoke(this, IntelRevealType.Class, revealedClass.ToString());
+    }
+
+    public void RevealSource()
+    {
+        if (knowsSource)
+            return;
+
+        if (string.IsNullOrWhiteSpace(sourceAddress))
+            return;
+
+        knowsSource = true;
+        revealedSource = sourceAddress;
+        OnIntelRevealed?.Invoke(this, IntelRevealType.Source, revealedSource);
+    }
+
+    public void RevealDestination()
+    {
+        if (knowsDestination)
+            return;
+
+        string destination = GetDestinationName();
+        if (string.IsNullOrWhiteSpace(destination))
+            return;
+
+        knowsDestination = true;
+        revealedDestination = destination;
+        OnIntelRevealed?.Invoke(this, IntelRevealType.Destination, revealedDestination);
+    }
+
     private string GetKeywordDisplayName(IPacketKeyword keyword)
     {
         if (keyword == null)
@@ -724,7 +800,7 @@ public class PacketView : MonoBehaviour
 
     public bool IsKnownThreat()
     {
-        return GetVisibleClass() == VisibleClass.Threat;
+        return knowsClass && revealedClass == PacketClass.Threat;
     }
 
     public bool HasInfections()
@@ -1369,11 +1445,20 @@ public class PacketView : MonoBehaviour
     {
         List<string> parts = new();
 
+        if (knowsClass)
+            parts.Add($"class={revealedClass}");
+
         if (knowsKind && revealedKind != PacketKind.None)
             parts.Add($"kind={revealedKind}");
 
         if (knowsInfectionType && revealedInfectionType != InfectionType.None)
             parts.Add($"infection={revealedInfectionType}");
+
+        if (knowsSource && !string.IsNullOrWhiteSpace(revealedSource))
+            parts.Add($"src={revealedSource}");
+
+        if (knowsDestination && !string.IsNullOrWhiteSpace(revealedDestination))
+            parts.Add($"dest={revealedDestination}");
 
         if (revealedKeywordCount > 0)
             parts.Add($"keywords={BuildRevealedKeywordSummary()}");
