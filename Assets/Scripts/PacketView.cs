@@ -115,6 +115,14 @@ public class PacketView : MonoBehaviour
     public PacketScanVisual scanVisual;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
+    [SerializeField] private SpriteRenderer scanPulseRenderer;
+    [SerializeField] private float scanPulseSpeed = 5f;
+    [SerializeField] private float scanPulseMinAlpha = 0.35f;
+    [SerializeField] private float scanPulseMaxAlpha = 1f;
+    [SerializeField] private float scanPulseScaleMin = 1.05f;
+    [SerializeField] private float scanPulseScaleMax = 1.28f;
+    private Vector3 borderBaseScale = Vector3.one;
+    private Vector3 pulseBaseScale = Vector3.one;
 
     [Header("Visual Lanes")]
     [SerializeField] private int visualLaneIndex = 0;
@@ -191,6 +199,12 @@ public class PacketView : MonoBehaviour
         HideScanTag();
         RefreshVisuals();
 
+        if (borderRenderer != null)
+            borderBaseScale = borderRenderer.transform.localScale;
+
+        if (scanPulseRenderer != null)
+            pulseBaseScale = scanPulseRenderer.transform.localScale;
+
         if (label != null)
             label.text = visiblePacketId;
 
@@ -225,6 +239,7 @@ public class PacketView : MonoBehaviour
     {
         UpdateStepEaseVisual();
         UpdateSpeedTail();
+        UpdateActiveScanPulse();
     }
 
     public bool CanAdvanceScanStage()
@@ -382,6 +397,14 @@ public class PacketView : MonoBehaviour
     public void SetActivelyScanned(bool value)
     {
         isActivelyScanned = value;
+        ToggleScanBorder(value);
+
+        if (!value && scanTagLabel != null)
+        {
+            scanTagLabel.text = "";
+            scanTagLabel.gameObject.SetActive(false);
+        }
+
         RefreshVisuals();
     }
 
@@ -438,29 +461,86 @@ public class PacketView : MonoBehaviour
         RefreshVisuals();
     }
 
-    public void HideScanTag()
+    private void UpdateActiveScanPulse()
     {
-        if (scanTagLabel == null)
+        if (!isActivelyScanned)
             return;
 
-        scanTagLabel.text = "";
-        scanTagLabel.gameObject.SetActive(false);
+        float pulse01 = Mathf.InverseLerp(-1f, 1f, Mathf.Sin(Time.time * scanPulseSpeed));
+        float alpha = Mathf.Lerp(scanPulseMinAlpha, scanPulseMaxAlpha, pulse01);
+        float scale = Mathf.Lerp(scanPulseScaleMin, scanPulseScaleMax, pulse01);
+
+        if (borderRenderer != null && borderRenderer.enabled)
+        {
+            Color c = scanBorderColor;
+            c.a = alpha;
+            borderRenderer.color = c;
+            borderRenderer.transform.localScale = borderBaseScale * scale;
+        }
+
+        if (scanPulseRenderer != null && scanPulseRenderer.enabled)
+        {
+            Color c = scanBorderColor;
+            c.a = alpha * 0.7f;
+            scanPulseRenderer.color = c;
+            scanPulseRenderer.transform.localScale = pulseBaseScale * Mathf.Lerp(scale, scale + 0.12f, 0.6f);
+        }
+    }
+
+    public void HideScanTag()
+    {
+        isActivelyScanned = false;
+
+        if (scanTagLabel != null)
+        {
+            scanTagLabel.text = "";
+            scanTagLabel.gameObject.SetActive(false);
+        }
+
         ToggleScanBorder(false);
     }
 
     public void ToggleScanBorder(bool show)
     {
-        if (borderRenderer == null)
-            return;
-            
-        if(show){
-            borderRenderer.color = scanBorderColor;
-        } else {
-            borderRenderer.color = Color.black;
+        if (borderRenderer != null)
+        {
+            borderRenderer.enabled = show;
+
+            if (show)
+            {
+                borderRenderer.transform.localScale = borderBaseScale;
+
+                Color c = scanBorderColor;
+                c.a = scanPulseMaxAlpha;
+                borderRenderer.color = c;
+            }
+            else
+            {
+                borderRenderer.transform.localScale = borderBaseScale;
+                borderRenderer.color = Color.clear;
+            }
+        }
+
+        if (scanPulseRenderer != null)
+        {
+            scanPulseRenderer.enabled = show;
+
+            if (show)
+            {
+                scanPulseRenderer.transform.localScale = pulseBaseScale;
+
+                Color c = scanBorderColor;
+                c.a = scanPulseMinAlpha;
+                scanPulseRenderer.color = c;
+            }
+            else
+            {
+                scanPulseRenderer.transform.localScale = pulseBaseScale;
+                scanPulseRenderer.color = Color.clear;
+            }
         }
     }
 
-    // TODO temporary RefreshScanTag until crosshair project - hide scan tag, show border 
     public void RefreshScanTag(ScanDirector scanDirector)
     {
         if (scanTagLabel != null)
@@ -468,6 +548,28 @@ public class PacketView : MonoBehaviour
             scanTagLabel.text = "";
             scanTagLabel.gameObject.SetActive(false);
         }
+
+        if (scanDirector == null)
+        {
+            if (isActivelyScanned)
+                HideScanTag();
+            return;
+        }
+
+        bool shouldBeActive = scanDirector.IsPacketActivelyScanned(this);
+
+        if (shouldBeActive == isActivelyScanned)
+            return;
+
+        isActivelyScanned = shouldBeActive;
+
+        if (!isActivelyScanned)
+        {
+            HideScanTag();
+            return;
+        }
+
+        ToggleScanBorder(true);
     }
 
     // TODO - bring back when we do crosshair scan 

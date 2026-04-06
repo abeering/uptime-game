@@ -30,6 +30,25 @@ public static class ScanBarFormatter
         return result;
     }
 
+    public static string BuildOperationsScanBarOnly(
+        int stageIndex,
+        float confidence01,
+        bool isComplete,
+        bool willBeDropped,
+        int stageCount = 3,
+        char activeStageChar = '='
+    )
+    {
+        confidence01 = Mathf.Clamp01(confidence01);
+
+        string bar = BuildBarOnly(stageIndex, isComplete, stageCount, activeStageChar);
+
+        if (willBeDropped)
+            return $"{bar} !";
+
+        return bar;
+    }
+
     public static string BuildWorldScanTag(
         int stageIndex,
         float confidence01,

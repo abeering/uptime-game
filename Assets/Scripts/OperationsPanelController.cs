@@ -16,8 +16,6 @@ public class OperationsPanelController : MonoBehaviour
             return;
 
         StringBuilder sb = new StringBuilder();
-        scanDirector.AppendOperationsPanel(sb);
-        sb.AppendLine();
         commandDirector.AppendOperationsPanel(sb);
         sb.AppendLine();
         scanDirector.AppendKnownThreatsSection(sb, networkRuntime);

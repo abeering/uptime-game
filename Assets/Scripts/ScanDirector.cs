@@ -420,12 +420,9 @@ public class ScanDirector : MonoBehaviour
         return GetPacketClassShortLabel(packetClass);
     }
 
-    public void AppendOperationsPanel(StringBuilder sb)
+    public void AppendScanPanel(StringBuilder sb)
     {
         int activeCount = GetActiveScanCount();
-
-        sb.AppendLine("<b>SCANS</b>   " + activeCount + " / " + maxActiveScans);
-        sb.AppendLine();
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -447,7 +444,7 @@ public class ScanDirector : MonoBehaviour
 
             bool willBeDropped = WouldBeDropped(p);
 
-            string bar = ScanBarFormatter.BuildOperationsScanBar(
+            string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
                 p.GetScanDisplayStageIndex(),
                 p.GetScanConfidence01(),
                 p.IsScanComplete(),
@@ -475,9 +472,8 @@ public class ScanDirector : MonoBehaviour
                 $"S{i + 1}  <b>{p.packetId}</b>  {stageLabel}  {classLabel}{dropMarker}"
             );
             sb.AppendLine(
-                $"    {bar.PadRight(12)}  {percentText.PadLeft(4)}  ETA {etaText}"
+                $"    {bar.PadRight(8)}  {percentText.PadLeft(4)}  ETA {etaText}"
             );
-            sb.AppendLine();
         }
 
         if (completedEntries.Count > 0)
@@ -498,6 +494,11 @@ public class ScanDirector : MonoBehaviour
 
             sb.AppendLine();
         }
+    }
+
+    public void AppendOperationsPanel(StringBuilder sb)
+    {
+        AppendScanPanel(sb);
     }
     
     public void AppendKnownThreatsSection(StringBuilder sb, NetworkRuntime networkRuntime)
