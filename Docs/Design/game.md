@@ -35,7 +35,7 @@ The game *is about*:
 # CORE STRUCTURE: THREE LAYERS OF GAMEPLAY
 
 ## 1. Micro (Execution Layer)
-- Commands: `scan`, `block`, `clean`, `throttle`, etc.
+- Commands: `scan`, `block`, `clean`, `trace`, `throttle`, etc.
 - Fast, real-time input
 - Immediate consequences
 
