@@ -14,11 +14,13 @@ public class ScanPanelController : MonoBehaviour
             return;
 
         if (titleText != null)
-            titleText.text = $"scans {scanDirector.GetActiveScanCount()} / {scanDirector.maxActiveScans}";
+            titleText.text =
+                $"intel  S {scanDirector.GetActiveScanCount()} / {scanDirector.maxActiveScans}   T {scanDirector.GetActiveTraceCount()} / {scanDirector.maxActiveTraces}";
+            
 
         StringBuilder sb = new StringBuilder();
         scanDirector.AppendScanPanel(sb);
         scanText.text = sb.ToString();
     }
-    
+
 }

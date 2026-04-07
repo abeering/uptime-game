@@ -6,12 +6,17 @@ public class ScanSlot
     public PacketView target;
     public int assignedTick = -1;
 
-    private readonly ScanLogTheme theme;
+    private readonly string packetTagText;
+    private readonly Color slotColor;
 
-    public ScanSlot(int newSlotIndex, ScanLogTheme logTheme)
+    public string PacketTagText => packetTagText;
+    public Color SlotColor => slotColor;
+
+    public ScanSlot(int newSlotIndex, string newPacketTagText, Color newSlotColor)
     {
         slotIndex = newSlotIndex;
-        theme = logTheme;
+        packetTagText = newPacketTagText;
+        slotColor = newSlotColor;
     }
 
     public bool IsEmpty()
@@ -21,17 +26,7 @@ public class ScanSlot
 
     public Color GetThemeColor()
     {
-        if (theme == null)
-            return Color.white;
-
-        return slotIndex switch
-        {
-            0 => theme.slot1,
-            1 => theme.slot2,
-            2 => theme.slot3,
-            3 => theme.slot4,
-            _ => theme.muted
-        };
+        return slotColor;
     }
 
     public void Assign(PacketView packet, int currentTick)
@@ -43,17 +38,15 @@ public class ScanSlot
 
         if (target != null)
         {
-            target.SetActivelyScanned(true);
-            target.ShowActiveScanTag(this);
+            target.SetActiveIntelVisual(true, slotColor);
+            target.ShowActiveIntelTag(packetTagText, slotColor);
         }
     }
 
     public void Clear()
     {
         if (target != null)
-        {
-            target.SetActivelyScanned(false);
-        }
+            target.SetActiveIntelVisual(false, slotColor);
 
         target = null;
         assignedTick = -1;

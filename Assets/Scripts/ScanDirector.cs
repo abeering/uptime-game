@@ -8,40 +8,69 @@ public class ScanDirector : MonoBehaviour
     [Header("Scan Slots")]
     [Min(1)] public int maxActiveScans = 2;
 
+    [Header("Trace Slots")]
+    [Min(1)] public int maxActiveTraces = 1;
+
     [Header("Tuning")]
     public int baseScanDurationTicksSingle = 30;
     public int baseScanDurationTicksDual = 45;
+    public int baseTraceDurationTicks = 12;
 
     [Header("UI Theme")]
     [SerializeField] private ScanLogTheme logTheme = new();
 
     private CommandDirector commandDirector;
 
-    private readonly List<ScanSlot> slots = new();
-    private readonly List<ActiveScanCompletion> completionLinger = new();
+    private readonly List<ScanSlot> scanSlots = new();
+    private readonly List<ScanSlot> traceSlots = new();
+    private readonly List<ActiveIntelCompletion> completionLinger = new();
     private const int completionLingerTicks = 6;
 
     private int tickCounter = 0;
 
-    private class ActiveScanCompletion
+    private enum IntelSlotMode
     {
+        Scan,
+        Trace
+    }
+
+    private class ActiveIntelCompletion
+    {
+        public IntelSlotMode mode;
         public int slotIndex;
+        public string slotLabel;
+        public Color slotColor;
         public string packetId;
         public ScanStage stage;
         public VisibleClass visibleClass;
         public string barText;
         public string percentText;
-        public string kindText;
+        public string secondaryText;
         public int lingerTicks;
         public bool wasReplacementCandidate;
     }
 
     void Awake()
     {
-        slots.Clear();
+        scanSlots.Clear();
+        traceSlots.Clear();
 
         for (int i = 0; i < maxActiveScans; i++)
-            slots.Add(new ScanSlot(i, logTheme));
+        {
+            Color slotColor = i switch
+            {
+                0 => logTheme.slot1,
+                1 => logTheme.slot2,
+                2 => logTheme.slot3,
+                3 => logTheme.slot4,
+                _ => logTheme.muted
+            };
+
+            scanSlots.Add(new ScanSlot(i, $"S{i + 1}", slotColor));
+        }
+
+        for (int i = 0; i < maxActiveTraces; i++)
+            traceSlots.Add(new ScanSlot(i, $"T{i + 1}", logTheme.trace1));
     }
 
     public void Tick()
@@ -49,6 +78,7 @@ public class ScanDirector : MonoBehaviour
         tickCounter++;
         TickCompletedEntries();
         TickActiveScans();
+        TickActiveTraces();
     }
 
     public void SetCommandDirector(CommandDirector director)
@@ -68,11 +98,12 @@ public class ScanDirector : MonoBehaviour
         if (existingSlot != null)
             return;
 
-        ScanSlot emptySlot = FindEmptySlot();
+        ScanSlot emptySlot = FindEmptySlot(scanSlots);
         if (emptySlot != null)
         {
             SubscribeToPacket(packet);
             emptySlot.Assign(packet, tickCounter);
+            packet.SetActivelyScanned(true);
             RefreshActiveScanTags();
             return;
         }
@@ -83,6 +114,41 @@ public class ScanDirector : MonoBehaviour
             UnsubscribeFromPacket(replacementSlot.target);
             replacementSlot.Assign(packet, tickCounter);
             SubscribeToPacket(packet);
+            packet.SetActivelyScanned(true);
+        }
+
+        RefreshActiveScanTags();
+    }
+
+    public void StartTrace(PacketView packet)
+    {
+        if (packet == null)
+            return;
+
+        if (packet.knowsSource && packet.knowsDestination)
+            return;
+
+        ScanSlot existingSlot = FindTraceSlotForPacket(packet);
+        if (existingSlot != null)
+            return;
+
+        ScanSlot emptySlot = FindEmptySlot(traceSlots);
+        if (emptySlot != null)
+        {
+            SubscribeToPacket(packet);
+            emptySlot.Assign(packet, tickCounter);
+            packet.SetActivelyTraced(true, emptySlot.GetThemeColor());
+            RefreshActiveScanTags();
+            return;
+        }
+
+        ScanSlot replacementSlot = FindOldestSlot(traceSlots);
+        if (replacementSlot != null)
+        {
+            UnsubscribeFromPacket(replacementSlot.target);
+            replacementSlot.Assign(packet, tickCounter);
+            SubscribeToPacket(packet);
+            packet.SetActivelyTraced(true, replacementSlot.GetThemeColor());
         }
 
         RefreshActiveScanTags();
@@ -90,9 +156,15 @@ public class ScanDirector : MonoBehaviour
 
     private void RefreshActiveScanTags()
     {
-        for (int i = 0; i < slots.Count; i++)
+        RefreshSlotTags(scanSlots);
+        RefreshSlotTags(traceSlots);
+    }
+
+    private void RefreshSlotTags(List<ScanSlot> slotList)
+    {
+        for (int i = 0; i < slotList.Count; i++)
         {
-            ScanSlot slot = slots[i];
+            ScanSlot slot = slotList[i];
             if (slot == null || slot.target == null)
                 continue;
 
@@ -105,27 +177,45 @@ public class ScanDirector : MonoBehaviour
         if (packet == null)
             return;
 
-        ScanSlot slot = FindSlotForPacket(packet);
-        if (slot != null)
+        ScanSlot scanSlot = FindSlotForPacket(packet);
+        if (scanSlot != null)
         {
-            UnsubscribeFromPacket(slot.target);
-            slot.Clear();
-            RefreshActiveScanTags();
+            UnsubscribeFromPacket(scanSlot.target);
+            scanSlot.Clear();
         }
+
+        ScanSlot traceSlot = FindTraceSlotForPacket(packet);
+        if (traceSlot != null)
+        {
+            UnsubscribeFromPacket(traceSlot.target);
+            traceSlot.Clear();
+        }
+
+        RefreshActiveScanTags();
     }
 
     public IReadOnlyList<ScanSlot> GetSlots()
     {
-        return slots;
+        return scanSlots;
     }
 
     public int GetActiveScanCount()
     {
+        return CountActiveSlots(scanSlots);
+    }
+
+    public int GetActiveTraceCount()
+    {
+        return CountActiveSlots(traceSlots);
+    }
+
+    private int CountActiveSlots(List<ScanSlot> slotList)
+    {
         int count = 0;
 
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < slotList.Count; i++)
         {
-            if (!slots[i].IsEmpty())
+            if (!slotList[i].IsEmpty())
                 count++;
         }
 
@@ -179,9 +269,9 @@ public class ScanDirector : MonoBehaviour
         if (baseDurationTicks <= 0)
             baseDurationTicks = 1;
 
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < scanSlots.Count; i++)
         {
-            ScanSlot slot = slots[i];
+            ScanSlot slot = scanSlots[i];
             if (slot.IsEmpty())
                 continue;
 
@@ -212,15 +302,18 @@ public class ScanDirector : MonoBehaviour
                     activeStageChar: '='
                 );
 
-                completionLinger.Add(new ActiveScanCompletion
+                completionLinger.Add(new ActiveIntelCompletion
                 {
+                    mode = IntelSlotMode.Scan,
                     slotIndex = i,
+                    slotLabel = slot.PacketTagText,
+                    slotColor = slot.GetThemeColor(),
                     packetId = packet.packetId,
                     stage = packet.scanStage,
                     visibleClass = packet.GetVisibleClass(),
                     barText = bar,
                     percentText = "100%",
-                    kindText = GetKindLine(packet),
+                    secondaryText = GetKindLine(packet),
                     lingerTicks = completionLingerTicks,
                     wasReplacementCandidate = willBeDropped
                 });
@@ -228,6 +321,72 @@ public class ScanDirector : MonoBehaviour
                 UnsubscribeFromPacket(packet);
                 slot.Clear();
             }
+        }
+
+        RefreshActiveScanTags();
+    }
+
+    private void TickActiveTraces()
+    {
+        if (traceSlots.Count <= 0)
+            return;
+
+        for (int i = 0; i < traceSlots.Count; i++)
+        {
+            ScanSlot slot = traceSlots[i];
+            if (slot.IsEmpty())
+                continue;
+
+            PacketView packet = slot.target;
+            if (packet == null)
+            {
+                slot.Clear();
+                continue;
+            }
+
+            if (packet.knowsSource && packet.knowsDestination)
+            {
+                slot.Clear();
+                continue;
+            }
+
+            int ticksElapsed = tickCounter - slot.assignedTick;
+            int ticksRemaining = Mathf.Max(0, baseTraceDurationTicks - ticksElapsed);
+
+            if (ticksRemaining > 0)
+                continue;
+
+            bool willBeDropped = WouldTraceBeDropped(packet);
+
+            packet.RevealSource();
+            packet.RevealDestination();
+
+            string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
+                2,
+                1f,
+                true,
+                false,
+                activeStageChar: '='
+            );
+
+            completionLinger.Add(new ActiveIntelCompletion
+            {
+                mode = IntelSlotMode.Trace,
+                slotIndex = i,
+                slotLabel = slot.PacketTagText,
+                slotColor = slot.GetThemeColor(),
+                packetId = packet.packetId,
+                stage = ScanStage.Confirmed,
+                visibleClass = packet.GetVisibleClass(),
+                barText = bar,
+                percentText = "100%",
+                secondaryText = $"src={packet.revealedSource}  dest={packet.revealedDestination}",
+                lingerTicks = completionLingerTicks,
+                wasReplacementCandidate = willBeDropped
+            });
+
+            UnsubscribeFromPacket(packet);
+            slot.Clear();
         }
 
         RefreshActiveScanTags();
@@ -258,6 +417,12 @@ public class ScanDirector : MonoBehaviour
         return candidate != null && candidate.target == packet;
     }
 
+    private bool WouldTraceBeDropped(PacketView packet)
+    {
+        ScanSlot candidate = FindOldestSlot(traceSlots);
+        return candidate != null && candidate.target == packet;
+    }
+
     public bool IsPacketActivelyScanned(PacketView packet)
     {
         if (packet == null)
@@ -266,12 +431,12 @@ public class ScanDirector : MonoBehaviour
         return FindSlotForPacket(packet) != null;
     }
 
-    private ScanSlot FindEmptySlot()
+    private ScanSlot FindEmptySlot(List<ScanSlot> slotList)
     {
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < slotList.Count; i++)
         {
-            if (slots[i].IsEmpty())
-                return slots[i];
+            if (slotList[i].IsEmpty())
+                return slotList[i];
         }
 
         return null;
@@ -279,30 +444,46 @@ public class ScanDirector : MonoBehaviour
 
     public ScanSlot FindSlotForPacket(PacketView packet)
     {
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < scanSlots.Count; i++)
         {
-            if (slots[i].Matches(packet))
-                return slots[i];
+            if (scanSlots[i].Matches(packet))
+                return scanSlots[i];
         }
 
         return null;
     }
 
-    private ScanSlot GetReplacementCandidateSlot()
+    public ScanSlot FindTraceSlotForPacket(PacketView packet)
     {
-        if (FindEmptySlot() != null)
-            return null;
+        for (int i = 0; i < traceSlots.Count; i++)
+        {
+            if (traceSlots[i].Matches(packet))
+                return traceSlots[i];
+        }
 
-        return FindOldestSlot();
+        return null;
     }
 
-    private ScanSlot FindOldestSlot()
+    public ScanSlot FindAnySlotForPacket(PacketView packet)
+    {
+        return FindSlotForPacket(packet) ?? FindTraceSlotForPacket(packet);
+    }
+
+    private ScanSlot GetReplacementCandidateSlot()
+    {
+        if (FindEmptySlot(scanSlots) != null)
+            return null;
+
+        return FindOldestSlot(scanSlots);
+    }
+
+    private ScanSlot FindOldestSlot(List<ScanSlot> slotList)
     {
         ScanSlot oldest = null;
 
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < slotList.Count; i++)
         {
-            ScanSlot slot = slots[i];
+            ScanSlot slot = slotList[i];
             if (slot.IsEmpty())
                 continue;
 
@@ -447,12 +628,16 @@ public class ScanDirector : MonoBehaviour
         return GetPacketClassShortLabel(packetClass);
     }
 
-    private ScanPanelRowData BuildEmptyRow(int slotIndex)
+    private ScanPanelRowData BuildEmptyScanRow(int slotIndex)
     {
+        ScanSlot slot = scanSlots[slotIndex];
+
         return new ScanPanelRowData
         {
             slotIndex = slotIndex,
-            state = ScanPanelRowState.Empty,
+            slotLabel = slot.PacketTagText,
+            slotColor = slot.GetThemeColor(),
+            state = ScanPanelRowState.EmptyScan,
             packetId = "--",
             barText = "[---]",
             percentText = "--%",
@@ -465,7 +650,7 @@ public class ScanDirector : MonoBehaviour
         };
     }
 
-    private ScanPanelRowData BuildLingerRow(ActiveScanCompletion linger)
+    private ScanPanelRowData BuildScanLingerRow(ActiveIntelCompletion linger)
     {
         if (linger == null)
             return null;
@@ -473,7 +658,9 @@ public class ScanDirector : MonoBehaviour
         return new ScanPanelRowData
         {
             slotIndex = linger.slotIndex,
-            state = ScanPanelRowState.CompletedLinger,
+            slotLabel = linger.slotLabel,
+            slotColor = linger.slotColor,
+            state = ScanPanelRowState.CompletedScanLinger,
             packetId = linger.packetId,
             barText = linger.barText,
             percentText = linger.percentText,
@@ -482,15 +669,14 @@ public class ScanDirector : MonoBehaviour
             visibleClass = linger.visibleClass,
             showDone = true,
             willBeDropped = linger.wasReplacementCandidate,
-            // TODO 
-            // secondaryIntelLine = GetKindLine(linger)
-            secondaryIntelLine = null
+            secondaryIntelLine = linger.secondaryText
         };
     }
 
-    private ScanPanelRowData BuildActiveRow(int slotIndex, PacketView p, int activeCount)
+    private ScanPanelRowData BuildActiveScanRow(int slotIndex, PacketView p, int activeCount)
     {
         bool willBeDropped = WouldBeDropped(p);
+        ScanSlot slot = scanSlots[slotIndex];
 
         string bar = ScanBarFormatter.BuildOperationsScanBarOnly(
             p.GetScanDisplayStageIndex(),
@@ -509,7 +695,9 @@ public class ScanDirector : MonoBehaviour
         return new ScanPanelRowData
         {
             slotIndex = slotIndex,
-            state = ScanPanelRowState.Active,
+            slotLabel = slot.PacketTagText,
+            slotColor = slot.GetThemeColor(),
+            state = ScanPanelRowState.ActiveScan,
             packetId = p.packetId,
             barText = bar,
             percentText = percentText,
@@ -518,23 +706,111 @@ public class ScanDirector : MonoBehaviour
             visibleClass = p.GetVisibleClass(),
             showDone = false,
             willBeDropped = willBeDropped,
-            // TODO Fix 
-            // secondaryIntelLine = GetKindLine(p)
+            secondaryIntelLine = GetKindLine(p)
+        };
+    }
+
+    private ScanPanelRowData BuildEmptyTraceRow(int slotIndex)
+    {
+        ScanSlot slot = traceSlots[slotIndex];
+
+        return new ScanPanelRowData
+        {
+            slotIndex = slotIndex,
+            slotLabel = slot.PacketTagText,
+            slotColor = slot.GetThemeColor(),
+            state = ScanPanelRowState.EmptyTrace,
+            packetId = "--",
+            barText = "[---]",
+            percentText = "--%",
+            etaText = "--",
+            stage = ScanStage.Unknown,
+            visibleClass = VisibleClass.Unknown,
+            showDone = false,
+            willBeDropped = false,
             secondaryIntelLine = null
         };
     }
 
-    private ScanPanelRowData BuildRowForSlot(int slotIndex, int activeCount)
+    private ScanPanelRowData BuildActiveTraceRow(int slotIndex, PacketView p)
     {
-        ActiveScanCompletion linger = completionLinger.Find(c => c.slotIndex == slotIndex);
+        ScanSlot slot = traceSlots[slotIndex];
+        int ticksElapsed = tickCounter - slot.assignedTick;
+        float progress01 = Mathf.Clamp01((float)ticksElapsed / Mathf.Max(1, baseTraceDurationTicks));
+        int pct = Mathf.RoundToInt(progress01 * 100f);
+        int ticksRemaining = Mathf.Max(0, baseTraceDurationTicks - ticksElapsed);
+
+        return new ScanPanelRowData
+        {
+            slotIndex = slotIndex,
+            slotLabel = slot.PacketTagText,
+            slotColor = slot.GetThemeColor(),
+            state = ScanPanelRowState.ActiveTrace,
+            packetId = p.packetId,
+            barText = ScanBarFormatter.BuildOperationsScanBarOnly(
+                Mathf.Clamp(Mathf.FloorToInt(progress01 * 3f), 0, 2),
+                progress01,
+                false,
+                false,
+                activeStageChar: '='
+            ),
+            percentText = $"{pct}%",
+            etaText = ticksRemaining.ToString(),
+            stage = ScanStage.Unknown,
+            visibleClass = p.GetVisibleClass(),
+            showDone = false,
+            willBeDropped = false,
+            secondaryIntelLine = "TRACE"
+        };
+    }
+
+    private ScanPanelRowData BuildTraceLingerRow(ActiveIntelCompletion linger)
+    {
+        if (linger == null)
+            return null;
+
+        return new ScanPanelRowData
+        {
+            slotIndex = linger.slotIndex,
+            slotLabel = linger.slotLabel,
+            slotColor = linger.slotColor,
+            state = ScanPanelRowState.CompletedTraceLinger,
+            packetId = linger.packetId,
+            barText = linger.barText,
+            percentText = linger.percentText,
+            etaText = "--",
+            stage = linger.stage,
+            visibleClass = linger.visibleClass,
+            showDone = true,
+            willBeDropped = linger.wasReplacementCandidate,
+            secondaryIntelLine = linger.secondaryText
+        };
+    }
+    
+    private ScanPanelRowData BuildScanRowForSlot(int slotIndex, int activeCount)
+    {
+        ActiveIntelCompletion linger = completionLinger.Find(c => c.mode == IntelSlotMode.Scan && c.slotIndex == slotIndex);
         if (linger != null)
-            return BuildLingerRow(linger);
+            return BuildScanLingerRow(linger);
 
-        ScanSlot slot = slots[slotIndex];
+        ScanSlot slot = scanSlots[slotIndex];
         if (slot == null || slot.IsEmpty() || slot.target == null)
-            return BuildEmptyRow(slotIndex);
+            return BuildEmptyScanRow(slotIndex);
 
-        return BuildActiveRow(slotIndex, slot.target, activeCount);
+        return BuildActiveScanRow(slotIndex, slot.target, activeCount);
+    }
+
+    private ScanPanelRowData BuildTraceRowForSlot(int slotIndex)
+    {
+        ActiveIntelCompletion linger = completionLinger.Find(c => c.mode == IntelSlotMode.Trace && c.slotIndex == slotIndex);
+        if (linger != null)
+            return BuildTraceLingerRow(linger);
+
+        ScanSlot slot = traceSlots[slotIndex];
+        if (slot == null || slot.IsEmpty() || slot.target == null)
+            return BuildEmptyTraceRow(slotIndex);
+
+        return BuildActiveTraceRow(slotIndex, slot.target);
     }
 
     // this has to do a weird thing to maintain alignment, we colorize the ! alpha=0 inside Colorize()
@@ -551,9 +827,14 @@ public class ScanDirector : MonoBehaviour
     private void AppendFormattedScanRow(StringBuilder sb, ScanPanelRowData row)
     {
         string warnPrefix = FormatWarnPrefix(row.willBeDropped);
-        string slotTag = FormatInlineSlotTag(row.slotIndex);
+        string slotTag = FormatInlineSlotTag(row.slotLabel, row.slotColor);
 
-        if (row.state == ScanPanelRowState.Empty)
+        bool isTraceRow =
+            row.state == ScanPanelRowState.EmptyTrace ||
+            row.state == ScanPanelRowState.ActiveTrace ||
+            row.state == ScanPanelRowState.CompletedTraceLinger;
+
+        if (row.state == ScanPanelRowState.EmptyScan || row.state == ScanPanelRowState.EmptyTrace)
         {
             sb.Append(warnPrefix);
             sb.Append(" ");
@@ -574,12 +855,62 @@ public class ScanDirector : MonoBehaviour
             return;
         }
 
+        if (isTraceRow)
+        {
+            sb.Append(warnPrefix);
+            sb.Append(" ");
+            sb.Append(slotTag);
+            sb.Append(" ");
+            sb.Append(PadRightSafe(row.packetId, 3));
+            sb.Append("  ");
+            sb.Append(PadRightSafe(row.barText, 5));
+            sb.Append("  ");
+            sb.Append(PadLeftSafe(row.percentText, 4));
+            sb.Append("  ");
+
+            if (row.showDone)
+            {
+                sb.Append(ColorizeMuted("DONE", true));
+                sb.Append(" ");
+                sb.Append("  ");
+            }
+            else
+            {
+                sb.Append(ColorizeMuted("ETA"));
+                sb.Append(" ");
+                sb.Append(PadLeftSafe(row.etaText, 2));
+                sb.Append("  ");
+            }
+
+            sb.Append(RichTextUtil.Colorize(PadRightSafe("TRACE", 9), row.slotColor, true));
+            sb.Append(" ");
+
+            string classText = ColorizeVisibleClassPadded(
+                row.visibleClass,
+                PadRightSafe(GetVisibleClassShortLabel(row.visibleClass), 8)
+            );
+            sb.Append(classText);
+            sb.AppendLine();
+
+            if (!string.IsNullOrWhiteSpace(row.secondaryIntelLine))
+            {
+                sb.Append("  ");
+                sb.Append("    ");
+                sb.Append(" ");
+                sb.Append("    ");
+                sb.Append(row.secondaryIntelLine.Trim());
+                sb.AppendLine();
+            }
+
+            return;
+        }
+
         string stageText = ColorizeStagePadded(
             row.stage,
             PadRightSafe(GetStageShortLabel(row.stage), 9)
         );
 
-        string classText = ColorizeVisibleClassPadded(
+        string classTextScan = ColorizeVisibleClassPadded(
             row.visibleClass,
             PadRightSafe(GetVisibleClassShortLabel(row.visibleClass), 8)
         );
@@ -611,34 +942,36 @@ public class ScanDirector : MonoBehaviour
 
         sb.Append(stageText);
         sb.Append(" ");
-        sb.Append(classText);
+        sb.Append(classTextScan);
         sb.AppendLine();
 
         if (!string.IsNullOrWhiteSpace(row.secondaryIntelLine))
         {
-            sb.Append("  ");   // warning col + spacer
-            sb.Append("    "); // [S1]
-            sb.Append(" ");    // spacer after tag
-            sb.Append("    "); // packet id area
-            sb.Append(ColorizeVisibleClassPadded(
-                row.visibleClass,
-                row.secondaryIntelLine.Trim()
-            ));
+            sb.Append("  ");
+            sb.Append("    ");
+            sb.Append(" ");
+            sb.Append("    ");
+            sb.Append(ColorizeVisibleClassPadded(row.visibleClass, row.secondaryIntelLine.Trim()));
             sb.AppendLine();
         }
     }
 
     public void AppendScanPanel(StringBuilder sb)
     {
-        int activeCount = GetActiveScanCount();
+        int activeScanCount = GetActiveScanCount();
 
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i < scanSlots.Count; i++)
         {
-            ScanPanelRowData row = BuildRowForSlot(i, activeCount);
-            if (row == null)
-                continue;
+            ScanPanelRowData row = BuildScanRowForSlot(i, activeScanCount);
+            if (row != null)
+                AppendFormattedScanRow(sb, row);
+        }
 
-            AppendFormattedScanRow(sb, row);
+        for (int i = 0; i < traceSlots.Count; i++)
+        {
+            ScanPanelRowData row = BuildTraceRowForSlot(i);
+            if (row != null)
+                AppendFormattedScanRow(sb, row);
         }
     }
 
@@ -687,14 +1020,19 @@ public class ScanDirector : MonoBehaviour
 
     private enum ScanPanelRowState
     {
-        Empty,
-        Active,
-        CompletedLinger
+        EmptyScan,
+        ActiveScan,
+        CompletedScanLinger,
+        EmptyTrace,
+        ActiveTrace,
+        CompletedTraceLinger
     }
 
     private class ScanPanelRowData
     {
         public int slotIndex;
+        public string slotLabel;
+        public Color slotColor;
         public ScanPanelRowState state;
 
         public string packetId;
@@ -711,21 +1049,9 @@ public class ScanDirector : MonoBehaviour
         public string secondaryIntelLine;
     }
 
-    private Color GetSlotColor(int slotIndex)
+    private string FormatInlineSlotTag(string slotLabel, Color slotColor)
     {
-        return slotIndex switch
-        {
-            0 => logTheme.slot1,
-            1 => logTheme.slot2,
-            2 => logTheme.slot3,
-            3 => logTheme.slot4,
-            _ => logTheme.muted
-        };
-    }
-
-    private string FormatInlineSlotTag(int slotIndex)
-    {
-        return RichTextUtil.Colorize($"[S{slotIndex + 1}]", GetSlotColor(slotIndex), true);
+        return RichTextUtil.Colorize($"[{slotLabel}]", slotColor, true);
     }
 
     private string GetKindLine(PacketView p)
@@ -734,14 +1060,6 @@ public class ScanDirector : MonoBehaviour
             return "";
 
         return p.revealedKind.ToString();
-    }
-
-    private string GetKindLine(ActiveScanCompletion linger)
-    {
-        if (linger == null || string.IsNullOrWhiteSpace(linger.kindText))
-            return "";
-
-        return linger.kindText;
     }
 
     private static string PadRightSafe(string value, int width)

@@ -121,7 +121,8 @@ public class PacketView : MonoBehaviour
     public ScanStage scanStage = ScanStage.Unknown;
     [Min(0)] public int scanTicksIntoStage = 0;
     public bool isActivelyScanned = false;
-    [SerializeField] private int activeScanSlotIndex = -1;
+    public bool isActivelyTraced = false;
+    [SerializeField] private string activeIntelTagText = null;
 
     [Header("Visuals")]
     public Color unknownColor = Color.gray;
@@ -428,32 +429,83 @@ public class PacketView : MonoBehaviour
         };
     }
 
-    public void SetActivelyScanned(bool value)
+    public void SetActiveIntelVisual(bool value, Color borderColor)
     {
-        isActivelyScanned = value;
-        ToggleScanBorder(value);
-
-        if (!value)
-            HideActiveScanTag();
+        if (value)
+        {
+            scanBorderColor = borderColor;
+            ToggleScanBorder(true);
+        }
+        else
+        {
+            isActivelyScanned = false;
+            isActivelyTraced = false;
+            ToggleScanBorder(false);
+            HideActiveIntelTag();
+        }
 
         RefreshVisuals();
     }
 
-    public void ShowActiveScanTag(ScanSlot slot)
+    public void SetActivelyScanned(bool value)
     {
-        if (slot == null)
+        isActivelyScanned = value;
+
+        if (value)
         {
-            HideActiveScanTag();
+            isActivelyTraced = false;
+            SetActiveIntelVisual(true, scanBorderColor);
+        }
+        else if (!isActivelyTraced)
+        {
+            SetActiveIntelVisual(false, scanBorderColor);
+        }
+    }
+
+    public void SetActivelyTraced(bool value, Color traceColor)
+    {
+        isActivelyTraced = value;
+
+        if (value)
+        {
+            isActivelyScanned = false;
+            SetActiveIntelVisual(true, traceColor);
+        }
+        else if (!isActivelyScanned)
+        {
+            SetActiveIntelVisual(false, traceColor);
+        }
+    }
+
+    public void ShowActiveIntelTag(string tagText, Color tagColor)
+    {
+        if (string.IsNullOrWhiteSpace(tagText))
+        {
+            HideActiveIntelTag();
             return;
         }
 
-        activeScanSlotIndex = slot.slotIndex;
-        ApplyActiveScanTag(slot);
+        activeIntelTagText = tagText;
+
+        if (scanTagLabel != null)
+        {
+            scanTagLabel.gameObject.SetActive(true);
+            scanTagLabel.color = scanTagTextColor;
+            scanTagLabel.text = tagText;
+        }
+
+        if (scanTagBackgroundRenderer != null)
+        {
+            Color bg = tagColor;
+            bg.a = scanTagBackgroundAlpha;
+            scanTagBackgroundRenderer.enabled = true;
+            scanTagBackgroundRenderer.color = bg;
+        }
     }
 
-    public void HideActiveScanTag()
+    public void HideActiveIntelTag()
     {
-        activeScanSlotIndex = -1;
+        activeIntelTagText = null;
 
         if (scanTagLabel != null)
         {
@@ -465,32 +517,6 @@ public class PacketView : MonoBehaviour
         {
             scanTagBackgroundRenderer.enabled = false;
             scanTagBackgroundRenderer.color = Color.clear;
-        }
-    }
-
-    private void ApplyActiveScanTag(ScanSlot slot)
-    {
-        if (scanTagLabel == null)
-            return;
-
-        if (!isActivelyScanned || slot == null)
-        {
-            HideActiveScanTag();
-            return;
-        }
-
-        activeScanSlotIndex = slot.slotIndex;
-
-        scanTagLabel.gameObject.SetActive(true);
-        scanTagLabel.color = scanTagTextColor;
-        scanTagLabel.text = $"S{slot.slotIndex + 1}";
-
-        if (scanTagBackgroundRenderer != null)
-        {
-            Color bg = slot.GetThemeColor();
-            bg.a = scanTagBackgroundAlpha;
-            scanTagBackgroundRenderer.enabled = true;
-            scanTagBackgroundRenderer.color = bg;
         }
     }
 
@@ -568,7 +594,7 @@ public class PacketView : MonoBehaviour
 
     private void UpdateActiveScanPulse()
     {
-        if (!isActivelyScanned)
+        if (!isActivelyScanned && !isActivelyTraced)
             return;
 
         float pulse01 = Mathf.InverseLerp(-1f, 1f, Mathf.Sin(Time.time * scanPulseSpeed));
@@ -595,8 +621,9 @@ public class PacketView : MonoBehaviour
     public void HideScanTag()
     {
         isActivelyScanned = false;
+        isActivelyTraced = false;
         ToggleScanBorder(false);
-        HideActiveScanTag();
+        HideActiveIntelTag();
     }
 
     public void ToggleScanBorder(bool show)
@@ -645,14 +672,25 @@ public class PacketView : MonoBehaviour
         if (scanTagLabel == null)
             return;
 
-        if (!isActivelyScanned)
+        if (!isActivelyScanned && !isActivelyTraced)
         {
-            HideActiveScanTag();
+            HideActiveIntelTag();
             return;
         }
 
-        ScanSlot slot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
-        ApplyActiveScanTag(slot);
+        ScanSlot slot = scanDirector != null ? scanDirector.FindAnySlotForPacket(this) : null;
+        if (slot == null)
+        {
+            HideActiveIntelTag();
+            return;
+        }
+
+        if (slot.PacketTagText.StartsWith("T"))
+            SetActivelyTraced(true, slot.GetThemeColor());
+        else
+            SetActivelyScanned(true);
+
+        ShowActiveIntelTag(slot.PacketTagText, slot.GetThemeColor());
     }
 
     public float GetScanConfidence01()

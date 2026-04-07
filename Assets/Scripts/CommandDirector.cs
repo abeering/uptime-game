@@ -577,28 +577,25 @@ public class CommandDirector : MonoBehaviour
         LogScanStarted(packetId, durationTicks);
     }
 
-    private void StartTrace(string packetId, int durationTicks = 4)
+    private void StartTrace(string packetId, int durationTicks = 12)
     {
         PacketView packet = networkRuntime.GetPacket(packetId);
 
         if (packet == null)
         {
-            Log($"TRACE failed: packet {packetId} not found");
+            LogCommandError($"trace failed: {packetId} not found");
             AudioManager.Instance?.PlayCommandRejected();
             return;
         }
 
-        TraceOperation trace = new TraceOperation
+        if (scanDirector == null)
         {
-            id = nextScanId,
-            displayId = $"trace{nextScanId}",
-            packetId = packetId,
-            remainingTicks = durationTicks,
-            totalTicks = durationTicks
-        };
+            LogCommandError("trace failed: no scan director");
+            AudioManager.Instance?.PlayCommandRejected();
+            return;
+        }
 
-        nextScanId++;
-        operations.Add(trace);
+        scanDirector.StartTrace(packet);
 
         AudioManager.Instance?.PlayCommandAccepted();
         LogTraceStarted(packetId, durationTicks);

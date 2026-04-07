@@ -22,6 +22,9 @@ public class ScanLogTheme
     public Color slot3 = new(1.00f, 0.70f, 0.30f, 1f);
     public Color slot4 = new(1.00f, 0.45f, 0.80f, 1f);
 
+    [Header("Trace Slots")]
+    public Color trace1 = new(0.95f, 0.45f, 1.00f, 1f);
+
     [Header("Misc")]
     public Color muted = new(0.67f, 0.67f, 0.67f, 0.53f);
 }
