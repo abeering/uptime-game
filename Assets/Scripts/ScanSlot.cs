@@ -45,9 +45,6 @@ public class ScanSlot
 
     public void Clear()
     {
-        if (target != null)
-            target.SetActiveIntelVisual(false, slotColor);
-
         target = null;
         assignedTick = -1;
     }

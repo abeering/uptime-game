@@ -438,10 +438,11 @@ public class PacketView : MonoBehaviour
         }
         else
         {
-            isActivelyScanned = false;
-            isActivelyTraced = false;
-            ToggleScanBorder(false);
-            HideActiveIntelTag();
+            if (!isActivelyScanned && !isActivelyTraced)
+            {
+                ToggleScanBorder(false);
+                HideActiveIntelTag();
+            }
         }
 
         RefreshVisuals();
@@ -453,12 +454,15 @@ public class PacketView : MonoBehaviour
 
         if (value)
         {
-            isActivelyTraced = false;
             SetActiveIntelVisual(true, scanBorderColor);
         }
         else if (!isActivelyTraced)
         {
             SetActiveIntelVisual(false, scanBorderColor);
+        }
+        else
+        {
+            RefreshVisuals();
         }
     }
 
@@ -468,12 +472,15 @@ public class PacketView : MonoBehaviour
 
         if (value)
         {
-            isActivelyScanned = false;
             SetActiveIntelVisual(true, traceColor);
         }
         else if (!isActivelyScanned)
         {
             SetActiveIntelVisual(false, traceColor);
+        }
+        else
+        {
+            RefreshVisuals();
         }
     }
 
@@ -672,25 +679,49 @@ public class PacketView : MonoBehaviour
         if (scanTagLabel == null)
             return;
 
-        if (!isActivelyScanned && !isActivelyTraced)
+        ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
+        ScanSlot traceSlot = scanDirector != null ? scanDirector.FindTraceSlotForPacket(this) : null;
+
+        bool hasScan = scanSlot != null;
+        bool hasTrace = traceSlot != null;
+
+        isActivelyScanned = hasScan;
+        isActivelyTraced = hasTrace;
+
+        if (!hasScan && !hasTrace)
         {
+            ToggleScanBorder(false);
             HideActiveIntelTag();
+            RefreshVisuals();
             return;
         }
 
-        ScanSlot slot = scanDirector != null ? scanDirector.FindAnySlotForPacket(this) : null;
-        if (slot == null)
-        {
-            HideActiveIntelTag();
-            return;
-        }
+        Color borderColor = hasTrace
+            ? traceSlot.GetThemeColor()
+            : scanSlot.GetThemeColor();
 
-        if (slot.PacketTagText.StartsWith("T"))
-            SetActivelyTraced(true, slot.GetThemeColor());
+        SetActiveIntelVisual(true, borderColor);
+
+        string tagText;
+        Color tagColor;
+
+        if (hasScan && hasTrace)
+        {
+            tagText = $"{scanSlot.PacketTagText}/{traceSlot.PacketTagText}";
+            tagColor = traceSlot.GetThemeColor();
+        }
+        else if (hasTrace)
+        {
+            tagText = traceSlot.PacketTagText;
+            tagColor = traceSlot.GetThemeColor();
+        }
         else
-            SetActivelyScanned(true);
+        {
+            tagText = scanSlot.PacketTagText;
+            tagColor = scanSlot.GetThemeColor();
+        }
 
-        ShowActiveIntelTag(slot.PacketTagText, slot.GetThemeColor());
+        ShowActiveIntelTag(tagText, tagColor);
     }
 
     public float GetScanConfidence01()
