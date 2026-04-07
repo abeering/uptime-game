@@ -111,13 +111,10 @@ public class ScanDirector : MonoBehaviour
         ScanSlot replacementSlot = GetReplacementCandidateSlot();
         if (replacementSlot != null)
         {
-            PacketView oldPacket = replacementSlot.target;
-            replacementSlot.Assign(packet, tickCounter);
-
-            if (!IsPacketTracked(oldPacket))
-                UnsubscribeFromPacket(oldPacket);
+            ClearSlotAndMaybeUnsubscribe(replacementSlot);
 
             SubscribeToPacket(packet);
+            replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
         }
 
@@ -149,13 +146,10 @@ public class ScanDirector : MonoBehaviour
         ScanSlot replacementSlot = FindOldestSlot(traceSlots);
         if (replacementSlot != null)
         {
-            PacketView oldPacket = replacementSlot.target;
-            replacementSlot.Assign(packet, tickCounter);
-
-            if (!IsPacketTracked(oldPacket))
-                UnsubscribeFromPacket(oldPacket);
+            ClearSlotAndMaybeUnsubscribe(replacementSlot);
 
             SubscribeToPacket(packet);
+            replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, replacementSlot.GetThemeColor());
         }
 
@@ -187,14 +181,11 @@ public class ScanDirector : MonoBehaviour
 
         ScanSlot scanSlot = FindSlotForPacket(packet);
         if (scanSlot != null)
-            scanSlot.Clear();
+            ClearSlotAndMaybeUnsubscribe(scanSlot);
 
         ScanSlot traceSlot = FindTraceSlotForPacket(packet);
-        if (scanSlot != null)
-            scanSlot.Clear();
-
-        if (!IsPacketTracked(packet))
-            UnsubscribeFromPacket(packet);
+        if (traceSlot != null)
+            ClearSlotAndMaybeUnsubscribe(traceSlot);
 
         RefreshActiveScanTags();
     }
@@ -289,10 +280,7 @@ public class ScanDirector : MonoBehaviour
 
             if (!packet.CanAdvanceScanStage())
             {
-                slot.Clear();
-                if (!IsPacketTracked(packet))
-                    UnsubscribeFromPacket(packet);
-
+                ClearSlotAndMaybeUnsubscribe(slot);
                 continue;
             }
 
@@ -326,9 +314,7 @@ public class ScanDirector : MonoBehaviour
                     wasReplacementCandidate = willBeDropped
                 });
 
-                slot.Clear();
-                if (!IsPacketTracked(packet))
-                    UnsubscribeFromPacket(packet);
+                ClearSlotAndMaybeUnsubscribe(slot);
             }
         }
 
@@ -355,10 +341,7 @@ public class ScanDirector : MonoBehaviour
 
             if (packet.knowsSource && packet.knowsDestination)
             {
-                slot.Clear();
-                if (!IsPacketTracked(packet))
-                    UnsubscribeFromPacket(packet);
-
+                ClearSlotAndMaybeUnsubscribe(slot);
                 continue;
             }
 
@@ -397,9 +380,8 @@ public class ScanDirector : MonoBehaviour
                 wasReplacementCandidate = willBeDropped
             });
 
+            UnsubscribeFromPacket(packet);
             slot.Clear();
-            if (!IsPacketTracked(packet))
-                UnsubscribeFromPacket(packet);
         }
 
         RefreshActiveScanTags();
@@ -450,6 +432,22 @@ public class ScanDirector : MonoBehaviour
             return false;
 
         return FindSlotForPacket(packet) != null || FindTraceSlotForPacket(packet) != null;
+    }
+
+    // Clear() - but also in case the packet is being traced/scanned simultaneously 
+    // then check for unsubscribe 
+    private void ClearSlotAndMaybeUnsubscribe(ScanSlot slot)
+    {
+        if (slot == null || slot.target == null)
+            return;
+
+        PacketView packet = slot.target;
+
+        slot.Clear();
+        packet.RefreshScanTag(this);
+
+        if (!IsPacketTracked(packet))
+            UnsubscribeFromPacket(packet);
     }
 
     private ScanSlot FindEmptySlot(List<ScanSlot> slotList)
