@@ -543,6 +543,25 @@ public class PacketView : MonoBehaviour
                 break;
         }
 
+        switch (stage)
+        {
+            case ScanStage.Probable:
+                RevealClass();
+                break;
+
+            case ScanStage.Likely:
+                RevealClass();
+                RevealKind();
+                break;
+
+            case ScanStage.Confirmed:
+                RefreshRevealedClass(trueClass);
+                RevealKind();
+                RevealInfectionType();
+                RevealAllKeywords();
+                break;
+        }
+
         scanTicksIntoStage = 0;
         RefreshVisuals();
     }
