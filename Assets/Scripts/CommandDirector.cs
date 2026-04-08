@@ -22,15 +22,41 @@ public class CommandDirector : MonoBehaviour
     private readonly List<Operation> operations = new();
 
     private int nextScanId = 1;
-    private int nextBlockId = 1;
+    private readonly Queue<string> availableBlockDisplayIds = new();
 
     private AudioManager audioManager;
     public AudioManager AudioManager => audioManager;
 
     void Awake() {
         audioManager = AudioManager.Instance;
+        InitializeBlockIdPool();
+
         if (scanDirector != null)
             scanDirector.SetCommandDirector(this);
+    }
+
+    private void InitializeBlockIdPool()
+    {
+        availableBlockDisplayIds.Clear();
+
+        for (int i = 1; i <= 9; i++)
+            availableBlockDisplayIds.Enqueue($"#{i}");
+    }
+
+    private string GetNextBlockDisplayId()
+    {
+        if (availableBlockDisplayIds.Count == 0)
+            return null;
+
+        return availableBlockDisplayIds.Dequeue();
+    }
+
+    private void ReleaseBlockDisplayId(string displayId)
+    {
+        if (string.IsNullOrWhiteSpace(displayId))
+            return;
+
+        availableBlockDisplayIds.Enqueue(displayId);
     }
 
     private ScanLogTheme GetConsoleTheme()
@@ -139,6 +165,35 @@ public class CommandDirector : MonoBehaviour
             return theme.classBenign;
 
         return new Color(0.72f, 1.00f, 0.72f, 1f);
+    }
+
+    public BlockOperation FindArmedBlockForPacket(PacketView packet)
+    {
+        if (packet == null)
+            return null;
+
+        for (int i = 0; i < operations.Count; i++)
+        {
+            if (operations[i] is not BlockOperation block)
+                continue;
+
+            if (block.isFinished || block.state != BlockState.Armed)
+                continue;
+
+            if (string.Equals(block.packetId, packet.packetId, StringComparison.OrdinalIgnoreCase))
+                return block;
+        }
+
+        return null;
+    }
+
+    public Color GetBlockTagColor()
+    {
+        ScanLogTheme theme = GetConsoleTheme();
+        if (theme != null)
+            return theme.classThreat; // or a dedicated block color later
+
+        return new Color(1.00f, 0.42f, 0.42f, 1f);
     }
 
     public string FormatPrefix(ConsoleLogPrefix prefix)
@@ -477,6 +532,13 @@ public class CommandDirector : MonoBehaviour
             if (operations[i].ShouldRemove())
             {
                 Debug.Log($"[CommandDirector] removing operation {operations[i].displayId}");
+
+                if (operations[i] is BlockOperation block)
+                {
+                    ReleaseBlockDisplayId(block.displayId);
+                    RefreshBlockTagForPacketId(block.packetId);
+                }
+
                 operations.RemoveAt(i);
             }
         }
@@ -496,6 +558,7 @@ public class CommandDirector : MonoBehaviour
             if (op is BlockOperation block)
             {
                 block.TryTrigger(packet, node, this);
+                packet.RefreshBlockTag(this);
 
                 if (packet.isRemoved)
                     return true;
@@ -503,6 +566,18 @@ public class CommandDirector : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void RefreshBlockTagForPacketId(string packetId)
+    {
+        if (networkRuntime == null || string.IsNullOrWhiteSpace(packetId))
+            return;
+
+        PacketView packet = networkRuntime.GetPacket(packetId);
+        if (packet == null)
+            return;
+
+        packet.RefreshBlockTag(this);
     }
 
     public void NotifyPacketRemoved(string packetId, string reason)
@@ -516,6 +591,8 @@ public class CommandDirector : MonoBehaviour
         {
             operations[i].OnPacketRemoved(packetId, reason, this);
         }
+
+        RefreshBlockTagForPacketId(packetId);
     }
 
     private void StartSpawn(
@@ -620,16 +697,23 @@ public class CommandDirector : MonoBehaviour
             return;
         }
 
+        string blockDisplayId = GetNextBlockDisplayId();
+        if (string.IsNullOrWhiteSpace(blockDisplayId))
+        {
+            LogCommandError("block failed: max 9 active blocks");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
         BlockOperation block = new BlockOperation
         {
-            id = nextBlockId,
-            displayId = $"block{nextBlockId}",
+            displayId = blockDisplayId,
             packetId = packetId,
             nodeId = nodeId
         };
 
-        nextBlockId++;
         operations.Add(block);
+        RefreshBlockTagForPacketId(packetId);
 
         audioManager?.PlayCommandAccepted();
         LogBlockArmed(block.displayId, packetId, nodeId);
@@ -710,6 +794,9 @@ public class CommandDirector : MonoBehaviour
 
             audioManager?.PlayCommandAccepted();
             op.Cancel(this);
+            if (op is BlockOperation blockOp)
+                RefreshBlockTagForPacketId(blockOp.packetId);
+
             return;
         }
 
@@ -728,30 +815,29 @@ public class CommandDirector : MonoBehaviour
             ? theme.classBenign
             : new Color(0.72f, 1.00f, 0.72f, 1f);
 
-        sb.AppendLine("<b>BLOCKS</b>");
+        sb.AppendLine("<b>ACTIVE BLOCKS</b>");
 
-        bool hasBlocks = false;
-        int blockIndex = 1;
+        bool hasActiveBlocks = false;
 
         for (int i = 0; i < operations.Count; i++)
         {
             if (operations[i] is not BlockOperation block)
                 continue;
 
-            hasBlocks = true;
+            if (block.state != BlockState.Armed || block.isFinished)
+                continue;
 
-            sb.AppendLine($"B{blockIndex}  <b>{block.displayId}</b>  target=<b>{block.packetId}</b>  @ {block.nodeId}");
+            hasActiveBlocks = true;
 
-            if (block.isFinished)
-                sb.AppendLine($"    {RichTextUtil.Colorize("finished", mutedColor)}");
-            else
-                sb.AppendLine($"    {RichTextUtil.Colorize("armed", armedColor, true)}");
+            string idCol = $"<b>{block.displayId.PadRight(3)}</b>"; // "#1", "#10" safe
+            string packetCol = $"<b>{block.packetId}</b>";          // always 2 chars
+            string nodeCol = block.nodeId.PadRight(6);
+            string statusCol = RichTextUtil.Colorize("armed", armedColor, true);
 
-            sb.AppendLine();
-            blockIndex++;
+            sb.AppendLine($"{idCol} {packetCol} @ {nodeCol} {statusCol}");
         }
 
-        if (!hasBlocks)
+        if (!hasActiveBlocks)
             sb.AppendLine(RichTextUtil.Colorize("none", mutedColor));
     }
 
@@ -800,4 +886,5 @@ public class CommandDirector : MonoBehaviour
         Debug.Log($"[Command] {message}");
         OnLogMessage?.Invoke(message);
     }
+
 }

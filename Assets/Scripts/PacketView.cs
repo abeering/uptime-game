@@ -74,6 +74,8 @@ public class PacketView : MonoBehaviour
     public TMPro.TextMeshPro label;
     public TMPro.TextMeshPro scanTagLabel;
     [SerializeField] private SpriteRenderer scanTagBackgroundRenderer;
+    public TMPro.TextMeshPro blockTagLabel;
+    [SerializeField] private SpriteRenderer blockTagBackgroundRenderer;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -144,6 +146,10 @@ public class PacketView : MonoBehaviour
     [Header("Scan Tag Visuals")]
     [SerializeField] private float scanTagBackgroundAlpha = 0.92f;
     [SerializeField] private Color scanTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
+
+    [Header("Block Tag Visuals")]
+    [SerializeField] private float blockTagBackgroundAlpha = 0.92f;
+    [SerializeField] private Color blockTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
 
     [Header("Visual Lanes")]
     [SerializeField] private int visualLaneIndex = 0;
@@ -218,6 +224,7 @@ public class PacketView : MonoBehaviour
         route = newRoute;
 
         HideScanTag();
+        HideBlockTag();
         RefreshVisuals();
 
         if (borderRenderer != null)
@@ -527,6 +534,45 @@ public class PacketView : MonoBehaviour
         }
     }
 
+    public void ShowBlockTag(string tagText, Color tagColor)
+    {
+        if (string.IsNullOrWhiteSpace(tagText))
+        {
+            HideBlockTag();
+            return;
+        }
+
+        if (blockTagLabel != null)
+        {
+            blockTagLabel.gameObject.SetActive(true);
+            blockTagLabel.color = blockTagTextColor;
+            blockTagLabel.text = tagText;
+        }
+
+        if (blockTagBackgroundRenderer != null)
+        {
+            Color bg = tagColor;
+            bg.a = blockTagBackgroundAlpha;
+            blockTagBackgroundRenderer.enabled = true;
+            blockTagBackgroundRenderer.color = bg;
+        }
+    }
+
+    public void HideBlockTag()
+    {
+        if (blockTagLabel != null)
+        {
+            blockTagLabel.text = "";
+            blockTagLabel.gameObject.SetActive(false);
+        }
+
+        if (blockTagBackgroundRenderer != null)
+        {
+            blockTagBackgroundRenderer.enabled = false;
+            blockTagBackgroundRenderer.color = Color.clear;
+        }
+    }
+
     public bool IsScanComplete()
     {
         return scanStage == ScanStage.Confirmed;
@@ -722,6 +768,26 @@ public class PacketView : MonoBehaviour
         }
 
         ShowActiveIntelTag(tagText, tagColor);
+    }
+
+    public void RefreshBlockTag(CommandDirector commandDirector)
+    {
+        if (commandDirector == null)
+        {
+            HideBlockTag();
+            return;
+        }
+
+        BlockOperation armedBlock = commandDirector.FindArmedBlockForPacket(this);
+
+        if (armedBlock == null)
+        {
+            HideBlockTag();
+            return;
+        }
+
+        Color tagColor = commandDirector.GetBlockTagColor();
+        ShowBlockTag(armedBlock.displayId, tagColor);
     }
 
     public float GetScanConfidence01()
@@ -1595,6 +1661,12 @@ public class PacketView : MonoBehaviour
 
         if (scanTagLabel != null)
             scanTagLabel.sortingOrder = order + 2;
+
+        if (blockTagBackgroundRenderer != null)
+            blockTagBackgroundRenderer.sortingOrder = order + 3;
+
+        if (blockTagLabel != null)
+            blockTagLabel.sortingOrder = order + 4;
 
         if (speedTail != null)
             speedTail.sortingOrder = order - 3;
