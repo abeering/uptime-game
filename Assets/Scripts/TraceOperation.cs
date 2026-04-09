@@ -41,7 +41,7 @@ public class TraceOperation : Operation
         }
     }
 
-    public override void OnPacketRemoved(string removedPacketId, string reason, CommandDirector context)
+    public override void OnPacketRemoved(string removedPacketId, PacketRemovalReason reason, CommandDirector context)
     {
         if (isFinished || state != TraceState.Running)
             return;
@@ -51,7 +51,7 @@ public class TraceOperation : Operation
             state = TraceState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.LogTraceFailed(displayId, packetId, $"removed ({reason})");
+            context.LogTraceFailed(displayId, packetId, $"removed ({reason.ToString().ToLowerInvariant()})");
         }
     }
 

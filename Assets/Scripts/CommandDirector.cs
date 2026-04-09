@@ -598,7 +598,7 @@ public class CommandDirector : MonoBehaviour
         packet.RefreshBlockTag(this);
     }
 
-    public void NotifyPacketRemoved(string packetId, string reason)
+    public void NotifyPacketRemoved(string packetId, PacketRemovalReason reason)
     {
         PacketView packet = networkRuntime.GetPacket(packetId);
         

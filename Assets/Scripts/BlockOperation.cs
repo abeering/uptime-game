@@ -19,7 +19,7 @@ public class BlockOperation : Operation
         // Block operations are event-driven for now.
     }
 
-    public override void OnPacketRemoved(string removedPacketId, string reason, CommandDirector context)
+    public override void OnPacketRemoved(string removedPacketId, PacketRemovalReason reason, CommandDirector context)
     {
         if (isFinished || state != BlockState.Armed)
             return;
@@ -29,7 +29,7 @@ public class BlockOperation : Operation
             state = BlockState.Failed;
             isFinished = true;
             lingerTicksRemaining = 3;
-            context.LogBlockFailed(displayId, packetId, $"removed ({reason})");
+            context.LogBlockFailed(displayId, packetId, $"removed ({reason.ToString().ToLowerInvariant()})");
         }
     }
 

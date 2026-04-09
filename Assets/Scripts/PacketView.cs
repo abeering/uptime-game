@@ -179,7 +179,7 @@ public class PacketView : MonoBehaviour
     private LineRenderer speedTail;
 
     public event Action<PacketView, NodeView> OnReachedNode;
-    public event Action<PacketView, string> OnRemoved;
+    public event Action<PacketView, PacketRemovalReason> OnRemoved;
     public event Action<PacketView> OnRouteCompleted;
     public event Action<PacketView, ScanStage, ScanStage> OnScanStageChanged;
     public event Action<PacketView, IntelRevealType, string> OnIntelRevealed;
@@ -1575,7 +1575,7 @@ public class PacketView : MonoBehaviour
         return step.aToB ? step.connection.nodeB : step.connection.nodeA;
     }
 
-    public void NotifyRemoved(string reason)
+    public void NotifyRemoved(PacketRemovalReason reason)
     {
         if (isRemoved)
             return;

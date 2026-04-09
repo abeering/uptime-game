@@ -9,7 +9,7 @@ public abstract class Operation
 
     public abstract void Tick(CommandDirector context);
 
-    public abstract void OnPacketRemoved(string packetId, string reason, CommandDirector context);
+    public abstract void OnPacketRemoved(string packetId, PacketRemovalReason reason, CommandDirector context);
 
     public abstract bool CanCancel();
 
