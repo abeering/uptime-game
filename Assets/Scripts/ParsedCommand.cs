@@ -6,6 +6,7 @@ public enum CommandType
     Scan,
     DeepScan,
     Trace,
+    Clean,
     Block,
     Cancel,
     Boost,
