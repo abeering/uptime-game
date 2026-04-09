@@ -14,7 +14,8 @@ public class CleanMinigameOverlayView : MonoBehaviour
     [Header("Placement")]
     public Vector3 worldOffset = new Vector3(1.5f, 0.5f, 0f);
 
-    private Canvas parentCanvas;
+    [Header("Runtime")]
+    public CleanDirector cleanDirector;
 
     private void Awake()
     {
@@ -53,7 +54,7 @@ public class CleanMinigameOverlayView : MonoBehaviour
         }
     }
 
-    public void ShowMinigameStub(CleanSession session)
+    public void ShowMinigame(CleanSession session)
     {
         if (session == null)
             return;
@@ -62,19 +63,12 @@ public class CleanMinigameOverlayView : MonoBehaviour
             titleText.text = session.minigameType.ToString();
 
         if (minigameText != null)
-        {
-            minigameText.text =
-                "PID   CPU   NAME\n" +
-                "3812  12%   syncd\n" +
-                "4421  87%   minerd\n" +
-                "1022  08%   auth\n" +
-                "7710  23%   cache";
-        }
+            minigameText.text = BuildMinigameText(session);
 
         if (promptText != null)
         {
             promptText.gameObject.SetActive(true);
-            promptText.text = "terminate pid >";
+            promptText.text = "terminate >";
         }
 
         if (inputField != null)
@@ -84,6 +78,73 @@ public class CleanMinigameOverlayView : MonoBehaviour
             inputField.Select();
             inputField.ActivateInputField();
         }
+    }
+
+    public void ShowResult(CleanSession session)
+    {
+        if (session == null)
+            return;
+
+        if (titleText != null)
+            titleText.text = "clean result";
+
+        if (minigameText != null)
+            minigameText.text = session.resultMessage;
+
+        if (promptText != null)
+            promptText.gameObject.SetActive(false);
+
+        if (inputField != null)
+        {
+            inputField.text = string.Empty;
+            inputField.gameObject.SetActive(false);
+        }
+    }
+
+    public void SubmitCurrentInput()
+    {
+        if (inputField == null || cleanDirector == null)
+            return;
+
+        string raw = inputField.text;
+        cleanDirector.SubmitInput(raw);
+
+        inputField.text = string.Empty;
+    }
+
+    public void HandleEndEdit(string _)
+    {
+        SubmitCurrentInput();
+    }
+
+    private string BuildMinigameText(CleanSession session)
+    {
+        if (session == null)
+            return string.Empty;
+
+        switch (session.minigameType)
+        {
+            case CleanMinigameType.ProcessKiller:
+                return BuildProcessKillerText(session);
+
+            default:
+                return "unsupported minigame";
+        }
+    }
+
+    private string BuildProcessKillerText(CleanSession session)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine("PID   CPU   NAME");
+
+        for (int i = 0; i < session.processEntries.Count; i++)
+        {
+            ProcessKillerEntry entry = session.processEntries[i];
+            sb.AppendLine($"{entry.pid}  {entry.cpuPercent:00}%   {entry.processName}");
+        }
+
+        return sb.ToString().TrimEnd();
     }
 
     public void PositionNearNode(NodeView node)

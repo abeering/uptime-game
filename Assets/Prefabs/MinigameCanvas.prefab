@@ -327,7 +327,19 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7562817653303034764}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -1098,6 +1110,7 @@ GameObject:
   - component: {fileID: 1358143178533178354}
   - component: {fileID: 7721027844069486439}
   - component: {fileID: 4641607151137330808}
+  - component: {fileID: 88689916342122002}
   m_Layer: 0
   m_Name: MinigameCanvas
   m_TagString: Untagged
@@ -1127,7 +1140,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.02, y: 1.953}
+  m_AnchoredPosition: {x: -0.020019531, y: 1.9530029}
   m_SizeDelta: {x: 500, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1358143178533178354
@@ -1175,7 +1188,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &4641607151137330808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1193,3 +1206,22 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &88689916342122002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562817653303034764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb98a4f924abe5844963632bc27df699, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CleanMinigameOverlayView
+  rootTransform: {fileID: 6677470323364193644}
+  titleText: {fileID: 3194520450901031390}
+  minigameText: {fileID: 2175665851884151313}
+  promptText: {fileID: 4993850368778108169}
+  inputField: {fileID: 3106477776615874804}
+  worldOffset: {x: 1.5, y: 0.5, z: 0}
+  cleanDirector: {fileID: 0}

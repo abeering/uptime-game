@@ -413,7 +413,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CleanDirector
   networkRuntime: {fileID: 1878212259}
   overlayView: {fileID: 7559087597066484011}
-  splashTicks: 2
+  splashTicks: 4
+  resultTicks: 4
 --- !u!1 &158690091
 GameObject:
   m_ObjectHideFlags: 0
@@ -9158,6 +9159,34 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7559087597066484011}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: HandleEndEdit
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: CleanMinigameOverlayView, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106477776615874804, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 6677470323364193644, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -9246,6 +9275,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7721027844069486439, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9277,6 +9310,7 @@ MonoBehaviour:
   promptText: {fileID: 437083061}
   inputField: {fileID: 1371334987}
   worldOffset: {x: 1.5, y: 0.5, z: 0}
+  cleanDirector: {fileID: 151009144}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
