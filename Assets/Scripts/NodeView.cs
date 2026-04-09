@@ -22,6 +22,7 @@ public class NodeView : MonoBehaviour
     [Header("Infection")]
     private readonly System.Collections.Generic.List<NodeInfectionInstance> activeInfections = new();
     public bool IsInfected => activeInfections.Count > 0;
+    public int InfectionCount => activeInfections.Count;
     
     private void Awake()
     {
@@ -105,6 +106,25 @@ public class NodeView : MonoBehaviour
         ApplyInfection(InfectionFactory.CreateDefaultPayload(type));
     }
 
+    public bool RemoveInfection(InfectionType type)
+    {
+        if (type == InfectionType.None)
+            return false;
+
+        for (int i = 0; i < activeInfections.Count; i++)
+        {
+            if (activeInfections[i].Type != type)
+                continue;
+
+            activeInfections[i].OnRemoved();
+            activeInfections.RemoveAt(i);
+            RefreshVisuals();
+            return true;
+        }
+
+        return false;
+    }
+
     public void ClearInfection()
     {
         if (activeInfections.Count == 0)
@@ -117,6 +137,26 @@ public class NodeView : MonoBehaviour
 
         activeInfections.Clear();
         RefreshVisuals();
+    }
+
+    public NodeInfectionInstance PrimaryInfection
+    {
+        get
+        {
+            if (activeInfections.Count == 0)
+                return null;
+
+            return activeInfections[0];
+        }
+    }
+
+    public InfectionType ActiveInfectionType
+    {
+        get
+        {
+            NodeInfectionInstance infection = PrimaryInfection;
+            return infection != null ? infection.Type : InfectionType.None;
+        }
     }
 
     public bool BlocksTraffic()

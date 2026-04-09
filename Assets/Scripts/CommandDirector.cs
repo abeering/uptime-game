@@ -16,6 +16,7 @@ public class CommandDirector : MonoBehaviour
     public NetworkRuntime networkRuntime;
     public TrafficDirector trafficDirector;
     public ScanDirector scanDirector;
+    public CleanDirector cleanDirector;
 
     public event Action<string> OnLogMessage;
 
@@ -33,6 +34,9 @@ public class CommandDirector : MonoBehaviour
 
         if (scanDirector != null)
             scanDirector.SetCommandDirector(this);
+
+        if (cleanDirector != null)
+            cleanDirector.SetCommandDirector(this);
     }
 
     private void InitializeBlockIdPool()
@@ -449,6 +453,17 @@ public class CommandDirector : MonoBehaviour
                 StartBlock(command.packetId, command.nodeId);
                 return;
 
+            case CommandType.Clean:
+                if (string.IsNullOrWhiteSpace(command.nodeId))
+                {
+                    Log("ERROR usage: clean <node>");
+                    audioManager?.PlayCommandRejected();
+                    return;
+                }
+
+                StartClean(command.nodeId);
+                return;
+
             case CommandType.Cancel:
                 if (string.IsNullOrWhiteSpace(command.operationId))
                 {
@@ -519,6 +534,9 @@ public class CommandDirector : MonoBehaviour
     {
         if (scanDirector != null)
             scanDirector.Tick();
+
+        if (cleanDirector != null)
+            cleanDirector.Tick();
 
         for (int i = 0; i < operations.Count; i++)
         {
@@ -717,6 +735,37 @@ public class CommandDirector : MonoBehaviour
 
         audioManager?.PlayCommandAccepted();
         LogBlockArmed(block.displayId, packetId, nodeId);
+    }
+
+    private void StartClean(string nodeId)
+    {
+        NodeView node = networkRuntime != null
+            ? networkRuntime.GetNode(nodeId)
+            : null;
+
+        if (node == null)
+        {
+            LogCommandError($"clean failed: {nodeId} not found");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        if (cleanDirector == null)
+        {
+            LogCommandError("clean failed: no clean director");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        if (!cleanDirector.TryStartClean(node, out string failureReason))
+        {
+            LogCommandError(failureReason);
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        audioManager?.PlayCommandAccepted();
+        Log($"{FormatPrefix(ConsoleLogPrefix.Flow)}  <b>CLEAN</b>  {node.nodeId}");
     }
 
     private void StartBoost(string packetId)

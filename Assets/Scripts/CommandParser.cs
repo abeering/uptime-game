@@ -158,6 +158,17 @@ public static class CommandParser
             return result;
         }
 
+        if (verb == "clean")
+        {
+            if (parts.Length >= 2)
+            {
+                result.type = CommandType.Clean;
+                result.nodeId = parts[1];
+            }
+
+            return result;
+        }
+
         if (verb == "trace")
         {
             if (parts.Length >= 2)
