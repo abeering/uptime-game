@@ -372,3 +372,269 @@ Start with:
 - Modifier combinations
 - Multi-stage cleans
 - Chained minigames
+
+
+# Clean Minigame Pillars
+
+## Purpose
+
+The clean() system is not a collection of disconnected minigames.
+It is a **small set of cognitive interaction pillars** that can be:
+
+* reused
+* reskinned
+* scaled horizontally
+
+Each pillar represents a **distinct way the player thinks under pressure**.
+
+---
+
+## Core Pillars
+
+### 1. Identify
+
+**Pattern:**
+Inspect → find anomaly → type it
+
+**Player Experience:**
+"Something is wrong here."
+
+**Examples:**
+
+* Highest CPU process
+* Corrupted hex values
+* Duplicate ports
+* Missing route entries
+
+**Cognitive Load:**
+Visual comparison
+
+**Notes:**
+
+* Backbone of the system
+* Fastest to understand
+* Most scalable via flavor
+
+---
+
+### 2. Filter
+
+**Pattern:**
+Stream → react only to valid signals
+
+**Player Experience:**
+"Only act on the right things."
+
+**Examples:**
+
+* React only to valid symbols
+* Ignore noise in a signal stream
+* Accept/reject entries
+
+**Cognitive Load:**
+Recognition + inhibition
+
+**Notes:**
+
+* Continuous, not snapshot
+* Failure often comes from false positives
+
+---
+
+### 3. Repair
+
+**Pattern:**
+See corrupted structure → fix it
+
+**Player Experience:**
+"This is broken. Fix it."
+
+**Examples:**
+
+* Fix a command string
+* Restore missing characters
+* Repair malformed data
+
+**Cognitive Load:**
+Pattern completion
+
+**Constraints:**
+
+* The correct answer must feel inevitable
+* Avoid ambiguity or multiple valid solutions
+
+---
+
+### 4. Memory
+
+**Pattern:**
+Observe → hide → reproduce
+
+**Player Experience:**
+"Remember this."
+
+**Examples:**
+
+* Key sequences
+* Short strings
+* Ordered inputs
+
+**Cognitive Load:**
+Short-term memory
+
+**Notes:**
+
+* Forces player to disengage from main game
+* Keep duration short
+
+---
+
+### 5. Timing
+
+**Pattern:**
+Continuous motion → act at correct moment
+
+**Player Experience:**
+"Now."
+
+**Examples:**
+
+* Hit target zone
+* Align markers
+* Stop at threshold
+
+**Cognitive Load:**
+Motor timing
+
+**Notes:**
+
+* Introduces physical tension
+* Complements cognitive games
+
+---
+
+### 6. Burst
+
+**Pattern:**
+Perform simple action rapidly
+
+**Player Experience:**
+"Go fast."
+
+**Examples:**
+
+* Rapid key presses
+* Fast typing bursts
+* Repeated inputs
+
+**Cognitive Load:**
+Speed + accuracy
+
+**Notes:**
+
+* Creates panic pressure
+* Good contrast to slower games
+
+---
+
+## Design Principles
+
+### 1. Visual Clarity First
+
+The player should infer the rule from the layout, not instructions.
+
+Bad:
+
+* Requires reading explanation
+
+Good:
+
+* The anomaly is visually obvious
+
+---
+
+### 2. One Cognitive Verb Per Game
+
+Each minigame should test **one thing only**.
+
+Avoid mixing:
+
+* memory + timing
+* repair + filtering
+
+---
+
+### 3. Answer Is Already Visible
+
+The player should extract, not invent.
+
+Good:
+
+* Type PID shown on screen
+
+Bad:
+
+* Derive a value through multiple transformations
+
+---
+
+### 4. Prompt Labels Action (Not Rules)
+
+Prompt should be minimal:
+
+Examples:
+
+* terminate >
+* scrub >
+* repair >
+
+The screen teaches the rule.
+
+---
+
+### 5. Difficulty via Perception, Not Complexity
+
+Scale difficulty by:
+
+* density
+* noise
+* similarity between options
+* speed pressure
+
+Not by:
+
+* adding rules
+* increasing instructions
+
+---
+
+## System Model
+
+Minigames are defined by:
+
+* Pillar (Identify, Repair, etc.)
+* Flavor (tcpdump, hex, routing, etc.)
+* Difficulty
+
+The pillar defines behavior.
+The flavor defines presentation.
+
+---
+
+## Development Strategy
+
+Start with:
+
+1. Identify (existing)
+2. Repair
+3. One non-text pillar (Memory or Timing)
+
+Then expand horizontally by adding flavors within each pillar.
+
+---
+
+## Key Insight
+
+You are not building many games.
+
+You are building a **small vocabulary of actions** that can be expressed through many technical interfaces.
