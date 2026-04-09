@@ -8,6 +8,7 @@ public class TrafficDirector : MonoBehaviour
     public Transform packetsRoot;
     public NetworkRuntime networkRuntime;
     public CommandDirector commandDirector;
+    public ScoreDirector scoreDirector;
     private AudioManager audioManager;
 
     [Header("Routes")]
@@ -512,16 +513,27 @@ public class TrafficDirector : MonoBehaviour
             plan.startsQuickScanned,
             plan.infections
         );
+
         packet.keywords.AddRange(plan.keywords);
         packet.OnReachedNode += HandlePacketReachedNode;
+
         activePackets.Add(packet);
         networkRuntime.RegisterPacket(packet);
+
+        int actualSpawnTick = GameController.Instance != null
+            ? GameController.Instance.CurrentTick
+            : plan.spawnTick;
+
+        scoreDirector?.RegisterPacketSpawn(packet, actualSpawnTick);
+
         audioManager?.PlayClick();
 
         if (logSpawns)
         {
             Debug.Log(
-                $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} at tick {plan.spawnTick}"
+                $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} " +
+                $"scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} " +
+                $"plannedTick={plan.spawnTick} actualTick={actualSpawnTick}"
             );
         }
     }
@@ -534,7 +546,7 @@ public class TrafficDirector : MonoBehaviour
         // 1) Player / command intercepts resolve first.
         if (commandDirector != null)
         {
-            if(commandDirector.ResolvePacketArrivalIntercepts(packet, node))
+            if (commandDirector.ResolvePacketArrivalIntercepts(packet, node))
                 return;
 
             if (packet.isRemoved)
@@ -547,7 +559,7 @@ public class TrafficDirector : MonoBehaviour
             if (logSpawns)
                 Debug.Log($"[TrafficDirector] {packet.packetId} blocked at {node.nodeId}");
 
-            RemovePacket(packet, "blocked");
+            RemovePacket(packet, "blocked", node);
             return;
         }
 
@@ -565,7 +577,7 @@ public class TrafficDirector : MonoBehaviour
                 bool applied = node.ApplyInfection(payload);
                 if (applied)
                 {
-                    RemovePacket(packet, "infected");
+                    RemovePacket(packet, "infected", node);
                     return;
                 }
             }
@@ -603,15 +615,26 @@ public class TrafficDirector : MonoBehaviour
 
     public void RemovePacket(PacketView packet, string reason)
     {
+        RemovePacket(packet, reason, null);
+    }
+
+    public void RemovePacket(PacketView packet, string reason, NodeView node)
+    {
         if (packet == null)
             return;
 
         if (logSpawns)
             Debug.Log($"[TrafficDirector] removing {packet.packetId} ({reason})");
 
-        if(commandDirector != null)
+        int currentTick = GameController.Instance != null
+            ? GameController.Instance.CurrentTick
+            : 0;
+
+        scoreDirector?.RecordPacketRemoval(packet, reason, currentTick, node);
+
+        if (commandDirector != null)
             commandDirector.NotifyPacketRemoved(packet.packetId, reason);
-        
+
         packet.NotifyRemoved(reason);
         networkRuntime.UnregisterPacket(packet);
         activePackets.Remove(packet);

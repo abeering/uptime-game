@@ -5,7 +5,7 @@ public class GameController : MonoBehaviour
 {
     [Header("Tick")]
     [Min(0.1f)]
-    public float tickIntervalSeconds = 1f;
+    public float tickIntervalSeconds = 0.5f;
     public bool autoStart = true;
     public bool logTicks = true;
 
@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public CommandDirector commandDirector;
 
     private int tickCount = 0;
+    public int CurrentTick => tickCount;
 
     public static GameController Instance { get; private set; }
 

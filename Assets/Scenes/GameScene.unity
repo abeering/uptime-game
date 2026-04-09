@@ -485,6 +485,7 @@ Transform:
   - {fileID: 1433750261}
   - {fileID: 251853587}
   - {fileID: 151009143}
+  - {fileID: 580718490}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &192042489
@@ -2535,6 +2536,59 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &580718488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 580718490}
+  - component: {fileID: 580718489}
+  m_Layer: 0
+  m_Name: ScoreDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &580718489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580718488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f3cd671f3307b4a9600b28c539c847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreDirector
+  logScoreEvents: 1
+  currentRunId: debug-run-001
+  currentLevelId: level-001
+  totalScore: 0
+  earlyThresholdTicks: 2
+  veryLateThresholdTicks: 4
+  earlyBonus: 4
+  latePenalty: -3
+  veryLatePenalty: -8
+--- !u!4 &580718490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580718488}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 167012417}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &598726294
 GameObject:
   m_ObjectHideFlags: 0
@@ -4863,6 +4917,7 @@ MonoBehaviour:
   commandDirector: {fileID: 838780728}
   networkRuntime: {fileID: 1878212259}
   scanDirector: {fileID: 914094258}
+  scoreDirector: {fileID: 580718489}
 --- !u!1 &1072276950
 GameObject:
   m_ObjectHideFlags: 0
@@ -6897,6 +6952,7 @@ MonoBehaviour:
   packetsRoot: {fileID: 1195232782}
   networkRuntime: {fileID: 1878212259}
   commandDirector: {fileID: 838780728}
+  scoreDirector: {fileID: 580718489}
   routeToDb:
   - connection: {fileID: 1638192324}
     aToB: 1

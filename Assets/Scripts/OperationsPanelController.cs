@@ -9,6 +9,7 @@ public class OperationsPanelController : MonoBehaviour
     public CommandDirector commandDirector;
     public NetworkRuntime networkRuntime;
     public ScanDirector scanDirector;
+    public ScoreDirector scoreDirector;
 
     private void Update()
     {
@@ -16,9 +17,16 @@ public class OperationsPanelController : MonoBehaviour
             return;
 
         StringBuilder sb = new StringBuilder();
+
+        scanDirector.AppendKnownThreatsSection(sb, networkRuntime);
+        sb.AppendLine();
+
         commandDirector.AppendOperationsPanel(sb);
         sb.AppendLine();
-        scanDirector.AppendKnownThreatsSection(sb, networkRuntime);
+
+        scoreDirector.AppendOperationsPanel(sb);
+        
         operationsText.text = sb.ToString();
     }
+
 }
