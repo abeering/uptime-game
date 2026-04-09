@@ -1257,7 +1257,7 @@ public class PacketView : MonoBehaviour
 
     public virtual BlockResolution HandleBlocked(NodeView node)
     {
-        return BlockResolution.Remove("blocked", "blocked");
+        return BlockResolution.Remove(PacketRemovalReason.Blocked, "blocked");
     }
 
     private void AdvanceOneStep()

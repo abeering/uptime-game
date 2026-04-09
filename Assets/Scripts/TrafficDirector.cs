@@ -559,7 +559,7 @@ public class TrafficDirector : MonoBehaviour
             if (logSpawns)
                 Debug.Log($"[TrafficDirector] {packet.packetId} blocked at {node.nodeId}");
 
-            RemovePacket(packet, "blocked", node);
+            RemovePacket(packet, PacketRemovalReason.Blocked, node);
             return;
         }
 
@@ -577,7 +577,7 @@ public class TrafficDirector : MonoBehaviour
                 bool applied = node.ApplyInfection(payload);
                 if (applied)
                 {
-                    RemovePacket(packet, "infected", node);
+                    RemovePacket(packet, PacketRemovalReason.Infected, node);
                     return;
                 }
             }
@@ -608,23 +608,25 @@ public class TrafficDirector : MonoBehaviour
                 if (logSpawns)
                     Debug.Log($"Packet {packet.packetId} arrived.");
 
-                RemovePacket(packet, "arrived");
+                RemovePacket(packet, PacketRemovalReason.Arrived);
             }
         }
     }
 
-    public void RemovePacket(PacketView packet, string reason)
+    public void RemovePacket(PacketView packet, PacketRemovalReason reason)
     {
         RemovePacket(packet, reason, null);
     }
 
-    public void RemovePacket(PacketView packet, string reason, NodeView node)
+    public void RemovePacket(PacketView packet, PacketRemovalReason reason, NodeView node)
     {
         if (packet == null)
             return;
 
+        string legacyReason = ToLegacyReasonString(reason);
+
         if (logSpawns)
-            Debug.Log($"[TrafficDirector] removing {packet.packetId} ({reason})");
+            Debug.Log($"[TrafficDirector] removing {packet.packetId} ({legacyReason})");
 
         int currentTick = GameController.Instance != null
             ? GameController.Instance.CurrentTick
@@ -633,14 +635,25 @@ public class TrafficDirector : MonoBehaviour
         scoreDirector?.RecordPacketRemoval(packet, reason, currentTick, node);
 
         if (commandDirector != null)
-            commandDirector.NotifyPacketRemoved(packet.packetId, reason);
+            commandDirector.NotifyPacketRemoved(packet.packetId, legacyReason);
 
-        packet.NotifyRemoved(reason);
+        packet.NotifyRemoved(legacyReason);
         networkRuntime.UnregisterPacket(packet);
         activePackets.Remove(packet);
         availablePacketIds.Add(packet.packetId);
 
         Destroy(packet.gameObject);
+    }
+
+    private string ToLegacyReasonString(PacketRemovalReason reason)
+    {
+        return reason switch
+        {
+            PacketRemovalReason.Arrived => "arrived",
+            PacketRemovalReason.Blocked => "blocked",
+            PacketRemovalReason.Infected => "infected",
+            _ => "unknown"
+        };
     }
 
     private string GetNextPacketId()

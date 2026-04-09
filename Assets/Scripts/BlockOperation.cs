@@ -51,10 +51,11 @@ public class BlockOperation : Operation
 
         if (resolution.shouldRemove)
         {
-            context.trafficDirector.RemovePacket(
-                packet,
-                string.IsNullOrWhiteSpace(resolution.removeReason) ? "blocked" : resolution.removeReason
-            );
+            PacketRemovalReason removeReason = resolution.removeReason == PacketRemovalReason.Unknown
+                ? PacketRemovalReason.Blocked
+                : resolution.removeReason;
+
+            context.trafficDirector.RemovePacket(packet, removeReason);
         }
 
         state = BlockState.Triggered;

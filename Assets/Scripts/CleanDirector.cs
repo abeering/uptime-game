@@ -51,6 +51,7 @@ public class CleanDirector : MonoBehaviour
     [Header("References")]
     public NetworkRuntime networkRuntime;
     public CleanMinigameOverlayView overlayView;
+    public ScoreDirector scoreDirector;
 
     [Header("Timing")]
     public int splashTicks = 4;
@@ -267,12 +268,23 @@ public class CleanDirector : MonoBehaviour
 
         activeSession.wasSuccessful = success;
 
+        int currentTick = GameController.Instance != null
+            ? GameController.Instance.CurrentTick
+            : 0;
+
         if (success)
         {
             bool removed = activeSession.node.RemoveInfection(activeSession.infectionType);
             activeSession.resultMessage = removed
                 ? "NODE RESTORED"
                 : "CLEAN COMPLETE";
+
+            scoreDirector?.RecordCleanResult(
+                activeSession.node,
+                activeSession.infectionType,
+                true,
+                currentTick
+            );
 
             commandDirector?.Log(
                 $"{commandDirector.FormatPrefix(ConsoleLogPrefix.Flow)}  <b>CLEAN</b>  {activeSession.node.nodeId}  {commandDirector.FormatSuccess("restored")}"
@@ -281,6 +293,13 @@ public class CleanDirector : MonoBehaviour
         else
         {
             activeSession.resultMessage = "CLEAN FAILED";
+
+            scoreDirector?.RecordCleanResult(
+                activeSession.node,
+                activeSession.infectionType,
+                false,
+                currentTick
+            );
 
             commandDirector?.Log(
                 $"{commandDirector.FormatPrefix(ConsoleLogPrefix.Error)}  <b>CLEAN</b>  {activeSession.node.nodeId}  {commandDirector.FormatFailure("failed")}"

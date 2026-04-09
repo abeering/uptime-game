@@ -1,10 +1,12 @@
 public struct BlockResolution
 {
     public bool shouldRemove;
-    public string removeReason;
+    public PacketRemovalReason removeReason;
     public string logText;
 
-    public static BlockResolution Remove(string reason = "blocked", string logText = "blocked")
+    public static BlockResolution Remove(
+        PacketRemovalReason reason = PacketRemovalReason.Blocked,
+        string logText = "blocked")
     {
         return new BlockResolution
         {
@@ -19,7 +21,7 @@ public struct BlockResolution
         return new BlockResolution
         {
             shouldRemove = false,
-            removeReason = null,
+            removeReason = PacketRemovalReason.Unknown,
             logText = logText
         };
     }

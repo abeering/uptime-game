@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Text;
+using UnityEngine;
 
 public class ScoreDirector : MonoBehaviour
 {
@@ -20,6 +20,18 @@ public class ScoreDirector : MonoBehaviour
     public int earlyBonus = 4;
     public int latePenalty = -3;
     public int veryLatePenalty = -8;
+
+    [Header("Event Values")]
+    public int healthyPacketDeliveredValue = 10;
+    public int healthyPacketLostValue = -10;
+    public int priorityPacketDeliveredValue = 18;
+    public int priorityPacketLostValue = -18;
+    public int threatBlockedValue = 15;
+    public int threatReachedNodeValue = -20;
+    public int benignBlockedValue = -12;
+    public int successfulCleanValue = 12;
+    public int failedCleanValue = -8;
+    public int blockAtFirstNodeValue = 5;
 
     private readonly Dictionary<string, PacketTimingSnapshot> packetSnapshots = new();
     private readonly List<ScoreLedgerEntry> ledger = new();
@@ -43,34 +55,33 @@ public class ScoreDirector : MonoBehaviour
         if (packet == null || string.IsNullOrWhiteSpace(packet.PacketId))
             return;
 
-        int expectedDurationTicks = ComputeExpectedDurationTicks(packet);
-
         packetSnapshots[packet.PacketId] = new PacketTimingSnapshot
         {
             packetId = packet.PacketId,
             packetClass = packet.trueClass,
             spawnTick = spawnTick,
-            expectedDurationTicks = expectedDurationTicks
+            expectedDurationTicks = ComputeExpectedDurationTicks(packet),
+            routeConnectionCount = packet.route != null ? packet.route.Length : 0
         };
 
         if (logScoreEvents)
         {
+            PacketTimingSnapshot snapshot = packetSnapshots[packet.PacketId];
             Debug.Log(
-                $"[Score] snapshot {packet.PacketId} " +
-                $"spawn={spawnTick} expected={expectedDurationTicks} class={packet.trueClass}"
+                $"[Score] snapshot {snapshot.packetId} " +
+                $"spawn={snapshot.spawnTick} expected={snapshot.expectedDurationTicks} " +
+                $"routeEdges={snapshot.routeConnectionCount} class={snapshot.packetClass}"
             );
         }
     }
 
-    public void RecordPacketRemoval(PacketView packet, string reason, int currentTick, NodeView node = null)
+    public void RecordPacketRemoval(PacketView packet, PacketRemovalReason reason, int currentTick, NodeView node = null)
     {
         if (packet == null || string.IsNullOrWhiteSpace(packet.PacketId))
             return;
 
         if (!packetSnapshots.TryGetValue(packet.PacketId, out PacketTimingSnapshot snapshot))
             return;
-
-        int actualDurationTicks = Mathf.Max(0, currentTick - snapshot.spawnTick);
 
         ScoreEventType? eventType = ResolvePacketEventType(packet, reason);
         if (!eventType.HasValue)
@@ -79,42 +90,58 @@ public class ScoreDirector : MonoBehaviour
             return;
         }
 
-        int baseValue = GetBaseValue(eventType.Value);
+        int actualDurationTicks = Mathf.Max(0, currentTick - snapshot.spawnTick);
+        bool wasFirstNodeOutcome = node != null && packet.nodesReachedCount == 1;
 
-        ScoreLedgerEntry entry = new ScoreLedgerEntry
+        ScoreEventContext context = new ScoreEventContext
         {
-            eventType = eventType.Value,
-            baseValue = baseValue,
-            finalValue = baseValue,
-            context = new ScoreEventContext
-            {
-                packetId = packet.PacketId,
-                nodeId = node != null ? node.nodeId : null,
-                runId = currentRunId,
-                levelId = currentLevelId,
-                reason = reason,
-                tick = currentTick,
-                spawnTick = snapshot.spawnTick,
-                expectedDurationTicks = snapshot.expectedDurationTicks,
-                actualDurationTicks = actualDurationTicks
-            }
+            packetId = packet.PacketId,
+            nodeId = node != null ? node.nodeId : null,
+            infectionType = packet.GetPrimaryInfectionType().ToString(),
+            runId = currentRunId,
+            levelId = currentLevelId,
+            reason = ToReasonString(reason),
+            tick = currentTick,
+            spawnTick = snapshot.spawnTick,
+            expectedDurationTicks = snapshot.expectedDurationTicks,
+            actualDurationTicks = actualDurationTicks,
+            timingDeltaTicks = snapshot.expectedDurationTicks - actualDurationTicks,
+            nodesReachedCount = packet.nodesReachedCount,
+            routeConnectionCount = snapshot.routeConnectionCount,
+            wasFirstNodeOutcome = wasFirstNodeOutcome,
+            timingBand = ScoreTimingBand.None
         };
 
-        ApplyTimingModifier(entry);
+        RecordEvent(eventType.Value, context);
 
-        ledger.Add(entry);
-        totalScore += entry.finalValue;
-        packetSnapshots.Remove(packet.PacketId);
-
-        if (logScoreEvents)
+        if (eventType.Value == ScoreEventType.ThreatBlocked && wasFirstNodeOutcome)
         {
-            Debug.Log(
-                $"[Score] {entry.eventType} packet={entry.context.packetId} " +
-                $"base={entry.baseValue} final={entry.finalValue} " +
-                $"expected={entry.context.expectedDurationTicks} actual={entry.context.actualDurationTicks} " +
-                $"reason={entry.context.reason}"
+            RecordEvent(
+                ScoreEventType.BlockAtFirstNode,
+                CloneContext(context)
             );
         }
+
+        packetSnapshots.Remove(packet.PacketId);
+    }
+
+    public void RecordCleanResult(NodeView node, InfectionType infectionType, bool wasSuccessful, int currentTick)
+    {
+        ScoreEventContext context = new ScoreEventContext
+        {
+            nodeId = node != null ? node.nodeId : null,
+            infectionType = infectionType.ToString(),
+            runId = currentRunId,
+            levelId = currentLevelId,
+            reason = wasSuccessful ? "clean-success" : "clean-failed",
+            tick = currentTick,
+            timingBand = ScoreTimingBand.None
+        };
+
+        RecordEvent(
+            wasSuccessful ? ScoreEventType.SuccessfulClean : ScoreEventType.FailedClean,
+            context
+        );
     }
 
     public int GetScoreForLevel(string levelId)
@@ -149,7 +176,117 @@ public class ScoreDirector : MonoBehaviour
         return total;
     }
 
-    private void ApplyTimingModifier(ScoreLedgerEntry entry)
+    public void AppendOperationsPanel(StringBuilder sb)
+    {
+        if (sb == null)
+            return;
+
+        sb.AppendLine("=== SCORE ===");
+        sb.AppendLine($"total   {totalScore}");
+        sb.AppendLine($"level   {GetScoreForLevel(currentLevelId)}");
+        sb.AppendLine($"run     {GetScoreForRun(currentRunId)}");
+
+        int throughput = GetCategoryScore(ScoreCategory.Throughput);
+        int threat = GetCategoryScore(ScoreCategory.ThreatHandling);
+        int mistakes = GetCategoryScore(ScoreCategory.Mistakes);
+        int maintenance = GetCategoryScore(ScoreCategory.Maintenance);
+
+        sb.AppendLine($"flow    {FormatSigned(throughput)}");
+        sb.AppendLine($"threat  {FormatSigned(threat)}");
+        sb.AppendLine($"mistake {FormatSigned(mistakes)}");
+        sb.AppendLine($"clean   {FormatSigned(maintenance)}");
+
+        if (ledger.Count == 0)
+        {
+            sb.AppendLine("recent  none");
+            return;
+        }
+
+        int count = Mathf.Min(4, ledger.Count);
+        sb.AppendLine("recent");
+
+        for (int i = ledger.Count - count; i < ledger.Count; i++)
+        {
+            ScoreLedgerEntry entry = ledger[i];
+
+            string packetId = string.IsNullOrWhiteSpace(entry.context.packetId)
+                ? "--"
+                : entry.context.packetId;
+
+            string timingSuffix = entry.context.timingBand != ScoreTimingBand.None
+                ? $" [{entry.context.timingBand.ToString().ToLowerInvariant()}]"
+                : "";
+
+            sb.AppendLine(
+                $"  {packetId}  {entry.eventType}  {FormatSigned(entry.finalValue)}{timingSuffix}"
+            );
+        }
+    }
+
+    [ContextMenu("Score Debug / Dump Ledger")]
+    public void DebugDumpLedger()
+    {
+        Debug.Log("===== SCORE LEDGER =====");
+
+        if (ledger.Count == 0)
+        {
+            Debug.Log("[Score] ledger empty");
+            return;
+        }
+
+        for (int i = 0; i < ledger.Count; i++)
+        {
+            ScoreLedgerEntry entry = ledger[i];
+
+            Debug.Log(
+                $"[{i}] {entry.eventType} " +
+                $"cat={entry.category} " +
+                $"packet={entry.context.packetId ?? "--"} " +
+                $"node={entry.context.nodeId ?? "--"} " +
+                $"base={entry.baseValue} final={entry.finalValue} " +
+                $"delta={entry.context.timingDeltaTicks?.ToString() ?? "--"} " +
+                $"band={entry.context.timingBand}"
+            );
+        }
+    }
+
+    [ContextMenu("Score Debug / Clear Ledger")]
+    public void DebugClearLedger()
+    {
+        ledger.Clear();
+        packetSnapshots.Clear();
+        totalScore = 0;
+        Debug.Log("[Score] ledger cleared");
+    }
+
+    private void RecordEvent(ScoreEventType eventType, ScoreEventContext context)
+    {
+        ScoreLedgerEntry entry = new ScoreLedgerEntry
+        {
+            category = ResolveCategory(eventType),
+            eventType = eventType,
+            context = context,
+            baseValue = GetBaseValue(eventType),
+            finalValue = GetBaseValue(eventType)
+        };
+
+        ApplyModifiers(entry);
+
+        ledger.Add(entry);
+        totalScore += entry.finalValue;
+
+        if (logScoreEvents)
+        {
+            Debug.Log(
+                $"[Score] {entry.eventType} cat={entry.category} " +
+                $"base={entry.baseValue} final={entry.finalValue} " +
+                $"packet={entry.context.packetId ?? "--"} node={entry.context.nodeId ?? "--"} " +
+                $"reason={entry.context.reason}"
+            );
+        }
+    }
+
+    private void ApplyModifiers(ScoreLedgerEntry entry)
     {
         bool isDelivery =
             entry.eventType == ScoreEventType.HealthyPacketDelivered ||
@@ -165,12 +302,16 @@ public class ScoreDirector : MonoBehaviour
         int actual = entry.context.actualDurationTicks.Value;
         int deltaTicks = expected - actual;
 
+        entry.context.timingDeltaTicks = deltaTicks;
+
         int modifierDelta = 0;
+        ScoreTimingBand band = ScoreTimingBand.OnTime;
         string label = "on-time";
 
         if (deltaTicks >= earlyThresholdTicks)
         {
             modifierDelta = earlyBonus;
+            band = ScoreTimingBand.Early;
             label = "early";
         }
         else if (deltaTicks < 0)
@@ -180,14 +321,18 @@ public class ScoreDirector : MonoBehaviour
             if (lateBy >= veryLateThresholdTicks)
             {
                 modifierDelta = veryLatePenalty;
+                band = ScoreTimingBand.VeryLate;
                 label = "very-late";
             }
             else
             {
                 modifierDelta = latePenalty;
+                band = ScoreTimingBand.Late;
                 label = "late";
             }
         }
+
+        entry.context.timingBand = band;
 
         if (modifierDelta == 0)
             return;
@@ -222,7 +367,7 @@ public class ScoreDirector : MonoBehaviour
         return totalTicks;
     }
 
-    private ScoreEventType? ResolvePacketEventType(PacketView packet, string reason)
+    private ScoreEventType? ResolvePacketEventType(PacketView packet, PacketRemovalReason reason)
     {
         if (packet == null)
             return null;
@@ -233,18 +378,18 @@ public class ScoreDirector : MonoBehaviour
 
         switch (reason)
         {
-            case "arrived":
+            case PacketRemovalReason.Arrived:
                 if (isPriority) return ScoreEventType.PriorityPacketDelivered;
                 if (isBenign) return ScoreEventType.HealthyPacketDelivered;
                 return null;
 
-            case "blocked":
+            case PacketRemovalReason.Blocked:
                 if (isThreat) return ScoreEventType.ThreatBlocked;
                 if (isBenign) return ScoreEventType.BenignBlocked;
                 if (isPriority) return ScoreEventType.PriorityPacketLost;
                 return null;
 
-            case "infected":
+            case PacketRemovalReason.Infected:
                 if (isThreat) return ScoreEventType.ThreatReachedNode;
                 return null;
 
@@ -255,69 +400,120 @@ public class ScoreDirector : MonoBehaviour
         }
     }
 
+    private ScoreCategory ResolveCategory(ScoreEventType eventType)
+    {
+        switch (eventType)
+        {
+            case ScoreEventType.HealthyPacketDelivered:
+            case ScoreEventType.HealthyPacketLost:
+            case ScoreEventType.PriorityPacketDelivered:
+            case ScoreEventType.PriorityPacketLost:
+                return ScoreCategory.Throughput;
+
+            case ScoreEventType.ThreatBlocked:
+            case ScoreEventType.ThreatReachedNode:
+            case ScoreEventType.BlockAtFirstNode:
+                return ScoreCategory.ThreatHandling;
+
+            case ScoreEventType.BenignBlocked:
+                return ScoreCategory.Mistakes;
+
+            case ScoreEventType.SuccessfulClean:
+            case ScoreEventType.FailedClean:
+                return ScoreCategory.Maintenance;
+
+            default:
+                return ScoreCategory.Throughput;
+        }
+    }
+
     private int GetBaseValue(ScoreEventType eventType)
     {
         switch (eventType)
         {
             case ScoreEventType.HealthyPacketDelivered:
-                return 10;
+                return healthyPacketDeliveredValue;
 
             case ScoreEventType.HealthyPacketLost:
-                return -10;
+                return healthyPacketLostValue;
 
             case ScoreEventType.PriorityPacketDelivered:
-                return 18;
+                return priorityPacketDeliveredValue;
 
             case ScoreEventType.PriorityPacketLost:
-                return -18;
+                return priorityPacketLostValue;
 
             case ScoreEventType.ThreatBlocked:
-                return 15;
+                return threatBlockedValue;
 
             case ScoreEventType.ThreatReachedNode:
-                return -20;
+                return threatReachedNodeValue;
 
             case ScoreEventType.BenignBlocked:
-                return -12;
+                return benignBlockedValue;
+
+            case ScoreEventType.SuccessfulClean:
+                return successfulCleanValue;
+
+            case ScoreEventType.FailedClean:
+                return failedCleanValue;
+
+            case ScoreEventType.BlockAtFirstNode:
+                return blockAtFirstNodeValue;
 
             default:
                 return 0;
         }
     }
 
-    public void AppendOperationsPanel(StringBuilder sb)
+    private int GetCategoryScore(ScoreCategory category)
     {
-        if (sb == null)
-            return;
+        int total = 0;
 
-        sb.AppendLine("=== SCORE ===");
-
-        sb.AppendLine($"total   {totalScore}");
-        sb.AppendLine($"level   {GetScoreForLevel(currentLevelId)}");
-        sb.AppendLine($"run     {GetScoreForRun(currentRunId)}");
-
-        if (ledger == null || ledger.Count == 0)
+        for (int i = 0; i < ledger.Count; i++)
         {
-            sb.AppendLine("recent  none");
-            return;
+            if (ledger[i].category == category)
+                total += ledger[i].finalValue;
         }
 
-        int count = Mathf.Min(3, ledger.Count);
-        sb.AppendLine("recent");
-
-        for (int i = ledger.Count - count; i < ledger.Count; i++)
-        {
-            ScoreLedgerEntry entry = ledger[i];
-
-            string sign = entry.finalValue >= 0 ? "+" : "";
-            string packetId = string.IsNullOrWhiteSpace(entry.context.packetId)
-                ? "--"
-                : entry.context.packetId;
-
-            sb.AppendLine(
-                $"  {packetId}  {entry.eventType}  {sign}{entry.finalValue}"
-            );
-        }
+        return total;
     }
-    
+
+    private static string FormatSigned(int value)
+    {
+        return value >= 0 ? $"+{value}" : value.ToString();
+    }
+
+    private static string ToReasonString(PacketRemovalReason reason)
+    {
+        return reason switch
+        {
+            PacketRemovalReason.Arrived => "arrived",
+            PacketRemovalReason.Blocked => "blocked",
+            PacketRemovalReason.Infected => "infected",
+            _ => "unknown"
+        };
+    }
+
+    private static ScoreEventContext CloneContext(ScoreEventContext source)
+    {
+        return new ScoreEventContext
+        {
+            packetId = source.packetId,
+            nodeId = source.nodeId,
+            infectionType = source.infectionType,
+            runId = source.runId,
+            levelId = source.levelId,
+            reason = source.reason,
+            tick = source.tick,
+            spawnTick = source.spawnTick,
+            expectedDurationTicks = source.expectedDurationTicks,
+            actualDurationTicks = source.actualDurationTicks,
+            timingDeltaTicks = source.timingDeltaTicks,
+            nodesReachedCount = source.nodesReachedCount,
+            routeConnectionCount = source.routeConnectionCount,
+            wasFirstNodeOutcome = source.wasFirstNodeOutcome,
+            timingBand = source.timingBand
+        };
+    }
 }

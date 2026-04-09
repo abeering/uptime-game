@@ -1,6 +1,22 @@
 using System;
 using System.Collections.Generic;
 
+public enum PacketRemovalReason
+{
+    Unknown,
+    Arrived,
+    Blocked,
+    Infected
+}
+
+public enum ScoreCategory
+{
+    Throughput,
+    ThreatHandling,
+    Mistakes,
+    Maintenance
+}
+
 public enum ScoreEventType
 {
     HealthyPacketDelivered,
@@ -11,7 +27,6 @@ public enum ScoreEventType
     ThreatReachedNode,
     BenignBlocked,
 
-    // reserved for later
     SuccessfulClean,
     FailedClean,
     BlockAtFirstNode
@@ -20,6 +35,15 @@ public enum ScoreEventType
 public enum ScoreModifierType
 {
     Timing
+}
+
+public enum ScoreTimingBand
+{
+    None,
+    Early,
+    OnTime,
+    Late,
+    VeryLate
 }
 
 [Serializable]
@@ -42,6 +66,7 @@ public class ScoreEventContext
 {
     public string packetId;
     public string nodeId;
+    public string infectionType;
     public string runId;
     public string levelId;
     public string reason;
@@ -51,11 +76,20 @@ public class ScoreEventContext
     public int? spawnTick;
     public int? expectedDurationTicks;
     public int? actualDurationTicks;
+    public int? timingDeltaTicks;
+
+    public int? nodesReachedCount;
+    public int? routeConnectionCount;
+
+    public bool? wasFirstNodeOutcome;
+
+    public ScoreTimingBand timingBand = ScoreTimingBand.None;
 }
 
 [Serializable]
 public class ScoreLedgerEntry
 {
+    public ScoreCategory category;
     public ScoreEventType eventType;
     public ScoreEventContext context = new();
 
@@ -72,4 +106,5 @@ public class PacketTimingSnapshot
     public PacketClass packetClass;
     public int spawnTick;
     public int expectedDurationTicks;
+    public int routeConnectionCount;
 }
