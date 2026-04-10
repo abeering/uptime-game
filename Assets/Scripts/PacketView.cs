@@ -61,6 +61,20 @@ public enum IntelRevealType
 
 public class PacketView : MonoBehaviour
 {
+    private struct PacketTagData
+    {
+        public string text;
+        public Color backgroundColor;
+        public Color textColor;
+
+        public PacketTagData(string text, Color backgroundColor, Color textColor)
+        {
+            this.text = text;
+            this.backgroundColor = backgroundColor;
+            this.textColor = textColor;
+        }
+    }
+
     public string packetId = "a1";
     public string PacketId => packetId;
     public string visiblePacketId = "a1";
@@ -150,6 +164,15 @@ public class PacketView : MonoBehaviour
     [Header("Block Tag Visuals")]
     [SerializeField] private float blockTagBackgroundAlpha = 0.92f;
     [SerializeField] private Color blockTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
+
+    [Header("Tag Rail")]
+    [SerializeField] private Transform tagAnchor;
+    [SerializeField] private GameObject packetTagPrefab;
+    [SerializeField] private Vector3 tagStartOffset = Vector3.zero;
+    [SerializeField] private float tagSpacing = 0.42f;
+    [SerializeField] private Color defaultTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
+    private readonly List<PacketTagView> activeTagViews = new();
+    private readonly List<PacketTagView> tagViews = new();
 
     [Header("Visual Lanes")]
     [SerializeField] private int visualLaneIndex = 0;
@@ -241,7 +264,7 @@ public class PacketView : MonoBehaviour
         route = newRoute;
 
         HideScanTag();
-        HideBlockTag();
+        ClearAllTagViews();
         RefreshVisuals();
 
         // reset speed tail 
@@ -745,9 +768,6 @@ public class PacketView : MonoBehaviour
 
     public void RefreshScanTag(ScanDirector scanDirector)
     {
-        if (scanTagLabel == null)
-            return;
-
         ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
         ScanSlot traceSlot = scanDirector != null ? scanDirector.FindTraceSlotForPacket(this) : null;
 
@@ -770,47 +790,48 @@ public class PacketView : MonoBehaviour
             : scanSlot.GetThemeColor();
 
         SetActiveIntelVisual(true, borderColor);
-
-        string tagText;
-        Color tagColor;
-
-        if (hasScan && hasTrace)
-        {
-            tagText = $"{scanSlot.PacketTagText}/{traceSlot.PacketTagText}";
-            tagColor = traceSlot.GetThemeColor();
-        }
-        else if (hasTrace)
-        {
-            tagText = traceSlot.PacketTagText;
-            tagColor = traceSlot.GetThemeColor();
-        }
-        else
-        {
-            tagText = scanSlot.PacketTagText;
-            tagColor = scanSlot.GetThemeColor();
-        }
-
-        ShowActiveIntelTag(tagText, tagColor);
     }
 
     public void RefreshBlockTag(CommandDirector commandDirector)
     {
-        if (commandDirector == null)
-        {
-            HideBlockTag();
+        // legacy no-op: block tags are now drawn through RefreshTags(...)
+    }
+
+    private void EnsureTagPoolSize(int count)
+    {
+        if (packetTagPrefab == null || tagAnchor == null)
             return;
-        }
 
-        BlockOperation armedBlock = commandDirector.FindArmedBlockForPacket(this);
-
-        if (armedBlock == null)
+        while (activeTagViews.Count < count)
         {
-            HideBlockTag();
-            return;
-        }
+            GameObject instance = Instantiate(packetTagPrefab, tagAnchor);
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+            instance.transform.localScale = Vector3.one;
 
-        Color tagColor = commandDirector.GetBlockTagColor();
-        ShowBlockTag(armedBlock.displayId, tagColor);
+            PacketTagView tagView = instance.GetComponent<PacketTagView>();
+            if (tagView == null)
+            {
+                Debug.LogWarning($"[PacketView] PacketTag prefab on {name} is missing PacketTagView.");
+                Destroy(instance);
+                return;
+            }
+
+            tagView.Hide();
+            activeTagViews.Add(tagView);
+        }
+    }
+
+    private void HideUnusedTagViews(int usedCount)
+    {
+        for (int i = usedCount; i < activeTagViews.Count; i++)
+            activeTagViews[i].Hide();
+    }
+
+    private void ClearAllTagViews()
+    {
+        for (int i = 0; i < activeTagViews.Count; i++)
+            activeTagViews[i].Hide();
     }
 
     public float GetScanConfidence01()
@@ -1087,6 +1108,77 @@ public class PacketView : MonoBehaviour
         //     visualStage,
         //     GetScanStageProgress01()
         // );
+    }
+
+    public void RefreshTags(ScanDirector scanDirector, CommandDirector commandDirector)
+    {
+        List<PacketTagData> tags = new();
+
+        ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
+        if (scanSlot != null)
+        {
+            tags.Add(new PacketTagData(
+                scanSlot.PacketTagText,
+                WithAlpha(scanSlot.GetThemeColor(), scanTagBackgroundAlpha),
+                defaultTagTextColor
+            ));
+        }
+
+        ScanSlot traceSlot = scanDirector != null ? scanDirector.FindTraceSlotForPacket(this) : null;
+        if (traceSlot != null)
+        {
+            tags.Add(new PacketTagData(
+                traceSlot.PacketTagText,
+                WithAlpha(traceSlot.GetThemeColor(), scanTagBackgroundAlpha),
+                defaultTagTextColor
+            ));
+        }
+
+        if (commandDirector != null)
+        {
+            BlockOperation armedBlock = commandDirector.FindArmedBlockForPacket(this);
+            if (armedBlock != null)
+            {
+                Color blockColor = commandDirector.GetBlockTagColor();
+                tags.Add(new PacketTagData(
+                    armedBlock.displayId,
+                    WithAlpha(blockColor, blockTagBackgroundAlpha),
+                    defaultTagTextColor
+                ));
+            }
+        }
+
+        if (tags.Count == 0)
+        {
+            ClearAllTagViews();
+            return;
+        }
+
+        EnsureTagPoolSize(tags.Count);
+
+        int order = spriteRenderer != null ? spriteRenderer.sortingOrder : 0;
+
+        for (int i = 0; i < tags.Count; i++)
+        {
+            PacketTagView view = activeTagViews[i];
+            if (view == null)
+                continue;
+
+            view.transform.localPosition = tagStartOffset + new Vector3(i * tagSpacing, 0f, 0f);
+            view.transform.localRotation = Quaternion.identity;
+            view.transform.localScale = Vector3.one;
+
+            view.SetTag(tags[i].text, tags[i].backgroundColor, tags[i].textColor);
+            view.SetSortOrder(order + 1 + (i * 2), order + 2 + (i * 2));
+        }
+
+        HideUnusedTagViews(tags.Count);
+    }
+
+    private static Color WithAlpha(Color color, float alpha)
+    {
+        color.a = alpha;
+        return color;
     }
 
     private void EnsureSpeedTail()
@@ -1780,17 +1872,13 @@ public class PacketView : MonoBehaviour
         if (scanPulseRenderer != null)
             scanPulseRenderer.sortingOrder = order - 2;
 
-        if (scanTagBackgroundRenderer != null)
-            scanTagBackgroundRenderer.sortingOrder = order + 1;
+        for (int i = 0; i < activeTagViews.Count; i++)
+        {
+            if (activeTagViews[i] == null)
+                continue;
 
-        if (scanTagLabel != null)
-            scanTagLabel.sortingOrder = order + 2;
-
-        if (blockTagBackgroundRenderer != null)
-            blockTagBackgroundRenderer.sortingOrder = order + 3;
-
-        if (blockTagLabel != null)
-            blockTagLabel.sortingOrder = order + 4;
+            activeTagViews[i].SetSortOrder(order + 1 + (i * 2), order + 2 + (i * 2));
+        }
 
         if (speedTail != null)
             speedTail.sortingOrder = order - 3;

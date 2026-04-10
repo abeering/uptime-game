@@ -257,6 +257,7 @@ public class ScanDirector : MonoBehaviour
                 continue;
 
             slot.target.RefreshScanTag(this);
+            slot.target.RefreshTags(this, commandDirector);
         }
     }
 
@@ -525,6 +526,7 @@ public class ScanDirector : MonoBehaviour
 
         slot.Clear();
         packet.RefreshScanTag(this);
+        packet.RefreshTags(this, commandDirector);
 
         if (!IsPacketTracked(packet))
             UnsubscribeFromPacket(packet);

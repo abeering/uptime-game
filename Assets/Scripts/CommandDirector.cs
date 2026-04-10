@@ -576,7 +576,7 @@ public class CommandDirector : MonoBehaviour
             if (op is BlockOperation block)
             {
                 block.TryTrigger(packet, node, this);
-                packet.RefreshBlockTag(this);
+                packet.RefreshTags(scanDirector, this);
 
                 if (packet.isRemoved)
                     return true;
@@ -595,7 +595,7 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
             return;
 
-        packet.RefreshBlockTag(this);
+        packet.RefreshTags(scanDirector, this);
     }
 
     public void NotifyPacketRemoved(string packetId, PacketRemovalReason reason)
