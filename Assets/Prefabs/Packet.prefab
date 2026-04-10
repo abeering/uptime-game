@@ -866,11 +866,22 @@ MonoBehaviour:
   stepEaseFraction: 0.35
   minStepEaseDuration: 0.04
   enableSpeedTail: 1
-  tailMinLength: 0.06
-  tailMaxLength: 0.32
-  tailWidth: 0.045
-  tailAlpha: 0.28
-  tailRearOffset: 0.15
+  tailMinLength: 0.1
+  tailMaxLength: 0.5
+  tailWidth: 0.075
+  tailAlpha: 0.6
+  tailRearOffset: 0.18
+  tailDirectionLerpSpeed: 12
+  tailGrowPerTick: 0.05
+  tailResolution: 8
+  enableTailPulse: 1
+  tailPulseTravelDuration: 0.18
+  tailPulseWidth01: 0.1
+  tailPulseStrength: 0.85
+  scaleTailPulseByPacketSpeed: 1
+  tailPulseDurationMin: 0.08
+  tailPulseDurationMax: 0.24
+  tailPulseDurationFractionOfMove: 0.4
 --- !u!114 &5004352954912364169
 MonoBehaviour:
   m_ObjectHideFlags: 0

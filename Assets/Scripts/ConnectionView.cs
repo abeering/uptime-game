@@ -66,6 +66,14 @@ public class ConnectionView : MonoBehaviour
         lineRenderer.SetPosition(0, nodeA.transform.position);
         lineRenderer.SetPosition(1, nodeB.transform.position);
 
+        lineRenderer.startWidth = 0.02f;
+        lineRenderer.endWidth = 0.02f;
+
+        Color c = lineRenderer.startColor;
+        c.a = 0.25f; // try 0.1–0.25 range
+        lineRenderer.startColor = c;
+        lineRenderer.endColor = c;
+
         RefreshLabel();
     }
 

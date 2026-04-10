@@ -175,6 +175,23 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float tailWidth = 0.045f;
     [SerializeField] private float tailAlpha = 0.28f;
     [SerializeField] private float tailRearOffset = 0.15f;
+    [SerializeField] private float tailDirectionLerpSpeed = 12f;
+    private Vector3 smoothedTailDirection = Vector3.right;
+    private bool hasTailDirection = false;
+    // growing + pulsing 
+    [SerializeField] private float tailGrowPerTick = 0.05f;
+    [SerializeField] private int tailResolution = 8;
+    [SerializeField] private bool enableTailPulse = true;
+    [SerializeField] private float tailPulseTravelDuration = 0.22f;
+    [SerializeField] private float tailPulseWidth01 = 0.18f;
+    [SerializeField] private float tailPulseStrength = 0.32f;
+    private float currentTailLength = 0f;
+    private float tailPulseElapsed = 999f;
+    private bool tailPulseActive = false;
+    [SerializeField] private bool scaleTailPulseByPacketSpeed = true;
+    [SerializeField] private float tailPulseDurationMin = 0.07f;
+    [SerializeField] private float tailPulseDurationMax = 0.28f;
+    [SerializeField] private float tailPulseDurationFractionOfMove = 0.45f;
 
     private LineRenderer speedTail;
 
@@ -227,6 +244,11 @@ public class PacketView : MonoBehaviour
         HideBlockTag();
         RefreshVisuals();
 
+        // reset speed tail 
+        currentTailLength = 0f;
+        tailPulseElapsed = tailPulseTravelDuration;
+        tailPulseActive = false;
+
         if (borderRenderer != null)
             borderBaseScale = borderRenderer.transform.localScale;
 
@@ -266,6 +288,7 @@ public class PacketView : MonoBehaviour
     private void Update()
     {
         UpdateStepEaseVisual();
+        UpdateTailPulseRealtime();
         UpdateSpeedTail();
         UpdateActiveScanPulse();
     }
@@ -1079,7 +1102,7 @@ public class PacketView : MonoBehaviour
 
         speedTail = tailObj.AddComponent<LineRenderer>();
         speedTail.useWorldSpace = true;
-        speedTail.positionCount = 2;
+        speedTail.positionCount = Mathf.Max(2, tailResolution);
         speedTail.alignment = LineAlignment.View;
         speedTail.textureMode = LineTextureMode.Stretch;
         speedTail.numCapVertices = 2;
@@ -1137,40 +1160,50 @@ public class PacketView : MonoBehaviour
         }
 
         Vector3 moveDir = GetCurrentTravelDirection();
+        Vector3 targetDir = moveDir.normalized;
+        if (!hasTailDirection)
+        {
+            smoothedTailDirection = targetDir;
+            hasTailDirection = true;
+        }
+        else
+        {
+            smoothedTailDirection = Vector3.Lerp(
+                smoothedTailDirection,
+                targetDir,
+                Time.deltaTime * tailDirectionLerpSpeed
+            ).normalized;
+        }
         if (moveDir.sqrMagnitude <= 0.0001f)
         {
             speedTail.enabled = false;
             return;
         }
 
-        float tailLength = GetSpeedTailLength(edge);
+        float targetTailLength = GetSpeedTailLength(edge);
+        currentTailLength = Mathf.Min(currentTailLength, targetTailLength);
+        float tailLength = currentTailLength;
         Vector3 center = transform.position;
-        Vector3 head = center - (moveDir * tailRearOffset);
-        Vector3 tail = head - (moveDir * tailLength);
-
+        Vector3 head = center - (smoothedTailDirection * tailRearOffset);
+        Vector3 tail = head - (smoothedTailDirection * tailLength);
+        
         speedTail.enabled = true;
-        speedTail.SetPosition(0, head);
-        speedTail.SetPosition(1, tail);
+        int pointCount = Mathf.Max(2, tailResolution);
+        speedTail.positionCount = pointCount;
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            float t = i / (float)(pointCount - 1);
+            Vector3 p = Vector3.Lerp(head, tail, t);
+            speedTail.SetPosition(i, p);
+        }
 
         if (spriteRenderer != null)
         {
             Color baseColor = spriteRenderer.color;
-            Color tailColor = new Color(baseColor.r, baseColor.g, baseColor.b, tailAlpha);
+            Color tailColor = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
 
-            Gradient gradient = new Gradient();
-            gradient.SetKeys(
-                new GradientColorKey[]
-                {
-                    new GradientColorKey(tailColor, 0f),
-                    new GradientColorKey(tailColor, 1f)
-                },
-                new GradientAlphaKey[]
-                {
-                    new GradientAlphaKey(tailAlpha, 0f),
-                    new GradientAlphaKey(0f, 1f)
-                }
-            );
-
+            Gradient gradient = BuildTailGradient(tailColor);
             speedTail.colorGradient = gradient;
         }
     }
@@ -1191,6 +1224,47 @@ public class PacketView : MonoBehaviour
         return dir.normalized;
     }
 
+    private Gradient BuildTailGradient(Color tailColor)
+    {
+        int steps = Mathf.Clamp(tailResolution, 2, 8);
+        var colorKeys = new GradientColorKey[steps];
+        var alphaKeys = new GradientAlphaKey[steps];
+
+        float pulseCenter01 = GetTailPulseCenter01();
+
+        for (int i = 0; i < steps; i++)
+        {
+            float t = i / (float)(steps - 1);
+
+            float baseA = Mathf.Lerp(tailAlpha, 0f, t);
+
+            float pulseA = 0f;
+            if (enableTailPulse && tailPulseActive)
+            {
+                float dist = Mathf.Abs(t - pulseCenter01);
+                float normalized = 1f - Mathf.Clamp01(dist / Mathf.Max(0.001f, tailPulseWidth01));
+                pulseA = normalized * normalized * tailPulseStrength;
+            }
+
+            float finalA = Mathf.Clamp01(baseA + pulseA);
+
+            colorKeys[i] = new GradientColorKey(tailColor, t);
+            alphaKeys[i] = new GradientAlphaKey(finalA, t);
+        }
+
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
+    }
+
+    private float GetTailPulseCenter01()
+    {
+        if (!enableTailPulse || !tailPulseActive || tailPulseTravelDuration <= 0.001f)
+            return -1f;
+
+        return Mathf.Clamp01(tailPulseElapsed / tailPulseTravelDuration);
+    }
+
     private float GetSpeedTailLength(ConnectionView edge)
     {
         if (edge == null)
@@ -1202,6 +1276,53 @@ public class PacketView : MonoBehaviour
         float normalizedFastness = Mathf.InverseLerp(6f, 1f, effectiveInterval);
 
         return Mathf.Lerp(tailMinLength, tailMaxLength, normalizedFastness);
+    }
+
+    private void GrowTailTowardTarget()
+    {
+        ConnectionView edge = GetCurrentConnection();
+        if (edge == null)
+            return;
+
+        float targetLength = GetSpeedTailLength(edge);
+        currentTailLength = Mathf.Min(targetLength, currentTailLength + tailGrowPerTick);
+    }
+
+    private void UpdateTailPulseRealtime()
+    {
+        if (!enableTailPulse || !tailPulseActive)
+            return;
+
+        tailPulseElapsed += Time.deltaTime;
+
+        if (tailPulseElapsed >= tailPulseTravelDuration)
+        {
+            tailPulseElapsed = tailPulseTravelDuration;
+            tailPulseActive = false;
+        }
+    }
+
+    private void TriggerTailPulse()
+    {
+        if (!enableTailPulse)
+            return;
+
+        if (scaleTailPulseByPacketSpeed)
+        {
+            ConnectionView edge = GetCurrentConnection();
+            if (edge != null)
+            {
+                float moveIntervalSeconds = GetCurrentMoveIntervalSeconds(edge);
+                tailPulseTravelDuration = Mathf.Clamp(
+                    moveIntervalSeconds * tailPulseDurationFractionOfMove,
+                    tailPulseDurationMin,
+                    tailPulseDurationMax
+                );
+            }
+        }
+
+        tailPulseElapsed = 0f;
+        tailPulseActive = true;
     }
 
     public bool TryBoost()
@@ -1246,6 +1367,8 @@ public class PacketView : MonoBehaviour
         {
             keyword.OnTick(this, context);
         }
+
+        GrowTailTowardTarget();
 
         ticksUntilAdvance--;
 
@@ -1306,6 +1429,7 @@ public class PacketView : MonoBehaviour
             RefreshVisualLaneAssignment();
         }
 
+        TriggerTailPulse();
         SnapToCurrentPosition();
         Vector3 newVisualPosition = transform.position;
 
