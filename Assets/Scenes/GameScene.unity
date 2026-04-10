@@ -413,6 +413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CleanDirector
   networkRuntime: {fileID: 1878212259}
   overlayView: {fileID: 7559087597066484011}
+  scoreDirector: {fileID: 580718489}
   splashTicks: 4
   resultTicks: 4
 --- !u!1 &158690091
@@ -2574,6 +2575,16 @@ MonoBehaviour:
   earlyBonus: 4
   latePenalty: -3
   veryLatePenalty: -8
+  healthyPacketDeliveredValue: 10
+  healthyPacketLostValue: -10
+  priorityPacketDeliveredValue: 18
+  priorityPacketLostValue: -18
+  threatBlockedValue: 15
+  threatReachedNodeValue: -20
+  benignBlockedValue: -12
+  successfulCleanValue: 12
+  failedCleanValue: -8
+  blockAtFirstNodeValue: 5
 --- !u!4 &580718490
 Transform:
   m_ObjectHideFlags: 0
@@ -3916,7 +3927,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -3928,8 +3948,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -4085,7 +4105,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -4097,8 +4126,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -4412,7 +4441,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -4424,8 +4462,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -5851,7 +5889,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -5863,8 +5910,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -6020,7 +6067,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -6032,8 +6088,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -7262,7 +7318,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -7274,8 +7339,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -7734,7 +7799,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.5211258
+        value: 0.39999998
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.39999998
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -7746,8 +7820,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.47058824}
-      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.627451}
+      key0: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
+      key1: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 0.2509804}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
