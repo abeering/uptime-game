@@ -10,7 +10,6 @@ public class CleanMinigameOverlayView : MonoBehaviour
     public RectTransform rootTransform;
     public TMP_Text titleText;
     public TMP_Text minigameText;
-    public TMP_Text promptText;
     public TMP_InputField inputField;
 
     [Header("Splash Animation")]
@@ -26,10 +25,22 @@ public class CleanMinigameOverlayView : MonoBehaviour
     [Header("Runtime")]
     public CleanDirector cleanDirector;
 
+    private string currentPromptPrefix = string.Empty;
+    private bool suppressInputChange = false;
+
     private void Awake()
     {
         if (rootTransform == null)
             rootTransform = transform as RectTransform;
+
+        if (inputField != null)
+            inputField.onValueChanged.AddListener(HandleInputValueChanged);
+    }
+
+    private void OnDestroy()
+    {
+        if (inputField != null)
+            inputField.onValueChanged.RemoveListener(HandleInputValueChanged);
     }
 
     public void Show()
@@ -49,6 +60,7 @@ public class CleanMinigameOverlayView : MonoBehaviour
             inputField.DeactivateInputField();
 
         gameObject.SetActive(false);
+        currentPromptPrefix = string.Empty;
     }
 
     public bool WantsFocus()
@@ -65,6 +77,14 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
         inputField.ActivateInputField();
         inputField.Select();
+
+        int end = inputField.text != null ? inputField.text.Length : 0;
+        inputField.caretPosition = end;
+        inputField.stringPosition = end;
+        inputField.selectionAnchorPosition = end;
+        inputField.selectionFocusPosition = end;
+
+        ClampCaretToEditableRegion();
     }
 
     public void ShowSplash(CleanSession session)
@@ -74,9 +94,6 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
         if (titleText != null)
             titleText.text = $"clean {session.node.nodeId}";
-
-        if (promptText != null)
-            promptText.gameObject.SetActive(false);
 
         if (inputField != null)
         {
@@ -96,6 +113,8 @@ public class CleanMinigameOverlayView : MonoBehaviour
             else
                 minigameText.text = BuildSplashText(session);
         }
+
+        currentPromptPrefix = string.Empty;
     }
 
     public void ShowMinigame(CleanSession session)
@@ -115,16 +134,12 @@ public class CleanMinigameOverlayView : MonoBehaviour
         if (minigameText != null)
             minigameText.text = BuildMinigameText(session);
 
-        if (promptText != null)
-        {
-            promptText.gameObject.SetActive(true);
-            promptText.text = "terminate >";
-        }
+        currentPromptPrefix = "terminate > ";
 
         if (inputField != null)
         {
             inputField.gameObject.SetActive(true);
-            inputField.text = string.Empty;
+            SetInputTextPreservingPrompt(string.Empty);
         }
 
         ForceFocus();
@@ -147,14 +162,13 @@ public class CleanMinigameOverlayView : MonoBehaviour
         if (minigameText != null)
             minigameText.text = session.resultMessage;
 
-        if (promptText != null)
-            promptText.gameObject.SetActive(false);
-
         if (inputField != null)
         {
             inputField.text = string.Empty;
             inputField.gameObject.SetActive(false);
         }
+
+        currentPromptPrefix = string.Empty;
     }
 
     public void SubmitCurrentInput()
@@ -162,15 +176,90 @@ public class CleanMinigameOverlayView : MonoBehaviour
         if (inputField == null || cleanDirector == null)
             return;
 
-        string raw = inputField.text;
+        string raw = GetSubmittedInput();
+
         cleanDirector.SubmitInput(raw);
 
-        inputField.text = string.Empty;
+        if (inputField.gameObject.activeInHierarchy)
+            SetInputTextPreservingPrompt(string.Empty);
     }
 
     public void HandleEndEdit(string _)
     {
         SubmitCurrentInput();
+    }
+
+    private void HandleInputValueChanged(string value)
+    {
+        if (inputField == null || suppressInputChange)
+            return;
+
+        if (string.IsNullOrEmpty(currentPromptPrefix))
+            return;
+
+        if (!value.StartsWith(currentPromptPrefix))
+        {
+            string repairedUserText = string.Empty;
+
+            if (value.Length > currentPromptPrefix.Length)
+                repairedUserText = value.Substring(currentPromptPrefix.Length);
+
+            SetInputTextPreservingPrompt(repairedUserText);
+            return;
+        }
+
+        ClampCaretToEditableRegion();
+    }
+
+    private void ClampCaretToEditableRegion()
+    {
+        if (inputField == null || string.IsNullOrEmpty(currentPromptPrefix))
+            return;
+
+        int min = currentPromptPrefix.Length;
+
+        if (inputField.caretPosition < min)
+            inputField.caretPosition = min;
+
+        if (inputField.stringPosition < min)
+            inputField.stringPosition = min;
+
+        if (inputField.selectionAnchorPosition < min)
+            inputField.selectionAnchorPosition = min;
+
+        if (inputField.selectionFocusPosition < min)
+            inputField.selectionFocusPosition = min;
+    }
+
+    private void SetInputTextPreservingPrompt(string userText)
+    {
+        if (inputField == null)
+            return;
+
+        suppressInputChange = true;
+        inputField.text = currentPromptPrefix + userText;
+        inputField.caretPosition = inputField.text.Length;
+        inputField.stringPosition = inputField.text.Length;
+        inputField.selectionAnchorPosition = inputField.text.Length;
+        inputField.selectionFocusPosition = inputField.text.Length;
+        inputField.ForceLabelUpdate();
+        suppressInputChange = false;
+    }
+
+    private string GetSubmittedInput()
+    {
+        if (inputField == null)
+            return string.Empty;
+
+        string value = inputField.text ?? string.Empty;
+
+        if (string.IsNullOrEmpty(currentPromptPrefix))
+            return value.Trim();
+
+        if (!value.StartsWith(currentPromptPrefix))
+            return value.Trim();
+
+        return value.Substring(currentPromptPrefix.Length).Trim();
     }
 
     private string BuildMinigameText(CleanSession session)
