@@ -276,11 +276,6 @@ public class ScanDirector : MonoBehaviour
         RefreshActiveScanTags();
     }
 
-    public IReadOnlyList<ScanSlot> GetSlots()
-    {
-        return scanSlots;
-    }
-
     public int GetActiveScanCount()
     {
         return CountActiveSlots(scanSlots);
@@ -466,8 +461,7 @@ public class ScanDirector : MonoBehaviour
                 wasReplacementCandidate = willBeDropped
             });
 
-            UnsubscribeFromPacket(packet);
-            slot.Clear();
+            ClearSlotAndMaybeUnsubscribe(slot);
         }
 
         RefreshActiveScanTags();
