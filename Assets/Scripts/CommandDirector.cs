@@ -22,7 +22,6 @@ public class CommandDirector : MonoBehaviour
 
     private readonly List<Operation> operations = new();
 
-    private int nextScanId = 1;
     private readonly Queue<string> availableBlockDisplayIds = new();
 
     private AudioManager audioManager;
@@ -576,7 +575,7 @@ public class CommandDirector : MonoBehaviour
             if (op is BlockOperation block)
             {
                 block.TryTrigger(packet, node, this);
-                packet.RefreshTags(scanDirector, this);
+                packet.RefreshIntelPresentation(scanDirector, this);
 
                 if (packet.isRemoved)
                     return true;
@@ -595,7 +594,7 @@ public class CommandDirector : MonoBehaviour
         if (packet == null)
             return;
 
-        packet.RefreshTags(scanDirector, this);
+        packet.RefreshIntelPresentation(scanDirector, this);
     }
 
     public void NotifyPacketRemoved(string packetId, PacketRemovalReason reason)

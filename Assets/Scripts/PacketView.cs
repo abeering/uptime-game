@@ -88,8 +88,6 @@ public class PacketView : MonoBehaviour
     public TMPro.TextMeshPro label;
     public TMPro.TextMeshPro scanTagLabel;
     [SerializeField] private SpriteRenderer scanTagBackgroundRenderer;
-    public TMPro.TextMeshPro blockTagLabel;
-    [SerializeField] private SpriteRenderer blockTagBackgroundRenderer;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -172,7 +170,6 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float tagSpacing = 0.42f;
     [SerializeField] private Color defaultTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
     private readonly List<PacketTagView> activeTagViews = new();
-    private readonly List<PacketTagView> tagViews = new();
 
     [Header("Visual Lanes")]
     [SerializeField] private int visualLaneIndex = 0;
@@ -580,45 +577,6 @@ public class PacketView : MonoBehaviour
         }
     }
 
-    public void ShowBlockTag(string tagText, Color tagColor)
-    {
-        if (string.IsNullOrWhiteSpace(tagText))
-        {
-            HideBlockTag();
-            return;
-        }
-
-        if (blockTagLabel != null)
-        {
-            blockTagLabel.gameObject.SetActive(true);
-            blockTagLabel.color = blockTagTextColor;
-            blockTagLabel.text = tagText;
-        }
-
-        if (blockTagBackgroundRenderer != null)
-        {
-            Color bg = tagColor;
-            bg.a = blockTagBackgroundAlpha;
-            blockTagBackgroundRenderer.enabled = true;
-            blockTagBackgroundRenderer.color = bg;
-        }
-    }
-
-    public void HideBlockTag()
-    {
-        if (blockTagLabel != null)
-        {
-            blockTagLabel.text = "";
-            blockTagLabel.gameObject.SetActive(false);
-        }
-
-        if (blockTagBackgroundRenderer != null)
-        {
-            blockTagBackgroundRenderer.enabled = false;
-            blockTagBackgroundRenderer.color = Color.clear;
-        }
-    }
-
     public bool IsScanComplete()
     {
         return scanStage == ScanStage.Confirmed;
@@ -766,6 +724,12 @@ public class PacketView : MonoBehaviour
         }
     }
 
+    public void RefreshIntelPresentation(ScanDirector scanDirector, CommandDirector commandDirector)
+    {
+        RefreshScanTag(scanDirector);
+        RefreshTags(scanDirector, commandDirector);
+    }
+
     public void RefreshScanTag(ScanDirector scanDirector)
     {
         ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
@@ -790,11 +754,6 @@ public class PacketView : MonoBehaviour
             : scanSlot.GetThemeColor();
 
         SetActiveIntelVisual(true, borderColor);
-    }
-
-    public void RefreshBlockTag(CommandDirector commandDirector)
-    {
-        // legacy no-op: block tags are now drawn through RefreshTags(...)
     }
 
     private void EnsureTagPoolSize(int count)
