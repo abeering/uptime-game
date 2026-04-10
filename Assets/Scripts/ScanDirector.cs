@@ -1095,7 +1095,7 @@ public class ScanDirector : MonoBehaviour
 
         List<PacketView> knownThreats = networkRuntime.GetKnownThreatPackets();
 
-        if (knownThreats.Count == 0)
+        if (knownThreats == null || knownThreats.Count == 0)
         {
             sb.AppendLine(RichTextUtil.Colorize("none", logTheme.muted));
             return;
@@ -1107,18 +1107,110 @@ public class ScanDirector : MonoBehaviour
             if (packet == null)
                 continue;
 
+            // header: packet id + scan stage + best known identity
             string stageLabel = GetStageRichLabel(packet.scanStage);
-            string classLabel = GetVisibleClassRichLabel(packet);
+            string identityLabel = BuildKnownThreatIdentityLabel(packet);
 
-            sb.AppendLine($"T{i + 1}  <b>{packet.packetId}</b>  {stageLabel}  {classLabel}");
-            sb.AppendLine($"    src={packet.sourceAddress}  dest={packet.GetDestinationName()}");
+            sb.AppendLine($"<b>{packet.packetId}</b>  {stageLabel}  {identityLabel}");
 
-            string intelSummary = packet.BuildOperationsIntelSummary();
-            if (!string.IsNullOrWhiteSpace(intelSummary))
-                sb.AppendLine($"    {intelSummary}");
+            // detail lines only if known
+            string keywordLine = BuildKnownThreatKeywordLine(packet);
+            if (!string.IsNullOrWhiteSpace(keywordLine))
+                sb.AppendLine($"    {keywordLine}");
 
-            sb.AppendLine();
+            string infectionLine = BuildKnownThreatInfectionLine(packet);
+            if (!string.IsNullOrWhiteSpace(infectionLine))
+                sb.AppendLine($"    {infectionLine}");
+
+            string traceLine = BuildKnownThreatTraceLine(packet);
+            if (!string.IsNullOrWhiteSpace(traceLine))
+                sb.AppendLine($"    {traceLine}");
+
+            string blockedLine = BuildKnownThreatBlockedLine(packet);
+            if (!string.IsNullOrWhiteSpace(blockedLine))
+                sb.AppendLine($"    {blockedLine}");
+
+            if (i < knownThreats.Count - 1)
+                sb.AppendLine();
         }
+    }
+
+    private string BuildKnownThreatIdentityLabel(PacketView packet)
+    {
+        if (packet == null)
+            return RichTextUtil.Colorize("UNKNOWN", logTheme.classUnknown, true);
+
+        // best known identity = class -> kind
+        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+        {
+            return RichTextUtil.Colorize(
+                packet.revealedKind.ToString().ToUpperInvariant(),
+                logTheme.classThreat,
+                true
+            );
+        }
+
+        if (packet.knowsClass)
+        {
+            return GetPacketClassRichLabel(packet.revealedClass);
+        }
+
+        return GetVisibleClassRichLabel(packet);
+    }
+
+    private string BuildKnownThreatKeywordLine(PacketView packet)
+    {
+        if (packet == null)
+            return null;
+
+        var keywordIds = packet.GetRevealedKeywordIds();
+        if (keywordIds == null || keywordIds.Count == 0)
+            return null;
+
+        return $"kw={string.Join(",", keywordIds)}";
+    }
+
+    private string BuildKnownThreatInfectionLine(PacketView packet)
+    {
+        if (packet == null || !packet.knowsInfectionType || packet.revealedInfectionType == InfectionType.None)
+            return null;
+
+        return $"inf={packet.revealedInfectionType.ToString().ToLowerInvariant()}";
+    }
+
+    private string BuildKnownThreatTraceLine(PacketView packet)
+    {
+        if (packet == null)
+            return null;
+
+        bool knowsSrc = packet.knowsSource && !string.IsNullOrWhiteSpace(packet.revealedSource);
+        bool knowsDest = packet.knowsDestination && !string.IsNullOrWhiteSpace(packet.revealedDestination);
+
+        if (!knowsSrc && !knowsDest)
+            return null;
+
+        if (knowsSrc && knowsDest)
+            return $"src={packet.revealedSource}  dest={packet.revealedDestination}";
+
+        if (knowsSrc)
+            return $"src={packet.revealedSource}";
+
+        return $"dest={packet.revealedDestination}";
+    }
+
+    private string BuildKnownThreatBlockedLine(PacketView packet)
+    {
+        if (packet == null || commandDirector == null)
+            return null;
+
+        BlockOperation armedBlock = commandDirector.FindArmedBlockForPacket(packet);
+        if (armedBlock == null)
+            return null;
+
+        if (armedBlock.nodeId != null && !string.IsNullOrWhiteSpace(armedBlock.nodeId))
+            return $"blocked @ {armedBlock.nodeId}";
+
+        return "blocked";
     }
 
     private enum ScanPanelRowState
