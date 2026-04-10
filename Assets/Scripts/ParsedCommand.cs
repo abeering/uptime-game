@@ -24,6 +24,7 @@ public class ParsedCommand
     public string rawText;
     public string connectionId;
     public int throttleAmount;
+    public int? intelSlotIndex;
 
     // for Spawn
     public PacketClass packetClass = PacketClass.Benign;

@@ -3,6 +3,16 @@ using UnityEngine;
 using System.Text;
 using System;
 
+public enum IntelAssignResult
+{
+    Started,
+    Replaced,
+    AlreadyTracking,
+    AlreadyComplete,
+    InvalidSlot,
+    NoAvailableSlot
+}
+
 public class ScanDirector : MonoBehaviour
 {
     [Header("Scan Slots")]
@@ -86,17 +96,52 @@ public class ScanDirector : MonoBehaviour
         commandDirector = director;
     }
 
-    public void StartScan(PacketView packet)
+    public IntelAssignResult StartScan(PacketView packet)
+    {
+        return StartScan(packet, null);
+    }
+
+    public IntelAssignResult StartScan(PacketView packet, int? preferredSlotIndex)
     {
         if (packet == null)
-            return;
+            return IntelAssignResult.NoAvailableSlot;
 
         if (!packet.CanAdvanceScanStage())
-            return;
+            return IntelAssignResult.AlreadyComplete;
 
         ScanSlot existingSlot = FindSlotForPacket(packet);
         if (existingSlot != null)
-            return;
+        {
+            if (!preferredSlotIndex.HasValue || existingSlot.slotIndex == preferredSlotIndex.Value)
+                return IntelAssignResult.AlreadyTracking;
+        }
+
+        if (preferredSlotIndex.HasValue)
+        {
+            int slotIndex = preferredSlotIndex.Value;
+
+            if (!IsValidScanSlotIndex(slotIndex))
+                return IntelAssignResult.InvalidSlot;
+
+            ScanSlot targetSlot = scanSlots[slotIndex];
+
+            if (targetSlot.target == packet)
+                return IntelAssignResult.AlreadyTracking;
+
+            if (existingSlot != null)
+                ClearSlotAndMaybeUnsubscribe(existingSlot);
+
+            bool wasReplacing = !targetSlot.IsEmpty();
+            if (wasReplacing)
+                ClearSlotAndMaybeUnsubscribe(targetSlot);
+
+            SubscribeToPacket(packet);
+            targetSlot.Assign(packet, tickCounter);
+            packet.SetActivelyScanned(true);
+            RefreshActiveScanTags();
+
+            return wasReplacing ? IntelAssignResult.Replaced : IntelAssignResult.Started;
+        }
 
         ScanSlot emptySlot = FindEmptySlot(scanSlots);
         if (emptySlot != null)
@@ -105,7 +150,7 @@ public class ScanDirector : MonoBehaviour
             emptySlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
             RefreshActiveScanTags();
-            return;
+            return IntelAssignResult.Started;
         }
 
         ScanSlot replacementSlot = GetReplacementCandidateSlot();
@@ -116,22 +161,60 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
+            RefreshActiveScanTags();
+            return IntelAssignResult.Replaced;
         }
 
         RefreshActiveScanTags();
+        return IntelAssignResult.NoAvailableSlot;
     }
 
-    public void StartTrace(PacketView packet)
+    public IntelAssignResult StartTrace(PacketView packet)
+    {
+        return StartTrace(packet, null);
+    }
+
+    public IntelAssignResult StartTrace(PacketView packet, int? preferredSlotIndex)
     {
         if (packet == null)
-            return;
+            return IntelAssignResult.NoAvailableSlot;
 
         if (packet.knowsSource && packet.knowsDestination)
-            return;
+            return IntelAssignResult.AlreadyComplete;
 
         ScanSlot existingSlot = FindTraceSlotForPacket(packet);
         if (existingSlot != null)
-            return;
+        {
+            if (!preferredSlotIndex.HasValue || existingSlot.slotIndex == preferredSlotIndex.Value)
+                return IntelAssignResult.AlreadyTracking;
+        }
+
+        if (preferredSlotIndex.HasValue)
+        {
+            int slotIndex = preferredSlotIndex.Value;
+
+            if (!IsValidTraceSlotIndex(slotIndex))
+                return IntelAssignResult.InvalidSlot;
+
+            ScanSlot targetSlot = traceSlots[slotIndex];
+
+            if (targetSlot.target == packet)
+                return IntelAssignResult.AlreadyTracking;
+
+            if (existingSlot != null)
+                ClearSlotAndMaybeUnsubscribe(existingSlot);
+
+            bool wasReplacing = !targetSlot.IsEmpty();
+            if (wasReplacing)
+                ClearSlotAndMaybeUnsubscribe(targetSlot);
+
+            SubscribeToPacket(packet);
+            targetSlot.Assign(packet, tickCounter);
+            packet.SetActivelyTraced(true, targetSlot.GetThemeColor());
+            RefreshActiveScanTags();
+
+            return wasReplacing ? IntelAssignResult.Replaced : IntelAssignResult.Started;
+        }
 
         ScanSlot emptySlot = FindEmptySlot(traceSlots);
         if (emptySlot != null)
@@ -140,7 +223,7 @@ public class ScanDirector : MonoBehaviour
             emptySlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, emptySlot.GetThemeColor());
             RefreshActiveScanTags();
-            return;
+            return IntelAssignResult.Started;
         }
 
         ScanSlot replacementSlot = FindOldestSlot(traceSlots);
@@ -151,9 +234,12 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, replacementSlot.GetThemeColor());
+            RefreshActiveScanTags();
+            return IntelAssignResult.Replaced;
         }
 
         RefreshActiveScanTags();
+        return IntelAssignResult.NoAvailableSlot;
     }
 
     private void RefreshActiveScanTags()
@@ -486,6 +572,16 @@ public class ScanDirector : MonoBehaviour
     public ScanSlot FindAnySlotForPacket(PacketView packet)
     {
         return FindSlotForPacket(packet) ?? FindTraceSlotForPacket(packet);
+    }
+
+    private bool IsValidScanSlotIndex(int slotIndex)
+    {
+        return slotIndex >= 0 && slotIndex < scanSlots.Count;
+    }
+
+    private bool IsValidTraceSlotIndex(int slotIndex)
+    {
+        return slotIndex >= 0 && slotIndex < traceSlots.Count;
     }
 
     private ScanSlot GetReplacementCandidateSlot()

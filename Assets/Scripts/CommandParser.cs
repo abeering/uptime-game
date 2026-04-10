@@ -1,7 +1,11 @@
 using System;
+using System.Text.RegularExpressions;
 
 public static class CommandParser
 {
+    private static readonly Regex ScanVerbRegex = new(@"^(scan|s)(\d+)?$", RegexOptions.IgnoreCase);
+    private static readonly Regex TraceVerbRegex = new(@"^(trace|t)(\d+)?$", RegexOptions.IgnoreCase);
+
     private static bool IsSpawnModifierToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
@@ -136,12 +140,19 @@ public static class CommandParser
 
         string verb = parts[0].ToLowerInvariant();
 
-        if (verb == "scan")
+        Match scanMatch = ScanVerbRegex.Match(verb);
+        if (scanMatch.Success)
         {
             if (parts.Length >= 2)
             {
                 result.type = CommandType.Scan;
                 result.packetId = parts[1];
+
+                if (scanMatch.Groups[2].Success &&
+                    int.TryParse(scanMatch.Groups[2].Value, out int parsedSlot))
+                {
+                    result.intelSlotIndex = parsedSlot - 1;
+                }
             }
 
             return result;
@@ -158,35 +169,42 @@ public static class CommandParser
             return result;
         }
 
-        if (verb == "clean")
-        {
-            if (parts.Length >= 2)
-            {
-                result.type = CommandType.Clean;
-                result.nodeId = parts[1];
-            }
-
-            return result;
-        }
-
-        if (verb == "trace")
+        Match traceMatch = TraceVerbRegex.Match(verb);
+        if (traceMatch.Success)
         {
             if (parts.Length >= 2)
             {
                 result.type = CommandType.Trace;
                 result.packetId = parts[1];
+
+                if (traceMatch.Groups[2].Success &&
+                    int.TryParse(traceMatch.Groups[2].Value, out int parsedSlot))
+                {
+                    result.intelSlotIndex = parsedSlot - 1;
+                }
             }
 
             return result;
         }
 
-        if (verb == "block")
+        if (verb == "block" || verb == "b")
         {
             if (parts.Length >= 4 && parts[2] == "@")
             {
                 result.type = CommandType.Block;
                 result.packetId = parts[1];
                 result.nodeId = parts[3];
+            }
+
+            return result;
+        }
+
+        if (verb == "clean")
+        {
+            if (parts.Length >= 2)
+            {
+                result.type = CommandType.Clean;
+                result.nodeId = parts[1];
             }
 
             return result;

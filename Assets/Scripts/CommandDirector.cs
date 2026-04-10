@@ -423,23 +423,23 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Scan:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("ERROR usage: scan <packet>");
+                    Log("ERROR usage: scan <packet> | scanN <packet>");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
 
-                StartScan(command.packetId);
+                StartScan(command.packetId, command.intelSlotIndex);
                 return;
 
             case CommandType.Trace:
                 if (string.IsNullOrWhiteSpace(command.packetId))
                 {
-                    Log("ERROR usage: trace <packet>");
+                    Log("ERROR usage: trace <packet> | traceN <packet>");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
 
-                StartTrace(command.packetId);
+                StartTrace(command.packetId, command.intelSlotIndex);
                 return;
 
             case CommandType.Block:
@@ -655,45 +655,122 @@ public class CommandDirector : MonoBehaviour
         audioManager?.PlayCommandAccepted();
     }
 
-    private void StartScan(string packetId, int durationTicks = 4)
+    private void StartScan(string packetId, int? slotIndex = null)
     {
         PacketView packet = networkRuntime.GetPacket(packetId);
 
         if (packet == null)
         {
             LogCommandError($"scan failed: {packetId} not found");
-            AudioManager.Instance?.PlayCommandRejected();
+            audioManager?.PlayCommandRejected();
             return;
         }
 
-        scanDirector.StartScan(packet);
+        if (scanDirector == null)
+        {
+            LogCommandError("scan failed: no scan director");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
 
-        AudioManager.Instance?.PlayCommandAccepted();
-        LogScanStarted(packetId, durationTicks);
+        IntelAssignResult result = scanDirector.StartScan(packet, slotIndex);
+
+        switch (result)
+        {
+            case IntelAssignResult.Started:
+                audioManager?.PlayCommandAccepted();
+                LogScanStarted(packetId, scanDirector.baseScanDurationTicksSingle);
+                return;
+
+            case IntelAssignResult.Replaced:
+                audioManager?.PlayCommandAccepted();
+
+                if (slotIndex.HasValue)
+                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"replaced S{slotIndex.Value + 1}", true)}");
+                else
+                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted("replaced oldest", true)}");
+
+                return;
+
+            case IntelAssignResult.AlreadyTracking:
+                LogCommandError($"scan ignored: {packetId} already being scanned");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            case IntelAssignResult.AlreadyComplete:
+                LogCommandError($"scan ignored: {packetId} already confirmed");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            case IntelAssignResult.InvalidSlot:
+                LogCommandError($"scan failed: invalid slot S{slotIndex.GetValueOrDefault() + 1}");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            default:
+                LogCommandError("scan failed");
+                audioManager?.PlayCommandRejected();
+                return;
+        }
     }
 
-    private void StartTrace(string packetId, int durationTicks = 12)
+    private void StartTrace(string packetId, int? slotIndex = null)
     {
         PacketView packet = networkRuntime.GetPacket(packetId);
 
         if (packet == null)
         {
             LogCommandError($"trace failed: {packetId} not found");
-            AudioManager.Instance?.PlayCommandRejected();
+            audioManager?.PlayCommandRejected();
             return;
         }
 
         if (scanDirector == null)
         {
             LogCommandError("trace failed: no scan director");
-            AudioManager.Instance?.PlayCommandRejected();
+            audioManager?.PlayCommandRejected();
             return;
         }
 
-        scanDirector.StartTrace(packet);
+        IntelAssignResult result = scanDirector.StartTrace(packet, slotIndex);
 
-        AudioManager.Instance?.PlayCommandAccepted();
-        LogTraceStarted(packetId, durationTicks);
+        switch (result)
+        {
+            case IntelAssignResult.Started:
+                audioManager?.PlayCommandAccepted();
+                LogTraceStarted(packetId, scanDirector.baseTraceDurationTicks);
+                return;
+
+            case IntelAssignResult.Replaced:
+                audioManager?.PlayCommandAccepted();
+
+                if (slotIndex.HasValue)
+                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"replaced T{slotIndex.Value + 1}", true)}");
+                else
+                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted("replaced oldest", true)}");
+
+                return;
+
+            case IntelAssignResult.AlreadyTracking:
+                LogCommandError($"trace ignored: {packetId} already being traced");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            case IntelAssignResult.AlreadyComplete:
+                LogCommandError($"trace ignored: {packetId} already has source/destination");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            case IntelAssignResult.InvalidSlot:
+                LogCommandError($"trace failed: invalid slot T{slotIndex.GetValueOrDefault() + 1}");
+                audioManager?.PlayCommandRejected();
+                return;
+
+            default:
+                LogCommandError("trace failed");
+                audioManager?.PlayCommandRejected();
+                return;
+        }
     }
 
     private void StartBlock(string packetId, string nodeId)
