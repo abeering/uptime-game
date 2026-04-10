@@ -86,8 +86,6 @@ public class PacketView : MonoBehaviour
 
     [Header("Labels")]
     public TMPro.TextMeshPro label;
-    public TMPro.TextMeshPro scanTagLabel;
-    [SerializeField] private SpriteRenderer scanTagBackgroundRenderer;
 
     [Header("Debug State")]
     public int routeIndex = 0;
@@ -136,7 +134,6 @@ public class PacketView : MonoBehaviour
     [Min(0)] public int scanTicksIntoStage = 0;
     public bool isActivelyScanned = false;
     public bool isActivelyTraced = false;
-    [SerializeField] private string activeIntelTagText = null;
 
     [Header("Visuals")]
     public Color unknownColor = Color.gray;
@@ -260,7 +257,6 @@ public class PacketView : MonoBehaviour
         boostCount = 0;
         route = newRoute;
 
-        HideScanTag();
         ClearAllTagViews();
         RefreshVisuals();
 
@@ -442,7 +438,7 @@ public class PacketView : MonoBehaviour
         ResetRevealedIntel();
 
         RefreshVisuals();
-        HideScanTag();
+        ClearAllTagViews();
     }
 
     private void ResetRevealedIntel()
@@ -491,7 +487,6 @@ public class PacketView : MonoBehaviour
             if (!isActivelyScanned && !isActivelyTraced)
             {
                 ToggleScanBorder(false);
-                HideActiveIntelTag();
             }
         }
 
@@ -531,49 +526,6 @@ public class PacketView : MonoBehaviour
         else
         {
             RefreshVisuals();
-        }
-    }
-
-    public void ShowActiveIntelTag(string tagText, Color tagColor)
-    {
-        if (string.IsNullOrWhiteSpace(tagText))
-        {
-            HideActiveIntelTag();
-            return;
-        }
-
-        activeIntelTagText = tagText;
-
-        if (scanTagLabel != null)
-        {
-            scanTagLabel.gameObject.SetActive(true);
-            scanTagLabel.color = scanTagTextColor;
-            scanTagLabel.text = tagText;
-        }
-
-        if (scanTagBackgroundRenderer != null)
-        {
-            Color bg = tagColor;
-            bg.a = scanTagBackgroundAlpha;
-            scanTagBackgroundRenderer.enabled = true;
-            scanTagBackgroundRenderer.color = bg;
-        }
-    }
-
-    public void HideActiveIntelTag()
-    {
-        activeIntelTagText = null;
-
-        if (scanTagLabel != null)
-        {
-            scanTagLabel.text = "";
-            scanTagLabel.gameObject.SetActive(false);
-        }
-
-        if (scanTagBackgroundRenderer != null)
-        {
-            scanTagBackgroundRenderer.enabled = false;
-            scanTagBackgroundRenderer.color = Color.clear;
         }
     }
 
@@ -675,14 +627,6 @@ public class PacketView : MonoBehaviour
         }
     }
 
-    public void HideScanTag()
-    {
-        isActivelyScanned = false;
-        isActivelyTraced = false;
-        ToggleScanBorder(false);
-        HideActiveIntelTag();
-    }
-
     public void ToggleScanBorder(bool show)
     {
         if (borderRenderer != null)
@@ -727,7 +671,11 @@ public class PacketView : MonoBehaviour
     public void RefreshIntelPresentation(ScanDirector scanDirector, CommandDirector commandDirector)
     {
         RefreshScanTag(scanDirector);
-        RefreshTags(scanDirector, commandDirector);
+
+        if (commandDirector != null)
+            RefreshTags(scanDirector, commandDirector);
+        else
+            RefreshTags(scanDirector, null);
     }
 
     public void RefreshScanTag(ScanDirector scanDirector)
@@ -744,7 +692,6 @@ public class PacketView : MonoBehaviour
         if (!hasScan && !hasTrace)
         {
             ToggleScanBorder(false);
-            HideActiveIntelTag();
             RefreshVisuals();
             return;
         }
@@ -1071,6 +1018,9 @@ public class PacketView : MonoBehaviour
 
     public void RefreshTags(ScanDirector scanDirector, CommandDirector commandDirector)
     {
+        if (packetTagPrefab == null || tagAnchor == null)
+            return;
+
         List<PacketTagData> tags = new();
 
         ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;

@@ -37,10 +37,7 @@ public class ScanSlot
         assignedTick = currentTick;
 
         if (target != null)
-        {
             target.SetActiveIntelVisual(true, slotColor);
-            target.ShowActiveIntelTag(packetTagText, slotColor);
-        }
     }
 
     public void Clear()

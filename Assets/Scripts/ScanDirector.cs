@@ -138,7 +138,7 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             targetSlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
 
             return wasReplacing ? IntelAssignResult.Replaced : IntelAssignResult.Started;
         }
@@ -149,7 +149,7 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             emptySlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
             return IntelAssignResult.Started;
         }
 
@@ -161,11 +161,11 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyScanned(true);
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
             return IntelAssignResult.Replaced;
         }
 
-        RefreshActiveScanTags();
+        RefreshAllPacketTags();
         return IntelAssignResult.NoAvailableSlot;
     }
 
@@ -211,7 +211,7 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             targetSlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, targetSlot.GetThemeColor());
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
 
             return wasReplacing ? IntelAssignResult.Replaced : IntelAssignResult.Started;
         }
@@ -222,7 +222,7 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             emptySlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, emptySlot.GetThemeColor());
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
             return IntelAssignResult.Started;
         }
 
@@ -234,15 +234,15 @@ public class ScanDirector : MonoBehaviour
             SubscribeToPacket(packet);
             replacementSlot.Assign(packet, tickCounter);
             packet.SetActivelyTraced(true, replacementSlot.GetThemeColor());
-            RefreshActiveScanTags();
+            RefreshAllPacketTags();
             return IntelAssignResult.Replaced;
         }
 
-        RefreshActiveScanTags();
+        RefreshAllPacketTags();
         return IntelAssignResult.NoAvailableSlot;
     }
 
-    private void RefreshActiveScanTags()
+    private void RefreshAllPacketTags()
     {
         RefreshSlotTags(scanSlots);
         RefreshSlotTags(traceSlots);
@@ -273,7 +273,7 @@ public class ScanDirector : MonoBehaviour
         if (traceSlot != null)
             ClearSlotAndMaybeUnsubscribe(traceSlot);
 
-        RefreshActiveScanTags();
+        RefreshAllPacketTags();
     }
 
     public int GetActiveScanCount()
@@ -399,7 +399,7 @@ public class ScanDirector : MonoBehaviour
             }
         }
 
-        RefreshActiveScanTags();
+        RefreshAllPacketTags();
     }
 
     private void TickActiveTraces()
@@ -464,7 +464,7 @@ public class ScanDirector : MonoBehaviour
             ClearSlotAndMaybeUnsubscribe(slot);
         }
 
-        RefreshActiveScanTags();
+        RefreshAllPacketTags();
     }
 
     private void TickCompletedEntries()
