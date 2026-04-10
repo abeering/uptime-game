@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -10,6 +12,13 @@ public class CleanMinigameOverlayView : MonoBehaviour
     public TMP_Text minigameText;
     public TMP_Text promptText;
     public TMP_InputField inputField;
+
+    [Header("Splash Animation")]
+    public float splashLineDelay = 0.18f;
+    public float splashTypedCharDelay = 0.025f;
+    public bool animateSplash = true;
+
+    private Coroutine splashRoutine;
 
     [Header("Placement")]
     public Vector3 worldOffset = new Vector3(1.5f, 0.5f, 0f);
@@ -30,6 +39,12 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
     public void Hide()
     {
+        if (splashRoutine != null)
+        {
+            StopCoroutine(splashRoutine);
+            splashRoutine = null;
+        }
+
         if (inputField != null)
             inputField.DeactivateInputField();
 
@@ -60,9 +75,6 @@ public class CleanMinigameOverlayView : MonoBehaviour
         if (titleText != null)
             titleText.text = $"clean {session.node.nodeId}";
 
-        if (minigameText != null)
-            minigameText.text = BuildSplashText(session);
-
         if (promptText != null)
             promptText.gameObject.SetActive(false);
 
@@ -71,12 +83,31 @@ public class CleanMinigameOverlayView : MonoBehaviour
             inputField.gameObject.SetActive(false);
             inputField.text = string.Empty;
         }
+
+        if (minigameText != null)
+        {
+            if (splashRoutine != null)
+                StopCoroutine(splashRoutine);
+
+            minigameText.text = string.Empty;
+
+            if (animateSplash)
+                splashRoutine = StartCoroutine(AnimateSplashText(session));
+            else
+                minigameText.text = BuildSplashText(session);
+        }
     }
 
     public void ShowMinigame(CleanSession session)
     {
         if (session == null)
             return;
+
+        if (splashRoutine != null)
+        {
+            StopCoroutine(splashRoutine);
+            splashRoutine = null;
+        }
 
         if (titleText != null)
             titleText.text = session.minigameType.ToString();
@@ -103,6 +134,12 @@ public class CleanMinigameOverlayView : MonoBehaviour
     {
         if (session == null)
             return;
+
+        if (splashRoutine != null)
+        {
+            StopCoroutine(splashRoutine);
+            splashRoutine = null;
+        }
 
         if (titleText != null)
             titleText.text = "clean result";
@@ -174,23 +211,81 @@ public class CleanMinigameOverlayView : MonoBehaviour
         rootTransform.position = node.transform.position + worldOffset;
     }
 
+    private struct SplashLine
+    {
+        public string text;
+        public bool typewriter;
+
+        public SplashLine(string text, bool typewriter = false)
+        {
+            this.text = text;
+            this.typewriter = typewriter;
+        }
+    }
+
+    private IEnumerator AnimateSplashText(CleanSession session)
+    {
+        if (minigameText == null || session == null)
+            yield break;
+
+        List<SplashLine> lines = BuildSplashLines(session);
+        StringBuilder committed = new StringBuilder();
+
+        for (int i = 0; i < lines.Count; i++)
+        {
+            SplashLine line = lines[i];
+
+            if (line.typewriter)
+            {
+                for (int c = 0; c < line.text.Length; c++)
+                {
+                    minigameText.text = committed.ToString() + line.text.Substring(0, c + 1);
+                    yield return new WaitForSeconds(splashTypedCharDelay);
+                }
+            }
+            else
+            {
+                minigameText.text = committed.ToString() + line.text;
+            }
+
+            committed.AppendLine(line.text);
+            minigameText.text = committed.ToString();
+
+            if (i < lines.Count - 1)
+                yield return new WaitForSeconds(splashLineDelay);
+        }
+
+        splashRoutine = null;
+    }
+
+    private List<SplashLine> BuildSplashLines(CleanSession session)
+    {
+        return new List<SplashLine>
+        {
+            new SplashLine($"> ssh {session.node.nodeId}.local", true),
+            new SplashLine("connecting..."),
+            new SplashLine("auth ok"),
+            new SplashLine("mounting /proc..."),
+            new SplashLine("scanning anomalies..."),
+            new SplashLine(""),
+            new SplashLine($"detected infection: {session.infectionType.ToString().ToUpperInvariant()}"),
+            new SplashLine($"cleanup module: {session.minigameType.ToString().ToUpperInvariant()}"),
+            new SplashLine($"difficulty: {GetDifficultyLabel(session.difficultyTier)}"),
+            new SplashLine("modifiers: NONE"),
+            new SplashLine(""),
+            new SplashLine("stand by...")
+        };
+    }
+
     private string BuildSplashText(CleanSession session)
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"> ssh {session.node.nodeId}.local");
-        sb.AppendLine("connecting...");
-        sb.AppendLine("auth ok");
-        sb.AppendLine("mounting /proc...");
-        sb.AppendLine("scanning anomalies...");
-        sb.AppendLine();
-        sb.AppendLine($"detected infection: {session.infectionType.ToString().ToUpperInvariant()}");
-        sb.AppendLine($"cleanup module: {session.minigameType.ToString().ToUpperInvariant()}");
-        sb.AppendLine($"difficulty: {GetDifficultyLabel(session.difficultyTier)}");
-        sb.AppendLine("modifiers: NONE");
-        sb.AppendLine();
-        sb.AppendLine("stand by...");
+        List<SplashLine> lines = BuildSplashLines(session);
 
-        return sb.ToString();
+        for (int i = 0; i < lines.Count; i++)
+            sb.AppendLine(lines[i].text);
+
+        return sb.ToString().TrimEnd();
     }
 
     private string GetDifficultyLabel(int difficultyTier)
