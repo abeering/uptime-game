@@ -30,7 +30,26 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
     public void Hide()
     {
+        if (inputField != null)
+            inputField.DeactivateInputField();
+
         gameObject.SetActive(false);
+    }
+
+    public bool WantsFocus()
+    {
+        return gameObject.activeInHierarchy
+            && inputField != null
+            && inputField.gameObject.activeInHierarchy;
+    }
+
+    public void ForceFocus()
+    {
+        if (inputField == null || !inputField.gameObject.activeInHierarchy)
+            return;
+
+        inputField.ActivateInputField();
+        inputField.Select();
     }
 
     public void ShowSplash(CleanSession session)
@@ -75,9 +94,9 @@ public class CleanMinigameOverlayView : MonoBehaviour
         {
             inputField.gameObject.SetActive(true);
             inputField.text = string.Empty;
-            inputField.Select();
-            inputField.ActivateInputField();
         }
+
+        ForceFocus();
     }
 
     public void ShowResult(CleanSession session)

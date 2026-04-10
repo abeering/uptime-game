@@ -487,6 +487,7 @@ Transform:
   - {fileID: 251853587}
   - {fileID: 151009143}
   - {fileID: 580718490}
+  - {fileID: 1747015485}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &192042489
@@ -8201,6 +8202,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1713623885}
   m_CullTransparentMesh: 1
+--- !u!1 &1747015484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1747015485}
+  - component: {fileID: 1747015486}
+  m_Layer: 0
+  m_Name: UIFocusDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1747015485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747015484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 167012417}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1747015486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747015484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e319afd8b219e0d46b14d94357510701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIFocusDirector
+  consoleController: {fileID: 2027853058}
+  cleanOverlay: {fileID: 7559087597066484012}
 --- !u!1 &1760422385
 GameObject:
   m_ObjectHideFlags: 0
@@ -9285,6 +9332,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 192042490}
     m_Modifications:
+    - target: {fileID: 88689916342122002, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+      propertyPath: cleanDirector
+      value: 
+      objectReference: {fileID: 151009144}
     - target: {fileID: 1358143178533178354, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
       propertyPath: m_Camera
       value: 
@@ -9441,6 +9492,17 @@ MonoBehaviour:
   inputField: {fileID: 1371334987}
   worldOffset: {x: 1.5, y: 0.5, z: 0}
   cleanDirector: {fileID: 151009144}
+--- !u!114 &7559087597066484012 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 88689916342122002, guid: 02bd01bbe50924947817ba196320efa6, type: 3}
+  m_PrefabInstance: {fileID: 7559087597066484009}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906378425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb98a4f924abe5844963632bc27df699, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CleanMinigameOverlayView
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

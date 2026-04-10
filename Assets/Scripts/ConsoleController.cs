@@ -167,6 +167,11 @@ public class ConsoleController : MonoBehaviour
         inputField.Select();
     }
 
+    public void ForceFocus()
+    {
+        FocusInput();
+    }
+
     public void HandleEndEdit(string _)
     {
         if (Keyboard.current == null)

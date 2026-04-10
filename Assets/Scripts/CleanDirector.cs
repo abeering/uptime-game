@@ -175,6 +175,8 @@ public class CleanDirector : MonoBehaviour
 
         if (overlayView != null)
             overlayView.ShowMinigame(session);
+
+        UIFocusDirector.Instance?.RefreshFocus();
     }
 
     private void BuildMinigameData(CleanSession session)
@@ -316,6 +318,8 @@ public class CleanDirector : MonoBehaviour
 
         if (overlayView != null)
             overlayView.ShowResult(session);
+
+        UIFocusDirector.Instance?.RefreshFocus();
     }
 
     private void EndSession()
@@ -324,6 +328,8 @@ public class CleanDirector : MonoBehaviour
             overlayView.Hide();
 
         activeSession = null;
+
+        UIFocusDirector.Instance?.RefreshFocus();
     }
 
     private CleanMinigameType ResolveMinigameType(InfectionType infectionType)
