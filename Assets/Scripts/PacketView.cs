@@ -154,11 +154,9 @@ public class PacketView : MonoBehaviour
 
     [Header("Scan Tag Visuals")]
     [SerializeField] private float scanTagBackgroundAlpha = 0.92f;
-    [SerializeField] private Color scanTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
 
     [Header("Block Tag Visuals")]
     [SerializeField] private float blockTagBackgroundAlpha = 0.92f;
-    [SerializeField] private Color blockTagTextColor = new(0.08f, 0.08f, 0.08f, 1f);
 
     [Header("Tag Rail")]
     [SerializeField] private Transform tagAnchor;
@@ -493,42 +491,6 @@ public class PacketView : MonoBehaviour
         RefreshVisuals();
     }
 
-    public void SetActivelyScanned(bool value)
-    {
-        isActivelyScanned = value;
-
-        if (value)
-        {
-            SetActiveIntelVisual(true, scanBorderColor);
-        }
-        else if (!isActivelyTraced)
-        {
-            SetActiveIntelVisual(false, scanBorderColor);
-        }
-        else
-        {
-            RefreshVisuals();
-        }
-    }
-
-    public void SetActivelyTraced(bool value, Color traceColor)
-    {
-        isActivelyTraced = value;
-
-        if (value)
-        {
-            SetActiveIntelVisual(true, traceColor);
-        }
-        else if (!isActivelyScanned)
-        {
-            SetActiveIntelVisual(false, traceColor);
-        }
-        else
-        {
-            RefreshVisuals();
-        }
-    }
-
     public bool IsScanComplete()
     {
         return scanStage == ScanStage.Confirmed;
@@ -670,7 +632,7 @@ public class PacketView : MonoBehaviour
 
     public void RefreshIntelPresentation(ScanDirector scanDirector, CommandDirector commandDirector)
     {
-        RefreshScanTag(scanDirector);
+        RefreshIntelBorderState(scanDirector);
 
         if (commandDirector != null)
             RefreshTags(scanDirector, commandDirector);
@@ -678,7 +640,7 @@ public class PacketView : MonoBehaviour
             RefreshTags(scanDirector, null);
     }
 
-    public void RefreshScanTag(ScanDirector scanDirector)
+    public void RefreshIntelBorderState(ScanDirector scanDirector)
     {
         ScanSlot scanSlot = scanDirector != null ? scanDirector.FindSlotForPacket(this) : null;
         ScanSlot traceSlot = scanDirector != null ? scanDirector.FindTraceSlotForPacket(this) : null;
