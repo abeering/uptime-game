@@ -206,3 +206,31 @@ increases latency permanently on edge
 4. “Radiating”
 
 affects nearby edges
+
+### names random 
+
+Overclocked 
+Injector
+Boostfield
+Catalyst 
+Slipstream 
+Dragfield 
+Throttlefield
+Latency Well
+Quarantine Field
+Tar Pit 
+Congestion
+Accelerating
+Dragging
+Congesting
+Jamming
+Amplifying
+Distorting
+Radiating 
+Emitting 
+Projecting
+Diffusing
+Leaking
+Pulsing
+Broadcasting
+Disrupting
