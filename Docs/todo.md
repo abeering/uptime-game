@@ -17,12 +17,6 @@
   - Optional confidence overlay (secondary signal)
 - Ensure packet color reflects **perceived identity**, not raw %
 
-### Scan Feedback UX
-- Improve clarity of:
-  - Current scan progress
-  - Which scan will be replaced when starting a new one
-- Ensure scan completion + linger behavior feels responsive
-
 ---
 
 ## 2. Console + Operations Panel Clarity
@@ -63,35 +57,6 @@
   - Variable number of keywords per packet
   - Weighted distributions per threat type
 
----
-
-## 4. Scoring System (Initial Pass)
-
-### Metrics
-- Track:
-  - False blocks (benign incorrectly blocked)
-  - Threats that reach destination
-  - Delayed packets (vs expected arrival)
-- Define "expected arrival time":
-  - Based on route length + latency + baseSpeed
-
-### UI Integration
-- Add score summary to Operations Panel
-- Keep it lightweight (no full scoreboard yet)
-
----
-
-## 5. Scan System UX (Core Loop Polish)
-
-- Reinforce "limited attention" mechanic:
-  - Max scan slots
-  - Clear replacement rules
-- Ensure player can answer:
-  - "Should I start a new scan right now?"
-- Tune:
-  - Scan duration vs edge traversal time
-
----
 
 ## 6. Packet Spawn + Flow Tuning
 
@@ -114,35 +79,6 @@
   - Coordinated behaviors
 - Keep as data-driven (no heavy implementation yet)
 
----
-
-## 8. Visual / Rendering Cleanup
-
-- Ensure packet layering is always readable
-- Maintain simple overlap solution (z-order cycling)
-- De-prioritize shader-heavy solutions for now
-- Keep UI crisp (TMP settings, scaling sanity)
-
----
-
-## 9. Recents + State Tracking
-
-- Add packets to **Recents** when:
-  - Scan completes
-  - Packet leaves scan slot (replaced)
-  - Packet is removed (optional)
-- Ensure Recents feel informative, not noisy
-
----
-
-## 10. Architecture / Systems Cleanup
-
-- Keep visual systems (scan tags, overlays) separate from core logic
-- Avoid leaking gameplay logic into rendering layer
-- Continue moving toward:
-  - Data-driven definitions (packets, networks, attacks)
-
----
 
 ## 11. Nice-to-Have / Later
 

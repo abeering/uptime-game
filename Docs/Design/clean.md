@@ -1,0 +1,1 @@
+- can clean an empty node - invisible infections 
