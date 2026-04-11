@@ -83,6 +83,7 @@ public class PacketView : MonoBehaviour
     [Min(1)]
     public int baseSpeed = 1;
     public int boostCount = 0;
+    [NonSerialized] public int auraBaseSpeedModifier = 0;
 
     [Header("Labels")]
     public TMPro.TextMeshPro label;
@@ -254,6 +255,7 @@ public class PacketView : MonoBehaviour
         baseSpeed = Mathf.Max(1, newBaseSpeed);
         boostCount = 0;
         route = newRoute;
+        auraBaseSpeedModifier = 0;
 
         ClearAllTagViews();
         RefreshVisuals();
@@ -1331,6 +1333,13 @@ public class PacketView : MonoBehaviour
             keyword.OnTick(this, context);
         }
 
+        // apply aura speed modifiers after keyword effects, so they can modify the base speed for the tick they are applied on
+        auraBaseSpeedModifier = 0;
+        if (context.speedModifiers.TryGetValue(this, out int speedDelta))
+        {
+            auraBaseSpeedModifier = Mathf.Clamp(speedDelta, -2, 2);
+        }
+
         GrowTailTowardTarget();
 
         ticksUntilAdvance--;
@@ -1434,7 +1443,7 @@ public class PacketView : MonoBehaviour
             return;
         }
 
-        ticksUntilAdvance = Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
+        ticksUntilAdvance = Mathf.Max(1, GetEffectiveBaseSpeed() * edge.EffectiveLatency);
     }
 
     public void SnapToCurrentPosition()
@@ -1469,10 +1478,17 @@ public class PacketView : MonoBehaviour
 
     private int GetEffectiveMoveInterval(ConnectionView edge)
     {
-        if (edge == null)
-            return baseSpeed;
+        int effectiveBaseSpeed = GetEffectiveBaseSpeed();
 
-        return Mathf.Max(1, baseSpeed * edge.EffectiveLatency);
+        if (edge == null)
+            return effectiveBaseSpeed;
+
+        return Mathf.Max(1, effectiveBaseSpeed * edge.EffectiveLatency);
+    }
+
+    public int GetEffectiveBaseSpeed()
+    {
+        return Mathf.Max(1, baseSpeed + auraBaseSpeedModifier);
     }
 
     private float GetCurrentMoveIntervalSeconds(ConnectionView edge)

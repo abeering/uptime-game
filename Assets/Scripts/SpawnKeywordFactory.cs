@@ -79,6 +79,46 @@ public static class SpawnKeywordFactory
                 return true;
             }
 
+            case "accelerating":
+            case "accelerate":
+            {
+                int radius = 2;
+                int delta = -1;
+                bool ignoreSameClassAndKind = true;
+
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int r))
+                    radius = Mathf.Max(1, r);
+
+                if (parts.Length >= 3 && int.TryParse(parts[2], out int d))
+                    delta = Mathf.Min(-1, d);
+
+                if (parts.Length >= 4 && bool.TryParse(parts[3], out bool parsedIgnore))
+                    ignoreSameClassAndKind = parsedIgnore;
+
+                keyword = new AcceleratingKeyword(radius, delta, ignoreSameClassAndKind);
+                return true;
+            }
+
+            case "dragging":
+            case "drag":
+            {
+                int radius = 2;
+                int slow = 1;
+                bool ignoreSameClassAndKind = true;
+
+                if (parts.Length >= 2 && int.TryParse(parts[1], out int r))
+                    radius = Mathf.Max(1, r);
+
+                if (parts.Length >= 3 && int.TryParse(parts[2], out int s))
+                    slow = Mathf.Max(1, s);
+
+                if (parts.Length >= 4 && bool.TryParse(parts[3], out bool parsedIgnore))
+                    ignoreSameClassAndKind = parsedIgnore;
+
+                keyword = new DraggingKeyword(radius, slow, ignoreSameClassAndKind);
+                return true;
+            }
+
             default:
                 error = $"unknown keyword '{keywordName}'";
                 return false;
