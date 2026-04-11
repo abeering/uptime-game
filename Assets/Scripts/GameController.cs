@@ -13,6 +13,10 @@ public class GameController : MonoBehaviour
     public TrafficDirector trafficDirector;
     public NodeDirector nodeDirector;
     public CommandDirector commandDirector;
+    public LevelDirector levelDirector;
+
+    [Header("Systems")]
+    public bool levelEnabled = false;
 
     private int tickCount = 0;
     public int CurrentTick => tickCount;
@@ -35,6 +39,9 @@ public class GameController : MonoBehaviour
     {
         RefreshAllConnections();
 
+        if (levelEnabled && levelDirector != null)
+            levelDirector.Initialize();
+
         if (autoStart)
             StartCoroutine(TickLoop());
     }
@@ -54,6 +61,9 @@ public class GameController : MonoBehaviour
 
         if (logTicks)
             Debug.Log($"--- TICK {tickCount} ---");
+
+        if (levelEnabled && levelDirector != null)
+            levelDirector.ProcessTick(tickCount);
 
         if (trafficDirector != null)
             trafficDirector.ProcessTick(tickCount);

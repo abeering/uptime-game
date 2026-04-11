@@ -434,6 +434,41 @@ public class TrafficDirector : MonoBehaviour
         };
     }
 
+    public SpawnPlan CreateEventSpawnPlan(
+        int spawnTick,
+        PacketClass packetClass,
+        PacketKind packetKind,
+        RouteStep[] route,
+        int? scanDifficultyOverride = null,
+        int? baseSpeedOverride = null,
+        bool startsQuickScanned = false,
+        List<InfectionPayload> infections = null,
+        List<IPacketKeyword> keywords = null,
+        string sourceAddressOverride = null)
+    {
+        if (route == null || route.Length == 0)
+            return null;
+
+        SpawnPlan plan = new SpawnPlan
+        {
+            spawnTick = spawnTick,
+            packetId = GetNextPacketId(),
+            packetClass = packetClass,
+            packetKind = packetKind,
+            scanDifficulty = scanDifficultyOverride ?? Random.Range(minScanDifficulty, maxScanDifficulty + 1),
+            sourceAddress = !string.IsNullOrWhiteSpace(sourceAddressOverride)
+                ? sourceAddressOverride
+                : GenerateSourceAddress(),
+            baseSpeed = baseSpeedOverride ?? minBaseMoveInterval,
+            route = CloneRoute(route),
+            startsQuickScanned = startsQuickScanned,
+            infections = infections != null ? new List<InfectionPayload>(infections) : new List<InfectionPayload>(),
+            keywords = keywords != null ? new List<IPacketKeyword>(keywords) : new List<IPacketKeyword>()
+        };
+
+        return plan;
+    }
+
     private RouteStep[] ChooseRoute()
     {
         List<RouteStep[]> availableRoutes = new();
