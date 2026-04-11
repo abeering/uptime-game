@@ -11,7 +11,8 @@ public class LevelDirector : MonoBehaviour
     public void Initialize()
     {
         // hardcode one event for now
-        events.Add(new InfectionBurstEvent(startTick: 40, duration: 40));
+        events.Add(new InfectionBurstEvent(startTick: 500, duration: 40));
+        events.Add(new DdosSwarmEvent(startTick: 120, secondBurstTick: 300));
     }
 
     public void ProcessTick(int tick)

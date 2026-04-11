@@ -488,6 +488,7 @@ Transform:
   - {fileID: 151009143}
   - {fileID: 580718490}
   - {fileID: 1747015485}
+  - {fileID: 875170674}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &192042489
@@ -3400,6 +3401,51 @@ MonoBehaviour:
   trafficDirector: {fileID: 1482744061}
   scanDirector: {fileID: 914094258}
   cleanDirector: {fileID: 151009144}
+--- !u!1 &875170673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 875170674}
+  - component: {fileID: 875170675}
+  m_Layer: 0
+  m_Name: LevelDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &875170674
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 875170673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 167012417}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &875170675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 875170673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbc076c7e7898d40868cddc0c951d2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelDirector
+  trafficDirector: {fileID: 1482744061}
 --- !u!1 &878126493
 GameObject:
   m_ObjectHideFlags: 0
@@ -4737,10 +4783,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameController
   tickIntervalSeconds: 0.5
   autoStart: 1
-  logTicks: 0
+  logTicks: 1
   trafficDirector: {fileID: 1482744061}
   nodeDirector: {fileID: 1433750262}
   commandDirector: {fileID: 838780728}
+  levelDirector: {fileID: 875170675}
+  levelEnabled: 1
 --- !u!1 &1037435974
 GameObject:
   m_ObjectHideFlags: 0
