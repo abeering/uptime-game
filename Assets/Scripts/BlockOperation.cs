@@ -1,3 +1,5 @@
+using System;
+
 public enum BlockState
 {
     Armed,
@@ -6,10 +8,19 @@ public enum BlockState
     Cancelled
 }
 
+public enum BlockMatchType
+{
+    PacketId,
+    SourceAddress
+}
+
 public class BlockOperation : Operation
 {
     public string packetId;
     public string nodeId;
+    public BlockMatchType matchType = BlockMatchType.PacketId;
+    public string sourceAddress;
+
     public BlockState state = BlockState.Armed;
 
     public override string OperationType => "block";
@@ -24,7 +35,12 @@ public class BlockOperation : Operation
         if (isFinished || state != BlockState.Armed)
             return;
 
-        if (string.Equals(packetId, removedPacketId, System.StringComparison.OrdinalIgnoreCase))
+        bool matches =
+            matchType == BlockMatchType.PacketId
+                ? string.Equals(packetId, removedPacketId, StringComparison.OrdinalIgnoreCase)
+                : false; // we don't resolve source-based failure here (safe for now)
+
+        if (matches)
         {
             state = BlockState.Failed;
             isFinished = true;
@@ -41,7 +57,19 @@ public class BlockOperation : Operation
         if (packet == null || reachedNode == null || context == null)
             return;
 
-        if (!string.Equals(packet.packetId, packetId, System.StringComparison.OrdinalIgnoreCase))
+        bool matches = matchType switch
+        {
+            BlockMatchType.PacketId =>
+                string.Equals(packet.packetId, packetId, StringComparison.OrdinalIgnoreCase),
+
+            BlockMatchType.SourceAddress =>
+                !string.IsNullOrWhiteSpace(sourceAddress) &&
+                string.Equals(packet.sourceAddress, sourceAddress, StringComparison.OrdinalIgnoreCase),
+
+            _ => false
+        };
+
+        if (!matches)
             return;
 
         if (!string.Equals(reachedNode.nodeId, nodeId, System.StringComparison.OrdinalIgnoreCase))
@@ -58,11 +86,25 @@ public class BlockOperation : Operation
             context.trafficDirector.RemovePacket(packet, removeReason);
         }
 
-        state = BlockState.Triggered;
-        isFinished = true;
-
         var verb = string.IsNullOrWhiteSpace(resolution.logText) ? "blocked" : resolution.logText;
-        context.LogBlockTriggered(displayId, packetId, nodeId, verb);
+
+        if (matchType == BlockMatchType.PacketId)
+        {
+            state = BlockState.Triggered;
+            isFinished = true;
+        }
+        else
+        {
+            // persistent source rule: stays armed after firing
+            state = BlockState.Armed;
+            isFinished = false;
+        }
+
+        string targetLabel = matchType == BlockMatchType.SourceAddress
+            ? $"src={sourceAddress}"
+            : packet.packetId;
+
+        context.LogBlockTriggered(displayId, targetLabel, nodeId, verb);
     }
 
     public override bool CanCancel()
@@ -91,7 +133,11 @@ public class BlockOperation : Operation
             _ => "unknown"
         };
 
-        return $"{displayId}  {packetId} @ {nodeId}  {status}";
+        string target = matchType == BlockMatchType.SourceAddress
+            ? $"src={sourceAddress}"
+            : packetId;
+
+        return $"{displayId}  {target} @ {nodeId}  {status}";
     }
     
 }

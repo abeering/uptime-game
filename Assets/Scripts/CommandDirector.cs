@@ -180,10 +180,12 @@ public class CommandDirector : MonoBehaviour
             if (operations[i] is not BlockOperation block)
                 continue;
 
-            if (block.isFinished || block.state != BlockState.Armed)
-                continue;
+            if (block.matchType == BlockMatchType.PacketId &&
+                string.Equals(block.packetId, packet.packetId, StringComparison.OrdinalIgnoreCase))
+                return block;
 
-            if (string.Equals(block.packetId, packet.packetId, StringComparison.OrdinalIgnoreCase))
+            if (block.matchType == BlockMatchType.SourceAddress &&
+                string.Equals(block.sourceAddress, packet.sourceAddress, StringComparison.OrdinalIgnoreCase))
                 return block;
         }
 
@@ -442,14 +444,29 @@ public class CommandDirector : MonoBehaviour
                 return;
 
             case CommandType.Block:
-                if (string.IsNullOrWhiteSpace(command.packetId) || string.IsNullOrWhiteSpace(command.nodeId))
+                if (string.IsNullOrWhiteSpace(command.nodeId))
                 {
-                    Log("ERROR usage: block <packet> @ <node>");
+                    Log("ERROR usage: block <packet>|src:<addr> @ <node>");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
 
-                StartBlock(command.packetId, command.nodeId);
+                if (!string.IsNullOrWhiteSpace(command.packetId))
+                {
+                    StartBlock(command.packetId, command.nodeId);
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(command.rawText) &&
+                    command.rawText.StartsWith("src:", StringComparison.OrdinalIgnoreCase))
+                {
+                    string src = command.rawText.Substring(4);
+                    StartBlockBySource(src, command.nodeId);
+                    return;
+                }
+
+                Log("ERROR invalid block target");
+                audioManager?.PlayCommandRejected();
                 return;
 
             case CommandType.Clean:
@@ -813,6 +830,46 @@ public class CommandDirector : MonoBehaviour
         LogBlockArmed(block.displayId, packetId, nodeId);
     }
 
+    private void StartBlockBySource(string sourceAddress, string nodeId)
+    {
+        NodeView node = networkRuntime.GetNode(nodeId);
+
+        if (node == null)
+        {
+            Log($"BLOCK failed: node {nodeId} not found");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(sourceAddress))
+        {
+            LogCommandError("block failed: invalid source");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        string blockDisplayId = GetNextBlockDisplayId();
+        if (string.IsNullOrWhiteSpace(blockDisplayId))
+        {
+            LogCommandError("block failed: max 9 active blocks");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        BlockOperation block = new BlockOperation
+        {
+            displayId = blockDisplayId,
+            matchType = BlockMatchType.SourceAddress,
+            sourceAddress = sourceAddress,
+            nodeId = nodeId
+        };
+
+        operations.Add(block);
+
+        audioManager?.PlayCommandAccepted();
+        Log($"{FormatPrefix(ConsoleLogPrefix.Block)}  <b>{block.displayId}</b>  {FormatMuted("ARMED", true)}  src={sourceAddress}  @ {nodeId}");
+    }
+
     private void StartClean(string nodeId)
     {
         NodeView node = networkRuntime != null
@@ -959,7 +1016,11 @@ public class CommandDirector : MonoBehaviour
             string nodeCol = block.nodeId.PadRight(6);
             string statusCol = RichTextUtil.Colorize("armed", armedColor, true);
 
-            sb.AppendLine($"{idCol} {packetCol} @ {nodeCol} {statusCol}");
+            string targetCol = block.matchType == BlockMatchType.SourceAddress
+                ? $"src={block.sourceAddress}"
+                : $"<b>{block.packetId}</b>";
+            sb.AppendLine($"{idCol} {targetCol} @ {nodeCol} {statusCol}");
+
         }
 
         if (!hasActiveBlocks)

@@ -192,8 +192,18 @@ public static class CommandParser
             if (parts.Length >= 4 && parts[2] == "@")
             {
                 result.type = CommandType.Block;
-                result.packetId = parts[1];
-                result.nodeId = parts[3];
+
+                if (parts[1].StartsWith("src:", StringComparison.OrdinalIgnoreCase))
+                {
+                    result.packetId = null;
+                    result.nodeId = parts[3];
+                    result.rawText = parts[1]; // stash full token
+                }
+                else
+                {
+                    result.packetId = parts[1];
+                    result.nodeId = parts[3];
+                }
             }
 
             return result;
