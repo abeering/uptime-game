@@ -384,7 +384,8 @@ public class ScanDirector : MonoBehaviour
                     visibleClass = packet.GetVisibleClass(),
                     barText = bar,
                     percentText = "100%",
-                    secondaryText = GetKindLine(packet),
+                    // secondaryText = GetKindLine(packet),
+                    secondaryText = null,
                     lingerTicks = completionLingerTicks,
                     wasReplacementCandidate = willBeDropped
                 });
@@ -647,6 +648,70 @@ public class ScanDirector : MonoBehaviour
         };
     }
 
+    private string GetBestKnownIdentityShortLabel(PacketView packet)
+    {
+        if (packet == null)
+            return "UNKNOWN";
+
+        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+            return packet.revealedKind.ToString().ToUpperInvariant();
+
+        if (packet.knowsClass)
+            return GetPacketClassShortLabel(packet.revealedClass);
+
+        return GetVisibleClassShortLabel(packet);
+    }
+
+    private string GetBestKnownIdentityRichLabel(PacketView packet)
+    {
+        if (packet == null)
+            return RichTextUtil.Colorize("UNKNOWN", logTheme.classUnknown, true);
+
+        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+        {
+            return RichTextUtil.Colorize(
+                packet.revealedKind.ToString().ToUpperInvariant(),
+                logTheme.classThreat,
+                true
+            );
+        }
+
+        if (packet.knowsClass)
+            return GetPacketClassRichLabel(packet.revealedClass);
+
+        return GetVisibleClassRichLabel(packet);
+    }
+
+    private string GetBestKnownIdentityRichLabelPadded(PacketView packet, int width)
+    {
+        string label = GetBestKnownIdentityShortLabel(packet);
+        return GetBestKnownIdentityRichLabelPadded(packet, label, width);
+    }
+
+    private string GetBestKnownIdentityRichLabelPadded(PacketView packet, string label, int width)
+    {
+        string paddedLabel = PadRightSafe(label, width);
+
+        if (packet == null)
+            return RichTextUtil.Colorize(paddedLabel, logTheme.classUnknown, true);
+
+        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+            return RichTextUtil.Colorize(paddedLabel, logTheme.classThreat, true);
+
+        if (packet.knowsClass)
+        {
+            return packet.revealedClass switch
+            {
+                PacketClass.Benign   => RichTextUtil.Colorize(paddedLabel, logTheme.classBenign, true),
+                PacketClass.Threat   => RichTextUtil.Colorize(paddedLabel, logTheme.classThreat, true),
+                PacketClass.Priority => RichTextUtil.Colorize(paddedLabel, logTheme.classPriority, true),
+                _ => paddedLabel
+            };
+        }
+
+        return ColorizeVisibleClassPadded(packet.GetVisibleClass(), paddedLabel);
+    }
+
     private int GetEtaTicksToNextStage(PacketView packet, int activeCount)
     {
         if (packet == null || !packet.CanAdvanceScanStage())
@@ -809,7 +874,8 @@ public class ScanDirector : MonoBehaviour
             visibleClass = p.GetVisibleClass(),
             showDone = false,
             willBeDropped = willBeDropped,
-            secondaryIntelLine = GetKindLine(p)
+            // secondaryIntelLine = GetKindLine(p)
+            secondaryIntelLine = null
         };
     }
 
@@ -1013,10 +1079,20 @@ public class ScanDirector : MonoBehaviour
             PadRightSafe(GetStageShortLabel(row.stage), 9)
         );
 
-        string classTextScan = ColorizeVisibleClassPadded(
-            row.visibleClass,
-            PadRightSafe(GetVisibleClassShortLabel(row.visibleClass), 8)
-        );
+        PacketView scanPacket = null;
+
+        if (row.state == ScanPanelRowState.ActiveScan)
+        {
+            ScanSlot slot = scanSlots[row.slotIndex];
+            scanPacket = slot != null ? slot.target : null;
+        }
+
+        string classTextScan = scanPacket != null
+            ? GetBestKnownIdentityRichLabelPadded(scanPacket, 8)
+            : ColorizeVisibleClassPadded(
+                row.visibleClass,
+                PadRightSafe(GetVisibleClassShortLabel(row.visibleClass), 8)
+            );
 
         sb.Append(warnPrefix);
         sb.Append(" ");
@@ -1047,16 +1123,6 @@ public class ScanDirector : MonoBehaviour
         sb.Append(" ");
         sb.Append(classTextScan);
         sb.AppendLine();
-
-        if (!string.IsNullOrWhiteSpace(row.secondaryIntelLine))
-        {
-            sb.Append("  ");
-            sb.Append("    ");
-            sb.Append(" ");
-            sb.Append("    ");
-            sb.Append(ColorizeVisibleClassPadded(row.visibleClass, row.secondaryIntelLine.Trim()));
-            sb.AppendLine();
-        }
     }
 
     public void AppendScanPanel(StringBuilder sb)
@@ -1137,25 +1203,7 @@ public class ScanDirector : MonoBehaviour
 
     private string BuildKnownThreatIdentityLabel(PacketView packet)
     {
-        if (packet == null)
-            return RichTextUtil.Colorize("UNKNOWN", logTheme.classUnknown, true);
-
-        // best known identity = class -> kind
-        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
-        {
-            return RichTextUtil.Colorize(
-                packet.revealedKind.ToString().ToUpperInvariant(),
-                logTheme.classThreat,
-                true
-            );
-        }
-
-        if (packet.knowsClass)
-        {
-            return GetPacketClassRichLabel(packet.revealedClass);
-        }
-
-        return GetVisibleClassRichLabel(packet);
+        return GetBestKnownIdentityRichLabel(packet);
     }
 
     private string BuildKnownThreatKeywordLine(PacketView packet)
@@ -1247,14 +1295,6 @@ public class ScanDirector : MonoBehaviour
     private string FormatInlineSlotTag(string slotLabel, Color slotColor)
     {
         return RichTextUtil.Colorize($"[{slotLabel}]", slotColor, true);
-    }
-
-    private string GetKindLine(PacketView p)
-    {
-        if (p == null || !p.knowsKind || p.revealedKind == PacketKind.None)
-            return "";
-
-        return p.revealedKind.ToString();
     }
 
     private static string PadRightSafe(string value, int width)
