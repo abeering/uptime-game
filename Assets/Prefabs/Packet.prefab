@@ -350,10 +350,6 @@ MonoBehaviour:
   baseSpeed: 1
   boostCount: 0
   label: {fileID: 1972112214506033737}
-  scanTagLabel: {fileID: 0}
-  scanTagBackgroundRenderer: {fileID: 0}
-  blockTagLabel: {fileID: 0}
-  blockTagBackgroundRenderer: {fileID: 0}
   routeIndex: 0
   currentStep: 0
   ticksUntilAdvance: 0
@@ -384,11 +380,10 @@ MonoBehaviour:
   scanTicksIntoStage: 0
   isActivelyScanned: 0
   isActivelyTraced: 0
-  activeIntelTagText: 
   unknownColor: {r: 0.6666667, g: 0.6666667, b: 0.6666667, a: 1}
-  benignColor: {r: 0, g: 1, b: 0, a: 1}
-  threatColor: {r: 1, g: 0, b: 0, a: 1}
-  priorityColor: {r: 0, g: 1, b: 1, a: 1}
+  benignColor: {r: 0.72156864, g: 1, b: 0.72156864, a: 1}
+  threatColor: {r: 1, g: 0.41960785, b: 0.41960785, a: 1}
+  priorityColor: {r: 0.4, g: 0.8, b: 1, a: 1}
   scanVisual: {fileID: 5004352954912364169}
   spriteRenderer: {fileID: 665827891915246429}
   borderRenderer: {fileID: 6535546156096995785}
@@ -399,9 +394,7 @@ MonoBehaviour:
   scanPulseScaleMin: 1.05
   scanPulseScaleMax: 1.28
   scanTagBackgroundAlpha: 0.92
-  scanTagTextColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
   blockTagBackgroundAlpha: 0.92
-  blockTagTextColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
   tagAnchor: {fileID: 9163843593630943544}
   packetTagPrefab: {fileID: 3016773344039722958, guid: 6b54d03108c1a184f84394ee4f92131c, type: 3}
   tagStartOffset: {x: 0, y: 0, z: 0}

@@ -262,3 +262,10 @@ They are the foundation for:
 - Run identity
 - Strategic diversity
 - Replayability
+
+
+# random notes 
+
+- what if upgrading is like a puzzle - not hard, not game-losing/winning, but instead you just have to do a sort of "terminal / hacker puzzle" (<30s) in making your decision 
+- what if some upgrades were not just "upgrade node" - but were "create programmable" - basically allow you to tune / specify ranges / packet info etc on a node to do "automation" like tasks 
+-- need more ideas on automation 
