@@ -1847,4 +1847,22 @@ public class PacketView : MonoBehaviour
             speedTail.sortingOrder = order - 4;
     }
 
+    // used for packetoverlapcoordinator to determine distance between packets 
+    public float GetVisualOverlapRadius()
+    {
+        if (borderRenderer != null)
+        {
+            Bounds b = borderRenderer.bounds;
+            return Mathf.Max(b.extents.x, b.extents.y);
+        }
+
+        if (spriteRenderer != null)
+        {
+            Bounds b = spriteRenderer.bounds;
+            return Mathf.Max(b.extents.x, b.extents.y);
+        }
+
+        return 0.2f;
+    }
+
 }

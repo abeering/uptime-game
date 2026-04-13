@@ -5,7 +5,7 @@ public class PacketOverlapCoordinator : MonoBehaviour
 {
     [Header("Overlap Detection")]
     [Min(0.01f)]
-    public float overlapDistance = 0.35f;
+    public float overlapDistance = 0.02f;
 
     [Header("Cycle Timing")]
     [Min(0.05f)]
@@ -69,7 +69,12 @@ public class PacketOverlapCoordinator : MonoBehaviour
                         continue;
 
                     float dist = Vector3.Distance(currentPos, other.transform.position);
-                    if (dist <= overlapDistance)
+
+                    float currentRadius = current.GetVisualOverlapRadius();
+                    float otherRadius = other.GetVisualOverlapRadius();
+                    float threshold = currentRadius + otherRadius;
+
+                    if (dist <= threshold)
                     {
                         visited.Add(other);
                         queue.Enqueue(other);

@@ -235,8 +235,8 @@ public class ConnectionView : MonoBehaviour
         int modifier = GetTotalLatencyModifier();
 
         return modifier > 0
-            ? $"L{latency}+{modifier}"
-            : $"L{latency}";
+            ? $"{connectionId} L{latency}+{modifier}"
+            : $"{connectionId} L{latency}";
     }
 
 }
