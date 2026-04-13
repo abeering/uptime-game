@@ -17,8 +17,9 @@ public class InfectionBurstEvent : ILevelEvent
         return globalTick >= StartTick && globalTick <= EndTick;
     }
 
-    public void OnTick(int globalTick, int localTick, TrafficDirector traffic)
+    public void OnTick(int globalTick, int localTick, LevelEventContext context)
     {
+        TrafficDirector traffic = context.Traffic;
         if (traffic == null)
             return;
 

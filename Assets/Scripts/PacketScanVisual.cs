@@ -112,8 +112,6 @@ public class PacketScanVisual : MonoBehaviour
         if (sweepRenderer == null)
             return;
 
-        Debug.Log($"[PacketScanVisual] setting sweep order to {sortingOrder}");
-
         sweepRenderer.sortingLayerID = sortingLayerID;
         sweepRenderer.sortingOrder = sortingOrder;
     }

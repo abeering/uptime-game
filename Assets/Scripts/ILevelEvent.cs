@@ -5,5 +5,5 @@ public interface ILevelEvent
 
     bool IsActive(int globalTick);
 
-    void OnTick(int globalTick, int localTick, TrafficDirector traffic);
+    void OnTick(int globalTick, int localTick, LevelEventContext context);
 }

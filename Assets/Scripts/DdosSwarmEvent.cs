@@ -40,16 +40,33 @@ public class DdosSwarmEvent : ILevelEvent
         return globalTick >= StartTick && globalTick <= EndTick;
     }
 
-    public void OnTick(int globalTick, int localTick, TrafficDirector traffic)
+    public void OnTick(int globalTick, int localTick, LevelEventContext context)
     {
+        TrafficDirector traffic = context.Traffic;
         if (traffic == null)
             return;
 
         if (localTick == 0)
+        {
+            context.Notifications?.PushMessage(new Notification
+            {
+                SpeakerName = "Ops",
+                Body = "Seeing a coordinated traffic surge. Looks like DDOS."
+            });
+
             QueueBurst(globalTick, traffic);
+        }
 
         if (localTick == secondBurstLocalTick)
+        {
+            context.Notifications?.PushMessage(new Notification
+            {
+                SpeakerName = "Ops",
+                Body = "Second surge confirmed. Pressure is sustained."
+            });
+
             QueueBurst(globalTick, traffic);
+        }
     }
 
     private void QueueBurst(int burstStartTick, TrafficDirector traffic)
