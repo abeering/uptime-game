@@ -136,14 +136,17 @@ public class PacketView : MonoBehaviour
     public bool isActivelyScanned = false;
     public bool isActivelyTraced = false;
 
-    [Header("Visuals")]
+    [Header("Body Colors")]
     public Color unknownColor = Color.gray;
     public Color benignColor = Color.green;
     public Color threatColor = Color.red;
     public Color priorityColor = Color.cyan;
+
+    [Header("Visual References")]
     public PacketScanVisual scanVisual;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
+    [SerializeField] private SpriteRenderer gapFillRenderer;
     [SerializeField] private SpriteRenderer scanPulseRenderer;
     [SerializeField] private float scanPulseSpeed = 5f;
     [SerializeField] private float scanPulseMinAlpha = 0.35f;
@@ -152,6 +155,15 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float scanPulseScaleMax = 1.28f;
     private Vector3 borderBaseScale = Vector3.one;
     private Vector3 pulseBaseScale = Vector3.one;
+
+    [Header("Border Colors")]
+    [SerializeField] private Color borderUnknownColor = new(0.90f, 0.92f, 0.94f, 1f);
+    [SerializeField] private Color borderBenignColor = new(0.45f, 0.95f, 0.45f, 1f);
+    [SerializeField] private Color borderThreatColor = new(1.00f, 0.45f, 0.45f, 1f);
+    [SerializeField] private Color borderPriorityColor = new(0.40f, 0.80f, 1.00f, 1f);
+
+    [Header("Gap Visuals")]
+    [SerializeField] private Color gapFillColor = new(0.18f, 0.19f, 0.21f, 1f);
 
     [Header("Scan Tag Visuals")]
     [SerializeField] private float scanTagBackgroundAlpha = 0.92f;
@@ -257,9 +269,6 @@ public class PacketView : MonoBehaviour
         route = newRoute;
         auraBaseSpeedModifier = 0;
 
-        ClearAllTagViews();
-        RefreshVisuals();
-
         // reset speed tail 
         currentTailLength = 0f;
         tailPulseElapsed = tailPulseTravelDuration;
@@ -281,6 +290,9 @@ public class PacketView : MonoBehaviour
 
         visualLaneIndex = 0;
         visualLaneConnection = null;
+
+        ClearAllTagViews();
+        RefreshVisuals();
         RefreshVisualLaneAssignment();
         SnapToCurrentPosition();
         StopStepEase();
@@ -306,7 +318,9 @@ public class PacketView : MonoBehaviour
         UpdateStepEaseVisual();
         UpdateTailPulseRealtime();
         UpdateSpeedTail();
-        UpdateActiveScanPulse();
+
+        // TODO: replaced by gap animation soon
+        // UpdateActiveScanPulse();
     }
 
     public bool CanAdvanceScanStage()
@@ -480,13 +494,15 @@ public class PacketView : MonoBehaviour
         if (value)
         {
             scanBorderColor = borderColor;
-            ToggleScanBorder(true);
+            // TODO: replaced by gap animation soon 
+            // ToggleScanBorder(true);
         }
         else
         {
             if (!isActivelyScanned && !isActivelyTraced)
             {
-                ToggleScanBorder(false);
+                // TODO: replaced by gap animation soon
+                // ToggleScanBorder(false);
             }
         }
 
@@ -579,7 +595,7 @@ public class PacketView : MonoBehaviour
             Color c = scanBorderColor;
             c.a = alpha;
             borderRenderer.color = c;
-            borderRenderer.transform.localScale = borderBaseScale * scale;
+            borderRenderer.transform.localScale = borderBaseScale;
         }
 
         if (scanPulseRenderer != null && scanPulseRenderer.enabled)
@@ -655,7 +671,8 @@ public class PacketView : MonoBehaviour
 
         if (!hasScan && !hasTrace)
         {
-            ToggleScanBorder(false);
+            // TODO: replaced by gap animation soon
+            // ToggleScanBorder(false);
             RefreshVisuals();
             return;
         }
@@ -927,28 +944,84 @@ public class PacketView : MonoBehaviour
     private void ApplyVisuals()
     {
         VisibleClass visible = GetVisibleClass();
+        float confidence01 = GetScanConfidence01();
 
-        Color identityColor = visible switch
+        ApplyBodyVisual(visible, confidence01);
+        ApplyGapVisual();
+        ApplyBorderVisual(visible, confidence01);
+    }
+
+    private Color GetBodyTargetColor(VisibleClass visible)
+    {
+        return visible switch
         {
             VisibleClass.Unknown => unknownColor,
             VisibleClass.Benign => benignColor,
             VisibleClass.Threat => threatColor,
             VisibleClass.Priority => priorityColor,
-            _ => Color.white
+            _ => unknownColor
         };
+    }
 
-        float confidence01 = Mathf.Clamp01(confidencePercent / 100f);
+    private Color GetBorderTargetColor(VisibleClass visible)
+    {
+        return visible switch
+        {
+            VisibleClass.Unknown => borderUnknownColor,
+            VisibleClass.Benign => borderBenignColor,
+            VisibleClass.Threat => borderThreatColor,
+            VisibleClass.Priority => borderPriorityColor,
+            _ => borderUnknownColor
+        };
+    }
 
-        Color bodyColor = visible == VisibleClass.Unknown
-            ? Color.gray
-            : Color.Lerp(Color.gray, identityColor, confidence01);
+    private void ApplyBodyVisual(VisibleClass visible, float confidence01)
+    {
+        if (spriteRenderer == null)
+            return;
 
-        if (spriteRenderer != null)
-            spriteRenderer.color = bodyColor;
+        Color target = GetBodyTargetColor(visible);
+
+        Color final = visible == VisibleClass.Unknown
+            ? target
+            : Color.Lerp(unknownColor, target, confidence01);
+
+        spriteRenderer.color = final;
+    }
+
+    private void ApplyGapVisual()
+    {
+        if (gapFillRenderer == null)
+            return;
+
+        gapFillRenderer.color = gapFillColor;
+    }
+
+   private void ApplyBorderVisual(VisibleClass visible, float confidence01)
+    {
+        if (borderRenderer == null)
+            return;
+
+        borderRenderer.enabled = true;
+
+        Color target = GetBorderTargetColor(visible);
+
+        Color final = visible == VisibleClass.Unknown
+            ? target
+            : Color.Lerp(borderUnknownColor, target, confidence01);
+
+        borderRenderer.color = final;
+
+        // Static for now while we tune shape/overlap/readability.
+        borderRenderer.transform.localScale = borderBaseScale;
     }
 
     private void RefreshVisuals()
     {
+        // TODO fixed when we mvoe to gap scan animation
+        if (scanPulseRenderer != null)
+            scanPulseRenderer.enabled = false;
+
         ApplyVisuals();
         RefreshScanVisual();
     }
@@ -1747,28 +1820,31 @@ public class PacketView : MonoBehaviour
 
     public void SetVisualSortOrder(int order)
     {
+        if (borderRenderer != null)
+            borderRenderer.sortingOrder = order - 2;
+
+        if (gapFillRenderer != null)
+            gapFillRenderer.sortingOrder = order - 1;
+
         if (spriteRenderer != null)
             spriteRenderer.sortingOrder = order;
 
         if (label != null)
-            label.sortingOrder = order;
-
-        if (borderRenderer != null)
-            borderRenderer.sortingOrder = order - 1;
+            label.sortingOrder = order + 1;
 
         if (scanPulseRenderer != null)
-            scanPulseRenderer.sortingOrder = order - 2;
+            scanPulseRenderer.sortingOrder = order - 3;
 
         for (int i = 0; i < activeTagViews.Count; i++)
         {
             if (activeTagViews[i] == null)
                 continue;
 
-            activeTagViews[i].SetSortOrder(order + 1 + (i * 2), order + 2 + (i * 2));
+            activeTagViews[i].SetSortOrder(order + 2 + (i * 2), order + 3 + (i * 2));
         }
 
         if (speedTail != null)
-            speedTail.sortingOrder = order - 3;
+            speedTail.sortingOrder = order - 4;
     }
 
 }
