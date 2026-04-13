@@ -106,7 +106,7 @@ public class ConsoleController : MonoBehaviour
             return;
 
         string arrow = isExpanded ? "▲" : "▼";
-        titleText.text = $"{arrow} console";
+        titleText.text = $"CONSOLE <color=#6A7370>{arrow}</color>";
         
     }
 
