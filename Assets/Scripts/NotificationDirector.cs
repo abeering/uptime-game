@@ -52,6 +52,8 @@ public class NotificationDirector : MonoBehaviour
         Vector2 finalPosition = GetAnchoredPositionForIndex(0);
         entry.PlayEnter(finalPosition, entrySpawnOffsetY);
 
+        AudioManager.Instance?.PlayNewNotification();
+
         RefreshStack(skipEntry: entry);
 
         Coroutine life = StartCoroutine(LifetimeRoutine(entry, lingerSeconds));

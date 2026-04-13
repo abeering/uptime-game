@@ -27,6 +27,9 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioCue nodeRecovered;
     [SerializeField] private AudioCue alert;
 
+    [Header("Notifications")]
+    [SerializeField] private AudioCue newNotification;
+
     private AudioSource[] pooledSources;
     private int nextSourceIndex = 0;
 
@@ -102,4 +105,6 @@ public class AudioManager : MonoBehaviour
     public void PlayInfectionStarted() => Play(infectionStarted);
     public void PlayNodeRecovered() => Play(nodeRecovered);
     public void PlayAlert() => Play(alert);
+
+    public void PlayNewNotification() => Play(newNotification);
 }
