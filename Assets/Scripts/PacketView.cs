@@ -164,6 +164,7 @@ public class PacketView : MonoBehaviour
 
     [Header("Gap Visuals")]
     [SerializeField] private Color gapFillColor = new(0.18f, 0.19f, 0.21f, 1f);
+    [SerializeField] private SpriteMask scanMask;
 
     [Header("Scan Tag Visuals")]
     [SerializeField] private float scanTagBackgroundAlpha = 0.92f;
@@ -1018,7 +1019,6 @@ public class PacketView : MonoBehaviour
 
     private void RefreshVisuals()
     {
-        // TODO fixed when we mvoe to gap scan animation
         if (scanPulseRenderer != null)
             scanPulseRenderer.enabled = false;
 
@@ -1031,15 +1031,21 @@ public class PacketView : MonoBehaviour
         if (scanVisual == null)
             return;
 
+        if (isActivelyTraced && !isActivelyScanned)
+        {
+            scanVisual.ShowTrace(scanBorderColor);
+            return;
+        }
+
         if (!isActivelyScanned)
         {
-            scanVisual.HideScanVisual();
+            scanVisual.Hide();
             return;
         }
 
         if (scanStage == ScanStage.Confirmed)
         {
-            scanVisual.HideScanVisual();
+            scanVisual.Hide();
             return;
         }
 
@@ -1047,10 +1053,7 @@ public class PacketView : MonoBehaviour
             ? ScanStage.Probable
             : scanStage;
 
-        // scanVisual.ShowProgressiveScan(
-        //     visualStage,
-        //     GetScanStageProgress01()
-        // );
+        scanVisual.ShowScan(scanBorderColor, visualStage);
     }
 
     public void RefreshTags(ScanDirector scanDirector, CommandDirector commandDirector)
@@ -1820,31 +1823,47 @@ public class PacketView : MonoBehaviour
 
     public void SetVisualSortOrder(int order)
     {
+        int tailOrder = order - 4;
+        int borderOrder = order - 3;
+        int gapOrder = order - 2;
+        int sweepOrder = order - 1;
+        int bodyOrder = order;
+        int labelOrder = order + 1;
+
+        if (speedTail != null)
+            speedTail.sortingOrder = tailOrder;
+
         if (borderRenderer != null)
-            borderRenderer.sortingOrder = order - 2;
+            borderRenderer.sortingOrder = borderOrder;
 
         if (gapFillRenderer != null)
-            gapFillRenderer.sortingOrder = order - 1;
+            gapFillRenderer.sortingOrder = gapOrder;
+
+        if (scanVisual != null && gapFillRenderer != null)
+            scanVisual.SetSorting(gapFillRenderer.sortingLayerID, sweepOrder);
 
         if (spriteRenderer != null)
-            spriteRenderer.sortingOrder = order;
+            spriteRenderer.sortingOrder = bodyOrder;
 
         if (label != null)
-            label.sortingOrder = order + 1;
+            label.sortingOrder = labelOrder;
 
-        if (scanPulseRenderer != null)
-            scanPulseRenderer.sortingOrder = order - 3;
+        if (scanMask != null && gapFillRenderer != null)
+        {
+            scanMask.frontSortingLayerID = gapFillRenderer.sortingLayerID;
+            scanMask.backSortingLayerID = gapFillRenderer.sortingLayerID;
+            scanMask.isCustomRangeActive = true;
+            scanMask.backSortingOrder = gapOrder;
+            scanMask.frontSortingOrder = bodyOrder;
+        }
 
         for (int i = 0; i < activeTagViews.Count; i++)
         {
             if (activeTagViews[i] == null)
                 continue;
 
-            activeTagViews[i].SetSortOrder(order + 2 + (i * 2), order + 3 + (i * 2));
+            activeTagViews[i].SetSortOrder(labelOrder + 1 + (i * 2), labelOrder + 2 + (i * 2));
         }
-
-        if (speedTail != null)
-            speedTail.sortingOrder = order - 4;
     }
 
     // used for packetoverlapcoordinator to determine distance between packets 
