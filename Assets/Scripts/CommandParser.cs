@@ -189,27 +189,37 @@ public static class CommandParser
 
         if (verb == "block" || verb == "b")
         {
-            if (parts.Length >= 4 && parts[2] == "@")
+            int atIndex = Array.FindIndex(parts, p => p == "@");
+
+            if (atIndex >= 2 && atIndex < parts.Length - 1)
             {
                 result.type = CommandType.Block;
+                result.nodeId = parts[atIndex + 1];
 
+                // source rule still only supports a single target token
                 if (parts[1].StartsWith("src:", StringComparison.OrdinalIgnoreCase))
                 {
                     result.packetId = null;
-                    result.nodeId = parts[3];
-                    result.rawText = parts[1]; // stash full token
+                    result.rawText = parts[1];
                 }
                 else
                 {
-                    result.packetId = parts[1];
-                    result.nodeId = parts[3];
+                    for (int i = 1; i < atIndex; i++)
+                    {
+                        string token = parts[i];
+                        if (!string.IsNullOrWhiteSpace(token))
+                            result.packetIds.Add(token);
+                    }
+
+                    if (result.packetIds.Count == 1)
+                        result.packetId = result.packetIds[0];
                 }
             }
 
             return result;
         }
 
-        if (verb == "clean")
+        if (verb == "clean" || verb == "c")
         {
             if (parts.Length >= 2)
             {
@@ -220,7 +230,7 @@ public static class CommandParser
             return result;
         }
 
-        if (verb == "cancel")
+        if (verb == "cancel" || verb == "x")
         {
             if (parts.Length >= 2)
             {

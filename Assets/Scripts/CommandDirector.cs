@@ -458,14 +458,8 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Block:
                 if (string.IsNullOrWhiteSpace(command.nodeId))
                 {
-                    Log("ERROR usage: block <packet>|src:<addr> @ <node>");
+                    Log("ERROR usage: block <packet...>|src:<addr> @ <node>");
                     audioManager?.PlayCommandRejected();
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(command.packetId))
-                {
-                    StartBlock(command.packetId, command.nodeId);
                     return;
                 }
 
@@ -474,6 +468,18 @@ public class CommandDirector : MonoBehaviour
                 {
                     string src = command.rawText.Substring(4);
                     StartBlockBySource(src, command.nodeId);
+                    return;
+                }
+
+                if (command.packetIds != null && command.packetIds.Count > 0)
+                {
+                    StartBlockMany(command.packetIds, command.nodeId);
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(command.packetId))
+                {
+                    StartBlock(command.packetId, command.nodeId);
                     return;
                 }
 
@@ -840,6 +846,99 @@ public class CommandDirector : MonoBehaviour
 
         audioManager?.PlayCommandAccepted();
         LogBlockArmed(block.displayId, packetId, nodeId);
+    }
+
+    private void StartBlockMany(List<string> packetIds, string nodeId)
+    {
+        if (packetIds == null || packetIds.Count == 0)
+        {
+            LogCommandError("block failed: no packet targets");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
+        List<string> normalizedPacketIds = new();
+
+        for (int i = 0; i < packetIds.Count; i++)
+        {
+            string packetId = packetIds[i]?.Trim();
+
+            if (string.IsNullOrWhiteSpace(packetId))
+                continue;
+
+            if (seen.Add(packetId))
+                normalizedPacketIds.Add(packetId);
+        }
+
+        if (normalizedPacketIds.Count == 0)
+        {
+            LogCommandError("block failed: no valid packet targets");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        NodeView node = networkRuntime != null ? networkRuntime.GetNode(nodeId) : null;
+        if (node == null)
+        {
+            Log($"BLOCK failed: node {nodeId} not found");
+            audioManager?.PlayCommandRejected();
+            return;
+        }
+
+        int armedCount = 0;
+        int missingCount = 0;
+        int fullCount = 0;
+
+        List<string> missingPackets = new();
+        List<string> noSlotPackets = new();
+
+        for (int i = 0; i < normalizedPacketIds.Count; i++)
+        {
+            string packetId = normalizedPacketIds[i];
+
+            PacketView packet = networkRuntime.GetPacket(packetId);
+            if (packet == null)
+            {
+                missingCount++;
+                missingPackets.Add(packetId);
+                continue;
+            }
+
+            string blockDisplayId = GetNextBlockDisplayId();
+            if (string.IsNullOrWhiteSpace(blockDisplayId))
+            {
+                fullCount++;
+                noSlotPackets.Add(packetId);
+                continue;
+            }
+
+            BlockOperation block = new BlockOperation
+            {
+                displayId = blockDisplayId,
+                packetId = packetId,
+                nodeId = nodeId
+            };
+
+            operations.Add(block);
+            RefreshBlockTagForPacketId(packetId);
+            LogBlockArmed(block.displayId, packetId, nodeId);
+            armedCount++;
+        }
+
+        if (armedCount > 0)
+            audioManager?.PlayCommandAccepted();
+        else
+            audioManager?.PlayCommandRejected();
+
+        if (missingCount > 0)
+            LogCommandError($"block skipped: not found [{string.Join(", ", missingPackets)}]");
+
+        if (fullCount > 0)
+            LogCommandError($"block skipped: no slots left [{string.Join(", ", noSlotPackets)}]");
+
+        if (armedCount > 0 && (missingCount > 0 || fullCount > 0))
+            Log($"{FormatPrefix(ConsoleLogPrefix.Block)}  {FormatMuted($"ARMED {armedCount}/{normalizedPacketIds.Count}", true)}  @ {nodeId}");
     }
 
     private void StartBlockBySource(string sourceAddress, string nodeId)

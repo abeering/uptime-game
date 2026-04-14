@@ -19,6 +19,7 @@ public class ParsedCommand
 {
     public CommandType type = CommandType.Unknown;
     public string packetId;
+    public List<string> packetIds = new();   // NEW
     public string nodeId;
     public string operationId;
     public string rawText;
@@ -37,6 +38,6 @@ public class ParsedCommand
     public bool spawnAllowAlreadyInfectedNode = false;
     public Dictionary<string, string> spawnInfectionParams = new();
 
-    // for autospawn / disable spawn 
+    // for autospawn / disable spawn
     public string autoSpawnMode;
 }
