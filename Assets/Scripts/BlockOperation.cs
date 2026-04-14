@@ -76,19 +76,14 @@ public class BlockOperation : Operation
             return;
 
         var resolution = packet.HandleBlocked(reachedNode);
-        AudioManager.Instance?.PlayBlockTriggered();
-
-        if (resolution.shouldRemove)
-        {
-            PacketRemovalReason removeReason = resolution.removeReason == PacketRemovalReason.Unknown
-                ? PacketRemovalReason.Blocked
-                : resolution.removeReason;
-
-            context.trafficDirector.RemovePacket(packet, removeReason);
-        }
 
         var verb = string.IsNullOrWhiteSpace(resolution.logText) ? "blocked" : resolution.logText;
 
+        string targetLabel = matchType == BlockMatchType.SourceAddress
+            ? $"src={sourceAddress}"
+            : packet.packetId;
+
+        // Mark state BEFORE packet removal so OnPacketRemoved does not misfire.
         if (matchType == BlockMatchType.PacketId)
         {
             state = BlockState.Triggered;
@@ -101,9 +96,14 @@ public class BlockOperation : Operation
             isFinished = false;
         }
 
-        string targetLabel = matchType == BlockMatchType.SourceAddress
-            ? $"src={sourceAddress}"
-            : packet.packetId;
+        if (resolution.shouldRemove)
+        {
+            PacketRemovalReason removeReason = resolution.removeReason == PacketRemovalReason.Unknown
+                ? PacketRemovalReason.Blocked
+                : resolution.removeReason;
+
+            context.trafficDirector.RemovePacket(packet, removeReason);
+        }
 
         context.LogBlockTriggered(displayId, targetLabel, nodeId, verb);
     }
