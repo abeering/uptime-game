@@ -2817,6 +2817,19 @@ MonoBehaviour:
     volume: 1
     pitchMin: 1
     pitchMax: 1
+  blockPlaced:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  blockTriggered:
+    cueName: 
+    clips:
+    - {fileID: 8300000, guid: c6558391a5c895a4bb4821968b8f83f1, type: 3}
+    volume: 0.25
+    pitchMin: 1
+    pitchMax: 1
   threatIdentified:
     cueName: 
     clips:
@@ -2826,8 +2839,9 @@ MonoBehaviour:
     pitchMax: 1
   infectionStarted:
     cueName: 
-    clips: []
-    volume: 1
+    clips:
+    - {fileID: 8300000, guid: 171fb56e6b54c4e4f94afb8366b648aa, type: 3}
+    volume: 0.25
     pitchMin: 1
     pitchMax: 1
   nodeRecovered:
@@ -2837,6 +2851,12 @@ MonoBehaviour:
     pitchMin: 1
     pitchMax: 1
   alert:
+    cueName: 
+    clips: []
+    volume: 1
+    pitchMin: 1
+    pitchMax: 1
+  newNotification:
     cueName: 
     clips: []
     volume: 1
