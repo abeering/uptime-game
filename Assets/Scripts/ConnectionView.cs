@@ -129,6 +129,24 @@ public class ConnectionView : MonoBehaviour
         RefreshSlowPulseLabelTransform();
     }
 
+    private void ApplySortingLayer()
+    {
+        if (lineRenderer != null)
+        {
+            lineRenderer.sortingLayerName = "Connections";
+        }
+
+        if (edgeLabel != null)
+        {
+            edgeLabel.sortingLayerID = SortingLayer.NameToID("Connections");
+        }
+
+        if (slowPulseLabel != null)
+        {
+            slowPulseLabel.sortingLayerID = SortingLayer.NameToID("Connections");
+        }
+    }
+
     public Vector3 GetWorldPositionAtStep(int step, bool aToB)
     {
         if (nodeA == null || nodeB == null)
@@ -173,6 +191,7 @@ public class ConnectionView : MonoBehaviour
         RefreshLabel();
         RefreshSlowPulseLabelTransform();
         UpdateThrottleVisuals();
+        ApplySortingLayer();
     }
 
     public void SetThrottle(int amount)
