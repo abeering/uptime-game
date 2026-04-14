@@ -76,6 +76,7 @@ public class BlockOperation : Operation
             return;
 
         var resolution = packet.HandleBlocked(reachedNode);
+        AudioManager.Instance?.PlayBlockTriggered();
 
         if (resolution.shouldRemove)
         {

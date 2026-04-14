@@ -21,6 +21,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioCue operationComplete;
     [SerializeField] private AudioCue operationFailed;
 
+    [Header("Blocks")]
+    [SerializeField] private AudioCue blockPlaced;
+    [SerializeField] private AudioCue blockTriggered;
+
     [Header("Threat / Network")]
     [SerializeField] private AudioCue threatIdentified;
     [SerializeField] private AudioCue infectionStarted;
@@ -93,18 +97,29 @@ public class AudioManager : MonoBehaviour
         sfxMasterVolume = Mathf.Clamp01(value);
     }
 
+    // commands 
     public void PlayCommandAccepted() => Play(commandAccepted);
     public void PlayCommandRejected() => Play(commandRejected);
     public void PlayClick() => Play(click);
 
+    // scanning 
     public void PlayScanStarted() => Play(scanStarted);
+    public void PlayThreatIdentified() => Play(threatIdentified);
+
+    // operatiions
     public void PlayOperationComplete() => Play(operationComplete);
     public void PlayOperationFailed() => Play(operationFailed);
 
-    public void PlayThreatIdentified() => Play(threatIdentified);
+    // threat / network
     public void PlayInfectionStarted() => Play(infectionStarted);
     public void PlayNodeRecovered() => Play(nodeRecovered);
-    public void PlayAlert() => Play(alert);
 
+    // blocks and blocking 
+    public void PlayBlockPlaced() => Play(blockPlaced);
+    public void PlayBlockTriggered() => Play(blockTriggered);
+
+    // notifications 
     public void PlayNewNotification() => Play(newNotification);
+    
+    public void PlayAlert() => Play(alert);
 }

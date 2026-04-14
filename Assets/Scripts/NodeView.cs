@@ -92,6 +92,8 @@ public class NodeView : MonoBehaviour
         instance.Initialize(this, payload);
         activeInfections.Add(instance);
 
+        AudioManager.Instance?.PlayInfectionStarted();
+
         instance.OnApplied();
         RefreshVisuals();
         return true;
