@@ -280,18 +280,20 @@ public class CommandDirector : MonoBehaviour
 
     public void LogIntelStageChange(PacketView packet, ScanStage newStage)
     {
-        if (packet == null || newStage == ScanStage.Unknown)
-            return;
+        // TODO we might want to log these - but only as a setting
 
-        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
-        string packetId = FormatPacketId(packet);
-        string stageLabel = FormatStage(newStage);
-        string classLabel = FormatVisibleClass(packet);
+        // if (packet == null || newStage == ScanStage.Unknown)
+        //     return;
 
-        if (newStage == ScanStage.Confirmed)
-            Log($"{prefix}  {packetId}  {stageLabel}  {classLabel}");
-        else
-            Log($"{prefix}  {packetId}  {stageLabel}  ({classLabel})");
+        // string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        // string packetId = FormatPacketId(packet);
+        // string stageLabel = FormatStage(newStage);
+        // string classLabel = FormatVisibleClass(packet);
+
+        // if (newStage == ScanStage.Confirmed)
+        //     Log($"{prefix}  {packetId}  {stageLabel}  {classLabel}");
+        // else
+        //     Log($"{prefix}  {packetId}  {stageLabel}  ({classLabel})");
     }
 
     public void LogIntelReveal(PacketView packet, IntelRevealType revealType, string revealedValue)
@@ -304,13 +306,13 @@ public class CommandDirector : MonoBehaviour
 
         switch (revealType)
         {
-            case IntelRevealType.Class:
-                Log($"{prefix}  {packetId}  <b>CLASS</b>  {revealedValue}");
-                break;
-
-            case IntelRevealType.Kind:
-                Log($"{prefix}  {packetId}  <b>KIND</b>  {revealedValue}");
-                break;
+            // TODO maybe on setting 
+            // case IntelRevealType.Class:
+            //     Log($"{prefix}  {packetId}  <b>CLASS</b>  {revealedValue}");
+            //     break;
+            // case IntelRevealType.Kind:
+            //     Log($"{prefix}  {packetId}  <b>KIND</b>  {revealedValue}");
+            //     break;
 
             case IntelRevealType.InfectionType:
                 Log($"{prefix}  {packetId}  <b>INFECTION</b>  {revealedValue}");
@@ -332,8 +334,9 @@ public class CommandDirector : MonoBehaviour
 
     public void LogTraceStarted(string packetId, int durationTicks)
     {
-        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
-        Log($"{prefix}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"started ({durationTicks}s)")}");
+        // TODO we might want to log these - but only as a setting
+        // string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        // Log($"{prefix}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"started ({durationTicks}s)")}");
     }
 
     public void LogTraceReveal(PacketView packet)
@@ -343,7 +346,7 @@ public class CommandDirector : MonoBehaviour
 
         string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
         string packetId = FormatPacketId(packet);
-        Log($"{prefix}  {packetId}  <b>TRACE</b>  source={packet.sourceAddress}  destination={packet.GetDestinationName()}");
+        Log($"{prefix}  {packetId}  <b>TRACE</b>  src={packet.sourceAddress}  dest={packet.GetDestinationName()}");
     }
 
     public void LogTraceFailed(string displayId, string packetId, string reason)
@@ -385,8 +388,9 @@ public class CommandDirector : MonoBehaviour
 
     public void LogScanStarted(string packetId, int durationTicks)
     {
-        string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
-        Log($"{prefix}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"started ({durationTicks}s)")}");
+        // TODO we might want to log these - but only as a setting
+        // string prefix = FormatPrefix(ConsoleLogPrefix.Intel);
+        // Log($"{prefix}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"started ({durationTicks}s)")}");
     }
 
     public void LogBoostApplied(string packetId)
@@ -573,8 +577,6 @@ public class CommandDirector : MonoBehaviour
 
             if (operations[i].ShouldRemove())
             {
-                Debug.Log($"[CommandDirector] removing operation {operations[i].displayId}");
-
                 if (operations[i] is BlockOperation block)
                 {
                     ReleaseBlockDisplayId(block.displayId);
@@ -709,10 +711,11 @@ public class CommandDirector : MonoBehaviour
             case IntelAssignResult.Replaced:
                 audioManager?.PlayCommandAccepted();
 
-                if (slotIndex.HasValue)
-                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"replaced S{slotIndex.Value + 1}", true)}");
-                else
-                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted("replaced oldest", true)}");
+                // TODO we may want to log these, but only as a setting
+                // if (slotIndex.HasValue)
+                //     Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted($"replaced S{slotIndex.Value + 1}", true)}");
+                // else
+                //     Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>SCAN</b>  {FormatMuted("replaced oldest", true)}");
 
                 return;
 
@@ -768,10 +771,11 @@ public class CommandDirector : MonoBehaviour
             case IntelAssignResult.Replaced:
                 audioManager?.PlayCommandAccepted();
 
-                if (slotIndex.HasValue)
-                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"replaced T{slotIndex.Value + 1}", true)}");
-                else
-                    Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted("replaced oldest", true)}");
+                // TODO we may want to log these, but only as a setting
+                // if (slotIndex.HasValue)
+                //     Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted($"replaced T{slotIndex.Value + 1}", true)}");
+                // else
+                //     Log($"{FormatPrefix(ConsoleLogPrefix.Intel)}  {FormatPacketId(packetId)}  <b>TRACE</b>  {FormatMuted("replaced oldest", true)}");
 
                 return;
 
@@ -906,7 +910,8 @@ public class CommandDirector : MonoBehaviour
         }
 
         audioManager?.PlayCommandAccepted();
-        Log($"{FormatPrefix(ConsoleLogPrefix.Flow)}  <b>CLEAN</b>  {node.nodeId}");
+        // TODO we may want to log these, but only as a setting
+        // Log($"{FormatPrefix(ConsoleLogPrefix.Flow)}  <b>CLEAN</b>  {node.nodeId}");
     }
 
     private void StartBoost(string packetId)
