@@ -103,6 +103,7 @@ public class BlockOperation : Operation
                 : resolution.removeReason;
 
             context.trafficDirector.RemovePacket(packet, removeReason);
+            AudioManager.Instance.PlayBlockTriggered();
         }
 
         context.LogBlockTriggered(displayId, targetLabel, nodeId, verb);

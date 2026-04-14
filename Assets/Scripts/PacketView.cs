@@ -93,7 +93,6 @@ public class PacketView : MonoBehaviour
     public int currentStep = 0;
     public int ticksUntilAdvance = 0;
     public int nodesReachedCount = 0;
-    // public bool movingAToB = true; NECESSARY?
     public bool hasArrived = false;
     public bool isRemoved { get; private set; }
 
@@ -155,6 +154,17 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float scanPulseScaleMax = 1.28f;
     private Vector3 borderBaseScale = Vector3.one;
     private Vector3 pulseBaseScale = Vector3.one;
+    private Vector3 gapBaseScale = Vector3.one;
+
+    [Header("Confirmed Gap Pulse")]
+    [SerializeField] private bool enableConfirmedGapPulse = true;
+    [SerializeField] private float confirmedGapPulseDuration = 0.32f;
+    [SerializeField] private float confirmedGapPulseMaxAlpha = 0.90f;
+    [SerializeField] private float confirmedGapPulseScale = 1.08f;
+    [SerializeField] private AnimationCurve confirmedGapPulseCurve =
+        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    private float confirmedGapPulseElapsed = 999f;
+    private bool confirmedGapPulseActive = false;
 
     [Header("Border Colors")]
     [SerializeField] private Color borderUnknownColor = new(0.90f, 0.92f, 0.94f, 1f);
@@ -209,7 +219,6 @@ public class PacketView : MonoBehaviour
     private bool hasTailDirection = false;
     private Vector3 targetTailDirection = Vector3.right;
     private bool hasTargetTailDirection = false;
-    // growing + pulsing 
     [SerializeField] private float tailGrowPerTick = 0.05f;
     [SerializeField] private int tailResolution = 8;
     [SerializeField] private bool enableTailPulse = true;
@@ -232,7 +241,6 @@ public class PacketView : MonoBehaviour
     public event Action<PacketView, ScanStage, ScanStage> OnScanStageChanged;
     public event Action<PacketView, IntelRevealType, string> OnIntelRevealed;
 
-    // keywords 
     public List<IPacketKeyword> keywords = new();
 
     public void Initialize(
@@ -266,13 +274,14 @@ public class PacketView : MonoBehaviour
         scanStage = ScanStage.Unknown;
         scanTicksIntoStage = 0;
         isActivelyScanned = false;
+        confirmedGapPulseActive = false;
+        confirmedGapPulseElapsed = confirmedGapPulseDuration;
 
         baseSpeed = Mathf.Max(1, newBaseSpeed);
         boostCount = 0;
         route = newRoute;
         auraBaseSpeedModifier = 0;
 
-        // reset speed tail 
         currentTailLength = 0f;
         tailPulseElapsed = tailPulseTravelDuration;
         tailPulseActive = false;
@@ -286,6 +295,9 @@ public class PacketView : MonoBehaviour
 
         if (scanPulseRenderer != null)
             pulseBaseScale = scanPulseRenderer.transform.localScale;
+
+        if (gapFillRenderer != null)
+            gapBaseScale = gapFillRenderer.transform.localScale;
 
         if (label != null)
             label.text = visiblePacketId;
@@ -310,7 +322,6 @@ public class PacketView : MonoBehaviour
         else
             ResetProgressiveScanState();
 
-        // debug output 
         if (infections != null && infections.Count > 0)
         {
             for (int i = 0; i < infections.Count; i++)
@@ -325,9 +336,7 @@ public class PacketView : MonoBehaviour
         UpdateStepEaseVisual();
         UpdateTailPulseRealtime();
         UpdateSpeedTail();
-
-        // TODO: replaced by gap animation soon
-        // UpdateActiveScanPulse();
+        UpdateConfirmedGapPulse();
     }
 
     public bool CanAdvanceScanStage()
@@ -352,16 +361,6 @@ public class PacketView : MonoBehaviour
     public float GetScanDifficultyMultiplier()
     {
         float difficulty01 = Mathf.Clamp01(scanDifficulty / 100f);
-
-        // First-pass mapping:
-        // easy packets scan faster than baseline
-        // hard packets scan slower than baseline
-        //
-        // difficulty 0   -> 0.65x duration
-        // difficulty 25  -> 0.8625x duration
-        // difficulty 50  -> 1.075x duration
-        // difficulty 75  -> 1.2875x duration
-        // difficulty 100 -> 1.5x duration
         return Mathf.Lerp(0.65f, 1.5f, difficulty01);
     }
 
@@ -394,8 +393,6 @@ public class PacketView : MonoBehaviour
     {
         float confidence01 = GetScanConfidence01();
 
-        // Phase 1 thresholds:
-        // simple on purpose so we can invert the architecture cleanly first.
         if (confidence01 >= 1f)
             scanStage = ScanStage.Confirmed;
         else if (confidence01 >= 0.55f)
@@ -412,8 +409,6 @@ public class PacketView : MonoBehaviour
         {
             case ScanStage.Unknown:
                 intelLevel = IntelLevel.None;
-                // why are we doing this
-                // reportedClass = PacketClass.Benign;
                 break;
 
             case ScanStage.Probable:
@@ -442,7 +437,55 @@ public class PacketView : MonoBehaviour
                 RevealKind();
                 RevealInfectionType();
                 RevealAllKeywords();
+
+                if (oldStage != ScanStage.Confirmed)
+                    TriggerConfirmedGapPulse();
                 break;
+        }
+    }
+
+    private void TriggerConfirmedGapPulse()
+    {
+        if (!enableConfirmedGapPulse || gapFillRenderer == null)
+            return;
+
+        confirmedGapPulseElapsed = 0f;
+        confirmedGapPulseActive = true;
+    }
+
+    private void UpdateConfirmedGapPulse()
+    {
+        if (gapFillRenderer == null)
+            return;
+
+        if (!confirmedGapPulseActive)
+        {
+            gapFillRenderer.transform.localScale = gapBaseScale;
+            return;
+        }
+
+        float duration = Mathf.Max(0.01f, confirmedGapPulseDuration);
+        confirmedGapPulseElapsed += Time.deltaTime;
+
+        float t = Mathf.Clamp01(confirmedGapPulseElapsed / duration);
+        float shaped = confirmedGapPulseCurve != null
+            ? confirmedGapPulseCurve.Evaluate(t)
+            : t;
+
+        float pulse01 = Mathf.Sin(shaped * Mathf.PI);
+        float scale = Mathf.Lerp(1f, confirmedGapPulseScale, pulse01);
+
+        Color c = scanBorderColor;
+        c.a = Mathf.Lerp(0f, confirmedGapPulseMaxAlpha, pulse01);
+
+        gapFillRenderer.transform.localScale = gapBaseScale * scale;
+        gapFillRenderer.color = c;
+
+        if (t >= 1f)
+        {
+            confirmedGapPulseActive = false;
+            gapFillRenderer.transform.localScale = gapBaseScale;
+            gapFillRenderer.color = gapFillColor;
         }
     }
 
@@ -455,6 +498,8 @@ public class PacketView : MonoBehaviour
         reportedClass = PacketClass.Benign;
         confidencePercent = 0;
         intelLevel = IntelLevel.None;
+        confirmedGapPulseActive = false;
+        confirmedGapPulseElapsed = confirmedGapPulseDuration;
 
         ResetRevealedIntel();
 
@@ -501,16 +546,6 @@ public class PacketView : MonoBehaviour
         if (value)
         {
             scanBorderColor = borderColor;
-            // TODO: replaced by gap animation soon 
-            // ToggleScanBorder(true);
-        }
-        else
-        {
-            if (!isActivelyScanned && !isActivelyTraced)
-            {
-                // TODO: replaced by gap animation soon
-                // ToggleScanBorder(false);
-            }
         }
 
         RefreshVisuals();
@@ -536,6 +571,8 @@ public class PacketView : MonoBehaviour
         reportedClass = PacketClass.Benign;
         confidencePercent = 0;
         intelLevel = IntelLevel.None;
+        confirmedGapPulseActive = false;
+        confirmedGapPulseElapsed = confirmedGapPulseDuration;
         ResetRevealedIntel();
 
         switch (stage)
@@ -678,8 +715,6 @@ public class PacketView : MonoBehaviour
 
         if (!hasScan && !hasTrace)
         {
-            // TODO: replaced by gap animation soon
-            // ToggleScanBorder(false);
             RefreshVisuals();
             return;
         }
@@ -1001,10 +1036,14 @@ public class PacketView : MonoBehaviour
         if (gapFillRenderer == null)
             return;
 
+        if (confirmedGapPulseActive)
+            return;
+
         gapFillRenderer.color = gapFillColor;
+        gapFillRenderer.transform.localScale = gapBaseScale;
     }
 
-   private void ApplyBorderVisual(VisibleClass visible, float confidence01)
+    private void ApplyBorderVisual(VisibleClass visible, float confidence01)
     {
         if (borderRenderer == null)
             return;
@@ -1018,8 +1057,6 @@ public class PacketView : MonoBehaviour
             : Color.Lerp(borderUnknownColor, target, confidence01);
 
         borderRenderer.color = final;
-
-        // Static for now while we tune shape/overlap/readability.
         borderRenderer.transform.localScale = borderBaseScale;
     }
 
@@ -1240,7 +1277,7 @@ public class PacketView : MonoBehaviour
         Vector3 center = transform.position;
         Vector3 head = center - (smoothedTailDirection * tailRearOffset);
         Vector3 tail = head - (smoothedTailDirection * tailLength);
-        
+
         speedTail.enabled = true;
         int pointCount = Mathf.Max(2, tailResolution);
         speedTail.positionCount = pointCount;
@@ -1909,5 +1946,4 @@ public class PacketView : MonoBehaviour
 
         return 0.2f;
     }
-
 }
