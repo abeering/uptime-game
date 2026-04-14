@@ -1059,7 +1059,7 @@ public class PacketView : MonoBehaviour
             ? ScanStage.Probable
             : scanStage;
 
-        scanVisual.ShowScan(scanBorderColor, visualStage);
+        scanVisual.ShowScan(scanBorderColor, visualStage, GetScanConfidence01());
     }
 
     public void RefreshTags(ScanDirector scanDirector, CommandDirector commandDirector)

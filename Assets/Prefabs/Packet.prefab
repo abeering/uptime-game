@@ -355,7 +355,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacketScanVisual
   sweepRenderer: {fileID: 5400569738607837180}
-  scanSweepDegreesPerSecond: 180
+  scanSweepMinDegreesPerSecond: 130
+  scanSweepMidDegreesPerSecond: 180
+  scanSweepMaxDegreesPerSecond: 900
+  scanSweepMidConfidence: 0.4
+  scanSweepLowCurveExponent: 1
+  scanSweepHighCurveExponent: 0.45
   traceSweepDegreesPerSecond: 110
   startAngleDegrees: 0
   probableAlpha: 0.28

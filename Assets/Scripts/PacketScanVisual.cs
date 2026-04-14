@@ -6,7 +6,12 @@ public class PacketScanVisual : MonoBehaviour
     [SerializeField] private SpriteRenderer sweepRenderer;
 
     [Header("Rotation")]
-    [SerializeField] private float scanSweepDegreesPerSecond = 180f;
+    [SerializeField] private float scanSweepMinDegreesPerSecond = 130f;
+    [SerializeField] private float scanSweepMidDegreesPerSecond = 180f;   // speed at midpoint confidence
+    [SerializeField] private float scanSweepMaxDegreesPerSecond = 300f;
+    [SerializeField, Range(0f, 1f)] private float scanSweepMidConfidence = 0.5f;
+    [SerializeField] private float scanSweepLowCurveExponent = 1.0f;      // 0 -> midpoint
+    [SerializeField] private float scanSweepHighCurveExponent = 1.4f;     // midpoint -> 100%
     [SerializeField] private float traceSweepDegreesPerSecond = 110f;
     [SerializeField] private float startAngleDegrees = 0f;
 
@@ -23,6 +28,7 @@ public class PacketScanVisual : MonoBehaviour
     private bool isVisible = false;
     private bool isTrace = false;
     private float sweepDegreesPerSecond = 180f;
+    private float currentConfidence01 = 0f;
     private Color activeColor = Color.white;
     private Vector3 baseScale = Vector3.one;
 
@@ -48,13 +54,19 @@ public class PacketScanVisual : MonoBehaviour
 
     public void ShowScan(Color color, ScanStage stage)
     {
+        ShowScan(color, stage, 0f);
+    }
+
+    public void ShowScan(Color color, ScanStage stage, float confidence01)
+    {
         if (sweepRenderer == null)
             return;
 
         isVisible = true;
         isTrace = false;
-        sweepDegreesPerSecond = scanSweepDegreesPerSecond;
         activeColor = color;
+        currentConfidence01 = Mathf.Clamp01(confidence01);
+        sweepDegreesPerSecond = GetScanSweepDegreesPerSecond(currentConfidence01);
 
         sweepRenderer.enabled = true;
         sweepRenderer.transform.localScale = Vector3.Scale(baseScale, scanScale);
@@ -62,6 +74,15 @@ public class PacketScanVisual : MonoBehaviour
         Color c = activeColor;
         c.a = GetAlphaForStage(stage);
         sweepRenderer.color = c;
+    }
+
+    public void UpdateScanConfidence(float confidence01)
+    {
+        if (!isVisible || isTrace)
+            return;
+
+        currentConfidence01 = Mathf.Clamp01(confidence01);
+        sweepDegreesPerSecond = GetScanSweepDegreesPerSecond(currentConfidence01);
     }
 
     public void ShowTrace(Color color)
@@ -86,6 +107,7 @@ public class PacketScanVisual : MonoBehaviour
     {
         isVisible = false;
         isTrace = false;
+        currentConfidence01 = 0f;
 
         if (sweepRenderer == null)
             return;
@@ -94,6 +116,26 @@ public class PacketScanVisual : MonoBehaviour
         sweepRenderer.color = Color.clear;
         sweepRenderer.transform.localScale = baseScale;
         sweepRenderer.transform.localRotation = Quaternion.Euler(0f, 0f, startAngleDegrees);
+    }
+
+    private float GetScanSweepDegreesPerSecond(float confidence01)
+    {
+        confidence01 = Mathf.Clamp01(confidence01);
+
+        float mid = Mathf.Clamp(scanSweepMidConfidence, 0.001f, 0.999f);
+
+        if (confidence01 <= mid)
+        {
+            float t = confidence01 / mid;
+            t = Mathf.Pow(t, Mathf.Max(0.01f, scanSweepLowCurveExponent));
+            return Mathf.Lerp(scanSweepMinDegreesPerSecond, scanSweepMidDegreesPerSecond, t);
+        }
+        else
+        {
+            float t = (confidence01 - mid) / (1f - mid);
+            t = Mathf.Pow(t, Mathf.Max(0.01f, scanSweepHighCurveExponent));
+            return Mathf.Lerp(scanSweepMidDegreesPerSecond, scanSweepMaxDegreesPerSecond, t);
+        }
     }
 
     private float GetAlphaForStage(ScanStage stage)
@@ -115,5 +157,4 @@ public class PacketScanVisual : MonoBehaviour
         sweepRenderer.sortingLayerID = sortingLayerID;
         sweepRenderer.sortingOrder = sortingOrder;
     }
-
 }
