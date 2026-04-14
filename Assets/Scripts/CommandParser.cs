@@ -279,11 +279,15 @@ public static class CommandParser
 
         if (verb == "throttle")
         {
-            if (parts.Length >= 3 && int.TryParse(parts[2], out int amount))
+            if (parts.Length >= 2)
             {
                 result.type = CommandType.Throttle;
                 result.connectionId = parts[1];
-                result.throttleAmount = amount;
+
+                if (parts.Length >= 3 && int.TryParse(parts[2], out int amount))
+                    result.throttleAmount = amount;
+                else
+                    result.throttleAmount = null;
             }
 
             return result;

@@ -401,11 +401,19 @@ public class CommandDirector : MonoBehaviour
         Log($"{prefix}  {FormatFailure("FAILED")}  {message}");
     }
 
-    public void LogThrottleApplied(ConnectionView connection, int amount)
+    public void LogThrottleApplied(ConnectionView connection)
     {
         string prefix = FormatPrefix(ConsoleLogPrefix.Flow);
         string edgeId = connection != null ? connection.connectionId : "----";
-        string value = connection != null ? $"L{connection.latency}+{amount}" : amount.ToString();
+
+        if (connection == null)
+        {
+            Log($"{prefix}  <b>{edgeId}</b>  <b>THROTTLE</b>");
+            return;
+        }
+
+        int activeAmount = connection.GetManualThrottleAmount();
+        string value = $"L{connection.latency}+{activeAmount} [{connection.GetThrottleRemainingTicks()}t]";
 
         Log($"{prefix}  <b>{edgeId}</b>  <b>THROTTLE</b>  {FormatMuted(value)}");
     }
@@ -506,7 +514,7 @@ public class CommandDirector : MonoBehaviour
             case CommandType.Throttle:
                 if (string.IsNullOrWhiteSpace(command.connectionId))
                 {
-                    Log("ERROR usage: throttle <connection> <amount>");
+                    Log("ERROR usage: throttle <connection> [amount]");
                     audioManager?.PlayCommandRejected();
                     return;
                 }
@@ -932,7 +940,7 @@ public class CommandDirector : MonoBehaviour
         LogBoostApplied(packetId);
     }
 
-    private void StartThrottle(string connectionId, int amount)
+    private void StartThrottle(string connectionId, int? requestedAmount)
     {
         ConnectionView connection = networkRuntime != null
             ? networkRuntime.GetConnection(connectionId)
@@ -945,17 +953,12 @@ public class CommandDirector : MonoBehaviour
             return;
         }
 
-        if (amount < 0)
-        {
-            LogCommandError($"throttle failed: amount must be >= 0");
-            audioManager?.PlayCommandRejected();
-            return;
-        }
+        int normalizedAmount = connection.NormalizeThrottleAmount(requestedAmount ?? 0);
 
-        connection.SetThrottle(amount);
+        connection.SetThrottle(normalizedAmount);
 
         audioManager?.PlayCommandAccepted();
-        LogThrottleApplied(connection, amount);
+        LogThrottleApplied(connection);
     }
 
     private void CancelOperation(string operationId)

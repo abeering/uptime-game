@@ -115,6 +115,11 @@ public class NetworkRuntime : MonoBehaviour
         return connection;
     }
 
+    public List<ConnectionView> GetAllConnections()
+    {
+        return new List<ConnectionView>(connections.Values);
+    }
+
     public ConnectionView FindConnectionBetween(NodeView fromNode, NodeView toNode)
     {
         if (fromNode == null || toNode == null)

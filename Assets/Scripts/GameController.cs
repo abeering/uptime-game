@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     public NodeDirector nodeDirector;
     public CommandDirector commandDirector;
     public LevelDirector levelDirector;
+    public NetworkRuntime networkRuntime;
 
     [Header("Systems")]
     public bool levelEnabled = false;
@@ -73,6 +74,20 @@ public class GameController : MonoBehaviour
 
         if (commandDirector != null)
             commandDirector.ProcessTick();
+
+        if (networkRuntime != null)
+            TickConnections();
+    }
+
+    private void TickConnections()
+    {
+        var connections = networkRuntime.GetAllConnections();
+
+        foreach (var connection in connections)
+        {
+            if (connection != null)
+                connection.ProcessTick();
+        }
     }
 
     [ContextMenu("Refresh All Connections")]

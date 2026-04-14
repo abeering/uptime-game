@@ -23,7 +23,7 @@ public class ParsedCommand
     public string operationId;
     public string rawText;
     public string connectionId;
-    public int throttleAmount;
+    public int? throttleAmount;
     public int? intelSlotIndex;
 
     // for Spawn
