@@ -207,6 +207,8 @@ public class PacketView : MonoBehaviour
     [SerializeField] private float tailDirectionLerpSpeed = 12f;
     private Vector3 smoothedTailDirection = Vector3.right;
     private bool hasTailDirection = false;
+    private Vector3 targetTailDirection = Vector3.right;
+    private bool hasTargetTailDirection = false;
     // growing + pulsing 
     [SerializeField] private float tailGrowPerTick = 0.05f;
     [SerializeField] private int tailResolution = 8;
@@ -274,6 +276,10 @@ public class PacketView : MonoBehaviour
         currentTailLength = 0f;
         tailPulseElapsed = tailPulseTravelDuration;
         tailPulseActive = false;
+        smoothedTailDirection = Vector3.right;
+        hasTailDirection = false;
+        targetTailDirection = Vector3.right;
+        hasTargetTailDirection = false;
 
         if (borderRenderer != null)
             borderBaseScale = borderRenderer.transform.localScale;
@@ -1200,8 +1206,17 @@ public class PacketView : MonoBehaviour
             return;
         }
 
-        Vector3 moveDir = GetCurrentTravelDirection();
-        Vector3 targetDir = moveDir.normalized;
+        Vector3 fallbackDir = GetCurrentTravelDirection();
+        Vector3 targetDir = hasTargetTailDirection ? targetTailDirection : fallbackDir;
+
+        if (targetDir.sqrMagnitude <= 0.0001f)
+        {
+            speedTail.enabled = false;
+            return;
+        }
+
+        targetDir.Normalize();
+
         if (!hasTailDirection)
         {
             smoothedTailDirection = targetDir;
@@ -1209,16 +1224,14 @@ public class PacketView : MonoBehaviour
         }
         else
         {
-            smoothedTailDirection = Vector3.Lerp(
+            Vector3 lerped = Vector3.Lerp(
                 smoothedTailDirection,
                 targetDir,
                 Time.deltaTime * tailDirectionLerpSpeed
-            ).normalized;
-        }
-        if (moveDir.sqrMagnitude <= 0.0001f)
-        {
-            speedTail.enabled = false;
-            return;
+            );
+
+            if (lerped.sqrMagnitude > 0.000001f)
+                smoothedTailDirection = lerped.normalized;
         }
 
         float targetTailLength = GetSpeedTailLength(edge);
@@ -1366,6 +1379,17 @@ public class PacketView : MonoBehaviour
         tailPulseActive = true;
     }
 
+    private void SetTailTargetFromStep(Vector3 fromPosition, Vector3 toPosition)
+    {
+        Vector3 dir = toPosition - fromPosition;
+
+        if (dir.sqrMagnitude <= 0.000001f)
+            return;
+
+        targetTailDirection = dir.normalized;
+        hasTargetTailDirection = true;
+    }
+
     public bool TryBoost()
     {
         if (!IsPriority())
@@ -1445,7 +1469,7 @@ public class PacketView : MonoBehaviour
 
         currentStep++;
 
-        if (currentStep > edge.lengthSteps)
+        if (currentStep >= edge.lengthSteps)
         {
             NodeView reachedNode = GetCurrentDestinationNode();
 
@@ -1480,6 +1504,8 @@ public class PacketView : MonoBehaviour
         TriggerTailPulse();
         SnapToCurrentPosition();
         Vector3 newVisualPosition = transform.position;
+
+        SetTailTargetFromStep(previousVisualPosition, newVisualPosition);
 
         if (enableStepEasing && edge != null)
         {
