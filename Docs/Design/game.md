@@ -427,3 +427,8 @@ Each business should meaningfully differ:
 - Validate that different builds produce different moment-to-moment gameplay
 
 ---
+
+# random idea pastebin 
+
+- "area scans" scanning one packet actually triggers on a radius 
+- 
