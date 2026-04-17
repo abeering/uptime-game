@@ -4597,6 +4597,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDirector
   trafficDirector: {fileID: 1482744061}
   notificationDirector: {fileID: 511128189}
+  benignLossWeight: 1
+  priorityLossWeight: 3
+  trafficLossThreshold: 10
+  elevatedAtFraction: 0.5
+  dangerAtFraction: 0.75
+  criticalAtFraction: 0.9
+  logFailureState: 1
 --- !u!1 &878126493
 GameObject:
   m_ObjectHideFlags: 0
@@ -6070,13 +6077,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameController
   tickIntervalSeconds: 0.5
   autoStart: 1
-  logTicks: 1
+  logTicks: 0
   trafficDirector: {fileID: 1482744061}
   nodeDirector: {fileID: 1433750262}
   commandDirector: {fileID: 838780728}
   levelDirector: {fileID: 875170675}
   networkRuntime: {fileID: 1878212259}
-  levelEnabled: 1
+  levelEnabled: 0
 --- !u!1 &1037435974
 GameObject:
   m_ObjectHideFlags: 0
@@ -8678,6 +8685,7 @@ MonoBehaviour:
   networkRuntime: {fileID: 1878212259}
   commandDirector: {fileID: 838780728}
   scoreDirector: {fileID: 580718489}
+  levelDirector: {fileID: 875170675}
   routeToDb:
   - connection: {fileID: 1638192324}
     aToB: 1

@@ -22,6 +22,9 @@ public class GameController : MonoBehaviour
     private int tickCount = 0;
     public int CurrentTick => tickCount;
 
+    private bool ticksPaused = false;
+    public bool TicksPaused => ticksPaused;
+
     public static GameController Instance { get; private set; }
 
     private void Awake()
@@ -56,8 +59,21 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public void PauseTicks()
+    {
+        ticksPaused = true;
+    }
+
+    public void ResumeTicks()
+    {
+        ticksPaused = false;
+    }
+
     private void RunTick()
     {
+        if (ticksPaused)
+            return;
+
         tickCount++;
 
         if (logTicks)

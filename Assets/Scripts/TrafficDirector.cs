@@ -9,6 +9,7 @@ public class TrafficDirector : MonoBehaviour
     public NetworkRuntime networkRuntime;
     public CommandDirector commandDirector;
     public ScoreDirector scoreDirector;
+    public LevelDirector levelDirector;
     private AudioManager audioManager;
 
     [Header("Routes")]
@@ -612,6 +613,7 @@ public class TrafficDirector : MonoBehaviour
                 bool applied = node.ApplyInfection(payload);
                 if (applied)
                 {
+                    levelDirector?.RecordNodeCompromised(node, packet, payload);
                     RemovePacket(packet, PacketRemovalReason.Infected, node);
                     return;
                 }
@@ -666,6 +668,7 @@ public class TrafficDirector : MonoBehaviour
             : 0;
 
         scoreDirector?.RecordPacketRemoval(packet, reason, currentTick, node);
+        levelDirector?.RecordPacketRemoval(packet, reason, node);
 
         if (commandDirector != null)
             commandDirector.NotifyPacketRemoved(packet.packetId, reason);
