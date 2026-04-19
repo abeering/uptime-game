@@ -21,6 +21,7 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
     [Header("Placement")]
     public Vector3 worldOffset = new Vector3(1.5f, 0.5f, 0f);
+    public PopupClampRegion popupClampRegion;
 
     [Header("Runtime")]
     public CleanDirector cleanDirector;
@@ -45,6 +46,7 @@ public class CleanMinigameOverlayView : MonoBehaviour
 
     public void Show()
     {
+        Debug.Log($"[CleanOverlay] Show on {name}");
         gameObject.SetActive(true);
     }
 
@@ -297,7 +299,21 @@ public class CleanMinigameOverlayView : MonoBehaviour
         if (node == null || rootTransform == null)
             return;
 
-        rootTransform.position = node.transform.position + worldOffset;
+        Vector3 desiredWorldPosition = node.transform.position + worldOffset;
+
+        if (popupClampRegion != null &&
+            popupClampRegion.TryGetBestClampedWorldPosition(
+                rootTransform,
+                desiredWorldPosition,
+                out Vector3 clampedWorldPosition))
+        {
+            Debug.Log($"[CleanOverlay] desired={desiredWorldPosition} clamped={clampedWorldPosition}");
+            rootTransform.position = clampedWorldPosition;
+            return;
+        }
+
+        Debug.Log($"[CleanOverlay] clamp failed, using desired={desiredWorldPosition}");
+        rootTransform.position = desiredWorldPosition;
     }
 
     private struct SplashLine

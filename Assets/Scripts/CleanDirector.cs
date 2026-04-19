@@ -118,23 +118,28 @@ public class CleanDirector : MonoBehaviour
 
     public bool TryStartClean(NodeView node, out string failureReason)
     {
+        Debug.Log("[Clean] TryStartClean called");
+
         failureReason = null;
 
         if (node == null)
         {
             failureReason = "clean failed: node not found";
+            Debug.Log("[Clean] FAIL node null");
             return false;
         }
 
         if (activeSession != null)
         {
             failureReason = "clean failed: another clean is already active";
+            Debug.Log("[Clean] FAIL active session already exists");
             return false;
         }
 
         if (!node.IsInfected)
         {
             failureReason = $"clean failed: {node.nodeId} is not infected";
+            Debug.Log($"[Clean] FAIL node {node.nodeId} not infected");
             return false;
         }
 
@@ -144,8 +149,11 @@ public class CleanDirector : MonoBehaviour
         if (minigameType == CleanMinigameType.None)
         {
             failureReason = $"clean failed: no minigame mapped for {infectionType}";
+            Debug.Log($"[Clean] FAIL no minigame for {infectionType}");
             return false;
         }
+
+        Debug.Log($"[Clean] PASS starting clean on {node.nodeId}");
 
         activeSession = new CleanSession
         {
@@ -159,8 +167,11 @@ public class CleanDirector : MonoBehaviour
 
         BuildMinigameData(activeSession);
 
+        Debug.Log($"[Clean] overlayView = {(overlayView != null ? overlayView.name : "NULL")}");
+
         if (overlayView != null)
         {
+            Debug.Log("[Clean] calling overlayView.Show()");
             overlayView.Show();
             overlayView.ShowSplash(activeSession);
             overlayView.PositionNearNode(node);
