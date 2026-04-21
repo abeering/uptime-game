@@ -124,6 +124,7 @@ public class TrafficDirector : MonoBehaviour
 
     private TrafficProfile activeProfile;
     private TrafficRuntimeState runtimeState;
+    private readonly List<TrafficModifier> activeModifiers = new();
 
     private void Awake()
     {
@@ -173,7 +174,7 @@ public class TrafficDirector : MonoBehaviour
     private void ResolveRuntimeState(int currentTick)
     {
         EnsureRuntimeState();
-        runtimeState.ResolveForTick(activeProfile, currentTick);
+        runtimeState.ResolveForTick(activeProfile, currentTick, activeModifiers);
 
         if (logRampValues)
         {
@@ -250,6 +251,7 @@ public class TrafficDirector : MonoBehaviour
 
     public void ProcessTick(int currentTick)
     {
+        TickModifiers();
         ResolveRuntimeState(currentTick);
 
         if (autoSpawnEnabled)
@@ -258,6 +260,28 @@ public class TrafficDirector : MonoBehaviour
         // Always process queued plans, even when scheduled autospawn is disabled.
         SpawnDuePlans(currentTick);
         TickActivePackets();
+    }
+
+    private void TickModifiers()
+    {
+        for (int i = activeModifiers.Count - 1; i >= 0; i--)
+        {
+            if (activeModifiers[i].Tick())
+                activeModifiers.RemoveAt(i);
+        }
+    }
+
+    public void ApplyModifier(TrafficModifier modifier)
+    {
+        if (modifier == null)
+            return;
+
+        activeModifiers.Add(modifier);
+
+        if (logSpawns)
+        {
+            Debug.Log($"[TrafficDirector] modifier applied (duration={modifier.remainingTicks})");
+        }
     }
 
     private void UpdateScheduledSpawns(int currentTick)

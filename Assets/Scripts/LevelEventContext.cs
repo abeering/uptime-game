@@ -8,4 +8,10 @@ public class LevelEventContext
         Traffic = traffic;
         Notifications = notifications;
     }
+
+    public void ApplyTrafficModifier(TrafficModifier modifier)
+    {
+        Traffic?.ApplyModifier(modifier);
+    }
+
 }
