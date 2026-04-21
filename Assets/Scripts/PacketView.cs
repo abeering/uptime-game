@@ -146,14 +146,7 @@ public class PacketView : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
     [SerializeField] private SpriteRenderer gapFillRenderer;
-    [SerializeField] private SpriteRenderer scanPulseRenderer;
-    [SerializeField] private float scanPulseSpeed = 5f;
-    [SerializeField] private float scanPulseMinAlpha = 0.35f;
-    [SerializeField] private float scanPulseMaxAlpha = 1f;
-    [SerializeField] private float scanPulseScaleMin = 1.05f;
-    [SerializeField] private float scanPulseScaleMax = 1.28f;
     private Vector3 borderBaseScale = Vector3.one;
-    private Vector3 pulseBaseScale = Vector3.one;
     private Vector3 gapBaseScale = Vector3.one;
 
     [Header("Confirmed Gap Pulse")]
@@ -292,9 +285,6 @@ public class PacketView : MonoBehaviour
 
         if (borderRenderer != null)
             borderBaseScale = borderRenderer.transform.localScale;
-
-        if (scanPulseRenderer != null)
-            pulseBaseScale = scanPulseRenderer.transform.localScale;
 
         if (gapFillRenderer != null)
             gapBaseScale = gapFillRenderer.transform.localScale;
@@ -564,7 +554,7 @@ public class PacketView : MonoBehaviour
         return Mathf.Clamp((int)scanStage, 0, 2);
     }
 
-    public void SetInitialScanState(ScanStage stage, PacketClass initialReportedClass, int ticksIntoStage = 0)
+    public void SetInitialScanState(ScanStage stage, PacketClass initialReportedClass)
     {
         scanStage = stage;
         isActivelyScanned = false;
@@ -623,73 +613,6 @@ public class PacketView : MonoBehaviour
 
         scanTicksIntoStage = 0;
         RefreshVisuals();
-    }
-
-    private void UpdateActiveScanPulse()
-    {
-        if (!isActivelyScanned && !isActivelyTraced)
-            return;
-
-        float pulse01 = Mathf.InverseLerp(-1f, 1f, Mathf.Sin(Time.time * scanPulseSpeed));
-        float alpha = Mathf.Lerp(scanPulseMinAlpha, scanPulseMaxAlpha, pulse01);
-        float scale = Mathf.Lerp(scanPulseScaleMin, scanPulseScaleMax, pulse01);
-
-        if (borderRenderer != null && borderRenderer.enabled)
-        {
-            Color c = scanBorderColor;
-            c.a = alpha;
-            borderRenderer.color = c;
-            borderRenderer.transform.localScale = borderBaseScale;
-        }
-
-        if (scanPulseRenderer != null && scanPulseRenderer.enabled)
-        {
-            Color c = scanBorderColor;
-            c.a = alpha * 0.7f;
-            scanPulseRenderer.color = c;
-            scanPulseRenderer.transform.localScale = pulseBaseScale * Mathf.Lerp(scale, scale + 0.12f, 0.6f);
-        }
-    }
-
-    public void ToggleScanBorder(bool show)
-    {
-        if (borderRenderer != null)
-        {
-            borderRenderer.enabled = show;
-
-            if (show)
-            {
-                borderRenderer.transform.localScale = borderBaseScale;
-
-                Color c = scanBorderColor;
-                c.a = scanPulseMaxAlpha;
-                borderRenderer.color = c;
-            }
-            else
-            {
-                borderRenderer.transform.localScale = borderBaseScale;
-                borderRenderer.color = Color.clear;
-            }
-        }
-
-        if (scanPulseRenderer != null)
-        {
-            scanPulseRenderer.enabled = show;
-
-            if (show)
-            {
-                scanPulseRenderer.transform.localScale = pulseBaseScale;
-
-                Color c = scanBorderColor;
-                c.a = scanPulseMinAlpha;
-                scanPulseRenderer.color = c;
-            }
-            else
-            {
-                scanPulseRenderer.transform.localScale = pulseBaseScale;
-                scanPulseRenderer.color = Color.clear;
-            }
-        }
     }
 
     public void RefreshIntelPresentation(ScanDirector scanDirector, CommandDirector commandDirector)
@@ -766,18 +689,6 @@ public class PacketView : MonoBehaviour
     public float GetScanConfidence01()
     {
         return Mathf.Clamp01(confidencePercent / 100f);
-    }
-
-    public float GetCurrentStageStartConfidence01()
-    {
-        return scanStage switch
-        {
-            ScanStage.Unknown => 0.00f,
-            ScanStage.Probable => 0.20f,
-            ScanStage.Likely => 0.55f,
-            ScanStage.Confirmed => 1.00f,
-            _ => 0.00f
-        };
     }
 
     public float GetCurrentStageEndConfidence01()
@@ -1062,9 +973,6 @@ public class PacketView : MonoBehaviour
 
     private void RefreshVisuals()
     {
-        if (scanPulseRenderer != null)
-            scanPulseRenderer.enabled = false;
-
         ApplyVisuals();
         RefreshScanVisual();
     }
@@ -1567,11 +1475,6 @@ public class PacketView : MonoBehaviour
         }
     }
 
-    public void ForceAdvanceTimer(int ticks)
-    {
-        ticksUntilAdvance = Mathf.Max(1, ticks);
-    }
-
     private void ResetAdvanceTimer()
     {
         ConnectionView edge = GetCurrentConnection();
@@ -1707,15 +1610,6 @@ public class PacketView : MonoBehaviour
         return step != null && step.aToB;
     }
 
-    public string GetDebugStatus()
-    {
-        ConnectionView edge = GetCurrentConnection();
-        if (edge == null)
-            return $"{packetId}: arrived";
-
-        return $"{packetId}: {edge.connectionId} step {currentStep}/{edge.lengthSteps}, next move in {ticksUntilAdvance}";
-    }
-
     public int GetVisualLaneIndex()
     {
         return visualLaneIndex;
@@ -1824,42 +1718,6 @@ public class PacketView : MonoBehaviour
 
         isRemoved = true;
         OnRemoved?.Invoke(this, reason);
-    }
-
-    public string GetOperationsLine()
-    {
-        if (confidencePercent <= 0)
-            return $"{packetId} - Unknown - src={sourceAddress} dest={GetDestinationName()}";
-
-        if (intelLevel < IntelLevel.DeepScanned)
-            return $"{packetId} - {reportedClass} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
-
-        return $"{packetId} - {trueClass}/{trueKind} ({confidencePercent}%) - src={sourceAddress} dest={GetDestinationName()}";
-    }
-
-    public string BuildOperationsIntelSummary()
-    {
-        List<string> parts = new();
-
-        if (knowsClass)
-            parts.Add($"class={revealedClass}");
-
-        if (knowsKind && revealedKind != PacketKind.None)
-            parts.Add($"kind={revealedKind}");
-
-        if (knowsInfectionType && revealedInfectionType != InfectionType.None)
-            parts.Add($"infection={revealedInfectionType}");
-
-        if (knowsSource && !string.IsNullOrWhiteSpace(revealedSource))
-            parts.Add($"src={revealedSource}");
-
-        if (knowsDestination && !string.IsNullOrWhiteSpace(revealedDestination))
-            parts.Add($"dest={revealedDestination}");
-
-        if (revealedKeywordCount > 0)
-            parts.Add($"keywords={BuildRevealedKeywordSummary()}");
-
-        return string.Join("  ", parts);
     }
 
     public string BuildRevealedKeywordSummary()

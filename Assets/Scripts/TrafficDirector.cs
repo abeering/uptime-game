@@ -105,13 +105,6 @@ public class TrafficDirector : MonoBehaviour
     [Range(0, 100)] public int minScanDifficulty = 10;
     [Range(0, 100)] public int maxScanDifficulty = 40;
 
-    [Header("Burst Control")]
-
-    // Maximum number of new packets that may be generated on a single tick.
-    // Keep this at 1 for a calmer, more readable prototype.
-    // Increase later for panic/burst scenarios.
-    [Min(1)] public int maxSpawnsPerTick = 1;
-
     [Header("Debug")]
     public bool logSpawns = true;
     public bool logRampValues = false;
@@ -334,18 +327,6 @@ public class TrafficDirector : MonoBehaviour
             return new List<InfectionPayload>();
 
         InfectionPayload payload = InfectionFactory.CreateDefaultPayload(type);
-
-        return payload != null
-            ? new List<InfectionPayload> { payload }
-            : new List<InfectionPayload>();
-    }
-
-    private List<InfectionPayload> BuildOverrideInfections(InfectionType? infectionOverride)
-    {
-        if (!infectionOverride.HasValue || infectionOverride.Value == InfectionType.None)
-            return new List<InfectionPayload>();
-
-        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(infectionOverride.Value);
 
         return payload != null
             ? new List<InfectionPayload> { payload }
@@ -826,12 +807,100 @@ public class TrafficDirector : MonoBehaviour
 
         if (logSpawns)
         {
+            string infectionSummary = BuildInfectionLogSummary(plan.infections);
+            string keywordSummary = BuildKeywordLogSummary(plan.keywords);
+            string routeSummary = BuildRouteLogSummary(plan.route);
             Debug.Log(
                 $"Spawned {plan.packetId} class={plan.packetClass} kind={plan.packetKind} " +
-                $"scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} " +
-                $"plannedTick={plan.spawnTick} actualTick={actualSpawnTick}"
+                $"src={plan.sourceAddress} scanDifficulty={plan.scanDifficulty} moveInterval={plan.baseSpeed} " +
+                $"plannedTick={plan.spawnTick} actualTick={actualSpawnTick}{infectionSummary}{keywordSummary}"
+                + routeSummary
             );
         }
+    }
+
+    private static string BuildInfectionLogSummary(List<InfectionPayload> infections)
+    {
+        if (infections == null || infections.Count == 0)
+            return "";
+
+        List<string> labels = new();
+
+        for (int i = 0; i < infections.Count; i++)
+        {
+            InfectionPayload infection = infections[i];
+            if (infection == null || infection.type == InfectionType.None)
+                continue;
+
+            labels.Add(infection.type.ToString());
+        }
+
+        return labels.Count > 0
+            ? $" infections=[{string.Join(", ", labels)}]"
+            : "";
+    }
+
+    private static string BuildKeywordLogSummary(List<IPacketKeyword> keywords)
+    {
+        if (keywords == null || keywords.Count == 0)
+            return "";
+
+        List<string> labels = new();
+
+        for (int i = 0; i < keywords.Count; i++)
+        {
+            IPacketKeyword keyword = keywords[i];
+            if (keyword == null)
+                continue;
+
+            if (!string.IsNullOrWhiteSpace(keyword.DisplayName))
+            {
+                labels.Add(keyword.DisplayName);
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword.KeywordId))
+            {
+                labels.Add(keyword.KeywordId);
+                continue;
+            }
+
+            labels.Add(keyword.GetType().Name);
+        }
+
+        return labels.Count > 0
+            ? $" keywords=[{string.Join(", ", labels)}]"
+            : "";
+    }
+
+    private static string BuildRouteLogSummary(RouteStep[] route)
+    {
+        if (route == null || route.Length == 0)
+            return "";
+
+        List<string> nodeIds = new();
+
+        for (int i = 0; i < route.Length; i++)
+        {
+            RouteStep step = route[i];
+            if (step == null || step.connection == null)
+                continue;
+
+            NodeView fromNode = step.aToB ? step.connection.nodeA : step.connection.nodeB;
+            NodeView toNode = step.aToB ? step.connection.nodeB : step.connection.nodeA;
+
+            string fromId = fromNode != null ? fromNode.nodeId : "?";
+            string toId = toNode != null ? toNode.nodeId : "?";
+
+            if (nodeIds.Count == 0)
+                nodeIds.Add(fromId);
+
+            nodeIds.Add(toId);
+        }
+
+        return nodeIds.Count > 0
+            ? $" route={string.Join(" -> ", nodeIds)}"
+            : "";
     }
 
     private void HandlePacketReachedNode(PacketView packet, NodeView node)
