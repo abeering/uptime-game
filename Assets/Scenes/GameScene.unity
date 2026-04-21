@@ -8242,7 +8242,7 @@ MonoBehaviour:
   commandDirector: {fileID: 838780728}
   levelDirector: {fileID: 875170675}
   networkRuntime: {fileID: 1878212259}
-  levelEnabled: 0
+  levelEnabled: 1
 --- !u!1 &1037435974
 GameObject:
   m_ObjectHideFlags: 0
