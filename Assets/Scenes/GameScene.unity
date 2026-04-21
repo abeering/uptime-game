@@ -8242,7 +8242,7 @@ MonoBehaviour:
   commandDirector: {fileID: 838780728}
   levelDirector: {fileID: 875170675}
   networkRuntime: {fileID: 1878212259}
-  levelEnabled: 1
+  levelEnabled: 0
 --- !u!1 &1037435974
 GameObject:
   m_ObjectHideFlags: 0
@@ -11027,7 +11027,7 @@ MonoBehaviour:
   maxScanDifficulty: 40
   maxSpawnsPerTick: 1
   logSpawns: 1
-  logRampValues: 0
+  logRampValues: 1
   autoSpawnEnabled: 1
 --- !u!1 &1488048326
 GameObject:

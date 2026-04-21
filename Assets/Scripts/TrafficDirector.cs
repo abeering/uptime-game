@@ -499,12 +499,7 @@ public class TrafficDirector : MonoBehaviour
         if (roll < clampedMalwareChance)
         {
             ctx.packetClass = PacketClass.Threat;
-
-            float kindRoll = Random.value;
-            if (kindRoll < 0.4f) ctx.packetKind = PacketKind.Virus;
-            else if (kindRoll < 0.7f) ctx.packetKind = PacketKind.Worm;
-            else if (kindRoll < 0.9f) ctx.packetKind = PacketKind.Spyware;
-            else ctx.packetKind = PacketKind.Ddos;
+            ctx.packetKind = RollThreatKind();
 
             return;
         }
@@ -512,17 +507,41 @@ public class TrafficDirector : MonoBehaviour
         if (roll < clampedMalwareChance + clampedPriorityChance)
         {
             ctx.packetClass = PacketClass.Priority;
-
-            float kindRoll = Random.value;
-            if (kindRoll < 0.4f) ctx.packetKind = PacketKind.Auth;
-            else if (kindRoll < 0.75f) ctx.packetKind = PacketKind.Control;
-            else ctx.packetKind = PacketKind.FileTransfer;
+            ctx.packetKind = RollPriorityKind();
 
             return;
         }
 
         ctx.packetClass = PacketClass.Benign;
         ctx.packetKind = PacketKind.None;
+    }
+
+    private T RollFromWeights<T>(Dictionary<T, float> weights)
+    {
+        if (weights == null || weights.Count == 0)
+            return default;
+
+        float totalWeight = 0f;
+        foreach (var kvp in weights)
+            totalWeight += Mathf.Max(0f, kvp.Value);
+
+        if (totalWeight <= 0f)
+            return default;
+
+        float roll = Random.value * totalWeight;
+        float running = 0f;
+
+        foreach (var kvp in weights)
+        {
+            running += Mathf.Max(0f, kvp.Value);
+            if (roll <= running)
+                return kvp.Key;
+        }
+
+        foreach (var kvp in weights)
+            return kvp.Key;
+
+        return default;
     }
 
     private void RollPacketTuning(ProceduralSpawnContext ctx)
@@ -539,6 +558,55 @@ public class TrafficDirector : MonoBehaviour
     private void RollRoute(ProceduralSpawnContext ctx)
     {
         ctx.route = ChooseRoute();
+    }
+
+    private PacketKind RollThreatKind()
+    {
+        EnsureRuntimeState();
+
+        Dictionary<PacketKind, float> weights = activeProfile.CloneThreatKindWeights();
+
+        for (int i = 0; i < activeModifiers.Count; i++)
+        {
+            TrafficModifier mod = activeModifiers[i];
+            if (mod == null || mod.threatKindWeightDeltas == null)
+                continue;
+
+            foreach (var kvp in mod.threatKindWeightDeltas)
+            {
+                if (!weights.ContainsKey(kvp.Key))
+                    weights[kvp.Key] = 0f;
+
+                weights[kvp.Key] += kvp.Value;
+            }
+        }
+
+        PacketKind rolled = RollFromWeights(weights);
+        return rolled == PacketKind.None ? PacketKind.Virus : rolled;
+    }
+
+    private PacketKind RollPriorityKind()
+    {
+        Dictionary<PacketKind, float> weights = activeProfile.ClonePriorityKindWeights();
+
+        for (int i = 0; i < activeModifiers.Count; i++)
+        {
+            TrafficModifier mod = activeModifiers[i];
+
+            if (mod == null || mod.priorityKindWeightDeltas == null)
+                continue;
+
+            foreach (var kvp in mod.priorityKindWeightDeltas)
+            {
+                if (!weights.ContainsKey(kvp.Key))
+                    weights[kvp.Key] = 0f;
+
+                weights[kvp.Key] += kvp.Value;
+            }
+        }
+
+        PacketKind rolled = RollFromWeights(weights);
+        return rolled == PacketKind.None ? PacketKind.Auth : rolled;
     }
 
     private void RollInfections(ProceduralSpawnContext ctx)

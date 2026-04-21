@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class TrafficModifier
@@ -7,6 +8,9 @@ public class TrafficModifier
 
     public float malwareChanceDelta;
     public float priorityChanceDelta;
+
+    public Dictionary<PacketKind, float> threatKindWeightDeltas = new();
+    public Dictionary<PacketKind, float> priorityKindWeightDeltas = new();
 
     public int spawnIntervalDelta;
 
