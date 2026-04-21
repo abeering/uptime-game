@@ -54,6 +54,25 @@ public class NetworkRuntime : MonoBehaviour
         return packet;
     }
 
+    public List<PacketView> GetPacketsBySource(string sourceAddress)
+    {
+        List<PacketView> matches = new();
+
+        if (string.IsNullOrWhiteSpace(sourceAddress))
+            return matches;
+
+        foreach (var packet in packets.Values)
+        {
+            if (packet == null)
+                continue;
+
+            if (string.Equals(packet.sourceAddress, sourceAddress, StringComparison.OrdinalIgnoreCase))
+                matches.Add(packet);
+        }
+
+        return matches;
+    }
+
     // ---- NODES ----
 
     public void RegisterNode(NodeView node)

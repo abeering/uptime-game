@@ -180,12 +180,16 @@ public class CommandDirector : MonoBehaviour
             if (operations[i] is not BlockOperation block)
                 continue;
 
+            if (block.state != BlockState.Armed || block.isFinished)
+                continue;
+
             if (block.matchType == BlockMatchType.PacketId &&
                 string.Equals(block.packetId, packet.packetId, StringComparison.OrdinalIgnoreCase))
                 return block;
 
             if (block.matchType == BlockMatchType.SourceAddress &&
-                string.Equals(block.sourceAddress, packet.sourceAddress, StringComparison.OrdinalIgnoreCase))
+                packet.knowsSource &&
+                string.Equals(block.sourceAddress, packet.revealedSource, StringComparison.OrdinalIgnoreCase))
                 return block;
         }
 
@@ -586,7 +590,7 @@ public class CommandDirector : MonoBehaviour
                 if (operations[i] is BlockOperation block)
                 {
                     ReleaseBlockDisplayId(block.displayId);
-                    RefreshBlockTagForPacketId(block.packetId);
+                    RefreshBlockTags(block);
                 }
 
                 operations.RemoveAt(i);
@@ -616,6 +620,35 @@ public class CommandDirector : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void RefreshBlockTags(BlockOperation block)
+    {
+        if (networkRuntime == null || block == null)
+            return;
+
+        if (block.matchType == BlockMatchType.PacketId)
+        {
+            RefreshBlockTagForPacketId(block.packetId);
+            return;
+        }
+
+        if (block.matchType != BlockMatchType.SourceAddress ||
+            string.IsNullOrWhiteSpace(block.sourceAddress))
+            return;
+
+        List<PacketView> packets = networkRuntime.GetPacketsBySource(block.sourceAddress);
+        for (int i = 0; i < packets.Count; i++)
+        {
+            PacketView packet = packets[i];
+            if (packet == null || packet.isRemoved || !packet.knowsSource)
+                continue;
+
+            if (!string.Equals(packet.revealedSource, block.sourceAddress, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            packet.RefreshIntelPresentation(scanDirector, this);
+        }
     }
 
     private void RefreshBlockTagForPacketId(string packetId)
@@ -976,6 +1009,7 @@ public class CommandDirector : MonoBehaviour
         };
 
         operations.Add(block);
+        RefreshBlockTags(block);
 
         audioManager?.PlayCommandAccepted();
         Log($"{FormatPrefix(ConsoleLogPrefix.Block)}  <b>{block.displayId}</b>  {FormatMuted("ARMED", true)}  src={sourceAddress}  @ {nodeId}");
@@ -1084,7 +1118,7 @@ public class CommandDirector : MonoBehaviour
             audioManager?.PlayCommandAccepted();
             op.Cancel(this);
             if (op is BlockOperation blockOp)
-                RefreshBlockTagForPacketId(blockOp.packetId);
+                RefreshBlockTags(blockOp);
 
             return;
         }

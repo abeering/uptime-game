@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GlitchOverlay
+  m_Shader: {fileID: 4800000, guid: 2e97a6960c491460ba037db12094f31c, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: _ZWrite
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: f337c37c844e246d3bb960aab40c6382, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BackgroundNoiseStrength: 0.08
+    - _BandCount: 8
+    - _BandSpeed: 3.5
+    - _BandStrength: 0.95
+    - _BandThicknessMax: 0.11
+    - _BandThicknessMin: 0.04
+    - _BlockFlickerSpeed: 10
+    - _BlockGridX: 24
+    - _BlockGridY: 14
+    - _BlockStrength: 0.9
+    - _BrightBandBoost: 0.9
+    - _DropoutDensity: 90
+    - _DropoutSpeed: 14
+    - _DropoutStrength: 0.8
+    - _EnableExternalAlpha: 0
+    - _FlickerSpeed: 8
+    - _FlickerStrength: 0.66
+    - _Intensity: 0.75
+    - _NoiseScrollX: 0
+    - _NoiseScrollY: 0.45
+    - _NoiseTiling: 2.4
+    - _Opacity: 0.42
+    - _ScanlineDensity: 150
+    - _ScanlineStrength: 0.08
+    - _TearBandCount: 18
+    - _TearSpeed: 2
+    - _TearStrength: 0.71
+    - _ZWrite: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TintColor: {r: 0.39999998, g: 1, b: 0.8, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
