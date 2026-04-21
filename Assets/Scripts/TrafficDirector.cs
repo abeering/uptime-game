@@ -299,12 +299,12 @@ public class TrafficDirector : MonoBehaviour
 
     private List<InfectionPayload> BuildDefaultInfectionsForKind(PacketKind kind)
     {
-        PacketKindProfile kindProfile = PacketKindProfile.CreateDefault(kind);
+        PacketKindProfile kindProfile = GetKindProfile(kind);
 
-        if (!kindProfile.canRollInfections)
+        if (kindProfile == null || !kindProfile.canRollInfections)
             return new List<InfectionPayload>();
 
-        InfectionType type = InfectionRules.RollDefaultInfectionType(kind);
+        InfectionType type = kindProfile.RollInfectionType();
 
         if (type == InfectionType.None)
             return new List<InfectionPayload>();
@@ -519,20 +519,65 @@ public class TrafficDirector : MonoBehaviour
 
     private void RollInfections(ProceduralSpawnContext ctx)
     {
-        if (ctx.packetClass != PacketClass.Threat)
+        PacketKindProfile kindProfile = GetKindProfile(ctx.packetKind);
+
+        if (kindProfile == null || !kindProfile.canRollInfections)
         {
             ctx.infections = new List<InfectionPayload>();
             return;
         }
 
-        ctx.infections = BuildDefaultInfectionsForKind(ctx.packetKind);
+        InfectionType type = kindProfile.RollInfectionType();
+
+        if (type == InfectionType.None)
+        {
+            ctx.infections = new List<InfectionPayload>();
+            return;
+        }
+
+        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(type);
+
+        ctx.infections = payload != null
+            ? new List<InfectionPayload> { payload }
+            : new List<InfectionPayload>();
     }
 
     private void RollKeywords(ProceduralSpawnContext ctx)
     {
-        // Intentionally empty for this first pass.
-        // This is the handoff point for future PacketKindProfile keyword realization.
-        ctx.keywords = new List<IPacketKeyword>();
+        PacketKindProfile kindProfile = GetKindProfile(ctx.packetKind);
+
+        if (kindProfile == null || kindProfile.keywordWeights == null || kindProfile.keywordWeights.Count == 0)
+        {
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        int minCount = Mathf.Max(0, kindProfile.minKeywordCount);
+        int maxCount = Mathf.Max(minCount, kindProfile.maxKeywordCount);
+        int keywordCount = Random.Range(minCount, maxCount + 1);
+
+        if (keywordCount <= 0)
+        {
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        List<string> rolledSpecs = SpawnKeywordFactory.RollUniqueSpecs(kindProfile.keywordWeights, keywordCount);
+        List<IPacketKeyword> builtKeywords = SpawnKeywordFactory.BuildMany(rolledSpecs, out string keywordError);
+
+        if (builtKeywords == null)
+        {
+            Debug.LogWarning($"[TrafficDirector] failed to build keywords for {ctx.packetKind}: {keywordError}");
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        ctx.keywords = builtKeywords;
+    }
+
+    private PacketKindProfile GetKindProfile(PacketKind kind)
+    {
+        return PacketKindProfile.CreateDefault(kind);
     }
 
     private SpawnPlan FinalizeProceduralPlan(ProceduralSpawnContext ctx)

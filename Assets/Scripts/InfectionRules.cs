@@ -64,7 +64,7 @@ public static class InfectionRules
         };
     }
 
-    private static InfectionType RollFromTable(List<WeightedInfectionEntry> table)
+    public static InfectionType RollFromTable(List<WeightedInfectionEntry> table)
     {
         if (table == null || table.Count == 0)
             return InfectionType.None;

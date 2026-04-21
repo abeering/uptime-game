@@ -14,7 +14,15 @@ public class PacketKindProfile
     [Min(0)] public int maxKeywordCount = 0;
 
     public List<WeightedInfectionEntry> infectionWeights = new();
-    public List<string> keywordSpecs = new();
+    public List<WeightedKeywordSpecEntry> keywordWeights = new();
+
+    public InfectionType RollInfectionType()
+    {
+        if (!canRollInfections || infectionWeights == null || infectionWeights.Count == 0)
+            return InfectionType.None;
+
+        return InfectionRules.RollFromTable(infectionWeights);
+    }
 
     public static PacketKindProfile CreateDefault(PacketKind kind)
     {
@@ -32,6 +40,13 @@ public class PacketKindProfile
                 profile.minKeywordCount = 0;
                 profile.maxKeywordCount = 1;
                 profile.infectionWeights = InfectionRules.GetDefaultInfectionTable(kind);
+                profile.keywordWeights = new List<WeightedKeywordSpecEntry>
+                {
+                    new("mutating:3", 0.45f),
+                    new("jittery:1", 0.20f),
+                    new("desynced:2:2", 0.15f),
+                    new("surging:2:2:1", 0.20f),
+                };
                 break;
 
             case PacketKind.Worm:
@@ -39,8 +54,15 @@ public class PacketKindProfile
                 profile.canRollInfections = true;
                 profile.infectionsAreRequired = true;
                 profile.minKeywordCount = 0;
-                profile.maxKeywordCount = 1;
+                profile.maxKeywordCount = 2;
                 profile.infectionWeights = InfectionRules.GetDefaultInfectionTable(kind);
+                profile.keywordWeights = new List<WeightedKeywordSpecEntry>
+                {
+                    new("surging:2:2:1", 0.35f),
+                    new("desynced:2:3", 0.25f),
+                    new("accelerating:2:-1:true", 0.20f),
+                    new("dragging:2:1:true", 0.20f),
+                };
                 break;
 
             case PacketKind.Spyware:
@@ -50,15 +72,28 @@ public class PacketKindProfile
                 profile.minKeywordCount = 0;
                 profile.maxKeywordCount = 1;
                 profile.infectionWeights = InfectionRules.GetDefaultInfectionTable(kind);
+                profile.keywordWeights = new List<WeightedKeywordSpecEntry>
+                {
+                    new("jittery:1", 0.35f),
+                    new("desynced:2:2", 0.35f),
+                    new("mutating:4", 0.15f),
+                    new("surging:2:2:1", 0.15f),
+                };
                 break;
 
             case PacketKind.Ddos:
                 profile.defaultClass = PacketClass.Threat;
                 profile.canRollInfections = true;
                 profile.infectionsAreRequired = true;
-                profile.minKeywordCount = 0;
-                profile.maxKeywordCount = 0;
+                profile.minKeywordCount = 1;
+                profile.maxKeywordCount = 2;
                 profile.infectionWeights = InfectionRules.GetDefaultInfectionTable(kind);
+                profile.keywordWeights = new List<WeightedKeywordSpecEntry>
+                {
+                    new("dragging:2:1:true", 0.45f),
+                    new("accelerating:2:-1:true", 0.35f),
+                    new("surging:1:2:1", 0.20f),
+                };
                 break;
 
             case PacketKind.Auth:
