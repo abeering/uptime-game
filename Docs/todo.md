@@ -36,26 +36,13 @@
 
 ---
 
-## 3. Keyword System Expansion
+## 3. Traffic Direction
 
-### Keyword Design
-- Add new keywords (brainstorm + implement)
-- Ensure keywords act as **modifiers**, not primary identity
-- Clarify:
-  - Which keywords are visible via scan
-  - Which are hidden until deeper inspection
-
-### TrafficDirector Integration
-- Formalize spawn pipeline:
-  - `rollBase`
-  - `rollClass` (Benign / Threat / Priority)
-  - `rollKind` (Virus, Worm, etc.)
-  - `rollInfectious`
-  - `rollInfectionType`
-  - `rollKeywords`
-- Support:
-  - Variable number of keywords per packet
-  - Weighted distributions per threat type
+Add keyword weight bias to TrafficModifier
+Add infection weight bias to TrafficModifier
+Apply modifier bias during PacketKindProfile realization
+Let events shape ambient traffic texture, not just class/kind frequency
+Keep explicit authored event packets as a parallel first-class path
 
 
 ## 6. Packet Spawn + Flow Tuning

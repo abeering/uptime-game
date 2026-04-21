@@ -143,4 +143,59 @@ public static class SpawnKeywordFactory
 
         return built;
     }
+
+    public static List<string> RollUniqueSpecs(
+    List<WeightedKeywordSpecEntry> table,
+    int count)
+    {
+        List<string> rolled = new();
+
+        if (table == null || table.Count == 0 || count <= 0)
+            return rolled;
+
+        List<WeightedKeywordSpecEntry> pool = new(table);
+
+        count = Mathf.Min(count, pool.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            string spec = RollOneSpec(pool);
+            if (string.IsNullOrWhiteSpace(spec))
+                break;
+
+            rolled.Add(spec);
+
+            int removeIndex = pool.FindIndex(entry => entry.spec == spec);
+            if (removeIndex >= 0)
+                pool.RemoveAt(removeIndex);
+        }
+
+        return rolled;
+    }
+
+    private static string RollOneSpec(List<WeightedKeywordSpecEntry> table)
+    {
+        if (table == null || table.Count == 0)
+            return null;
+
+        float totalWeight = 0f;
+        for (int i = 0; i < table.Count; i++)
+            totalWeight += Mathf.Max(0f, table[i].weight);
+
+        if (totalWeight <= 0f)
+            return null;
+
+        float roll = UnityEngine.Random.value * totalWeight;
+        float running = 0f;
+
+        for (int i = 0; i < table.Count; i++)
+        {
+            running += Mathf.Max(0f, table[i].weight);
+            if (roll <= running)
+                return table[i].spec;
+        }
+
+        return table[table.Count - 1].spec;
+    }
+    
 }

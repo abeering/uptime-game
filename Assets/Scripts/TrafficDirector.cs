@@ -3,6 +3,26 @@ using UnityEngine;
 
 public class TrafficDirector : MonoBehaviour
 {
+    private sealed class ProceduralSpawnContext
+    {
+        public int currentTick;
+        public float malwareChance;
+        public float priorityChance;
+
+        public bool startsQuickScanned;
+
+        public PacketClass packetClass;
+        public PacketKind packetKind = PacketKind.None;
+
+        public int baseMoveInterval;
+        public int scanDifficulty;
+        public string sourceAddress;
+        public RouteStep[] route;
+
+        public List<InfectionPayload> infections = new();
+        public List<IPacketKeyword> keywords = new();
+    }
+
     [Header("References")]
     public PacketView packetPrefab;
     public Transform packetsRoot;
@@ -85,7 +105,6 @@ public class TrafficDirector : MonoBehaviour
     [Range(0, 100)] public int minScanDifficulty = 10;
     [Range(0, 100)] public int maxScanDifficulty = 40;
 
-
     [Header("Burst Control")]
 
     // Maximum number of new packets that may be generated on a single tick.
@@ -102,17 +121,70 @@ public class TrafficDirector : MonoBehaviour
     private readonly List<PacketView> activePackets = new();
 
     private readonly List<string> availablePacketIds = new();
-    private int ticksUntilNextSpawn = 0;
+
+    private TrafficProfile activeProfile;
+    private TrafficRuntimeState runtimeState;
+    private readonly List<TrafficModifier> activeModifiers = new();
 
     private void Awake()
     {
         InitializePacketIdPool();
         audioManager = AudioManager.Instance;
+        EnsureRuntimeState();
     }
 
     private void Start()
     {
+        EnsureRuntimeState();
         ScheduleNextSpawn(0);
+    }
+
+    private void EnsureRuntimeState()
+    {
+        activeProfile ??= TrafficProfile.FromDirector(this);
+
+        if (runtimeState == null)
+        {
+            runtimeState = new TrafficRuntimeState();
+            runtimeState.ResetFromProfile(activeProfile);
+        }
+    }
+
+    public void SetTrafficProfile(TrafficProfile profile, bool resetRuntimeState = true)
+    {
+        activeProfile = profile ?? TrafficProfile.FromDirector(this);
+        runtimeState ??= new TrafficRuntimeState();
+
+        if (resetRuntimeState)
+            runtimeState.ResetFromProfile(activeProfile);
+    }
+
+    public TrafficProfile GetActiveProfile()
+    {
+        EnsureRuntimeState();
+        return activeProfile;
+    }
+
+    public TrafficRuntimeState GetRuntimeState()
+    {
+        EnsureRuntimeState();
+        return runtimeState;
+    }
+
+    private void ResolveRuntimeState(int currentTick)
+    {
+        EnsureRuntimeState();
+        runtimeState.ResolveForTick(activeProfile, currentTick, activeModifiers);
+
+        if (logRampValues)
+        {
+            Debug.Log(
+                $"[TrafficDirector] runtime tick={currentTick} " +
+                $"spawnInterval={runtimeState.currentSpawnInterval} " +
+                $"malwareChance={runtimeState.currentMalwareChance:F3} " +
+                $"priorityChance={runtimeState.currentPriorityChance:F3}"
+            );
+        }
     }
 
     private void InitializePacketIdPool()
@@ -121,7 +193,7 @@ public class TrafficDirector : MonoBehaviour
 
         for (int num = 0; num <= 9; num++)
         {
-            for (char letter = 'a'; letter <= 'z'; letter++)            
+            for (char letter = 'a'; letter <= 'z'; letter++)
             {
                 availablePacketIds.Add($"{letter}{num}");
             }
@@ -130,7 +202,9 @@ public class TrafficDirector : MonoBehaviour
 
     public void QueueSpawnPlan(SpawnPlan plan)
     {
-        if (plan == null) return;
+        if (plan == null)
+            return;
+
         queuedPlans.Add(plan);
     }
 
@@ -144,6 +218,8 @@ public class TrafficDirector : MonoBehaviour
         int? baseSpeedOverride = null,
         int? scanDifficultyOverride = null)
     {
+        EnsureRuntimeState();
+
         if (sourceNode == null || route == null || route.Length == 0)
             return;
 
@@ -157,9 +233,9 @@ public class TrafficDirector : MonoBehaviour
             packetId = GetNextPacketId(),
             packetClass = packetClass,
             packetKind = packetKind,
-            scanDifficulty = scanDifficultyOverride ?? Mathf.RoundToInt((minScanDifficulty + maxScanDifficulty) * 0.5f),
+            scanDifficulty = scanDifficultyOverride ?? Mathf.RoundToInt((activeProfile.minScanDifficulty + activeProfile.maxScanDifficulty) * 0.5f),
             sourceAddress = sourceNode.nodeId,
-            baseSpeed = baseSpeedOverride ?? minBaseMoveInterval,
+            baseSpeed = baseSpeedOverride ?? activeProfile.minBaseMoveInterval,
             route = CloneRoute(route),
             startsQuickScanned = false,
             infections = resolvedInfections
@@ -175,75 +251,84 @@ public class TrafficDirector : MonoBehaviour
 
     public void ProcessTick(int currentTick)
     {
+        TickModifiers();
+        ResolveRuntimeState(currentTick);
+
         if (autoSpawnEnabled)
-        {
             UpdateScheduledSpawns(currentTick);
-        }
 
         // Always process queued plans, even when scheduled autospawn is disabled.
         SpawnDuePlans(currentTick);
-
         TickActivePackets();
+    }
+
+    private void TickModifiers()
+    {
+        for (int i = activeModifiers.Count - 1; i >= 0; i--)
+        {
+            if (activeModifiers[i].Tick())
+                activeModifiers.RemoveAt(i);
+        }
+    }
+
+    public void ApplyModifier(TrafficModifier modifier)
+    {
+        if (modifier == null)
+            return;
+
+        activeModifiers.Add(modifier);
+
+        if (logSpawns)
+        {
+            Debug.Log($"[TrafficDirector] modifier applied (duration={modifier.remainingTicks})");
+        }
     }
 
     private void UpdateScheduledSpawns(int currentTick)
     {
-        if (currentTick < openingGraceTicks)
+        if (currentTick < activeProfile.openingGraceTicks)
             return;
 
-        ticksUntilNextSpawn--;
-
-        if (ticksUntilNextSpawn > 0)
+        if (runtimeState.ticksUntilNextSpawn > 0)
+        {
+            runtimeState.ticksUntilNextSpawn--;
             return;
+        }
 
-        float malwareChance = GetCurrentMalwareChance(currentTick);
-        float priorityChance = GetCurrentPriorityChance(currentTick);
+        SpawnPlan plan = BuildProceduralPlan(currentTick);
 
-        QueueSpawnPlan(BuildProceduralPlan(currentTick, malwareChance, priorityChance));
+        if (plan != null)
+            QueueSpawnPlan(plan);
 
         ScheduleNextSpawn(currentTick);
     }
 
-    private float GetCurrentMalwareChance(int currentTick)
-    {
-        return Mathf.Min(
-            maxMalwareChance,
-            startingMalwareChance + (malwareChanceRampPerTick * currentTick)
-        );
-    }
-
-    private float GetCurrentPriorityChance(int currentTick)
-    {
-        return Mathf.Min(
-            maxPriorityChance,
-            startingPriorityChance + (priorityChanceRampPerTick * currentTick)
-        );
-    }
-
-    private int GetCurrentSpawnInterval(int currentTick)
-    {
-        int reduction = currentTick / ticksPerSpawnIntervalStep;
-        int interval = startingSpawnIntervalTicks - reduction;
-
-        return Mathf.Max(minSpawnIntervalTicks, interval);
-    }
-
     private void ScheduleNextSpawn(int currentTick)
     {
-        int baseInterval = GetCurrentSpawnInterval(currentTick);
-        int jitter = Random.Range(-spawnIntervalJitter, spawnIntervalJitter + 1);
+        ResolveRuntimeState(currentTick);
 
-        ticksUntilNextSpawn = Mathf.Max(1, baseInterval + jitter);
+        int baseInterval = runtimeState.currentSpawnInterval;
+        int jitter = Random.Range(-activeProfile.spawnIntervalJitter, activeProfile.spawnIntervalJitter + 1);
+
+        runtimeState.ticksUntilNextSpawn = Mathf.Max(1, baseInterval + jitter);
 
         if (logSpawns)
         {
-            Debug.Log($"Next spawn in {ticksUntilNextSpawn} ticks (base {baseInterval}, jitter {jitter})");
+            Debug.Log(
+                $"[TrafficDirector] next spawn in {runtimeState.ticksUntilNextSpawn} ticks " +
+                $"(base {baseInterval}, jitter {jitter})"
+            );
         }
     }
 
     private List<InfectionPayload> BuildDefaultInfectionsForKind(PacketKind kind)
     {
-        InfectionType type = InfectionRules.RollDefaultInfectionType(kind);
+        PacketKindProfile kindProfile = GetKindProfile(kind);
+
+        if (kindProfile == null || !kindProfile.canRollInfections)
+            return new List<InfectionPayload>();
+
+        InfectionType type = kindProfile.RollInfectionType();
 
         if (type == InfectionType.None)
             return new List<InfectionPayload>();
@@ -372,66 +457,239 @@ public class TrafficDirector : MonoBehaviour
         return System.Enum.TryParse(rawValue, true, out value);
     }
 
-    private SpawnPlan BuildProceduralPlan(int currentTick, float malwareChance, float priorityChance)
+    private SpawnPlan BuildProceduralPlan(int currentTick)
     {
-        float clampedMalwareChance = Mathf.Clamp01(malwareChance);
-        float clampedPriorityChance = Mathf.Clamp(priorityChance, 0f, 1f - clampedMalwareChance);
-        bool startsQuickScanned = Random.value < startingQuickScanChance;
+        ProceduralSpawnContext ctx = CreateProceduralSpawnContext(currentTick);
+
+        RollBase(ctx);
+        RollClassAndKind(ctx);
+        RollPacketTuning(ctx);
+        RollRoute(ctx);
+        RollInfections(ctx);
+        RollKeywords(ctx);
+
+        return FinalizeProceduralPlan(ctx);
+    }
+
+    private ProceduralSpawnContext CreateProceduralSpawnContext(int currentTick)
+    {
+        ResolveRuntimeState(currentTick);
+
+        return new ProceduralSpawnContext
+        {
+            currentTick = currentTick,
+            malwareChance = runtimeState.currentMalwareChance,
+            priorityChance = runtimeState.currentPriorityChance
+        };
+    }
+
+    private void RollBase(ProceduralSpawnContext ctx)
+    {
+        ctx.startsQuickScanned = Random.value < activeProfile.startingQuickScanChance;
+        ctx.sourceAddress = GenerateSourceAddress();
+    }
+
+    private void RollClassAndKind(ProceduralSpawnContext ctx)
+    {
+        float clampedMalwareChance = Mathf.Clamp01(ctx.malwareChance);
+        float clampedPriorityChance = Mathf.Clamp(ctx.priorityChance, 0f, 1f - clampedMalwareChance);
 
         float roll = Random.value;
 
-        PacketClass pClass;
-        PacketKind pKind = PacketKind.None;
-
         if (roll < clampedMalwareChance)
         {
-            pClass = PacketClass.Threat;
+            ctx.packetClass = PacketClass.Threat;
+            ctx.packetKind = RollThreatKind();
 
-            float kindRoll = Random.value;
-
-            if (kindRoll < 0.4f) pKind = PacketKind.Virus;
-            else if (kindRoll < 0.7f) pKind = PacketKind.Worm;
-            else if (kindRoll < 0.9f) pKind = PacketKind.Spyware;
-            else pKind = PacketKind.Ddos;
+            return;
         }
-        else if (roll < clampedMalwareChance + clampedPriorityChance)
+
+        if (roll < clampedMalwareChance + clampedPriorityChance)
         {
-            pClass = PacketClass.Priority;
+            ctx.packetClass = PacketClass.Priority;
+            ctx.packetKind = RollPriorityKind();
 
-            float kindRoll = Random.value;
-
-            if (kindRoll < 0.4f) pKind = PacketKind.Auth;
-            else if (kindRoll < 0.75f) pKind = PacketKind.Control;
-            else pKind = PacketKind.FileTransfer;
+            return;
         }
-        else
+
+        ctx.packetClass = PacketClass.Benign;
+        ctx.packetKind = PacketKind.None;
+    }
+
+    private T RollFromWeights<T>(Dictionary<T, float> weights)
+    {
+        if (weights == null || weights.Count == 0)
+            return default;
+
+        float totalWeight = 0f;
+        foreach (var kvp in weights)
+            totalWeight += Mathf.Max(0f, kvp.Value);
+
+        if (totalWeight <= 0f)
+            return default;
+
+        float roll = Random.value * totalWeight;
+        float running = 0f;
+
+        foreach (var kvp in weights)
         {
-            pClass = PacketClass.Benign;
+            running += Mathf.Max(0f, kvp.Value);
+            if (roll <= running)
+                return kvp.Key;
         }
 
-        int baseMoveInterval = Random.Range(minBaseMoveInterval, maxBaseMoveInterval + 1);
+        foreach (var kvp in weights)
+            return kvp.Key;
+
+        return default;
+    }
+
+    private void RollPacketTuning(ProceduralSpawnContext ctx)
+    {
+        ctx.baseMoveInterval = Random.Range(activeProfile.minBaseMoveInterval, activeProfile.maxBaseMoveInterval + 1);
 
         // Priority traffic trends slightly faster before boost.
-        if (pClass == PacketClass.Priority)
-            baseMoveInterval = Mathf.Max(minBaseMoveInterval, baseMoveInterval - 1);
+        if (ctx.packetClass == PacketClass.Priority)
+            ctx.baseMoveInterval = Mathf.Max(activeProfile.minBaseMoveInterval, ctx.baseMoveInterval - 1);
 
-        int scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1);
-        RouteStep[] route = ChooseRoute();
+        ctx.scanDifficulty = Random.Range(activeProfile.minScanDifficulty, activeProfile.maxScanDifficulty + 1);
+    }
+
+    private void RollRoute(ProceduralSpawnContext ctx)
+    {
+        ctx.route = ChooseRoute();
+    }
+
+    private PacketKind RollThreatKind()
+    {
+        EnsureRuntimeState();
+
+        Dictionary<PacketKind, float> weights = activeProfile.CloneThreatKindWeights();
+
+        for (int i = 0; i < activeModifiers.Count; i++)
+        {
+            TrafficModifier mod = activeModifiers[i];
+            if (mod == null || mod.threatKindWeightDeltas == null)
+                continue;
+
+            foreach (var kvp in mod.threatKindWeightDeltas)
+            {
+                if (!weights.ContainsKey(kvp.Key))
+                    weights[kvp.Key] = 0f;
+
+                weights[kvp.Key] += kvp.Value;
+            }
+        }
+
+        PacketKind rolled = RollFromWeights(weights);
+        return rolled == PacketKind.None ? PacketKind.Virus : rolled;
+    }
+
+    private PacketKind RollPriorityKind()
+    {
+        Dictionary<PacketKind, float> weights = activeProfile.ClonePriorityKindWeights();
+
+        for (int i = 0; i < activeModifiers.Count; i++)
+        {
+            TrafficModifier mod = activeModifiers[i];
+
+            if (mod == null || mod.priorityKindWeightDeltas == null)
+                continue;
+
+            foreach (var kvp in mod.priorityKindWeightDeltas)
+            {
+                if (!weights.ContainsKey(kvp.Key))
+                    weights[kvp.Key] = 0f;
+
+                weights[kvp.Key] += kvp.Value;
+            }
+        }
+
+        PacketKind rolled = RollFromWeights(weights);
+        return rolled == PacketKind.None ? PacketKind.Auth : rolled;
+    }
+
+    private void RollInfections(ProceduralSpawnContext ctx)
+    {
+        PacketKindProfile kindProfile = GetKindProfile(ctx.packetKind);
+
+        if (kindProfile == null || !kindProfile.canRollInfections)
+        {
+            ctx.infections = new List<InfectionPayload>();
+            return;
+        }
+
+        InfectionType type = kindProfile.RollInfectionType();
+
+        if (type == InfectionType.None)
+        {
+            ctx.infections = new List<InfectionPayload>();
+            return;
+        }
+
+        InfectionPayload payload = InfectionFactory.CreateDefaultPayload(type);
+
+        ctx.infections = payload != null
+            ? new List<InfectionPayload> { payload }
+            : new List<InfectionPayload>();
+    }
+
+    private void RollKeywords(ProceduralSpawnContext ctx)
+    {
+        PacketKindProfile kindProfile = GetKindProfile(ctx.packetKind);
+
+        if (kindProfile == null || kindProfile.keywordWeights == null || kindProfile.keywordWeights.Count == 0)
+        {
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        int minCount = Mathf.Max(0, kindProfile.minKeywordCount);
+        int maxCount = Mathf.Max(minCount, kindProfile.maxKeywordCount);
+        int keywordCount = Random.Range(minCount, maxCount + 1);
+
+        if (keywordCount <= 0)
+        {
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        List<string> rolledSpecs = SpawnKeywordFactory.RollUniqueSpecs(kindProfile.keywordWeights, keywordCount);
+        List<IPacketKeyword> builtKeywords = SpawnKeywordFactory.BuildMany(rolledSpecs, out string keywordError);
+
+        if (builtKeywords == null)
+        {
+            Debug.LogWarning($"[TrafficDirector] failed to build keywords for {ctx.packetKind}: {keywordError}");
+            ctx.keywords = new List<IPacketKeyword>();
+            return;
+        }
+
+        ctx.keywords = builtKeywords;
+    }
+
+    private PacketKindProfile GetKindProfile(PacketKind kind)
+    {
+        return PacketKindProfile.CreateDefault(kind);
+    }
+
+    private SpawnPlan FinalizeProceduralPlan(ProceduralSpawnContext ctx)
+    {
+        if (ctx.route == null || ctx.route.Length == 0)
+            return null;
 
         return new SpawnPlan
         {
-            spawnTick = currentTick,
+            spawnTick = ctx.currentTick,
             packetId = GetNextPacketId(),
-            packetClass = pClass,
-            packetKind = pKind,
-            scanDifficulty = scanDifficulty,
-            sourceAddress = GenerateSourceAddress(),
-            baseSpeed = baseMoveInterval,
-            route = route,
-            startsQuickScanned = startsQuickScanned,
-            infections = pClass == PacketClass.Threat
-                ? BuildDefaultInfectionsForKind(pKind)
-                : new List<InfectionPayload>()
+            packetClass = ctx.packetClass,
+            packetKind = ctx.packetKind,
+            scanDifficulty = ctx.scanDifficulty,
+            sourceAddress = ctx.sourceAddress,
+            baseSpeed = ctx.baseMoveInterval,
+            route = ctx.route,
+            startsQuickScanned = ctx.startsQuickScanned,
+            infections = ctx.infections ?? new List<InfectionPayload>(),
+            keywords = ctx.keywords ?? new List<IPacketKeyword>()
         };
     }
 
@@ -447,6 +705,8 @@ public class TrafficDirector : MonoBehaviour
         List<IPacketKeyword> keywords = null,
         string sourceAddressOverride = null)
     {
+        EnsureRuntimeState();
+
         if (route == null || route.Length == 0)
             return null;
 
@@ -456,11 +716,11 @@ public class TrafficDirector : MonoBehaviour
             packetId = GetNextPacketId(),
             packetClass = packetClass,
             packetKind = packetKind,
-            scanDifficulty = scanDifficultyOverride ?? Random.Range(minScanDifficulty, maxScanDifficulty + 1),
+            scanDifficulty = scanDifficultyOverride ?? Random.Range(activeProfile.minScanDifficulty, activeProfile.maxScanDifficulty + 1),
             sourceAddress = !string.IsNullOrWhiteSpace(sourceAddressOverride)
                 ? sourceAddressOverride
                 : GenerateSourceAddress(),
-            baseSpeed = baseSpeedOverride ?? minBaseMoveInterval,
+            baseSpeed = baseSpeedOverride ?? activeProfile.minBaseMoveInterval,
             route = CloneRoute(route),
             startsQuickScanned = startsQuickScanned,
             infections = infections != null ? new List<InfectionPayload>(infections) : new List<InfectionPayload>(),
@@ -699,7 +959,7 @@ public class TrafficDirector : MonoBehaviour
 
     private string GenerateSourceAddress()
     {
-        return $"{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}.{Random.Range(1,6)}";
+        return $"{Random.Range(1, 6)}.{Random.Range(1, 6)}.{Random.Range(1, 6)}.{Random.Range(1, 6)}";
     }
 
     public bool DebugSpawnPacket(
@@ -714,6 +974,8 @@ public class TrafficDirector : MonoBehaviour
         Dictionary<string, string> infectionParams,
         out string message)
     {
+        EnsureRuntimeState();
+
         message = "";
 
         if (routeNodeIds == null || routeNodeIds.Length < 2)
@@ -743,9 +1005,9 @@ public class TrafficDirector : MonoBehaviour
             packetId = GetNextPacketId(),
             packetClass = packetClass,
             packetKind = packetKind,
-            scanDifficulty = Random.Range(minScanDifficulty, maxScanDifficulty + 1),
+            scanDifficulty = Random.Range(activeProfile.minScanDifficulty, activeProfile.maxScanDifficulty + 1),
             sourceAddress = routeNodeIds[0],
-            baseSpeed = minBaseMoveInterval,
+            baseSpeed = activeProfile.minBaseMoveInterval,
             route = route,
             startsQuickScanned = false,
             infections = BuildOverrideInfections(
@@ -758,7 +1020,7 @@ public class TrafficDirector : MonoBehaviour
         };
 
         if (packetClass == PacketClass.Priority)
-            plan.baseSpeed = Mathf.Max(minBaseMoveInterval, plan.baseSpeed - 1);
+            plan.baseSpeed = Mathf.Max(activeProfile.minBaseMoveInterval, plan.baseSpeed - 1);
 
         plan.keywords.AddRange(builtKeywords);
 
@@ -866,5 +1128,4 @@ public class TrafficDirector : MonoBehaviour
 
         return networkRuntime.FindConnectionBetween(fromNode, toNode);
     }
-
 }

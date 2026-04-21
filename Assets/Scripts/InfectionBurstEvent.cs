@@ -32,8 +32,16 @@ public class InfectionBurstEvent : ILevelEvent
             QueueInfectiousVirus(globalTick, traffic);
 
         // Phase C — trailing pressure
-        if (localTick >= 12 && localTick <= 20 && localTick % 3 == 0)
+        if (localTick >= 12 && localTick <= 20 && localTick % 3 == 0) 
             QueueMixedTraffic(globalTick, traffic);
+
+        if(localTick == 25) {
+            context.ApplyTrafficModifier(new TrafficModifier(120)
+            {
+                spawnIntervalDelta = -3,
+                malwareChanceDelta = 0.15f
+            });
+        }
     }
 
     private void QueueThreat(int globalTick, TrafficDirector traffic)

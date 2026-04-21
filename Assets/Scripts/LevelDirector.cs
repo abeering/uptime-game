@@ -69,8 +69,8 @@ public class LevelDirector : MonoBehaviour
         context = new LevelEventContext(trafficDirector, notificationDirector);
 
         events.Clear();
-        events.Add(new InfectionBurstEvent(startTick: 500, duration: 40));
-        events.Add(new DdosSwarmEvent(startTick: 120, secondBurstTick: 300));
+        events.Add(new InfectionBurstEvent(startTick: 50, duration: 40));
+        // events.Add(new DdosSwarmEvent(startTick: 120, secondBurstTick: 300));
 
         weightedTrafficLoss = 0;
         levelFailed = false;
