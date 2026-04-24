@@ -5,6 +5,7 @@ public class DesyncedKeyword : IPacketKeyword
     public string KeywordId => "desynced";
     public string DisplayName => "Desynced";
     public string Description => "Stalls out of cadence, then jumps ahead multiple steps at once.";
+    public float AnomalyModifier01 => 0.45f;
 
     private readonly int stallTicks;
     private readonly int teleportSteps;

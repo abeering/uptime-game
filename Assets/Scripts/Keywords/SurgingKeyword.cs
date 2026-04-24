@@ -5,6 +5,7 @@ public class SurgingKeyword : IPacketKeyword
     public string KeywordId => "surging";
     public string DisplayName => "Surging";
     public string Description => "Stalls briefly, then surges forward with a short burst of unusually fast movement.";
+    public float AnomalyModifier01 => 0.35f;
 
     private readonly int stallTicks;
     private readonly int burstTicks;

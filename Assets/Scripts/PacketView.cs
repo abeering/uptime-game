@@ -145,9 +145,14 @@ public class PacketView : MonoBehaviour
     public PacketScanVisual scanVisual;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer borderRenderer;
+    public SpriteRenderer borderFxRenderer;
     [SerializeField] private SpriteRenderer gapFillRenderer;
     private Vector3 borderBaseScale = Vector3.one;
     private Vector3 gapBaseScale = Vector3.one;
+    private Material borderRuntimeMaterial;
+    private Material borderFxRuntimeMaterial;
+    private static readonly int ShaderConfidence01 = Shader.PropertyToID("_Confidence01");
+    private static readonly int ShaderAnomaly01 = Shader.PropertyToID("_Anomaly01");
 
     [Header("Confirmed Gap Pulse")]
     [SerializeField] private bool enableConfirmedGapPulse = true;
@@ -283,8 +288,15 @@ public class PacketView : MonoBehaviour
         targetTailDirection = Vector3.right;
         hasTargetTailDirection = false;
 
-        if (borderRenderer != null)
+        if (borderRenderer != null){
             borderBaseScale = borderRenderer.transform.localScale;
+        }
+
+        if (borderFxRenderer != null)
+        {
+            borderFxRuntimeMaterial = borderFxRenderer.material;
+            Debug.Log($"{packetId} FX mat id={borderFxRuntimeMaterial.GetInstanceID()}");
+        }
 
         if (gapFillRenderer != null)
             gapBaseScale = gapFillRenderer.transform.localScale;
@@ -529,6 +541,25 @@ public class PacketView : MonoBehaviour
             ScanStage.Confirmed => 1f,
             _ => 0f
         };
+    }
+
+    private float GetAnomaly01()
+    {
+        if (keywords == null || keywords.Count == 0)
+            return 0f;
+
+        float total = 0f;
+
+        foreach (IPacketKeyword keyword in keywords)
+        {
+            if (keyword == null)
+                continue;
+
+            total += Mathf.Max(0f, keyword.AnomalyModifier01);
+        }
+
+        // Soft compression: multiple keywords stack, but do not instantly become insane.
+        return Mathf.Clamp01(1f - Mathf.Exp(-total));
     }
 
     public void SetActiveIntelVisual(bool value, Color borderColor)
@@ -969,6 +1000,35 @@ public class PacketView : MonoBehaviour
 
         borderRenderer.color = final;
         borderRenderer.transform.localScale = borderBaseScale;
+
+        float anomaly01 = GetAnomaly01();
+
+        UpdateBorderShader(borderRenderer, ref borderRuntimeMaterial, confidence01, anomaly01);
+
+        if (borderFxRenderer != null)
+        {
+            borderFxRenderer.enabled = true;
+            borderFxRenderer.color = final;
+
+            UpdateBorderShader(borderFxRenderer, ref borderFxRuntimeMaterial, confidence01, anomaly01);
+        }
+    }
+
+    private void UpdateBorderShader(
+        SpriteRenderer renderer,
+        ref Material runtimeMaterial,
+        float confidence01,
+        float anomaly01
+    )
+    {
+        if (renderer == null)
+            return;
+
+        if (runtimeMaterial == null)
+            runtimeMaterial = renderer.material;
+
+        runtimeMaterial.SetFloat(ShaderConfidence01, Mathf.Clamp01(confidence01));
+        runtimeMaterial.SetFloat(ShaderAnomaly01, Mathf.Clamp01(anomaly01));
     }
 
     private void RefreshVisuals()

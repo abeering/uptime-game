@@ -4,8 +4,11 @@ public interface IPacketKeyword
     string DisplayName { get; }
     string Description { get; }
 
+    // Visual-only contribution to packet border instability.
+    // PacketView sums these and clamps to 0..1.
+    float AnomalyModifier01 { get; }
+
     void OnTick(PacketView packet, KeywordContext context);
 
-    // optional hooks (no-op by default via extension methods later if needed)
     void OnScanned(PacketView packet, KeywordContext context) { }
 }

@@ -5,6 +5,7 @@ public class MutatingKeyword : IPacketKeyword
     public string KeywordId => "mutating";
     public string DisplayName => "Mutating";
     public string Description => "Changes its visible packet ID every few ticks, making it harder to track reliably.";
+    public float AnomalyModifier01 => 0.55f;
     
     private readonly int ticksPerMutation;
     private int ticksRemaining;

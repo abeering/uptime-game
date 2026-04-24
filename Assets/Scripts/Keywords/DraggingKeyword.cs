@@ -5,6 +5,7 @@ public class DraggingKeyword : IPacketKeyword
     public string KeywordId => "dragging";
     public string DisplayName => "Dragging";
     public string Description => "Slows nearby packets on the same connection.";
+    public float AnomalyModifier01 => 0.30f;
 
     private readonly int radiusSteps;
     private readonly int slowAmount;

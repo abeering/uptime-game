@@ -5,6 +5,7 @@ public class AcceleratingKeyword : IPacketKeyword
     public string KeywordId => "accelerating";
     public string DisplayName => "Accelerating";
     public string Description => "Speeds up nearby packets on the same connection.";
+    public float AnomalyModifier01 => 0.30f;
 
     private readonly int radiusSteps;
     private readonly int speedDelta;

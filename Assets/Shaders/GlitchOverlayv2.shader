@@ -1,4 +1,4 @@
-Shader "UI/ConsoleChaosGlitchOverlay"
+Shader "Uptime/ConsoleChaosGlitchOverlay"
 {
     Properties
     {

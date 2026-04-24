@@ -5,6 +5,7 @@ public class JitteryKeyword : IPacketKeyword
     public string KeywordId => "jittery";
     public string DisplayName => "Jittery";
     public string Description => "Moves with small timing jitter, arriving a little earlier or later than expected.";
+    public float AnomalyModifier01 => 0.20f;
 
     private readonly int jitterAmount;
 
