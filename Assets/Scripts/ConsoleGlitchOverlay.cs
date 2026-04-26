@@ -12,6 +12,10 @@ public class ConsoleGlitchOverlay : MonoBehaviour
     [Header("Material")]
     [SerializeField] private Material runtimeMaterial;
 
+    [Header("Seed")]
+    [SerializeField] private bool randomizeSeedOnAwake = true;
+    [SerializeField] private float seed = 37.1f;
+
     [Header("Base Settings")]
     [Range(0f, 1f)] public float opacity = 0.16f;
     [Range(0f, 1f)] public float intensity = 0.28f;
@@ -31,6 +35,7 @@ public class ConsoleGlitchOverlay : MonoBehaviour
 
     private static readonly int OpacityId = Shader.PropertyToID("_Opacity");
     private static readonly int IntensityId = Shader.PropertyToID("_Intensity");
+    private static readonly int SeedId = Shader.PropertyToID("_Seed");
 
     private void Awake()
     {
@@ -49,6 +54,14 @@ public class ConsoleGlitchOverlay : MonoBehaviour
         else
         {
             Debug.LogWarning($"{nameof(ConsoleGlitchOverlay)} on {name} has no material assigned.");
+        }
+
+        if (instantiatedMaterial != null)
+        {
+            if (randomizeSeedOnAwake)
+                seed = Random.Range(1f, 9999f);
+
+            instantiatedMaterial.SetFloat(SeedId, seed);
         }
 
         rawImage.raycastTarget = false;

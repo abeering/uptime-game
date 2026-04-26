@@ -22,6 +22,7 @@ public class LevelDirector : MonoBehaviour
     [Header("References")]
     public TrafficDirector trafficDirector;
     public NotificationDirector notificationDirector;
+    [SerializeField] private GlitchDirector glitchDirector;
 
     [Header("Failure Thresholds")]
     [Min(0)] public int benignLossWeight = 1;
@@ -67,6 +68,7 @@ public class LevelDirector : MonoBehaviour
     public void Initialize()
     {
         context = new LevelEventContext(trafficDirector, notificationDirector);
+        glitchDirector?.SetAll(false);
 
         events.Clear();
         events.Add(new InfectionBurstEvent(startTick: 50, duration: 40));
