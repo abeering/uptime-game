@@ -42,15 +42,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _BackgroundNoiseStrength: 0.08
-    - _BandCount: 8
-    - _BandSpeed: 3.5
-    - _BandStrength: 0.95
-    - _BandThicknessMax: 0.11
-    - _BandThicknessMin: 0.04
+    - _BandCount: 4
+    - _BandSpeed: 1.5
+    - _BandStrength: 0.1
+    - _BandThicknessMax: 0.01
+    - _BandThicknessMin: 0.005
     - _BlockFlickerSpeed: 10
     - _BlockGridX: 24
     - _BlockGridY: 14
-    - _BlockStrength: 0.9
+    - _BlockStrength: 0.01
     - _BrightBandBoost: 0.9
     - _DropoutDensity: 90
     - _DropoutSpeed: 14
@@ -58,7 +58,7 @@ Material:
     - _EnableExternalAlpha: 0
     - _FlickerSpeed: 8
     - _FlickerStrength: 0.66
-    - _Intensity: 0.75
+    - _Intensity: 0.5
     - _NoiseScrollX: 0
     - _NoiseScrollY: 0.45
     - _NoiseTiling: 2.4

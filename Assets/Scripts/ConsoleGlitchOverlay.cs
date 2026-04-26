@@ -4,6 +4,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(RawImage))]
 public class ConsoleGlitchOverlay : MonoBehaviour
 {
+
+    [Header("Activation")]
+    [SerializeField] private bool startEnabled = false;
+    public bool IsEnabled { get; private set; }
+
     [Header("Material")]
     [SerializeField] private Material runtimeMaterial;
 
@@ -47,10 +52,15 @@ public class ConsoleGlitchOverlay : MonoBehaviour
         }
 
         rawImage.raycastTarget = false;
+
+        SetGlitchEnabled(startEnabled);
     }
 
     private void Update()
     {
+        if (!IsEnabled)
+            return;
+
         if (instantiatedMaterial == null)
             return;
 
@@ -67,6 +77,21 @@ public class ConsoleGlitchOverlay : MonoBehaviour
 
         instantiatedMaterial.SetFloat(OpacityId, finalOpacity);
         instantiatedMaterial.SetFloat(IntensityId, finalIntensity);
+    }
+
+    public void SetGlitchEnabled(bool enabled)
+    {
+        IsEnabled = enabled;
+
+        if (rawImage != null)
+            rawImage.enabled = enabled;
+
+        currentSpike = 0f;
+    }
+
+    public void ToggleGlitch()
+    {
+        SetGlitchEnabled(!IsEnabled);
     }
 
     public void TriggerGlitch()
