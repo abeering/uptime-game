@@ -1,16 +1,43 @@
-using System.Text;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class ScanPanelController : MonoBehaviour
 {
+    [Header("Header")]
     public TMP_Text titleText;
+
+    [Header("Legacy Text Renderer")]
+    [Tooltip("Optional. Leave assigned during migration if you want; this script will disable it.")]
     public TMP_Text scanText;
+
+    [Header("Row Rendering")]
+    public Transform rowContainer;
+    public ScanRowView rowPrefab;
+
+    [Header("Data")]
     public ScanDirector scanDirector;
+
+    private readonly List<ScanRowView> rowViews = new();
+
+    private void Awake()
+    {
+        if (scanText != null)
+            scanText.gameObject.SetActive(false);
+    }
 
     private void Update()
     {
-        if (scanText == null || scanDirector == null)
+        if (scanDirector == null)
+            return;
+
+        UpdateTitle();
+        UpdateRows();
+    }
+
+    private void UpdateTitle()
+    {
+        if (titleText == null)
             return;
 
         int scans = scanDirector.GetActiveScanCount();
@@ -24,10 +51,33 @@ public class ScanPanelController : MonoBehaviour
 
         titleText.text =
             $"INTEL  S <color={scanColor}>{scans} / {maxScans}</color>   T <color={traceColor}>{traces} / {maxTraces}</color>";
-
-        StringBuilder sb = new StringBuilder();
-        scanDirector.AppendScanPanel(sb);
-        scanText.text = sb.ToString();
     }
 
+    private void UpdateRows()
+    {
+        if (rowContainer == null || rowPrefab == null)
+            return;
+
+        List<ScanDirector.ScanPanelRowData> rows = scanDirector.GetScanPanelRows();
+
+        EnsureRowCount(rows.Count);
+
+        for (int i = 0; i < rowViews.Count; i++)
+        {
+            bool active = i < rows.Count;
+            rowViews[i].gameObject.SetActive(active);
+
+            if (active)
+                rowViews[i].Render(rows[i]);
+        }
+    }
+
+    private void EnsureRowCount(int count)
+    {
+        while (rowViews.Count < count)
+        {
+            ScanRowView row = Instantiate(rowPrefab, rowContainer);
+            rowViews.Add(row);
+        }
+    }
 }

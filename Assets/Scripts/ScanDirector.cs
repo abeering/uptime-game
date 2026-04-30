@@ -1125,6 +1125,117 @@ public class ScanDirector : MonoBehaviour
         sb.AppendLine();
     }
 
+    private void PopulatePrefabFields(ScanPanelRowData row)
+    {
+        if (row == null)
+            return;
+
+        bool isTrace =
+            row.state == ScanPanelRowState.EmptyTrace ||
+            row.state == ScanPanelRowState.ActiveTrace ||
+            row.state == ScanPanelRowState.CompletedTraceLinger;
+
+        bool isEmpty =
+            row.state == ScanPanelRowState.EmptyScan ||
+            row.state == ScanPanelRowState.EmptyTrace;
+
+        if (isEmpty)
+        {
+            row.difficultyText = isTrace ? "TRACE" : "--";
+            row.stageText = "empty";
+            row.readoutText = "";
+            return;
+        }
+
+        if (isTrace)
+        {
+            row.difficultyText = "TRACE";
+            row.stageText = row.showDone ? "COMPLETE" : "TRACING";
+            row.readoutText = row.showDone
+                ? "ROUTE"
+                : "ROUTE";
+            return;
+        }
+
+        row.difficultyText = GetDifficultyLabelForScanRow(row);
+        row.stageText = GetStageShortLabel(row.stage);
+        row.readoutText = BuildScanPanelReadout(row);
+    }
+
+    private string GetDifficultyLabelForScanRow(ScanPanelRowData row)
+    {
+        // Phase 1 placeholder.
+        // Phase 2 will map packet.scanDifficulty into EASY / NORM / HARD.
+        return "NORM";
+    }
+
+    private string BuildScanPanelReadout(ScanPanelRowData row)
+    {
+        if (row == null)
+            return "";
+
+        if (row.state == ScanPanelRowState.CompletedScanLinger)
+            return $"CONFIRMED {GetVisibleClassShortLabel(row.visibleClass)}";
+
+        PacketView packet = null;
+
+        if (row.state == ScanPanelRowState.ActiveScan &&
+            row.slotIndex >= 0 &&
+            row.slotIndex < scanSlots.Count)
+        {
+            ScanSlot slot = scanSlots[row.slotIndex];
+            packet = slot != null ? slot.target : null;
+        }
+
+        if (packet == null)
+            return GetVisibleClassShortLabel(row.visibleClass);
+
+        string stageLabel = GetStageShortLabel(row.stage);
+
+        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+        {
+            string classLabel = packet.knowsClass
+                ? GetPacketClassShortLabel(packet.revealedClass)
+                : GetVisibleClassShortLabel(packet.GetVisibleClass());
+
+            string kindLabel = packet.revealedKind.ToString().ToUpperInvariant();
+            return $"{stageLabel} {classLabel} · {kindLabel}";
+        }
+
+        if (packet.knowsClass)
+            return $"{stageLabel} {GetPacketClassShortLabel(packet.revealedClass)}";
+
+        return $"{stageLabel} {GetVisibleClassShortLabel(packet.GetVisibleClass())}";
+    }
+
+    public List<ScanPanelRowData> GetScanPanelRows()
+    {
+        List<ScanPanelRowData> rows = new();
+        int activeScanCount = GetActiveScanCount();
+
+        for (int i = 0; i < scanSlots.Count; i++)
+        {
+            ScanPanelRowData row = BuildScanRowForSlot(i, activeScanCount);
+            if (row != null)
+            {
+                PopulatePrefabFields(row);
+                rows.Add(row);
+            }
+        }
+
+        for (int i = 0; i < traceSlots.Count; i++)
+        {
+            ScanPanelRowData row = BuildTraceRowForSlot(i);
+            if (row != null)
+            {
+                PopulatePrefabFields(row);
+                rows.Add(row);
+            }
+        }
+
+        return rows;
+    }
+
     public void AppendScanPanel(StringBuilder sb)
     {
         int activeScanCount = GetActiveScanCount();
@@ -1261,7 +1372,7 @@ public class ScanDirector : MonoBehaviour
         return "blocked";
     }
 
-    private enum ScanPanelRowState
+    public enum ScanPanelRowState
     {
         EmptyScan,
         ActiveScan,
@@ -1271,7 +1382,7 @@ public class ScanDirector : MonoBehaviour
         CompletedTraceLinger
     }
 
-    private class ScanPanelRowData
+    public class ScanPanelRowData
     {
         public int slotIndex;
         public string slotLabel;
@@ -1290,6 +1401,11 @@ public class ScanDirector : MonoBehaviour
         public bool willBeDropped;
 
         public string secondaryIntelLine;
+
+        // New row-prefab friendly fields.
+        public string difficultyText;
+        public string stageText;
+        public string readoutText;
     }
 
     private string FormatInlineSlotTag(string slotLabel, Color slotColor)
