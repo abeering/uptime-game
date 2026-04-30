@@ -70,6 +70,7 @@ Keep explicit authored event packets as a parallel first-class path
 ## 11. Nice-to-Have / Later
 
 - `inspect` command (deeper packet info)
+  - shows path of packet temporarily on network view if traced 
 - Help system for keywords (`help <keyword>`)
 - Node state effects (scan speed, spawning, etc.)
 - More meaningful Priority packet interactions
