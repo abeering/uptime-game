@@ -71,8 +71,8 @@ public class LevelDirector : MonoBehaviour
         glitchDirector?.SetAll(false);
 
         events.Clear();
-        events.Add(new InfectionBurstEvent(startTick: 50, duration: 40));
-        // events.Add(new DdosSwarmEvent(startTick: 120, secondBurstTick: 300));
+        // events.Add(new InfectionBurstEvent(startTick: 50, duration: 40));
+        events.Add(new DdosSwarmEvent(startTick: 40, secondBurstTick: 300));
 
         weightedTrafficLoss = 0;
         levelFailed = false;
