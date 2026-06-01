@@ -1174,8 +1174,13 @@ public class ScanDirector : MonoBehaviour
         if (row == null)
             return "";
 
-        if (row.state == ScanPanelRowState.CompletedScanLinger)
-            return $"CONFIRMED {GetVisibleClassShortLabel(row.visibleClass)}";
+        bool isTrace =
+            row.state == ScanPanelRowState.EmptyTrace ||
+            row.state == ScanPanelRowState.ActiveTrace ||
+            row.state == ScanPanelRowState.CompletedTraceLinger;
+
+        if (isTrace)
+            return row.showDone ? "ROUTE" : "";
 
         PacketView packet = null;
 
@@ -1187,25 +1192,23 @@ public class ScanDirector : MonoBehaviour
             packet = slot != null ? slot.target : null;
         }
 
-        if (packet == null)
-            return GetVisibleClassShortLabel(row.visibleClass);
-
-        string stageLabel = GetStageShortLabel(row.stage);
-
-        if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+        // Active row: use the packet's best known identity, but do NOT repeat stage.
+        if (packet != null)
         {
-            string classLabel = packet.knowsClass
-                ? GetPacketClassShortLabel(packet.revealedClass)
-                : GetVisibleClassShortLabel(packet.GetVisibleClass());
+            if (packet.knowsKind && packet.revealedKind != PacketKind.None)
+                return GetBestKnownIdentityRichLabel(packet);
 
-            string kindLabel = packet.revealedKind.ToString().ToUpperInvariant();
-            return $"{stageLabel} {classLabel} · {kindLabel}";
+            if (packet.knowsClass)
+                return GetPacketClassRichLabel(packet.revealedClass);
+
+            return GetVisibleClassRichLabel(packet);
         }
 
-        if (packet.knowsClass)
-            return $"{stageLabel} {GetPacketClassShortLabel(packet.revealedClass)}";
-
-        return $"{stageLabel} {GetVisibleClassShortLabel(packet.GetVisibleClass())}";
+        // Linger row fallback.
+        return ColorizeVisibleClassPadded(
+            row.visibleClass,
+            GetVisibleClassShortLabel(row.visibleClass)
+        );
     }
 
     public List<ScanPanelRowData> GetScanPanelRows()

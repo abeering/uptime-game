@@ -18,6 +18,9 @@ public class ScanRowView : MonoBehaviour
     public Image packetBody;
     public Image packetBorder;
 
+    [Header("Difficulty Gates")]
+    public GameObject[] difficultySquares;
+
     [Header("Fallback Colors")]
     public Color unknownColor = new(0.53f, 0.53f, 0.53f, 1f);
     public Color benignColor = new(0.72f, 1.00f, 0.72f, 1f);
@@ -41,6 +44,7 @@ public class ScanRowView : MonoBehaviour
         bool isEmpty =
             row.state == ScanDirector.ScanPanelRowState.EmptyScan ||
             row.state == ScanDirector.ScanPanelRowState.EmptyTrace;
+        SetDifficultySquaresVisible(!isEmpty);
 
         Color rowColor = row.slotColor;
         Color packetColor = GetPacketColor(row);
@@ -90,6 +94,18 @@ public class ScanRowView : MonoBehaviour
             visibleClass = VisibleClass.Unknown,
             slotColor = mutedColor
         });
+    }
+
+    private void SetDifficultySquaresVisible(bool visible)
+    {
+        if (difficultySquares == null)
+            return;
+
+        for (int i = 0; i < difficultySquares.Length; i++)
+        {
+            if (difficultySquares[i] != null)
+                difficultySquares[i].SetActive(visible);
+        }
     }
 
     private Color GetPacketColor(ScanDirector.ScanPanelRowData row)
