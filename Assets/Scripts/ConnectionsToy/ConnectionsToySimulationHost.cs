@@ -2,13 +2,54 @@ using UnityEngine;
 
 namespace Uptime.ConnectionsToy
 {
-    // Phase 0 seam: authored topology only. Simulation steps and resource state come later.
+    // Owns the toy's resource state. Views only render these values; no load is simulated yet.
+    [ExecuteAlways]
     public sealed class ConnectionsToySimulationHost : MonoBehaviour
     {
-        [SerializeField] private ConnectionsToyNodeView[] nodes;
-        [SerializeField] private ConnectionsToyPhysicalLinkView[] physicalLinks;
+        [SerializeField] private ConnectionsToyNodeResources[] nodes;
+        [SerializeField] private ConnectionsToyPhysicalLinkResources[] physicalLinks;
 
-        public ConnectionsToyNodeView[] Nodes => nodes;
-        public ConnectionsToyPhysicalLinkView[] PhysicalLinks => physicalLinks;
+        public ConnectionsToyNodeResources[] Nodes => nodes;
+        public ConnectionsToyPhysicalLinkResources[] PhysicalLinks => physicalLinks;
+
+        private void OnEnable() => RefreshDisplays();
+
+        private void OnValidate()
+        {
+            if (nodes != null)
+            {
+                foreach (ConnectionsToyNodeResources node in nodes)
+                    node?.ClampToCapacity();
+            }
+
+            if (physicalLinks != null)
+            {
+                foreach (ConnectionsToyPhysicalLinkResources link in physicalLinks)
+                    link?.ClampToCapacity();
+            }
+        }
+
+        private void Update() => RefreshDisplays();
+
+        public void RefreshDisplays()
+        {
+            if (nodes != null)
+            {
+                foreach (ConnectionsToyNodeResources node in nodes)
+                {
+                    if (node?.View != null)
+                        node.View.RenderResources(node);
+                }
+            }
+
+            if (physicalLinks != null)
+            {
+                foreach (ConnectionsToyPhysicalLinkResources link in physicalLinks)
+                {
+                    if (link?.View != null)
+                        link.View.RenderResources(link);
+                }
+            }
+        }
     }
 }

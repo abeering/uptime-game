@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 namespace Uptime.ConnectionsToy
@@ -10,10 +11,21 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private ConnectionsToyNodeView nodeB;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform label;
+        [SerializeField] private TMP_Text resourceReadout;
 
         public string LinkId => linkId;
         public ConnectionsToyNodeView NodeA => nodeA;
         public ConnectionsToyNodeView NodeB => nodeB;
+
+        public void RenderResources(ConnectionsToyPhysicalLinkResources resources)
+        {
+            if (resourceReadout == null || resources == null)
+                return;
+
+            string value = $"{linkId}  BW {resources.BandwidthUsageMBps:0.#}/{resources.BandwidthCapacityMBps:0.#} MB/s";
+            if (resourceReadout.text != value)
+                resourceReadout.text = value;
+        }
 
         private void LateUpdate()
         {
