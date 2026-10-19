@@ -199,3 +199,74 @@ Decisions to tune while playing, not before coding:
 **Without any attacker or scripted incident, I can watch two connections compete, understand the shortage, inspect them, change one allocation with a short typed command, and see the other connection measurably benefit.**
 
 If that basic moment feels good, Uptime has a new foundation worth playing with. If it doesn't, the experiment is intentionally small enough to change or abandon without disrupting Duel or the original Uptime prototype.
+
+
+## Appendix A — Future connection grammar, authored company identity, and visual reading (NOT V0 SCOPE)
+
+This appendix preserves the October 2026 design exploration as a **future direction**, not instructions to implement additional behaviors in Phases 0–4. The existing V0 experiment should remain a four-node, benign, single-stage resource-allocation toy.
+
+### A1. Shared, company-agnostic grammar
+
+The connection simulation should eventually support a common, reusable vocabulary of **mechanical identities and behaviors**, independent of any particular company or villain. Provisional terms:
+
+| Concept | Responsibility | Example |
+|---|---|---|
+| Mechanical **Type / Class** | Broad simulation behavior; reuse across companies | Transfer, authentication, query, processing, streaming |
+| **Arc / Plan** | Authored full lifetime sequence, transitions and possible contingent behaviors; not necessarily player-visible | Transfer → verify → install → close |
+| **Stage** | Which part of the arc is currently underway | Installing |
+| **Activity / Operation** | What the current stage is actually doing and consuming in the simulation | CPU-heavy processing on AUTH; data upload; disk write; idle/wait |
+| **Status / Satisfaction** | How successfully the connection is receiving what it needs or meeting its objective | Satisfied, constrained, critical, held, complete |
+
+These are **distinct axes**, not interchangeable enums and not yet a fixed class schema. A deployment's transfer stage may look mechanically like a file transfer; later it may become CPU-intensive installation. Its arc should be built from reusable activities rather than a bespoke script with unique engine rules. A single stage may impose different CPU, memory, disk and bandwidth demands. Player-visible labels should describe observed/known facts; hidden future stages, actual malicious intention, and claimed/declared identity may differ. Avoid leaking the entire arc through ordinary inspection by default.
+
+The important reusable abstraction is **what a connection can do**, not what it is called in a particular company.
+
+### A2. Company-specific authored compositions
+
+A **company connection catalog** curates the universal grammar into narrative **Purposes** (business identities) with parameters, priority/importance, failure stakes, routes, spawn weights, and recognizable flavor. This is not a new mechanical type for every fictional activity.
+
+| Reusable mechanical recipe | E-commerce purpose | Hospital purpose | Intelligence agency purpose |
+|---|---|---|---|
+| Authenticate → query → transfer | Customer checkout | Patient record retrieval | Classified document access |
+| Transfer → process → verify | Storefront deployment | Imaging software update | Intelligence analysis job |
+| Query → transfer → replicate | Customer-data backup | Medical-records backup | Archive synchronization |
+| Sustained transfer | Product photography upload | Medical imaging transfer | Satellite imagery ingest |
+
+These are **illustrative authoring examples**, not a promised set of connection types for V0. They can share the same engine while differing in duration, demands, deadlines, business importance and consequences. The company determines **what it means**, not new low-level resource physics.
+
+### A3. Company and villain orchestration
+
+A separate event/orchestration layer decides **when, why and in what mixture** catalog connections spawn. Fiction should correspond to real simulation activity rather than arbitrary announcements or cosmetic packet-count modifiers.
+
+Examples:
+
+- **Prospective information:** CEO says “Sale is going live!”; increased storefront/checkout workloads follow. Engineering says “Deploying changes to storefront”; a deployment-type arc begins shortly afterward. The message prepares the player to expect patterns.
+- **Reactive information:** Support says “People can't load the site!” after actual connection starvation or node overload. Their interpretation of the cause may be incomplete or mistaken; the underlying resource measurements remain authoritative.
+- **Villain intent:** A theft motive might be credit cards at an e-commerce company, medical records at a hospital, or classified files at an agency, while all three use shared mechanics such as access → query → unauthorized transfer. Another villain may seek downtime through contention, infection or denial of service. Authored target, company stakes, and attack personality give the mechanics narrative meaning.
+
+The orchestrator selects and configures **shared grammar + company catalog**; it should not replace the resource simulation with scripted outcomes. Different companies may have different topology, tolerated failures, workload mixes and narrative weights even with identical mechanical primitives.
+
+### A4. Connection visual grammar (later experiment)
+
+The player should develop routine understanding **without inspecting every apparently benign connection**. The network should convey current activity and satisfaction rather than assigning colors as “good” or “evil”.
+
+| Channel | Candidate encoded fact | Example |
+|---|---|---|
+| Stable short ID and path | Individual identity, persistence and reach | c7 remains legible across EXT1 → API → DB |
+| Moving ticks or pulses | Direction and current data movement | One-way upload, intermittent responses |
+| Pulse rhythm/density | Actual *allocated* activity (not requested demand) | Continuous transfer versus bursty auth/query |
+| Line width/weight | Desired demand or scale (must be consistently defined) | Broad line that is only lightly pulsing = hungry, starved connection |
+| Instability/warnings | Unmet demand, approaching deadline, or failure risk | A *benign* connection pulses critically because it is about to fail |
+| Node-local activity | CPU/disk-heavy stage after traffic quiets | Transfer stops but API begins processing |
+| Quiet/dotted held path | A connection still exists but is not currently moving data | Waiting, idle, paused |
+
+A connection's **Type** may inform a subtle motif, but its **current Activity and Status** should drive the main appearance. The same authored purpose can look different in different stages. A malicious connection may be satisfied, while a legitimate connection is failing. Do not make red synonymous with malicious and green synonymous with benign. Inspect can provide precise rates, totals, tags, deadlines, ownership and known identity while the overview communicates patterns and urgency.
+
+Start visual studies with only a few reusable marks; choose readability over every type having custom effects. Test overlapping logical connection IDs and path branches before layering more detail.
+
+### A5. Future-play example and scope guard
+
+A legitimate storefront deployment may (a) move 20 MB through EXT1 → API, (b) quiet its edge activity while verifying locally, (c) spike API CPU during installation, and (d) complete and release resources. Its company **Purpose** stays “Storefront Deployment”, its shared **Activity** changes, and its **Status** reflects whether each phase is being adequately served. Meanwhile a support/engineering message provides context, not a precomputed correct action.
+
+**Do not implement this example in Phase 0, 1, 2 or 3.** The V0 simulation intentionally proves just one static-stage objective per connection, truthful resource use, immediate inspection, and later a first throttle. Multi-stage arcs, companies, orchestration, notifications, villains, deception and richer activity rendering require separate decisions *after* the toy's underlying behavior is observed.
+
