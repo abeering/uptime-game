@@ -71,8 +71,46 @@ public class LevelDirector : MonoBehaviour
         glitchDirector?.SetAll(false);
 
         events.Clear();
-        events.Add(new InfectionBurstEvent(startTick: 50, duration: 40));
-        // events.Add(new DdosSwarmEvent(startTick: 120, secondBurstTick: 300));
+
+        // Day 1: "The Drop" — a fast-fashion launch day where legitimate demand
+        // creates the cover and urgency for a coordinated attack.
+        events.Add(new LevelNotificationEvent(1, "CEO", "Launch day. Keep checkout online."));
+        events.Add(new LevelNotificationEvent(8, "Ops", "Traffic is calm. Learn the routes."));
+        events.Add(new LevelTrafficModifierEvent(1, 44, spawnIntervalDelta: 5, malwareChanceDelta: -0.10f));
+
+        // The expected business spike: high-value traffic the player must protect.
+        events.Add(new LevelNotificationEvent(40, "Marketing", "The campaign is live. Traffic incoming."));
+        events.Add(new FlashSaleRushEvent(startTick: 44, packetCount: 2, cadenceTicks: 6));
+        events.Add(new LevelTrafficModifierEvent(44, 55, spawnIntervalDelta: 4, priorityChanceDelta: 0.08f));
+
+        // Suspicious traffic hides in the tail of the customer rush.
+        events.Add(new LevelNotificationEvent(92, "Support", "Customers report unwanted login codes."));
+        events.Add(new CheckoutProbeEvent(startTick: 98, packetCount: 1));
+        events.Add(new LevelNotificationEvent(118, "Ops", "The probes share a source. Scan first."));
+
+        // First breach, followed by a deliberate recovery window.
+        events.Add(new InventoryInfectionEvent(startTick: 132));
+        events.Add(new LevelNotificationEvent(143, "Warehouse", "Inventory just refreshed by itself."));
+        events.Add(new LevelNotificationEvent(188, "Ops", "Traffic is dipping. Clean up now."));
+        events.Add(new LevelTrafficModifierEvent(184, 50, spawnIntervalDelta: 8, malwareChanceDelta: -0.18f, priorityChanceDelta: -0.10f));
+
+        // Climax: attackers exploit the second promotion push to drag good traffic.
+        events.Add(new LevelNotificationEvent(238, "CEO", "Discount extended. Another spike incoming."));
+        events.Add(new DdosSwarmEvent(
+            startTick: 244,
+            secondBurstTick: 300,
+            minPacketCount: 1,
+            maxPacketCount: 2,
+            minCadenceTicks: 6,
+            maxCadenceTicks: 9));
+        events.Add(new LevelTrafficModifierEvent(244, 95, spawnIntervalDelta: 3, malwareChanceDelta: 0.04f, priorityChanceDelta: 0.04f));
+        events.Add(new LevelNotificationEvent(286, "Ops", "Bots are dragging real orders. Isolate them."));
+
+        // Pressure stops: the remaining traffic is the tail of the sale, not a new attack.
+        events.Add(new LevelNotificationEvent(352, "Ops", "Attack fading. Clear the last orders."));
+        events.Add(new LevelTrafficModifierEvent(350, 120, spawnIntervalDelta: 10, malwareChanceDelta: -0.25f, priorityChanceDelta: -0.08f));
+        events.Add(new LevelNotificationEvent(410, "CEO", "Checkout held. The drop sold out."));
+        events.Add(new LevelNotificationEvent(416, "Ops", "Shift survived. Good work."));
 
         weightedTrafficLoss = 0;
         levelFailed = false;

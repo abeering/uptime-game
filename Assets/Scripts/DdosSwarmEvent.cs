@@ -51,7 +51,7 @@ public class DdosSwarmEvent : ILevelEvent
             context.Notifications?.PushMessage(new Notification
             {
                 SpeakerName = "Ops",
-                Body = "Seeing a coordinated traffic surge. Looks like DDOS."
+                Body = "Coordinated traffic surge. Looks like DDOS."
             });
 
             QueueBurst(globalTick, traffic);
@@ -62,7 +62,7 @@ public class DdosSwarmEvent : ILevelEvent
             context.Notifications?.PushMessage(new Notification
             {
                 SpeakerName = "Ops",
-                Body = "Second surge confirmed. Pressure is sustained."
+                Body = "Second surge. Pressure is holding."
             });
 
             QueueBurst(globalTick, traffic);
