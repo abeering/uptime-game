@@ -34,16 +34,20 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private ConnectionsToyNodeRequirement[] route;
         [SerializeField, Min(0f)] private float totalWorkMB;
         [SerializeField, Min(0f)] private float desiredRateMBps;
+        [SerializeField, Min(0f), Tooltip("Seconds after simulation start before this connection is established.")]
+        private float startDelaySeconds;
 
         public string ConnectionId => connectionId;
         public ConnectionsToyNodeRequirement[] Route => route;
         public float TotalWorkMB => Mathf.Max(0f, totalWorkMB);
         public float DesiredRateMBps => Mathf.Max(0f, desiredRateMBps);
+        public float StartDelaySeconds => Mathf.Max(0f, startDelaySeconds);
 
         internal void ClampNonnegative()
         {
             totalWorkMB = TotalWorkMB;
             desiredRateMBps = DesiredRateMBps;
+            startDelaySeconds = StartDelaySeconds;
             if (route == null)
                 return;
 
@@ -61,6 +65,13 @@ namespace Uptime.ConnectionsToy
         NodeMemory
     }
 
+    public enum ConnectionsToyLifecycle
+    {
+        Pending,
+        Active,
+        Complete
+    }
+
     // Runtime state belongs to the simulation, never to a UI component.
     public sealed class ConnectionsToyLogicalConnectionState
     {
@@ -70,6 +81,7 @@ namespace Uptime.ConnectionsToy
         {
             Definition = definition;
             RouteLinks = routeLinks;
+            Lifecycle = definition.StartDelaySeconds > 0f ? ConnectionsToyLifecycle.Pending : ConnectionsToyLifecycle.Active;
         }
 
         public ConnectionsToyLogicalConnectionDefinition Definition { get; }
@@ -80,10 +92,13 @@ namespace Uptime.ConnectionsToy
         public float CompletedWorkMB { get; internal set; }
         public float RemainingWorkMB => Mathf.Max(0f, Definition.TotalWorkMB - CompletedWorkMB);
         public float ActualRateMBps { get; internal set; }
-        public float Satisfaction => IsComplete ? 1f : Definition.DesiredRateMBps > 0f ?
+        public float Satisfaction => IsComplete ? 1f : IsPending ? 0f : Definition.DesiredRateMBps > 0f ?
             ActualRateMBps / Definition.DesiredRateMBps : 0f;
-        public bool IsComplete { get; internal set; }
-        public bool IsActive => !IsComplete;
+        public ConnectionsToyLifecycle Lifecycle { get; internal set; }
+        public bool IsPending => Lifecycle == ConnectionsToyLifecycle.Pending;
+        public bool IsComplete => Lifecycle == ConnectionsToyLifecycle.Complete;
+        public bool IsActive => Lifecycle == ConnectionsToyLifecycle.Active;
+        public float EstablishedAtSeconds { get; internal set; }
         public ConnectionsToyLimitKind LimitKind { get; internal set; }
         public string LimitingResourceId { get; internal set; }
 

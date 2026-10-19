@@ -63,7 +63,7 @@ namespace Uptime.ConnectionsToy
                 connection.MemoryAdmitted = false;
                 connection.LimitKind = ConnectionsToyLimitKind.None;
                 connection.LimitingResourceId = string.Empty;
-                if (connection.IsComplete)
+                if (!connection.IsActive)
                     continue;
 
                 ConnectionsToyNodeResources blockedNode = null;
@@ -157,7 +157,7 @@ namespace Uptime.ConnectionsToy
                     continue;
 
                 connection.CompletedWorkMB = connection.Definition.TotalWorkMB;
-                connection.IsComplete = true;
+                connection.Lifecycle = ConnectionsToyLifecycle.Complete;
                 connection.ActualRateMBps = 0f;
                 connection.MemoryAdmitted = false;
                 connection.LimitKind = ConnectionsToyLimitKind.None;

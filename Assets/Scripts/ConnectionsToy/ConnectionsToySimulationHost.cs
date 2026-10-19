@@ -14,13 +14,16 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private ConnectionsToyPhysicalLinkResources[] physicalLinks;
         [SerializeField] private ConnectionsToyLogicalConnectionDefinition[] connections;
         [SerializeField] private TMP_Text connectionDebugReadout;
+        [SerializeField] private ConnectionsToyLogicalPathPresenter pathPresenter;
 
         private ConnectionsToyLogicalConnectionState[] runtimeConnections;
+        private float simulationTimeSeconds;
 
         public ConnectionsToyNodeResources[] Nodes => nodes;
         public ConnectionsToyPhysicalLinkResources[] PhysicalLinks => physicalLinks;
         public ConnectionsToyLogicalConnectionDefinition[] Definitions => connections;
         public IReadOnlyList<ConnectionsToyLogicalConnectionState> RuntimeConnections => runtimeConnections;
+        public float SimulationTimeSeconds => simulationTimeSeconds;
 
         private void OnEnable() => RefreshDisplays();
 
@@ -71,13 +74,22 @@ namespace Uptime.ConnectionsToy
             if (runtimeConnections == null)
                 ResetSimulation();
 
+            foreach (ConnectionsToyLogicalConnectionState connection in runtimeConnections)
+            {
+                if (!connection.IsPending || simulationTimeSeconds < connection.Definition.StartDelaySeconds)
+                    continue;
+                connection.Lifecycle = ConnectionsToyLifecycle.Active;
+                connection.EstablishedAtSeconds = simulationTimeSeconds;
+            }
             ConnectionsToyResourceAllocator.Step(nodes, physicalLinks, runtimeConnections, deltaSeconds);
+            simulationTimeSeconds += deltaSeconds;
             RefreshDisplays();
         }
 
         public void ResetSimulation()
         {
             ClearAllocatedUsage();
+            simulationTimeSeconds = 0f;
             var states = new List<ConnectionsToyLogicalConnectionState>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var nodeViews = new HashSet<ConnectionsToyNodeView>();
@@ -132,6 +144,8 @@ namespace Uptime.ConnectionsToy
 
             states.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             runtimeConnections = states.ToArray();
+            if (Application.isPlaying && pathPresenter != null)
+                pathPresenter.Bind(runtimeConnections);
             RefreshDisplays();
         }
 
@@ -186,6 +200,13 @@ namespace Uptime.ConnectionsToy
                 {
                     output.Append("DONE  ").Append(connection.CompletedWorkMB.ToString("0.#"))
                         .Append('/').Append(connection.Definition.TotalWorkMB.ToString("0.#")).Append(" MB");
+                    continue;
+                }
+
+                if (connection.IsPending)
+                {
+                    output.Append("PENDING  starts ")
+                        .Append(connection.Definition.StartDelaySeconds.ToString("0.#")).Append(" s");
                     continue;
                 }
 

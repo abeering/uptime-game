@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private RectTransform historyContent;
         [SerializeField] private ConnectionsToyTextRow textRowPrefab;
         [SerializeField] private ConnectionsToyPlaceholderOutput placeholderPrefab;
+        [SerializeField] private ConnectionsToyInspectOutput inspectPrefab;
+        [SerializeField] private ConnectionsToySimulationHost simulationHost;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
@@ -29,7 +32,7 @@ namespace Uptime.ConnectionsToy
         private void Start()
         {
             AppendText("CONNECTIONS TOY // TERMINAL READY", normalColor);
-            AppendText("Type test to render the output block.", mutedColor);
+            AppendText("Type help for commands.", mutedColor);
             StartCoroutine(FocusInputNextFrame());
         }
 
@@ -51,7 +54,8 @@ namespace Uptime.ConnectionsToy
             commandInput.SetTextWithoutNotify(string.Empty);
             AppendText($"> {command}", normalColor);
 
-            switch (command.ToLowerInvariant())
+            string[] tokens = command.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
+            switch (tokens[0].ToLowerInvariant())
             {
                 case "test":
                     AppendText("TEST // structured output follows", mutedColor);
@@ -59,8 +63,11 @@ namespace Uptime.ConnectionsToy
                     if (block != null)
                         block.Bind("PRESENTATION CHECK", "Authored UI block inside terminal history.", "PHASE 0", "STATIC", 0.42f);
                     break;
+                case "inspect":
+                    Inspect(tokens);
+                    break;
                 case "help":
-                    AppendText("COMMANDS  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect c1 [c2]  test  help", mutedColor);
                     break;
                 default:
                     AppendText($"UNKNOWN COMMAND  {command}  // type help", errorColor);
@@ -68,6 +75,48 @@ namespace Uptime.ConnectionsToy
             }
 
             StartCoroutine(FocusInputNextFrame());
+        }
+
+        private void Inspect(string[] tokens)
+        {
+            if (tokens.Length < 2 || tokens.Length > 3)
+            {
+                AppendText("USAGE  inspect c1 [c2]", errorColor);
+                return;
+            }
+            if (simulationHost == null || simulationHost.RuntimeConnections == null)
+            {
+                AppendText("INSPECT  simulation unavailable", errorColor);
+                return;
+            }
+
+            var selected = new List<ConnectionsToyLogicalConnectionState>();
+            for (int i = 1; i < tokens.Length; i++)
+            {
+                ConnectionsToyLogicalConnectionState match = null;
+                foreach (ConnectionsToyLogicalConnectionState state in simulationHost.RuntimeConnections)
+                    if (string.Equals(state.ConnectionId, tokens[i], System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        match = state;
+                        break;
+                    }
+                if (match == null)
+                {
+                    AppendText("INSPECT  unknown connection " + tokens[i], errorColor);
+                    return;
+                }
+                if (selected.Contains(match))
+                {
+                    AppendText("INSPECT  duplicate connection " + tokens[i], errorColor);
+                    return;
+                }
+                selected.Add(match);
+            }
+            ConnectionsToyInspectOutput block = AppendOutputBlock(inspectPrefab);
+            if (block == null)
+                AppendText("INSPECT  output unavailable", errorColor);
+            else
+                block.Bind(selected.ToArray());
         }
 
         public ConnectionsToyTextRow AppendText(string message, Color color)

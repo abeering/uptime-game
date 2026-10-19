@@ -3083,6 +3083,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1033840603}
   - {fileID: 1558257229}
   - {fileID: 84866897}
   - {fileID: 394130997}
@@ -4027,6 +4028,58 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 306972723}
   m_ActionId: 44b200b1-1557-4083-816c-b22cbdf77ddf
+--- !u!1 &1033840601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1033840603}
+  - component: {fileID: 1033840602}
+  m_Layer: 0
+  m_Name: LogicalPaths
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1033840602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033840601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af99aa2ad52440fb447fae1138d930d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyLogicalPathPresenter
+  networkArea: {fileID: 772389560}
+  pathLayer: {fileID: 1033840603}
+  pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  laneSpacing: 18
+--- !u!224 &1033840603
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033840601}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 772389560}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1056008362
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6108,6 +6161,8 @@ MonoBehaviour:
   historyContent: {fileID: 166906268}
   textRowPrefab: {fileID: 6014738351718847601, guid: dc00584ff4e5dd74f9064426a48a6e4b, type: 3}
   placeholderPrefab: {fileID: 4703692024107262633, guid: 96a14f158484292429ffeb2907e1f6ea, type: 3}
+  inspectPrefab: {fileID: 5640653935189085936, guid: 26d54e60cbf2ed44997ac0f737d12ca4, type: 3}
+  simulationHost: {fileID: 1996901015}
   maxEntries: 100
   normalColor: {r: 0.73, g: 0.89, b: 0.84, a: 1}
   mutedColor: {r: 0.47, g: 0.63, b: 0.62, a: 1}
@@ -6230,8 +6285,9 @@ MonoBehaviour:
       cpuUnitsPerMB: 0.5
       diskIoMBPerMB: 1
       memoryGB: 1
-    totalWorkMB: 120
+    totalWorkMB: 1500
     desiredRateMBps: 35
+    startDelaySeconds: 0
   - connectionId: c2
     route:
     - node: {fileID: 458374168}
@@ -6246,9 +6302,11 @@ MonoBehaviour:
       cpuUnitsPerMB: 0.5
       diskIoMBPerMB: 0.5
       memoryGB: 1
-    totalWorkMB: 60
+    totalWorkMB: 600
     desiredRateMBps: 35
+    startDelaySeconds: 3
   connectionDebugReadout: {fileID: 394130996}
+  pathPresenter: {fileID: 1033840602}
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
