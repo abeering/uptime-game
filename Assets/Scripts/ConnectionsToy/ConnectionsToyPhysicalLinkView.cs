@@ -4,6 +4,7 @@ using UnityEngine;
 namespace Uptime.ConnectionsToy
 {
     // A physical edge in the static topology. Logical connections will use a separate type.
+    [ExecuteAlways]
     public sealed class ConnectionsToyPhysicalLinkView : MonoBehaviour
     {
         [SerializeField] private string linkId;
@@ -12,6 +13,7 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform label;
         [SerializeField] private TMP_Text resourceReadout;
+        [SerializeField, Min(0f)] private float labelOffset = 26f;
 
         public string LinkId => linkId;
         public ConnectionsToyNodeView NodeA => nodeA;
@@ -22,7 +24,7 @@ namespace Uptime.ConnectionsToy
             if (resourceReadout == null || resources == null)
                 return;
 
-            string value = $"{linkId}  BW {resources.BandwidthUsageMBps:0.#}/{resources.BandwidthCapacityMBps:0.#} MB/s";
+            string value = $"{linkId} {resources.BandwidthUsageMBps:0.#}/{resources.BandwidthCapacityMBps:0.#} MB/s";
             if (resourceReadout.text != value)
                 resourceReadout.text = value;
         }
@@ -44,8 +46,17 @@ namespace Uptime.ConnectionsToy
 
             if (label != null)
             {
-                Vector2 normal = new(-direction.y, direction.x);
-                label.anchoredPosition = middle + normal.normalized * 22f;
+                Vector2 normal = new Vector2(-direction.y, direction.x).normalized;
+                if (normal.y < 0f)
+                    normal = -normal;
+
+                label.anchoredPosition = middle + normal * labelOffset;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                if (angle > 90f)
+                    angle -= 180f;
+                else if (angle < -90f)
+                    angle += 180f;
+                label.localRotation = Quaternion.Euler(0f, 0f, angle);
             }
         }
     }

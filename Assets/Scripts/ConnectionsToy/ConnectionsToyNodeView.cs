@@ -15,9 +15,17 @@ namespace Uptime.ConnectionsToy
             if (resourceReadout == null || resources == null)
                 return;
 
-            string value = $"USED / CAP\nCPU   {resources.CpuUsageUnits:0.#}/{resources.CpuCapacityUnits:0.#} u\nMEM   {resources.MemoryUsageGB:0.#}/{resources.MemoryCapacityGB:0.#} GB\nDISK  {resources.DiskIoUsageMBps:0.#}/{resources.DiskIoCapacityMBps:0.#} MB/s";
+            string value = $"{Percent(resources.CpuUsageUnits, resources.CpuCapacityUnits)}%\n{Percent(resources.MemoryUsageGB, resources.MemoryCapacityGB)}%\n{Percent(resources.DiskIoUsageMBps, resources.DiskIoCapacityMBps)}%";
             if (resourceReadout.text != value)
                 resourceReadout.text = value;
+        }
+
+        private static int Percent(float usage, float capacity)
+        {
+            if (capacity <= 0f)
+                return 0;
+
+            return Mathf.FloorToInt(Mathf.Clamp01(usage / capacity) * 100f + 0.5f);
         }
     }
 }
