@@ -77,7 +77,6 @@ namespace Uptime.ConnectionsToy
             Vector2 a = area.InverseTransformPoint(physicalLink.NodeA.transform.position);
             Vector2 b = area.InverseTransformPoint(physicalLink.NodeB.transform.position);
             Vector2 direction = (b - a).normalized;
-            Vector2 normal = new Vector2(-direction.y, direction.x);
             float budget = physicalLink.BundleWidth(area);
             ConnectionsToyIdentityPacking.Layout layout = identityPresenter != null ?
                 identityPresenter.ResolveLayout(physicalLink, count, presenter.MaxLineWidth,
@@ -99,8 +98,10 @@ namespace Uptime.ConnectionsToy
             for (int i = 0; i < count; i++)
             {
                 float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, gap);
-                Vector2 start = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeA, area, direction) + normal * offset;
-                Vector2 end = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeB, area, -direction) + normal * offset;
+                Vector2 start = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeA,
+                    area, direction, offset);
+                Vector2 end = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeB,
+                    area, -direction, -offset);
                 graphics[i].SetPath(new[] { start }, new[] { end }, new[] { width }, 1f);
                 identities.Add(new ConnectionsToyIdentityPresenter.LiveLine(ids[i],
                     start, end, start, end, graphics[i].color, 1f, width));

@@ -135,9 +135,10 @@ namespace Uptime.ConnectionsToy
                 Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
                 Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
-                Vector2 normal = new Vector2(-direction.y, direction.x);
-                starts[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i].Node, networkArea, direction) + normal * laneOffsets[i];
-                ends[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node, networkArea, -direction) + normal * laneOffsets[i];
+                starts[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i].Node,
+                    networkArea, direction, laneOffsets[i]);
+                ends[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node,
+                    networkArea, -direction, -laneOffsets[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
         }

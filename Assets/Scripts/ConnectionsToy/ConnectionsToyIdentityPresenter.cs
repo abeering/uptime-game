@@ -151,7 +151,9 @@ namespace Uptime.ConnectionsToy
                 state.Layout = ConnectionsToyIdentityPacking.Solve(start, end, budget, count,
                     maximumLineWidth, minimumReadableLineWidth, minimumLineGap,
                     PillSize, MinimumPillGap,
-                    StaggerStep, EndInset, state.Clearance, obstacles);
+                    StaggerStep, EndInset, state.Clearance, obstacles,
+                    ConnectionsToyEdgeGeometry.CardRect(link.NodeA, networkArea),
+                    ConnectionsToyEdgeGeometry.CardRect(link.NodeB, networkArea));
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);
                 if (state.Layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable &&

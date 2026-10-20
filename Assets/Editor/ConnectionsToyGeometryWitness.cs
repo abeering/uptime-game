@@ -77,6 +77,17 @@ public static class ConnectionsToyGeometryWitness
                 var layout = identity.ResolveLayout(link, count, presenter.MaxLineWidth,
                     presenter.MinLineWidth, presenter.MinLineGap);
                 CheckLayout(layout, link.BundleWidth(presenter.NetworkArea), count);
+                Rect sourceCard = ConnectionsToyEdgeGeometry.CardRect(link.NodeA,
+                    presenter.NetworkArea);
+                Rect destinationCard = ConnectionsToyEdgeGeometry.CardRect(link.NodeB,
+                    presenter.NetworkArea);
+                foreach (ConnectionsToyIdentityPacking.Lane lane in layout.Lanes)
+                {
+                    Check(OnCardEdge(sourceCard, lane.Start),
+                        link.LinkId + " source lane reaches its card");
+                    Check(OnCardEdge(destinationCard, lane.End),
+                        link.LinkId + " destination lane reaches its card");
+                }
                 observedStages.Add(layout.Stage);
                 Debug.Log($"{link.LinkId} {count}: {layout.Stage}, {layout.LineWidth:0.##} px line, " +
                     $"{layout.LineGap:0.##} px gap, {layout.Schedule[0].Count} visible");
@@ -91,7 +102,7 @@ public static class ConnectionsToyGeometryWitness
             new Vector2(1f, 1f).normalized })
             foreach (int count in new[] { 2, 4, 8, 12 })
                 CheckLayout(ConnectionsToyIdentityPacking.Solve(Vector2.zero,
-                    direction * 280f, 96f, count, 12f, 2.5f, 3f, new Vector2(56f, 29f),
+                    direction * 280f, 96f, count, 12f, 2.5f, 3f, new Vector2(54f, 28f),
                     6f, 20f, 12f, 1f,
                     Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()), 96f, count);
         var stableLink = links.First(l => l.LinkId == "E1");
@@ -102,12 +113,12 @@ public static class ConnectionsToyGeometryWitness
             presenter.MaxLineWidth, presenter.MinLineWidth, presenter.MinLineGap)),
             "manual cycle never replans line geometry");
         Check(ConnectionsToyIdentityPacking.Solve(Vector2.zero, Vector2.up * 70f,
-            96f, 12, 12f, 2.5f, 3f, new Vector2(56f, 29f), 6f, 20f, 12f, 1f,
+            96f, 12, 12f, 2.5f, 3f, new Vector2(54f, 28f), 6f, 20f, 12f, 1f,
             Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()).Stage ==
                 ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable,
             "short edge cannot fit an invalid pill");
         CheckLayout(ConnectionsToyIdentityPacking.Solve(Vector2.zero, Vector2.up * 110f,
-            96f, 12, 12f, 2.5f, 3f, new Vector2(56f, 29f), 6f, 20f, 12f, 1f,
+            96f, 12, 12f, 2.5f, 3f, new Vector2(54f, 28f), 6f, 20f, 12f, 1f,
             Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()), 96f, 12);
 
         host.ResetSimulation();
@@ -154,7 +165,7 @@ public static class ConnectionsToyGeometryWitness
                     "rotated pill attached to line");
                 Check((placement.Bounds.Along - (lane.End - lane.Start).normalized).sqrMagnitude < 0.001f,
                     "pill follows line direction");
-                float margin = (56f * 0.5f + 12f) / Vector2.Distance(lane.Start, lane.End);
+                float margin = (54f * 0.5f + 12f) / Vector2.Distance(lane.Start, lane.End);
                 Check(placement.Fraction >= margin - 0.001f &&
                     placement.Fraction <= 1f - margin + 0.001f, "pill stays inside edge");
                 for (int j = 0; j < i; j++)
@@ -181,5 +192,16 @@ public static class ConnectionsToyGeometryWitness
     {
         if (!condition)
             throw new InvalidOperationException("ConnectionsToyGeometryWitness failed: " + name);
+    }
+
+    private static bool OnCardEdge(Rect card, Vector2 point)
+    {
+        const float tolerance = 0.1f;
+        bool inside = point.x >= card.xMin - tolerance && point.x <= card.xMax + tolerance &&
+            point.y >= card.yMin - tolerance && point.y <= card.yMax + tolerance;
+        float nearestSide = Mathf.Min(Mathf.Abs(point.x - card.xMin),
+            Mathf.Abs(point.x - card.xMax), Mathf.Abs(point.y - card.yMin),
+            Mathf.Abs(point.y - card.yMax));
+        return inside && nearestSide <= tolerance;
     }
 }

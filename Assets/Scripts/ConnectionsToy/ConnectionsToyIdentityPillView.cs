@@ -7,7 +7,7 @@ namespace Uptime.ConnectionsToy
     {
         [SerializeField] private ConnectionsToyPillGraphic plate;
         [SerializeField] private TMP_Text idText;
-        [SerializeField] private Vector2 dimensions = new Vector2(56f, 29f);
+        [SerializeField] private Vector2 dimensions = new Vector2(54f, 28f);
         [SerializeField, Min(8f)] private float fontSize = 16f;
 
         public Vector2 Size => new Vector2(Mathf.Max(32f, dimensions.x), Mathf.Max(23f, dimensions.y));

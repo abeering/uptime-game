@@ -135,11 +135,10 @@ namespace Uptime.ConnectionsToy
                         Vector2 a = networkArea.InverseTransformPoint(routeA.transform.position);
                         Vector2 b = networkArea.InverseTransformPoint(routeB.transform.position);
                         Vector2 direction = (b - a).normalized;
-                        Vector2 normal = new Vector2(-direction.y, direction.x);
-                        Vector2 targetStart = ConnectionsToyEdgeGeometry.CardEdge(routeA, networkArea, direction) +
-                            normal * offsets[edge];
-                        Vector2 targetEnd = ConnectionsToyEdgeGeometry.CardEdge(routeB, networkArea, -direction) +
-                            normal * offsets[edge];
+                        Vector2 targetStart = ConnectionsToyEdgeGeometry.CardEdge(routeA,
+                            networkArea, direction, offsets[edge]);
+                        Vector2 targetEnd = ConnectionsToyEdgeGeometry.CardEdge(routeB,
+                            networkArea, -direction, -offsets[edge]);
                         bool hasVisual = views[connection].TryGetVisualSegment(edge, out Vector2 visualStart,
                             out Vector2 visualEnd, out float visibleFraction, out Color lineColor);
                         if (!hasVisual)

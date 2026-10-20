@@ -77,7 +77,8 @@ namespace Uptime.ConnectionsToy
             float maximumLineWidth, float minimumReadableLineWidth, float minimumLineGap,
             Vector2 pillSize, float pillGap,
             float staggerStep, float endInset, float lineClearance,
-            IReadOnlyList<PillBounds> obstacles)
+            IReadOnlyList<PillBounds> obstacles, Rect? sourceCard = null,
+            Rect? destinationCard = null)
         {
             if (count <= 0 || (end - start).sqrMagnitude < 0.01f)
                 return new Layout(ReadabilityStage.Unavailable, 0f, minimumLineGap,
@@ -87,7 +88,8 @@ namespace Uptime.ConnectionsToy
                 pillSize.y, pillGap, lineClearance, minimumReadableLineWidth,
                 true, out float width, out float gap))
             {
-                Lane[] lanes = MakeLanes(start, end, count, width, gap);
+                Lane[] lanes = MakeLanes(start, end, count, width, gap,
+                    sourceCard, destinationCard);
                 List<Placement> centered = Pack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance, 3);
                 if (centered.Count == count)
@@ -98,7 +100,8 @@ namespace Uptime.ConnectionsToy
                 pillSize.y, pillGap, lineClearance, minimumReadableLineWidth,
                 false, out width, out gap))
             {
-                Lane[] lanes = MakeLanes(start, end, count, width, gap);
+                Lane[] lanes = MakeLanes(start, end, count, width, gap,
+                    sourceCard, destinationCard);
                 List<Placement> staggered = BestPack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance);
                 if (staggered != null && staggered.Count == count)
@@ -107,7 +110,8 @@ namespace Uptime.ConnectionsToy
 
             width = ConnectionsToyEdgeGeometry.LineWidth(budget, count, minimumLineGap, maximumLineWidth);
             gap = minimumLineGap;
-            Lane[] compressed = MakeLanes(start, end, count, width, gap);
+            Lane[] compressed = MakeLanes(start, end, count, width, gap,
+                sourceCard, destinationCard);
             List<Placement> overlaid = BestPack(compressed, Sequential(count), pillSize,
                 pillGap, staggerStep, endInset, obstacles, false, lineClearance);
             if (overlaid != null && overlaid.Count == count)
@@ -153,7 +157,8 @@ namespace Uptime.ConnectionsToy
                 count * width + (count - 1) * gap <= budget + 0.01f;
         }
 
-        private static Lane[] MakeLanes(Vector2 start, Vector2 end, int count, float width, float gap)
+        private static Lane[] MakeLanes(Vector2 start, Vector2 end, int count, float width,
+            float gap, Rect? sourceCard, Rect? destinationCard)
         {
             var lanes = new Lane[count];
             Vector2 direction = (end - start).normalized;
@@ -161,8 +166,13 @@ namespace Uptime.ConnectionsToy
             for (int i = 0; i < count; i++)
             {
                 float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, gap);
-                lanes[i] = new Lane("c" + (i + 1), start + normal * offset,
-                    end + normal * offset, width);
+                Vector2 laneStart = sourceCard.HasValue ?
+                    ConnectionsToyEdgeGeometry.CardEdge(sourceCard.Value, direction, offset) :
+                    start + normal * offset;
+                Vector2 laneEnd = destinationCard.HasValue ?
+                    ConnectionsToyEdgeGeometry.CardEdge(destinationCard.Value, -direction, -offset) :
+                    end + normal * offset;
+                lanes[i] = new Lane("c" + (i + 1), laneStart, laneEnd, width);
             }
             return lanes;
         }

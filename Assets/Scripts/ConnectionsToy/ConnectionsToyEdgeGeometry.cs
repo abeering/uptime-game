@@ -6,13 +6,35 @@ namespace Uptime.ConnectionsToy
     public static class ConnectionsToyEdgeGeometry
     {
         public static Vector2 CardEdge(ConnectionsToyNodeView node, RectTransform area, Vector2 direction)
+            => CardEdge(node, area, direction, 0f);
+
+        public static Vector2 CardEdge(ConnectionsToyNodeView node, RectTransform area,
+            Vector2 direction, float laneOffset)
+            => CardEdge(CardRect(node, area), direction, laneOffset);
+
+        public static Rect CardRect(ConnectionsToyNodeView node, RectTransform area)
         {
-            RectTransform card = (RectTransform)node.transform;
-            Vector2 center = area.InverseTransformPoint(node.transform.position);
-            Vector2 size = card.rect.size;
-            float x = Mathf.Abs(direction.x) > 0.001f ? size.x * 0.5f / Mathf.Abs(direction.x) : float.PositiveInfinity;
-            float y = Mathf.Abs(direction.y) > 0.001f ? size.y * 0.5f / Mathf.Abs(direction.y) : float.PositiveInfinity;
-            return center + direction * (Mathf.Min(x, y) + 5f);
+            var corners = new Vector3[4];
+            ((RectTransform)node.transform).GetWorldCorners(corners);
+            Vector2 min = area.InverseTransformPoint(corners[0]);
+            Vector2 max = area.InverseTransformPoint(corners[2]);
+            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        }
+
+        // Intersect the offset lane itself with the card, rather than offsetting a single
+        // center-line endpoint. Outer diagonal lanes otherwise stop short of the card.
+        public static Vector2 CardEdge(Rect card, Vector2 direction, float laneOffset)
+        {
+            Vector2 along = direction.normalized;
+            Vector2 across = new Vector2(-along.y, along.x);
+            Vector2 origin = card.center + across * laneOffset;
+            float x = Mathf.Abs(along.x) > 0.001f ?
+                ((along.x > 0f ? card.xMax : card.xMin) - origin.x) / along.x :
+                float.PositiveInfinity;
+            float y = Mathf.Abs(along.y) > 0.001f ?
+                ((along.y > 0f ? card.yMax : card.yMin) - origin.y) / along.y :
+                float.PositiveInfinity;
+            return origin + along * Mathf.Max(0f, Mathf.Min(x, y));
         }
 
         public static float LineWidth(float bundleWidth, int count, float gap, float maxLineWidth)
