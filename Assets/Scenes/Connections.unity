@@ -6385,38 +6385,46 @@ MonoBehaviour:
     bandwidthCapacityMBps: 25
   connections:
   - connectionId: c1
+    claimedPurpose: Record Retrieval
+    activityDescription: Reading records
+    currentOperation: 0
     route:
     - node: {fileID: 458374168}
-      cpuUnitsPerMB: 0
-      diskIoMBPerMB: 0
+      cpuUnitsPerWork: 0
+      diskIoMBPerWork: 0
       memoryGB: 0
     - node: {fileID: 252751404}
-      cpuUnitsPerMB: 1
-      diskIoMBPerMB: 0.5
+      cpuUnitsPerWork: 1
+      diskIoMBPerWork: 0.5
       memoryGB: 1
     - node: {fileID: 358228025}
-      cpuUnitsPerMB: 0.5
-      diskIoMBPerMB: 1
+      cpuUnitsPerWork: 0.5
+      diskIoMBPerWork: 1
       memoryGB: 1
-    totalWorkMB: 1500
-    desiredRateMBps: 35
+    totalWork: 1500
+    desiredWorkRate: 35
+    bandwidthMBPerWork: 1
     startDelaySeconds: 0
   - connectionId: c2
+    claimedPurpose: Customer Authentications
+    activityDescription: Processing authentication requests
+    currentOperation: 2
     route:
     - node: {fileID: 458374168}
-      cpuUnitsPerMB: 0
-      diskIoMBPerMB: 0
+      cpuUnitsPerWork: 0
+      diskIoMBPerWork: 0
       memoryGB: 0
     - node: {fileID: 252751404}
-      cpuUnitsPerMB: 1
-      diskIoMBPerMB: 0.5
+      cpuUnitsPerWork: 1
+      diskIoMBPerWork: 0.5
       memoryGB: 1
     - node: {fileID: 1603479477}
-      cpuUnitsPerMB: 0.5
-      diskIoMBPerMB: 0.5
+      cpuUnitsPerWork: 0.5
+      diskIoMBPerWork: 0.5
       memoryGB: 1
-    totalWorkMB: 600
-    desiredRateMBps: 35
+    totalWork: 600
+    desiredWorkRate: 35
+    bandwidthMBPerWork: 1
     startDelaySeconds: 3
   connectionDebugReadout: {fileID: 394130996}
   pathPresenter: {fileID: 1033840602}

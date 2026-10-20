@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Uptime.Connections
 {
@@ -7,46 +8,68 @@ namespace Uptime.Connections
     public sealed class NodeRequirement
     {
         [SerializeField] private NodeView node;
-        [SerializeField, Min(0f), Tooltip("CPU units used per MB transferred at this node.")]
-        private float cpuUnitsPerMB;
-        [SerializeField, Min(0f), Tooltip("Disk I/O MB used per MB transferred at this node.")]
-        private float diskIoMBPerMB;
+        [FormerlySerializedAs("cpuUnitsPerMB")]
+        [SerializeField, Min(0f), Tooltip("CPU units used per work unit at this node.")]
+        private float cpuUnitsPerWork;
+        [FormerlySerializedAs("diskIoMBPerMB")]
+        [SerializeField, Min(0f), Tooltip("Disk I/O MB used per work unit at this node.")]
+        private float diskIoMBPerWork;
         [SerializeField, Min(0f), Tooltip("GB reserved at this node while the connection is active.")]
         private float memoryGB;
 
         public NodeView Node => node;
-        public float CpuUnitsPerMB => Mathf.Max(0f, cpuUnitsPerMB);
-        public float DiskIoMBPerMB => Mathf.Max(0f, diskIoMBPerMB);
+        public float CpuUnitsPerWork => Mathf.Max(0f, cpuUnitsPerWork);
+        public float DiskIoMBPerWork => Mathf.Max(0f, diskIoMBPerWork);
         public float MemoryGB => Mathf.Max(0f, memoryGB);
 
         internal void ClampNonnegative()
         {
-            cpuUnitsPerMB = CpuUnitsPerMB;
-            diskIoMBPerMB = DiskIoMBPerMB;
+            cpuUnitsPerWork = CpuUnitsPerWork;
+            diskIoMBPerWork = DiskIoMBPerWork;
             memoryGB = MemoryGB;
         }
+    }
+
+    public enum OperationKind
+    {
+        Read,
+        Write,
+        Execute
     }
 
     [Serializable]
     public sealed class LogicalConnectionDefinition
     {
+        // V0 has one current operation; its work and costs are authored here until stages exist.
         [SerializeField] private string connectionId;
+        [SerializeField] private string claimedPurpose;
+        [SerializeField] private string activityDescription;
+        [SerializeField] private OperationKind currentOperation;
         [SerializeField] private NodeRequirement[] route;
-        [SerializeField, Min(0f)] private float totalWorkMB;
-        [SerializeField, Min(0f)] private float desiredRateMBps;
+        [FormerlySerializedAs("totalWorkMB")]
+        [SerializeField, Min(0f)] private float totalWork;
+        [FormerlySerializedAs("desiredRateMBps")]
+        [SerializeField, Min(0f)] private float desiredWorkRate;
+        [SerializeField, Min(0f), Tooltip("Network MB consumed on each traversed link per work unit.")]
+        private float bandwidthMBPerWork = 1f;
         [SerializeField, Min(0f), Tooltip("Seconds after simulation start before this connection is established.")]
         private float startDelaySeconds;
 
         public string ConnectionId => connectionId;
+        public string ClaimedPurpose => claimedPurpose;
+        public string ActivityDescription => activityDescription;
+        public OperationKind CurrentOperation => currentOperation;
         public NodeRequirement[] Route => route;
-        public float TotalWorkMB => Mathf.Max(0f, totalWorkMB);
-        public float DesiredRateMBps => Mathf.Max(0f, desiredRateMBps);
+        public float TotalWork => Mathf.Max(0f, totalWork);
+        public float DesiredWorkRate => Mathf.Max(0f, desiredWorkRate);
+        public float BandwidthMBPerWork => Mathf.Max(0f, bandwidthMBPerWork);
         public float StartDelaySeconds => Mathf.Max(0f, startDelaySeconds);
 
         internal void ClampNonnegative()
         {
-            totalWorkMB = TotalWorkMB;
-            desiredRateMBps = DesiredRateMBps;
+            totalWork = TotalWork;
+            desiredWorkRate = DesiredWorkRate;
+            bandwidthMBPerWork = BandwidthMBPerWork;
             startDelaySeconds = StartDelaySeconds;
             if (route == null)
                 return;
@@ -89,11 +112,14 @@ namespace Uptime.Connections
         internal bool MemoryAdmitted { get; set; }
 
         public string ConnectionId => Definition.ConnectionId;
-        public float CompletedWorkMB { get; internal set; }
-        public float RemainingWorkMB => Mathf.Max(0f, Definition.TotalWorkMB - CompletedWorkMB);
-        public float ActualRateMBps { get; internal set; }
-        public float Satisfaction => IsComplete ? 1f : IsPending ? 0f : Definition.DesiredRateMBps > 0f ?
-            ActualRateMBps / Definition.DesiredRateMBps : 0f;
+        public OperationKind CurrentOperation => Definition.CurrentOperation;
+        public float CompletedWork { get; internal set; }
+        public float RemainingWork => Mathf.Max(0f, Definition.TotalWork - CompletedWork);
+        public float ActualWorkRate { get; internal set; }
+        public float ActualBandwidthMBps => ActualWorkRate * Definition.BandwidthMBPerWork;
+        public float DesiredBandwidthMBps => Definition.DesiredWorkRate * Definition.BandwidthMBPerWork;
+        public float Satisfaction => IsComplete ? 1f : IsPending ? 0f : Definition.DesiredWorkRate > 0f ?
+            ActualWorkRate / Definition.DesiredWorkRate : 0f;
         public Lifecycle Lifecycle { get; internal set; }
         public bool IsPending => Lifecycle == Lifecycle.Pending;
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
@@ -106,7 +132,7 @@ namespace Uptime.Connections
         {
             foreach (NodeRequirement requirement in Definition.Route)
                 if (requirement.Node == node)
-                    return requirement.CpuUnitsPerMB;
+                    return requirement.CpuUnitsPerWork;
             return 0f;
         }
 
@@ -114,7 +140,7 @@ namespace Uptime.Connections
         {
             foreach (NodeRequirement requirement in Definition.Route)
                 if (requirement.Node == node)
-                    return requirement.DiskIoMBPerMB;
+                    return requirement.DiskIoMBPerWork;
             return 0f;
         }
 

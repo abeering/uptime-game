@@ -106,7 +106,7 @@ namespace Uptime.Connections
                     if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
                         !ids.Add(definition.ConnectionId))
                         throw new InvalidOperationException("Logical connections require unique, nonempty IDs.");
-                    if (definition.TotalWorkMB <= 0f || definition.DesiredRateMBps <= 0f ||
+                    if (definition.TotalWork <= 0f || definition.DesiredWorkRate <= 0f ||
                         definition.Route == null || definition.Route.Length < 2)
                         throw new InvalidOperationException($"Connection {definition.ConnectionId} needs work, rate, and a route of at least two nodes.");
 
@@ -190,16 +190,17 @@ namespace Uptime.Connections
         private string BuildDebugText()
         {
             if (runtimeConnections == null)
-                return "CONNECTIONS  •  Play to run authored transfers";
+                return "CONNECTIONS  •  Play to run authored operations";
 
-            var output = new StringBuilder("CONNECTIONS  •  actual / desired MB/s");
+            var output = new StringBuilder("CONNECTIONS  •  actual / desired work units/s");
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                output.Append('\n').Append(connection.ConnectionId).Append(' ');
+                output.Append('\n').Append(connection.ConnectionId).Append(' ')
+                    .Append(connection.Definition.CurrentOperation.ToString().ToUpperInvariant()).Append(' ');
                 if (connection.IsComplete)
                 {
-                    output.Append("DONE  ").Append(connection.CompletedWorkMB.ToString("0.#"))
-                        .Append('/').Append(connection.Definition.TotalWorkMB.ToString("0.#")).Append(" MB");
+                    output.Append("DONE  ").Append(connection.CompletedWork.ToString("0.#"))
+                        .Append('/').Append(connection.Definition.TotalWork.ToString("0.#")).Append(" work units");
                     continue;
                 }
 
@@ -210,10 +211,13 @@ namespace Uptime.Connections
                     continue;
                 }
 
-                output.Append(connection.CompletedWorkMB.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.TotalWorkMB.ToString("0.#")).Append(" MB  ")
-                    .Append(connection.ActualRateMBps.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.DesiredRateMBps.ToString("0.#")).Append(" MB/s  ")
+                output.Append(connection.CompletedWork.ToString("0.#")).Append('/')
+                    .Append(connection.Definition.TotalWork.ToString("0.#")).Append(" work units  ")
+                    .Append(connection.ActualWorkRate.ToString("0.#")).Append('/')
+                    .Append(connection.Definition.DesiredWorkRate.ToString("0.#")).Append(" work units/s  ")
+                    .Append("BW ").Append(connection.ActualBandwidthMBps.ToString("0.#"))
+                    .Append('/').Append(connection.DesiredBandwidthMBps.ToString("0.#"))
+                    .Append(" MB/s  ")
                     .Append(Mathf.RoundToInt(connection.Satisfaction * 100f)).Append('%');
                 if (connection.LimitKind != LimitKind.None)
                     output.Append("  [").Append(connection.LimitingResourceId).Append(' ')

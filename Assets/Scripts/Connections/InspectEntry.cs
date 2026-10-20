@@ -21,22 +21,26 @@ namespace Uptime.Connections
         public void Render(LogicalConnectionState state)
         {
             string lifecycle = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" : "ACTIVE";
-            Set(identity, state.ConnectionId.ToUpperInvariant() + "  /  " + lifecycle);
+            string claim = string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ? string.Empty :
+                "  /  " + state.Definition.ClaimedPurpose;
+            Set(identity, state.ConnectionId.ToUpperInvariant() + "  /  " +
+                state.Definition.CurrentOperation.ToString().ToUpperInvariant() + claim + "  /  " + lifecycle);
             string routeText = string.Empty;
             foreach (NodeRequirement requirement in state.Definition.Route)
                 routeText += (routeText.Length == 0 ? string.Empty : "  >  ") + requirement.Node.NodeId;
-            Set(route, routeText);
+            Set(route, string.IsNullOrWhiteSpace(state.Definition.ActivityDescription) ? routeText :
+                state.Definition.ActivityDescription + "  •  " + routeText);
 
-            float fraction = state.Definition.TotalWorkMB > 0f ? state.CompletedWorkMB / state.Definition.TotalWorkMB : 0f;
-            Set(work, $"WORK  {state.CompletedWorkMB:0.#} / {state.Definition.TotalWorkMB:0.#} MB   {fraction * 100f:0}%");
-            Set(throughput, $"RATE  {state.ActualRateMBps:0.#} / {state.Definition.DesiredRateMBps:0.#} MB/s   SAT {state.Satisfaction * 100f:0}%");
+            float fraction = state.Definition.TotalWork > 0f ? state.CompletedWork / state.Definition.TotalWork : 0f;
+            Set(work, $"WORK  {state.CompletedWork:0.#} / {state.Definition.TotalWork:0.#} work units   {fraction * 100f:0}%");
+            Set(throughput, $"RATE  {state.ActualWorkRate:0.#} / {state.Definition.DesiredWorkRate:0.#} work units/s  BW {state.ActualBandwidthMBps:0.#} / {state.DesiredBandwidthMBps:0.#} MB/s  SAT {state.Satisfaction * 100f:0}%");
 
             string limit = state.IsPending ? "Waiting to establish" : state.IsComplete ? "Released" :
                 state.LimitKind == LimitKind.None ? "None" :
                 state.LimitingResourceId + " " + LimitName(state.LimitKind);
             Set(bottleneck, "LIMIT  " + limit);
             string remaining = state.IsComplete ? "00:00" : state.IsPending ? "--:--" :
-                state.ActualRateMBps <= 0f ? "--:--" : FormatSeconds(state.RemainingWorkMB / state.ActualRateMBps);
+                state.ActualWorkRate <= 0f ? "--:--" : FormatSeconds(state.RemainingWork / state.ActualWorkRate);
             Set(eta, "ETA  " + remaining);
 
             if (progressFill != null)
