@@ -1,31 +1,58 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Uptime.ConnectionsToy
 {
-    // Edit-mode scene fixture. Draws disposable copies of the production path graphic;
+    // Scene fixture. Draws disposable copies of the production path graphic;
     // it does not create connections or touch the simulation host.
     [ExecuteAlways]
     public sealed class ConnectionsToyGeometryPreview : MonoBehaviour
     {
-        [SerializeField, Tooltip("Edit mode only. Clear this to return to the authored scene.")]
+        [SerializeField, Tooltip("Presentation preview only; the authored simulation remains unchanged.")]
         private bool previewEnabled;
         [SerializeField, Range(1, 16)] private int connectionCount = 1;
         [SerializeField] private ConnectionsToyPhysicalLinkView physicalLink;
         [SerializeField] private ConnectionsToyLogicalPathPresenter presenter;
+        [SerializeField] private ConnectionsToyIdentityPresenter identityPresenter;
 
         private readonly List<ConnectionsToyPathGraphic> graphics = new List<ConnectionsToyPathGraphic>();
         private bool warned;
+        private bool presentedIdentity;
+#if UNITY_EDITOR
+        private double nextEditorRefresh;
+#endif
+
+#if UNITY_EDITOR
+        private void OnEnable() => EditorApplication.update += RequestPreviewUpdate;
+
+        private void RequestPreviewUpdate()
+        {
+            if (Application.isPlaying || !previewEnabled ||
+                EditorApplication.timeSinceStartup < nextEditorRefresh)
+                return;
+            nextEditorRefresh = EditorApplication.timeSinceStartup + 0.08;
+            EditorApplication.QueuePlayerLoopUpdate();
+            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        }
+#endif
 
         private void Update()
         {
-            if (Application.isPlaying || !previewEnabled || physicalLink == null || presenter == null ||
+            if (!previewEnabled || physicalLink == null || presenter == null ||
                 presenter.NetworkArea == null || presenter.PathLayer == null || presenter.PathGraphicPrefab == null)
             {
+                if (Application.isPlaying && presenter != null)
+                    presenter.SetPreviewMode(false);
                 Clear();
+                ClearIdentities();
                 return;
             }
+            if (Application.isPlaying)
+                presenter.SetPreviewMode(true);
 
             int count = Mathf.Clamp(connectionCount, 1, 16);
             if (graphics.Count != count || (graphics.Count > 0 &&
@@ -60,16 +87,46 @@ namespace Uptime.ConnectionsToy
                     $"{width:0.##} px each, below the {presenter.MinLineWidth:0.##} px minimum.", this);
             warned = belowMinimum;
 
+            var identities = new List<ConnectionsToyIdentityPresenter.LiveLine>();
             for (int i = 0; i < count; i++)
             {
                 float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, gap);
                 Vector2 start = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeA, area, direction) + normal * offset;
                 Vector2 end = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeB, area, -direction) + normal * offset;
                 graphics[i].SetPath(new[] { start }, new[] { end }, new[] { width }, 1f);
+                identities.Add(new ConnectionsToyIdentityPresenter.LiveLine("c" + (i + 1),
+                    start, end, start, end, graphics[i].color, 1f));
+            }
+            if (identityPresenter != null)
+            {
+                identityPresenter.BeginFrame();
+                identityPresenter.PresentEdge(physicalLink, identities);
+                identityPresenter.EndFrame();
+                if (!Application.isPlaying)
+                    identityPresenter.Tick();
+                presentedIdentity = true;
             }
         }
 
-        private void OnDisable() => Clear();
+        private void OnDisable()
+        {
+#if UNITY_EDITOR
+            EditorApplication.update -= RequestPreviewUpdate;
+#endif
+            if (Application.isPlaying && presenter != null)
+                presenter.SetPreviewMode(false);
+            Clear();
+            ClearIdentities();
+        }
+
+        private void ClearIdentities()
+        {
+            if (!presentedIdentity || identityPresenter == null)
+                return;
+            identityPresenter.BeginFrame();
+            identityPresenter.EndFrame();
+            presentedIdentity = false;
+        }
 
         private void Clear()
         {
@@ -77,6 +134,7 @@ namespace Uptime.ConnectionsToy
             {
                 if (graphic == null)
                     continue;
+                graphic.gameObject.SetActive(false);
                 if (Application.isPlaying)
                     Destroy(graphic.gameObject);
                 else

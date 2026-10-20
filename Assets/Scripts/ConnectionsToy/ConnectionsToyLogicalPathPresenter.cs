@@ -9,6 +9,7 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private ConnectionsToyLogicalPathView pathPrefab;
+        [SerializeField] private ConnectionsToyIdentityPresenter identityPresenter;
         [Header("Logical line geometry (UI pixels)")]
         [SerializeField, Min(0.1f)] private float maxLineWidth = 12f;
         [SerializeField, Min(0f)] private float minLineGap = 3f;
@@ -19,6 +20,7 @@ namespace Uptime.ConnectionsToy
         private readonly Dictionary<ConnectionsToyLogicalConnectionState, ConnectionsToyLogicalPathView> views =
             new Dictionary<ConnectionsToyLogicalConnectionState, ConnectionsToyLogicalPathView>();
         private readonly HashSet<ConnectionsToyPhysicalLinkView> warnedLinks = new HashSet<ConnectionsToyPhysicalLinkView>();
+        private bool previewMode;
 
         public RectTransform NetworkArea => networkArea;
         public RectTransform PathLayer => pathLayer;
@@ -26,6 +28,21 @@ namespace Uptime.ConnectionsToy
         public float MaxLineWidth => Mathf.Max(0.1f, maxLineWidth);
         public float MinLineGap => Mathf.Max(0f, minLineGap);
         public float MinLineWidth => Mathf.Max(0.1f, minLineWidth);
+
+        public void SetPreviewMode(bool enabled)
+        {
+            if (previewMode == enabled)
+                return;
+            previewMode = enabled;
+            foreach (ConnectionsToyLogicalPathView view in views.Values)
+                if (view != null)
+                    view.gameObject.SetActive(!enabled);
+            if (enabled && identityPresenter != null)
+            {
+                identityPresenter.BeginFrame();
+                identityPresenter.EndFrame();
+            }
+        }
 
         public void Bind(ConnectionsToyLogicalConnectionState[] states)
         {
@@ -42,6 +59,7 @@ namespace Uptime.ConnectionsToy
                 ConnectionsToyLogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
                 view.name = "Logical path " + connection.ConnectionId;
                 view.Bind(connection, networkArea);
+                view.gameObject.SetActive(!previewMode);
                 views.Add(connection, view);
             }
             UpdateLayouts();
@@ -49,13 +67,15 @@ namespace Uptime.ConnectionsToy
 
         private void LateUpdate()
         {
-            if (connections != null)
+            if (connections != null && !previewMode)
                 UpdateLayouts();
         }
 
         // Recompute from active presentation state. Pending and departing paths hold no lane.
         private void UpdateLayouts()
         {
+            if (previewMode)
+                return;
             var usersByLink = new Dictionary<ConnectionsToyPhysicalLinkResources,
                 List<ConnectionsToyLogicalConnectionState>>();
             foreach (ConnectionsToyLogicalConnectionState connection in connections)
@@ -76,6 +96,10 @@ namespace Uptime.ConnectionsToy
                 users.Sort((a, b) => StringComparer.Ordinal.Compare(a.ConnectionId, b.ConnectionId));
 
             var currentlyOverflowed = new HashSet<ConnectionsToyPhysicalLinkView>();
+            var identitiesByLink = new Dictionary<ConnectionsToyPhysicalLinkView,
+                List<ConnectionsToyIdentityPresenter.LiveLine>>();
+            if (identityPresenter != null)
+                identityPresenter.BeginFrame();
             foreach (ConnectionsToyLogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive)
@@ -93,6 +117,34 @@ namespace Uptime.ConnectionsToy
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
                     offsets[edge] = connection.Definition.Route[edge].Node == linkView.NodeA ? offset : -offset;
                     widths[edge] = width;
+                    if (identityPresenter != null)
+                    {
+                        ConnectionsToyNodeView routeA = connection.Definition.Route[edge].Node;
+                        ConnectionsToyNodeView routeB = connection.Definition.Route[edge + 1].Node;
+                        Vector2 a = networkArea.InverseTransformPoint(routeA.transform.position);
+                        Vector2 b = networkArea.InverseTransformPoint(routeB.transform.position);
+                        Vector2 direction = (b - a).normalized;
+                        Vector2 normal = new Vector2(-direction.y, direction.x);
+                        Vector2 targetStart = ConnectionsToyEdgeGeometry.CardEdge(routeA, networkArea, direction) +
+                            normal * offsets[edge];
+                        Vector2 targetEnd = ConnectionsToyEdgeGeometry.CardEdge(routeB, networkArea, -direction) +
+                            normal * offsets[edge];
+                        bool hasVisual = views[connection].TryGetVisualSegment(edge, out Vector2 visualStart,
+                            out Vector2 visualEnd, out float visibleFraction, out Color lineColor);
+                        if (!hasVisual)
+                        {
+                            visualStart = targetStart;
+                            visualEnd = targetEnd;
+                        }
+                        if (!identitiesByLink.TryGetValue(linkView,
+                            out List<ConnectionsToyIdentityPresenter.LiveLine> lines))
+                        {
+                            lines = new List<ConnectionsToyIdentityPresenter.LiveLine>();
+                            identitiesByLink.Add(linkView, lines);
+                        }
+                        lines.Add(new ConnectionsToyIdentityPresenter.LiveLine(connection.ConnectionId,
+                            targetStart, targetEnd, visualStart, visualEnd, lineColor, visibleFraction));
+                    }
                     if (ConnectionsToyEdgeGeometry.BelowMinimum(budget, users.Count, minLineGap,
                         maxLineWidth, minLineWidth))
                     {
@@ -106,6 +158,13 @@ namespace Uptime.ConnectionsToy
                 views[connection].SetLayout(offsets, widths);
             }
             warnedLinks.IntersectWith(currentlyOverflowed);
+            if (identityPresenter != null)
+            {
+                foreach (KeyValuePair<ConnectionsToyPhysicalLinkView,
+                    List<ConnectionsToyIdentityPresenter.LiveLine>> entry in identitiesByLink)
+                    identityPresenter.PresentEdge(entry.Key, entry.Value);
+                identityPresenter.EndFrame();
+            }
         }
     }
 }

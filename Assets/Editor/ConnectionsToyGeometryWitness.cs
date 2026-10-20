@@ -14,10 +14,11 @@ public static class ConnectionsToyGeometryWitness
         Canvas.ForceUpdateCanvases();
         var presenter = UnityEngine.Object.FindFirstObjectByType<ConnectionsToyLogicalPathPresenter>();
         var preview = UnityEngine.Object.FindFirstObjectByType<ConnectionsToyGeometryPreview>();
+        var identity = UnityEngine.Object.FindFirstObjectByType<ConnectionsToyIdentityPresenter>();
         var host = UnityEngine.Object.FindFirstObjectByType<ConnectionsToySimulationHost>();
         var nodes = UnityEngine.Object.FindObjectsByType<ConnectionsToyNodeView>(FindObjectsSortMode.None);
         var links = UnityEngine.Object.FindObjectsByType<ConnectionsToyPhysicalLinkView>(FindObjectsSortMode.None);
-        Check(presenter != null && preview != null && host != null, "scene components");
+        Check(presenter != null && preview != null && host != null && identity != null, "scene components");
         Check(presenter.NetworkArea != null && presenter.PathLayer != null && presenter.PathGraphicPrefab != null,
             "path prefab and area references");
         Check(nodes.Length == 4 && links.Length == 3, "four nodes and three links");
@@ -60,7 +61,21 @@ public static class ConnectionsToyGeometryWitness
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/ConnectionsToy/ToyLogicalPath.prefab");
         Check(prefab != null && prefab.GetComponent<ConnectionsToyLogicalPathView>() != null &&
             prefab.GetComponent<ConnectionsToyPathGraphic>() != null, "authored path prefab");
-        Check(prefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 2, "independent ID tags");
+        Check(prefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 0, "old path tags removed");
+        var pillPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/ConnectionsToy/ToyIdentityPill.prefab");
+        Check(pillPrefab != null && pillPrefab.GetComponent<ConnectionsToyIdentityPillView>() != null &&
+            pillPrefab.GetComponent<ConnectionsToyPillGraphic>() != null &&
+            pillPrefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 1, "authored identity pill");
+        Check(new SerializedObject(presenter).FindProperty("identityPresenter").objectReferenceValue == identity &&
+            new SerializedObject(preview).FindProperty("identityPresenter").objectReferenceValue == identity &&
+            new SerializedObject(UnityEngine.Object.FindFirstObjectByType<ConnectionsToyTerminal>())
+                .FindProperty("identityPresenter").objectReferenceValue == identity, "identity scene bindings");
+        CheckPacking(4, 280f, Vector2.up, false);
+        CheckPacking(2, 280f, Vector2.up, false);
+        CheckPacking(4, 280f, Vector2.right, false);
+        CheckPacking(12, 120f, Vector2.up, true);
+        CheckPacking(12, 120f, Vector2.right, true);
+        CheckPacking(12, 150f, new Vector2(1f, 1f).normalized, true);
 
         host.ResetSimulation();
         var c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
@@ -77,7 +92,49 @@ public static class ConnectionsToyGeometryWitness
         Check(c1.ActualRateMBps > sharedRate, "released capacity accelerates c1");
         host.ResetSimulation();
         Debug.Log("ConnectionsToyGeometryWitness PASS: scene references, 1/2/3/4/8/16 lanes on three edges, " +
-            "centering, gap, budget, density, threshold, prefab IDs, establishment and completion.");
+            "centering, gap, budget, density, threshold, identity packing/cycling coverage, establishment and completion.");
+    }
+
+    private static void CheckPacking(int count, float length, Vector2 direction, bool expectCycling)
+    {
+        var lanes = new System.Collections.Generic.List<ConnectionsToyIdentityPacking.Lane>();
+        Vector2 normal = new Vector2(-direction.y, direction.x);
+        float width = ConnectionsToyEdgeGeometry.LineWidth(96f, count, 3f, 12f);
+        for (int i = 0; i < count; i++)
+        {
+            float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, 3f);
+            lanes.Add(new ConnectionsToyIdentityPacking.Lane("c" + (i + 1),
+                -direction * length * 0.5f + normal * offset,
+                direction * length * 0.5f + normal * offset));
+        }
+        var schedule = ConnectionsToyIdentityPacking.BuildSchedule(lanes, new Vector2(56f, 29f),
+            6f, 20f, 12f, Array.Empty<Rect>());
+        Check(schedule.Count > 0 && (schedule.Count > 1) == expectCycling, "packing capacity");
+        var covered = new System.Collections.Generic.HashSet<int>();
+        foreach (var cycle in schedule)
+        {
+            for (int i = 0; i < cycle.Count; i++)
+            {
+                var placement = cycle[i];
+                covered.Add(placement.LaneIndex);
+                Vector2 center = Vector2.Lerp(lanes[placement.LaneIndex].Start,
+                    lanes[placement.LaneIndex].End, placement.Fraction);
+                Check((center - placement.Bounds.center).sqrMagnitude < 0.001f, "pill attached to line");
+                for (int j = 0; j < i; j++)
+                {
+                    Rect other = cycle[j].Bounds;
+                    Rect expanded = new Rect(placement.Bounds.xMin - 6f, placement.Bounds.yMin - 6f,
+                        placement.Bounds.width + 12f, placement.Bounds.height + 12f);
+                    Check(!expanded.Overlaps(other), "no pill overlap");
+                }
+            }
+        }
+        Check(covered.Count == count, "cycling covers every connection");
+        if (expectCycling && schedule[0].Count > 1)
+            Check(schedule[0].Last().LaneIndex - schedule[0].First().LaneIndex >= count / 2,
+                "distributed first cycle");
+        Check(ConnectionsToyEdgeGeometry.LineWidth(96f, count, 3f, 12f) == width,
+            "pills do not change line width");
     }
 
     private static void Check(bool condition, string name)

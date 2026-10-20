@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Uptime.ConnectionsToy
@@ -15,6 +16,7 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private ConnectionsToyPlaceholderOutput placeholderPrefab;
         [SerializeField] private ConnectionsToyInspectOutput inspectPrefab;
         [SerializeField] private ConnectionsToySimulationHost simulationHost;
+        [SerializeField] private ConnectionsToyIdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
@@ -22,11 +24,16 @@ namespace Uptime.ConnectionsToy
 
         private int entryCount;
         private bool scrollPending;
+        private TMP_InputField.OnValidateInput previousInputValidator;
 
         private void Awake()
         {
             if (commandInput != null)
+            {
                 commandInput.onSubmit.AddListener(HandleSubmit);
+                previousInputValidator = commandInput.onValidateInput;
+                commandInput.onValidateInput = ValidateCommandCharacter;
+            }
         }
 
         private void Start()
@@ -39,7 +46,25 @@ namespace Uptime.ConnectionsToy
         private void OnDestroy()
         {
             if (commandInput != null)
+            {
                 commandInput.onSubmit.RemoveListener(HandleSubmit);
+                commandInput.onValidateInput = previousInputValidator;
+            }
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current == null || !Keyboard.current.backquoteKey.wasPressedThisFrame)
+                return;
+            identityPresenter?.CycleCongestedEdges();
+        }
+
+        private char ValidateCommandCharacter(string text, int position, char character)
+        {
+            if ((character == '`' || character == '~') && Keyboard.current != null &&
+                Keyboard.current.backquoteKey.wasPressedThisFrame)
+                return '\0';
+            return previousInputValidator != null ? previousInputValidator(text, position, character) : character;
         }
 
         private void HandleSubmit(string raw)

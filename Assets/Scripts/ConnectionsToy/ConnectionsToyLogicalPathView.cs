@@ -1,13 +1,10 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Uptime.ConnectionsToy
 {
     public sealed class ConnectionsToyLogicalPathView : MonoBehaviour
     {
         [SerializeField] private ConnectionsToyPathGraphic path;
-        [SerializeField] private TMP_Text[] segmentTags;
         [SerializeField, Range(0.1f, 2f)] private float establishmentSeconds = 0.6f;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
         [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
@@ -36,13 +33,35 @@ namespace Uptime.ConnectionsToy
             int count = connection.RouteLinks.Length;
             starts = new Vector2[count];
             ends = new Vector2[count];
-            for (int i = 0; i < segmentTags.Length; i++)
-            {
-                segmentTags[i].text = connection.ConnectionId;
-                segmentTags[i].transform.parent.gameObject.SetActive(false);
-            }
             path.raycastTarget = false;
             path.SetPath(starts, ends, new float[count], 0f);
+        }
+
+        public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
+            out float visibleFraction, out Color lineColor)
+        {
+            start = end = Vector2.zero;
+            visibleFraction = 0f;
+            lineColor = path != null ? path.color : Color.white;
+            if (!establishedVisual || segment < 0 || segment >= starts.Length)
+                return false;
+            start = starts[segment];
+            end = ends[segment];
+            float total = 0f;
+            float before = 0f;
+            for (int i = 0; i < starts.Length; i++)
+            {
+                float length = Vector2.Distance(starts[i], ends[i]);
+                if (i < segment)
+                    before += length;
+                total += length;
+            }
+            float segmentLength = Vector2.Distance(start, end);
+            if (segmentLength < 0.01f)
+                return false;
+            visibleFraction = Mathf.Clamp01((total * Mathf.Clamp01(establishmentElapsed / establishmentSeconds) - before) /
+                segmentLength);
+            return true;
         }
 
         public void SetLayout(float[] offsets, float[] widths)
@@ -111,7 +130,6 @@ namespace Uptime.ConnectionsToy
             if (path.color != tint)
                 path.color = tint;
 
-            float totalLength = 0f;
             for (int i = 0; i < starts.Length; i++)
             {
                 Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
@@ -120,43 +138,8 @@ namespace Uptime.ConnectionsToy
                 Vector2 normal = new Vector2(-direction.y, direction.x);
                 starts[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i].Node, networkArea, direction) + normal * laneOffsets[i];
                 ends[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node, networkArea, -direction) + normal * laneOffsets[i];
-                totalLength += Vector2.Distance(starts[i], ends[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
-
-            float visibleLength = totalLength * reveal;
-            float before = 0f;
-            for (int i = 0; i < segmentTags.Length; i++)
-            {
-                if (i >= starts.Length)
-                {
-                    segmentTags[i].transform.parent.gameObject.SetActive(false);
-                    continue;
-                }
-                float length = Vector2.Distance(starts[i], ends[i]);
-                float tagFraction = i == 0 ? (laneOffsets[i] > 0f ? 0.04f : 0.4f) : 0.28f;
-                bool visible = visibleLength >= before + length * tagFraction;
-                RectTransform tag = (RectTransform)segmentTags[i].transform.parent;
-                if (tag.gameObject.activeSelf != visible)
-                    tag.gameObject.SetActive(visible);
-                if (visible)
-                {
-                    Vector2 direction = (ends[i] - starts[i]).normalized;
-                    Vector2 normal = new Vector2(-direction.y, direction.x);
-                    float side = laneOffsets[i] < 0f ? -1f : 1f;
-                    if (i > 0 && direction.x > 0f)
-                        side = -1f;
-                    float tagOffset = i == 0 ? 18f : 30f;
-                    tag.anchoredPosition = Vector2.Lerp(starts[i], ends[i], tagFraction) + normal * (side * tagOffset);
-                    Color labelColor = tint;
-                    labelColor.a = fade;
-                    segmentTags[i].color = labelColor;
-                    Image background = tag.GetComponent<Image>();
-                    if (background != null)
-                        background.color = new Color(0.035f, 0.10f, 0.13f, 0.94f * fade);
-                }
-                before += length;
-            }
         }
 
     }

@@ -18,6 +18,7 @@ namespace Uptime.ConnectionsToy
         public string LinkId => linkId;
         public ConnectionsToyNodeView NodeA => nodeA;
         public ConnectionsToyNodeView NodeB => nodeB;
+        public RectTransform ResourceLabel => label;
 
         public float BundleWidth(RectTransform area)
         {
