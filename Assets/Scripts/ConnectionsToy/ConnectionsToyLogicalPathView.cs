@@ -10,38 +10,81 @@ namespace Uptime.ConnectionsToy
         [SerializeField] private TMP_Text[] segmentTags;
         [SerializeField, Range(0.1f, 2f)] private float establishmentSeconds = 0.6f;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
+        [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
         [SerializeField] private Color healthyColor = new Color(0.36f, 0.95f, 0.74f);
         [SerializeField] private Color constrainedColor = new Color(1f, 0.69f, 0.34f);
 
         private ConnectionsToyLogicalConnectionState state;
         private RectTransform networkArea;
         private float[] laneOffsets;
+        private float[] lineWidths;
+        private float[] fromOffsets;
+        private float[] fromWidths;
+        private float[] targetOffsets;
+        private float[] targetWidths;
+        private float relayoutElapsed;
         private Vector2[] starts;
         private Vector2[] ends;
         private float establishmentElapsed;
         private float departureElapsed;
         private bool establishedVisual;
 
-        public void Bind(ConnectionsToyLogicalConnectionState connection, RectTransform area, float[] offsets)
+        public void Bind(ConnectionsToyLogicalConnectionState connection, RectTransform area)
         {
             state = connection;
             networkArea = area;
-            laneOffsets = offsets;
-            starts = new Vector2[offsets.Length];
-            ends = new Vector2[offsets.Length];
+            int count = connection.RouteLinks.Length;
+            starts = new Vector2[count];
+            ends = new Vector2[count];
             for (int i = 0; i < segmentTags.Length; i++)
             {
                 segmentTags[i].text = connection.ConnectionId;
                 segmentTags[i].transform.parent.gameObject.SetActive(false);
             }
             path.raycastTarget = false;
-            path.SetPath(starts, ends, 0f);
+            path.SetPath(starts, ends, new float[count], 0f);
+        }
+
+        public void SetLayout(float[] offsets, float[] widths)
+        {
+            if (targetOffsets == null)
+            {
+                laneOffsets = (float[])offsets.Clone();
+                lineWidths = (float[])widths.Clone();
+                fromOffsets = (float[])offsets.Clone();
+                fromWidths = (float[])widths.Clone();
+            }
+            else
+            {
+                bool changed = false;
+                for (int i = 0; i < offsets.Length; i++)
+                    changed |= Mathf.Abs(targetOffsets[i] - offsets[i]) > 0.001f ||
+                        Mathf.Abs(targetWidths[i] - widths[i]) > 0.001f;
+                if (!changed)
+                    return;
+                fromOffsets = (float[])laneOffsets.Clone();
+                fromWidths = (float[])lineWidths.Clone();
+            }
+            targetOffsets = (float[])offsets.Clone();
+            targetWidths = (float[])widths.Clone();
+            relayoutElapsed = 0f;
         }
 
         private void LateUpdate()
         {
-            if (state == null || networkArea == null || path == null || state.IsPending)
+            if (state == null || networkArea == null || path == null || state.IsPending || laneOffsets == null)
                 return;
+
+            if (!state.IsComplete)
+            {
+                relayoutElapsed += Time.deltaTime;
+                float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(relayoutElapsed / relayoutSeconds));
+                for (int i = 0; i < laneOffsets.Length; i++)
+                {
+                    laneOffsets[i] = Mathf.Lerp(fromOffsets[i], targetOffsets[i], t);
+                    lineWidths[i] = Mathf.Lerp(fromWidths[i], targetWidths[i], t);
+                }
+            }
 
             if (!establishedVisual)
             {
@@ -75,11 +118,11 @@ namespace Uptime.ConnectionsToy
                 Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
                 Vector2 normal = new Vector2(-direction.y, direction.x);
-                starts[i] = CardEdge(state.Definition.Route[i].Node, a, direction) + normal * laneOffsets[i];
-                ends[i] = CardEdge(state.Definition.Route[i + 1].Node, b, -direction) + normal * laneOffsets[i];
+                starts[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i].Node, networkArea, direction) + normal * laneOffsets[i];
+                ends[i] = ConnectionsToyEdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node, networkArea, -direction) + normal * laneOffsets[i];
                 totalLength += Vector2.Distance(starts[i], ends[i]);
             }
-            path.SetPath(starts, ends, reveal);
+            path.SetPath(starts, ends, lineWidths, reveal);
 
             float visibleLength = totalLength * reveal;
             float before = 0f;
@@ -116,13 +159,5 @@ namespace Uptime.ConnectionsToy
             }
         }
 
-        private Vector2 CardEdge(ConnectionsToyNodeView node, Vector2 center, Vector2 direction)
-        {
-            RectTransform card = (RectTransform)node.transform;
-            Vector2 size = card.rect.size;
-            float x = Mathf.Abs(direction.x) > 0.001f ? size.x * 0.5f / Mathf.Abs(direction.x) : float.PositiveInfinity;
-            float y = Mathf.Abs(direction.y) > 0.001f ? size.y * 0.5f / Mathf.Abs(direction.y) : float.PositiveInfinity;
-            return center + direction * (Mathf.Min(x, y) + 5f);
-        }
     }
 }

@@ -1312,6 +1312,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyNodeView
   nodeId: API
   resourceReadout: {fileID: 392641478}
+  north: 96
+  northEast: 72
+  east: 72
+  southEast: 72
+  south: 96
+  southWest: 72
+  west: 72
+  northWest: 72
 --- !u!1 &288999813
 GameObject:
   m_ObjectHideFlags: 0
@@ -2269,6 +2277,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyNodeView
   nodeId: DB
   resourceReadout: {fileID: 1337900093}
+  north: 96
+  northEast: 72
+  east: 72
+  southEast: 72
+  south: 96
+  southWest: 72
+  west: 72
+  northWest: 72
 --- !u!114 &360212474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2771,6 +2787,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyNodeView
   nodeId: EXT1
   resourceReadout: {fileID: 1056008364}
+  north: 96
+  northEast: 72
+  east: 72
+  southEast: 72
+  south: 96
+  southWest: 72
+  west: 72
+  northWest: 72
 --- !u!1 &527563347
 GameObject:
   m_ObjectHideFlags: 0
@@ -4038,6 +4062,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1033840603}
   - component: {fileID: 1033840602}
+  - component: {fileID: 1033840604}
   m_Layer: 0
   m_Name: LogicalPaths
   m_TagString: Untagged
@@ -4060,7 +4085,25 @@ MonoBehaviour:
   networkArea: {fileID: 772389560}
   pathLayer: {fileID: 1033840603}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
-  laneSpacing: 18
+  maxLineWidth: 12
+  minLineGap: 3
+  minLineWidth: 2.5
+--- !u!114 &1033840604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033840601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84f3362edf4043188ae80644989352bb, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyGeometryPreview
+  previewEnabled: 0
+  connectionCount: 1
+  physicalLink: {fileID: 726002155}
+  presenter: {fileID: 1033840602}
 --- !u!224 &1033840603
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4995,6 +5038,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.ConnectionsToy.ConnectionsToyNodeView
   nodeId: AUTH
   resourceReadout: {fileID: 1934735351}
+  north: 96
+  northEast: 72
+  east: 72
+  southEast: 72
+  south: 96
+  southWest: 72
+  west: 72
+  northWest: 72
 --- !u!1 &1669263094
 GameObject:
   m_ObjectHideFlags: 0

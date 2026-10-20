@@ -6,12 +6,13 @@ namespace Uptime.ConnectionsToy
     // Only transient UI geometry lives here. The simulation never reads this path.
     public sealed class ConnectionsToyPathGraphic : MaskableGraphic
     {
-        [SerializeField, Min(1f)] private float strokeWidth = 4f;
         private Vector2[] starts;
         private Vector2[] ends;
+        private float[] widths;
         private float reveal;
 
-        public void SetPath(Vector2[] segmentStarts, Vector2[] segmentEnds, float visibleFraction)
+        public void SetPath(Vector2[] segmentStarts, Vector2[] segmentEnds,
+            float[] segmentWidths, float visibleFraction)
         {
             float nextReveal = Mathf.Clamp01(visibleFraction);
             bool changed = starts == null || starts.Length != segmentStarts.Length ||
@@ -19,7 +20,8 @@ namespace Uptime.ConnectionsToy
             if (!changed)
                 for (int i = 0; i < starts.Length; i++)
                     if ((starts[i] - segmentStarts[i]).sqrMagnitude > 0.01f ||
-                        (ends[i] - segmentEnds[i]).sqrMagnitude > 0.01f)
+                        (ends[i] - segmentEnds[i]).sqrMagnitude > 0.01f ||
+                        Mathf.Abs(widths[i] - segmentWidths[i]) > 0.001f)
                     {
                         changed = true;
                         break;
@@ -29,6 +31,7 @@ namespace Uptime.ConnectionsToy
 
             starts = (Vector2[])segmentStarts.Clone();
             ends = (Vector2[])segmentEnds.Clone();
+            widths = (float[])segmentWidths.Clone();
             reveal = nextReveal;
             SetVerticesDirty();
         }
@@ -50,7 +53,12 @@ namespace Uptime.ConnectionsToy
                 if (length < 0.01f)
                     continue;
                 Vector2 end = starts[i] + direction * Mathf.Min(1f, remaining / length);
-                Vector2 normal = new Vector2(-direction.y, direction.x).normalized * (strokeWidth * 0.5f);
+                if (widths[i] <= 0f)
+                {
+                    remaining -= length;
+                    continue;
+                }
+                Vector2 normal = new Vector2(-direction.y, direction.x).normalized * (widths[i] * 0.5f);
                 int index = mesh.currentVertCount;
                 Color32 tint = color;
                 mesh.AddVert(starts[i] - normal, tint, Vector2.zero);

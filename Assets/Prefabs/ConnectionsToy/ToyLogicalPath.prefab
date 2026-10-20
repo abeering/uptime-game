@@ -342,7 +342,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  strokeWidth: 4
 --- !u!114 &1946401160761542816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,6 +360,7 @@ MonoBehaviour:
   - {fileID: 1393100623523222302}
   establishmentSeconds: 0.6
   departureSeconds: 0.45
+  relayoutSeconds: 0.3
   healthyColor: {r: 0.36, g: 0.95, b: 0.74, a: 1}
   constrainedColor: {r: 1, g: 0.69, b: 0.34, a: 1}
 --- !u!1 &3630020786062166638

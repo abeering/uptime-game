@@ -19,6 +19,13 @@ namespace Uptime.ConnectionsToy
         public ConnectionsToyNodeView NodeA => nodeA;
         public ConnectionsToyNodeView NodeB => nodeB;
 
+        public float BundleWidth(RectTransform area)
+        {
+            Vector2 a = area.InverseTransformPoint(nodeA.transform.position);
+            Vector2 b = area.InverseTransformPoint(nodeB.transform.position);
+            return Mathf.Min(nodeA.BundleWidthToward(b - a), nodeB.BundleWidthToward(a - b));
+        }
+
         public void RenderResources(ConnectionsToyPhysicalLinkResources resources)
         {
             if (resourceReadout == null || resources == null)
