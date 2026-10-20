@@ -58,7 +58,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb6eaa87d3b74a64a603592281778515, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPillGraphic
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PillGraphic
   m_Material: {fileID: 0}
   m_Color: {r: 0.36, g: 0.95, b: 0.74, a: 1}
   m_RaycastTarget: 0
@@ -81,7 +81,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4138de8691134e4786ae9d65ea7d4be0, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsIdentityPillView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.IdentityPillView
   plate: {fileID: 6662132046099718197}
   idText: {fileID: 4622619431550222199}
   dimensions: {x: 54, y: 28}

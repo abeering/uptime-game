@@ -4,19 +4,19 @@ using UnityEngine.UI;
 namespace Uptime.Connections
 {
     // Each block owns its bindings. Destroying a history entry also stops its updates.
-    public sealed class ConnectionsInspectOutput : MonoBehaviour
+    public sealed class InspectOutput : MonoBehaviour
     {
-        [SerializeField] private ConnectionsInspectEntry[] entries;
+        [SerializeField] private InspectEntry[] entries;
         [SerializeField] private LayoutElement layout;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.2f;
         [SerializeField] private float oneEntryHeight = 156f;
         [SerializeField] private float twoEntryHeight = 282f;
 
-        private ConnectionsLogicalConnectionState[] states;
+        private LogicalConnectionState[] states;
         private bool[] frozen;
         private float nextRefresh;
 
-        public void Bind(ConnectionsLogicalConnectionState[] selected)
+        public void Bind(LogicalConnectionState[] selected)
         {
             if (selected == null || selected.Length == 0 || selected.Length > entries.Length)
                 return;

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     // The edge solver settles line spacing once; cycling then changes only the separate pill overlay.
-    public sealed class ConnectionsIdentityPresenter : MonoBehaviour
+    public sealed class IdentityPresenter : MonoBehaviour
     {
         public struct LiveLine
         {
@@ -35,7 +35,7 @@ namespace Uptime.Connections
 
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform pillLayer;
-        [SerializeField] private ConnectionsIdentityPillView pillPrefab;
+        [SerializeField] private IdentityPillView pillPrefab;
         [Header("Pill packing (UI pixels)")]
         [SerializeField, Min(0f)] private float minimumPillGap = 6f;
         [SerializeField, Min(4f)] private float staggerStep = 20f;
@@ -48,12 +48,12 @@ namespace Uptime.Connections
 
         private sealed class EdgeState
         {
-            public ConnectionsPhysicalLinkView Link;
+            public PhysicalLinkView Link;
             public readonly List<LiveLine> Lines = new List<LiveLine>();
-            public readonly List<ConnectionsIdentityPillView> Pills = new List<ConnectionsIdentityPillView>();
+            public readonly List<IdentityPillView> Pills = new List<IdentityPillView>();
             public readonly List<string> PillIds = new List<string>();
-            public ConnectionsIdentityPacking.Layout Layout;
-            public ConnectionsIdentityPacking.PillBounds[] Obstacles;
+            public IdentityPacking.Layout Layout;
+            public IdentityPacking.PillBounds[] Obstacles;
             public Vector2 Start;
             public Vector2 End;
             public Vector2 PillSize;
@@ -72,8 +72,8 @@ namespace Uptime.Connections
             public bool WarnedNoRoom;
         }
 
-        private readonly Dictionary<ConnectionsPhysicalLinkView, EdgeState> edges =
-            new Dictionary<ConnectionsPhysicalLinkView, EdgeState>();
+        private readonly Dictionary<PhysicalLinkView, EdgeState> edges =
+            new Dictionary<PhysicalLinkView, EdgeState>();
 
         public RectTransform NetworkArea => networkArea;
         public Vector2 PillSize => pillPrefab != null ? pillPrefab.Size : Vector2.zero;
@@ -96,14 +96,14 @@ namespace Uptime.Connections
             }
         }
 
-        private static string StageLetter(ConnectionsIdentityPacking.ReadabilityStage stage)
+        private static string StageLetter(IdentityPacking.ReadabilityStage stage)
         {
             switch (stage)
             {
-                case ConnectionsIdentityPacking.ReadabilityStage.Centered: return "A";
-                case ConnectionsIdentityPacking.ReadabilityStage.Staggered: return "B";
-                case ConnectionsIdentityPacking.ReadabilityStage.Overlaid: return "C";
-                case ConnectionsIdentityPacking.ReadabilityStage.Rotating: return "D";
+                case IdentityPacking.ReadabilityStage.Centered: return "A";
+                case IdentityPacking.ReadabilityStage.Staggered: return "B";
+                case IdentityPacking.ReadabilityStage.Overlaid: return "C";
+                case IdentityPacking.ReadabilityStage.Rotating: return "D";
                 default: return "—";
             }
         }
@@ -114,7 +114,7 @@ namespace Uptime.Connections
                 state.Seen = false;
         }
 
-        public ConnectionsIdentityPacking.Layout ResolveLayout(ConnectionsPhysicalLinkView link,
+        public IdentityPacking.Layout ResolveLayout(PhysicalLinkView link,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
             float minimumLineGap)
         {
@@ -128,10 +128,10 @@ namespace Uptime.Connections
             Vector2 a = networkArea.InverseTransformPoint(link.NodeA.transform.position);
             Vector2 b = networkArea.InverseTransformPoint(link.NodeB.transform.position);
             Vector2 direction = (b - a).normalized;
-            Vector2 start = ConnectionsEdgeGeometry.CardEdge(link.NodeA, networkArea, direction);
-            Vector2 end = ConnectionsEdgeGeometry.CardEdge(link.NodeB, networkArea, -direction);
+            Vector2 start = EdgeGeometry.CardEdge(link.NodeA, networkArea, direction);
+            Vector2 end = EdgeGeometry.CardEdge(link.NodeB, networkArea, -direction);
             float budget = link.BundleWidth(networkArea);
-            ConnectionsIdentityPacking.PillBounds[] obstacles = Obstacles(link);
+            IdentityPacking.PillBounds[] obstacles = Obstacles(link);
             if (NeedsPlan(state, start, end, budget, count, maximumLineWidth,
                 minimumReadableLineWidth, minimumLineGap, obstacles))
             {
@@ -148,27 +148,27 @@ namespace Uptime.Connections
                 state.Step = StaggerStep;
                 state.Inset = EndInset;
                 state.Clearance = Mathf.Max(0f, pillToLineClearance);
-                state.Layout = ConnectionsIdentityPacking.Solve(start, end, budget, count,
+                state.Layout = IdentityPacking.Solve(start, end, budget, count,
                     maximumLineWidth, minimumReadableLineWidth, minimumLineGap,
                     PillSize, MinimumPillGap,
                     StaggerStep, EndInset, state.Clearance, obstacles,
-                    ConnectionsEdgeGeometry.CardRect(link.NodeA, networkArea),
-                    ConnectionsEdgeGeometry.CardRect(link.NodeB, networkArea));
+                    EdgeGeometry.CardRect(link.NodeA, networkArea),
+                    EdgeGeometry.CardRect(link.NodeB, networkArea));
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);
-                if (state.Layout.Stage == ConnectionsIdentityPacking.ReadabilityStage.Unavailable &&
+                if (state.Layout.Stage == IdentityPacking.ReadabilityStage.Unavailable &&
                     !state.WarnedNoRoom)
                 {
                     Debug.LogWarning($"No full-size identity pill fits on {link.LinkId}.", link);
                     state.WarnedNoRoom = true;
                 }
-                else if (state.Layout.Stage != ConnectionsIdentityPacking.ReadabilityStage.Unavailable)
+                else if (state.Layout.Stage != IdentityPacking.ReadabilityStage.Unavailable)
                     state.WarnedNoRoom = false;
             }
             return state.Layout;
         }
 
-        public void PresentEdge(ConnectionsPhysicalLinkView link, List<LiveLine> liveLines)
+        public void PresentEdge(PhysicalLinkView link, List<LiveLine> liveLines)
         {
             if (link == null || liveLines == null || liveLines.Count == 0 ||
                 networkArea == null || pillLayer == null || pillPrefab == null)
@@ -189,7 +189,7 @@ namespace Uptime.Connections
                     }
             if (idsChanged)
             {
-                var old = new Dictionary<string, ConnectionsIdentityPillView>();
+                var old = new Dictionary<string, IdentityPillView>();
                 for (int i = 0; i < state.PillIds.Count; i++)
                     if (state.Pills[i] != null)
                         old.Add(state.PillIds[i], state.Pills[i]);
@@ -197,7 +197,7 @@ namespace Uptime.Connections
                 state.PillIds.Clear();
                 foreach (LiveLine line in state.Lines)
                 {
-                    if (!old.TryGetValue(line.Id, out ConnectionsIdentityPillView pill))
+                    if (!old.TryGetValue(line.Id, out IdentityPillView pill))
                     {
                         pill = Instantiate(pillPrefab, pillLayer, false);
                         if (!Application.isPlaying)
@@ -210,7 +210,7 @@ namespace Uptime.Connections
                     state.Pills.Add(pill);
                     state.PillIds.Add(line.Id);
                 }
-                foreach (ConnectionsIdentityPillView pill in old.Values)
+                foreach (IdentityPillView pill in old.Values)
                     DestroyView(pill.gameObject);
             }
             Apply(state);
@@ -218,13 +218,13 @@ namespace Uptime.Connections
 
         public void EndFrame()
         {
-            var removed = new List<ConnectionsPhysicalLinkView>();
-            foreach (KeyValuePair<ConnectionsPhysicalLinkView, EdgeState> pair in edges)
+            var removed = new List<PhysicalLinkView>();
+            foreach (KeyValuePair<PhysicalLinkView, EdgeState> pair in edges)
                 if (!pair.Value.Seen)
                     removed.Add(pair.Key);
-            foreach (ConnectionsPhysicalLinkView link in removed)
+            foreach (PhysicalLinkView link in removed)
             {
-                foreach (ConnectionsIdentityPillView pill in edges[link].Pills)
+                foreach (IdentityPillView pill in edges[link].Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
                 edges.Remove(link);
@@ -280,24 +280,24 @@ namespace Uptime.Connections
         {
             if (state.Layout == null || state.Layout.Schedule.Count == 0)
             {
-                foreach (ConnectionsIdentityPillView pill in state.Pills)
+                foreach (IdentityPillView pill in state.Pills)
                     if (pill != null)
                         pill.gameObject.SetActive(false);
                 return;
             }
-            List<ConnectionsIdentityPacking.Placement> visible = state.Layout.Schedule[state.Cycle];
-            var displayed = new List<ConnectionsIdentityPacking.Placement>();
-            var visualLanes = new List<ConnectionsIdentityPacking.Lane>();
+            List<IdentityPacking.Placement> visible = state.Layout.Schedule[state.Cycle];
+            var displayed = new List<IdentityPacking.Placement>();
+            var visualLanes = new List<IdentityPacking.Lane>();
             foreach (LiveLine line in state.Lines)
-                visualLanes.Add(new ConnectionsIdentityPacking.Lane(line.Id,
+                visualLanes.Add(new IdentityPacking.Lane(line.Id,
                     line.VisualStart, line.VisualEnd, line.Width));
-            bool avoidLines = state.Layout.Stage == ConnectionsIdentityPacking.ReadabilityStage.Centered ||
-                state.Layout.Stage == ConnectionsIdentityPacking.ReadabilityStage.Staggered;
+            bool avoidLines = state.Layout.Stage == IdentityPacking.ReadabilityStage.Centered ||
+                state.Layout.Stage == IdentityPacking.ReadabilityStage.Staggered;
             for (int i = 0; i < state.Pills.Count; i++)
             {
                 bool selected = false;
                 float fraction = 0f;
-                foreach (ConnectionsIdentityPacking.Placement placement in visible)
+                foreach (IdentityPacking.Placement placement in visible)
                     if (placement.LaneIndex == i)
                     {
                         selected = true;
@@ -308,17 +308,17 @@ namespace Uptime.Connections
                 float length = Vector2.Distance(line.VisualStart, line.VisualEnd);
                 bool show = selected && length > 0.01f &&
                     line.VisibleFraction + 0.001f >= fraction + state.PillSize.x * 0.5f / length;
-                ConnectionsIdentityPillView pill = state.Pills[i];
-                ConnectionsIdentityPacking.PillBounds bounds =
-                    ConnectionsIdentityPacking.Bounds(visualLanes[i], fraction, state.PillSize);
+                IdentityPillView pill = state.Pills[i];
+                IdentityPacking.PillBounds bounds =
+                    IdentityPacking.Bounds(visualLanes[i], fraction, state.PillSize);
                 if (show)
-                    show = ConnectionsIdentityPacking.CanShow(bounds, i, visualLanes,
+                    show = IdentityPacking.CanShow(bounds, i, visualLanes,
                         displayed, state.Obstacles, state.Gap, avoidLines, state.Clearance);
                 if (pill.gameObject.activeSelf != show)
                     pill.gameObject.SetActive(show);
                 if (show)
                 {
-                    displayed.Add(new ConnectionsIdentityPacking.Placement(i, fraction, bounds));
+                    displayed.Add(new IdentityPacking.Placement(i, fraction, bounds));
                     pill.SetPose(bounds.Center, bounds.Along);
                     pill.SetLineColor(line.Color);
                 }
@@ -327,7 +327,7 @@ namespace Uptime.Connections
 
         private bool NeedsPlan(EdgeState state, Vector2 start, Vector2 end, float budget,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
-            float minimumLineGap, ConnectionsIdentityPacking.PillBounds[] obstacles)
+            float minimumLineGap, IdentityPacking.PillBounds[] obstacles)
         {
             if (state.Layout == null || state.Count != count || state.PillSize != PillSize ||
                 (state.Start - start).sqrMagnitude > 0.25f ||
@@ -349,14 +349,14 @@ namespace Uptime.Connections
             return false;
         }
 
-        private ConnectionsIdentityPacking.PillBounds[] Obstacles(ConnectionsPhysicalLinkView link)
+        private IdentityPacking.PillBounds[] Obstacles(PhysicalLinkView link)
         {
             return link.ResourceLabel != null ? new[] { Bounds(link.NodeA.transform),
                 Bounds(link.NodeB.transform), Bounds(link.ResourceLabel) } :
                 new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
         }
 
-        private ConnectionsIdentityPacking.PillBounds Bounds(Transform target)
+        private IdentityPacking.PillBounds Bounds(Transform target)
         {
             var corners = new Vector3[4];
             ((RectTransform)target).GetWorldCorners(corners);
@@ -364,7 +364,7 @@ namespace Uptime.Connections
             Vector2 topLeft = networkArea.InverseTransformPoint(corners[1]);
             Vector2 topRight = networkArea.InverseTransformPoint(corners[2]);
             Vector2 bottomRight = networkArea.InverseTransformPoint(corners[3]);
-            return new ConnectionsIdentityPacking.PillBounds(
+            return new IdentityPacking.PillBounds(
                 (bottomLeft + topRight) * 0.5f, bottomRight - bottomLeft,
                 new Vector2(Vector2.Distance(bottomLeft, bottomRight),
                     Vector2.Distance(bottomLeft, topLeft)));
@@ -384,7 +384,7 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             foreach (EdgeState state in edges.Values)
-                foreach (ConnectionsIdentityPillView pill in state.Pills)
+                foreach (IdentityPillView pill in state.Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
             edges.Clear();

@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     [Serializable]
-    public sealed class ConnectionsNodeResources
+    public sealed class NodeResources
     {
-        [SerializeField] private ConnectionsNodeView view;
+        [SerializeField] private NodeView view;
         [SerializeField, Min(0f), Tooltip("Capacity in abstract CPU units.")] private float cpuCapacityUnits = 100f;
         [SerializeField, Min(0f), Tooltip("Idle CPU usage in the same units as capacity.")] private float cpuBaselineUnits;
         [SerializeField, Min(0f)] private float memoryCapacityGB = 8f;
@@ -18,7 +18,7 @@ namespace Uptime.Connections
         [NonSerialized] private float reservedMemoryGB;
         [NonSerialized] private float allocatedDiskIoMBps;
 
-        public ConnectionsNodeView View => view;
+        public NodeView View => view;
         public float CpuCapacityUnits => Mathf.Max(0f, cpuCapacityUnits);
         public float CpuBaselineUnits => Mathf.Clamp(cpuBaselineUnits, 0f, CpuCapacityUnits);
         public float CpuUsageUnits => CpuBaselineUnits + allocatedCpuUnits;
@@ -55,14 +55,14 @@ namespace Uptime.Connections
     }
 
     [Serializable]
-    public sealed class ConnectionsPhysicalLinkResources
+    public sealed class PhysicalLinkResources
     {
-        [SerializeField] private ConnectionsPhysicalLinkView view;
+        [SerializeField] private PhysicalLinkView view;
         [SerializeField, Min(0f), Tooltip("Physical link capacity in megabytes per second.")] private float bandwidthCapacityMBps = 50f;
 
         [NonSerialized] private float allocatedBandwidthMBps;
 
-        public ConnectionsPhysicalLinkView View => view;
+        public PhysicalLinkView View => view;
         public float BandwidthCapacityMBps => Mathf.Max(0f, bandwidthCapacityMBps);
         public float BandwidthUsageMBps => allocatedBandwidthMBps;
 

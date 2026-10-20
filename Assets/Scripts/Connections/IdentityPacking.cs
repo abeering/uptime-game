@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     // Chooses one presentation layout per physical edge. Cycling only changes the visible pills.
-    public static class ConnectionsIdentityPacking
+    public static class IdentityPacking
     {
         public enum ReadabilityStage { Centered, Staggered, Overlaid, Rotating, Unavailable }
 
@@ -108,7 +108,7 @@ namespace Uptime.Connections
                     return Single(ReadabilityStage.Staggered, width, gap, lanes, staggered);
             }
 
-            width = ConnectionsEdgeGeometry.LineWidth(budget, count, minimumLineGap, maximumLineWidth);
+            width = EdgeGeometry.LineWidth(budget, count, minimumLineGap, maximumLineWidth);
             gap = minimumLineGap;
             Lane[] compressed = MakeLanes(start, end, count, width, gap,
                 sourceCard, destinationCard);
@@ -165,12 +165,12 @@ namespace Uptime.Connections
             Vector2 normal = new Vector2(-direction.y, direction.x);
             for (int i = 0; i < count; i++)
             {
-                float offset = ConnectionsEdgeGeometry.Offset(i, count, width, gap);
+                float offset = EdgeGeometry.Offset(i, count, width, gap);
                 Vector2 laneStart = sourceCard.HasValue ?
-                    ConnectionsEdgeGeometry.CardEdge(sourceCard.Value, direction, offset) :
+                    EdgeGeometry.CardEdge(sourceCard.Value, direction, offset) :
                     start + normal * offset;
                 Vector2 laneEnd = destinationCard.HasValue ?
-                    ConnectionsEdgeGeometry.CardEdge(destinationCard.Value, -direction, -offset) :
+                    EdgeGeometry.CardEdge(destinationCard.Value, -direction, -offset) :
                     end + normal * offset;
                 lanes[i] = new Lane("c" + (i + 1), laneStart, laneEnd, width);
             }

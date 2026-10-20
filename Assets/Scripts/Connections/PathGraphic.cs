@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Uptime.Connections
 {
     // Only transient UI geometry lives here. The simulation never reads this path.
-    public sealed class ConnectionsPathGraphic : MaskableGraphic
+    public sealed class PathGraphic : MaskableGraphic
     {
         private Vector2[] starts;
         private Vector2[] ends;

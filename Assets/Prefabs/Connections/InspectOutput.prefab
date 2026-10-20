@@ -232,7 +232,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b90f9adcf66f4f34abe025b323d6fe99, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsInspectEntry
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.InspectEntry
   identity: {fileID: 686308223747904029}
   route: {fileID: 5119339839380013983}
   work: {fileID: 1889591523199373350}
@@ -1478,7 +1478,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 836eebc4958741cf817b348c171f6825, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsInspectOutput
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.InspectOutput
   entries:
   - {fileID: 73917788027203378}
   - {fileID: 4674007658338814172}
@@ -1656,7 +1656,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b90f9adcf66f4f34abe025b323d6fe99, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsInspectEntry
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.InspectEntry
   identity: {fileID: 5480376113600827305}
   route: {fileID: 2747289783424737815}
   work: {fileID: 3590236810256333891}

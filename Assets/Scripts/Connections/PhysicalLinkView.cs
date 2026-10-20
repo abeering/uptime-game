@@ -5,19 +5,19 @@ namespace Uptime.Connections
 {
     // A physical edge in the static topology. Logical connections will use a separate type.
     [ExecuteAlways]
-    public sealed class ConnectionsPhysicalLinkView : MonoBehaviour
+    public sealed class PhysicalLinkView : MonoBehaviour
     {
         [SerializeField] private string linkId;
-        [SerializeField] private ConnectionsNodeView nodeA;
-        [SerializeField] private ConnectionsNodeView nodeB;
+        [SerializeField] private NodeView nodeA;
+        [SerializeField] private NodeView nodeB;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform label;
         [SerializeField] private TMP_Text resourceReadout;
         [SerializeField, Min(0f)] private float labelOffset = 26f;
 
         public string LinkId => linkId;
-        public ConnectionsNodeView NodeA => nodeA;
-        public ConnectionsNodeView NodeB => nodeB;
+        public NodeView NodeA => nodeA;
+        public NodeView NodeB => nodeB;
         public RectTransform ResourceLabel => label;
 
         public float BundleWidth(RectTransform area)
@@ -27,7 +27,7 @@ namespace Uptime.Connections
             return Mathf.Min(nodeA.BundleWidthToward(b - a), nodeB.BundleWidthToward(a - b));
         }
 
-        public void RenderResources(ConnectionsPhysicalLinkResources resources)
+        public void RenderResources(PhysicalLinkResources resources)
         {
             if (resourceReadout == null || resources == null)
                 return;

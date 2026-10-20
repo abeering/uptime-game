@@ -57,7 +57,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8e3b4a3cb834e938d0585ba1068aff3, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPathGraphic
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PathGraphic
   m_Material: {fileID: 0}
   m_Color: {r: 0.36, g: 0.95, b: 0.74, a: 1}
   m_RaycastTarget: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 921db07e5da1412684a573373370683a, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsLogicalPathView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.LogicalPathView
   path: {fileID: 8284974062488692513}
   establishmentSeconds: 0.6
   departureSeconds: 0.45

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsIdentityPillView : MonoBehaviour
+    public sealed class IdentityPillView : MonoBehaviour
     {
-        [SerializeField] private ConnectionsPillGraphic plate;
+        [SerializeField] private PillGraphic plate;
         [SerializeField] private TMP_Text idText;
         [SerializeField] private Vector2 dimensions = new Vector2(54f, 28f);
         [SerializeField, Min(8f)] private float fontSize = 16f;

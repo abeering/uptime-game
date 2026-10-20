@@ -170,5 +170,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1da18e2fce920d149b20ab72d5eb9e89, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsTextRow
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.TextRow
   text: {fileID: 7290430063653679295}

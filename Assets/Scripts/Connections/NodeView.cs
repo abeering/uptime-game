@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsNodeView : MonoBehaviour
+    public sealed class NodeView : MonoBehaviour
     {
         [SerializeField] private string nodeId;
         [SerializeField] private TMP_Text resourceReadout;
@@ -36,7 +36,7 @@ namespace Uptime.Connections
             }
         }
 
-        public void RenderResources(ConnectionsNodeResources resources)
+        public void RenderResources(NodeResources resources)
         {
             if (resourceReadout == null || resources == null)
                 return;

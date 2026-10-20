@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsTextRow : MonoBehaviour
+    public sealed class TextRow : MonoBehaviour
     {
         [SerializeField] private TMP_Text text;
 

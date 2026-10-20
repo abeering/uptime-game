@@ -7,16 +7,16 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsTerminal : MonoBehaviour
+    public sealed class Terminal : MonoBehaviour
     {
         [SerializeField] private TMP_InputField commandInput;
         [SerializeField] private ScrollRect historyScroll;
         [SerializeField] private RectTransform historyContent;
-        [SerializeField] private ConnectionsTextRow textRowPrefab;
-        [SerializeField] private ConnectionsPlaceholderOutput placeholderPrefab;
-        [SerializeField] private ConnectionsInspectOutput inspectPrefab;
-        [SerializeField] private ConnectionsSimulationHost simulationHost;
-        [SerializeField] private ConnectionsIdentityPresenter identityPresenter;
+        [SerializeField] private TextRow textRowPrefab;
+        [SerializeField] private PlaceholderOutput placeholderPrefab;
+        [SerializeField] private InspectOutput inspectPrefab;
+        [SerializeField] private SimulationHost simulationHost;
+        [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
@@ -84,7 +84,7 @@ namespace Uptime.Connections
             {
                 case "test":
                     AppendText("TEST // structured output follows", mutedColor);
-                    ConnectionsPlaceholderOutput block = AppendOutputBlock(placeholderPrefab);
+                    PlaceholderOutput block = AppendOutputBlock(placeholderPrefab);
                     if (block != null)
                         block.Bind("PRESENTATION CHECK", "Authored UI block inside terminal history.", "PHASE 0", "STATIC", 0.42f);
                     break;
@@ -115,11 +115,11 @@ namespace Uptime.Connections
                 return;
             }
 
-            var selected = new List<ConnectionsLogicalConnectionState>();
+            var selected = new List<LogicalConnectionState>();
             for (int i = 1; i < tokens.Length; i++)
             {
-                ConnectionsLogicalConnectionState match = null;
-                foreach (ConnectionsLogicalConnectionState state in simulationHost.RuntimeConnections)
+                LogicalConnectionState match = null;
+                foreach (LogicalConnectionState state in simulationHost.RuntimeConnections)
                     if (string.Equals(state.ConnectionId, tokens[i], System.StringComparison.OrdinalIgnoreCase))
                     {
                         match = state;
@@ -137,16 +137,16 @@ namespace Uptime.Connections
                 }
                 selected.Add(match);
             }
-            ConnectionsInspectOutput block = AppendOutputBlock(inspectPrefab);
+            InspectOutput block = AppendOutputBlock(inspectPrefab);
             if (block == null)
                 AppendText("INSPECT  output unavailable", errorColor);
             else
                 block.Bind(selected.ToArray());
         }
 
-        public ConnectionsTextRow AppendText(string message, Color color)
+        public TextRow AppendText(string message, Color color)
         {
-            ConnectionsTextRow row = AppendOutputBlock(textRowPrefab);
+            TextRow row = AppendOutputBlock(textRowPrefab);
             if (row != null)
                 row.Bind(message, color);
             return row;

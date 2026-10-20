@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsInspectEntry : MonoBehaviour
+    public sealed class InspectEntry : MonoBehaviour
     {
         [SerializeField] private TMP_Text identity;
         [SerializeField] private TMP_Text route;
@@ -18,12 +18,12 @@ namespace Uptime.Connections
         [SerializeField] private Color limitedColor = new Color(1f, 0.69f, 0.34f);
         [SerializeField] private Color quietColor = new Color(0.52f, 0.67f, 0.66f);
 
-        public void Render(ConnectionsLogicalConnectionState state)
+        public void Render(LogicalConnectionState state)
         {
             string lifecycle = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" : "ACTIVE";
             Set(identity, state.ConnectionId.ToUpperInvariant() + "  /  " + lifecycle);
             string routeText = string.Empty;
-            foreach (ConnectionsNodeRequirement requirement in state.Definition.Route)
+            foreach (NodeRequirement requirement in state.Definition.Route)
                 routeText += (routeText.Length == 0 ? string.Empty : "  >  ") + requirement.Node.NodeId;
             Set(route, routeText);
 
@@ -32,7 +32,7 @@ namespace Uptime.Connections
             Set(throughput, $"RATE  {state.ActualRateMBps:0.#} / {state.Definition.DesiredRateMBps:0.#} MB/s   SAT {state.Satisfaction * 100f:0}%");
 
             string limit = state.IsPending ? "Waiting to establish" : state.IsComplete ? "Released" :
-                state.LimitKind == ConnectionsLimitKind.None ? "None" :
+                state.LimitKind == LimitKind.None ? "None" :
                 state.LimitingResourceId + " " + LimitName(state.LimitKind);
             Set(bottleneck, "LIMIT  " + limit);
             string remaining = state.IsComplete ? "00:00" : state.IsPending ? "--:--" :
@@ -50,14 +50,14 @@ namespace Uptime.Connections
             if (stateTag != null && stateTag.color != tint) stateTag.color = tint;
         }
 
-        private static string LimitName(ConnectionsLimitKind kind)
+        private static string LimitName(LimitKind kind)
         {
             switch (kind)
             {
-                case ConnectionsLimitKind.PhysicalLinkBandwidth: return "bandwidth";
-                case ConnectionsLimitKind.NodeCpu: return "CPU";
-                case ConnectionsLimitKind.NodeDiskIo: return "disk I/O";
-                case ConnectionsLimitKind.NodeMemory: return "memory";
+                case LimitKind.PhysicalLinkBandwidth: return "bandwidth";
+                case LimitKind.NodeCpu: return "CPU";
+                case LimitKind.NodeDiskIo: return "disk I/O";
+                case LimitKind.NodeMemory: return "memory";
                 default: return "none";
             }
         }

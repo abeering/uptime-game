@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Uptime.Connections
 {
     // Small rounded UI plate with a real colored outline; authored on IdentityPill.prefab.
-    public sealed class ConnectionsPillGraphic : MaskableGraphic
+    public sealed class PillGraphic : MaskableGraphic
     {
         [SerializeField, Min(0f)] private float cornerRadius = 7f;
         [SerializeField, Min(0f)] private float borderThickness = 2f;

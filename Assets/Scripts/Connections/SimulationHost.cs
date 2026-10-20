@@ -8,21 +8,21 @@ namespace Uptime.Connections
 {
     // The only clock and owner of resource state for the Connections game.
     [ExecuteAlways]
-    public sealed class ConnectionsSimulationHost : MonoBehaviour
+    public sealed class SimulationHost : MonoBehaviour
     {
-        [SerializeField] private ConnectionsNodeResources[] nodes;
-        [SerializeField] private ConnectionsPhysicalLinkResources[] physicalLinks;
-        [SerializeField] private ConnectionsLogicalConnectionDefinition[] connections;
+        [SerializeField] private NodeResources[] nodes;
+        [SerializeField] private PhysicalLinkResources[] physicalLinks;
+        [SerializeField] private LogicalConnectionDefinition[] connections;
         [SerializeField] private TMP_Text connectionDebugReadout;
-        [SerializeField] private ConnectionsLogicalPathPresenter pathPresenter;
+        [SerializeField] private LogicalPathPresenter pathPresenter;
 
-        private ConnectionsLogicalConnectionState[] runtimeConnections;
+        private LogicalConnectionState[] runtimeConnections;
         private float simulationTimeSeconds;
 
-        public ConnectionsNodeResources[] Nodes => nodes;
-        public ConnectionsPhysicalLinkResources[] PhysicalLinks => physicalLinks;
-        public ConnectionsLogicalConnectionDefinition[] Definitions => connections;
-        public IReadOnlyList<ConnectionsLogicalConnectionState> RuntimeConnections => runtimeConnections;
+        public NodeResources[] Nodes => nodes;
+        public PhysicalLinkResources[] PhysicalLinks => physicalLinks;
+        public LogicalConnectionDefinition[] Definitions => connections;
+        public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
 
         private void OnEnable() => RefreshDisplays();
@@ -49,19 +49,19 @@ namespace Uptime.Connections
         {
             if (nodes != null)
             {
-                foreach (ConnectionsNodeResources node in nodes)
+                foreach (NodeResources node in nodes)
                     node?.ClampToCapacity();
             }
 
             if (physicalLinks != null)
             {
-                foreach (ConnectionsPhysicalLinkResources link in physicalLinks)
+                foreach (PhysicalLinkResources link in physicalLinks)
                     link?.ClampToCapacity();
             }
 
             if (connections != null)
             {
-                foreach (ConnectionsLogicalConnectionDefinition connection in connections)
+                foreach (LogicalConnectionDefinition connection in connections)
                     connection?.ClampNonnegative();
             }
         }
@@ -74,14 +74,14 @@ namespace Uptime.Connections
             if (runtimeConnections == null)
                 ResetSimulation();
 
-            foreach (ConnectionsLogicalConnectionState connection in runtimeConnections)
+            foreach (LogicalConnectionState connection in runtimeConnections)
             {
                 if (!connection.IsPending || simulationTimeSeconds < connection.Definition.StartDelaySeconds)
                     continue;
-                connection.Lifecycle = ConnectionsLifecycle.Active;
+                connection.Lifecycle = Lifecycle.Active;
                 connection.EstablishedAtSeconds = simulationTimeSeconds;
             }
-            ConnectionsResourceAllocator.Step(nodes, physicalLinks, runtimeConnections, deltaSeconds);
+            ResourceAllocator.Step(nodes, physicalLinks, runtimeConnections, deltaSeconds);
             simulationTimeSeconds += deltaSeconds;
             RefreshDisplays();
         }
@@ -90,10 +90,10 @@ namespace Uptime.Connections
         {
             ClearAllocatedUsage();
             simulationTimeSeconds = 0f;
-            var states = new List<ConnectionsLogicalConnectionState>();
+            var states = new List<LogicalConnectionState>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
-            var nodeViews = new HashSet<ConnectionsNodeView>();
-            foreach (ConnectionsNodeResources node in nodes)
+            var nodeViews = new HashSet<NodeView>();
+            foreach (NodeResources node in nodes)
             {
                 if (node?.View == null || !nodeViews.Add(node.View))
                     throw new InvalidOperationException("Nodes require unique, assigned views.");
@@ -101,7 +101,7 @@ namespace Uptime.Connections
 
             if (connections != null)
             {
-                foreach (ConnectionsLogicalConnectionDefinition definition in connections)
+                foreach (LogicalConnectionDefinition definition in connections)
                 {
                     if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
                         !ids.Add(definition.ConnectionId))
@@ -110,20 +110,20 @@ namespace Uptime.Connections
                         definition.Route == null || definition.Route.Length < 2)
                         throw new InvalidOperationException($"Connection {definition.ConnectionId} needs work, rate, and a route of at least two nodes.");
 
-                    var visited = new HashSet<ConnectionsNodeView>();
-                    foreach (ConnectionsNodeRequirement requirement in definition.Route)
+                    var visited = new HashSet<NodeView>();
+                    foreach (NodeRequirement requirement in definition.Route)
                     {
                         if (requirement?.Node == null || !nodeViews.Contains(requirement.Node) ||
                             !visited.Add(requirement.Node))
                             throw new InvalidOperationException($"Connection {definition.ConnectionId} has an invalid or repeated route node.");
                     }
 
-                    var routeLinks = new ConnectionsPhysicalLinkResources[definition.Route.Length - 1];
+                    var routeLinks = new PhysicalLinkResources[definition.Route.Length - 1];
                     for (int i = 0; i < routeLinks.Length; i++)
                     {
-                        ConnectionsNodeView a = definition.Route[i].Node;
-                        ConnectionsNodeView b = definition.Route[i + 1].Node;
-                        foreach (ConnectionsPhysicalLinkResources link in physicalLinks)
+                        NodeView a = definition.Route[i].Node;
+                        NodeView b = definition.Route[i + 1].Node;
+                        foreach (PhysicalLinkResources link in physicalLinks)
                         {
                             if (link?.View == null)
                                 throw new InvalidOperationException("Physical links require assigned views.");
@@ -138,7 +138,7 @@ namespace Uptime.Connections
                         if (routeLinks[i] == null)
                             throw new InvalidOperationException($"Route {definition.ConnectionId} has no physical link from {a.NodeId} to {b.NodeId}.");
                     }
-                    states.Add(new ConnectionsLogicalConnectionState(definition, routeLinks));
+                    states.Add(new LogicalConnectionState(definition, routeLinks));
                 }
             }
 
@@ -152,10 +152,10 @@ namespace Uptime.Connections
         private void ClearAllocatedUsage()
         {
             if (nodes != null)
-                foreach (ConnectionsNodeResources node in nodes)
+                foreach (NodeResources node in nodes)
                     node?.ClearAllocatedUsage();
             if (physicalLinks != null)
-                foreach (ConnectionsPhysicalLinkResources link in physicalLinks)
+                foreach (PhysicalLinkResources link in physicalLinks)
                     link?.ClearAllocatedUsage();
         }
 
@@ -163,7 +163,7 @@ namespace Uptime.Connections
         {
             if (nodes != null)
             {
-                foreach (ConnectionsNodeResources node in nodes)
+                foreach (NodeResources node in nodes)
                 {
                     if (node?.View != null)
                         node.View.RenderResources(node);
@@ -172,7 +172,7 @@ namespace Uptime.Connections
 
             if (physicalLinks != null)
             {
-                foreach (ConnectionsPhysicalLinkResources link in physicalLinks)
+                foreach (PhysicalLinkResources link in physicalLinks)
                 {
                     if (link?.View != null)
                         link.View.RenderResources(link);
@@ -193,7 +193,7 @@ namespace Uptime.Connections
                 return "CONNECTIONS  •  Play to run authored transfers";
 
             var output = new StringBuilder("CONNECTIONS  •  actual / desired MB/s");
-            foreach (ConnectionsLogicalConnectionState connection in runtimeConnections)
+            foreach (LogicalConnectionState connection in runtimeConnections)
             {
                 output.Append('\n').Append(connection.ConnectionId).Append(' ');
                 if (connection.IsComplete)
@@ -215,21 +215,21 @@ namespace Uptime.Connections
                     .Append(connection.ActualRateMBps.ToString("0.#")).Append('/')
                     .Append(connection.Definition.DesiredRateMBps.ToString("0.#")).Append(" MB/s  ")
                     .Append(Mathf.RoundToInt(connection.Satisfaction * 100f)).Append('%');
-                if (connection.LimitKind != ConnectionsLimitKind.None)
+                if (connection.LimitKind != LimitKind.None)
                     output.Append("  [").Append(connection.LimitingResourceId).Append(' ')
                         .Append(LimitLabel(connection.LimitKind)).Append(']');
             }
             return output.ToString();
         }
 
-        private static string LimitLabel(ConnectionsLimitKind kind)
+        private static string LimitLabel(LimitKind kind)
         {
             switch (kind)
             {
-                case ConnectionsLimitKind.PhysicalLinkBandwidth: return "BW";
-                case ConnectionsLimitKind.NodeCpu: return "CPU";
-                case ConnectionsLimitKind.NodeDiskIo: return "DISK";
-                case ConnectionsLimitKind.NodeMemory: return "MEM";
+                case LimitKind.PhysicalLinkBandwidth: return "BW";
+                case LimitKind.NodeCpu: return "CPU";
+                case LimitKind.NodeDiskIo: return "DISK";
+                case LimitKind.NodeMemory: return "MEM";
                 default: return string.Empty;
             }
         }

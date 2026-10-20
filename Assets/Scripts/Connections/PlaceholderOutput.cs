@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsPlaceholderOutput : MonoBehaviour
+    public sealed class PlaceholderOutput : MonoBehaviour
     {
         [SerializeField] private TMP_Text title;
         [SerializeField] private TMP_Text detail;

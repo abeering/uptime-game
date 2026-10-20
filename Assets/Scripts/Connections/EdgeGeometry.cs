@@ -3,16 +3,16 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     // Pixel geometry only. Resource demand and connection status never enter this calculation.
-    public static class ConnectionsEdgeGeometry
+    public static class EdgeGeometry
     {
-        public static Vector2 CardEdge(ConnectionsNodeView node, RectTransform area, Vector2 direction)
+        public static Vector2 CardEdge(NodeView node, RectTransform area, Vector2 direction)
             => CardEdge(node, area, direction, 0f);
 
-        public static Vector2 CardEdge(ConnectionsNodeView node, RectTransform area,
+        public static Vector2 CardEdge(NodeView node, RectTransform area,
             Vector2 direction, float laneOffset)
             => CardEdge(CardRect(node, area), direction, laneOffset);
 
-        public static Rect CardRect(ConnectionsNodeView node, RectTransform area)
+        public static Rect CardRect(NodeView node, RectTransform area)
         {
             var corners = new Vector3[4];
             ((RectTransform)node.transform).GetWorldCorners(corners);

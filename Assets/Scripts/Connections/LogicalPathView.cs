@@ -2,16 +2,16 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public sealed class ConnectionsLogicalPathView : MonoBehaviour
+    public sealed class LogicalPathView : MonoBehaviour
     {
-        [SerializeField] private ConnectionsPathGraphic path;
+        [SerializeField] private PathGraphic path;
         [SerializeField, Range(0.1f, 2f)] private float establishmentSeconds = 0.6f;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
         [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
         [SerializeField] private Color healthyColor = new Color(0.36f, 0.95f, 0.74f);
         [SerializeField] private Color constrainedColor = new Color(1f, 0.69f, 0.34f);
 
-        private ConnectionsLogicalConnectionState state;
+        private LogicalConnectionState state;
         private RectTransform networkArea;
         private float[] laneOffsets;
         private float[] lineWidths;
@@ -26,7 +26,7 @@ namespace Uptime.Connections
         private float departureElapsed;
         private bool establishedVisual;
 
-        public void Bind(ConnectionsLogicalConnectionState connection, RectTransform area)
+        public void Bind(LogicalConnectionState connection, RectTransform area)
         {
             state = connection;
             networkArea = area;
@@ -135,9 +135,9 @@ namespace Uptime.Connections
                 Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
                 Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
-                starts[i] = ConnectionsEdgeGeometry.CardEdge(state.Definition.Route[i].Node,
+                starts[i] = EdgeGeometry.CardEdge(state.Definition.Route[i].Node,
                     networkArea, direction, laneOffsets[i]);
-                ends[i] = ConnectionsEdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node,
+                ends[i] = EdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node,
                     networkArea, -direction, -laneOffsets[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);

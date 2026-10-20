@@ -814,7 +814,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f1a7ae6c01bc0140a6913947046e88d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPlaceholderOutput
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PlaceholderOutput
   title: {fileID: 3558206587481114176}
   detail: {fileID: 5996651034783314039}
   firstTag: {fileID: 1726058107884319778}

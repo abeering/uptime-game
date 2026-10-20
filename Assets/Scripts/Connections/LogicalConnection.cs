@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     [Serializable]
-    public sealed class ConnectionsNodeRequirement
+    public sealed class NodeRequirement
     {
-        [SerializeField] private ConnectionsNodeView node;
+        [SerializeField] private NodeView node;
         [SerializeField, Min(0f), Tooltip("CPU units used per MB transferred at this node.")]
         private float cpuUnitsPerMB;
         [SerializeField, Min(0f), Tooltip("Disk I/O MB used per MB transferred at this node.")]
@@ -14,7 +14,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f), Tooltip("GB reserved at this node while the connection is active.")]
         private float memoryGB;
 
-        public ConnectionsNodeView Node => node;
+        public NodeView Node => node;
         public float CpuUnitsPerMB => Mathf.Max(0f, cpuUnitsPerMB);
         public float DiskIoMBPerMB => Mathf.Max(0f, diskIoMBPerMB);
         public float MemoryGB => Mathf.Max(0f, memoryGB);
@@ -28,17 +28,17 @@ namespace Uptime.Connections
     }
 
     [Serializable]
-    public sealed class ConnectionsLogicalConnectionDefinition
+    public sealed class LogicalConnectionDefinition
     {
         [SerializeField] private string connectionId;
-        [SerializeField] private ConnectionsNodeRequirement[] route;
+        [SerializeField] private NodeRequirement[] route;
         [SerializeField, Min(0f)] private float totalWorkMB;
         [SerializeField, Min(0f)] private float desiredRateMBps;
         [SerializeField, Min(0f), Tooltip("Seconds after simulation start before this connection is established.")]
         private float startDelaySeconds;
 
         public string ConnectionId => connectionId;
-        public ConnectionsNodeRequirement[] Route => route;
+        public NodeRequirement[] Route => route;
         public float TotalWorkMB => Mathf.Max(0f, totalWorkMB);
         public float DesiredRateMBps => Mathf.Max(0f, desiredRateMBps);
         public float StartDelaySeconds => Mathf.Max(0f, startDelaySeconds);
@@ -51,12 +51,12 @@ namespace Uptime.Connections
             if (route == null)
                 return;
 
-            foreach (ConnectionsNodeRequirement requirement in route)
+            foreach (NodeRequirement requirement in route)
                 requirement?.ClampNonnegative();
         }
     }
 
-    public enum ConnectionsLimitKind
+    public enum LimitKind
     {
         None,
         PhysicalLinkBandwidth,
@@ -65,7 +65,7 @@ namespace Uptime.Connections
         NodeMemory
     }
 
-    public enum ConnectionsLifecycle
+    public enum Lifecycle
     {
         Pending,
         Active,
@@ -73,19 +73,19 @@ namespace Uptime.Connections
     }
 
     // Runtime state belongs to the simulation, never to a UI component.
-    public sealed class ConnectionsLogicalConnectionState
+    public sealed class LogicalConnectionState
     {
-        internal ConnectionsLogicalConnectionState(
-            ConnectionsLogicalConnectionDefinition definition,
-            ConnectionsPhysicalLinkResources[] routeLinks)
+        internal LogicalConnectionState(
+            LogicalConnectionDefinition definition,
+            PhysicalLinkResources[] routeLinks)
         {
             Definition = definition;
             RouteLinks = routeLinks;
-            Lifecycle = definition.StartDelaySeconds > 0f ? ConnectionsLifecycle.Pending : ConnectionsLifecycle.Active;
+            Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Active;
         }
 
-        public ConnectionsLogicalConnectionDefinition Definition { get; }
-        internal ConnectionsPhysicalLinkResources[] RouteLinks { get; }
+        public LogicalConnectionDefinition Definition { get; }
+        internal PhysicalLinkResources[] RouteLinks { get; }
         internal bool MemoryAdmitted { get; set; }
 
         public string ConnectionId => Definition.ConnectionId;
@@ -94,33 +94,33 @@ namespace Uptime.Connections
         public float ActualRateMBps { get; internal set; }
         public float Satisfaction => IsComplete ? 1f : IsPending ? 0f : Definition.DesiredRateMBps > 0f ?
             ActualRateMBps / Definition.DesiredRateMBps : 0f;
-        public ConnectionsLifecycle Lifecycle { get; internal set; }
-        public bool IsPending => Lifecycle == ConnectionsLifecycle.Pending;
-        public bool IsComplete => Lifecycle == ConnectionsLifecycle.Complete;
-        public bool IsActive => Lifecycle == ConnectionsLifecycle.Active;
+        public Lifecycle Lifecycle { get; internal set; }
+        public bool IsPending => Lifecycle == Lifecycle.Pending;
+        public bool IsComplete => Lifecycle == Lifecycle.Complete;
+        public bool IsActive => Lifecycle == Lifecycle.Active;
         public float EstablishedAtSeconds { get; internal set; }
-        public ConnectionsLimitKind LimitKind { get; internal set; }
+        public LimitKind LimitKind { get; internal set; }
         public string LimitingResourceId { get; internal set; }
 
-        internal float CpuCost(ConnectionsNodeView node)
+        internal float CpuCost(NodeView node)
         {
-            foreach (ConnectionsNodeRequirement requirement in Definition.Route)
+            foreach (NodeRequirement requirement in Definition.Route)
                 if (requirement.Node == node)
                     return requirement.CpuUnitsPerMB;
             return 0f;
         }
 
-        internal float DiskIoCost(ConnectionsNodeView node)
+        internal float DiskIoCost(NodeView node)
         {
-            foreach (ConnectionsNodeRequirement requirement in Definition.Route)
+            foreach (NodeRequirement requirement in Definition.Route)
                 if (requirement.Node == node)
                     return requirement.DiskIoMBPerMB;
             return 0f;
         }
 
-        internal bool Uses(ConnectionsPhysicalLinkResources link)
+        internal bool Uses(PhysicalLinkResources link)
         {
-            foreach (ConnectionsPhysicalLinkResources routeLink in RouteLinks)
+            foreach (PhysicalLinkResources routeLink in RouteLinks)
                 if (routeLink == link)
                     return true;
             return false;

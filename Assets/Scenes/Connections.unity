@@ -1309,7 +1309,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e16170b2fe03234691e33ec26943342, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsNodeView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: API
   resourceReadout: {fileID: 392641478}
   north: 96
@@ -2274,7 +2274,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e16170b2fe03234691e33ec26943342, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsNodeView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: DB
   resourceReadout: {fileID: 1337900093}
   north: 96
@@ -2784,7 +2784,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e16170b2fe03234691e33ec26943342, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsNodeView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: EXT1
   resourceReadout: {fileID: 1056008364}
   north: 96
@@ -3069,7 +3069,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d3258c9500afcd4b80a0c3255d1df0e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPhysicalLinkView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PhysicalLinkView
   linkId: E1
   nodeA: {fileID: 458374168}
   nodeB: {fileID: 252751404}
@@ -3361,7 +3361,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d3258c9500afcd4b80a0c3255d1df0e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPhysicalLinkView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PhysicalLinkView
   linkId: E2
   nodeA: {fileID: 252751404}
   nodeB: {fileID: 358228025}
@@ -3548,7 +3548,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d4c2546141a9471cadd70dce4d4f7261, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsIdentityPresenter
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.IdentityPresenter
   networkArea: {fileID: 772389560}
   pillLayer: {fileID: 901162629}
   pillPrefab: {fileID: 8025527490866664778, guid: 3b613de177b2977418658a5f6a9bb7fc, type: 3}
@@ -4140,7 +4140,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2af99aa2ad52440fb447fae1138d930d, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsLogicalPathPresenter
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.LogicalPathPresenter
   networkArea: {fileID: 772389560}
   pathLayer: {fileID: 1033840603}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
@@ -4178,7 +4178,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84f3362edf4043188ae80644989352bb, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsGeometryPreview
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.GeometryPreview
   previewEnabled: 0
   connectionCount: 1
   physicalLink: {fileID: 726002155}
@@ -5096,7 +5096,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e16170b2fe03234691e33ec26943342, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsNodeView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: AUTH
   resourceReadout: {fileID: 1934735351}
   north: 96
@@ -5647,7 +5647,7 @@ GameObject:
   - component: {fileID: 1784815693}
   - component: {fileID: 1784815692}
   m_Layer: 0
-  m_Name: Connections Camera
+  m_Name: Game Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5847,7 +5847,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d3258c9500afcd4b80a0c3255d1df0e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsPhysicalLinkView
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PhysicalLinkView
   linkId: E3
   nodeA: {fileID: 252751404}
   nodeB: {fileID: 1603479477}
@@ -6267,7 +6267,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2881e45dbb1a3d4eb54a2ad300472c5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsTerminal
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Terminal
   commandInput: {fileID: 1946291436}
   historyScroll: {fileID: 2037299991}
   historyContent: {fileID: 166906268}
@@ -6329,7 +6329,7 @@ GameObject:
   - component: {fileID: 1996901016}
   - component: {fileID: 1996901015}
   m_Layer: 0
-  m_Name: ConnectionsSimulationHost
+  m_Name: SimulationHost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6346,7 +6346,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8edbedb98d4d14848a79f0ae3394ced3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsSimulationHost
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.SimulationHost
   nodes:
   - view: {fileID: 458374168}
     cpuCapacityUnits: 100
@@ -6723,7 +6723,7 @@ GameObject:
   - component: {fileID: 2073764756}
   - component: {fileID: 2073764755}
   m_Layer: 0
-  m_Name: ConnectionsCanvas
+  m_Name: GameCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

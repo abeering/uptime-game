@@ -11,16 +11,16 @@ namespace Uptime.Connections
     // Scene fixture. Draws disposable copies of the production path graphic;
     // it does not create connections or touch the simulation host.
     [ExecuteAlways]
-    public sealed class ConnectionsGeometryPreview : MonoBehaviour
+    public sealed class GeometryPreview : MonoBehaviour
     {
         [SerializeField, Tooltip("Presentation preview only; the authored simulation remains unchanged.")]
         private bool previewEnabled;
         [SerializeField, Range(1, 16)] private int connectionCount = 1;
-        [SerializeField] private ConnectionsPhysicalLinkView physicalLink;
-        [SerializeField] private ConnectionsLogicalPathPresenter presenter;
-        [SerializeField] private ConnectionsIdentityPresenter identityPresenter;
+        [SerializeField] private PhysicalLinkView physicalLink;
+        [SerializeField] private LogicalPathPresenter presenter;
+        [SerializeField] private IdentityPresenter identityPresenter;
 
-        private readonly List<ConnectionsPathGraphic> graphics = new List<ConnectionsPathGraphic>();
+        private readonly List<PathGraphic> graphics = new List<PathGraphic>();
         private bool warned;
         private bool presentedIdentity;
 #if UNITY_EDITOR
@@ -62,7 +62,7 @@ namespace Uptime.Connections
                 Clear();
                 for (int i = 0; i < count; i++)
                 {
-                    ConnectionsPathGraphic graphic = Instantiate(
+                    PathGraphic graphic = Instantiate(
                         presenter.PathGraphicPrefab, presenter.PathLayer, false);
                     graphic.name = "Geometry preview " + (i + 1);
                     graphic.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
@@ -78,32 +78,32 @@ namespace Uptime.Connections
             Vector2 b = area.InverseTransformPoint(physicalLink.NodeB.transform.position);
             Vector2 direction = (b - a).normalized;
             float budget = physicalLink.BundleWidth(area);
-            ConnectionsIdentityPacking.Layout layout = identityPresenter != null ?
+            IdentityPacking.Layout layout = identityPresenter != null ?
                 identityPresenter.ResolveLayout(physicalLink, count, presenter.MaxLineWidth,
                     presenter.MinLineWidth, presenter.MinLineGap) : null;
             float gap = layout != null ? layout.LineGap : presenter.MinLineGap;
             float width = layout != null ? layout.LineWidth :
-                ConnectionsEdgeGeometry.LineWidth(budget, count, gap, presenter.MaxLineWidth);
+                EdgeGeometry.LineWidth(budget, count, gap, presenter.MaxLineWidth);
             bool belowMinimum = width < presenter.MinLineWidth;
             if (belowMinimum && !warned)
                 Debug.LogWarning($"Geometry preview {physicalLink.LinkId}: {count} lines need " +
                     $"{width:0.##} px each, below the {presenter.MinLineWidth:0.##} px minimum.", this);
             warned = belowMinimum;
 
-            var identities = new List<ConnectionsIdentityPresenter.LiveLine>();
+            var identities = new List<IdentityPresenter.LiveLine>();
             var ids = new List<string>();
             for (int i = 0; i < count; i++)
                 ids.Add("c" + (i + 1));
             ids.Sort(StringComparer.Ordinal);
             for (int i = 0; i < count; i++)
             {
-                float offset = ConnectionsEdgeGeometry.Offset(i, count, width, gap);
-                Vector2 start = ConnectionsEdgeGeometry.CardEdge(physicalLink.NodeA,
+                float offset = EdgeGeometry.Offset(i, count, width, gap);
+                Vector2 start = EdgeGeometry.CardEdge(physicalLink.NodeA,
                     area, direction, offset);
-                Vector2 end = ConnectionsEdgeGeometry.CardEdge(physicalLink.NodeB,
+                Vector2 end = EdgeGeometry.CardEdge(physicalLink.NodeB,
                     area, -direction, -offset);
                 graphics[i].SetPath(new[] { start }, new[] { end }, new[] { width }, 1f);
-                identities.Add(new ConnectionsIdentityPresenter.LiveLine(ids[i],
+                identities.Add(new IdentityPresenter.LiveLine(ids[i],
                     start, end, start, end, graphics[i].color, 1f, width));
             }
             if (identityPresenter != null)
@@ -139,7 +139,7 @@ namespace Uptime.Connections
 
         private void Clear()
         {
-            foreach (ConnectionsPathGraphic graphic in graphics)
+            foreach (PathGraphic graphic in graphics)
             {
                 if (graphic == null)
                     continue;
