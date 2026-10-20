@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -78,24 +79,31 @@ namespace Uptime.ConnectionsToy
             Vector2 direction = (b - a).normalized;
             Vector2 normal = new Vector2(-direction.y, direction.x);
             float budget = physicalLink.BundleWidth(area);
-            float gap = presenter.MinLineGap;
-            float width = ConnectionsToyEdgeGeometry.LineWidth(budget, count, gap, presenter.MaxLineWidth);
-            bool belowMinimum = ConnectionsToyEdgeGeometry.BelowMinimum(
-                budget, count, gap, presenter.MaxLineWidth, presenter.MinLineWidth);
+            ConnectionsToyIdentityPacking.Layout layout = identityPresenter != null ?
+                identityPresenter.ResolveLayout(physicalLink, count, presenter.MaxLineWidth,
+                    presenter.MinLineWidth, presenter.MinLineGap) : null;
+            float gap = layout != null ? layout.LineGap : presenter.MinLineGap;
+            float width = layout != null ? layout.LineWidth :
+                ConnectionsToyEdgeGeometry.LineWidth(budget, count, gap, presenter.MaxLineWidth);
+            bool belowMinimum = width < presenter.MinLineWidth;
             if (belowMinimum && !warned)
                 Debug.LogWarning($"Geometry preview {physicalLink.LinkId}: {count} lines need " +
                     $"{width:0.##} px each, below the {presenter.MinLineWidth:0.##} px minimum.", this);
             warned = belowMinimum;
 
             var identities = new List<ConnectionsToyIdentityPresenter.LiveLine>();
+            var ids = new List<string>();
+            for (int i = 0; i < count; i++)
+                ids.Add("c" + (i + 1));
+            ids.Sort(StringComparer.Ordinal);
             for (int i = 0; i < count; i++)
             {
                 float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, gap);
                 Vector2 start = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeA, area, direction) + normal * offset;
                 Vector2 end = ConnectionsToyEdgeGeometry.CardEdge(physicalLink.NodeB, area, -direction) + normal * offset;
                 graphics[i].SetPath(new[] { start }, new[] { end }, new[] { width }, 1f);
-                identities.Add(new ConnectionsToyIdentityPresenter.LiveLine("c" + (i + 1),
-                    start, end, start, end, graphics[i].color, 1f));
+                identities.Add(new ConnectionsToyIdentityPresenter.LiveLine(ids[i],
+                    start, end, start, end, graphics[i].color, 1f, width));
             }
             if (identityPresenter != null)
             {

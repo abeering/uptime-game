@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uptime.ConnectionsToy
 {
-    // A separate overlay: pills may cover lines, but neither packing nor cycling changes line geometry.
+    // The edge solver settles line spacing once; cycling then changes only the separate pill overlay.
     public sealed class ConnectionsToyIdentityPresenter : MonoBehaviour
     {
         public struct LiveLine
@@ -16,9 +16,11 @@ namespace Uptime.ConnectionsToy
             public Vector2 VisualEnd;
             public Color Color;
             public float VisibleFraction;
+            public float Width;
 
             public LiveLine(string id, Vector2 targetStart, Vector2 targetEnd,
-                Vector2 visualStart, Vector2 visualEnd, Color color, float visibleFraction)
+                Vector2 visualStart, Vector2 visualEnd, Color color, float visibleFraction,
+                float width)
             {
                 Id = id;
                 TargetStart = targetStart;
@@ -27,6 +29,7 @@ namespace Uptime.ConnectionsToy
                 VisualEnd = visualEnd;
                 Color = color;
                 VisibleFraction = visibleFraction;
+                Width = width;
             }
         }
 
@@ -37,6 +40,7 @@ namespace Uptime.ConnectionsToy
         [SerializeField, Min(0f)] private float minimumPillGap = 6f;
         [SerializeField, Min(4f)] private float staggerStep = 20f;
         [SerializeField, Min(0f)] private float endInset = 12f;
+        [SerializeField, Min(0f)] private float pillToLineClearance = 1f;
         [Header("Identity rotation")]
         [SerializeField] private bool automaticCycling = true;
         [SerializeField, Min(0.5f)] private float automaticCycleSeconds = 2.6f;
@@ -47,13 +51,21 @@ namespace Uptime.ConnectionsToy
             public ConnectionsToyPhysicalLinkView Link;
             public readonly List<LiveLine> Lines = new List<LiveLine>();
             public readonly List<ConnectionsToyIdentityPillView> Pills = new List<ConnectionsToyIdentityPillView>();
-            public readonly List<ConnectionsToyIdentityPacking.Lane> PlanLanes = new List<ConnectionsToyIdentityPacking.Lane>();
-            public List<List<ConnectionsToyIdentityPacking.Placement>> Schedule;
-            public Rect[] Obstacles;
+            public readonly List<string> PillIds = new List<string>();
+            public ConnectionsToyIdentityPacking.Layout Layout;
+            public ConnectionsToyIdentityPacking.PillBounds[] Obstacles;
+            public Vector2 Start;
+            public Vector2 End;
             public Vector2 PillSize;
             public float Gap;
             public float Step;
             public float Inset;
+            public float Clearance;
+            public float Budget;
+            public float MaximumWidth;
+            public float MinimumReadableWidth;
+            public float MinimumGap;
+            public int Count;
             public int Cycle;
             public float NextCycleAt;
             public bool Seen;
@@ -69,6 +81,32 @@ namespace Uptime.ConnectionsToy
         public float StaggerStep => Mathf.Max(4f, staggerStep);
         public float EndInset => Mathf.Max(0f, endInset);
         public bool AutomaticCycling => automaticCycling;
+        public string StageDiagnostic
+        {
+            get
+            {
+                var lines = new List<string>();
+                foreach (EdgeState state in edges.Values)
+                    if (state.Layout != null)
+                        lines.Add($"{state.Link.LinkId}: {StageLetter(state.Layout.Stage)} " +
+                            $"{state.Layout.Stage} " +
+                            $"({state.Count} lines, {VisibleCount(state)} pills)");
+                lines.Sort(StringComparer.Ordinal);
+                return lines.Count == 0 ? "No active edge" : string.Join(" | ", lines);
+            }
+        }
+
+        private static string StageLetter(ConnectionsToyIdentityPacking.ReadabilityStage stage)
+        {
+            switch (stage)
+            {
+                case ConnectionsToyIdentityPacking.ReadabilityStage.Centered: return "A";
+                case ConnectionsToyIdentityPacking.ReadabilityStage.Staggered: return "B";
+                case ConnectionsToyIdentityPacking.ReadabilityStage.Overlaid: return "C";
+                case ConnectionsToyIdentityPacking.ReadabilityStage.Rotating: return "D";
+                default: return "—";
+            }
+        }
 
         public void BeginFrame()
         {
@@ -76,59 +114,102 @@ namespace Uptime.ConnectionsToy
                 state.Seen = false;
         }
 
-        public void PresentEdge(ConnectionsToyPhysicalLinkView link, List<LiveLine> liveLines)
+        public ConnectionsToyIdentityPacking.Layout ResolveLayout(ConnectionsToyPhysicalLinkView link,
+            int count, float maximumLineWidth, float minimumReadableLineWidth,
+            float minimumLineGap)
         {
-            if (link == null || liveLines == null || liveLines.Count == 0 ||
-                networkArea == null || pillLayer == null || pillPrefab == null)
-                return;
+            if (link == null || networkArea == null || pillPrefab == null)
+                return null;
             if (!edges.TryGetValue(link, out EdgeState state))
             {
                 state = new EdgeState { Link = link };
                 edges.Add(link, state);
             }
-            state.Seen = true;
-            state.Lines.Clear();
-            state.Lines.AddRange(liveLines);
-            state.Lines.Sort((a, b) => StringComparer.Ordinal.Compare(a.Id, b.Id));
-
-            var lanes = new List<ConnectionsToyIdentityPacking.Lane>();
-            foreach (LiveLine line in state.Lines)
-                lanes.Add(new ConnectionsToyIdentityPacking.Lane(line.Id, line.TargetStart, line.TargetEnd));
-            Rect[] obstacles = Obstacles(link);
-            if (NeedsPlan(state, lanes, obstacles))
+            Vector2 a = networkArea.InverseTransformPoint(link.NodeA.transform.position);
+            Vector2 b = networkArea.InverseTransformPoint(link.NodeB.transform.position);
+            Vector2 direction = (b - a).normalized;
+            Vector2 start = ConnectionsToyEdgeGeometry.CardEdge(link.NodeA, networkArea, direction);
+            Vector2 end = ConnectionsToyEdgeGeometry.CardEdge(link.NodeB, networkArea, -direction);
+            float budget = link.BundleWidth(networkArea);
+            ConnectionsToyIdentityPacking.PillBounds[] obstacles = Obstacles(link);
+            if (NeedsPlan(state, start, end, budget, count, maximumLineWidth,
+                minimumReadableLineWidth, minimumLineGap, obstacles))
             {
-                foreach (ConnectionsToyIdentityPillView pill in state.Pills)
-                    if (pill != null)
-                        DestroyView(pill.gameObject);
-                state.Pills.Clear();
-                state.PlanLanes.Clear();
-                state.PlanLanes.AddRange(lanes);
+                state.Start = start;
+                state.End = end;
+                state.Budget = budget;
+                state.Count = count;
+                state.MaximumWidth = maximumLineWidth;
+                state.MinimumReadableWidth = minimumReadableLineWidth;
+                state.MinimumGap = minimumLineGap;
                 state.Obstacles = obstacles;
                 state.PillSize = PillSize;
                 state.Gap = MinimumPillGap;
                 state.Step = StaggerStep;
                 state.Inset = EndInset;
-                state.Schedule = ConnectionsToyIdentityPacking.BuildSchedule(lanes, PillSize,
-                    MinimumPillGap, StaggerStep, EndInset, obstacles);
+                state.Clearance = Mathf.Max(0f, pillToLineClearance);
+                state.Layout = ConnectionsToyIdentityPacking.Solve(start, end, budget, count,
+                    maximumLineWidth, minimumReadableLineWidth, minimumLineGap,
+                    PillSize, MinimumPillGap,
+                    StaggerStep, EndInset, state.Clearance, obstacles);
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);
-                foreach (LiveLine line in state.Lines)
+                if (state.Layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable &&
+                    !state.WarnedNoRoom)
                 {
-                    ConnectionsToyIdentityPillView pill = Instantiate(pillPrefab, pillLayer, false);
-                    pill.name = $"{link.LinkId} identity {line.Id}";
-                    if (!Application.isPlaying)
-                        pill.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
-                    pill.Bind(line.Id, line.Color);
-                    pill.gameObject.SetActive(false);
-                    state.Pills.Add(pill);
-                }
-                if (state.Schedule.Count == 0 && !state.WarnedNoRoom)
-                {
-                    Debug.LogWarning($"No readable identity pill fits on {link.LinkId}; increase edge length or reduce pill size.", link);
+                    Debug.LogWarning($"No full-size identity pill fits on {link.LinkId}.", link);
                     state.WarnedNoRoom = true;
                 }
-                else if (state.Schedule.Count > 0)
+                else if (state.Layout.Stage != ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable)
                     state.WarnedNoRoom = false;
+            }
+            return state.Layout;
+        }
+
+        public void PresentEdge(ConnectionsToyPhysicalLinkView link, List<LiveLine> liveLines)
+        {
+            if (link == null || liveLines == null || liveLines.Count == 0 ||
+                networkArea == null || pillLayer == null || pillPrefab == null)
+                return;
+            if (!edges.TryGetValue(link, out EdgeState state) || state.Layout == null)
+                return;
+            state.Seen = true;
+            state.Lines.Clear();
+            state.Lines.AddRange(liveLines);
+            state.Lines.Sort((a, b) => StringComparer.Ordinal.Compare(a.Id, b.Id));
+            bool idsChanged = state.PillIds.Count != state.Lines.Count;
+            if (!idsChanged)
+                for (int i = 0; i < state.Lines.Count; i++)
+                    if (state.PillIds[i] != state.Lines[i].Id)
+                    {
+                        idsChanged = true;
+                        break;
+                    }
+            if (idsChanged)
+            {
+                var old = new Dictionary<string, ConnectionsToyIdentityPillView>();
+                for (int i = 0; i < state.PillIds.Count; i++)
+                    if (state.Pills[i] != null)
+                        old.Add(state.PillIds[i], state.Pills[i]);
+                state.Pills.Clear();
+                state.PillIds.Clear();
+                foreach (LiveLine line in state.Lines)
+                {
+                    if (!old.TryGetValue(line.Id, out ConnectionsToyIdentityPillView pill))
+                    {
+                        pill = Instantiate(pillPrefab, pillLayer, false);
+                        if (!Application.isPlaying)
+                            pill.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
+                    }
+                    else
+                        old.Remove(line.Id);
+                    pill.name = $"{link.LinkId} identity {line.Id}";
+                    pill.Bind(line.Id, line.Color);
+                    state.Pills.Add(pill);
+                    state.PillIds.Add(line.Id);
+                }
+                foreach (ConnectionsToyIdentityPillView pill in old.Values)
+                    DestroyView(pill.gameObject);
             }
             Apply(state);
         }
@@ -161,7 +242,7 @@ namespace Uptime.ConnectionsToy
             float now = Clock();
             foreach (EdgeState state in edges.Values)
             {
-                if (state.Schedule == null || state.Schedule.Count <= 1 || now < state.NextCycleAt)
+                if (state.Layout == null || state.Layout.Schedule.Count <= 1 || now < state.NextCycleAt)
                     continue;
                 Advance(state, now);
             }
@@ -171,31 +252,45 @@ namespace Uptime.ConnectionsToy
         {
             float now = Clock();
             foreach (EdgeState state in edges.Values)
-                if (state.Schedule != null && state.Schedule.Count > 1)
+                if (state.Layout != null && state.Layout.Schedule.Count > 1)
                     Advance(state, now);
         }
 
         private void Advance(EdgeState state, float now)
         {
-            state.Cycle = (state.Cycle + 1) % state.Schedule.Count;
+            state.Cycle = (state.Cycle + 1) % state.Layout.Schedule.Count;
             state.NextCycleAt = now + Dwell(state);
             Apply(state);
         }
 
         private float Dwell(EdgeState state)
         {
-            int visible = state.Schedule != null && state.Schedule.Count > 0 ?
-                Mathf.Max(1, state.Schedule[state.Cycle].Count) : 1;
-            float density = (float)state.Lines.Count / visible;
+            int visible = Mathf.Max(1, VisibleCount(state));
+            float density = Mathf.Max(1f, (float)state.Count / visible);
             return Mathf.Max(minimumDwellSeconds, automaticCycleSeconds / Mathf.Sqrt(density));
         }
 
+        private static int VisibleCount(EdgeState state) =>
+            state.Layout != null && state.Layout.Schedule.Count > 0 ?
+                state.Layout.Schedule[state.Cycle].Count : 0;
+
         private void Apply(EdgeState state)
         {
-            if (state.Schedule == null || state.Schedule.Count == 0)
+            if (state.Layout == null || state.Layout.Schedule.Count == 0)
+            {
+                foreach (ConnectionsToyIdentityPillView pill in state.Pills)
+                    if (pill != null)
+                        pill.gameObject.SetActive(false);
                 return;
-            List<ConnectionsToyIdentityPacking.Placement> visible = state.Schedule[state.Cycle];
-            var displayedBounds = new List<Rect>();
+            }
+            List<ConnectionsToyIdentityPacking.Placement> visible = state.Layout.Schedule[state.Cycle];
+            var displayed = new List<ConnectionsToyIdentityPacking.Placement>();
+            var visualLanes = new List<ConnectionsToyIdentityPacking.Lane>();
+            foreach (LiveLine line in state.Lines)
+                visualLanes.Add(new ConnectionsToyIdentityPacking.Lane(line.Id,
+                    line.VisualStart, line.VisualEnd, line.Width));
+            bool avoidLines = state.Layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Centered ||
+                state.Layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Staggered;
             for (int i = 0; i < state.Pills.Count; i++)
             {
                 bool selected = false;
@@ -208,82 +303,69 @@ namespace Uptime.ConnectionsToy
                         break;
                     }
                 LiveLine line = state.Lines[i];
-                bool show = selected && line.VisibleFraction + 0.001f >= fraction;
+                float length = Vector2.Distance(line.VisualStart, line.VisualEnd);
+                bool show = selected && length > 0.01f &&
+                    line.VisibleFraction + 0.001f >= fraction + state.PillSize.x * 0.5f / length;
                 ConnectionsToyIdentityPillView pill = state.Pills[i];
-                Vector2 position = Vector2.Lerp(line.VisualStart, line.VisualEnd, fraction);
-                Rect bounds = new Rect(position - state.PillSize * 0.5f, state.PillSize);
+                ConnectionsToyIdentityPacking.PillBounds bounds =
+                    ConnectionsToyIdentityPacking.Bounds(visualLanes[i], fraction, state.PillSize);
                 if (show)
-                {
-                    foreach (Rect other in displayedBounds)
-                        if (OverlapsWithGap(bounds, other, state.Gap))
-                        {
-                            show = false;
-                            break;
-                        }
-                }
-                if (show)
-                    foreach (Rect obstacle in state.Obstacles)
-                        if (OverlapsWithGap(bounds, obstacle, state.Gap))
-                        {
-                            show = false;
-                            break;
-                        }
+                    show = ConnectionsToyIdentityPacking.CanShow(bounds, i, visualLanes,
+                        displayed, state.Obstacles, state.Gap, avoidLines, state.Clearance);
                 if (pill.gameObject.activeSelf != show)
                     pill.gameObject.SetActive(show);
                 if (show)
                 {
-                    displayedBounds.Add(bounds);
-                    pill.SetPosition(position);
+                    displayed.Add(new ConnectionsToyIdentityPacking.Placement(i, fraction, bounds));
+                    pill.SetPose(bounds.Center, bounds.Along);
                     pill.SetLineColor(line.Color);
                 }
             }
         }
 
-        private static bool OverlapsWithGap(Rect a, Rect b, float gap)
+        private bool NeedsPlan(EdgeState state, Vector2 start, Vector2 end, float budget,
+            int count, float maximumLineWidth, float minimumReadableLineWidth,
+            float minimumLineGap, ConnectionsToyIdentityPacking.PillBounds[] obstacles)
         {
-            return a.xMin < b.xMax + gap && a.xMax + gap > b.xMin &&
-                a.yMin < b.yMax + gap && a.yMax + gap > b.yMin;
-        }
-
-        private bool NeedsPlan(EdgeState state, List<ConnectionsToyIdentityPacking.Lane> lanes, Rect[] obstacles)
-        {
-            if (state.Schedule == null || state.PlanLanes.Count != lanes.Count || state.PillSize != PillSize ||
+            if (state.Layout == null || state.Count != count || state.PillSize != PillSize ||
+                (state.Start - start).sqrMagnitude > 0.25f ||
+                (state.End - end).sqrMagnitude > 0.25f ||
+                !Mathf.Approximately(state.Budget, budget) ||
+                !Mathf.Approximately(state.MaximumWidth, maximumLineWidth) ||
+                !Mathf.Approximately(state.MinimumReadableWidth, minimumReadableLineWidth) ||
+                !Mathf.Approximately(state.MinimumGap, minimumLineGap) ||
                 !Mathf.Approximately(state.Gap, MinimumPillGap) ||
                 !Mathf.Approximately(state.Step, StaggerStep) || !Mathf.Approximately(state.Inset, EndInset) ||
+                !Mathf.Approximately(state.Clearance, Mathf.Max(0f, pillToLineClearance)) ||
                 state.Obstacles == null || state.Obstacles.Length != obstacles.Length)
                 return true;
             for (int i = 0; i < obstacles.Length; i++)
-                if ((state.Obstacles[i].center - obstacles[i].center).sqrMagnitude > 0.25f ||
-                    (state.Obstacles[i].size - obstacles[i].size).sqrMagnitude > 0.25f)
-                    return true;
-            for (int i = 0; i < lanes.Count; i++)
-                if (state.PlanLanes[i].Id != lanes[i].Id ||
-                    (state.PlanLanes[i].Start - lanes[i].Start).sqrMagnitude > 0.25f ||
-                    (state.PlanLanes[i].End - lanes[i].End).sqrMagnitude > 0.25f)
+                if ((state.Obstacles[i].Center - obstacles[i].Center).sqrMagnitude > 0.25f ||
+                    (state.Obstacles[i].HalfSize - obstacles[i].HalfSize).sqrMagnitude > 0.25f ||
+                    (state.Obstacles[i].Along - obstacles[i].Along).sqrMagnitude > 0.0001f)
                     return true;
             return false;
         }
 
-        private Rect[] Obstacles(ConnectionsToyPhysicalLinkView link)
+        private ConnectionsToyIdentityPacking.PillBounds[] Obstacles(ConnectionsToyPhysicalLinkView link)
         {
             return link.ResourceLabel != null ? new[] { Bounds(link.NodeA.transform),
                 Bounds(link.NodeB.transform), Bounds(link.ResourceLabel) } :
                 new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
         }
 
-        private Rect Bounds(Transform target)
+        private ConnectionsToyIdentityPacking.PillBounds Bounds(Transform target)
         {
             var corners = new Vector3[4];
             ((RectTransform)target).GetWorldCorners(corners);
-            Vector2 min = networkArea.InverseTransformPoint(corners[0]);
-            Vector2 max = min;
-            for (int i = 1; i < 4; i++)
-            {
-                Vector2 point = networkArea.InverseTransformPoint(corners[i]);
-                min = Vector2.Min(min, point);
-                max = Vector2.Max(max, point);
-            }
-            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+            Vector2 bottomLeft = networkArea.InverseTransformPoint(corners[0]);
+            Vector2 topLeft = networkArea.InverseTransformPoint(corners[1]);
+            Vector2 topRight = networkArea.InverseTransformPoint(corners[2]);
+            Vector2 bottomRight = networkArea.InverseTransformPoint(corners[3]);
+            return new ConnectionsToyIdentityPacking.PillBounds(
+                (bottomLeft + topRight) * 0.5f, bottomRight - bottomLeft,
+                new Vector2(Vector2.Distance(bottomLeft, bottomRight),
+                    Vector2.Distance(bottomLeft, topLeft)));
         }
 
         private static float Clock() => Time.realtimeSinceStartup;

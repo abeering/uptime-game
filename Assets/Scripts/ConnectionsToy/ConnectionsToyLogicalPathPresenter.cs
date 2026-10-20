@@ -95,6 +95,14 @@ namespace Uptime.ConnectionsToy
             foreach (List<ConnectionsToyLogicalConnectionState> users in usersByLink.Values)
                 users.Sort((a, b) => StringComparer.Ordinal.Compare(a.ConnectionId, b.ConnectionId));
 
+            var layouts = new Dictionary<ConnectionsToyPhysicalLinkResources,
+                ConnectionsToyIdentityPacking.Layout>();
+            if (identityPresenter != null)
+                foreach (KeyValuePair<ConnectionsToyPhysicalLinkResources,
+                    List<ConnectionsToyLogicalConnectionState>> entry in usersByLink)
+                    layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key.View,
+                        entry.Value.Count, maxLineWidth, minLineWidth, minLineGap));
+
             var currentlyOverflowed = new HashSet<ConnectionsToyPhysicalLinkView>();
             var identitiesByLink = new Dictionary<ConnectionsToyPhysicalLinkView,
                 List<ConnectionsToyIdentityPresenter.LiveLine>>();
@@ -112,8 +120,11 @@ namespace Uptime.ConnectionsToy
                     ConnectionsToyPhysicalLinkView linkView = link.View;
                     List<ConnectionsToyLogicalConnectionState> users = usersByLink[link];
                     float budget = linkView.BundleWidth(networkArea);
-                    float width = ConnectionsToyEdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
-                    float offset = ConnectionsToyEdgeGeometry.Offset(users.IndexOf(connection), users.Count, width, minLineGap);
+                    layouts.TryGetValue(link, out ConnectionsToyIdentityPacking.Layout layout);
+                    float width = layout != null ? layout.LineWidth :
+                        ConnectionsToyEdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
+                    float gap = layout != null ? layout.LineGap : minLineGap;
+                    float offset = ConnectionsToyEdgeGeometry.Offset(users.IndexOf(connection), users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
                     offsets[edge] = connection.Definition.Route[edge].Node == linkView.NodeA ? offset : -offset;
                     widths[edge] = width;
@@ -143,10 +154,10 @@ namespace Uptime.ConnectionsToy
                             identitiesByLink.Add(linkView, lines);
                         }
                         lines.Add(new ConnectionsToyIdentityPresenter.LiveLine(connection.ConnectionId,
-                            targetStart, targetEnd, visualStart, visualEnd, lineColor, visibleFraction));
+                            targetStart, targetEnd, visualStart, visualEnd, lineColor, visibleFraction,
+                            width));
                     }
-                    if (ConnectionsToyEdgeGeometry.BelowMinimum(budget, users.Count, minLineGap,
-                        maxLineWidth, minLineWidth))
+                    if (width < minLineWidth)
                     {
                         currentlyOverflowed.Add(linkView);
                         if (warnedLinks.Add(linkView))

@@ -8,7 +8,7 @@ namespace Uptime.ConnectionsToy
     {
         [SerializeField, Min(0f)] private float cornerRadius = 7f;
         [SerializeField, Min(0f)] private float borderThickness = 2f;
-        [SerializeField] private Color fillColor = new Color(0.025f, 0.075f, 0.10f, 0.97f);
+        [SerializeField] private Color fillColor = new Color(0.025f, 0.075f, 0.10f, 1f);
 
         public void SetOutline(Color outline)
         {

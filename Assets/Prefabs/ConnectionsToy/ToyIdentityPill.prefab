@@ -69,7 +69,7 @@ MonoBehaviour:
       m_Calls: []
   cornerRadius: 7
   borderThickness: 2
-  fillColor: {r: 0.025, g: 0.075, b: 0.1, a: 0.97}
+  fillColor: {r: 0.025, g: 0.075, b: 0.1, a: 1}
 --- !u!114 &8025527490866664778
 MonoBehaviour:
   m_ObjectHideFlags: 0

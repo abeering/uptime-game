@@ -70,12 +70,45 @@ public static class ConnectionsToyGeometryWitness
             new SerializedObject(preview).FindProperty("identityPresenter").objectReferenceValue == identity &&
             new SerializedObject(UnityEngine.Object.FindFirstObjectByType<ConnectionsToyTerminal>())
                 .FindProperty("identityPresenter").objectReferenceValue == identity, "identity scene bindings");
-        CheckPacking(4, 280f, Vector2.up, false);
-        CheckPacking(2, 280f, Vector2.up, false);
-        CheckPacking(4, 280f, Vector2.right, false);
-        CheckPacking(12, 120f, Vector2.up, true);
-        CheckPacking(12, 120f, Vector2.right, true);
-        CheckPacking(12, 150f, new Vector2(1f, 1f).normalized, true);
+        var observedStages = new System.Collections.Generic.HashSet<ConnectionsToyIdentityPacking.ReadabilityStage>();
+        foreach (ConnectionsToyPhysicalLinkView link in links)
+            foreach (int count in new[] { 1, 2, 3, 4, 6, 8, 10, 12 })
+            {
+                var layout = identity.ResolveLayout(link, count, presenter.MaxLineWidth,
+                    presenter.MinLineWidth, presenter.MinLineGap);
+                CheckLayout(layout, link.BundleWidth(presenter.NetworkArea), count);
+                observedStages.Add(layout.Stage);
+                Debug.Log($"{link.LinkId} {count}: {layout.Stage}, {layout.LineWidth:0.##} px line, " +
+                    $"{layout.LineGap:0.##} px gap, {layout.Schedule[0].Count} visible");
+            }
+        foreach (ConnectionsToyIdentityPacking.ReadabilityStage stage in new[] {
+            ConnectionsToyIdentityPacking.ReadabilityStage.Centered,
+            ConnectionsToyIdentityPacking.ReadabilityStage.Staggered,
+            ConnectionsToyIdentityPacking.ReadabilityStage.Overlaid,
+            ConnectionsToyIdentityPacking.ReadabilityStage.Rotating })
+            Check(observedStages.Contains(stage), "all four readability stages are exercised");
+        foreach (Vector2 direction in new[] { Vector2.up, Vector2.right,
+            new Vector2(1f, 1f).normalized })
+            foreach (int count in new[] { 2, 4, 8, 12 })
+                CheckLayout(ConnectionsToyIdentityPacking.Solve(Vector2.zero,
+                    direction * 280f, 96f, count, 12f, 2.5f, 3f, new Vector2(56f, 29f),
+                    6f, 20f, 12f, 1f,
+                    Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()), 96f, count);
+        var stableLink = links.First(l => l.LinkId == "E1");
+        var stableLayout = identity.ResolveLayout(stableLink, 12,
+            presenter.MaxLineWidth, presenter.MinLineWidth, presenter.MinLineGap);
+        identity.CycleCongestedEdges();
+        Check(ReferenceEquals(stableLayout, identity.ResolveLayout(stableLink, 12,
+            presenter.MaxLineWidth, presenter.MinLineWidth, presenter.MinLineGap)),
+            "manual cycle never replans line geometry");
+        Check(ConnectionsToyIdentityPacking.Solve(Vector2.zero, Vector2.up * 70f,
+            96f, 12, 12f, 2.5f, 3f, new Vector2(56f, 29f), 6f, 20f, 12f, 1f,
+            Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()).Stage ==
+                ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable,
+            "short edge cannot fit an invalid pill");
+        CheckLayout(ConnectionsToyIdentityPacking.Solve(Vector2.zero, Vector2.up * 110f,
+            96f, 12, 12f, 2.5f, 3f, new Vector2(56f, 29f), 6f, 20f, 12f, 1f,
+            Array.Empty<ConnectionsToyIdentityPacking.PillBounds>()), 96f, 12);
 
         host.ResetSimulation();
         var c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
@@ -91,50 +124,57 @@ public static class ConnectionsToyGeometryWitness
         host.StepSimulation(0.1f);
         Check(c1.ActualRateMBps > sharedRate, "released capacity accelerates c1");
         host.ResetSimulation();
-        Debug.Log("ConnectionsToyGeometryWitness PASS: scene references, 1/2/3/4/8/16 lanes on three edges, " +
-            "centering, gap, budget, density, threshold, identity packing/cycling coverage, establishment and completion.");
+        Debug.Log("ConnectionsToyGeometryWitness PASS: scene references, edge budgets and stages, " +
+            "rotated pill clearance and cycle coverage, short edges, establishment and completion.");
     }
 
-    private static void CheckPacking(int count, float length, Vector2 direction, bool expectCycling)
+    private static void CheckLayout(ConnectionsToyIdentityPacking.Layout layout, float budget, int count)
     {
-        var lanes = new System.Collections.Generic.List<ConnectionsToyIdentityPacking.Lane>();
-        Vector2 normal = new Vector2(-direction.y, direction.x);
-        float width = ConnectionsToyEdgeGeometry.LineWidth(96f, count, 3f, 12f);
-        for (int i = 0; i < count; i++)
-        {
-            float offset = ConnectionsToyEdgeGeometry.Offset(i, count, width, 3f);
-            lanes.Add(new ConnectionsToyIdentityPacking.Lane("c" + (i + 1),
-                -direction * length * 0.5f + normal * offset,
-                direction * length * 0.5f + normal * offset));
-        }
-        var schedule = ConnectionsToyIdentityPacking.BuildSchedule(lanes, new Vector2(56f, 29f),
-            6f, 20f, 12f, Array.Empty<Rect>());
-        Check(schedule.Count > 0 && (schedule.Count > 1) == expectCycling, "packing capacity");
+        Check(layout != null && layout.Lanes.Length == count, "edge layout exists");
+        Check(layout.Stage != ConnectionsToyIdentityPacking.ReadabilityStage.Unavailable,
+            "edge supports at least one pill");
+        Check(count * layout.LineWidth + (count - 1) * layout.LineGap <= budget + 0.02f,
+            "pill-aware lines remain within attachment budget");
+        Check(layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Rotating ||
+            layout.Schedule.Count == 1 && layout.Schedule[0].Count == count,
+            "all labels remain visible until rotation is necessary");
+        if (layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Centered)
+            Check(layout.Schedule[0].All(p => Mathf.Abs(p.Fraction - 0.5f) < 0.001f),
+                "centered stage has aligned pills");
         var covered = new System.Collections.Generic.HashSet<int>();
-        foreach (var cycle in schedule)
+        foreach (var cycle in layout.Schedule)
         {
             for (int i = 0; i < cycle.Count; i++)
             {
                 var placement = cycle[i];
                 covered.Add(placement.LaneIndex);
-                Vector2 center = Vector2.Lerp(lanes[placement.LaneIndex].Start,
-                    lanes[placement.LaneIndex].End, placement.Fraction);
-                Check((center - placement.Bounds.center).sqrMagnitude < 0.001f, "pill attached to line");
+                var lane = layout.Lanes[placement.LaneIndex];
+                Vector2 center = Vector2.Lerp(lane.Start, lane.End, placement.Fraction);
+                Check((center - placement.Bounds.Center).sqrMagnitude < 0.001f,
+                    "rotated pill attached to line");
+                Check((placement.Bounds.Along - (lane.End - lane.Start).normalized).sqrMagnitude < 0.001f,
+                    "pill follows line direction");
+                float margin = (56f * 0.5f + 12f) / Vector2.Distance(lane.Start, lane.End);
+                Check(placement.Fraction >= margin - 0.001f &&
+                    placement.Fraction <= 1f - margin + 0.001f, "pill stays inside edge");
                 for (int j = 0; j < i; j++)
-                {
-                    Rect other = cycle[j].Bounds;
-                    Rect expanded = new Rect(placement.Bounds.xMin - 6f, placement.Bounds.yMin - 6f,
-                        placement.Bounds.width + 12f, placement.Bounds.height + 12f);
-                    Check(!expanded.Overlaps(other), "no pill overlap");
-                }
+                    Check(!ConnectionsToyIdentityPacking.Intersects(placement.Bounds,
+                        cycle[j].Bounds, 6f), "no pill overlap");
+                if (layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Centered ||
+                    layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Staggered)
+                    for (int other = 0; other < count; other++)
+                        if (other != placement.LaneIndex)
+                            Check(!ConnectionsToyIdentityPacking.SegmentIntersects(placement.Bounds,
+                                layout.Lanes[other].Start, layout.Lanes[other].End,
+                                layout.Lanes[other].Width * 0.5f + 1f),
+                                "no unrelated line occlusion in stage A/B");
             }
         }
         Check(covered.Count == count, "cycling covers every connection");
-        if (expectCycling && schedule[0].Count > 1)
-            Check(schedule[0].Last().LaneIndex - schedule[0].First().LaneIndex >= count / 2,
+        if (layout.Stage == ConnectionsToyIdentityPacking.ReadabilityStage.Rotating &&
+            layout.Schedule[0].Count > 1)
+            Check(layout.Schedule[0].Last().LaneIndex - layout.Schedule[0].First().LaneIndex >= count / 2,
                 "distributed first cycle");
-        Check(ConnectionsToyEdgeGeometry.LineWidth(96f, count, 3f, 12f) == width,
-            "pills do not change line width");
     }
 
     private static void Check(bool condition, string name)

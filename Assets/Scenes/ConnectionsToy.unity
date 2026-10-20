@@ -3555,6 +3555,7 @@ MonoBehaviour:
   minimumPillGap: 6
   staggerStep: 20
   endInset: 12
+  pillToLineClearance: 1
   automaticCycling: 1
   automaticCycleSeconds: 2.6
   minimumDwellSeconds: 1.2
