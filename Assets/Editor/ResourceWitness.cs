@@ -180,8 +180,7 @@ namespace Uptime.Connections.EditorTools
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
                 var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
-                string title = ((TMP_Text)fields.FindProperty("identity").objectReferenceValue).text;
-                Check(title == "INSPECT / C1 - Record Retrieval", "inspect identity is in title bar");
+                CheckHeader(fields, "C1", "Record Retrieval", false);
                 Check(load.Contains("SLOWED") && load.Contains("LOAD 3.8/5") &&
                     load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
                 Check(tokens.Length == 1 && tokens[0].Text == "READ → DB" &&
@@ -271,14 +270,13 @@ namespace Uptime.Connections.EditorTools
                 var activeEntry = (InspectEntry)entries.GetArrayElementAtIndex(0).objectReferenceValue;
                 var completedEntry = (InspectEntry)entries.GetArrayElementAtIndex(1).objectReferenceValue;
                 var fields = new SerializedObject(completedEntry);
-                var title = (TMP_Text)fields.FindProperty("identity").objectReferenceValue;
                 var tokens = completedEntry.GetComponentsInChildren<InspectOperationToken>();
                 var status = (TMP_Text)fields.FindProperty("throughput").objectReferenceValue;
                 var work = (TMP_Text)fields.FindProperty("work").objectReferenceValue;
                 var activity = (TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue;
                 var eta = (TMP_Text)fields.FindProperty("eta").objectReferenceValue;
                 var progress = (Image)fields.FindProperty("progressFill").objectReferenceValue;
-                Check(title.text == "INSPECT / C3 - Record Indexing", "completed identity in title bar");
+                CheckHeader(fields, "C3", "Record Indexing", true);
                 Check(tokens.Length == 2 && tokens[0].Text == "WRITE → DB" &&
                     tokens[1].Text == "READ → DB" && tokens.All(t => t.HasCheckmark && !t.HasOutline),
                     "completed operations remain subdued and visible");
@@ -344,6 +342,29 @@ namespace Uptime.Connections.EditorTools
                 SetField(definition, "startDelaySeconds", originalDelay);
                 host.ResetSimulation();
             }
+        }
+
+        private static void CheckHeader(SerializedObject fields, string id,
+            string purpose, bool complete)
+        {
+            var prefix = (TMP_Text)fields.FindProperty("identity").objectReferenceValue;
+            var purposeText = (TMP_Text)fields.FindProperty("purpose").objectReferenceValue;
+            var pill = (IdentityPillView)fields.FindProperty("headerIdentityPill").objectReferenceValue;
+            Check(prefix != null && prefix.text == "INSPECT /" &&
+                purposeText != null && purposeText.text == "- " + purpose,
+                "inspect header separates prefix and purpose");
+            Check(pill != null && pill.GetComponentInChildren<TMP_Text>().text == id,
+                "inspect header identity is in its own pill");
+            var inspectPrefab = AssetDatabase.LoadAssetAtPath<InspectOutput>(
+                "Assets/Prefabs/Connections/InspectOutput.prefab");
+            var nestedPill = inspectPrefab.GetComponentInChildren<IdentityPillView>();
+            var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(nestedPill);
+            Check(AssetDatabase.GetAssetPath(source) == "Assets/Prefabs/Connections/IdentityPill.prefab",
+                "inspect header reuses network identity pill prefab");
+            Color expected = fields.FindProperty(complete ? "quietColor" : "activeColor").colorValue;
+            Check(pill.GetComponent<PillGraphic>().color == expected &&
+                pill.Size == new Vector2(54f, 28f),
+                "inspect header pill keeps authored geometry and chrome color");
         }
 
         private static OperationStage Stage(OperationKind kind, float work, float load)

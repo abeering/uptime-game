@@ -8,6 +8,8 @@ namespace Uptime.Connections
     public sealed class InspectEntry : MonoBehaviour
     {
         [SerializeField] private TMP_Text identity;
+        [SerializeField] private IdentityPillView headerIdentityPill;
+        [SerializeField] private TMP_Text purpose;
         [SerializeField] private RectTransform operationRow;
         [SerializeField] private InspectOperationToken operationTokenPrefab;
         [SerializeField] private TMP_Text work;
@@ -43,10 +45,19 @@ namespace Uptime.Connections
 
         public void Render(LogicalConnectionState state)
         {
-            string claim = string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
-                string.Empty : " - " + state.Definition.ClaimedPurpose;
-            Set(identity, "INSPECT / " + state.ConnectionId.ToUpperInvariant() + claim);
+            Set(identity, "INSPECT /");
+            Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
+                string.Empty : "- " + state.Definition.ClaimedPurpose);
             if (identity != null) identity.color = state.IsComplete ? quietColor : activeColor;
+            if (purpose != null) purpose.color = state.IsComplete ? quietColor : activeColor;
+            if (headerIdentityPill != null)
+            {
+                Color identityColor = state.IsComplete ? quietColor : activeColor;
+                if (!ReferenceEquals(renderedState, state))
+                    headerIdentityPill.Bind(state.ConnectionId, identityColor);
+                else
+                    headerIdentityPill.SetLineColor(identityColor);
+            }
             if (panelBackground != null)
                 panelBackground.color = state.IsComplete ? completeBackground : activeBackground;
             if (titleBar != null)
