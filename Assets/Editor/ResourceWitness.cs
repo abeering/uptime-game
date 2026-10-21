@@ -6,6 +6,7 @@ using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
@@ -95,6 +96,7 @@ namespace Uptime.Connections.EditorTools
                 Near(db.RequestedLoad, 5f, "completed c3 releases requested LOAD");
                 Near(db.AllocatedLoad, 5f, "completed c3 releases allocated LOAD");
                 CheckCapacityAndAccounting(host);
+                CheckCompletedPresentation(c1, c3);
                 Debug.Log($"ResourceWitness completion: expected c1 5, DB request/allocation 5/5; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.AllocatedLoad:0.###}");
 
                 SetField(c2Definition.Route.Last(), "node", db.View);
@@ -176,9 +178,16 @@ namespace Uptime.Connections.EditorTools
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
                 string timeline = ((TMP_Text)fields.FindProperty("route").objectReferenceValue).text;
+                string title = ((TMP_Text)fields.FindProperty("identity").objectReferenceValue).text;
+                Check(title == "INSPECT / C1 - Record Retrieval", "inspect identity is in title bar");
                 Check(load.Contains("SLOWED") && load.Contains("LOAD 3.8/5") &&
                     load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
                 Check(timeline.Contains("READ") && timeline.Contains("DB"), "single-operation timeline");
+                Check(((TMP_Text)fields.FindProperty("route").objectReferenceValue).fontSize >
+                    ((TMP_Text)fields.FindProperty("identity").objectReferenceValue).fontSize,
+                    "operation pill row has larger type than title");
+                Check(((LayoutElement)new SerializedObject(output).FindProperty("layout")
+                    .objectReferenceValue).preferredHeight == 172f, "single active entry height");
             }
             finally
             {
@@ -222,6 +231,44 @@ namespace Uptime.Connections.EditorTools
                     Check(status.Contains("AT SPEED") && status.Contains("LOAD 4/4"),
                         "inspection uses READ allocation");
                 }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+        }
+
+        private static void CheckCompletedPresentation(LogicalConnectionState active, LogicalConnectionState complete)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { active, complete });
+                var serialized = new SerializedObject(output);
+                var entries = serialized.FindProperty("entries");
+                var activeEntry = (InspectEntry)entries.GetArrayElementAtIndex(0).objectReferenceValue;
+                var completedEntry = (InspectEntry)entries.GetArrayElementAtIndex(1).objectReferenceValue;
+                var fields = new SerializedObject(completedEntry);
+                var title = (TMP_Text)fields.FindProperty("identity").objectReferenceValue;
+                var timeline = (TMP_Text)fields.FindProperty("route").objectReferenceValue;
+                var status = (TMP_Text)fields.FindProperty("throughput").objectReferenceValue;
+                var work = (TMP_Text)fields.FindProperty("work").objectReferenceValue;
+                var activity = (TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue;
+                var eta = (TMP_Text)fields.FindProperty("eta").objectReferenceValue;
+                var progress = (Image)fields.FindProperty("progressFill").objectReferenceValue;
+                Check(title.text == "INSPECT / C3 - Record Indexing", "completed identity in title bar");
+                Check(timeline.text.Contains("WRITE") && timeline.text.Contains("READ") &&
+                    !timeline.text.Contains("+1"), "completed operations remain visible");
+                Check(status.text == "COMPLETE", "completed status has no live LOAD");
+                Check(!work.gameObject.activeSelf && !activity.gameObject.activeSelf &&
+                    !eta.gameObject.activeSelf && !progress.transform.parent.gameObject.activeSelf,
+                    "completed progress and supporting info hidden");
+                Check(((RectTransform)activeEntry.transform).rect.height == 156f &&
+                    ((RectTransform)completedEntry.transform).rect.height == 98f,
+                    "completed entry is shorter than active entry");
+                Check(((LayoutElement)serialized.FindProperty("layout").objectReferenceValue)
+                    .preferredHeight == 280f, "mixed entries reflow within terminal history");
             }
             finally
             {
