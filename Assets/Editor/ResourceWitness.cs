@@ -239,8 +239,15 @@ namespace Uptime.Connections.EditorTools
                         tokens[0].HasCheckmark && !tokens[0].HasOutline &&
                         tokens[1].Text == "READ → DB" && tokens[1].HasOutline,
                         "completed and active authored tokens update");
-                    Check(tokens[1].OutlineColor == fields.FindProperty("activeColor").colorValue,
-                        "at-speed operation outline uses green performance color");
+                    Color nominal = fields.FindProperty("atSpeedColor").colorValue;
+                    Color chrome = fields.FindProperty("activeColor").colorValue;
+                    Check(tokens[1].OutlineColor == nominal &&
+                        ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).color == nominal,
+                        "at-speed pill and status use green performance color");
+                    Check(((TMP_Text)fields.FindProperty("identity").objectReferenceValue).color == chrome &&
+                        ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == chrome &&
+                        ((Image)fields.FindProperty("progressFill").objectReferenceValue).color == chrome,
+                        "title and panel accents keep blue-green chrome color");
                     Check(work.Contains("/60"), "inspection WORK uses READ stage");
                     Check(status.Contains("AT SPEED") && status.Contains("LOAD 4/4"),
                         "inspection uses READ allocation");

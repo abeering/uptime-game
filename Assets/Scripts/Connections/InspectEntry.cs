@@ -19,6 +19,7 @@ namespace Uptime.Connections
         [SerializeField] private Image panelBackground;
         [SerializeField] private Image titleBar;
         [SerializeField] private Color activeColor = new Color(0.35f, 0.92f, 0.72f);
+        [SerializeField] private Color atSpeedColor = new Color(0.56f, 0.89f, 0.40f);
         [SerializeField] private Color limitedColor = new Color(1f, 0.69f, 0.34f);
         [SerializeField] private Color stalledColor = new Color(0.96f, 0.29f, 0.26f);
         [SerializeField] private Color quietColor = new Color(0.52f, 0.67f, 0.66f);
@@ -51,7 +52,7 @@ namespace Uptime.Connections
             if (titleBar != null)
                 titleBar.color = state.IsComplete ? completeTitleBar : activeTitleBar;
             Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
-                state.Performance == LoadPerformance.AtSpeed ? activeColor :
+                state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
             if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex ||
                 renderedOperationCount != state.OperationCount || renderedComplete != state.IsComplete)
@@ -88,8 +89,9 @@ namespace Uptime.Connections
                 if (Mathf.Abs(anchor.x - fraction) > 0.0005f)
                     progressFill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(fraction), anchor.y);
             }
-            if (progressFill != null && progressFill.color != tint) progressFill.color = tint;
-            if (stateTag != null && stateTag.color != tint) stateTag.color = tint;
+            Color chrome = state.IsComplete ? quietColor : activeColor;
+            if (progressFill != null && progressFill.color != chrome) progressFill.color = chrome;
+            if (stateTag != null && stateTag.color != chrome) stateTag.color = chrome;
         }
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
