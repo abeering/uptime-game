@@ -28,6 +28,7 @@ namespace Uptime.Connections.EditorTools
             float originalC2Load = GetFloat(c2Definition, "desiredLoad");
             float originalC3Load = GetFloat(c3Definition, "desiredLoad");
             float originalC3Work = GetFloat(c3Definition, "totalWork");
+            var originalC3Operations = (OperationStage[])Field(c3Definition, "operations").GetValue(c3Definition);
             float originalC2Delay = GetFloat(c2Definition, "startDelaySeconds");
             float originalC3Delay = GetFloat(c3Definition, "startDelaySeconds");
             float originalDbBaseline = GetFloat(db, "baselineLoad");
@@ -45,6 +46,8 @@ namespace Uptime.Connections.EditorTools
                 Color elevated = new SerializedObject(db.View.LoadBar).FindProperty("elevatedColor").colorValue;
                 Check(db.View.LoadBar.FillColor == elevated, "5/10 LOAD uses elevated color");
                 Check(c2.IsPending && c3.IsPending, "delayed connections pending");
+                Check(c1.OperationCount == 1 && c2.OperationCount == 1 && c3.OperationCount == 2,
+                    "legacy single operations and authored arc");
                 CheckCapacityAndAccounting(host);
                 Debug.Log($"ResourceWitness uncontended: expected c1 5, DB 5/10, API baseline 1; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.LoadCapacity:0.###}, {api.RequestedLoad:0.###}");
 
@@ -52,6 +55,8 @@ namespace Uptime.Connections.EditorTools
                 while (c3.IsPending && steps++ < 50)
                     host.StepSimulation(0.1f);
                 Check(c2.IsActive && c3.IsActive, "authored delayed establishment");
+                Check(c3.CurrentOperation == OperationKind.Write && c3.CurrentOperationIndex == 0,
+                    "arc begins with WRITE");
                 Near(db.RequestedLoad, 13f, "authored DB requested LOAD");
                 Near(db.AllocatedLoad, 10f, "authored DB allocated LOAD");
                 Near(c1.AllocatedLoad, 50f / 13f, "authored c1 proportional LOAD");
@@ -60,8 +65,27 @@ namespace Uptime.Connections.EditorTools
                 Near(api.RequestedLoad, 1f, "transit API remains at baseline");
                 CheckCapacityAndAccounting(host);
                 CheckPresentation(host, c1, db);
+                CheckArcPresentation(c3, true);
                 Debug.Log($"ResourceWitness authored 13/10: expected c1 3.846, c3 6.154, c2 5; observed {c1.AllocatedLoad:0.###}, {c3.AllocatedLoad:0.###}, {c2.AllocatedLoad:0.###}");
 
+                steps = 0;
+                while (c3.CurrentOperationIndex == 0 && steps++ < 1000)
+                    host.StepSimulation(0.1f);
+                Check(c3.IsActive && c3.CurrentOperation == OperationKind.Read &&
+                    c3.CurrentOperationIndex == 1 && c3.IsTransitioning &&
+                    c3.CompletedWork == 0f && c3.AllocatedLoad == 0f,
+                    "WRITE completes into READ without completing connection");
+                Check(ReferenceEquals(c3, State(host, "c3")) && c3.ConnectionId == "c3",
+                    "arc retains connection identity and runtime state");
+                Near(db.RequestedLoad, 5f, "transition defers next operation LOAD");
+                host.StepSimulation(0.1f);
+                Near(c3.AllocatedLoad, 4f, "READ uses its independent LOAD");
+                Near(c1.AllocatedLoad, 5f, "c1 recovers when READ reduces demand");
+                Near(db.RequestedLoad, 9f, "READ and c1 request nine LOAD");
+                Check(c3.CompletedWork > 0f && c3.CompletedWork < c3.CurrentTotalWork,
+                    "READ begins its own WORK");
+                CheckArcPresentation(c3, false);
+                Debug.Log($"ResourceWitness arc: WRITE 30/8 -> READ 60/4, DB request {db.RequestedLoad:0.###}, c3 allocation {c3.AllocatedLoad:0.###}");
                 steps = 0;
                 while (!c3.IsComplete && steps++ < 1000)
                     host.StepSimulation(0.1f);
@@ -77,6 +101,7 @@ namespace Uptime.Connections.EditorTools
                 SetField(c2Definition, "desiredLoad", 3f);
                 SetField(c3Definition, "desiredLoad", 5f);
                 SetField(c3Definition, "totalWork", 5f);
+                SetField(c3Definition, "operations", Array.Empty<OperationStage>());
                 SetField(c2Definition, "startDelaySeconds", 0f);
                 SetField(c3Definition, "startDelaySeconds", 0f);
                 host.ResetSimulation();
@@ -109,6 +134,13 @@ namespace Uptime.Connections.EditorTools
                 Near(State(host, "c1").AllocatedLoad, 40f / 13f, "baseline c1 fraction");
                 CheckCapacityAndAccounting(host);
                 Debug.Log($"ResourceWitness baseline: expected request 15, allocation 10, c1 3.077; observed {db.RequestedLoad:0.###}, {db.AllocatedLoad:0.###}, {State(host, "c1").AllocatedLoad:0.###}");
+                SetField(db, "baselineLoad", 10f);
+                host.ResetSimulation();
+                host.StepSimulation(0.1f);
+                Near(State(host, "c1").CompletedWork, 0f, "stalled connection makes no WORK");
+                Near(State(host, "c1").AllocatedLoad, 0f, "stalled connection has no LOAD");
+                CheckCapacityAndAccounting(host);
+                CheckStalledPresentation(State(host, "c1"));
                 Debug.Log("ResourceWitness PASS");
             }
             finally
@@ -117,6 +149,7 @@ namespace Uptime.Connections.EditorTools
                 SetField(c2Definition, "desiredLoad", originalC2Load);
                 SetField(c3Definition, "desiredLoad", originalC3Load);
                 SetField(c3Definition, "totalWork", originalC3Work);
+                SetField(c3Definition, "operations", originalC3Operations);
                 SetField(c2Definition, "startDelaySeconds", originalC2Delay);
                 SetField(c3Definition, "startDelaySeconds", originalC3Delay);
                 SetField(db, "baselineLoad", originalDbBaseline);
@@ -142,10 +175,10 @@ namespace Uptime.Connections.EditorTools
                     .GetArrayElementAtIndex(0).objectReferenceValue;
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
-                string target = ((TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue).text;
-                Check(load.Contains("3.8 / 5") && load.Contains("LOAD"), "inspect allocated/desired LOAD");
-                Check(target.Contains("13 / 10 requested") && target.Contains("10 allocated"),
-                    "inspect agrees with node LOAD");
+                string timeline = ((TMP_Text)fields.FindProperty("route").objectReferenceValue).text;
+                Check(load.Contains("SLOWED") && load.Contains("LOAD 3.8/5") &&
+                    load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
+                Check(timeline.Contains("READ") && timeline.Contains("DB"), "single-operation timeline");
             }
             finally
             {
@@ -160,6 +193,62 @@ namespace Uptime.Connections.EditorTools
             }
         }
 
+        private static void CheckArcPresentation(LogicalConnectionState state, bool writeStage)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { state });
+                var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
+                    .GetArrayElementAtIndex(0).objectReferenceValue;
+                SerializedObject fields = new SerializedObject(entry);
+                string timeline = ((TMP_Text)fields.FindProperty("route").objectReferenceValue).text;
+                string work = ((TMP_Text)fields.FindProperty("work").objectReferenceValue).text;
+                string status = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
+                if (writeStage)
+                {
+                    Check(timeline.Contains("WRITE") && timeline.Contains("+1") &&
+                        !timeline.Contains("READ"), "future operation hides details");
+                    Check(work.Contains("/30"), "inspection WORK uses WRITE stage");
+                    Check(status.Contains("SLOWED") && status.Contains("DB OVERLOADED"),
+                        "inspection WRITE slowdown");
+                }
+                else
+                {
+                    Check(timeline.Contains("WRITE") && timeline.Contains("READ") &&
+                        !timeline.Contains("+1"), "completed and active pills update");
+                    Check(work.Contains("/60"), "inspection WORK uses READ stage");
+                    Check(status.Contains("AT SPEED") && status.Contains("LOAD 4/4"),
+                        "inspection uses READ allocation");
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+        }
+
+        private static void CheckStalledPresentation(LogicalConnectionState state)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { state });
+                var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
+                    .GetArrayElementAtIndex(0).objectReferenceValue;
+                string status = ((TMP_Text)new SerializedObject(entry).FindProperty("throughput")
+                    .objectReferenceValue).text;
+                Check(status.Contains("STALLED") && status.Contains("NO LOAD AVAILABLE"),
+                    "inspection stalled status");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+        }
+
         private static void CheckCapacityAndAccounting(SimulationHost host)
         {
             foreach (NodeResources node in host.Nodes)
@@ -167,9 +256,9 @@ namespace Uptime.Connections.EditorTools
                 float requested = node.BaselineLoad;
                 float allocated = node.BaselineLoad;
                 foreach (LogicalConnectionState connection in host.RuntimeConnections)
-                    if (connection.IsActive && connection.TargetNode == node.View)
+                    if (connection.IsDemanding && connection.TargetNode == node.View)
                     {
-                        requested += connection.Definition.DesiredLoad;
+                        requested += connection.DesiredLoad;
                         allocated += connection.AllocatedLoad;
                     }
                 Near(node.RequestedLoad, requested, node.View.NodeId + " requested accounting");

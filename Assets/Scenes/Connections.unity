@@ -6354,6 +6354,15 @@ MonoBehaviour:
     totalWork: 90
     desiredLoad: 8
     startDelaySeconds: 3
+    operations:
+    - operation: 1
+      totalWork: 30
+      desiredLoad: 8
+      activityDescription: Updating the DB index
+    - operation: 0
+      totalWork: 60
+      desiredLoad: 4
+      activityDescription: Reading the updated index
   connectionDebugReadout: {fileID: 394130996}
   pathPresenter: {fileID: 1033840602}
 --- !u!4 &1996901016

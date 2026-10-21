@@ -27,36 +27,36 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in ordered)
             {
                 connection.AllocatedLoad = 0f;
-                if (connection.IsActive)
-                    demandByNode[nodeByView[connection.TargetNode]] += connection.Definition.DesiredLoad;
+                // A stage completed on the previous step begins requesting now.
+                connection.IsTransitioning = false;
+                if (connection.IsDemanding)
+                    demandByNode[nodeByView[connection.TargetNode]] += connection.DesiredLoad;
             }
 
             foreach (LogicalConnectionState connection in ordered)
             {
-                if (!connection.IsActive)
+                if (!connection.IsDemanding)
                     continue;
                 NodeResources target = nodeByView[connection.TargetNode];
                 float demand = demandByNode[target];
                 float available = Mathf.Max(0f, target.LoadCapacity - target.BaselineLoad);
                 float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
-                connection.AllocatedLoad = connection.Definition.DesiredLoad * fraction;
-                connection.CompletedWork = Mathf.Min(connection.Definition.TotalWork,
+                connection.AllocatedLoad = connection.DesiredLoad * fraction;
+                connection.CompletedWork = Mathf.Min(connection.CurrentTotalWork,
                     connection.CompletedWork + connection.ActualWorkRate * deltaSeconds);
                 if (connection.RemainingWork > Epsilon)
                     continue;
 
-                connection.CompletedWork = connection.Definition.TotalWork;
-                connection.Lifecycle = Lifecycle.Complete;
-                connection.AllocatedLoad = 0f;
+                connection.FinishOperation();
             }
 
             foreach (NodeResources node in nodes)
                 node.ClearUsage();
             foreach (LogicalConnectionState connection in ordered)
             {
-                if (!connection.IsActive)
+                if (!connection.IsDemanding)
                     continue;
-                nodeByView[connection.TargetNode].AddUsage(connection.Definition.DesiredLoad,
+                nodeByView[connection.TargetNode].AddUsage(connection.DesiredLoad,
                     connection.AllocatedLoad);
             }
             foreach (NodeResources node in nodes)
