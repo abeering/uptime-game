@@ -76,13 +76,13 @@ namespace Uptime.Connections
         {
             if (previewMode)
                 return;
-            var usersByLink = new Dictionary<PhysicalLinkResources,
+            var usersByLink = new Dictionary<PhysicalLinkReference,
                 List<LogicalConnectionState>>();
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive)
                     continue;
-                foreach (PhysicalLinkResources link in connection.RouteLinks)
+                foreach (PhysicalLinkReference link in connection.RouteLinks)
                 {
                     if (!usersByLink.TryGetValue(link, out List<LogicalConnectionState> users))
                     {
@@ -95,10 +95,10 @@ namespace Uptime.Connections
             foreach (List<LogicalConnectionState> users in usersByLink.Values)
                 users.Sort((a, b) => StringComparer.Ordinal.Compare(a.ConnectionId, b.ConnectionId));
 
-            var layouts = new Dictionary<PhysicalLinkResources,
+            var layouts = new Dictionary<PhysicalLinkReference,
                 IdentityPacking.Layout>();
             if (identityPresenter != null)
-                foreach (KeyValuePair<PhysicalLinkResources,
+                foreach (KeyValuePair<PhysicalLinkReference,
                     List<LogicalConnectionState>> entry in usersByLink)
                     layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key.View,
                         entry.Value.Count, maxLineWidth, minLineWidth, minLineGap));
@@ -116,7 +116,7 @@ namespace Uptime.Connections
                 float[] widths = new float[offsets.Length];
                 for (int edge = 0; edge < offsets.Length; edge++)
                 {
-                    PhysicalLinkResources link = connection.RouteLinks[edge];
+                    PhysicalLinkReference link = connection.RouteLinks[edge];
                     PhysicalLinkView linkView = link.View;
                     List<LogicalConnectionState> users = usersByLink[link];
                     float budget = linkView.BundleWidth(networkArea);

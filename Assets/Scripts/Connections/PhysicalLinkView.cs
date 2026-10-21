@@ -27,12 +27,12 @@ namespace Uptime.Connections
             return Mathf.Min(nodeA.BundleWidthToward(b - a), nodeB.BundleWidthToward(a - b));
         }
 
-        public void RenderResources(PhysicalLinkResources resources)
+        public void RenderLink()
         {
-            if (resourceReadout == null || resources == null)
+            if (resourceReadout == null)
                 return;
 
-            string value = $"{linkId} {resources.BandwidthUsageMBps:0.#}/{resources.BandwidthCapacityMBps:0.#} MB/s";
+            string value = linkId;
             if (resourceReadout.text != value)
                 resourceReadout.text = value;
         }

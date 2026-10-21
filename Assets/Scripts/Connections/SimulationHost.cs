@@ -11,7 +11,7 @@ namespace Uptime.Connections
     public sealed class SimulationHost : MonoBehaviour
     {
         [SerializeField] private NodeResources[] nodes;
-        [SerializeField] private PhysicalLinkResources[] physicalLinks;
+        [SerializeField] private PhysicalLinkReference[] physicalLinks;
         [SerializeField] private LogicalConnectionDefinition[] connections;
         [SerializeField] private TMP_Text connectionDebugReadout;
         [SerializeField] private LogicalPathPresenter pathPresenter;
@@ -20,7 +20,7 @@ namespace Uptime.Connections
         private float simulationTimeSeconds;
 
         public NodeResources[] Nodes => nodes;
-        public PhysicalLinkResources[] PhysicalLinks => physicalLinks;
+        public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
         public LogicalConnectionDefinition[] Definitions => connections;
         public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
@@ -53,12 +53,6 @@ namespace Uptime.Connections
                     node?.ClampToCapacity();
             }
 
-            if (physicalLinks != null)
-            {
-                foreach (PhysicalLinkResources link in physicalLinks)
-                    link?.ClampToCapacity();
-            }
-
             if (connections != null)
             {
                 foreach (LogicalConnectionDefinition connection in connections)
@@ -81,7 +75,7 @@ namespace Uptime.Connections
                 connection.Lifecycle = Lifecycle.Active;
                 connection.EstablishedAtSeconds = simulationTimeSeconds;
             }
-            ResourceAllocator.Step(nodes, physicalLinks, runtimeConnections, deltaSeconds);
+            ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
             simulationTimeSeconds += deltaSeconds;
             RefreshDisplays();
         }
@@ -93,10 +87,12 @@ namespace Uptime.Connections
             var states = new List<LogicalConnectionState>();
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var nodeViews = new HashSet<NodeView>();
+            var nodeByView = new Dictionary<NodeView, NodeResources>();
             foreach (NodeResources node in nodes)
             {
                 if (node?.View == null || !nodeViews.Add(node.View))
                     throw new InvalidOperationException("Nodes require unique, assigned views.");
+                nodeByView.Add(node.View, node);
             }
 
             if (connections != null)
@@ -106,24 +102,24 @@ namespace Uptime.Connections
                     if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
                         !ids.Add(definition.ConnectionId))
                         throw new InvalidOperationException("Logical connections require unique, nonempty IDs.");
-                    if (definition.TotalWork <= 0f || definition.DesiredWorkRate <= 0f ||
+                    if (definition.TotalWork <= 0f || definition.DesiredLoad <= 0f ||
                         definition.Route == null || definition.Route.Length < 2)
                         throw new InvalidOperationException($"Connection {definition.ConnectionId} needs work, rate, and a route of at least two nodes.");
 
                     var visited = new HashSet<NodeView>();
-                    foreach (NodeRequirement requirement in definition.Route)
+                    foreach (RouteNode requirement in definition.Route)
                     {
                         if (requirement?.Node == null || !nodeViews.Contains(requirement.Node) ||
                             !visited.Add(requirement.Node))
                             throw new InvalidOperationException($"Connection {definition.ConnectionId} has an invalid or repeated route node.");
                     }
 
-                    var routeLinks = new PhysicalLinkResources[definition.Route.Length - 1];
+                    var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
                     for (int i = 0; i < routeLinks.Length; i++)
                     {
                         NodeView a = definition.Route[i].Node;
                         NodeView b = definition.Route[i + 1].Node;
-                        foreach (PhysicalLinkResources link in physicalLinks)
+                        foreach (PhysicalLinkReference link in physicalLinks)
                         {
                             if (link?.View == null)
                                 throw new InvalidOperationException("Physical links require assigned views.");
@@ -138,7 +134,8 @@ namespace Uptime.Connections
                         if (routeLinks[i] == null)
                             throw new InvalidOperationException($"Route {definition.ConnectionId} has no physical link from {a.NodeId} to {b.NodeId}.");
                     }
-                    states.Add(new LogicalConnectionState(definition, routeLinks));
+                    states.Add(new LogicalConnectionState(definition, routeLinks,
+                        nodeByView[definition.TargetNode]));
                 }
             }
 
@@ -153,10 +150,7 @@ namespace Uptime.Connections
         {
             if (nodes != null)
                 foreach (NodeResources node in nodes)
-                    node?.ClearAllocatedUsage();
-            if (physicalLinks != null)
-                foreach (PhysicalLinkResources link in physicalLinks)
-                    link?.ClearAllocatedUsage();
+                    node?.ClearUsage();
         }
 
         public void RefreshDisplays()
@@ -172,10 +166,10 @@ namespace Uptime.Connections
 
             if (physicalLinks != null)
             {
-                foreach (PhysicalLinkResources link in physicalLinks)
+                foreach (PhysicalLinkReference link in physicalLinks)
                 {
                     if (link?.View != null)
-                        link.View.RenderResources(link);
+                        link.View.RenderLink();
                 }
             }
 
@@ -192,7 +186,7 @@ namespace Uptime.Connections
             if (runtimeConnections == null)
                 return "CONNECTIONS  •  Play to run authored operations";
 
-            var output = new StringBuilder("CONNECTIONS  •  actual / desired work units/s");
+            var output = new StringBuilder("CONNECTIONS  •  allocated / desired LOAD; 1 LOAD = 1 WORK/s");
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
                 output.Append('\n').Append(connection.ConnectionId).Append(' ')
@@ -212,30 +206,13 @@ namespace Uptime.Connections
                 }
 
                 output.Append(connection.CompletedWork.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.TotalWork.ToString("0.#")).Append(" work units  ")
-                    .Append(connection.ActualWorkRate.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.DesiredWorkRate.ToString("0.#")).Append(" work units/s  ")
-                    .Append("BW ").Append(connection.ActualBandwidthMBps.ToString("0.#"))
-                    .Append('/').Append(connection.DesiredBandwidthMBps.ToString("0.#"))
-                    .Append(" MB/s  ")
-                    .Append(Mathf.RoundToInt(connection.Satisfaction * 100f)).Append('%');
-                if (connection.LimitKind != LimitKind.None)
-                    output.Append("  [").Append(connection.LimitingResourceId).Append(' ')
-                        .Append(LimitLabel(connection.LimitKind)).Append(']');
+                    .Append(connection.Definition.TotalWork.ToString("0.#")).Append(" WORK  ")
+                    .Append(connection.AllocatedLoad.ToString("0.#")).Append('/')
+                    .Append(connection.Definition.DesiredLoad.ToString("0.#")).Append(" LOAD  ")
+                    .Append(Mathf.RoundToInt(connection.Satisfaction * 100f)).Append('%')
+                    .Append("  [").Append(connection.TargetNode.NodeId).Append(']');
             }
             return output.ToString();
-        }
-
-        private static string LimitLabel(LimitKind kind)
-        {
-            switch (kind)
-            {
-                case LimitKind.PhysicalLinkBandwidth: return "BW";
-                case LimitKind.NodeCpu: return "CPU";
-                case LimitKind.NodeDiskIo: return "DISK";
-                case LimitKind.NodeMemory: return "MEM";
-                default: return string.Empty;
-            }
         }
     }
 }
