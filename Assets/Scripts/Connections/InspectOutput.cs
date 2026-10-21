@@ -9,8 +9,8 @@ namespace Uptime.Connections
         [SerializeField] private InspectEntry[] entries;
         [SerializeField] private LayoutElement layout;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.2f;
-        [SerializeField, Min(1f)] private float activeEntryHeight = 156f;
-        [SerializeField, Min(1f)] private float completeEntryHeight = 98f;
+        [SerializeField, Min(1f)] private float activeEntryHeight = 186f;
+        [SerializeField, Min(1f)] private float completeEntryHeight = 124f;
         [SerializeField, Min(0f)] private float topPadding = 8f;
         [SerializeField, Min(0f)] private float entryGap = 10f;
         [SerializeField, Min(0f)] private float bottomPadding = 8f;

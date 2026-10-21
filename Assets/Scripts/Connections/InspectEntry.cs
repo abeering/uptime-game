@@ -1,5 +1,5 @@
 using TMPro;
-using System.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +8,8 @@ namespace Uptime.Connections
     public sealed class InspectEntry : MonoBehaviour
     {
         [SerializeField] private TMP_Text identity;
-        [SerializeField] private TMP_Text route;
+        [SerializeField] private RectTransform operationRow;
+        [SerializeField] private InspectOperationToken operationTokenPrefab;
         [SerializeField] private TMP_Text work;
         [SerializeField] private TMP_Text throughput;
         [SerializeField] private TMP_Text bottleneck;
@@ -25,6 +26,12 @@ namespace Uptime.Connections
         [SerializeField] private Color completeBackground = new Color(0.026f, 0.078f, 0.095f);
         [SerializeField] private Color activeTitleBar = new Color(0.055f, 0.16f, 0.19f);
         [SerializeField] private Color completeTitleBar = new Color(0.04f, 0.11f, 0.13f);
+
+        private readonly List<InspectOperationToken> operationTokens = new List<InspectOperationToken>();
+        private LogicalConnectionState renderedState;
+        private int renderedStage = -1;
+        private int renderedOperationCount = -1;
+        private bool renderedComplete;
 
         public void SetHeight(float height)
         {
@@ -46,7 +53,11 @@ namespace Uptime.Connections
             Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
                 state.Performance == LoadPerformance.AtSpeed ? activeColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
-            Set(route, Timeline(state, tint));
+            if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex ||
+                renderedOperationCount != state.OperationCount || renderedComplete != state.IsComplete)
+                RebuildOperations(state, tint);
+            else if (!state.IsComplete && renderedStage < operationTokens.Count)
+                operationTokens[renderedStage].SetActiveColor(tint);
             NodeResources target = state.TargetResources;
             string status = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
@@ -81,34 +92,35 @@ namespace Uptime.Connections
             if (stateTag != null && stateTag.color != tint) stateTag.color = tint;
         }
 
-        private static string Timeline(LogicalConnectionState state, Color activeColor)
+        private void RebuildOperations(LogicalConnectionState state, Color tint)
         {
-            var line = new StringBuilder();
+            foreach (InspectOperationToken token in operationTokens)
+            {
+                token.gameObject.SetActive(false);
+                if (Application.isPlaying) Destroy(token.gameObject);
+                else DestroyImmediate(token.gameObject);
+            }
+            operationTokens.Clear();
+            if (operationRow == null || operationTokenPrefab == null) return;
             string target = state.TargetNode.NodeId;
             for (int i = 0; i < state.OperationCount; i++)
             {
                 if (i > state.CurrentOperationIndex && !state.IsComplete)
                 {
-                    line.Append("  +").Append(state.OperationCount - i);
+                    InspectOperationToken future = Instantiate(operationTokenPrefab, operationRow);
+                    future.ShowFuture(state.OperationCount - i);
+                    operationTokens.Add(future);
                     break;
                 }
-                if (line.Length > 0) line.Append("  ");
-                OperationKind operation = state.Definition.OperationAt(i);
-                string arrow = operation == OperationKind.Read ? "←" :
-                    operation == OperationKind.Write ? "→" : "·";
-                string pill = " " + operation.ToString().ToUpperInvariant() +
-                    " " + arrow + " " + target + " ";
-                if (i < state.CurrentOperationIndex || state.IsComplete)
-                    line.Append("<mark=#4B5D5D44><color=#839696>")
-                        .Append(pill).Append("</color></mark>");
-                else
-                {
-                    string color = ColorUtility.ToHtmlStringRGB(activeColor);
-                    line.Append("<mark=#").Append(color).Append("66><color=#")
-                        .Append(color).Append('>').Append(pill).Append("</color></mark>");
-                }
+                InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
+                token.ShowOperation(state.Definition.OperationAt(i), target,
+                    i < state.CurrentOperationIndex || state.IsComplete, tint);
+                operationTokens.Add(token);
             }
-            return line.ToString();
+            renderedState = state;
+            renderedStage = state.CurrentOperationIndex;
+            renderedOperationCount = state.OperationCount;
+            renderedComplete = state.IsComplete;
         }
 
         private static string FormatSeconds(float seconds)
