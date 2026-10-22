@@ -5,5 +5,6 @@ This folder keeps useful exploration that has not become current implementation 
 - [clean.md](clean.md) — a short observation about cleaning an apparently empty node and invisible infections; no current mechanic is implied.
 - [first-prototype-level.md](first-prototype-level.md) — an illustrative authored level shape and pressure arc. Its Packet-style ticks, event API, and concrete values are examples, while its run/level cohesion questions remain relevant to shared Uptime design.
 - [topology-runtime-spec-v1.md](topology-runtime-spec-v1.md) — an unimplemented runtime pipeline proposal using Packet-side class names. The wider topology and network-growth goals remain in [shared design](../Design/Uptime_Design.md); this proposal is not a current contract for either scene.
+- [connections-lane-spacing-continuity.md](connections-lane-spacing-continuity.md) — parked Connections presentation research on route-coherent lane spacing, occupancy-responsive gaps, and placing identity pills after geometry; no implementation work is authorized.
 
 Research may be promoted through an explicit design decision. Keep its original alternatives and examples available when doing so.
