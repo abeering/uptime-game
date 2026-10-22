@@ -6,6 +6,7 @@ using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
@@ -95,6 +96,9 @@ namespace Uptime.Connections.EditorTools
                 Near(db.RequestedLoad, 5f, "completed c3 releases requested LOAD");
                 Near(db.AllocatedLoad, 5f, "completed c3 releases allocated LOAD");
                 CheckCapacityAndAccounting(host);
+                CheckCompletedPresentation(c1, c3);
+                CheckThreeStagePresentation(host, c3Definition, originalC3Operations,
+                    originalC3Delay);
                 Debug.Log($"ResourceWitness completion: expected c1 5, DB request/allocation 5/5; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.AllocatedLoad:0.###}");
 
                 SetField(c2Definition.Route.Last(), "node", db.View);
@@ -175,10 +179,23 @@ namespace Uptime.Connections.EditorTools
                     .GetArrayElementAtIndex(0).objectReferenceValue;
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
-                string timeline = ((TMP_Text)fields.FindProperty("route").objectReferenceValue).text;
+                var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
+                CheckHeader(fields, "C1", "Record Retrieval", false);
                 Check(load.Contains("SLOWED") && load.Contains("LOAD 3.8/5") &&
                     load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
-                Check(timeline.Contains("READ") && timeline.Contains("DB"), "single-operation timeline");
+                Check(tokens.Length == 1 && tokens[0].Text == "READ → DB" &&
+                    tokens[0].HasOutline && !tokens[0].HasCheckmark,
+                    "single active operation has authored outlined pill");
+                Check(tokens[0].OutlineColor == new SerializedObject(entry)
+                    .FindProperty("limitedColor").colorValue,
+                    "slowed operation outline uses orange performance color");
+                Check(tokens[0].GetComponent<LayoutElement>().preferredHeight == 40f,
+                    "operation pill has full authored height");
+                entry.Render(c1);
+                Check(ReferenceEquals(tokens[0], entry.GetComponentInChildren<InspectOperationToken>()),
+                    "live LOAD refresh keeps authored operation token");
+                Check(((LayoutElement)new SerializedObject(output).FindProperty("layout")
+                    .objectReferenceValue).preferredHeight == 202f, "single active entry height");
             }
             finally
             {
@@ -203,25 +220,174 @@ namespace Uptime.Connections.EditorTools
                 var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
                     .GetArrayElementAtIndex(0).objectReferenceValue;
                 SerializedObject fields = new SerializedObject(entry);
-                string timeline = ((TMP_Text)fields.FindProperty("route").objectReferenceValue).text;
+                var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
                 string work = ((TMP_Text)fields.FindProperty("work").objectReferenceValue).text;
                 string status = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
                 if (writeStage)
                 {
-                    Check(timeline.Contains("WRITE") && timeline.Contains("+1") &&
-                        !timeline.Contains("READ"), "future operation hides details");
+                    Check(tokens.Length == 2 && tokens[0].Text == "WRITE → DB" &&
+                        tokens[0].HasOutline && tokens[1].Text == "+1" &&
+                        !tokens[1].HasOutline, "future operation hides details");
                     Check(work.Contains("/30"), "inspection WORK uses WRITE stage");
                     Check(status.Contains("SLOWED") && status.Contains("DB OVERLOADED"),
                         "inspection WRITE slowdown");
                 }
                 else
                 {
-                    Check(timeline.Contains("WRITE") && timeline.Contains("READ") &&
-                        !timeline.Contains("+1"), "completed and active pills update");
+                    Check(tokens.Length == 2 && tokens[0].Text == "WRITE → DB" &&
+                        tokens[0].HasCheckmark && !tokens[0].HasOutline &&
+                        tokens[1].Text == "READ → DB" && tokens[1].HasOutline,
+                        "completed and active authored tokens update");
+                    Color nominal = fields.FindProperty("atSpeedColor").colorValue;
+                    Color chrome = fields.FindProperty("activeColor").colorValue;
+                    Check(tokens[1].OutlineColor == nominal &&
+                        ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).color == nominal,
+                        "at-speed pill and status use green performance color");
+                    Check(((TMP_Text)fields.FindProperty("identity").objectReferenceValue).color == chrome &&
+                        ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == chrome &&
+                        ((Image)fields.FindProperty("progressFill").objectReferenceValue).color == chrome,
+                        "title and panel accents keep blue-green chrome color");
                     Check(work.Contains("/60"), "inspection WORK uses READ stage");
                     Check(status.Contains("AT SPEED") && status.Contains("LOAD 4/4"),
                         "inspection uses READ allocation");
                 }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+        }
+
+        private static void CheckCompletedPresentation(LogicalConnectionState active, LogicalConnectionState complete)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { active, complete });
+                var serialized = new SerializedObject(output);
+                var entries = serialized.FindProperty("entries");
+                var activeEntry = (InspectEntry)entries.GetArrayElementAtIndex(0).objectReferenceValue;
+                var completedEntry = (InspectEntry)entries.GetArrayElementAtIndex(1).objectReferenceValue;
+                var fields = new SerializedObject(completedEntry);
+                var tokens = completedEntry.GetComponentsInChildren<InspectOperationToken>();
+                var status = (TMP_Text)fields.FindProperty("throughput").objectReferenceValue;
+                var work = (TMP_Text)fields.FindProperty("work").objectReferenceValue;
+                var activity = (TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue;
+                var eta = (TMP_Text)fields.FindProperty("eta").objectReferenceValue;
+                var progress = (Image)fields.FindProperty("progressFill").objectReferenceValue;
+                CheckHeader(fields, "C3", "Record Indexing", true);
+                Check(tokens.Length == 2 && tokens[0].Text == "WRITE → DB" &&
+                    tokens[1].Text == "READ → DB" && tokens.All(t => t.HasCheckmark && !t.HasOutline),
+                    "completed operations remain subdued and visible");
+                Check(status.text == "COMPLETE", "completed status has no live LOAD");
+                Check(!work.gameObject.activeSelf && !activity.gameObject.activeSelf &&
+                    !eta.gameObject.activeSelf && !progress.transform.parent.gameObject.activeSelf,
+                    "completed progress and supporting info hidden");
+                Check(((RectTransform)activeEntry.transform).rect.height == 186f &&
+                    ((RectTransform)completedEntry.transform).rect.height == 124f,
+                    "completed entry is shorter than active entry");
+                Check(((LayoutElement)serialized.FindProperty("layout").objectReferenceValue)
+                    .preferredHeight == 336f, "mixed entries reflow within terminal history");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+        }
+
+        private static void CheckThreeStagePresentation(SimulationHost host,
+            LogicalConnectionDefinition definition, OperationStage[] originalOperations, float originalDelay)
+        {
+            try
+            {
+                SetField(definition, "operations", new[]
+                {
+                    Stage(OperationKind.Read, 3f, 5f),
+                    Stage(OperationKind.Write, 30f, 8f),
+                    Stage(OperationKind.Execute, 5f, 4f)
+                });
+                SetField(definition, "startDelaySeconds", 0f);
+                host.ResetSimulation();
+                var state = State(host, "c3");
+                int steps = 0;
+                while (state.CurrentOperationIndex == 0 && steps++ < 1000)
+                    host.StepSimulation(0.1f);
+                host.StepSimulation(0.1f);
+                Check(state.CurrentOperationIndex == 1 && state.Performance == LoadPerformance.Slowed,
+                    "three-stage middle operation is slowed");
+                CheckTokens(state, middle => middle.Length == 3 &&
+                    middle[0].Text == "READ → DB" && middle[0].HasCheckmark &&
+                    !middle[0].HasOutline && middle[1].Text == "WRITE → DB" &&
+                    middle[1].HasOutline && middle[2].Text == "+1" &&
+                    !middle[2].HasOutline,
+                    "middle-stage timeline is completed, active, future");
+                steps = 0;
+                while (state.CurrentOperationIndex == 1 && steps++ < 1000)
+                    host.StepSimulation(0.1f);
+                host.StepSimulation(0.1f);
+                CheckTokens(state, final => final.Length == 3 && final[0].HasCheckmark &&
+                    final[1].HasCheckmark && final[2].Text == "EXECUTE → DB" &&
+                    final[2].HasOutline,
+                    "next stage reveals final operation and preserves history");
+                steps = 0;
+                while (!state.IsComplete && steps++ < 1000) host.StepSimulation(0.1f);
+                CheckTokens(state, complete => complete.Length == 3 &&
+                    complete.All(t => t.HasCheckmark && !t.HasOutline),
+                    "all completed operations are subdued");
+            }
+            finally
+            {
+                SetField(definition, "operations", originalOperations);
+                SetField(definition, "startDelaySeconds", originalDelay);
+                host.ResetSimulation();
+            }
+        }
+
+        private static void CheckHeader(SerializedObject fields, string id,
+            string purpose, bool complete)
+        {
+            var prefix = (TMP_Text)fields.FindProperty("identity").objectReferenceValue;
+            var purposeText = (TMP_Text)fields.FindProperty("purpose").objectReferenceValue;
+            var pill = (IdentityPillView)fields.FindProperty("headerIdentityPill").objectReferenceValue;
+            Check(prefix != null && prefix.text == "INSPECT /" &&
+                purposeText != null && purposeText.text == "- " + purpose,
+                "inspect header separates prefix and purpose");
+            Check(pill != null && pill.GetComponentInChildren<TMP_Text>().text == id,
+                "inspect header identity is in its own pill");
+            var inspectPrefab = AssetDatabase.LoadAssetAtPath<InspectOutput>(
+                "Assets/Prefabs/Connections/InspectOutput.prefab");
+            var nestedPill = inspectPrefab.GetComponentInChildren<IdentityPillView>();
+            var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(nestedPill);
+            Check(AssetDatabase.GetAssetPath(source) == "Assets/Prefabs/Connections/IdentityPill.prefab",
+                "inspect header reuses network identity pill prefab");
+            Color expected = fields.FindProperty(complete ? "quietColor" : "activeColor").colorValue;
+            Check(pill.GetComponent<PillGraphic>().color == expected &&
+                pill.Size == new Vector2(54f, 28f),
+                "inspect header pill keeps authored geometry and chrome color");
+        }
+
+        private static OperationStage Stage(OperationKind kind, float work, float load)
+        {
+            var stage = new OperationStage();
+            SetField(stage, "operation", kind);
+            SetField(stage, "totalWork", work);
+            SetField(stage, "desiredLoad", load);
+            return stage;
+        }
+
+        private static void CheckTokens(LogicalConnectionState state,
+            Func<InspectOperationToken[], bool> condition, string name)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { state });
+                var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
+                    .GetArrayElementAtIndex(0).objectReferenceValue;
+                var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
+                Check(condition(tokens), name);
             }
             finally
             {
@@ -242,6 +408,10 @@ namespace Uptime.Connections.EditorTools
                     .objectReferenceValue).text;
                 Check(status.Contains("STALLED") && status.Contains("NO LOAD AVAILABLE"),
                     "inspection stalled status");
+                var token = entry.GetComponentsInChildren<InspectOperationToken>().Single();
+                Check(token.HasOutline && token.OutlineColor ==
+                    new SerializedObject(entry).FindProperty("stalledColor").colorValue,
+                    "stalled operation outline uses red performance color");
             }
             finally
             {

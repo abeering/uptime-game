@@ -9,8 +9,11 @@ namespace Uptime.Connections
         [SerializeField] private InspectEntry[] entries;
         [SerializeField] private LayoutElement layout;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.2f;
-        [SerializeField] private float oneEntryHeight = 156f;
-        [SerializeField] private float twoEntryHeight = 282f;
+        [SerializeField, Min(1f)] private float activeEntryHeight = 186f;
+        [SerializeField, Min(1f)] private float completeEntryHeight = 124f;
+        [SerializeField, Min(0f)] private float topPadding = 8f;
+        [SerializeField, Min(0f)] private float entryGap = 10f;
+        [SerializeField, Min(0f)] private float bottomPadding = 8f;
 
         private LogicalConnectionState[] states;
         private bool[] frozen;
@@ -21,11 +24,10 @@ namespace Uptime.Connections
             if (selected == null || selected.Length == 0 || selected.Length > entries.Length)
                 return;
             states = selected;
+            enabled = true;
             frozen = new bool[selected.Length];
             for (int i = 0; i < entries.Length; i++)
                 entries[i].gameObject.SetActive(i < states.Length);
-            if (layout != null)
-                layout.preferredHeight = states.Length == 1 ? oneEntryHeight : twoEntryHeight;
             Refresh();
             nextRefresh = Time.unscaledTime + refreshSeconds;
         }
@@ -51,8 +53,26 @@ namespace Uptime.Connections
                 else
                     allFrozen = false;
             }
+            Reflow();
             if (allFrozen)
                 enabled = false;
+        }
+
+        private void Reflow()
+        {
+            float y = topPadding;
+            for (int i = 0; i < states.Length; i++)
+            {
+                float height = states[i].IsComplete ? completeEntryHeight : activeEntryHeight;
+                RectTransform entry = (RectTransform)entries[i].transform;
+                entry.anchoredPosition = new Vector2(entry.anchoredPosition.x, -y);
+                entries[i].SetHeight(height);
+                y += height + (i + 1 < states.Length ? entryGap : 0f);
+            }
+            float totalHeight = y + bottomPadding;
+            if (layout != null)
+                layout.preferredHeight = totalHeight;
+            ((RectTransform)transform).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalHeight);
         }
 
         private void OnDestroy()
