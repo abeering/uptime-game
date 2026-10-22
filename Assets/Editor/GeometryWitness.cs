@@ -34,6 +34,9 @@ namespace Uptime.Connections.EditorTools
             foreach (PhysicalLinkView link in links)
             {
                 float budget = link.BundleWidth(presenter.NetworkArea);
+                Rect sourceCard = EdgeGeometry.CardRect(link.NodeA, presenter.NetworkArea);
+                Rect destinationCard = EdgeGeometry.CardRect(link.NodeB, presenter.NetworkArea);
+                Vector2 direction = (destinationCard.center - sourceCard.center).normalized;
                 Check(budget > 0f, link.LinkId + " bundle width");
                 foreach (int count in new[] { 1, 2, 3, 4, 8, 16 })
                 {
@@ -53,6 +56,16 @@ namespace Uptime.Connections.EditorTools
                     if (count % 2 == 1)
                         Check(Mathf.Abs(EdgeGeometry.Offset(count / 2, count, width,
                             presenter.MinLineGap)) < 0.001f, "odd center lane");
+                    for (int i = 0; i < count; i++)
+                    {
+                        float offset = EdgeGeometry.Offset(i, count, width, presenter.MinLineGap);
+                        Check(EndCovered(sourceCard, EdgeGeometry.CardUnderlap(sourceCard,
+                            direction, offset, width), direction, width),
+                            link.LinkId + " source path end covered");
+                        Check(EndCovered(destinationCard, EdgeGeometry.CardUnderlap(destinationCard,
+                            -direction, -offset, width), direction, width),
+                            link.LinkId + " destination path end covered");
+                    }
                 }
             }
             Check(EdgeGeometry.LineWidth(96f, 1, 3f, 12f) == 12f, "low density max");
@@ -215,6 +228,19 @@ namespace Uptime.Connections.EditorTools
                 Mathf.Abs(point.x - card.xMax), Mathf.Abs(point.y - card.yMin),
                 Mathf.Abs(point.y - card.yMax));
             return inside && nearestSide <= tolerance;
+        }
+
+        private static bool EndCovered(Rect card, Vector2 center, Vector2 direction, float width)
+        {
+            Vector2 normal = new Vector2(-direction.y, direction.x) * (width * 0.5f);
+            return InsideCard(card, center - normal) && InsideCard(card, center + normal);
+        }
+
+        private static bool InsideCard(Rect card, Vector2 point)
+        {
+            const float inset = 1.9f;
+            return point.x >= card.xMin + inset && point.x <= card.xMax - inset &&
+                point.y >= card.yMin + inset && point.y <= card.yMax - inset;
         }
     }
 }

@@ -37,6 +37,37 @@ namespace Uptime.Connections
             return origin + along * Mathf.Max(0f, Mathf.Min(x, y));
         }
 
+        // The path is drawn behind the card. Put both corners of its square end
+        // beneath the card face so a diagonal line cannot leave a bright sliver
+        // beside the card border.
+        public static Vector2 CardUnderlap(NodeView node, RectTransform area,
+            Vector2 direction, float laneOffset, float lineWidth)
+            => CardUnderlap(CardRect(node, area), direction, laneOffset, lineWidth);
+
+        public static Vector2 CardUnderlap(Rect card, Vector2 direction,
+            float laneOffset, float lineWidth)
+        {
+            const float borderCover = 2f;
+            Vector2 along = direction.normalized;
+            Vector2 across = new Vector2(-along.y, along.x);
+            Vector2 edge = CardEdge(card, direction, laneOffset);
+            float halfWidth = Mathf.Max(0f, lineWidth) * 0.5f;
+            float depth = 0f;
+            if (along.x > 0.001f)
+                depth = Mathf.Max(depth, (edge.x + Mathf.Abs(across.x) * halfWidth -
+                    (card.xMax - borderCover)) / along.x);
+            else if (along.x < -0.001f)
+                depth = Mathf.Max(depth, ((card.xMin + borderCover) - edge.x +
+                    Mathf.Abs(across.x) * halfWidth) / -along.x);
+            if (along.y > 0.001f)
+                depth = Mathf.Max(depth, (edge.y + Mathf.Abs(across.y) * halfWidth -
+                    (card.yMax - borderCover)) / along.y);
+            else if (along.y < -0.001f)
+                depth = Mathf.Max(depth, ((card.yMin + borderCover) - edge.y +
+                    Mathf.Abs(across.y) * halfWidth) / -along.y);
+            return edge - along * Mathf.Max(0f, depth);
+        }
+
         public static float LineWidth(float bundleWidth, int count, float gap, float maxLineWidth)
         {
             if (count <= 0)

@@ -149,10 +149,10 @@ namespace Uptime.Connections
                 Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
                 Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
-                starts[i] = EdgeGeometry.CardEdge(state.Definition.Route[i].Node,
-                    networkArea, direction, laneOffsets[i]);
-                ends[i] = EdgeGeometry.CardEdge(state.Definition.Route[i + 1].Node,
-                    networkArea, -direction, -laneOffsets[i]);
+                starts[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i].Node,
+                    networkArea, direction, laneOffsets[i], lineWidths[i]);
+                ends[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i + 1].Node,
+                    networkArea, -direction, -laneOffsets[i], lineWidths[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
             float spacing = state.IsActive && !state.IsTransitioning ?

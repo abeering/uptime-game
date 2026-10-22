@@ -98,10 +98,10 @@ namespace Uptime.Connections
             for (int i = 0; i < count; i++)
             {
                 float offset = EdgeGeometry.Offset(i, count, width, gap);
-                Vector2 start = EdgeGeometry.CardEdge(physicalLink.NodeA,
-                    area, direction, offset);
-                Vector2 end = EdgeGeometry.CardEdge(physicalLink.NodeB,
-                    area, -direction, -offset);
+                Vector2 start = EdgeGeometry.CardUnderlap(physicalLink.NodeA,
+                    area, direction, offset, width);
+                Vector2 end = EdgeGeometry.CardUnderlap(physicalLink.NodeB,
+                    area, -direction, -offset, width);
                 graphics[i].SetPath(new[] { start }, new[] { end }, new[] { width }, 1f);
                 identities.Add(new IdentityPresenter.LiveLine(ids[i],
                     start, end, start, end, graphics[i].color, 1f, width));
