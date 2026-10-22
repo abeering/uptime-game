@@ -20,6 +20,7 @@ namespace Uptime.Connections
         private readonly Dictionary<LogicalConnectionState, LogicalPathView> views =
             new Dictionary<LogicalConnectionState, LogicalPathView>();
         private readonly HashSet<PhysicalLinkView> warnedLinks = new HashSet<PhysicalLinkView>();
+        private readonly RouteLaneOrder laneOrder = new RouteLaneOrder();
         private bool previewMode;
 
         public RectTransform NetworkArea => networkArea;
@@ -53,6 +54,7 @@ namespace Uptime.Connections
                     Destroy(oldView.gameObject);
             views.Clear();
             warnedLinks.Clear();
+            laneOrder.Clear();
             connections = states;
             foreach (LogicalConnectionState connection in connections)
             {
@@ -103,10 +105,18 @@ namespace Uptime.Connections
                 return;
             var usersByLink = new Dictionary<PhysicalLinkReference,
                 List<LogicalConnectionState>>();
+            var routes = new List<RouteLaneOrder.Route>();
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive)
                     continue;
+                var nodes = new NodeView[connection.Definition.Route.Length];
+                var links = new PhysicalLinkView[connection.RouteLinks.Length];
+                for (int i = 0; i < nodes.Length; i++)
+                    nodes[i] = connection.Definition.Route[i].Node;
+                for (int i = 0; i < links.Length; i++)
+                    links[i] = connection.RouteLinks[i].View;
+                routes.Add(new RouteLaneOrder.Route(connection.ConnectionId, nodes, links));
                 foreach (PhysicalLinkReference link in connection.RouteLinks)
                 {
                     if (!usersByLink.TryGetValue(link, out List<LogicalConnectionState> users))
@@ -117,8 +127,13 @@ namespace Uptime.Connections
                     users.Add(connection);
                 }
             }
-            foreach (List<LogicalConnectionState> users in usersByLink.Values)
-                users.Sort((a, b) => StringComparer.Ordinal.Compare(a.ConnectionId, b.ConnectionId));
+            laneOrder.Update(routes, networkArea);
+            foreach (KeyValuePair<PhysicalLinkReference, List<LogicalConnectionState>> entry in usersByLink)
+            {
+                List<string> order = laneOrder.Orders[entry.Key.View];
+                entry.Value.Sort((a, b) => order.IndexOf(a.ConnectionId).CompareTo(
+                    order.IndexOf(b.ConnectionId)));
+            }
 
             var layouts = new Dictionary<PhysicalLinkReference,
                 IdentityPacking.Layout>();
@@ -197,7 +212,11 @@ namespace Uptime.Connections
             {
                 foreach (KeyValuePair<PhysicalLinkView,
                     List<IdentityPresenter.LiveLine>> entry in identitiesByLink)
+                {
+                    List<string> order = laneOrder.Orders[entry.Key];
+                    entry.Value.Sort((a, b) => order.IndexOf(a.Id).CompareTo(order.IndexOf(b.Id)));
                     identityPresenter.PresentEdge(entry.Key, entry.Value);
+                }
                 identityPresenter.EndFrame();
             }
         }
