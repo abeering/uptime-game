@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -19,110 +20,178 @@ namespace Uptime.Connections.EditorTools
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             Check(host != null, "simulation host");
             var c1Definition = host.Definitions.First(c => c.ConnectionId == "c1");
-            var dbRequirement = c1Definition.Route.Last();
-            float originalCpu = GetFloat(dbRequirement, "cpuUnitsPerWork");
-            float originalDisk = GetFloat(dbRequirement, "diskIoMBPerWork");
-            float originalBandwidth = GetFloat(c1Definition, "bandwidthMBPerWork");
+            var c2Definition = host.Definitions.First(c => c.ConnectionId == "c2");
+            var c3Definition = host.Definitions.First(c => c.ConnectionId == "c3");
+            var db = Node(host, "DB");
+            var api = Node(host, "API");
+            NodeView originalC2Target = c2Definition.TargetNode;
+            float originalC2Load = GetFloat(c2Definition, "desiredLoad");
+            float originalC3Load = GetFloat(c3Definition, "desiredLoad");
+            float originalC3Work = GetFloat(c3Definition, "totalWork");
+            float originalC2Delay = GetFloat(c2Definition, "startDelaySeconds");
+            float originalC3Delay = GetFloat(c3Definition, "startDelaySeconds");
+            float originalDbBaseline = GetFloat(db, "baselineLoad");
             try
             {
                 host.ResetSimulation();
-                var c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
-                var c2 = host.RuntimeConnections.First(c => c.ConnectionId == "c2");
-                Check(c1Definition.BandwidthMBPerWork == 1f &&
-                    c2.Definition.BandwidthMBPerWork == 1f, "authored 1 MB/work migration");
+                var c1 = State(host, "c1");
+                var c2 = State(host, "c2");
+                var c3 = State(host, "c3");
                 host.StepSimulation(0.1f);
-                Near(c1.ActualWorkRate, 35f, "uncontended work rate");
-                Near(Link(host, "E1").BandwidthUsageMBps, 35f, "uncontended link MB/s");
-                CheckCapacity(host);
+                Near(c1.AllocatedLoad, 5f, "uncontended c1 LOAD");
+                Near(db.RequestedLoad, 5f, "uncontended DB request");
+                Near(db.AllocatedLoad, 5f, "uncontended DB allocation");
+                Near(api.RequestedLoad, 1f, "transit API retains only baseline LOAD");
+                Color elevated = new SerializedObject(db.View.LoadBar).FindProperty("elevatedColor").colorValue;
+                Check(db.View.LoadBar.FillColor == elevated, "5/10 LOAD uses elevated color");
+                Check(c2.IsPending && c3.IsPending, "delayed connections pending");
+                CheckCapacityAndAccounting(host);
+                Debug.Log($"ResourceWitness uncontended: expected c1 5, DB 5/10, API baseline 1; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.LoadCapacity:0.###}, {api.RequestedLoad:0.###}");
 
                 int steps = 0;
-                while (c2.IsPending && steps++ < 50)
+                while (c3.IsPending && steps++ < 50)
                     host.StepSimulation(0.1f);
-                Check(c2.IsActive, "delayed c2 establishment");
-                Near(c1.ActualWorkRate, 25f, "shared c1 work units/s");
-                Near(c2.ActualWorkRate, 25f, "shared c2 work units/s");
-                Near(Link(host, "E1").BandwidthUsageMBps, 50f, "shared E1 MB/s");
-                CheckCapacity(host);
-                Debug.Log("ResourceWitness shared E1: expected c1/c2 25/25 work units/s, E1 50 MB/s; observed " +
-                    $"{c1.ActualWorkRate:0.###}/{c2.ActualWorkRate:0.###}, {Link(host, "E1").BandwidthUsageMBps:0.###}");
+                Check(c2.IsActive && c3.IsActive, "authored delayed establishment");
+                Near(db.RequestedLoad, 13f, "authored DB requested LOAD");
+                Near(db.AllocatedLoad, 10f, "authored DB allocated LOAD");
+                Near(c1.AllocatedLoad, 50f / 13f, "authored c1 proportional LOAD");
+                Near(c3.AllocatedLoad, 80f / 13f, "authored c3 proportional LOAD");
+                Near(c2.AllocatedLoad, 5f, "AUTH target does not compete with DB");
+                Near(api.RequestedLoad, 1f, "transit API remains at baseline");
+                CheckCapacityAndAccounting(host);
+                CheckPresentation(host, c1, db);
+                Debug.Log($"ResourceWitness authored 13/10: expected c1 3.846, c3 6.154, c2 5; observed {c1.AllocatedLoad:0.###}, {c3.AllocatedLoad:0.###}, {c2.AllocatedLoad:0.###}");
 
                 steps = 0;
-                while (!c2.IsComplete && steps++ < 1000)
+                while (!c3.IsComplete && steps++ < 1000)
                     host.StepSimulation(0.1f);
-                Check(c2.IsComplete && c1.IsActive, "c2 completes before c1");
+                Check(c3.IsComplete && c1.IsActive, "c3 completes while c1 remains active");
                 host.StepSimulation(0.1f);
-                Near(c1.ActualWorkRate, 35f, "released bandwidth raises c1 rate");
-                Near(Link(host, "E1").BandwidthUsageMBps, 35f, "released E1 usage");
-                Near(Node(host, "AUTH").MemoryUsageGB, Node(host, "AUTH").MemoryBaselineGB,
-                    "completed c2 releases AUTH memory");
-                CheckCapacity(host);
-                Debug.Log("ResourceWitness completion: expected c1 35 work units/s, E1 35 MB/s, AUTH memory baseline; observed " +
-                    $"{c1.ActualWorkRate:0.###}, {Link(host, "E1").BandwidthUsageMBps:0.###}, {Node(host, "AUTH").MemoryUsageGB:0.###} GB");
+                Near(c1.AllocatedLoad, 5f, "c1 recovers after c3 completion");
+                Near(db.RequestedLoad, 5f, "completed c3 releases requested LOAD");
+                Near(db.AllocatedLoad, 5f, "completed c3 releases allocated LOAD");
+                CheckCapacityAndAccounting(host);
+                Debug.Log($"ResourceWitness completion: expected c1 5, DB request/allocation 5/5; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.AllocatedLoad:0.###}");
 
-                SetFloat(dbRequirement, "cpuUnitsPerWork", 4f);
+                SetField(c2Definition.Route.Last(), "node", db.View);
+                SetField(c2Definition, "desiredLoad", 3f);
+                SetField(c3Definition, "desiredLoad", 5f);
+                SetField(c3Definition, "totalWork", 5f);
+                SetField(c2Definition, "startDelaySeconds", 0f);
+                SetField(c3Definition, "startDelaySeconds", 0f);
+                host.ResetSimulation();
+                host.StepSimulation(1f);
+                c1 = State(host, "c1");
+                c2 = State(host, "c2");
+                c3 = State(host, "c3");
+                Near(db.RequestedLoad, 13f, "three-way requested LOAD");
+                Near(db.AllocatedLoad, 10f, "three-way allocated LOAD");
+                Near(c1.AllocatedLoad, 50f / 13f, "three-way c1 allocation");
+                Near(c2.AllocatedLoad, 30f / 13f, "three-way c2 allocation");
+                Near(c3.AllocatedLoad, 50f / 13f, "three-way c3 allocation");
+                Near(c2.CompletedWork, 30f / 13f, "allocated LOAD advances WORK");
+                CheckCapacityAndAccounting(host);
+                Debug.Log($"ResourceWitness 5+5+3/10: expected 3.846/3.846/2.308; observed {c1.AllocatedLoad:0.###}/{c3.AllocatedLoad:0.###}/{c2.AllocatedLoad:0.###}");
+
+                host.StepSimulation(1f);
+                Check(c3.IsComplete, "short c3 work completes");
+                host.StepSimulation(0.1f);
+                Near(c1.AllocatedLoad, 5f, "c1 full LOAD after release");
+                Near(c2.AllocatedLoad, 3f, "c2 full LOAD after release");
+                Near(db.RequestedLoad, 8f, "remaining requests after release");
+                CheckCapacityAndAccounting(host);
+
+                SetField(db, "baselineLoad", 2f);
                 host.ResetSimulation();
                 host.StepSimulation(0.1f);
-                c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
-                Near(c1.ActualWorkRate, 18f, "DB CPU bottleneck work rate");
-                Near(Node(host, "DB").CpuUsageUnits, 80f, "DB CPU capacity");
-                Check(c1.LimitKind == LimitKind.NodeCpu && c1.LimitingResourceId == "DB", "DB CPU limiter");
-                CheckCapacity(host);
-                Debug.Log($"ResourceWitness CPU: expected 18 work units/s, DB CPU 80; observed {c1.ActualWorkRate:0.###}, {Node(host, "DB").CpuUsageUnits:0.###}");
-
-                SetFloat(dbRequirement, "cpuUnitsPerWork", originalCpu);
-                SetFloat(dbRequirement, "diskIoMBPerWork", 4f);
-                host.ResetSimulation();
-                host.StepSimulation(0.1f);
-                c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
-                Near(c1.ActualWorkRate, 23f, "DB disk bottleneck work rate");
-                Near(Node(host, "DB").DiskIoUsageMBps, 100f, "DB disk capacity");
-                Check(c1.LimitKind == LimitKind.NodeDiskIo && c1.LimitingResourceId == "DB", "DB disk limiter");
-                CheckCapacity(host);
-                Debug.Log($"ResourceWitness disk: expected 23 work units/s, DB disk 100 MB/s; observed {c1.ActualWorkRate:0.###}, {Node(host, "DB").DiskIoUsageMBps:0.###}");
-
-                SetFloat(dbRequirement, "diskIoMBPerWork", originalDisk);
-                SetFloat(dbRequirement, "cpuUnitsPerWork", 4f);
-                SetFloat(c1Definition, "bandwidthMBPerWork", 0.1f);
-                host.ResetSimulation();
-                host.StepSimulation(0.1f);
-                c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
-                Near(c1.ActualWorkRate, 18f, "low-bandwidth CPU-heavy work rate");
-                Near(c1.ActualBandwidthMBps, 1.8f, "low-bandwidth actual MB/s");
-                Near(Link(host, "E1").BandwidthUsageMBps, 1.8f, "low-bandwidth E1 usage");
-                Near(Node(host, "DB").CpuUsageUnits, 80f, "low-bandwidth DB CPU usage");
-                CheckCapacity(host);
-                Debug.Log($"ResourceWitness low bandwidth: expected 18 work units/s, E1 1.8 MB/s, DB CPU 80; observed {c1.ActualWorkRate:0.###}, {Link(host, "E1").BandwidthUsageMBps:0.###}, {Node(host, "DB").CpuUsageUnits:0.###}");
+                Near(db.RequestedLoad, 15f, "baseline plus requested LOAD");
+                Near(db.AllocatedLoad, 10f, "baseline reduces available LOAD");
+                Near(State(host, "c1").AllocatedLoad, 40f / 13f, "baseline c1 fraction");
+                CheckCapacityAndAccounting(host);
+                Debug.Log($"ResourceWitness baseline: expected request 15, allocation 10, c1 3.077; observed {db.RequestedLoad:0.###}, {db.AllocatedLoad:0.###}, {State(host, "c1").AllocatedLoad:0.###}");
                 Debug.Log("ResourceWitness PASS");
             }
             finally
             {
-                SetFloat(dbRequirement, "cpuUnitsPerWork", originalCpu);
-                SetFloat(dbRequirement, "diskIoMBPerWork", originalDisk);
-                SetFloat(c1Definition, "bandwidthMBPerWork", originalBandwidth);
+                SetField(c2Definition.Route.Last(), "node", originalC2Target);
+                SetField(c2Definition, "desiredLoad", originalC2Load);
+                SetField(c3Definition, "desiredLoad", originalC3Load);
+                SetField(c3Definition, "totalWork", originalC3Work);
+                SetField(c2Definition, "startDelaySeconds", originalC2Delay);
+                SetField(c3Definition, "startDelaySeconds", originalC3Delay);
+                SetField(db, "baselineLoad", originalDbBaseline);
                 host.ResetSimulation();
             }
         }
 
-        private static float GetFloat(object owner, string name) => (float)Field(owner, name).GetValue(owner);
-        private static void SetFloat(object owner, string name, float value) => Field(owner, name).SetValue(owner, value);
-        private static FieldInfo Field(object owner, string name) => owner.GetType().GetField(name,
-            BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new InvalidOperationException("Missing field " + name);
-        private static NodeResources Node(SimulationHost host, string id) => host.Nodes.First(n => n.View.NodeId == id);
-        private static PhysicalLinkResources Link(SimulationHost host, string id) =>
-            host.PhysicalLinks.First(l => l.View.LinkId == id);
-
-        private static void CheckCapacity(SimulationHost host)
+        private static void CheckPresentation(SimulationHost host, LogicalConnectionState c1, NodeResources db)
         {
-            foreach (NodeResources node in host.Nodes)
-                Check(node.CpuUsageUnits <= node.CpuCapacityUnits + Tolerance &&
-                    node.MemoryUsageGB <= node.MemoryCapacityGB + Tolerance &&
-                    node.DiskIoUsageMBps <= node.DiskIoCapacityMBps + Tolerance,
-                    node.View.NodeId + " capacity");
-            foreach (PhysicalLinkResources link in host.PhysicalLinks)
-                Check(link.BandwidthUsageMBps <= link.BandwidthCapacityMBps + Tolerance,
-                    link.View.LinkId + " capacity");
+            NodeLoadBar bar = db.View.LoadBar;
+            Check(bar != null, "authored DB LOAD bar reference");
+            Check(bar.LabelText == "LOAD - 13 / 10", "DB bar shows uncapped requested LOAD");
+            Near(bar.FillFraction, 1f, "DB bar fill caps at 100 percent");
+            Color overloadColor = new SerializedObject(bar).FindProperty("overloadedColor").colorValue;
+            Check(bar.FillColor == overloadColor, "DB bar overload color");
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
+            Check(prefab != null, "inspect prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { c1 });
+                var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
+                    .GetArrayElementAtIndex(0).objectReferenceValue;
+                SerializedObject fields = new SerializedObject(entry);
+                string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
+                string target = ((TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue).text;
+                Check(load.Contains("3.8 / 5") && load.Contains("LOAD"), "inspect allocated/desired LOAD");
+                Check(target.Contains("13 / 10 requested") && target.Contains("10 allocated"),
+                    "inspect agrees with node LOAD");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(output.gameObject);
+            }
+            foreach (PhysicalLinkReference link in host.PhysicalLinks)
+            {
+                TMP_Text label = (TMP_Text)new SerializedObject(link.View)
+                    .FindProperty("resourceReadout").objectReferenceValue;
+                Check(label != null && label.text == link.View.LinkId,
+                    link.View.LinkId + " shows no resource LOAD");
+            }
         }
 
+        private static void CheckCapacityAndAccounting(SimulationHost host)
+        {
+            foreach (NodeResources node in host.Nodes)
+            {
+                float requested = node.BaselineLoad;
+                float allocated = node.BaselineLoad;
+                foreach (LogicalConnectionState connection in host.RuntimeConnections)
+                    if (connection.IsActive && connection.TargetNode == node.View)
+                    {
+                        requested += connection.Definition.DesiredLoad;
+                        allocated += connection.AllocatedLoad;
+                    }
+                Near(node.RequestedLoad, requested, node.View.NodeId + " requested accounting");
+                Near(node.AllocatedLoad, allocated, node.View.NodeId + " allocated accounting");
+                Check(node.AllocatedLoad <= node.LoadCapacity + Tolerance,
+                    node.View.NodeId + " capacity");
+                NodeLoadBar bar = node.View.LoadBar;
+                Check(bar != null && bar.LabelText == $"LOAD - {requested:0.#} / {node.LoadCapacity:0.#}",
+                    node.View.NodeId + " bar matches requested LOAD");
+                float fraction = node.LoadCapacity > 0f ? Mathf.Clamp01(requested / node.LoadCapacity) : 0f;
+                Near(bar.FillFraction, fraction, node.View.NodeId + " capped bar fill");
+            }
+        }
+
+        private static LogicalConnectionState State(SimulationHost host, string id) =>
+            host.RuntimeConnections.First(c => c.ConnectionId == id);
+        private static NodeResources Node(SimulationHost host, string id) =>
+            host.Nodes.First(n => n.View.NodeId == id);
+        private static float GetFloat(object owner, string name) => (float)Field(owner, name).GetValue(owner);
+        private static void SetField(object owner, string name, object value) => Field(owner, name).SetValue(owner, value);
+        private static FieldInfo Field(object owner, string name) => owner.GetType().GetField(name,
+            BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new InvalidOperationException("Missing field " + name);
         private static void Near(float observed, float expected, string name) =>
             Check(Mathf.Abs(observed - expected) <= Tolerance,
                 $"{name}: expected {expected:0.###}, observed {observed:0.###}");

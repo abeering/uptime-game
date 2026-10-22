@@ -206,8 +206,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 19, y: -8}
-  m_SizeDelta: {x: 140, y: 26}
+  m_AnchoredPosition: {x: 112, y: 30}
+  m_SizeDelta: {x: 160, y: 25}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &94218922
 MonoBehaviour:
@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -343,8 +343,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 19, y: -8}
-  m_SizeDelta: {x: 140, y: 26}
+  m_AnchoredPosition: {x: 112, y: 30}
+  m_SizeDelta: {x: 160, y: 25}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &106107429
 MonoBehaviour:
@@ -1311,7 +1311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: API
-  resourceReadout: {fileID: 392641478}
+  loadBar: {fileID: 392641478}
   north: 96
   northEast: 72
   east: 72
@@ -2276,7 +2276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: DB
-  resourceReadout: {fileID: 1337900093}
+  loadBar: {fileID: 1337900093}
   north: 96
   northEast: 72
   east: 72
@@ -2474,11 +2474,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 112
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 72
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2510,11 +2510,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 81
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -26
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2528,17 +2528,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
-      propertyPath: m_text
-      value: 'USED / CAP
-
-        CPU   10/100 u
-
-        MEM   1/8 GB
-
-        DISK 
-        5/80 MB/s'
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2551,15 +2540,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &392641478 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
+  m_CorrespondingSourceObject: {fileID: 863297285172375029, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
   m_PrefabInstance: {fileID: 392641476}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c73bc1d73094c13bbf1b51a19e40cb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeLoadBar
 --- !u!1001 &394130995
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2786,7 +2775,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: EXT1
-  resourceReadout: {fileID: 1056008364}
+  loadBar: {fileID: 1056008364}
   north: 96
   northEast: 72
   east: 72
@@ -3251,7 +3240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4270056194576589665, guid: 9685bc84401fb754eaad02e53865bd0c, type: 3}
       propertyPath: m_text
-      value: E2 0/35 MB/s
+      value: E2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3626,8 +3615,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 19, y: -8}
-  m_SizeDelta: {x: 140, y: 26}
+  m_AnchoredPosition: {x: 112, y: 30}
+  m_SizeDelta: {x: 160, y: 25}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &934485506
 MonoBehaviour:
@@ -3901,7 +3890,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4270056194576589665, guid: 9685bc84401fb754eaad02e53865bd0c, type: 3}
       propertyPath: m_text
-      value: E3 0/25 MB/s
+      value: E3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3958,8 +3947,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 19, y: -8}
-  m_SizeDelta: {x: 140, y: 26}
+  m_AnchoredPosition: {x: 112, y: 30}
+  m_SizeDelta: {x: 160, y: 25}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &985034627
 MonoBehaviour:
@@ -4222,11 +4211,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 112
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 72
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4258,11 +4247,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 81
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -26
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4276,17 +4265,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
-      propertyPath: m_text
-      value: 'USED / CAP
-
-        CPU   0/100 u
-
-        MEM   0/8 GB
-
-        DISK 
-        0/100 MB/s'
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4299,15 +4277,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1056008364 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
+  m_CorrespondingSourceObject: {fileID: 863297285172375029, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
   m_PrefabInstance: {fileID: 1056008362}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c73bc1d73094c13bbf1b51a19e40cb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeLoadBar
 --- !u!1 &1059645036
 GameObject:
   m_ObjectHideFlags: 0
@@ -4648,11 +4626,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 112
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 72
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4684,11 +4662,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 81
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -26
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4702,17 +4680,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
-      propertyPath: m_text
-      value: 'USED / CAP
-
-        CPU   8/80 u
-
-        MEM   2/16 GB
-
-        DISK 
-        8/100 MB/s'
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4725,15 +4692,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1337900093 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
+  m_CorrespondingSourceObject: {fileID: 863297285172375029, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
   m_PrefabInstance: {fileID: 1337900091}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c73bc1d73094c13bbf1b51a19e40cb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeLoadBar
 --- !u!1 &1404187477
 GameObject:
   m_ObjectHideFlags: 0
@@ -5098,7 +5065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeView
   nodeId: AUTH
-  resourceReadout: {fileID: 1934735351}
+  loadBar: {fileID: 1934735351}
   north: 96
   northEast: 72
   east: 72
@@ -5612,7 +5579,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4270056194576589665, guid: 9685bc84401fb754eaad02e53865bd0c, type: 3}
       propertyPath: m_text
-      value: E1 0/50 MB/s
+      value: E1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5950,11 +5917,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 112
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 72
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5986,11 +5953,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 81
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -26
       objectReference: {fileID: 0}
     - target: {fileID: 1009746530790320564, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6004,17 +5971,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
-      propertyPath: m_text
-      value: 'USED / CAP
-
-        CPU   6/60 u
-
-        MEM   1/8 GB
-
-        DISK 
-        3/40 MB/s'
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6027,15 +5983,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1934735351 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2705260266704120033, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
+  m_CorrespondingSourceObject: {fileID: 863297285172375029, guid: 86d9c9a5200b871498261bc178faccbe, type: 3}
   m_PrefabInstance: {fileID: 1934735349}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c73bc1d73094c13bbf1b51a19e40cb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NodeLoadBar
 --- !u!1 &1946291434
 GameObject:
   m_ObjectHideFlags: 0
@@ -6349,40 +6305,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.SimulationHost
   nodes:
   - view: {fileID: 458374168}
-    cpuCapacityUnits: 100
-    cpuBaselineUnits: 0
-    memoryCapacityGB: 8
-    memoryBaselineGB: 0
-    diskIoCapacityMBps: 100
-    diskIoBaselineMBps: 0
+    loadCapacity: 10
+    baselineLoad: 0
   - view: {fileID: 252751404}
-    cpuCapacityUnits: 100
-    cpuBaselineUnits: 10
-    memoryCapacityGB: 8
-    memoryBaselineGB: 1
-    diskIoCapacityMBps: 80
-    diskIoBaselineMBps: 5
+    loadCapacity: 10
+    baselineLoad: 1
   - view: {fileID: 358228025}
-    cpuCapacityUnits: 80
-    cpuBaselineUnits: 8
-    memoryCapacityGB: 16
-    memoryBaselineGB: 2
-    diskIoCapacityMBps: 100
-    diskIoBaselineMBps: 8
+    loadCapacity: 10
+    baselineLoad: 0
   - view: {fileID: 1603479477}
-    cpuCapacityUnits: 60
-    cpuBaselineUnits: 6
-    memoryCapacityGB: 8
-    memoryBaselineGB: 1
-    diskIoCapacityMBps: 40
-    diskIoBaselineMBps: 3
+    loadCapacity: 10
+    baselineLoad: 0
   physicalLinks:
   - view: {fileID: 726002155}
-    bandwidthCapacityMBps: 50
   - view: {fileID: 853061990}
-    bandwidthCapacityMBps: 35
   - view: {fileID: 1906518803}
-    bandwidthCapacityMBps: 25
   connections:
   - connectionId: c1
     claimedPurpose: Record Retrieval
@@ -6390,20 +6327,10 @@ MonoBehaviour:
     currentOperation: 0
     route:
     - node: {fileID: 458374168}
-      cpuUnitsPerWork: 0
-      diskIoMBPerWork: 0
-      memoryGB: 0
     - node: {fileID: 252751404}
-      cpuUnitsPerWork: 1
-      diskIoMBPerWork: 0.5
-      memoryGB: 1
     - node: {fileID: 358228025}
-      cpuUnitsPerWork: 0.5
-      diskIoMBPerWork: 1
-      memoryGB: 1
-    totalWork: 1500
-    desiredWorkRate: 35
-    bandwidthMBPerWork: 1
+    totalWork: 360
+    desiredLoad: 5
     startDelaySeconds: 0
   - connectionId: c2
     claimedPurpose: Customer Authentications
@@ -6411,20 +6338,21 @@ MonoBehaviour:
     currentOperation: 2
     route:
     - node: {fileID: 458374168}
-      cpuUnitsPerWork: 0
-      diskIoMBPerWork: 0
-      memoryGB: 0
     - node: {fileID: 252751404}
-      cpuUnitsPerWork: 1
-      diskIoMBPerWork: 0.5
-      memoryGB: 1
     - node: {fileID: 1603479477}
-      cpuUnitsPerWork: 0.5
-      diskIoMBPerWork: 0.5
-      memoryGB: 1
-    totalWork: 600
-    desiredWorkRate: 35
-    bandwidthMBPerWork: 1
+    totalWork: 180
+    desiredLoad: 5
+    startDelaySeconds: 3
+  - connectionId: c3
+    claimedPurpose: Record Indexing
+    activityDescription: Updating the DB index
+    currentOperation: 1
+    route:
+    - node: {fileID: 458374168}
+    - node: {fileID: 252751404}
+    - node: {fileID: 358228025}
+    totalWork: 90
+    desiredLoad: 8
     startDelaySeconds: 3
   connectionDebugReadout: {fileID: 394130996}
   pathPresenter: {fileID: 1033840602}

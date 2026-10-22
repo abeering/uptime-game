@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 
 namespace Uptime.Connections
@@ -6,7 +5,7 @@ namespace Uptime.Connections
     public sealed class NodeView : MonoBehaviour
     {
         [SerializeField] private string nodeId;
-        [SerializeField] private TMP_Text resourceReadout;
+        [SerializeField] private NodeLoadBar loadBar;
         [Header("Logical path attachment widths (UI pixels)")]
         [SerializeField, Min(0f)] private float north = 96f;
         [SerializeField, Min(0f)] private float northEast = 72f;
@@ -18,6 +17,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float northWest = 72f;
 
         public string NodeId => nodeId;
+        public NodeLoadBar LoadBar => loadBar;
 
         public float BundleWidthToward(Vector2 direction)
         {
@@ -38,20 +38,8 @@ namespace Uptime.Connections
 
         public void RenderResources(NodeResources resources)
         {
-            if (resourceReadout == null || resources == null)
-                return;
-
-            string value = $"{Percent(resources.CpuUsageUnits, resources.CpuCapacityUnits)}%\n{Percent(resources.MemoryUsageGB, resources.MemoryCapacityGB)}%\n{Percent(resources.DiskIoUsageMBps, resources.DiskIoCapacityMBps)}%";
-            if (resourceReadout.text != value)
-                resourceReadout.text = value;
-        }
-
-        private static int Percent(float usage, float capacity)
-        {
-            if (capacity <= 0f)
-                return 0;
-
-            return Mathf.FloorToInt(Mathf.Clamp01(usage / capacity) * 100f + 0.5f);
+            if (loadBar != null && resources != null)
+                loadBar.Render(resources);
         }
     }
 }
