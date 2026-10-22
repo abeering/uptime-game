@@ -71,7 +71,8 @@ namespace Uptime.Connections
             else if (!state.IsComplete && renderedStage < operationTokens.Count)
                 operationTokens[renderedStage].SetActiveColor(tint);
             NodeResources target = state.TargetResources;
-            string status = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
+            string status = state.Resolution == ConnectionResolution.Blocked ? "BLOCKED" :
+                state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
             string reason = string.Empty;
@@ -79,7 +80,7 @@ namespace Uptime.Connections
                 reason = target.LoadCapacity - target.BaselineLoad <= 0.0001f ?
                     " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
                     " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
-            Set(throughput, state.IsComplete ? "COMPLETE" :
+            Set(throughput, state.IsComplete ? status :
                 $"{status} · LOAD {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
             if (throughput != null) throughput.color = tint;
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
@@ -107,6 +108,7 @@ namespace Uptime.Connections
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
         {
+            bool completedNormally = state.IsComplete && state.Resolution != ConnectionResolution.Blocked;
             foreach (InspectOperationToken token in operationTokens)
             {
                 token.gameObject.SetActive(false);
@@ -118,7 +120,7 @@ namespace Uptime.Connections
             string target = state.TargetNode.NodeId;
             for (int i = 0; i < state.OperationCount; i++)
             {
-                if (i > state.CurrentOperationIndex && !state.IsComplete)
+                if (i > state.CurrentOperationIndex && !completedNormally)
                 {
                     InspectOperationToken future = Instantiate(operationTokenPrefab, operationRow);
                     future.ShowFuture(state.OperationCount - i);
@@ -127,7 +129,7 @@ namespace Uptime.Connections
                 }
                 InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
                 token.ShowOperation(state.Definition.OperationAt(i), target,
-                    i < state.CurrentOperationIndex || state.IsComplete, tint);
+                    i < state.CurrentOperationIndex || completedNormally, tint);
                 operationTokens.Add(token);
             }
             renderedState = state;

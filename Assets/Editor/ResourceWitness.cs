@@ -20,6 +20,7 @@ namespace Uptime.Connections.EditorTools
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             Check(host != null, "simulation host");
+            host.SetRunMode(ConnectionRunMode.AuthoredWitness);
             var c1Definition = host.Definitions.First(c => c.ConnectionId == "c1");
             var c2Definition = host.Definitions.First(c => c.ConnectionId == "c2");
             var c3Definition = host.Definitions.First(c => c.ConnectionId == "c3");
@@ -97,9 +98,9 @@ namespace Uptime.Connections.EditorTools
                 Near(db.AllocatedLoad, 5f, "completed c3 releases allocated LOAD");
                 CheckCapacityAndAccounting(host);
                 CheckCompletedPresentation(c1, c3);
+                Debug.Log($"ResourceWitness completion: expected c1 5, DB request/allocation 5/5; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.AllocatedLoad:0.###}");
                 CheckThreeStagePresentation(host, c3Definition, originalC3Operations,
                     originalC3Delay);
-                Debug.Log($"ResourceWitness completion: expected c1 5, DB request/allocation 5/5; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.AllocatedLoad:0.###}");
 
                 SetField(c2Definition.Route.Last(), "node", db.View);
                 SetField(c2Definition, "desiredLoad", 3f);
@@ -158,6 +159,7 @@ namespace Uptime.Connections.EditorTools
                 SetField(c3Definition, "startDelaySeconds", originalC3Delay);
                 SetField(db, "baselineLoad", originalDbBaseline);
                 host.ResetSimulation();
+                host.SetRunMode(ConnectionRunMode.Generated);
             }
         }
 

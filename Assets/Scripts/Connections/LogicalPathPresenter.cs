@@ -65,6 +65,31 @@ namespace Uptime.Connections
             UpdateLayouts();
         }
 
+        public void Add(LogicalConnectionState state)
+        {
+            if (state == null || views.ContainsKey(state)) return;
+            var next = new List<LogicalConnectionState>(connections ?? Array.Empty<LogicalConnectionState>()) { state };
+            connections = next.ToArray();
+            if (networkArea == null || pathLayer == null || pathPrefab == null) return;
+            LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
+            view.name = "Logical path " + state.ConnectionId;
+            view.Bind(state, networkArea);
+            view.gameObject.SetActive(!previewMode);
+            views.Add(state, view);
+            UpdateLayouts();
+        }
+
+        public void Retire(LogicalConnectionState state)
+        {
+            if (connections == null) return;
+            var next = new List<LogicalConnectionState>(connections);
+            next.Remove(state);
+            connections = next.ToArray();
+            // The view keeps its state through its own departure animation.
+            views.Remove(state);
+            UpdateLayouts();
+        }
+
         private void LateUpdate()
         {
             if (connections != null && !previewMode)

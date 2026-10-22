@@ -21,6 +21,7 @@ namespace Uptime.Connections.EditorTools
             var nodes = UnityEngine.Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None);
             var links = UnityEngine.Object.FindObjectsByType<PhysicalLinkView>(FindObjectsSortMode.None);
             Check(presenter != null && preview != null && host != null && identity != null, "scene components");
+            host.SetRunMode(ConnectionRunMode.AuthoredWitness);
             Check(presenter.NetworkArea != null && presenter.PathLayer != null && presenter.PathGraphicPrefab != null,
                 "path prefab and area references");
             Check(nodes.Length == 4 && links.Length == 3, "four nodes and three links");
@@ -147,6 +148,7 @@ namespace Uptime.Connections.EditorTools
             host.ResetSimulation();
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
                 "rotated pill clearance and cycle coverage, short edges, establishment and completion.");
+            host.SetRunMode(ConnectionRunMode.Generated);
         }
 
         private static void CheckLayout(IdentityPacking.Layout layout, float budget, int count)

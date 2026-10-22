@@ -6235,6 +6235,7 @@ MonoBehaviour:
   placeholderPrefab: {fileID: 4703692024107262633, guid: 96a14f158484292429ffeb2907e1f6ea, type: 3}
   inspectPrefab: {fileID: 5640653935189085936, guid: 26d54e60cbf2ed44997ac0f737d12ca4, type: 3}
   simulationHost: {fileID: 1996901015}
+  trafficDirector: {fileID: 1996901017}
   identityPresenter: {fileID: 901162628}
   maxEntries: 100
   normalColor: {r: 0.73, g: 0.89, b: 0.84, a: 1}
@@ -6288,6 +6289,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1996901016}
   - component: {fileID: 1996901015}
+  - component: {fileID: 1996901017}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -6369,6 +6371,28 @@ MonoBehaviour:
       activityDescription: Reading the updated index
   connectionDebugReadout: {fileID: 394130996}
   pathPresenter: {fileID: 1033840602}
+  runMode: 1
+  trafficDirector: {fileID: 1996901017}
+--- !u!114 &1996901017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44783d80164a49f78833818dd8899111, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionTrafficDirector
+  host: {fileID: 1996901015}
+  autoGenerationEnabled: 1
+  seed: 1701
+  initialGraceSeconds: 3
+  spawnIntervalSeconds: 13.5
+  spawnJitterSeconds: 1.5
+  ambientOriginId: EXT1
+  profiles: []
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
