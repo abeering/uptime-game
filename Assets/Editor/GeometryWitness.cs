@@ -4,6 +4,7 @@ using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
@@ -106,10 +107,11 @@ namespace Uptime.Connections.EditorTools
                         presenter.NetworkArea);
                     foreach (IdentityPacking.Lane lane in layout.Lanes)
                     {
-                        Check(OnCardEdge(sourceCard, lane.Start),
-                            link.LinkId + " source lane reaches its card");
-                        Check(OnCardEdge(destinationCard, lane.End),
-                            link.LinkId + " destination lane reaches its card");
+                        Vector2 direction = (destinationCard.center - sourceCard.center).normalized;
+                        Check(EndCovered(sourceCard, lane.Start, direction, lane.Width),
+                            link.LinkId + " source lane is covered by its card");
+                        Check(EndCovered(destinationCard, lane.End, direction, lane.Width),
+                            link.LinkId + " destination lane is covered by its card");
                     }
                     observedStages.Add(layout.Stage);
                     Debug.Log($"{link.LinkId} {count}: {layout.Stage}, {layout.LineWidth:0.##} px line, " +
@@ -124,6 +126,7 @@ namespace Uptime.Connections.EditorTools
                 Check(threeWidth + 0.01f >= fourWidth,
                     link.LinkId + " three paths stay at least as wide as four");
             }
+            CheckRenderedPillsAtReferenceSize(presenter, identity, links);
             foreach (IdentityPacking.ReadabilityStage stage in new[] {
                 IdentityPacking.ReadabilityStage.Centered,
                 IdentityPacking.ReadabilityStage.Staggered,
@@ -169,7 +172,8 @@ namespace Uptime.Connections.EditorTools
             Check(c1.ActualWorkRate > sharedRate, "released capacity accelerates c1");
             host.ResetSimulation();
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
-                "rotated pill clearance and cycle coverage, short edges, establishment and completion.");
+                "rendered pill visibility at reference size and 6 px gap, rotated pill clearance " +
+                "and cycle coverage, short edges, establishment and completion.");
             host.SetRunMode(ConnectionRunMode.Generated);
         }
 
@@ -228,15 +232,68 @@ namespace Uptime.Connections.EditorTools
                 throw new InvalidOperationException("GeometryWitness failed: " + name);
         }
 
-        private static bool OnCardEdge(Rect card, Vector2 point)
+        private static void CheckRenderedPillsAtReferenceSize(LogicalPathPresenter presenter,
+            IdentityPresenter identity, PhysicalLinkView[] links)
         {
-            const float tolerance = 0.1f;
-            bool inside = point.x >= card.xMin - tolerance && point.x <= card.xMax + tolerance &&
-                point.y >= card.yMin - tolerance && point.y <= card.yMax + tolerance;
-            float nearestSide = Mathf.Min(Mathf.Abs(point.x - card.xMin),
-                Mathf.Abs(point.x - card.xMax), Mathf.Abs(point.y - card.yMin),
-                Mathf.Abs(point.y - card.yMax));
-            return inside && nearestSide <= tolerance;
+            RectTransform area = presenter.NetworkArea;
+            RectTransform panel = (RectTransform)area.parent;
+            Vector2 reference = area.GetComponentInParent<CanvasScaler>().referenceResolution;
+            Vector2 originalSize = area.sizeDelta;
+            float width = reference.x * (panel.anchorMax.x - panel.anchorMin.x) +
+                panel.sizeDelta.x + originalSize.x;
+            float height = reference.y * (panel.anchorMax.y - panel.anchorMin.y) +
+                panel.sizeDelta.y + originalSize.y;
+            try
+            {
+                area.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+                area.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+                Canvas.ForceUpdateCanvases();
+                var pillLayer = (RectTransform)new SerializedObject(identity)
+                    .FindProperty("pillLayer").objectReferenceValue;
+                Debug.Log($"Geometry witness at reference layout: {area.rect.size}");
+                foreach (float lineGap in new[] { presenter.MinLineGap, 6f })
+                    foreach (PhysicalLinkView link in links)
+                        foreach (int count in new[] { 3, 4, 5 })
+                        {
+                            var layout = identity.ResolveLayout(link, count, presenter.MaxLineWidth,
+                                presenter.MinLineWidth, lineGap);
+                            Check(layout.Schedule.Count > 0, link.LinkId + " has a pill schedule");
+                            Vector2 a = area.InverseTransformPoint(link.NodeA.transform.position);
+                            Vector2 b = area.InverseTransformPoint(link.NodeB.transform.position);
+                            Vector2 direction = (b - a).normalized;
+                            var liveLines = new System.Collections.Generic.List<IdentityPresenter.LiveLine>();
+                            for (int i = 0; i < count; i++)
+                            {
+                                float offset = EdgeGeometry.Offset(i, count, layout.LineWidth, layout.LineGap);
+                                Vector2 start = EdgeGeometry.CardUnderlap(link.NodeA, area,
+                                    direction, offset, layout.LineWidth);
+                                Vector2 end = EdgeGeometry.CardUnderlap(link.NodeB, area,
+                                    -direction, -offset, layout.LineWidth);
+                                liveLines.Add(new IdentityPresenter.LiveLine("c" + (i + 1), start, end,
+                                    start, end, Color.white, 1f, layout.LineWidth));
+                            }
+                            identity.BeginFrame();
+                            identity.PresentEdge(link, liveLines);
+                            identity.EndFrame();
+                            int shown = pillLayer.GetComponentsInChildren<IdentityPillView>(true)
+                                .Count(pill => pill.gameObject.activeSelf);
+                            Check(shown == layout.Schedule[0].Count,
+                                $"{link.LinkId} {count} at {lineGap:0.#} px gap: {shown} live pills " +
+                                $"versus {layout.Schedule[0].Count} planned");
+                            if (Mathf.Approximately(lineGap, 6f) && count <= 4)
+                                Check(shown == count,
+                                    $"{link.LinkId} {count} at 6 px gap shows every identity");
+                            Debug.Log($"{link.LinkId} {count} at {lineGap:0.#} px gap: " +
+                                $"{layout.Stage}, {shown}/{count} pills shown");
+                        }
+            }
+            finally
+            {
+                identity.BeginFrame();
+                identity.EndFrame();
+                area.sizeDelta = originalSize;
+                Canvas.ForceUpdateCanvases();
+            }
         }
 
         private static bool EndCovered(Rect card, Vector2 center, Vector2 direction, float width)

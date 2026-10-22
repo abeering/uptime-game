@@ -172,11 +172,12 @@ namespace Uptime.Connections
             for (int i = 0; i < count; i++)
             {
                 float offset = EdgeGeometry.Offset(i, count, width, gap);
+                // Plan against the same covered endpoints drawn by LogicalPathView.
                 Vector2 laneStart = sourceCard.HasValue ?
-                    EdgeGeometry.CardEdge(sourceCard.Value, direction, offset) :
+                    EdgeGeometry.CardUnderlap(sourceCard.Value, direction, offset, width) :
                     start + normal * offset;
                 Vector2 laneEnd = destinationCard.HasValue ?
-                    EdgeGeometry.CardEdge(destinationCard.Value, -direction, -offset) :
+                    EdgeGeometry.CardUnderlap(destinationCard.Value, -direction, -offset, width) :
                     end + normal * offset;
                 lanes[i] = new Lane("c" + (i + 1), laneStart, laneEnd, width);
             }
