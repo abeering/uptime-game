@@ -30,7 +30,7 @@ Unity 6000.3.11f1 batch Editor compilation and Resource, Geometry, Traffic, and 
 | What does Connections now do? | [Connections Current State](Connections/Current_State.md) | Connections runtime, prefabs, and serialized `Connections.unity` on the working branch. |
 | Why was an approach chosen or changed? | The relevant current contract and linked PR | Original briefs, review assets, Git history, and research as evidence, with their original baseline in mind. |
 
-Current executable and serialized state wins a disagreement about **what is implemented**; correct stale current prose. Shared game-design intent may describe a future feature that neither prototype implements. An old proposal or checkpoint does not become a current rule by being in `Docs/Design/`. The generated Project Core proposed for a later phase will be a cold-start navigation aid, not a source of independent authority.
+Current executable and serialized state wins a disagreement about **what is implemented**; correct stale current prose. Shared game-design intent may describe a future feature that neither prototype implements. An old proposal or checkpoint does not become a current rule by being in `Docs/Design/`. The [generated Project Core](_generated/Uptime_Project_Core.md) is a cold-start navigation snapshot, not a source of independent authority or a live account of later changes.
 
 ## Open work, without implied authorization
 
