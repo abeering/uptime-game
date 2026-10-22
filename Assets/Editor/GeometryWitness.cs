@@ -115,6 +115,15 @@ namespace Uptime.Connections.EditorTools
                     Debug.Log($"{link.LinkId} {count}: {layout.Stage}, {layout.LineWidth:0.##} px line, " +
                         $"{layout.LineGap:0.##} px gap, {layout.Schedule[0].Count} visible");
                 }
+            foreach (PhysicalLinkView link in links)
+            {
+                float threeWidth = identity.ResolveLayout(link, 3, presenter.MaxLineWidth,
+                    presenter.MinLineWidth, presenter.MinLineGap).LineWidth;
+                float fourWidth = identity.ResolveLayout(link, 4, presenter.MaxLineWidth,
+                    presenter.MinLineWidth, presenter.MinLineGap).LineWidth;
+                Check(threeWidth + 0.01f >= fourWidth,
+                    link.LinkId + " three paths stay at least as wide as four");
+            }
             foreach (IdentityPacking.ReadabilityStage stage in new[] {
                 IdentityPacking.ReadabilityStage.Centered,
                 IdentityPacking.ReadabilityStage.Staggered,

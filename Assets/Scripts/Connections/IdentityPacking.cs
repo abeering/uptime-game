@@ -84,6 +84,9 @@ namespace Uptime.Connections
                 return new Layout(ReadabilityStage.Unavailable, 0f, minimumLineGap,
                     new Lane[0], new List<List<Placement>>());
 
+            // Keep centered pills only when they do not make the paths thinner
+            // than a staggered layout that can still show every identity.
+            Layout centeredLayout = null;
             if (TryPillAwareLines(budget, count, maximumLineWidth, minimumLineGap,
                 pillSize.y, pillGap, lineClearance, minimumReadableLineWidth,
                 true, out float width, out float gap))
@@ -93,7 +96,7 @@ namespace Uptime.Connections
                 List<Placement> centered = Pack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance, 3);
                 if (centered.Count == count)
-                    return Single(ReadabilityStage.Centered, width, gap, lanes, centered);
+                    centeredLayout = Single(ReadabilityStage.Centered, width, gap, lanes, centered);
             }
 
             if (TryPillAwareLines(budget, count, maximumLineWidth, minimumLineGap,
@@ -104,9 +107,12 @@ namespace Uptime.Connections
                     sourceCard, destinationCard);
                 List<Placement> staggered = BestPack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance);
-                if (staggered != null && staggered.Count == count)
+                if (staggered != null && staggered.Count == count &&
+                    (centeredLayout == null || width > centeredLayout.LineWidth + 0.01f))
                     return Single(ReadabilityStage.Staggered, width, gap, lanes, staggered);
             }
+            if (centeredLayout != null)
+                return centeredLayout;
 
             width = EdgeGeometry.LineWidth(budget, count, minimumLineGap, maximumLineWidth);
             gap = minimumLineGap;
