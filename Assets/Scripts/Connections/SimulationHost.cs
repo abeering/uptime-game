@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
+    public enum ConnectionRunMode { AuthoredWitness, Generated }
+
     // The only clock and owner of resource state for the Connections game.
     [ExecuteAlways]
     public sealed class SimulationHost : MonoBehaviour
@@ -15,8 +17,13 @@ namespace Uptime.Connections
         [SerializeField] private LogicalConnectionDefinition[] connections;
         [SerializeField] private TMP_Text connectionDebugReadout;
         [SerializeField] private LogicalPathPresenter pathPresenter;
+        [SerializeField] private ConnectionRunMode runMode;
+        [SerializeField] private ConnectionTrafficDirector trafficDirector;
 
         private LogicalConnectionState[] runtimeConnections;
+        private readonly Dictionary<string, LogicalConnectionState> history =
+            new Dictionary<string, LogicalConnectionState>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> usedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private float simulationTimeSeconds;
 
         public NodeResources[] Nodes => nodes;
@@ -24,6 +31,17 @@ namespace Uptime.Connections
         public LogicalConnectionDefinition[] Definitions => connections;
         public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
+        public ConnectionRunMode RunMode => runMode;
+        public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
+        public bool HasEverUsedId(string id) => usedIds.Contains(id);
+        public LogicalConnectionState FindConnection(string id) =>
+            id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
+
+        public void SetRunMode(ConnectionRunMode mode)
+        {
+            runMode = mode;
+            ResetSimulation();
+        }
 
         private void OnEnable() => RefreshDisplays();
 
@@ -68,6 +86,9 @@ namespace Uptime.Connections
             if (runtimeConnections == null)
                 ResetSimulation();
 
+            if (runMode == ConnectionRunMode.Generated)
+                trafficDirector?.Tick(simulationTimeSeconds);
+
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
                 if (!connection.IsPending || simulationTimeSeconds < connection.Definition.StartDelaySeconds)
@@ -77,75 +98,143 @@ namespace Uptime.Connections
             }
             ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
             simulationTimeSeconds += deltaSeconds;
+            if (runMode == ConnectionRunMode.Generated)
+            {
+                var remaining = new List<LogicalConnectionState>(runtimeConnections.Length);
+                foreach (LogicalConnectionState state in runtimeConnections)
+                {
+                    if (state.IsComplete)
+                    {
+                        Resolve(state, ConnectionResolution.Completed);
+                        pathPresenter?.Retire(state);
+                    }
+                    else remaining.Add(state);
+                }
+                runtimeConnections = remaining.ToArray();
+            }
             RefreshDisplays();
+        }
+
+        public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
+        {
+            if (runtimeConnections == null) ResetSimulation();
+            LogicalConnectionState state = BuildState(definition);
+            if (!usedIds.Add(state.ConnectionId))
+                throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
+            state.EstablishedAtSeconds = simulationTimeSeconds;
+            var next = new List<LogicalConnectionState>(runtimeConnections) { state };
+            runtimeConnections = next.ToArray();
+            history.Add(state.ConnectionId, state);
+            if (Application.isPlaying) pathPresenter?.Add(state);
+            return state;
+        }
+
+        public void ValidatePlan(ConnectionSpawnPlan plan)
+        {
+            if (plan == null || plan.Operations.Length == 0 ||
+                string.IsNullOrWhiteSpace(plan.ProfileId) || HasEverUsedId(plan.ConnectionId))
+                throw new InvalidOperationException("Spawn plan needs operations, profile ID, and an unused ID.");
+            BuildState(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public bool BlockConnection(string id)
+        {
+            if (runtimeConnections == null || id == null) return false;
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if (string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase) && state.IsActive)
+                {
+                    state.Lifecycle = Lifecycle.Complete;
+                    state.AllocatedLoad = 0f;
+                    Resolve(state, ConnectionResolution.Blocked);
+                    var next = new List<LogicalConnectionState>(runtimeConnections);
+                    next.Remove(state);
+                    runtimeConnections = next.ToArray();
+                    pathPresenter?.Retire(state);
+                    // Publish released LOAD immediately; peers receive new allocations next step.
+                    foreach (NodeResources node in nodes) node.ClearUsage();
+                    foreach (LogicalConnectionState live in runtimeConnections)
+                        if (live.IsDemanding)
+                            live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
+                    RefreshDisplays();
+                    return true;
+                }
+            return false;
+        }
+
+        private void Resolve(LogicalConnectionState state, ConnectionResolution reason)
+        {
+            state.Resolution = reason;
+            state.ResolvedAtSeconds = simulationTimeSeconds;
+            ConnectionResolved?.Invoke(state, reason);
         }
 
         public void ResetSimulation()
         {
             ClearAllocatedUsage();
             simulationTimeSeconds = 0f;
+            history.Clear();
+            usedIds.Clear();
             var states = new List<LogicalConnectionState>();
-            var ids = new HashSet<string>(StringComparer.Ordinal);
-            var nodeViews = new HashSet<NodeView>();
-            var nodeByView = new Dictionary<NodeView, NodeResources>();
-            foreach (NodeResources node in nodes)
-            {
-                if (node?.View == null || !nodeViews.Add(node.View))
-                    throw new InvalidOperationException("Nodes require unique, assigned views.");
-                nodeByView.Add(node.View, node);
-            }
-
-            if (connections != null)
+            if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
             {
                 foreach (LogicalConnectionDefinition definition in connections)
                 {
-                    if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
-                        !ids.Add(definition.ConnectionId))
-                        throw new InvalidOperationException("Logical connections require unique, nonempty IDs.");
-                    if (definition.Route == null || definition.Route.Length < 2)
-                        throw new InvalidOperationException($"Connection {definition.ConnectionId} needs work, rate, and a route of at least two nodes.");
-                    for (int operation = 0; operation < definition.OperationCount; operation++)
-                        if (definition.WorkAt(operation) <= 0f || definition.LoadAt(operation) <= 0f)
-                            throw new InvalidOperationException($"Connection {definition.ConnectionId} operation {operation + 1} needs positive WORK and LOAD.");
-
-                    var visited = new HashSet<NodeView>();
-                    foreach (RouteNode requirement in definition.Route)
-                    {
-                        if (requirement?.Node == null || !nodeViews.Contains(requirement.Node) ||
-                            !visited.Add(requirement.Node))
-                            throw new InvalidOperationException($"Connection {definition.ConnectionId} has an invalid or repeated route node.");
-                    }
-
-                    var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
-                    for (int i = 0; i < routeLinks.Length; i++)
-                    {
-                        NodeView a = definition.Route[i].Node;
-                        NodeView b = definition.Route[i + 1].Node;
-                        foreach (PhysicalLinkReference link in physicalLinks)
-                        {
-                            if (link?.View == null)
-                                throw new InvalidOperationException("Physical links require assigned views.");
-                            bool connects = (link.View.NodeA == a && link.View.NodeB == b) ||
-                                (link.View.NodeA == b && link.View.NodeB == a);
-                            if (!connects)
-                                continue;
-                            if (routeLinks[i] != null)
-                                throw new InvalidOperationException($"Route {definition.ConnectionId} has ambiguous physical links.");
-                            routeLinks[i] = link;
-                        }
-                        if (routeLinks[i] == null)
-                            throw new InvalidOperationException($"Route {definition.ConnectionId} has no physical link from {a.NodeId} to {b.NodeId}.");
-                    }
-                    states.Add(new LogicalConnectionState(definition, routeLinks,
-                        nodeByView[definition.TargetNode]));
+                    LogicalConnectionState state = BuildState(definition);
+                    if (!usedIds.Add(state.ConnectionId))
+                        throw new InvalidOperationException("Logical connections require unique IDs.");
+                    states.Add(state);
+                    history.Add(state.ConnectionId, state);
                 }
             }
 
             states.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             runtimeConnections = states.ToArray();
+            if (runMode == ConnectionRunMode.Generated)
+                trafficDirector?.ResetDirector();
             if (Application.isPlaying && pathPresenter != null)
                 pathPresenter.Bind(runtimeConnections);
             RefreshDisplays();
+        }
+
+        private LogicalConnectionState BuildState(LogicalConnectionDefinition definition)
+        {
+            if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
+                definition.Route == null || definition.Route.Length < 2)
+                throw new InvalidOperationException("Connection needs an ID and route of at least two nodes.");
+            var nodeByView = new Dictionary<NodeView, NodeResources>();
+            foreach (NodeResources node in nodes)
+            {
+                if (node?.View == null || nodeByView.ContainsKey(node.View))
+                    throw new InvalidOperationException("Nodes require unique, assigned views.");
+                nodeByView.Add(node.View, node);
+            }
+            var visited = new HashSet<NodeView>();
+            foreach (RouteNode requirement in definition.Route)
+                if (requirement?.Node == null || !nodeByView.ContainsKey(requirement.Node) ||
+                    !visited.Add(requirement.Node))
+                    throw new InvalidOperationException("Connection has an invalid or repeated route node.");
+            for (int i = 0; i < definition.OperationCount; i++)
+                if (definition.WorkAt(i) <= 0f || definition.LoadAt(i) <= 0f ||
+                    float.IsNaN(definition.WorkAt(i)) || float.IsInfinity(definition.WorkAt(i)) ||
+                    float.IsNaN(definition.LoadAt(i)) || float.IsInfinity(definition.LoadAt(i)) ||
+                    !Enum.IsDefined(typeof(OperationKind), definition.OperationAt(i)))
+                    throw new InvalidOperationException("Connection operation needs finite positive WORK and LOAD.");
+            var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
+            for (int i = 0; i < routeLinks.Length; i++)
+            {
+                NodeView a = definition.Route[i].Node;
+                NodeView b = definition.Route[i + 1].Node;
+                foreach (PhysicalLinkReference link in physicalLinks)
+                {
+                    if (link?.View == null) throw new InvalidOperationException("Physical link lacks a view.");
+                    if (!((link.View.NodeA == a && link.View.NodeB == b) ||
+                        (link.View.NodeA == b && link.View.NodeB == a))) continue;
+                    if (routeLinks[i] != null) throw new InvalidOperationException("Ambiguous route link.");
+                    routeLinks[i] = link;
+                }
+                if (routeLinks[i] == null) throw new InvalidOperationException("Route has no physical link.");
+            }
+            return new LogicalConnectionState(definition, routeLinks, nodeByView[definition.TargetNode]);
         }
 
         private void ClearAllocatedUsage()
@@ -186,7 +275,7 @@ namespace Uptime.Connections
         private string BuildDebugText()
         {
             if (runtimeConnections == null)
-                return "CONNECTIONS  •  Play to run authored operations";
+                return "CONNECTIONS  •  Play to run operations";
 
             var output = new StringBuilder("CONNECTIONS  •  allocated / desired LOAD; 1 LOAD = 1 WORK/s");
             foreach (LogicalConnectionState connection in runtimeConnections)

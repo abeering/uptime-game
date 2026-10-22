@@ -16,6 +16,7 @@ namespace Uptime.Connections
         [SerializeField] private PlaceholderOutput placeholderPrefab;
         [SerializeField] private InspectOutput inspectPrefab;
         [SerializeField] private SimulationHost simulationHost;
+        [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
@@ -91,8 +92,25 @@ namespace Uptime.Connections
                 case "inspect":
                     Inspect(tokens);
                     break;
+                case "block":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  block c17", errorColor);
+                    else if (simulationHost != null && simulationHost.BlockConnection(tokens[1]))
+                        AppendText("BLOCKED  " + tokens[1], normalColor);
+                    else AppendText("BLOCK  no active connection " + tokens[1], errorColor);
+                    break;
+                case "demandtest":
+                    if (trafficDirector == null || simulationHost == null ||
+                        simulationHost.RunMode != ConnectionRunMode.Generated)
+                        AppendText("DEMANDTEST  generated mode required", errorColor);
+                    else
+                    {
+                        ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
+                        AppendText("QUEUED  " + plan.ConnectionId + " high demand to DB", normalColor);
+                    }
+                    break;
                 case "help":
-                    AppendText("COMMANDS  inspect c1 [c2]  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect c1 [c2]  block c17  demandtest  test  help", mutedColor);
                     break;
                 default:
                     AppendText($"UNKNOWN COMMAND  {command}  // type help", errorColor);
@@ -119,12 +137,7 @@ namespace Uptime.Connections
             for (int i = 1; i < tokens.Length; i++)
             {
                 LogicalConnectionState match = null;
-                foreach (LogicalConnectionState state in simulationHost.RuntimeConnections)
-                    if (string.Equals(state.ConnectionId, tokens[i], System.StringComparison.OrdinalIgnoreCase))
-                    {
-                        match = state;
-                        break;
-                    }
+                match = simulationHost.FindConnection(tokens[i]);
                 if (match == null)
                 {
                     AppendText("INSPECT  unknown connection " + tokens[i], errorColor);

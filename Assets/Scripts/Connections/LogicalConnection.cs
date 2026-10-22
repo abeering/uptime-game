@@ -9,6 +9,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private NodeView node;
         public NodeView Node => node;
+        public RouteNode(NodeView value) { node = value; }
     }
 
     public enum OperationKind
@@ -30,12 +31,16 @@ namespace Uptime.Connections
         public float TotalWork => Mathf.Max(0f, totalWork);
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public string ActivityDescription => activityDescription;
+        public OperationStage() { }
+        public OperationStage(OperationKind kind, float work, float load, string description)
+        { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description; }
     }
 
     [Serializable]
     public sealed class LogicalConnectionDefinition
     {
         [SerializeField] private string connectionId;
+        [SerializeField] private string profileId;
         [SerializeField] private string claimedPurpose;
         [SerializeField] private string activityDescription;
         [SerializeField] private OperationKind currentOperation;
@@ -50,6 +55,7 @@ namespace Uptime.Connections
         private OperationStage[] operations;
 
         public string ConnectionId => connectionId;
+        public string ProfileId => profileId;
         public string ClaimedPurpose => claimedPurpose;
         public string ActivityDescription => activityDescription;
         public OperationKind CurrentOperation => currentOperation;
@@ -67,6 +73,28 @@ namespace Uptime.Connections
         private OperationStage StageAt(int index) => operations[index] ??
             throw new InvalidOperationException($"Connection {connectionId} has an empty operation stage.");
 
+        public static LogicalConnectionDefinition FromPlan(ConnectionSpawnPlan plan)
+        {
+            var result = new LogicalConnectionDefinition
+            {
+                connectionId = plan.ConnectionId,
+                profileId = plan.ProfileId,
+                claimedPurpose = plan.ClaimedPurpose,
+                activityDescription = plan.Operations[0].ActivityDescription,
+                currentOperation = plan.Operations[0].Operation,
+                route = new RouteNode[plan.Route.Length],
+                operations = new OperationStage[plan.Operations.Length]
+            };
+            for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
+            for (int i = 0; i < result.operations.Length; i++)
+            {
+                OperationStage stage = plan.Operations[i];
+                result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
+                    stage.DesiredLoad, stage.ActivityDescription);
+            }
+            return result;
+        }
+
         internal void ClampNonnegative()
         {
             totalWork = TotalWork;
@@ -81,6 +109,8 @@ namespace Uptime.Connections
         Active,
         Complete
     }
+
+    public enum ConnectionResolution { Completed, Blocked }
 
     public enum LoadPerformance
     {
@@ -128,6 +158,8 @@ namespace Uptime.Connections
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
         public bool IsActive => Lifecycle == Lifecycle.Active;
         public float EstablishedAtSeconds { get; internal set; }
+        public float ResolvedAtSeconds { get; internal set; }
+        public ConnectionResolution? Resolution { get; internal set; }
 
         internal void FinishOperation()
         {
