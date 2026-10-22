@@ -6236,6 +6236,7 @@ MonoBehaviour:
   inspectPrefab: {fileID: 5640653935189085936, guid: 26d54e60cbf2ed44997ac0f737d12ca4, type: 3}
   simulationHost: {fileID: 1996901015}
   trafficDirector: {fileID: 1996901017}
+  recorder: {fileID: 1996901018}
   identityPresenter: {fileID: 901162628}
   maxEntries: 100
   normalColor: {r: 0.73, g: 0.89, b: 0.84, a: 1}
@@ -6290,6 +6291,7 @@ GameObject:
   - component: {fileID: 1996901016}
   - component: {fileID: 1996901015}
   - component: {fileID: 1996901017}
+  - component: {fileID: 1996901018}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -6373,6 +6375,7 @@ MonoBehaviour:
   pathPresenter: {fileID: 1033840602}
   runMode: 1
   trafficDirector: {fileID: 1996901017}
+  recorder: {fileID: 1996901018}
 --- !u!114 &1996901017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6393,6 +6396,23 @@ MonoBehaviour:
   spawnJitterSeconds: 1.5
   ambientOriginId: EXT1
   profiles: []
+--- !u!114 &1996901018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ba2df889d248a8939eab210f5e182d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsRunRecorder
+  host: {fileID: 1996901015}
+  trafficDirector: {fileID: 1996901017}
+  recordingEnabled: 1
+  snapshotIntervalSeconds: 1
+  autosaveIntervalSeconds: 30
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
