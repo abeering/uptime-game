@@ -1,5 +1,7 @@
 # Connections Arcade V1 — traffic generation V0
 
+**Current status (October 22, 2026):** Integrated generated-traffic contract from [PR #6](https://github.com/abeering/uptime-game/pull/6). The closing "no run telemetry" limit records this traffic phase's original boundary; automatic run recording later merged in [#7](https://github.com/abeering/uptime-game/pull/7). The other listed limits remain subject to current runtime truth. See [Connections Current State](Current_State.md).
+
 This phase gives Connections a continuous benign traffic rhythm. Packet remains an independent game and its traffic classes are unchanged.
 
 ## Ownership and spawn pipeline

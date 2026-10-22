@@ -9,7 +9,7 @@ Before making changes, read:
 1. `Docs/README.md`, `Docs/Uptime_Current_State.md`, and `Docs/Design/Uptime_Design.md` for the project-wide source map, current posture, and shared game direction.
 2. `Docs/Packet/Current_State.md` or `Docs/Connections/Current_State.md` for the prototype in scope. Name whether work concerns shared Uptime design, Packet implementation, or Connections implementation.
 3. The relevant code, prefabs, scenes, and serialized settings **on the working branch**; runtime code and Inspector state are executable truth about implemented behavior.
-4. The full source design documents relevant to the task. `Docs/Design/connections-v0.md` is the original Connections brief, not its current mechanics contract. Older Packet-worded material may express shared Uptime design; translate concepts deliberately without importing Packet mechanics automatically.
+4. The full source design documents relevant to the task. `Docs/historical/connections-v0.md` is the original Connections brief, not its current mechanics contract. Older Packet-worded material may express shared Uptime design; translate concepts deliberately without importing Packet mechanics automatically.
 
 Do not silently promote open design hypotheses into settled rules or discard substantive proposals merely because they are unimplemented. Preserve source wording and provenance when organizing documentation. Call out assumptions and preserve the current Connections scenario's small scope.
 

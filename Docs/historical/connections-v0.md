@@ -1,5 +1,7 @@
 # Uptime — Connections V0
 
+**Archive note (October 22, 2026):** This is the original separate Connections experiment, not a current implementation contract. Its "independent games" wording records the original framing; Uptime is now documented as one game with two retained prototypes. Later [Connections Current State](../Connections/Current_State.md) and integrated contracts describe present mechanics. The original brief below is preserved as written.
+
 **Status:** Original V0 design brief for the Connections game; later phases require separate decisions.
 **Implementation home:** `abeering/uptime-game`; Packet and Connections remain independent games in one Unity project.
 **Purpose:** Test whether a handful of persistent, inspectable connections competing for real network resources produces enjoyable real-time command play.
