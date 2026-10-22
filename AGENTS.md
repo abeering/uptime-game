@@ -31,7 +31,7 @@ Do not silently promote open design hypotheses into settled rules or discard sub
 
 ## Input, terminal, and presentation
 
-- Preserve fast, keyboard-first command entry. Default commands and information requests return promptly; consequences progress in simulation time. Do not recreate scan queues or artificial inspection delays.
+- In Connections, preserve fast, keyboard-first command entry. Default commands and information requests return promptly; consequences progress in simulation time. Do not add scan queues or artificial inspection delays to Connections. Packet's intentional tick-based scan/trace slots remain valid for Packet work.
 - The Connections scene targets approximately one-third terminal and two-thirds network. The terminal should support both compact text messages and **structured output prefabs** (e.g., a connection comparison), with a persistent command prompt and scrollable history.
 - Prefer authored scenes, prefabs, containers, and Inspector/serialized references for visible UI. Code should instantiate and bind reusable prefab elements, not procedurally build ordinary UI hierarchies. Procedural geometry for transient network paths is appropriate.
 - Physical links and logical connection paths must remain visually distinguishable. Give logical connections stable short IDs and readable labels; avoid overlaps and jitter under load.
