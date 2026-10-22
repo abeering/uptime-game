@@ -10,6 +10,11 @@ namespace Uptime.Connections
         [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
         [SerializeField] private Color healthyColor = new Color(0.36f, 0.95f, 0.74f);
         [SerializeField] private Color constrainedColor = new Color(1f, 0.69f, 0.34f);
+        [SerializeField] private Color stalledColor = new Color(0.96f, 0.29f, 0.26f);
+        [Header("Operation activity")]
+        [SerializeField, Min(16f)] private float pulseSpacingAtOneLoad = 90f;
+        [SerializeField, Min(0f)] private float spacingReductionPerLoad = 0.32f;
+        [SerializeField, Min(1f)] private float pulseSpeedPixelsPerSecond = 90f;
 
         private LogicalConnectionState state;
         private RectTransform networkArea;
@@ -25,6 +30,13 @@ namespace Uptime.Connections
         private float establishmentElapsed;
         private float departureElapsed;
         private bool establishedVisual;
+        private float pulseTravel;
+
+        public float PulseSpacingFor(float requestedLoad) =>
+            Mathf.Max(18f, pulseSpacingAtOneLoad /
+                (1f + spacingReductionPerLoad * Mathf.Max(0f, requestedLoad - 1f)));
+        public static int DirectionFor(OperationKind operation) =>
+            operation == OperationKind.Read ? -1 : operation == OperationKind.Write ? 1 : 0;
 
         public void Bind(LogicalConnectionState connection, RectTransform area)
         {
@@ -125,7 +137,9 @@ namespace Uptime.Connections
 
             float reveal = Mathf.Clamp01(establishmentElapsed / establishmentSeconds);
             float fade = state.IsComplete ? 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
-            Color tint = state.Satisfaction >= 0.98f ? healthyColor : constrainedColor;
+            LoadPerformance performance = state.Performance;
+            Color tint = performance == LoadPerformance.AtSpeed ? healthyColor :
+                performance == LoadPerformance.Slowed ? constrainedColor : stalledColor;
             tint.a *= fade;
             if (path.color != tint)
                 path.color = tint;
@@ -141,6 +155,18 @@ namespace Uptime.Connections
                     networkArea, -direction, -laneOffsets[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
+            float spacing = state.IsActive && !state.IsTransitioning ?
+                PulseSpacingFor(state.DesiredLoad) : 0f;
+            bool interrupted = performance == LoadPerformance.Slowed &&
+                Mathf.Repeat(Time.unscaledTime, 0.55f) >= 0.32f;
+            int pulseDirection = DirectionFor(state.CurrentOperation);
+            if (spacing > 0f && pulseDirection != 0 && performance != LoadPerformance.Stalled && !interrupted)
+                pulseTravel += Time.deltaTime * pulseSpeedPixelsPerSecond;
+            float phase = spacing > 0f && pulseDirection != 0 ?
+                Mathf.Repeat(pulseTravel * pulseDirection, spacing) : 0f;
+            float opacity = performance == LoadPerformance.Stalled ? 0.2f :
+                interrupted ? 0f : 0.9f;
+            path.SetActivity(spacing, phase, opacity);
         }
 
     }

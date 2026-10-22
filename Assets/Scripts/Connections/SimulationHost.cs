@@ -102,9 +102,11 @@ namespace Uptime.Connections
                     if (definition == null || string.IsNullOrWhiteSpace(definition.ConnectionId) ||
                         !ids.Add(definition.ConnectionId))
                         throw new InvalidOperationException("Logical connections require unique, nonempty IDs.");
-                    if (definition.TotalWork <= 0f || definition.DesiredLoad <= 0f ||
-                        definition.Route == null || definition.Route.Length < 2)
+                    if (definition.Route == null || definition.Route.Length < 2)
                         throw new InvalidOperationException($"Connection {definition.ConnectionId} needs work, rate, and a route of at least two nodes.");
+                    for (int operation = 0; operation < definition.OperationCount; operation++)
+                        if (definition.WorkAt(operation) <= 0f || definition.LoadAt(operation) <= 0f)
+                            throw new InvalidOperationException($"Connection {definition.ConnectionId} operation {operation + 1} needs positive WORK and LOAD.");
 
                     var visited = new HashSet<NodeView>();
                     foreach (RouteNode requirement in definition.Route)
@@ -190,11 +192,13 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
                 output.Append('\n').Append(connection.ConnectionId).Append(' ')
-                    .Append(connection.Definition.CurrentOperation.ToString().ToUpperInvariant()).Append(' ');
+                    .Append(connection.CurrentOperation.ToString().ToUpperInvariant())
+                    .Append(' ').Append(connection.CurrentOperationIndex + 1)
+                    .Append('/').Append(connection.OperationCount).Append(' ');
                 if (connection.IsComplete)
                 {
                     output.Append("DONE  ").Append(connection.CompletedWork.ToString("0.#"))
-                        .Append('/').Append(connection.Definition.TotalWork.ToString("0.#")).Append(" work units");
+                        .Append('/').Append(connection.CurrentTotalWork.ToString("0.#")).Append(" work units");
                     continue;
                 }
 
@@ -205,10 +209,12 @@ namespace Uptime.Connections
                     continue;
                 }
 
+                if (connection.IsTransitioning)
+                    output.Append("NEXT OP  ");
                 output.Append(connection.CompletedWork.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.TotalWork.ToString("0.#")).Append(" WORK  ")
+                    .Append(connection.CurrentTotalWork.ToString("0.#")).Append(" WORK  ")
                     .Append(connection.AllocatedLoad.ToString("0.#")).Append('/')
-                    .Append(connection.Definition.DesiredLoad.ToString("0.#")).Append(" LOAD  ")
+                    .Append(connection.DesiredLoad.ToString("0.#")).Append(" LOAD  ")
                     .Append(Mathf.RoundToInt(connection.Satisfaction * 100f)).Append('%')
                     .Append("  [").Append(connection.TargetNode.NodeId).Append(']');
             }

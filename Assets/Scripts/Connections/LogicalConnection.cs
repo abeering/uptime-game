@@ -19,6 +19,20 @@ namespace Uptime.Connections
     }
 
     [Serializable]
+    public sealed class OperationStage
+    {
+        [SerializeField] private OperationKind operation;
+        [SerializeField, Min(0f)] private float totalWork;
+        [SerializeField, Min(0f)] private float desiredLoad = 5f;
+        [SerializeField] private string activityDescription;
+
+        public OperationKind Operation => operation;
+        public float TotalWork => Mathf.Max(0f, totalWork);
+        public float DesiredLoad => Mathf.Max(0f, desiredLoad);
+        public string ActivityDescription => activityDescription;
+    }
+
+    [Serializable]
     public sealed class LogicalConnectionDefinition
     {
         [SerializeField] private string connectionId;
@@ -32,6 +46,8 @@ namespace Uptime.Connections
         private float desiredLoad = 5f;
         [SerializeField, Min(0f), Tooltip("Seconds after simulation start before this connection is established.")]
         private float startDelaySeconds;
+        [SerializeField, Tooltip("Ordered operation arc. Empty preserves the legacy single-operation fields above.")]
+        private OperationStage[] operations;
 
         public string ConnectionId => connectionId;
         public string ClaimedPurpose => claimedPurpose;
@@ -42,6 +58,14 @@ namespace Uptime.Connections
         public float TotalWork => Mathf.Max(0f, totalWork);
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public float StartDelaySeconds => Mathf.Max(0f, startDelaySeconds);
+        public int OperationCount => operations != null && operations.Length > 0 ? operations.Length : 1;
+        public OperationKind OperationAt(int index) => HasArc ? StageAt(index).Operation : currentOperation;
+        public float WorkAt(int index) => HasArc ? StageAt(index).TotalWork : TotalWork;
+        public float LoadAt(int index) => HasArc ? StageAt(index).DesiredLoad : DesiredLoad;
+        public string ActivityAt(int index) => HasArc ? StageAt(index).ActivityDescription : activityDescription;
+        private bool HasArc => operations != null && operations.Length > 0;
+        private OperationStage StageAt(int index) => operations[index] ??
+            throw new InvalidOperationException($"Connection {connectionId} has an empty operation stage.");
 
         internal void ClampNonnegative()
         {
@@ -56,6 +80,13 @@ namespace Uptime.Connections
         Pending,
         Active,
         Complete
+    }
+
+    public enum LoadPerformance
+    {
+        AtSpeed,
+        Slowed,
+        Stalled
     }
 
     // Runtime state belongs to the fixed-step simulation, never to a view.
@@ -74,19 +105,43 @@ namespace Uptime.Connections
         public NodeResources TargetResources { get; }
         internal PhysicalLinkReference[] RouteLinks { get; }
         public string ConnectionId => Definition.ConnectionId;
-        public OperationKind CurrentOperation => Definition.CurrentOperation;
+        public int CurrentOperationIndex { get; internal set; }
+        public int OperationCount => Definition.OperationCount;
+        public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
+        public float CurrentTotalWork => Definition.WorkAt(CurrentOperationIndex);
+        public float DesiredLoad => Definition.LoadAt(CurrentOperationIndex);
+        public string ActivityDescription => Definition.ActivityAt(CurrentOperationIndex);
         public NodeView TargetNode => Definition.TargetNode;
         public float CompletedWork { get; internal set; }
-        public float RemainingWork => Mathf.Max(0f, Definition.TotalWork - CompletedWork);
+        public float RemainingWork => Mathf.Max(0f, CurrentTotalWork - CompletedWork);
         public float AllocatedLoad { get; internal set; }
         public float ActualWorkRate => AllocatedLoad;
-        public float Satisfaction => IsComplete ? 1f : IsPending ? 0f : Definition.DesiredLoad > 0f ?
-            AllocatedLoad / Definition.DesiredLoad : 0f;
+        public float Satisfaction => IsComplete ? 1f : IsPending || IsTransitioning ? 0f : DesiredLoad > 0f ?
+            AllocatedLoad / DesiredLoad : 0f;
+        public bool IsTransitioning { get; internal set; }
+        public bool IsDemanding => IsActive && !IsTransitioning;
+        public LoadPerformance Performance => IsComplete || IsTransitioning ? LoadPerformance.AtSpeed :
+            AllocatedLoad <= 0.0001f ? LoadPerformance.Stalled :
+            Satisfaction >= 0.98f ? LoadPerformance.AtSpeed : LoadPerformance.Slowed;
         public Lifecycle Lifecycle { get; internal set; }
         public bool IsPending => Lifecycle == Lifecycle.Pending;
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
         public bool IsActive => Lifecycle == Lifecycle.Active;
         public float EstablishedAtSeconds { get; internal set; }
+
+        internal void FinishOperation()
+        {
+            CompletedWork = CurrentTotalWork;
+            AllocatedLoad = 0f;
+            if (CurrentOperationIndex + 1 == OperationCount)
+                Lifecycle = Lifecycle.Complete;
+            else
+            {
+                CurrentOperationIndex++;
+                CompletedWork = 0f;
+                IsTransitioning = true;
+            }
+        }
 
         internal bool Uses(PhysicalLinkReference link)
         {

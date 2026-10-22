@@ -1,4 +1,5 @@
 using TMPro;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,28 +17,32 @@ namespace Uptime.Connections
         [SerializeField] private Image stateTag;
         [SerializeField] private Color activeColor = new Color(0.35f, 0.92f, 0.72f);
         [SerializeField] private Color limitedColor = new Color(1f, 0.69f, 0.34f);
+        [SerializeField] private Color stalledColor = new Color(0.96f, 0.29f, 0.26f);
         [SerializeField] private Color quietColor = new Color(0.52f, 0.67f, 0.66f);
 
         public void Render(LogicalConnectionState state)
         {
-            string lifecycle = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" : "ACTIVE";
-            string claim = string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ? string.Empty :
-                "  /  " + state.Definition.ClaimedPurpose;
-            Set(identity, state.ConnectionId.ToUpperInvariant() + "  /  " +
-                state.Definition.CurrentOperation.ToString().ToUpperInvariant() + claim + "  /  " + lifecycle);
-            string routeText = string.Empty;
-            foreach (RouteNode requirement in state.Definition.Route)
-                routeText += (routeText.Length == 0 ? string.Empty : "  >  ") + requirement.Node.NodeId;
-            Set(route, string.IsNullOrWhiteSpace(state.Definition.ActivityDescription) ? routeText :
-                state.Definition.ActivityDescription + "  •  " + routeText);
-
-            float fraction = state.Definition.TotalWork > 0f ? state.CompletedWork / state.Definition.TotalWork : 0f;
-            Set(work, $"WORK  {state.CompletedWork:0.#} / {state.Definition.TotalWork:0.#} work units   {fraction * 100f:0}%");
-            Set(throughput, $"LOAD  {state.AllocatedLoad:0.#} / {state.Definition.DesiredLoad:0.#} allocated / desired  SAT {state.Satisfaction * 100f:0}%");
-
+            string claim = string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
+                string.Empty : " — " + state.Definition.ClaimedPurpose;
+            Set(identity, state.ConnectionId.ToUpperInvariant() + claim);
+            Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
+                state.Performance == LoadPerformance.AtSpeed ? activeColor :
+                state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
+            Set(route, Timeline(state, tint));
             NodeResources target = state.TargetResources;
-            string targetLoad = $"{state.TargetNode.NodeId}  {target.RequestedLoad:0.#} / {target.LoadCapacity:0.#} requested  {target.AllocatedLoad:0.#} allocated";
-            Set(bottleneck, "TARGET  " + targetLoad);
+            string status = state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
+                state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
+                "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
+            string reason = string.Empty;
+            if (state.IsDemanding && state.Performance != LoadPerformance.AtSpeed)
+                reason = target.LoadCapacity - target.BaselineLoad <= 0.0001f ?
+                    " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
+                    " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
+            Set(throughput, $"{status} · LOAD {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
+            if (throughput != null) throughput.color = tint;
+            float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
+            Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
+            Set(bottleneck, state.ActivityDescription);
             string remaining = state.IsComplete ? "00:00" : state.IsPending ? "--:--" :
                 state.ActualWorkRate <= 0f ? "--:--" : FormatSeconds(state.RemainingWork / state.ActualWorkRate);
             Set(eta, "ETA  " + remaining);
@@ -48,9 +53,37 @@ namespace Uptime.Connections
                 if (Mathf.Abs(anchor.x - fraction) > 0.0005f)
                     progressFill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(fraction), anchor.y);
             }
-            Color tint = state.IsComplete || state.IsPending ? quietColor : state.Satisfaction >= 0.98f ? activeColor : limitedColor;
             if (progressFill != null && progressFill.color != tint) progressFill.color = tint;
             if (stateTag != null && stateTag.color != tint) stateTag.color = tint;
+        }
+
+        private static string Timeline(LogicalConnectionState state, Color activeColor)
+        {
+            var line = new StringBuilder();
+            string target = state.TargetNode.NodeId;
+            for (int i = 0; i < state.OperationCount; i++)
+            {
+                if (i > state.CurrentOperationIndex && !state.IsComplete)
+                {
+                    line.Append("  +").Append(state.OperationCount - i);
+                    break;
+                }
+                if (line.Length > 0) line.Append("  ");
+                OperationKind operation = state.Definition.OperationAt(i);
+                string arrow = operation == OperationKind.Read ? "←" :
+                    operation == OperationKind.Write ? "→" : "·";
+                string pill = "[" + operation.ToString().ToUpperInvariant() + " " + arrow + " " + target + "]";
+                if (i < state.CurrentOperationIndex || state.IsComplete)
+                    line.Append("<mark=#4B5D5D66><color=#839696>")
+                        .Append(pill).Append("</color></mark>");
+                else
+                {
+                    string color = ColorUtility.ToHtmlStringRGB(activeColor);
+                    line.Append("<mark=#").Append(color).Append("44><color=#")
+                        .Append(color).Append('>').Append(pill).Append("</color></mark>");
+                }
+            }
+            return line.ToString();
         }
 
         private static string FormatSeconds(float seconds)

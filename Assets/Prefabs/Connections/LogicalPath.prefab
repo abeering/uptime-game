@@ -84,3 +84,7 @@ MonoBehaviour:
   relayoutSeconds: 0.3
   healthyColor: {r: 0.36, g: 0.95, b: 0.74, a: 1}
   constrainedColor: {r: 1, g: 0.69, b: 0.34, a: 1}
+  stalledColor: {r: 0.96, g: 0.29, b: 0.26, a: 1}
+  pulseSpacingAtOneLoad: 90
+  spacingReductionPerLoad: 0.32
+  pulseSpeedPixelsPerSecond: 90

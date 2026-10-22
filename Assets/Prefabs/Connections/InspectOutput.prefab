@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: C1  /  ACTIVE
+  m_text: C1 — Record Retrieval
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -243,6 +243,7 @@ MonoBehaviour:
   stateTag: {fileID: 5090786146246736514}
   activeColor: {r: 0.35, g: 0.92, b: 0.72, a: 1}
   limitedColor: {r: 1, g: 0.69, b: 0.34, a: 1}
+  stalledColor: {r: 0.96, g: 0.29, b: 0.26, a: 1}
   quietColor: {r: 0.52, g: 0.67, b: 0.66, a: 1}
 --- !u!1 &569759109142227483
 GameObject:
@@ -256,7 +257,7 @@ GameObject:
   - component: {fileID: 9082301683636079466}
   - component: {fileID: 5119339839380013983}
   m_Layer: 0
-  m_Name: Route
+  m_Name: OperationTimeline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -278,7 +279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -27}
+  m_AnchoredPosition: {x: 12, y: -28}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &9082301683636079466
@@ -309,7 +310,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: EXT1  >  API  >  DB
+  m_text: [READ ← DB]
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -415,7 +416,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 445, y: -97}
+  m_AnchoredPosition: {x: 445, y: -101}
   m_SizeDelta: {x: 105, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &7895872227182678268
@@ -583,7 +584,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: C1  /  ACTIVE
+  m_text: C1 — Record Retrieval
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -690,8 +691,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -67}
-  m_SizeDelta: {x: 536, y: 6}
+  m_AnchoredPosition: {x: 12, y: -90}
+  m_SizeDelta: {x: 536, y: 9}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &5736808963432906603
 CanvasRenderer:
@@ -893,7 +894,7 @@ GameObject:
   - component: {fileID: 576711514165293407}
   - component: {fileID: 1789918860066361027}
   m_Layer: 0
-  m_Name: Throughput
+  m_Name: LoadStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -915,7 +916,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -78}
+  m_AnchoredPosition: {x: 12, y: -48}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &576711514165293407
@@ -946,7 +947,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LOAD  3.8 / 5 allocated / desired  SAT 77%
+  m_text: SLOWED · LOAD 3.8/5 · DB OVERLOADED
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -1167,7 +1168,7 @@ GameObject:
   - component: {fileID: 9080727106470014448}
   - component: {fileID: 2002123210900289975}
   m_Layer: 0
-  m_Name: Bottleneck
+  m_Name: Activity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1189,7 +1190,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -97}
+  m_AnchoredPosition: {x: 12, y: -101}
   m_SizeDelta: {x: 405, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &9080727106470014448
@@ -1220,7 +1221,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: TARGET  DB  13 / 10 requested  10 allocated
+  m_text: Reading records
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -1667,6 +1668,7 @@ MonoBehaviour:
   stateTag: {fileID: 7433634607854506342}
   activeColor: {r: 0.35, g: 0.92, b: 0.72, a: 1}
   limitedColor: {r: 1, g: 0.69, b: 0.34, a: 1}
+  stalledColor: {r: 0.96, g: 0.29, b: 0.26, a: 1}
   quietColor: {r: 0.52, g: 0.67, b: 0.66, a: 1}
 --- !u!1 &4785647328484839368
 GameObject:
@@ -1680,7 +1682,7 @@ GameObject:
   - component: {fileID: 5989200992512353206}
   - component: {fileID: 3590236810256333891}
   m_Layer: 0
-  m_Name: Work
+  m_Name: WorkProgress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1702,7 +1704,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -47}
+  m_AnchoredPosition: {x: 12, y: -69}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &5989200992512353206
@@ -1733,7 +1735,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: WORK  0 / 120 work units   0%
+  m_text: WORK 0%   0/360
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -1760,8 +1762,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 11.5
-  m_fontSizeBase: 11.5
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1817,7 +1819,7 @@ GameObject:
   - component: {fileID: 1118875282894052418}
   - component: {fileID: 8865388841748117658}
   m_Layer: 0
-  m_Name: Bottleneck
+  m_Name: Activity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1839,7 +1841,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -97}
+  m_AnchoredPosition: {x: 12, y: -101}
   m_SizeDelta: {x: 405, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1118875282894052418
@@ -1870,7 +1872,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: TARGET  DB  13 / 10 requested  10 allocated
+  m_text: Reading records
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -1954,7 +1956,7 @@ GameObject:
   - component: {fileID: 2000467826205557867}
   - component: {fileID: 1889591523199373350}
   m_Layer: 0
-  m_Name: Work
+  m_Name: WorkProgress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1976,7 +1978,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -47}
+  m_AnchoredPosition: {x: 12, y: -69}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2000467826205557867
@@ -2007,7 +2009,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: WORK  0 / 120 work units   0%
+  m_text: WORK 0%   0/360
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -2034,8 +2036,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 11.5
-  m_fontSizeBase: 11.5
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2091,7 +2093,7 @@ GameObject:
   - component: {fileID: 5040226335423453049}
   - component: {fileID: 2747289783424737815}
   m_Layer: 0
-  m_Name: Route
+  m_Name: OperationTimeline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2113,7 +2115,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -27}
+  m_AnchoredPosition: {x: 12, y: -28}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &5040226335423453049
@@ -2144,7 +2146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: EXT1  >  API  >  DB
+  m_text: [READ ← DB]
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -2251,8 +2253,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -67}
-  m_SizeDelta: {x: 536, y: 6}
+  m_AnchoredPosition: {x: 12, y: -90}
+  m_SizeDelta: {x: 536, y: 9}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &324966693417066359
 CanvasRenderer:
@@ -2304,7 +2306,7 @@ GameObject:
   - component: {fileID: 4275889792536581496}
   - component: {fileID: 5643530123618302694}
   m_Layer: 0
-  m_Name: Throughput
+  m_Name: LoadStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2326,7 +2328,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 12, y: -78}
+  m_AnchoredPosition: {x: 12, y: -48}
   m_SizeDelta: {x: 535, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4275889792536581496
@@ -2357,7 +2359,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LOAD  3.8 / 5 allocated / desired  SAT 77%
+  m_text: SLOWED · LOAD 3.8/5 · DB OVERLOADED
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -2463,7 +2465,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 445, y: -97}
+  m_AnchoredPosition: {x: 445, y: -101}
   m_SizeDelta: {x: 105, y: 16}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1414517432347121158

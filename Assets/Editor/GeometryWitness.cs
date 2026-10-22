@@ -63,6 +63,13 @@ namespace Uptime.Connections.EditorTools
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/LogicalPath.prefab");
             Check(prefab != null && prefab.GetComponent<LogicalPathView>() != null &&
                 prefab.GetComponent<PathGraphic>() != null, "authored path prefab");
+            LogicalPathView activity = prefab.GetComponent<LogicalPathView>();
+            Check(LogicalPathView.DirectionFor(OperationKind.Write) == 1 &&
+                LogicalPathView.DirectionFor(OperationKind.Read) == -1 &&
+                LogicalPathView.DirectionFor(OperationKind.Execute) == 0,
+                "operation pulse direction");
+            Check(activity.PulseSpacingFor(8f) < activity.PulseSpacingFor(2f) * 0.7f,
+                "high requested LOAD has denser activity");
             Check(prefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 0, "old path tags removed");
             var pillPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/IdentityPill.prefab");
             Check(pillPrefab != null && pillPrefab.GetComponent<IdentityPillView>() != null &&
