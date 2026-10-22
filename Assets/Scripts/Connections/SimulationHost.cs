@@ -19,6 +19,7 @@ namespace Uptime.Connections
         [SerializeField] private LogicalPathPresenter pathPresenter;
         [SerializeField] private ConnectionRunMode runMode;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
+        [SerializeField] private ConnectionsRunRecorder recorder;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -32,6 +33,7 @@ namespace Uptime.Connections
         public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
         public ConnectionRunMode RunMode => runMode;
+        public ConnectionsRunRecorder Recorder => recorder;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
         public bool HasEverUsedId(string id) => usedIds.Contains(id);
         public LogicalConnectionState FindConnection(string id) =>
@@ -89,15 +91,32 @@ namespace Uptime.Connections
             if (runMode == ConnectionRunMode.Generated)
                 trafficDirector?.Tick(simulationTimeSeconds);
 
+            bool observing = recorder != null && recorder.IsRecording;
+            var previousOperation = observing ? new Dictionary<LogicalConnectionState, int>() : null;
+            var runningBeforeStep = observing ? new HashSet<LogicalConnectionState>() : null;
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                if (!connection.IsPending || simulationTimeSeconds < connection.Definition.StartDelaySeconds)
-                    continue;
-                connection.Lifecycle = Lifecycle.Active;
-                connection.EstablishedAtSeconds = simulationTimeSeconds;
+                if (observing)
+                {
+                    previousOperation.Add(connection, connection.CurrentOperationIndex);
+                    if (!connection.IsComplete) runningBeforeStep.Add(connection);
+                }
+                if (connection.IsPending && simulationTimeSeconds >= connection.Definition.StartDelaySeconds)
+                {
+                    connection.Lifecycle = Lifecycle.Active;
+                    connection.EstablishedAtSeconds = simulationTimeSeconds;
+                    recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
+                }
+                else if (connection.IsTransitioning)
+                    recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
             }
             ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
             simulationTimeSeconds += deltaSeconds;
+            if (observing)
+                foreach (LogicalConnectionState state in runtimeConnections)
+                    if (runningBeforeStep.Contains(state) &&
+                        (state.CurrentOperationIndex != previousOperation[state] || state.IsComplete))
+                        recorder.RecordOperationCompleted(state, previousOperation[state], simulationTimeSeconds);
             if (runMode == ConnectionRunMode.Generated)
             {
                 var remaining = new List<LogicalConnectionState>(runtimeConnections.Length);
@@ -112,6 +131,7 @@ namespace Uptime.Connections
                 }
                 runtimeConnections = remaining.ToArray();
             }
+            recorder?.CaptureDueSnapshot(simulationTimeSeconds);
             RefreshDisplays();
         }
 
@@ -125,6 +145,9 @@ namespace Uptime.Connections
             var next = new List<LogicalConnectionState>(runtimeConnections) { state };
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
+            recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+            if (state.IsActive)
+                recorder?.RecordOperationStarted(state, simulationTimeSeconds);
             if (Application.isPlaying) pathPresenter?.Add(state);
             return state;
         }
@@ -155,6 +178,7 @@ namespace Uptime.Connections
                     foreach (LogicalConnectionState live in runtimeConnections)
                         if (live.IsDemanding)
                             live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
+                    recorder?.CaptureSnapshot(simulationTimeSeconds);
                     RefreshDisplays();
                     return true;
                 }
@@ -165,6 +189,7 @@ namespace Uptime.Connections
         {
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
+            recorder?.RecordResolution(state, reason, simulationTimeSeconds);
             ConnectionResolved?.Invoke(state, reason);
         }
 
@@ -191,6 +216,17 @@ namespace Uptime.Connections
             runtimeConnections = states.ToArray();
             if (runMode == ConnectionRunMode.Generated)
                 trafficDirector?.ResetDirector();
+            if (Application.isPlaying)
+            {
+                recorder?.BeginRun();
+                foreach (LogicalConnectionState state in runtimeConnections)
+                {
+                    recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+                    if (state.IsActive) recorder?.RecordOperationStarted(state, simulationTimeSeconds);
+                }
+                recorder?.CaptureSnapshot(simulationTimeSeconds);
+                recorder?.Save(false);
+            }
             if (Application.isPlaying && pathPresenter != null)
                 pathPresenter.Bind(runtimeConnections);
             RefreshDisplays();

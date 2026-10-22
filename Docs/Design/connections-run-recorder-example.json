@@ -1,0 +1,751 @@
+{
+    "schemaVersion": 1,
+    "run": {
+        "runId": "97bb8cd7",
+        "startedUtc": "2026-10-22T17:31:52.7434476Z",
+        "endedUtc": "2026-10-22T17:31:52.8303189Z",
+        "lastSavedUtc": "2026-10-22T17:31:52.8303189Z",
+        "unityVersion": "6000.3.11f1",
+        "sceneName": "Connections",
+        "mode": "Generated",
+        "seed": 1701,
+        "fixedStepSeconds": 0.019999992102384568,
+        "nodes": [
+            {
+                "id": "EXT1",
+                "loadCapacity": 10.0,
+                "baselineLoad": 0.0
+            },
+            {
+                "id": "API",
+                "loadCapacity": 10.0,
+                "baselineLoad": 1.0
+            },
+            {
+                "id": "DB",
+                "loadCapacity": 10.0,
+                "baselineLoad": 0.0
+            },
+            {
+                "id": "AUTH",
+                "loadCapacity": 10.0,
+                "baselineLoad": 0.0
+            }
+        ],
+        "traffic": {
+            "autoGenerationEnabled": false,
+            "ambientOriginId": "EXT1",
+            "openingGraceSeconds": 3.0,
+            "spawnIntervalSeconds": 13.5,
+            "spawnJitterSeconds": 1.5,
+            "profiles": [
+                {
+                    "id": "retrieval",
+                    "claimedPurpose": "Record Retrieval",
+                    "eligibleTargetIds": [
+                        "DB"
+                    ],
+                    "ambientWeight": 1.0,
+                    "operations": [
+                        {
+                            "kind": "Read",
+                            "activityDescription": "Reading records",
+                            "minimumLoad": 1.0,
+                            "maximumLoad": 2.5,
+                            "minimumDurationSeconds": 40.0,
+                            "maximumDurationSeconds": 70.0
+                        }
+                    ]
+                },
+                {
+                    "id": "indexing",
+                    "claimedPurpose": "Record Indexing",
+                    "eligibleTargetIds": [
+                        "DB"
+                    ],
+                    "ambientWeight": 0.800000011920929,
+                    "operations": [
+                        {
+                            "kind": "Write",
+                            "activityDescription": "Updating the DB index",
+                            "minimumLoad": 1.5,
+                            "maximumLoad": 3.0,
+                            "minimumDurationSeconds": 20.0,
+                            "maximumDurationSeconds": 35.0
+                        },
+                        {
+                            "kind": "Read",
+                            "activityDescription": "Reading the updated index",
+                            "minimumLoad": 1.0,
+                            "maximumLoad": 2.5,
+                            "minimumDurationSeconds": 20.0,
+                            "maximumDurationSeconds": 35.0
+                        }
+                    ]
+                },
+                {
+                    "id": "auth",
+                    "claimedPurpose": "Customer Authentications",
+                    "eligibleTargetIds": [
+                        "AUTH"
+                    ],
+                    "ambientWeight": 1.0,
+                    "operations": [
+                        {
+                            "kind": "Execute",
+                            "activityDescription": "Processing authentications",
+                            "minimumLoad": 1.0,
+                            "maximumLoad": 2.5,
+                            "minimumDurationSeconds": 40.0,
+                            "maximumDurationSeconds": 70.0
+                        }
+                    ]
+                },
+                {
+                    "id": "updates",
+                    "claimedPurpose": "Application Updates",
+                    "eligibleTargetIds": [
+                        "API"
+                    ],
+                    "ambientWeight": 0.800000011920929,
+                    "operations": [
+                        {
+                            "kind": "Write",
+                            "activityDescription": "Applying updates",
+                            "minimumLoad": 1.5,
+                            "maximumLoad": 3.0,
+                            "minimumDurationSeconds": 20.0,
+                            "maximumDurationSeconds": 35.0
+                        },
+                        {
+                            "kind": "Read",
+                            "activityDescription": "Verifying updates",
+                            "minimumLoad": 1.0,
+                            "maximumLoad": 2.5,
+                            "minimumDurationSeconds": 20.0,
+                            "maximumDurationSeconds": 35.0
+                        }
+                    ]
+                },
+                {
+                    "id": "quick-lookup",
+                    "claimedPurpose": "Quick Record Lookup",
+                    "eligibleTargetIds": [
+                        "DB"
+                    ],
+                    "ambientWeight": 0.3499999940395355,
+                    "operations": [
+                        {
+                            "kind": "Read",
+                            "activityDescription": "Looking up a record",
+                            "minimumLoad": 0.5,
+                            "maximumLoad": 1.5,
+                            "minimumDurationSeconds": 4.0,
+                            "maximumDurationSeconds": 8.0
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "events": [
+        {
+            "sequence": 1,
+            "timeSeconds": 0.0,
+            "type": "plan_queued",
+            "connectionId": "rec1",
+            "source": "explicit",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "indexing",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 2,
+            "timeSeconds": 0.0,
+            "type": "connection_spawned",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "indexing",
+            "definition": {
+                "profileId": "indexing",
+                "claimedPurpose": "Record Indexing",
+                "origin": "EXT1",
+                "target": "DB",
+                "route": [
+                    "EXT1",
+                    "API",
+                    "DB"
+                ],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "activityDescription": "Write",
+                        "desiredLoad": 1.0,
+                        "totalWork": 1.0,
+                        "nominalDurationSeconds": 1.0
+                    },
+                    {
+                        "kind": "Read",
+                        "activityDescription": "Read",
+                        "desiredLoad": 2.0,
+                        "totalWork": 1.0,
+                        "nominalDurationSeconds": 0.5
+                    }
+                ]
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 3,
+            "timeSeconds": 0.0,
+            "type": "operation_started",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "Write",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 1.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 4,
+            "timeSeconds": 1.0,
+            "type": "operation_completed",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "Write",
+            "completedWork": 1.0,
+            "actualDurationSeconds": 1.0,
+            "desiredLoad": 1.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 5,
+            "timeSeconds": 1.0,
+            "type": "operation_started",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 1,
+            "operationKind": "Read",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 2.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 6,
+            "timeSeconds": 1.5,
+            "type": "operation_completed",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 1,
+            "operationKind": "Read",
+            "completedWork": 1.0,
+            "actualDurationSeconds": 0.5,
+            "desiredLoad": 2.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 7,
+            "timeSeconds": 1.5,
+            "type": "connection_resolved",
+            "connectionId": "rec1",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 1,
+            "operationKind": "Read",
+            "completedWork": 1.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "Completed",
+            "elapsedLifetimeSeconds": 1.5,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 8,
+            "timeSeconds": 1.5,
+            "type": "marker",
+            "connectionId": "",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "DB suddenly red with two connections",
+            "snapshotIndex": 3
+        },
+        {
+            "sequence": 9,
+            "timeSeconds": 1.5,
+            "type": "player_action",
+            "connectionId": "missing",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "block missing",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 10,
+            "timeSeconds": 1.5,
+            "type": "plan_queued",
+            "connectionId": "rec2",
+            "source": "explicit",
+            "scheduledSpawnTime": 1.5,
+            "profileId": "test",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 11,
+            "timeSeconds": 1.5,
+            "type": "connection_spawned",
+            "connectionId": "rec2",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "test",
+            "definition": {
+                "profileId": "test",
+                "claimedPurpose": "Pressure",
+                "origin": "EXT1",
+                "target": "DB",
+                "route": [
+                    "EXT1",
+                    "API",
+                    "DB"
+                ],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "activityDescription": "Read",
+                        "desiredLoad": 10.0,
+                        "totalWork": 100.0,
+                        "nominalDurationSeconds": 10.0
+                    }
+                ]
+            },
+            "operationIndex": 0,
+            "operationKind": "",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 12,
+            "timeSeconds": 1.5,
+            "type": "operation_started",
+            "connectionId": "rec2",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "Read",
+            "completedWork": 0.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 10.0,
+            "resolutionReason": "",
+            "elapsedLifetimeSeconds": 0.0,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        },
+        {
+            "sequence": 13,
+            "timeSeconds": 1.600000023841858,
+            "type": "connection_resolved",
+            "connectionId": "rec2",
+            "source": "",
+            "scheduledSpawnTime": 0.0,
+            "profileId": "",
+            "definition": {
+                "profileId": "",
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "operations": []
+            },
+            "operationIndex": 0,
+            "operationKind": "Read",
+            "completedWork": 1.0,
+            "actualDurationSeconds": 0.0,
+            "desiredLoad": 0.0,
+            "resolutionReason": "Blocked",
+            "elapsedLifetimeSeconds": 0.10000002384185791,
+            "command": "",
+            "success": false,
+            "note": "",
+            "snapshotIndex": -1
+        }
+    ],
+    "snapshots": [
+        {
+            "timeSeconds": 0.0,
+            "activeConnections": 0,
+            "nodes": [
+                {
+                    "id": "EXT1",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "API",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 1.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "DB",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "AUTH",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                }
+            ],
+            "connections": []
+        },
+        {
+            "timeSeconds": 0.5,
+            "activeConnections": 1,
+            "nodes": [
+                {
+                    "id": "EXT1",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "API",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 1.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "DB",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "AUTH",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                }
+            ],
+            "connections": [
+                {
+                    "id": "rec1",
+                    "lifecycle": "Active",
+                    "operationIndex": 0,
+                    "operationKind": "Write",
+                    "target": "DB",
+                    "desiredLoad": 1.0,
+                    "allocatedLoad": 1.0,
+                    "completedWork": 0.5,
+                    "totalWork": 1.0,
+                    "performance": "AtSpeed"
+                }
+            ]
+        },
+        {
+            "timeSeconds": 1.0,
+            "activeConnections": 1,
+            "nodes": [
+                {
+                    "id": "EXT1",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "API",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 1.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "DB",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "AUTH",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                }
+            ],
+            "connections": [
+                {
+                    "id": "rec1",
+                    "lifecycle": "Active",
+                    "operationIndex": 1,
+                    "operationKind": "Read",
+                    "target": "DB",
+                    "desiredLoad": 2.0,
+                    "allocatedLoad": 0.0,
+                    "completedWork": 0.0,
+                    "totalWork": 1.0,
+                    "performance": "AtSpeed"
+                }
+            ]
+        },
+        {
+            "timeSeconds": 1.5,
+            "activeConnections": 0,
+            "nodes": [
+                {
+                    "id": "EXT1",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "API",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 1.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "DB",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "AUTH",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                }
+            ],
+            "connections": []
+        },
+        {
+            "timeSeconds": 1.600000023841858,
+            "activeConnections": 0,
+            "nodes": [
+                {
+                    "id": "EXT1",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "API",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 1.0,
+                    "requestedLoad": 1.0,
+                    "allocatedLoad": 1.0
+                },
+                {
+                    "id": "DB",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                },
+                {
+                    "id": "AUTH",
+                    "loadCapacity": 10.0,
+                    "baselineLoad": 0.0,
+                    "requestedLoad": 0.0,
+                    "allocatedLoad": 0.0
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

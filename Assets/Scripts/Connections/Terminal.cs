@@ -17,6 +17,7 @@ namespace Uptime.Connections
         [SerializeField] private InspectOutput inspectPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
+        [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
@@ -95,9 +96,13 @@ namespace Uptime.Connections
                 case "block":
                     if (tokens.Length != 2)
                         AppendText("USAGE  block c17", errorColor);
-                    else if (simulationHost != null && simulationHost.BlockConnection(tokens[1]))
-                        AppendText("BLOCKED  " + tokens[1], normalColor);
-                    else AppendText("BLOCK  no active connection " + tokens[1], errorColor);
+                    else
+                    {
+                        bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
+                        recorder?.RecordPlayerAction(command, tokens[1], blocked);
+                        AppendText(blocked ? "BLOCKED  " + tokens[1] :
+                            "BLOCK  no active connection " + tokens[1], blocked ? normalColor : errorColor);
+                    }
                     break;
                 case "demandtest":
                     if (trafficDirector == null || simulationHost == null ||
@@ -106,11 +111,37 @@ namespace Uptime.Connections
                     else
                     {
                         ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
+                        recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
                         AppendText("QUEUED  " + plan.ConnectionId + " high demand to DB", normalColor);
                     }
                     break;
+                case "mark":
+                    string note = raw.TrimStart().Substring(tokens[0].Length).TrimStart(' ', '\t');
+                    if (recorder != null && recorder.Mark(note))
+                        AppendText("MARK SAVED  " + System.IO.Path.GetFileName(recorder.OutputPath), normalColor);
+                    else AppendText("MARK  " + (recorder?.LastError ?? "recording unavailable"), errorColor);
+                    break;
+                case "log":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  log save | dir | folder", errorColor);
+                    else if (tokens[1].Equals("dir", System.StringComparison.OrdinalIgnoreCase))
+                        AppendText("LOG DIR  " + ConnectionsRunRecorder.LogDirectory, normalColor);
+                    else if (tokens[1].Equals("folder", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (ConnectionsRunRecorder.RevealDirectory(out string error))
+                            AppendText("LOG FOLDER OPENED", normalColor);
+                        else AppendText("LOG FOLDER  " + error, errorColor);
+                    }
+                    else if (tokens[1].Equals("save", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (recorder != null && recorder.Save(true))
+                            AppendText("LOG SAVED  " + System.IO.Path.GetFileName(recorder.OutputPath), normalColor);
+                        else AppendText("LOG SAVE  " + (recorder?.LastError ?? "recording unavailable"), errorColor);
+                    }
+                    else AppendText("USAGE  log save | dir | folder", errorColor);
+                    break;
                 case "help":
-                    AppendText("COMMANDS  inspect c1 [c2]  block c17  demandtest  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect  block  demandtest  mark  log save|dir|folder  test  help", mutedColor);
                     break;
                 default:
                     AppendText($"UNKNOWN COMMAND  {command}  // type help", errorColor);

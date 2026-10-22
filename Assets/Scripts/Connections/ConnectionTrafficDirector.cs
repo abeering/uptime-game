@@ -52,6 +52,10 @@ namespace Uptime.Connections
         public bool AutoGenerationEnabled { get => autoGenerationEnabled; set => autoGenerationEnabled = value; }
         public int Seed { get => seed; set => seed = value; }
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
+        public float InitialGraceSeconds => initialGraceSeconds;
+        public float SpawnIntervalSeconds => spawnIntervalSeconds;
+        public float SpawnJitterSeconds => spawnJitterSeconds;
+        public string AmbientOriginId => ambientOriginId;
 
         public void ResetDirector()
         {
@@ -65,7 +69,7 @@ namespace Uptime.Connections
                 profiles = DefaultProfiles();
         }
 
-        public void QueueSpawnPlan(ConnectionSpawnPlan plan)
+        public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
         {
             if (plan == null || string.IsNullOrWhiteSpace(plan.ConnectionId) ||
                 !reservedIds.Add(plan.ConnectionId))
@@ -73,6 +77,7 @@ namespace Uptime.Connections
             try { host.ValidatePlan(plan); }
             catch { reservedIds.Remove(plan.ConnectionId); throw; }
             queue.Add(new Queued { Plan = plan, Order = nextOrder++ });
+            host.Recorder?.RecordPlanQueued(plan, source, host.SimulationTimeSeconds);
         }
 
         public void Tick(float simulationTime)
@@ -83,7 +88,7 @@ namespace Uptime.Connections
                 while (nextAmbientAt <= simulationTime + 0.00001f)
                 {
                     ConnectionSpawnPlan plan = GeneratePlan(nextAmbientAt);
-                    if (plan != null) QueueSpawnPlan(plan);
+                    if (plan != null) QueueSpawnPlan(plan, "ambient");
                     nextAmbientAt += Mathf.Max(0.01f, spawnIntervalSeconds +
                         Range(-spawnJitterSeconds, spawnJitterSeconds));
                 }
@@ -112,7 +117,7 @@ namespace Uptime.Connections
             var plan = new ConnectionSpawnPlan(host.SimulationTimeSeconds, NewId(), route,
                 "high-demand-witness", "High Demand Test",
                 new[] { new OperationStage(OperationKind.Read, load * 50f, load, "High demand test") });
-            QueueSpawnPlan(plan);
+            QueueSpawnPlan(plan, "high-demand-witness");
             return plan;
         }
 
