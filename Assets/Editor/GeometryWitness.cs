@@ -130,12 +130,12 @@ namespace Uptime.Connections.EditorTools
             int startSteps = 0;
             while (c2.IsPending && startSteps++ < 50) host.StepSimulation(0.1f);
             Check(c1.IsActive && c2.IsActive, "delayed establishment includes c2");
-            float sharedRate = c1.ActualRateMBps;
+            float sharedRate = c1.ActualWorkRate;
             int steps = 0;
             while (!c2.IsComplete && steps++ < 1000) host.StepSimulation(0.1f);
             Check(c2.IsComplete && c1.IsActive, "c2 completion removes active lane");
             host.StepSimulation(0.1f);
-            Check(c1.ActualRateMBps > sharedRate, "released capacity accelerates c1");
+            Check(c1.ActualWorkRate > sharedRate, "released capacity accelerates c1");
             host.ResetSimulation();
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
                 "rotated pill clearance and cycle coverage, short edges, establishment and completion.");

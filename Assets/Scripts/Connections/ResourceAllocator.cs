@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    // Fixed memory reservations use stable-ID admission. Admitted transfers then
+    // Fixed memory reservations use stable-ID admission. Admitted operations then
     // receive max-min fair satisfaction (equal fractions of desired rate).
     internal static class ResourceAllocator
     {
@@ -25,7 +25,7 @@ namespace Uptime.Connections
                 switch (Kind)
                 {
                     case LimitKind.PhysicalLinkBandwidth:
-                        return connection.Uses(Link) ? 1f : 0f;
+                        return connection.Uses(Link) ? connection.Definition.BandwidthMBPerWork : 0f;
                     case LimitKind.NodeCpu:
                         return connection.CpuCost(Node.View);
                     case LimitKind.NodeDiskIo:
@@ -59,7 +59,7 @@ namespace Uptime.Connections
             var admitted = new List<LogicalConnectionState>();
             foreach (LogicalConnectionState connection in ordered)
             {
-                connection.ActualRateMBps = 0f;
+                connection.ActualWorkRate = 0f;
                 connection.MemoryAdmitted = false;
                 connection.LimitKind = LimitKind.None;
                 connection.LimitingResourceId = string.Empty;
@@ -100,14 +100,14 @@ namespace Uptime.Connections
                 float increment = float.PositiveInfinity;
                 foreach (LogicalConnectionState connection in growing)
                     increment = Mathf.Min(increment,
-                        (connection.Definition.DesiredRateMBps - connection.ActualRateMBps) /
-                        connection.Definition.DesiredRateMBps);
+                        (connection.Definition.DesiredWorkRate - connection.ActualWorkRate) /
+                        connection.Definition.DesiredWorkRate);
 
                 foreach (RateConstraint constraint in constraints)
                 {
                     constraint.Slope = 0f;
                     foreach (LogicalConnectionState connection in growing)
-                        constraint.Slope += constraint.Cost(connection) * connection.Definition.DesiredRateMBps;
+                        constraint.Slope += constraint.Cost(connection) * connection.Definition.DesiredWorkRate;
                     if (constraint.Slope > Epsilon)
                         increment = Mathf.Min(increment,
                             Mathf.Max(0f, constraint.Available - constraint.Used) / constraint.Slope);
@@ -116,14 +116,14 @@ namespace Uptime.Connections
                 if (increment > Epsilon)
                 {
                     foreach (LogicalConnectionState connection in growing)
-                        connection.ActualRateMBps += connection.Definition.DesiredRateMBps * increment;
+                        connection.ActualWorkRate += connection.Definition.DesiredWorkRate * increment;
                     foreach (RateConstraint constraint in constraints)
                         constraint.Used += constraint.Slope * increment;
                 }
 
                 int before = growing.Count;
                 growing.RemoveAll(connection =>
-                    connection.ActualRateMBps >= connection.Definition.DesiredRateMBps - Epsilon ||
+                    connection.ActualWorkRate >= connection.Definition.DesiredWorkRate - Epsilon ||
                     UsesSaturatedConstraint(connection, constraints));
                 if (growing.Count == before)
                     throw new InvalidOperationException("Resource allocation did not converge.");
@@ -131,7 +131,7 @@ namespace Uptime.Connections
 
             foreach (LogicalConnectionState connection in admitted)
             {
-                if (connection.ActualRateMBps >= connection.Definition.DesiredRateMBps - Epsilon)
+                if (connection.ActualWorkRate >= connection.Definition.DesiredWorkRate - Epsilon)
                     continue;
 
                 foreach (RateConstraint constraint in constraints)
@@ -151,14 +151,14 @@ namespace Uptime.Connections
 
             foreach (LogicalConnectionState connection in admitted)
             {
-                connection.CompletedWorkMB = Mathf.Min(connection.Definition.TotalWorkMB,
-                    connection.CompletedWorkMB + connection.ActualRateMBps * deltaSeconds);
-                if (connection.RemainingWorkMB > Epsilon)
+                connection.CompletedWork = Mathf.Min(connection.Definition.TotalWork,
+                    connection.CompletedWork + connection.ActualWorkRate * deltaSeconds);
+                if (connection.RemainingWork > Epsilon)
                     continue;
 
-                connection.CompletedWorkMB = connection.Definition.TotalWorkMB;
+                connection.CompletedWork = connection.Definition.TotalWork;
                 connection.Lifecycle = Lifecycle.Complete;
-                connection.ActualRateMBps = 0f;
+                connection.ActualWorkRate = 0f;
                 connection.MemoryAdmitted = false;
                 connection.LimitKind = LimitKind.None;
                 connection.LimitingResourceId = string.Empty;
@@ -228,14 +228,14 @@ namespace Uptime.Connections
                 if (!connection.IsActive || !connection.MemoryAdmitted)
                     continue;
 
-                float rate = connection.ActualRateMBps;
+                float rate = connection.ActualWorkRate;
                 foreach (NodeRequirement requirement in connection.Definition.Route)
                     nodeByView[requirement.Node].AddAllocatedUsage(
-                        rate * requirement.CpuUnitsPerMB,
+                        rate * requirement.CpuUnitsPerWork,
                         requirement.MemoryGB,
-                        rate * requirement.DiskIoMBPerMB);
+                        rate * requirement.DiskIoMBPerWork);
                 foreach (PhysicalLinkResources link in connection.RouteLinks)
-                    link.AddAllocatedUsage(rate);
+                    link.AddAllocatedUsage(connection.ActualBandwidthMBps);
             }
 
             foreach (NodeResources node in nodes)
