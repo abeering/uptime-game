@@ -1,5 +1,7 @@
 # Connections Arcade V1 — LOAD foundation
 
+**Current status (October 22, 2026):** Integrated target-node LOAD contract from [PR #4](https://github.com/abeering/uptime-game/pull/4). The closing "later decisions" list records this phase's original boundary: operation arcs and directional presentation later merged in [#5](https://github.com/abeering/uptime-game/pull/5), generated traffic in [#6](https://github.com/abeering/uptime-game/pull/6), and run recording in [#7](https://github.com/abeering/uptime-game/pull/7). Scoring, infections, and topology generation remain outside the integrated Connections V1 slice. See [Connections Current State](Current_State.md).
+
 **Scope:** Phase 1 implementation contract for `Assets/Scenes/Connections.unity`. This replaces the earlier CPU, memory, disk I/O, and bandwidth allocation rules for the Connections game. The older V0 briefs remain historical context. Packet is independent.
 
 ## Mechanical model

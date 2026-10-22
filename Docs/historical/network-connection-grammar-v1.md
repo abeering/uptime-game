@@ -1,8 +1,10 @@
 ﻿# Uptime — Network and Connection Grammar V1
 
+**Archive note (October 22, 2026):** This source describes the earlier [PR #3](https://github.com/abeering/uptime-game/pull/3) resource model and scene baseline. Its CPU, memory, disk I/O, link-bandwidth, and "current implementation" claims were superseded by [target-node LOAD](../Connections/connections-arcade-load-v1.md) and later arcs, traffic, and recording. Its conceptual vocabulary remains useful; use [Connections Current State](../Connections/Current_State.md) and runtime/scene state for present authority. The original design body below is preserved.
+
 **Status:** Phase A design contract for Connection Generation V0. Canonical vocabulary for the connection experiment; not a claim that every element is implemented.
 **Implementation baseline:** `main`, `0906f6f` (October 20, 2026), with runtime types in `Uptime.Connections` and the authored scene at `Assets/Scenes/Connections.unity`. The original document was drafted against `feat/connections-toy-phase3` at `0d25e3a`.
-**Related:** `Docs/Design/connections-v0.md`.
+**Related:** `Docs/historical/connections-v0.md`.
 
 ## Guiding fiction
 

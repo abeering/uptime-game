@@ -1,5 +1,7 @@
 # Connections Run Recorder V0
 
+**Current status (October 22, 2026):** Integrated run-recording contract from [PR #7](https://github.com/abeering/uptime-game/pull/7). The example and witness results below belong to that milestone; the listed interactive Play Mode checks were not completed during integration. See [Connections Current State](Current_State.md).
+
 Connections records each Play Mode run automatically. The recording starts when `SimulationHost` resets at Play start, creates a JSON file immediately, saves it every 30 seconds of real elapsed time, and saves once more when Play Mode stops. Saving updates the same run file. A reset or new Play Mode session gets a new UTC timestamp and random run ID in its filename.
 
 In the Unity Editor, find files at `<project-root>/Logs/UptimeRuns/`. The folder is created automatically and ignored by Git. Standalone builds use `Application.persistentDataPath/UptimeRuns/`. Filenames follow `uptime_YYYYMMDD_HHMMSS_seed-XXXXX_RUNID.json`, using the run's UTC start time. The output is ordinary UTF-8 JSON and can be attached directly to a ChatGPT conversation.
@@ -19,7 +21,7 @@ Explicit saves print the absolute file path in the Unity Console. Save errors ap
 
 `schemaVersion` is currently `1`. The top-level `run` object contains the unique ID, UTC start/end/save timestamps, Unity version, scene, run mode, seed, fixed step, copied node configuration, and copied ambient profile/cadence configuration. `events` has ordered sequence numbers and simulation timestamps for plan queueing, concrete connection spawns, operation starts and completions, resolution, block actions, and markers. A spawn event embeds the route and all generated operation LOAD/WORK values. Marker events carry a zero-based `snapshotIndex` into `snapshots`.
 
-[`connections-run-recorder-example.json`](connections-run-recorder-example.json) is the complete file saved by a Recorder Witness run. It includes a two-operation connection, a bookmark, autosave, and a blocked high-demand connection.
+[`connections-run-recorder-example.json`](examples/connections-run-recorder-example.json) is the complete file saved by a Recorder Witness run. It includes a two-operation connection, a bookmark, autosave, and a blocked high-demand connection.
 
 Snapshots are taken at about one-second **simulation** intervals after allocation, plus immediately for markers and blocks. Each contains authoritative requested and allocated LOAD for every node and current WORK, operation, demand, allocation, and performance for pending or active connections. A large manual simulation step yields one snapshot at the actual observed time; the recorder does not invent intermediate states. Autosaves use **real elapsed** time, including while simulation time is paused.
 

@@ -9,13 +9,15 @@ Uptime is one game design explored through two independent gameplay prototypes: 
 3. [Packet Current State](Packet/Current_State.md) or [Connections Current State](Connections/Current_State.md) — what the relevant prototype currently implements and where to inspect its executable truth.
 4. The relevant code and serialized Unity scene on the working branch when exact behavior matters.
 
-## Reading existing documents
+## Where sources live
 
-This is the first documentation cleanup phase. Existing files have **not** been moved, shortened, or archived. `Docs/Design/` still contains shared Uptime thinking, prototype-specific mechanics, research, and older implementation contracts side by side. A document's location or versioned title does not make every statement a current rule.
+- [Design](Design/Uptime_Design.md) holds shared Uptime game direction, including company identity, runs, scoring, upgrades, threats, cleaning, notifications, events, and topology. Packet terminology in a source does not by itself make its larger design intent Packet-only. Documents may contain both active direction and unsettled mechanics.
+- [Packet](Packet/Current_State.md) holds Packet-specific scanning, keywords, traversal, command examples, and interface ideas. Packet is parked and retained.
+- [Connections](Connections/Current_State.md) holds the integrated [LOAD](Connections/connections-arcade-load-v1.md), [operation arcs](Connections/connections-arcade-operation-arcs-v1.md), [traffic](Connections/connections-arcade-traffic-v0.md), and [recorder](Connections/connections-run-recorder-v0.md) contracts, plus the [recorder example](Connections/examples/connections-run-recorder-example.json). Their status notes distinguish original phase deferrals from later merged work.
+- [Research](research/README.md) preserves unresolved examples and implementation proposals that are not current authority. [Historical](historical/README.md) preserves superseded contracts, completed checkpoints, and unverified old observations. The [Connections V0 brief](historical/connections-v0.md) and [network and connection grammar](historical/network-connection-grammar-v1.md) remain complete; the grammar's older CPU/disk/memory/link allocation is not the current LOAD model.
+- `Review/` retains four Connections inspect UI Editor-preview folders with their READMEs and images. These are presentation evidence, not interactive Play Mode validation.
 
-The original [Connections V0 brief](Design/connections-v0.md) records the first experiment and future hypotheses. The [network and connection grammar](Design/network-connection-grammar-v1.md) preserves useful vocabulary and an earlier resource model; its CPU/disk/memory/link allocation and one-stage implementation mapping were superseded by later Arcade work. For current Connections behavior, start with its Current State and the [LOAD](Design/connections-arcade-load-v1.md), [operation arcs](Design/connections-arcade-operation-arcs-v1.md), [traffic](Design/connections-arcade-traffic-v0.md), and [recorder](Design/connections-run-recorder-v0.md) documents, checking the scene and runtime where prose may be stale.
-
-The four folders under `Docs/Review/` preserve Connections inspect UI Editor previews. Their READMEs state what was rendered; the images are not Play Mode validation. Packet-oriented notes, proposals, and debug examples also remain in their original paths for now. The current-state files identify useful entry points without replacing those sources.
+Phase 2 moved source documents without condensing their design material. Follow the links above or the prototype current-state pages; a directory, versioned title, or old "next" list alone does not establish current authority.
 
 ## Source authority
 

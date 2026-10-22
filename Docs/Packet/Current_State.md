@@ -1,6 +1,6 @@
 # Packet — Current State
 
-**Baseline:** Uptime `main` at `881901ab1b4d50e8afc88fde2feb50c3f5c63988`, October 22, 2026. Packet is a parked, retained Uptime gameplay prototype, not an abandoned or deprecated game. Its scenes are `Assets/Scenes/GameScene.unity` and `Assets/Scenes/ABScene.unity`. This document is an orientation to the inspected code, not a claim of fresh Packet Play Mode validation.
+**Baseline:** Uptime `main` at `225d524d34905b700b128faafeaad3584333c2bf`, October 22, 2026. Packet is a parked, retained Uptime gameplay prototype, not an abandoned or deprecated game. Its scenes are `Assets/Scenes/GameScene.unity` and `Assets/Scenes/ABScene.unity`. This document is an orientation to the inspected code, not a claim of fresh Packet Play Mode validation.
 
 ## Representation and implementation boundaries
 
@@ -19,9 +19,9 @@ The exact effects, timing, serialized references, and tuning of those systems sh
 
 Packet implements one representation of the wider [Uptime design](../Design/Uptime_Design.md). The broader company, adversary, run, upgrade, scoring, network-growth, infection, and notification goals are not Packet-only simply because many sources were written with packet examples.
 
-For Packet-specific ideas and evidence, retain the complete [packet keyword document](../Design/keywords.md), [scan difficulty proposal](../Design/scandifficulty.md), [scan/trace note](../Design/scan-vs-trace.md), [scan timing reference](../edge-traversal.md), [infection brainstorm](../Design/infections.md), [clean minigame drafts](../Design/clean-minigames.md), [level-phase checkpoint](../Design/levels-phase1.md), [debug spawn examples](../Debug/spawn.md), and [UI ideation](../gpt-prompts.md). These sources mix implemented observations, proposals, and old instructions. In particular, an item labeled “DONE” or “next” in an old document should be checked against current code and scene before being treated as present work.
+For Packet-specific ideas and evidence, retain the complete [packet keyword document](keywords.md), [scan difficulty proposal](scandifficulty.md), [scan/trace note](scan-vs-trace.md), [scan timing reference](edge-traversal.md), [infection brainstorm](../Design/infections.md), [clean minigame drafts](../Design/clean-minigames.md), [level-phase checkpoint](../historical/levels-phase1.md), [debug spawn examples](spawn.md), and [UI ideation](gpt-prompts.md). These sources mix implemented observations, proposals, and old instructions. In particular, an item labeled “DONE” or “next” in an old document should be checked against current code and scene before being treated as present work.
 
-The root [TODO](../todo.md) and [bug observations](../bugs.md) remain preserved but untriaged. Do not treat them as a verified current task queue or dismiss them without reproduction.
+The [older TODO](../historical/todo.md) and [bug observations](../historical/bugs.md) remain preserved but untriaged in historical sources. Do not treat them as a verified current task queue or dismiss them without reproduction.
 
 ## Validation and future work
 

@@ -1,6 +1,6 @@
 # Uptime — Current State
 
-**Documented baseline:** `main` at `881901ab1b4d50e8afc88fde2feb50c3f5c63988`, October 22, 2026. This is a dated repository snapshot, not a live branch-status feed. Check GitHub and the working branch before using it for a later implementation decision.
+**Documented baseline:** `main` at `225d524d34905b700b128faafeaad3584333c2bf`, October 22, 2026. This is a dated repository snapshot, not a live branch-status feed. Check GitHub and the working branch before using it for a later implementation decision.
 
 Uptime is one game being explored through two different gameplay prototypes. **Packet** models individual packets and discrete network traversal. **Connections** models persistent logical connections, operations, WORK, and shared LOAD. Both are retained. Connections is the current development focus and is promising, but no decision has been made to replace or abandon Packet. The broader game design is shared and can evolve as either prototype teaches us more.
 
