@@ -77,8 +77,11 @@ namespace Uptime.Connections
     [Serializable] public sealed class BehaviorRecord
     {
         public string id;
+        public string kind;
         public float startAfterSeconds;
         public float stopAfterSeconds;
+        public float normalIntervalSeconds;
+        public float elevatedIntervalSeconds;
         public float workDelta;
         public float loadDelta;
     }
@@ -547,8 +550,11 @@ namespace Uptime.Connections
             var result = new BehaviorRecord[source.Length];
             for (int i = 0; i < source.Length; i++)
                 result[i] = new BehaviorRecord { id = source[i].Id,
+                    kind = source[i].Kind.ToString(),
                     startAfterSeconds = source[i].StartAfterSeconds,
                     stopAfterSeconds = source[i].StopAfterSeconds,
+                    normalIntervalSeconds = source[i].NormalIntervalSeconds,
+                    elevatedIntervalSeconds = source[i].ElevatedIntervalSeconds,
                     workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta };
             return result;
         }

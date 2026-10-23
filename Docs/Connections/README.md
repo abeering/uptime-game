@@ -10,8 +10,8 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Traffic generation](connections-arcade-traffic-v0.md) — generated benign profiles, spawn plans, and cadence.
 - [Run recorder](connections-run-recorder-v0.md) — Play Mode JSON telemetry and terminal commands.
 - [Route-aware lanes](route-aware-lanes-v1.md) — path continuity and physical-link lane ordering.
-- [Threats V0, Slices 1–2](connections-threats-v0.md) — manual single-operation and delayed READ-to-WRITE threats, operation-completion delivery, and `kill` interception. SPIKING and OVERLOAD remain unimplemented.
-- [Behavior and modifier foundation](connections-behavior-foundation-v0.md) — Slice 3A connection and operation behavior scopes, effective WORK/LOAD, and modifier history. Gameplay keywords remain unimplemented.
+- [Threats V0, Slices 1–3B](connections-threats-v0.md) — manual threats, operation-completion delivery, `kill` interception, and reusable OVERLOAD/SPIKING LOAD behaviors.
+- [Behavior and modifier foundation](connections-behavior-foundation-v0.md) — connection and operation behavior scopes, effective WORK/LOAD, modifier history, and Slice 3B fixed-step keyword timing.
 
 ## Selected phase plans (not yet implemented)
 

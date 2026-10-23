@@ -1,6 +1,6 @@
 # Connections — Threats V0: selected baseline and phased plan
 
-**Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C) are implemented. Slice 3A implements the base/effective requirements and behavior-scope foundation of Phase D; gameplay keywords and the rest of Phases D–E remain plans.**
+**Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C), the Slice 3A behavior foundation, and Slice 3B OVERLOAD/SPIKING keywords are implemented. The remaining Phases D–E ideas remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 
 ## Objective and first playable slice
@@ -33,9 +33,17 @@ READ completion emits no delivery and leaves the connection transitioning. The W
 
 The [behavior foundation](connections-behavior-foundation-v0.md) introduces connection-owned runtime behavior state, passive active modifiers, base and effective WORK/LOAD, and append-only modifier history. Both connection and operation definition scopes use the same narrow timed adjustment executor in deterministic witness plans. Connection-scope WORK remains intentionally unsupported until its association semantics are designed. No new hostile profile or gameplay keyword uses this foundation yet; the existing threats and completion effects are unchanged.
 
+## Slice 3B implementation — OVERLOAD and SPIKING
+
+OVERLOAD applies one positive requested-LOAD delta after an optional delay and holds it until its connection or operation scope ends. SPIKING alternates ordinary demand and temporary elevated demand with positive configurable intervals, adding and removing a modifier for each burst. Both use the Slice 3A runtime, modifier history, and allocator. Connection-scope timing persists across operations; operation-scope timing begins with its operation. See the [behavior foundation](connections-behavior-foundation-v0.md) for fixed-step boundary semantics, including coarse steps.
+
+The default manual-only catalog adds `spiking-threat` (DB WRITE, 2 base LOAD, 5 seconds normal / 2 seconds elevated, +10 LOAD, one infection-delivery effect on normal completion), `spiking-benign` (the same demand behavior without hostility or delivery), and `overload-demo` (DB WRITE, 2 base LOAD, +10 LOAD after 5 seconds, no delivery). Each has 240 authored WORK and ambient weight zero. These are provisional observation profiles, not a traffic rebalance or a threat classification rule. Existing `basic-threat`, `delayed-threat`, and benign profiles retain their definitions.
+
 ## Reconciliation with the October 22–23 idea archive
 
 The [archive](connections-threat-investigation-ideas.md) was deliberately speculative. This conversation supersedes or resolves these aspects for the Threats V0 plan:
+
+The following bullets retain the October baseline wording. Slice 3B's later decision broadens both LOAD keywords to connection scope as well as operation scope; references here to behavior occurring “within one operation” describe the original example, not a scope restriction.
 
 - **SPIKING** means recurring temporary high-LOAD bursts with recovery intervals within **one operation** (illustration: 10 seconds normal / 2 seconds elevated / repeat).
 - **OVERLOAD** means one transition to sustained elevated LOAD during **one operation**; the transition may occur at operation start (our first loud WRITE) or partway through. These are **working keywords**, not promises of exact player-visible UI strings.
@@ -43,7 +51,7 @@ The [archive](connections-threat-investigation-ideas.md) was deliberately specul
 - An operation will eventually distinguish immutable authored/base WORK and requested LOAD from **effective WORK and effective requested LOAD** computed from its runtime behaviors. The allocator continues to allocate effective requested LOAD proportionally; it does not acquire threat-specific rules. Completed WORK is not retroactively rewritten when requirements change.
 - Lifecycle execution is universal for all connections. Definitions are reusable; each spawned connection owns its own behavior state, counters, and timers.
 - A delivery can eventually occur multiple times during one operation or across several operations, even after the player cleans a previous infection. **Do not** bake in one delivery per connection or only at final connection completion.
-- The chosen first slice implements none of the above dynamic behaviors; it establishes the narrow operation-completion delivery seam first.
+- The first slice established only the narrow operation-completion delivery seam; Slices 3A–3B subsequently added dynamic LOAD behavior without tying it to delivery.
 
 The archive also retains proposed `logs <connectionId>`, time-consuming `trace <connectionId>`, temporary edge `probe <edgeId>`, covert/overt infections, asynchronous `scan <nodeId>`, blind `clean <nodeId>`, and hacker counterplay. These are **not part of the selected first slice** and are not implicitly authorized by this document.
 
@@ -94,7 +102,7 @@ Later, effective demand changes must be applied **before allocation** each fixed
 - Third hostile example: otherwise normal-looking operation that spikes according to its keyword. Validate that benign operations can use the same keyword without infection delivery.
 - Keep threat classification and payload delivery independent of these operation-arc modifiers.
 
-Phase C is implemented as Slice 2. Slice 3A covers only the base/effective and behavior-scope foundation of Phase D. SPIKING, OVERLOAD, and remaining dynamic behavior decisions are still planned direction.
+Phase C is implemented as Slice 2. Slice 3A covers the base/effective and behavior-scope foundation of Phase D, and Slice 3B implements the two LOAD keywords and manual examples. Remaining dynamic behavior decisions are still planned direction.
 
 ## Deterministic witnesses and review criteria
 

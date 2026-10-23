@@ -38,7 +38,7 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 1 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 7,
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 10,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");
@@ -54,6 +54,21 @@ namespace Uptime.Connections.EditorTools
                     delayedProfile.operations[1].kind == "Write" &&
                     delayedProfile.operations[1].completionEffect == "InfectionDelivery",
                     "recorded catalog scopes delayed delivery to WRITE");
+                ProfileConfiguration spikingThreat = initial.run.traffic.profiles.Single(p =>
+                    p.id == "spiking-threat");
+                ProfileConfiguration spikingBenign = initial.run.traffic.profiles.Single(p =>
+                    p.id == "spiking-benign");
+                ProfileConfiguration overloadDemo = initial.run.traffic.profiles.Single(p =>
+                    p.id == "overload-demo");
+                Check(spikingThreat.isHostile && !spikingBenign.isHostile &&
+                    !overloadDemo.isHostile &&
+                    spikingThreat.ambientWeight == 0f &&
+                    spikingBenign.ambientWeight == 0f &&
+                    overloadDemo.ambientWeight == 0f &&
+                    spikingThreat.operations[0].behaviors[0].kind == "Spiking" &&
+                    spikingBenign.operations[0].behaviors[0].kind == "Spiking" &&
+                    overloadDemo.operations[0].behaviors[0].kind == "Overload",
+                    "recorded manual keyword catalog keeps demand behavior separate from hostility");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");

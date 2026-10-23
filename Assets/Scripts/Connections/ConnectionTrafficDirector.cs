@@ -281,8 +281,43 @@ namespace Uptime.Connections
                     Stage(OperationKind.Read, "Reading records", 2f, 2f, 8f, 8f),
                     ThreatWriteStage()
                 }
+            },
+            new ConnectionTrafficProfile
+            {
+                id = "spiking-threat", claimedPurpose = "Database Maintenance",
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                operations = new[] { SpikingWriteStage(CompletionEffect.InfectionDelivery) }
+            },
+            new ConnectionTrafficProfile
+            {
+                id = "spiking-benign", claimedPurpose = "Database Maintenance",
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
+                operations = new[] { SpikingWriteStage(CompletionEffect.None) }
+            },
+            new ConnectionTrafficProfile
+            {
+                id = "overload-demo", claimedPurpose = "Database Maintenance",
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
+                operations = new[] { new ConnectionOperationProfile
+                {
+                    operation = OperationKind.Write, activityDescription = "Writing records",
+                    minimumLoad = 2f, maximumLoad = 2f,
+                    minimumDuration = 120f, maximumDuration = 120f,
+                    behaviors = new[] { TimedModifierBehaviorDefinition.Overload(
+                        "OVERLOAD", 5f, 10f) }
+                } }
             }
         };
+        private static ConnectionOperationProfile SpikingWriteStage(CompletionEffect effect) =>
+            new ConnectionOperationProfile
+            {
+                operation = OperationKind.Write, activityDescription = "Writing records",
+                minimumLoad = 2f, maximumLoad = 2f,
+                minimumDuration = 120f, maximumDuration = 120f,
+                completionEffect = effect,
+                behaviors = new[] { TimedModifierBehaviorDefinition.Spiking(
+                    "SPIKING", 5f, 2f, 10f) }
+            };
         private static ConnectionOperationProfile ThreatWriteStage() => new ConnectionOperationProfile
         {
             operation = OperationKind.Write, activityDescription = "Writing records",

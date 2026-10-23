@@ -14,6 +14,8 @@ Threats V0 Slice 1 adds development-only `spawn <profileId>` through the same pr
 
 Slice 3A allows connection- and operation-scope behavior definitions to travel through the existing profile-to-concrete-plan path. The default profile catalog supplies none; the behavior witness queues explicit plans to exercise the foundation without changing ambient traffic or adding a threat profile. A Connection Plan describes intended operations and behaviors, while `ConnectionSpawnPlan` remains the scheduled concrete arrival. See the [behavior foundation](connections-behavior-foundation-v0.md).
 
+Slice 3B adds three manual-only, zero-ambient-weight profiles to that same default catalog: `spiking-threat`, `spiking-benign`, and `overload-demo`. The first two use the same SPIKING LOAD behavior but differ in internal hostility and operation-completion delivery. The OVERLOAD example has no delivery. Existing ambient weights and profile definitions are unchanged; these profiles are observation tuning, not a rebalance.
+
 The Packet game's separation between procedural traffic, concrete spawn plans, and level events informed this seam. Its tick schedules, modifiers, threat generation, and runtime code are not reused. Connections uses its existing simulation clock and LOAD allocator.
 
 ## Modes and tuning assumptions

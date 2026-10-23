@@ -251,10 +251,11 @@ namespace Uptime.Connections.EditorTools
                 Check(host.FindConnection("bw5").Behaviors.History.Count == 1 &&
                     host.FindConnection("bw5").Behaviors.History[0].ModifierId == "m1",
                     "reset/replay starts with fresh behavior state");
+                RunKeywords(host, director, recorder, db, route, baseline, oldBaseline);
                 Debug.Log("BehaviorWitness PASS: expected 2+3+5=10 LOAD; 10 then 5 then 2 " +
                     "requested LOAD, zero-allocation timer changes at 1s/2s, 8 accomplished " +
                     "WORK retained when requirement drops to 5; observed matching allocation, " +
-                    "history, kill, and replay.");
+                    "history, kill, replay, OVERLOAD, and SPIKING.");
             }
             finally
             {
@@ -264,6 +265,262 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = oldAuto;
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
+        }
+
+        private static void RunKeywords(SimulationHost host, ConnectionTrafficDirector director,
+            ConnectionsRunRecorder recorder, NodeResources db, NodeView[] route,
+            FieldInfo baseline, float oldBaseline)
+        {
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-overload", route, new[]
+            {
+                new OperationStage(OperationKind.Write, 200f, 2f, "Write",
+                    CompletionEffect.InfectionDelivery, new[]
+                    { TimedModifierBehaviorDefinition.Overload("op-overload", 0f, 10f) })
+            }, TimedModifierBehaviorDefinition.Overload("connection-overload", 2f, 3f)));
+            host.StepSimulation(1f);
+            LogicalConnectionState overloaded = host.FindConnection("kw-overload");
+            Check(overloaded.BaseLoad == 2f && overloaded.DesiredLoad == 12f &&
+                overloaded.AllocatedLoad == 10f && overloaded.CompletedWork == 10f &&
+                overloaded.Behaviors.History.Count == 1 &&
+                overloaded.Behaviors.History[0].TimeSeconds == 0f,
+                "zero-delay OVERLOAD applies before first allocation through the normal allocator");
+            host.StepSimulation(1f);
+            Check(overloaded.Behaviors.History.Count == 1 && overloaded.DesiredLoad == 12f,
+                "OVERLOAD activates only once before its delayed companion");
+            host.StepSimulation(1f);
+            Check(overloaded.DesiredLoad == 15f && overloaded.AllocatedLoad == 10f &&
+                overloaded.CompletedWork == 30f &&
+                overloaded.Behaviors.History.Count == 2 &&
+                overloaded.Behaviors.History[1].TimeSeconds == 2f &&
+                overloaded.Behaviors.History[1].Scope == BehaviorScope.Connection,
+                "delayed connection OVERLOAD combines with operation OVERLOAD at exact boundary");
+            Check(host.KillConnection("kw-overload") &&
+                overloaded.Behaviors.ActiveModifiers.Count == 0 &&
+                overloaded.Behaviors.History.Count == 4 && host.Occurrences.Count == 0,
+                "kill removes both sustained modifiers and prevents unfinished delivery");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-fraction", route, new[]
+            {
+                Stage(OperationKind.Write, 100f, 2f,
+                    TimedModifierBehaviorDefinition.Spiking("fraction-spike", 0.1f, 0.1f, 5f))
+            }, TimedModifierBehaviorDefinition.Overload("fraction-overload", 0.1f, 3f)));
+            for (int i = 0; i < 5; i++) host.StepSimulation(0.02f);
+            LogicalConnectionState fractional = host.FindConnection("kw-fraction");
+            Check(fractional.DesiredLoad == 2f && fractional.Behaviors.History.Count == 0,
+                "fractional delay stays normal before its exact boundary");
+            host.StepSimulation(0.02f);
+            Check(fractional.DesiredLoad == 10f && fractional.Behaviors.History.Count == 2 &&
+                fractional.Behaviors.History[0].SourceId == "fraction-overload" &&
+                fractional.Behaviors.History[1].SourceId == "fraction-spike",
+                "fractional OVERLOAD and SPIKING boundaries apply before allocation");
+            for (int i = 0; i < 4; i++) host.StepSimulation(0.02f);
+            host.StepSimulation(0.02f);
+            Check(fractional.DesiredLoad == 5f && fractional.Behaviors.History.Count == 3,
+                "fractional SPIKING recovery occurs at its exact boundary");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-spike", route, new[]
+            {
+                Stage(OperationKind.Read, 2f, 2f),
+                Stage(OperationKind.Write, 300f, 2f,
+                    TimedModifierBehaviorDefinition.Spiking("op-spike", 2f, 1f, 10f))
+            }));
+            host.StepSimulation(1f);
+            LogicalConnectionState spiking = host.FindConnection("kw-spike");
+            Check(spiking.CurrentOperationIndex == 1 && spiking.IsTransitioning &&
+                spiking.Behaviors.History.Count == 0,
+                "operation SPIKING does not begin during preceding READ");
+            float[] expectedLoad = { 2f, 2f, 12f, 2f, 2f, 12f, 2f };
+            float[] expectedWork = { 2f, 4f, 14f, 16f, 18f, 28f, 30f };
+            for (int i = 0; i < expectedLoad.Length; i++)
+            {
+                host.StepSimulation(1f);
+                Near(spiking.DesiredLoad, expectedLoad[i], "SPIKING phase " + i);
+                Near(spiking.AllocatedLoad, Mathf.Min(10f, expectedLoad[i]),
+                    "SPIKING allocation " + i);
+                Near(spiking.CompletedWork, expectedWork[i], "SPIKING allocated WORK " + i);
+            }
+            Check(spiking.Behaviors.History.Count == 4 &&
+                spiking.Behaviors.History[0].Action == ModifierChangeKind.Added &&
+                spiking.Behaviors.History[0].TimeSeconds == 3f &&
+                spiking.Behaviors.History[1].Action == ModifierChangeKind.Removed &&
+                spiking.Behaviors.History[1].TimeSeconds == 4f &&
+                spiking.Behaviors.History[2].ModifierId !=
+                    spiking.Behaviors.History[0].ModifierId &&
+                spiking.Behaviors.History[2].TimeSeconds == 6f &&
+                spiking.Behaviors.History[3].TimeSeconds == 7f &&
+                spiking.Behaviors.ActiveModifiers.Count == 0,
+                "SPIKING repeats with distinct modifier IDs and exact boundary history");
+            RunEvent[] spikeEvents = recorder.CurrentLog.events.Where(e =>
+                e.connectionId == "kw-spike" && e.type.StartsWith("modifier_")).ToArray();
+            Check(spikeEvents.Length == 4 &&
+                spikeEvents.All(e => e.behaviorId == "op-spike" &&
+                    e.modifierScope == "Operation" && e.operationIndex == 1) &&
+                spikeEvents[0].modifierId == spikeEvents[1].modifierId &&
+                spikeEvents[2].modifierId == spikeEvents[3].modifierId &&
+                spikeEvents[0].modifierId != spikeEvents[2].modifierId,
+                "recorder retains ordered operation SPIKING provenance");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-spike-end", route, new[]
+            {
+                Stage(OperationKind.Read, 2f, 2f),
+                Stage(OperationKind.Write, 11f, 2f,
+                    TimedModifierBehaviorDefinition.Spiking("short-spike", 1f, 2f, 10f)),
+                Stage(OperationKind.Read, 100f, 2f)
+            }));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            LogicalConnectionState spikeEnd = host.FindConnection("kw-spike-end");
+            Check(spikeEnd.CurrentOperationIndex == 2 && spikeEnd.IsTransitioning &&
+                spikeEnd.Behaviors.ActiveModifiers.Count == 0 &&
+                spikeEnd.Behaviors.History.Count == 2 &&
+                spikeEnd.Behaviors.History[0].SourceId == "short-spike" &&
+                spikeEnd.Behaviors.History[1].Action == ModifierChangeKind.Removed,
+                "operation SPIKING removes its elevated modifier on normal stage completion");
+            host.StepSimulation(1f);
+            Near(spikeEnd.DesiredLoad, 2f, "completed SPIKING does not leak into next stage");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-across", route, new[]
+            {
+                Stage(OperationKind.Read, 2f, 2f),
+                Stage(OperationKind.Write, 100f, 2f,
+                    TimedModifierBehaviorDefinition.Overload("op-load", 0f, 10f)),
+                Stage(OperationKind.Read, 100f, 2f)
+            }, TimedModifierBehaviorDefinition.Spiking("connection-spike", 2f, 2f, 3f)));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            LogicalConnectionState across = host.FindConnection("kw-across");
+            Check(across.CurrentOperationIndex == 1 && across.DesiredLoad == 12f &&
+                across.Behaviors.History.Count == 1,
+                "operation OVERLOAD starts on following step while connection timer persists");
+            host.StepSimulation(1f);
+            Check(across.DesiredLoad == 15f && across.Behaviors.ActiveModifiers.Count == 2 &&
+                across.Behaviors.History[1].Scope == BehaviorScope.Connection,
+                "connection SPIKING and operation OVERLOAD compose to 15 requested LOAD");
+            host.StepSimulation(1f);
+            Check(across.DesiredLoad == 15f && across.Behaviors.History.Count == 2,
+                "connection SPIKING remains elevated across its full interval");
+            host.StepSimulation(1f);
+            Check(across.DesiredLoad == 12f && across.Behaviors.History.Count == 3,
+                "connection SPIKING recovery removes only its own modifier");
+            host.StepSimulation(10f);
+            Check(across.CurrentOperationIndex == 2 && across.IsTransitioning &&
+                across.Behaviors.ActiveModifiers.Count == 0 &&
+                across.Behaviors.History.Last().SourceId == "op-load" &&
+                across.Behaviors.History.Last().Action == ModifierChangeKind.Removed,
+                "operation OVERLOAD is removed on completion without leaking to the third stage");
+            host.StepSimulation(1f);
+            Check(across.DesiredLoad == 5f && across.Behaviors.History.Count == 9 &&
+                across.Behaviors.ActiveModifiers.Count == 1 &&
+                across.Behaviors.History.Last().SourceId == "connection-spike",
+                "connection SPIKING catches up across a transition rather than restarting");
+
+            host.ResetSimulation();
+            baseline.SetValue(db, 10f);
+            director.QueueSpawnPlan(Plan("kw-stalled", route, new[]
+            {
+                Stage(OperationKind.Write, 100f, 2f,
+                    TimedModifierBehaviorDefinition.Spiking("stalled-spike", 1f, 1f, 10f))
+            }));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            LogicalConnectionState stalled = host.FindConnection("kw-stalled");
+            Check(stalled.DesiredLoad == 12f && stalled.AllocatedLoad == 0f &&
+                stalled.CompletedWork == 0f && stalled.Behaviors.History.Count == 1,
+                "zero allocated LOAD does not delay a SPIKING boundary");
+            host.StepSimulation(1f);
+            Check(stalled.DesiredLoad == 2f && stalled.CompletedWork == 0f &&
+                stalled.Behaviors.History.Count == 2,
+                "SPIKING recovers under zero allocation");
+            director.QueueSpawnPlan(Plan("kw-stalled-overload", route, new[]
+            {
+                Stage(OperationKind.Write, 100f, 2f,
+                    TimedModifierBehaviorDefinition.Overload("stalled-overload", 1f, 3f))
+            }));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            LogicalConnectionState stalledOverload = host.FindConnection("kw-stalled-overload");
+            Check(stalledOverload.DesiredLoad == 5f &&
+                stalledOverload.AllocatedLoad == 0f &&
+                stalledOverload.CompletedWork == 0f &&
+                stalledOverload.Behaviors.History.Count == 1,
+                "delayed OVERLOAD activates with zero allocated LOAD");
+            baseline.SetValue(db, oldBaseline);
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-wide", route, new[]
+            {
+                Stage(OperationKind.Write, 300f, 2f,
+                    TimedModifierBehaviorDefinition.Spiking("wide-spike", 1f, 1f, 10f))
+            }));
+            host.StepSimulation(5f);
+            LogicalConnectionState wide = host.FindConnection("kw-wide");
+            Near(wide.CompletedWork, 10f, "wide step uses its starting normal phase");
+            host.StepSimulation(1f);
+            Check(wide.Behaviors.History.Count == 5 &&
+                wide.Behaviors.ActiveModifiers.Count == 1 &&
+                wide.DesiredLoad == 12f &&
+                wide.Behaviors.History.All(e => e.TimeSeconds == 5f) &&
+                wide.Behaviors.History.Select(e => e.ModifierId).Distinct().Count() == 3,
+                "wide step reconciles every crossed boundary in order at next step start");
+            Near(wide.CompletedWork, 20f,
+                "wide step's 10 WORK plus following allocated 10 WORK");
+
+            host.ResetSimulation();
+            var shared = TimedModifierBehaviorDefinition.Spiking("shared-spike", 1f, 1f, 10f);
+            director.QueueSpawnPlan(Plan("kw-twin-a", route,
+                new[] { Stage(OperationKind.Read, 100f, 2f, shared) }));
+            director.QueueSpawnPlan(Plan("kw-twin-b", route,
+                new[] { Stage(OperationKind.Read, 100f, 2f, shared) }));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            LogicalConnectionState twinA = host.FindConnection("kw-twin-a");
+            LogicalConnectionState twinB = host.FindConnection("kw-twin-b");
+            Check(twinA.Behaviors != twinB.Behaviors &&
+                twinA.Behaviors.History.Count == 1 && twinB.Behaviors.History.Count == 1 &&
+                twinA.Behaviors.History[0].ModifierId == "m1" &&
+                twinB.Behaviors.History[0].ModifierId == "m1" &&
+                twinA.AllocatedLoad == 5f && twinB.AllocatedLoad == 5f,
+                "shared SPIKING definition creates independent instances with proportional allocation");
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("kw-twin-a", route,
+                new[] { Stage(OperationKind.Read, 100f, 2f, shared) }));
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            Check(host.FindConnection("kw-twin-a").Behaviors.History.Count == 1 &&
+                host.FindConnection("kw-twin-a").Behaviors.History[0].ModifierId == "m1",
+                "SPIKING reset/replay starts with fresh timing and modifier identity");
+
+            host.ResetSimulation();
+            ConnectionSpawnPlan threat = director.QueueProfile("spiking-threat");
+            ConnectionSpawnPlan benign = director.QueueProfile("spiking-benign");
+            ConnectionSpawnPlan overload = director.QueueProfile("overload-demo");
+            Check(threat.IsHostile && !benign.IsHostile && !overload.IsHostile &&
+                threat.Operations[0].Behaviors[0].Kind == ConnectionBehaviorKind.Spiking &&
+                benign.Operations[0].Behaviors[0].Kind == ConnectionBehaviorKind.Spiking &&
+                overload.Operations[0].Behaviors[0].Kind == ConnectionBehaviorKind.Overload,
+                "manual profiles keep behavior independent of hostility and completion effect");
+            ProfileConfiguration recordedBenign = recorder.CurrentLog.run.traffic.profiles
+                .Single(p => p.id == "spiking-benign");
+            Check(recordedBenign.operations[0].behaviors[0].kind == "Spiking" &&
+                recordedBenign.operations[0].behaviors[0].normalIntervalSeconds == 5f &&
+                recordedBenign.operations[0].behaviors[0].elevatedIntervalSeconds == 2f,
+                "recorder metadata retains keyword kind and interval tuning");
+            for (int i = 0; i < 250 && (host.FindConnection(threat.ConnectionId)?.Resolution == null ||
+                host.FindConnection(benign.ConnectionId)?.Resolution == null); i++)
+                host.StepSimulation(1f);
+            Check(host.FindConnection(threat.ConnectionId)?.Resolution == ConnectionResolution.Completed &&
+                host.FindConnection(benign.ConnectionId)?.Resolution == ConnectionResolution.Completed &&
+                host.Occurrences.Count == 1 &&
+                host.Occurrences[0].ConnectionId == threat.ConnectionId &&
+                host.Occurrences[0].OperationIndex == 0 &&
+                host.FindConnection(benign.ConnectionId).Behaviors.History.Count > 2,
+                "benign SPIKING has no delivery; hostile SPIKING delivers once on normal completion");
         }
 
         private static TimedModifierBehaviorDefinition Behavior(string id, float start,
