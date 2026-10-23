@@ -19,6 +19,27 @@ namespace Uptime.Connections
         Execute
     }
 
+    public enum CompletionEffect { None, InfectionDelivery }
+
+    public sealed class ConnectionEffectOccurrence
+    {
+        public ConnectionEffectOccurrence(CompletionEffect type, string connectionId,
+            int operationIndex, string targetNodeId, float timeSeconds)
+        {
+            Type = type;
+            ConnectionId = connectionId;
+            OperationIndex = operationIndex;
+            TargetNodeId = targetNodeId;
+            TimeSeconds = timeSeconds;
+        }
+
+        public CompletionEffect Type { get; }
+        public string ConnectionId { get; }
+        public int OperationIndex { get; }
+        public string TargetNodeId { get; }
+        public float TimeSeconds { get; }
+    }
+
     [Serializable]
     public sealed class OperationStage
     {
@@ -26,14 +47,18 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float totalWork;
         [SerializeField, Min(0f)] private float desiredLoad = 5f;
         [SerializeField] private string activityDescription;
+        [SerializeField] private CompletionEffect completionEffect;
 
         public OperationKind Operation => operation;
         public float TotalWork => Mathf.Max(0f, totalWork);
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public string ActivityDescription => activityDescription;
+        public CompletionEffect EffectOnCompletion => completionEffect;
         public OperationStage() { }
-        public OperationStage(OperationKind kind, float work, float load, string description)
-        { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description; }
+        public OperationStage(OperationKind kind, float work, float load, string description,
+            CompletionEffect effect = CompletionEffect.None)
+        { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
+            completionEffect = effect; }
     }
 
     [Serializable]
@@ -41,6 +66,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private string connectionId;
         [SerializeField] private string profileId;
+        [SerializeField] private bool isHostile;
         [SerializeField] private string claimedPurpose;
         [SerializeField] private string activityDescription;
         [SerializeField] private OperationKind currentOperation;
@@ -56,6 +82,7 @@ namespace Uptime.Connections
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
+        public bool IsHostile => isHostile;
         public string ClaimedPurpose => claimedPurpose;
         public string ActivityDescription => activityDescription;
         public OperationKind CurrentOperation => currentOperation;
@@ -69,6 +96,8 @@ namespace Uptime.Connections
         public float WorkAt(int index) => HasArc ? StageAt(index).TotalWork : TotalWork;
         public float LoadAt(int index) => HasArc ? StageAt(index).DesiredLoad : DesiredLoad;
         public string ActivityAt(int index) => HasArc ? StageAt(index).ActivityDescription : activityDescription;
+        public CompletionEffect EffectAt(int index) => HasArc ? StageAt(index).EffectOnCompletion :
+            CompletionEffect.None;
         private bool HasArc => operations != null && operations.Length > 0;
         private OperationStage StageAt(int index) => operations[index] ??
             throw new InvalidOperationException($"Connection {connectionId} has an empty operation stage.");
@@ -79,6 +108,7 @@ namespace Uptime.Connections
             {
                 connectionId = plan.ConnectionId,
                 profileId = plan.ProfileId,
+                isHostile = plan.IsHostile,
                 claimedPurpose = plan.ClaimedPurpose,
                 activityDescription = plan.Operations[0].ActivityDescription,
                 currentOperation = plan.Operations[0].Operation,
@@ -90,7 +120,7 @@ namespace Uptime.Connections
             {
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
-                    stage.DesiredLoad, stage.ActivityDescription);
+                    stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion);
             }
             return result;
         }
@@ -110,7 +140,7 @@ namespace Uptime.Connections
         Complete
     }
 
-    public enum ConnectionResolution { Completed, Blocked }
+    public enum ConnectionResolution { Completed, Killed }
 
     public enum LoadPerformance
     {
@@ -128,13 +158,17 @@ namespace Uptime.Connections
             Definition = definition;
             RouteLinks = routeLinks;
             TargetResources = targetResources;
+            deliveredEffects = new bool[definition.OperationCount];
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Active;
         }
+
+        private readonly bool[] deliveredEffects;
 
         public LogicalConnectionDefinition Definition { get; }
         public NodeResources TargetResources { get; }
         internal PhysicalLinkReference[] RouteLinks { get; }
         public string ConnectionId => Definition.ConnectionId;
+        public bool IsHostile => Definition.IsHostile;
         public int CurrentOperationIndex { get; internal set; }
         public int OperationCount => Definition.OperationCount;
         public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
@@ -160,6 +194,15 @@ namespace Uptime.Connections
         public float EstablishedAtSeconds { get; internal set; }
         public float ResolvedAtSeconds { get; internal set; }
         public ConnectionResolution? Resolution { get; internal set; }
+
+        internal ConnectionEffectOccurrence OnWorkCompleted(int operationIndex, float timeSeconds)
+        {
+            CompletionEffect effect = Definition.EffectAt(operationIndex);
+            if (effect == CompletionEffect.None || deliveredEffects[operationIndex]) return null;
+            deliveredEffects[operationIndex] = true;
+            return new ConnectionEffectOccurrence(effect, ConnectionId, operationIndex,
+                TargetNode.NodeId, timeSeconds);
+        }
 
         internal void FinishOperation()
         {

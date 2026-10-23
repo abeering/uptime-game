@@ -72,7 +72,7 @@ namespace Uptime.Connections
             else if (!state.IsComplete && renderedStage < operationTokens.Count)
                 operationTokens[renderedStage].SetActiveColor(tint);
             NodeResources target = state.TargetResources;
-            string status = state.Resolution == ConnectionResolution.Blocked ? "BLOCKED" :
+            string status = state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
@@ -109,7 +109,7 @@ namespace Uptime.Connections
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
         {
-            bool completedNormally = state.IsComplete && state.Resolution != ConnectionResolution.Blocked;
+            bool completedNormally = state.IsComplete && state.Resolution != ConnectionResolution.Killed;
             foreach (InspectOperationToken token in operationTokens)
             {
                 token.gameObject.SetActive(false);

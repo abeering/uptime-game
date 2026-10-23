@@ -9,12 +9,22 @@ namespace Uptime.Connections
     {
         private const float Epsilon = 0.0001f;
 
-        internal static void Step(NodeResources[] nodes, LogicalConnectionState[] connections, float deltaSeconds)
+        internal readonly struct OperationCompletion
+        {
+            public OperationCompletion(LogicalConnectionState state, int index)
+            { State = state; Index = index; }
+            public LogicalConnectionState State { get; }
+            public int Index { get; }
+        }
+
+        internal static List<OperationCompletion> Step(NodeResources[] nodes,
+            LogicalConnectionState[] connections, float deltaSeconds)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
 
             var ordered = new List<LogicalConnectionState>(connections);
+            var completed = new List<OperationCompletion>();
             ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             var nodeByView = new Dictionary<NodeView, NodeResources>();
             var demandByNode = new Dictionary<NodeResources, float>();
@@ -47,6 +57,7 @@ namespace Uptime.Connections
                 if (connection.RemainingWork > Epsilon)
                     continue;
 
+                completed.Add(new OperationCompletion(connection, connection.CurrentOperationIndex));
                 connection.FinishOperation();
             }
 
@@ -62,6 +73,7 @@ namespace Uptime.Connections
             foreach (NodeResources node in nodes)
                 if (node.AllocatedLoad > node.LoadCapacity + Epsilon)
                     throw new InvalidOperationException($"Node {node.View.NodeId} exceeded LOAD capacity.");
+            return completed;
         }
     }
 }

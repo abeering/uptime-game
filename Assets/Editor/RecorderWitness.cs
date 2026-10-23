@@ -38,8 +38,13 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 1 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 5,
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 6,
                     "copied run metadata and generator configuration");
+                ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
+                    p.id == "basic-threat");
+                Check(threatProfile.isHostile && threatProfile.ambientWeight == 0f &&
+                    threatProfile.operations[0].completionEffect == "InfectionDelivery",
+                    "recorded catalog includes manual-only threat behavior");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");
@@ -105,11 +110,11 @@ namespace Uptime.Connections.EditorTools
                 Check(repeated.events.Count == savedEvents && repeated.snapshots.Count == savedSnapshots &&
                     recorder.OutputPath == firstPath, "repeat save updates one file without duplicate records");
 
-                recorder.RecordPlayerAction("block missing", "missing", false);
+                recorder.RecordPlayerAction("kill missing", "missing", false);
                 recorder.SaveIfDue(Time.realtimeSinceStartupAsDouble + 31.0);
                 ConnectionsRunLog autosaved = Read(firstPath);
                 Check(autosaved.events.Count == savedEvents + 1 &&
-                    autosaved.events.Last().command == "block missing" &&
+                    autosaved.events.Last().command == "kill missing" &&
                     autosaved.events.Last().success == false,
                     "real-time autosave persists new events without advancing simulation");
 
@@ -120,11 +125,33 @@ namespace Uptime.Connections.EditorTools
                 LogicalConnectionState stressed = host.FindConnection("rec2");
                 float enabledWork = stressed.CompletedWork;
                 float enabledLoad = stressed.AllocatedLoad;
-                Check(host.BlockConnection("rec2"), "block active connection");
+                Check(host.KillConnection("rec2"), "kill active connection");
                 Check(recorder.CurrentLog.events.Last(e => e.type == "connection_resolved")
-                    .resolutionReason == "Blocked", "blocked resolution recorded separately");
+                    .resolutionReason == "Killed", "killed resolution recorded separately");
                 Check(recorder.CurrentLog.snapshots.Last().nodes.First(n => n.id == "DB")
-                    .requestedLoad == 0f, "block captures released LOAD immediately");
+                    .requestedLoad == 0f, "kill captures released LOAD immediately");
+                ConnectionSpawnPlan threat = director.QueueProfile("basic-threat");
+                Check(recorder.CurrentLog.events.Last(e => e.type == "plan_queued")
+                    .source == "manual", "manual spawn records its separate producer");
+                host.StepSimulation(24f);
+                RunEvent[] threatEvents = recorder.CurrentLog.events.Where(e =>
+                    e.connectionId == threat.ConnectionId &&
+                    (e.type == "operation_completed" || e.type == "effect" ||
+                        e.type == "connection_resolved")).ToArray();
+                Check(threatEvents.Length == 3 &&
+                    threatEvents[0].type == "operation_completed" &&
+                    threatEvents[1].type == "effect" &&
+                    threatEvents[2].type == "connection_resolved" &&
+                    threatEvents.All(e => e.timeSeconds == host.SimulationTimeSeconds) &&
+                    threatEvents[1].effectType == "InfectionDelivery" &&
+                    threatEvents[1].operationIndex == 0 &&
+                    threatEvents[1].targetNodeId == "DB",
+                    "WORK completion records effect before final resolution at one step time");
+                RunEvent threatSpawn = recorder.CurrentLog.events.Single(e =>
+                    e.type == "connection_spawned" && e.connectionId == threat.ConnectionId);
+                Check(threatSpawn.definition.isHostile &&
+                    threatSpawn.definition.operations[0].completionEffect == "InfectionDelivery",
+                    "concrete manual threat definition is recorded");
                 recorder.EndRun();
                 Check(!string.IsNullOrEmpty(Read(firstPath).run.endedUtc), "final save contains end timestamp");
 
@@ -153,7 +180,7 @@ namespace Uptime.Connections.EditorTools
                     "authored mode records its own configuration and connections");
                 recorder.EndRun();
                 Debug.Log("RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, " +
-                    "JSON saves, autosave, block, distinct runs, authored mode, and " +
+                    "JSON saves, autosave, kill, distinct runs, authored mode, and " +
                     "enabled/disabled parity. " + firstPath);
             }
             finally

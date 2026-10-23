@@ -19,7 +19,9 @@ Explicit saves print the absolute file path in the Unity Console. Save errors ap
 
 ## Format
 
-`schemaVersion` is currently `1`. The top-level `run` object contains the unique ID, UTC start/end/save timestamps, Unity version, scene, run mode, seed, fixed step, copied node configuration, and copied ambient profile/cadence configuration. `events` has ordered sequence numbers and simulation timestamps for plan queueing, concrete connection spawns, operation starts and completions, resolution, block actions, and markers. A spawn event embeds the route and all generated operation LOAD/WORK values. Marker events carry a zero-based `snapshotIndex` into `snapshots`.
+`schemaVersion` is currently `1`. The top-level `run` object contains the unique ID, UTC start/end/save timestamps, Unity version, scene, run mode, seed, fixed step, copied node configuration, and copied ambient profile/cadence configuration. `events` has ordered sequence numbers and simulation timestamps for plan queueing, concrete connection spawns, operation starts and completions, resolution, player actions, and markers. A spawn event embeds the route and all generated operation LOAD/WORK values. Marker events carry a zero-based `snapshotIndex` into `snapshots`.
+
+Threats V0 Slice 1 adds manual `plan_queued` events (`source: manual`), Killed resolutions and `effect` events. An infection-delivery event carries the connection ID, completed operation index, `effectType: InfectionDelivery`, `targetNodeId`, and simulation time. The operation-completed event precedes its effect, which precedes final connection resolution. Profile and concrete operation records include internal hostile classification and completion-effect settings. These are additive fields in schema version 1; the linked example predates this slice and retains its original Blocked action as a historical recording.
 
 [`connections-run-recorder-example.json`](examples/connections-run-recorder-example.json) is the complete file saved by a Recorder Witness run. It includes a two-operation connection, a bookmark, autosave, and a blocked high-demand connection.
 

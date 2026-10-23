@@ -1,6 +1,6 @@
 # Connections — Threats V0: selected baseline and phased plan
 
-**Status:** Selected design direction and proposed implementation sequence, October 23, 2026. **Documentation only; not yet implemented.**
+**Status:** Selected design direction and proposed implementation sequence, October 23, 2026. **Slice 1 is implemented on the focused implementation branch; Phases C–E remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 
 ## Objective and first playable slice
@@ -14,6 +14,14 @@ Build one consequential, interceptable hostile connection using the **existing f
 5. **Do not create node infection state, infection effects, cleaning, minigames, node modifiers, infection timers, or a fake persistent infected flag.** An infection *delivery event* is observable; a persistent infection is not implemented. Avoid terminal wording that falsely asserts persistent infection state.
 
 A high LOAD request alone is not the definition of a threat. Benign connections may eventually use identical demand patterns; hostile connections may also have ordinary demand and may never deliver an infection. Classification/intent, demand behavior, and payload effects are independent axes.
+
+## Slice 1 implementation
+
+`basic-threat` is a manual-only profile (`ambientWeight = 0`) with a single WRITE requesting 12 LOAD and 240 fixed WORK against DB. Its claimed purpose is Database Maintenance; hostile intent is internal profile/plan/connection data and does not color the path or appear in ordinary inspection. `spawn basic-threat` queues a concrete plan with a seeded letter-digit ID. `spawn <profileId>` also accepts the five existing benign profiles. An unknown ID returns an error, and manual queue dispatch works with ambient generation disabled. Traffic Director ambient selection, manual debug spawning, and any future Level Director remain separate producers of concrete plans; Level Director scheduling is not implemented.
+
+Each operation definition can carry a completion effect independently of its READ/WRITE/EXECUTE kind and LOAD. The allocator returns completed operation indices after normal WORK progress. `SimulationHost` records the operation completion, asks that connection instance for its effect, records and emits any resulting occurrence, then resolves a final connection. The instance owns a per-operation delivery flag. An infection-delivery occurrence has effect type, connection ID, operation index, target-node ID, and simulation time. The terminal announces delivery; the run recorder stores an `effect` event. No persistent node infection state is created.
+
+`kill <connectionId>` immediately resolves an active connection as Killed and publishes released target LOAD. An unfinished operation produces no completion effect. The old per-connection `block <id>` command is removed; `block <source>` remains reserved for future source prevention.
 
 ## Reconciliation with the October 22–23 idea archive
 
