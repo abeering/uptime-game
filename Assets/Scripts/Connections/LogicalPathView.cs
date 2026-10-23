@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
     public sealed class LogicalPathView : MonoBehaviour
     {
         [SerializeField] private PathGraphic path;
+        [SerializeField] private Image terminalMarkerPrefab;
         [SerializeField, Range(0.1f, 2f)] private float establishmentSeconds = 0.6f;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
         [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
@@ -34,8 +36,11 @@ namespace Uptime.Connections
         private float pulseTravel;
         private Color identityColor;
         private bool hasIdentityColor;
+        private Image terminalMarker;
+        private Vector2 markerSize;
 
         public event Action<LogicalConnectionState> Destroyed;
+        public Image TerminalMarker => terminalMarker;
 
         public float PulseSpacingFor(float requestedLoad) =>
             Mathf.Max(18f, pulseSpacingAtOneLoad /
@@ -54,7 +59,7 @@ namespace Uptime.Connections
                 (hasIdentityColor ? identityColor : healthyColor) :
             performance == LoadPerformance.Slowed ? constrainedColor : stalledColor;
 
-        public void Bind(LogicalConnectionState connection, RectTransform area)
+        public void Bind(LogicalConnectionState connection, RectTransform area, RectTransform markerLayer)
         {
             state = connection;
             networkArea = area;
@@ -63,6 +68,32 @@ namespace Uptime.Connections
             ends = new Vector2[count];
             path.raycastTarget = false;
             path.SetPath(starts, ends, new float[count], 0f);
+            if (terminalMarkerPrefab != null && markerLayer != null && connection.TargetNode != null)
+            {
+                terminalMarker = Instantiate(terminalMarkerPrefab, markerLayer, false);
+                terminalMarker.name = "Terminal marker " + connection.ConnectionId;
+                terminalMarker.raycastTarget = false;
+                markerSize = terminalMarker.rectTransform.rect.size;
+                terminalMarker.gameObject.SetActive(false);
+            }
+        }
+
+        public void SetPresentationActive(bool active)
+        {
+            gameObject.SetActive(active);
+            if (!active && terminalMarker != null)
+                terminalMarker.gameObject.SetActive(false);
+        }
+
+        public static Vector2 TerminalBorderPoint(Rect card, Vector2 towardSource,
+            float laneOffset, out bool verticalSide)
+        {
+            Vector2 point = EdgeGeometry.CardEdge(card, towardSource, laneOffset);
+            float xGap = Mathf.Min(Mathf.Abs(point.x - card.xMin), Mathf.Abs(point.x - card.xMax));
+            float yGap = Mathf.Min(Mathf.Abs(point.y - card.yMin), Mathf.Abs(point.y - card.yMax));
+            verticalSide = xGap < yGap || Mathf.Abs(xGap - yGap) < 0.001f &&
+                Mathf.Abs(towardSource.x) >= Mathf.Abs(towardSource.y);
+            return point;
         }
 
         public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
@@ -117,14 +148,17 @@ namespace Uptime.Connections
             relayoutElapsed = 0f;
         }
 
-        private void LateUpdate()
+        private void LateUpdate() => AdvanceVisual(Time.deltaTime);
+
+        // Shared by Play Mode and the deterministic geometry witness.
+        public void AdvanceVisual(float deltaSeconds)
         {
             if (state == null || networkArea == null || path == null || state.IsPending || laneOffsets == null)
                 return;
 
             if (!state.IsComplete)
             {
-                relayoutElapsed += Time.deltaTime;
+                relayoutElapsed += deltaSeconds;
                 float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(relayoutElapsed / relayoutSeconds));
                 for (int i = 0; i < laneOffsets.Length; i++)
                 {
@@ -141,15 +175,17 @@ namespace Uptime.Connections
 
             if (state.IsComplete)
             {
-                departureElapsed += Time.deltaTime;
+                departureElapsed += deltaSeconds;
                 if (departureElapsed >= departureSeconds)
                 {
+                    if (terminalMarker != null)
+                        terminalMarker.gameObject.SetActive(false);
                     Destroy(gameObject);
                     return;
                 }
             }
             else
-                establishmentElapsed += Time.deltaTime;
+                establishmentElapsed += deltaSeconds;
 
             float reveal = Mathf.Clamp01(establishmentElapsed / establishmentSeconds);
             float fade = state.IsComplete ? 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
@@ -170,13 +206,35 @@ namespace Uptime.Connections
                     networkArea, -direction, -laneOffsets[i], lineWidths[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
+            if (terminalMarker != null)
+            {
+                bool reachedTarget = reveal >= 1f;
+                terminalMarker.gameObject.SetActive(reachedTarget);
+                if (reachedTarget)
+                {
+                    int last = ends.Length - 1;
+                    NodeView target = state.TargetNode;
+                    Vector2 from = networkArea.InverseTransformPoint(
+                        state.Definition.Route[last].Node.transform.position);
+                    Vector2 to = networkArea.InverseTransformPoint(target.transform.position);
+                    Vector2 towardSource = (from - to).normalized;
+                    Vector2 border = TerminalBorderPoint(EdgeGeometry.CardRect(target, networkArea),
+                        towardSource, -laneOffsets[last], out bool verticalSide);
+                    terminalMarker.rectTransform.position = networkArea.TransformPoint(border);
+                    terminalMarker.rectTransform.sizeDelta = verticalSide ?
+                        new Vector2(markerSize.y, markerSize.x) : markerSize;
+                    Color markerColor = hasIdentityColor ? identityColor : healthyColor;
+                    markerColor.a *= fade;
+                    terminalMarker.color = markerColor;
+                }
+            }
             float spacing = state.IsActive && !state.IsTransitioning ?
                 PulseSpacingFor(state.DesiredLoad) : 0f;
             bool interrupted = performance == LoadPerformance.Slowed &&
                 Mathf.Repeat(Time.unscaledTime, 0.55f) >= 0.32f;
             int pulseDirection = DirectionFor(state.CurrentOperation);
             if (spacing > 0f && pulseDirection != 0 && performance != LoadPerformance.Stalled && !interrupted)
-                pulseTravel += Time.deltaTime * pulseSpeedPixelsPerSecond;
+                pulseTravel += deltaSeconds * pulseSpeedPixelsPerSecond;
             float phase = spacing > 0f && pulseDirection != 0 ?
                 Mathf.Repeat(pulseTravel * pulseDirection, spacing) : 0f;
             float opacity = performance == LoadPerformance.Stalled ? 0.2f :
@@ -184,7 +242,21 @@ namespace Uptime.Connections
             path.SetActivity(spacing, phase, opacity);
         }
 
-        private void OnDestroy() => Destroyed?.Invoke(state);
+        public void ReleaseTerminalMarker()
+        {
+            if (terminalMarker == null) return;
+            Image marker = terminalMarker;
+            terminalMarker = null;
+            marker.gameObject.SetActive(false);
+            if (Application.isPlaying) Destroy(marker.gameObject);
+            else DestroyImmediate(marker.gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseTerminalMarker();
+            Destroyed?.Invoke(state);
+        }
 
     }
 }
