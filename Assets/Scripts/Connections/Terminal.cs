@@ -45,6 +45,25 @@ namespace Uptime.Connections
             StartCoroutine(FocusInputNextFrame());
         }
 
+        private void OnEnable()
+        {
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.EffectOccurred += OnEffectOccurred;
+        }
+
+        private void OnDisable()
+        {
+            if (simulationHost != null)
+                simulationHost.EffectOccurred -= OnEffectOccurred;
+        }
+
+        private void OnEffectOccurred(ConnectionEffectOccurrence occurrence)
+        {
+            if (occurrence.Type == CompletionEffect.InfectionDelivery)
+                AppendText("[THREAT] " + occurrence.ConnectionId.ToLowerInvariant() +
+                    " delivered infection payload to " + occurrence.TargetNodeId, errorColor);
+        }
+
         private void OnDestroy()
         {
             if (commandInput != null)
@@ -93,19 +112,42 @@ namespace Uptime.Connections
                 case "inspect":
                     Inspect(tokens);
                     break;
-                case "block":
+                case "kill":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  block a7", errorColor);
+                        AppendText("USAGE  kill a7", errorColor);
                     else
                     {
-                        bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
-                        recorder?.RecordPlayerAction(command, tokens[1], blocked);
+                        bool killed = simulationHost != null && simulationHost.KillConnection(tokens[1]);
+                        recorder?.RecordPlayerAction(command, tokens[1], killed);
                         string displayId = tokens[1].ToLowerInvariant();
-                        AppendText(blocked ? "BLOCKED  " + displayId :
-                            "BLOCK  no active connection " + displayId,
-                            blocked ? normalColor : errorColor);
+                        AppendText(killed ? "KILLED  " + displayId :
+                            "KILL  no active connection " + displayId,
+                            killed ? normalColor : errorColor);
                     }
                     break;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "spawn":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  spawn <profileId>", errorColor);
+                    else if (trafficDirector == null || simulationHost == null)
+                        AppendText("SPAWN  simulation unavailable", errorColor);
+                    else
+                    {
+                        try
+                        {
+                            ConnectionSpawnPlan plan = trafficDirector.QueueProfile(tokens[1]);
+                            recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
+                            AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
+                                " from profile " + plan.ProfileId, normalColor);
+                        }
+                        catch (System.InvalidOperationException error)
+                        {
+                            recorder?.RecordPlayerAction(command, null, false);
+                            AppendText("SPAWN  " + error.Message, errorColor);
+                        }
+                    }
+                    break;
+#endif
                 case "demandtest":
                     if (trafficDirector == null || simulationHost == null ||
                         simulationHost.RunMode != ConnectionRunMode.Generated)
@@ -151,7 +193,11 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect  block  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    AppendText("COMMANDS  inspect  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+#else
+                    AppendText("COMMANDS  inspect  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+#endif
                     break;
                 default:
                     AppendText($"UNKNOWN COMMAND  {command}  // type help", errorColor);

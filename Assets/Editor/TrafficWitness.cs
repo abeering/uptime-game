@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Uptime.Connections;
 using UnityEditor;
@@ -50,6 +51,8 @@ namespace Uptime.Connections.EditorTools
                 }
                 Check(replay.Select(p => p.ProfileId).Distinct().Count() == 5,
                     "weighted catalog includes ordinary and incidental profiles");
+                Check(replay.All(p => p.ProfileId != "basic-threat"),
+                    "manual threat is absent from ambient traffic");
                 ConnectionTrafficProfile quick = director.Profiles.First(p => p.id == "quick-lookup");
                 Check(quick.operations.Length == 1 && quick.operations[0].operation == OperationKind.Read &&
                     quick.operations[0].minimumDuration == 4f && quick.operations[0].maximumDuration == 8f,
@@ -116,8 +119,8 @@ namespace Uptime.Connections.EditorTools
                     host.RuntimeConnections[0].ConnectionId == "later1" &&
                     host.RuntimeConnections[1].ConnectionId == "later2",
                     "same-time plans dispatch in insertion order");
-                Check(host.BlockConnection("later1") && host.BlockConnection("later2"),
-                    "scheduled plans can be blocked");
+                Check(host.KillConnection("later1") && host.KillConnection("later2"),
+                    "scheduled plans can be killed");
 
                 // Event-style burst with ambient disabled. There is no population cap.
                 for (int i = 0; i < 12; i++)
@@ -130,13 +133,14 @@ namespace Uptime.Connections.EditorTools
                 Near(dbResources.RequestedLoad, 120f, "burst requested LOAD");
                 Near(dbResources.AllocatedLoad, 10f, "burst allocated LOAD");
                 foreach (LogicalConnectionState state in host.RuntimeConnections.ToArray())
-                    Check(host.BlockConnection(state.ConnectionId), "block active connection");
+                    Check(host.KillConnection(state.ConnectionId), "kill active connection");
                 Check(host.RuntimeConnections.Count == 0 &&
-                    host.FindConnection("burst0").Resolution == ConnectionResolution.Blocked,
-                    "blocked connections retire with reason");
-                Near(dbResources.RequestedLoad, dbResources.BaselineLoad, "blocked LOAD released");
+                    host.FindConnection("burst0").Resolution == ConnectionResolution.Killed,
+                    "killed connections retire with reason");
+                Near(dbResources.RequestedLoad, dbResources.BaselineLoad, "killed LOAD released");
                 Debug.Log("TrafficWitness burst: expected 12 arrivals, DB 120 requested/10 allocated; " +
-                    $"observed 12 and {dbResources.RequestedLoad:0.#} after block release.");
+                    $"observed 12 and {dbResources.RequestedLoad:0.#} after kill release.");
+                CheckManualProfilesAndThreats(host, director);
                 Debug.Log("TrafficWitness PASS");
             }
             finally
@@ -144,6 +148,127 @@ namespace Uptime.Connections.EditorTools
                 director.Seed = originalSeed;
                 director.AutoGenerationEnabled = originalAuto;
                 host.SetRunMode(ConnectionRunMode.Generated);
+            }
+        }
+
+        private static void CheckManualProfilesAndThreats(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            var observed = new List<ConnectionEffectOccurrence>();
+            Action<ConnectionEffectOccurrence> onEffect = observed.Add;
+            host.EffectOccurred += onEffect;
+            try
+            {
+                director.AutoGenerationEnabled = false;
+                host.ResetSimulation();
+                bool unknownRejected = false;
+                try { director.QueueProfile("missing-profile"); }
+                catch (InvalidOperationException error)
+                { unknownRejected = error.Message.Contains("Unknown traffic profile"); }
+                Check(unknownRejected, "unknown manual profile reports a clear error");
+                ConnectionSpawnPlan benign = director.QueueProfile("quick-lookup");
+                ConnectionSpawnPlan threat = director.QueueProfile("basic-threat");
+                Check(host.FindConnection(benign.ConnectionId) == null &&
+                    host.FindConnection(threat.ConnectionId) == null,
+                    "manual plans queue before simulation dispatch");
+                Check(!benign.IsHostile && threat.IsHostile &&
+                    threat.Operations.Length == 1 &&
+                    threat.Operations[0].Operation == OperationKind.Write &&
+                    threat.Operations[0].DesiredLoad == 12f &&
+                    threat.Operations[0].TotalWork == 240f &&
+                    threat.Operations[0].EffectOnCompletion == CompletionEffect.InfectionDelivery,
+                    "manual profiles build concrete benign and fixed high-LOAD threat plans");
+                host.StepSimulation(0.1f);
+                LogicalConnectionState benignState = host.FindConnection(benign.ConnectionId);
+                LogicalConnectionState threatState = host.FindConnection(threat.ConnectionId);
+                Check(benignState.IsActive && threatState.IsActive &&
+                    benignState.AllocatedLoad < benignState.DesiredLoad &&
+                    threatState.AllocatedLoad < threatState.DesiredLoad,
+                    "manual threat contends with benign traffic through proportional LOAD");
+                NodeResources db = host.Nodes.First(n => n.View.NodeId == "DB");
+                Near(db.RequestedLoad, benignState.DesiredLoad + threatState.DesiredLoad,
+                    "manual demand appears in target LOAD");
+                Check(host.KillConnection(threat.ConnectionId) &&
+                    threatState.Resolution == ConnectionResolution.Killed &&
+                    host.Occurrences.Count == 0 && observed.Count == 0,
+                    "kill before WORK completion prevents delivery");
+                Near(db.RequestedLoad, benignState.DesiredLoad,
+                    "kill releases requested LOAD immediately");
+                host.StepSimulation(0.1f);
+                Near(benignState.AllocatedLoad, benignState.DesiredLoad,
+                    "benign allocation recovers on next step");
+                int steps = 0;
+                while (!benignState.IsComplete && steps++ < 100)
+                    host.StepSimulation(0.1f);
+                Check(benignState.Resolution == ConnectionResolution.Completed &&
+                    host.Occurrences.Count == 0,
+                    "manually spawned benign operation completes without an effect");
+
+                host.ResetSimulation();
+                Check(host.Occurrences.Count == 0, "reset clears effect history");
+                ConnectionSpawnPlan first = director.QueueProfile("basic-threat");
+                ConnectionSpawnPlan second = director.QueueProfile("basic-threat");
+                host.StepSimulation(0.1f);
+                LogicalConnectionState firstState = host.FindConnection(first.ConnectionId);
+                LogicalConnectionState secondState = host.FindConnection(second.ConnectionId);
+                Check(firstState != secondState && firstState.IsHostile && secondState.IsHostile &&
+                    firstState.CompletedWork > 0f && secondState.CompletedWork > 0f,
+                    "concurrent instances have separate runtime state");
+                steps = 0;
+                while ((!firstState.IsComplete || !secondState.IsComplete) && steps++ < 600)
+                    host.StepSimulation(0.1f);
+                Check(firstState.Resolution == ConnectionResolution.Completed &&
+                    secondState.Resolution == ConnectionResolution.Completed &&
+                    host.Occurrences.Count == 2 && observed.Count == 2 &&
+                    host.Occurrences.Select(e => e.ConnectionId).Distinct().Count() == 2 &&
+                    host.Occurrences.All(e => e.Type == CompletionEffect.InfectionDelivery &&
+                        e.OperationIndex == 0 && e.TargetNodeId == "DB" &&
+                        e.TimeSeconds > 0f),
+                    "each completed threat delivers exactly one independent occurrence");
+                host.StepSimulation(0.1f);
+                Check(!host.KillConnection(first.ConnectionId) && host.Occurrences.Count == 2,
+                    "killing after completion cannot erase delivered effects");
+
+                host.ResetSimulation();
+                Check(host.Occurrences.Count == 0, "replay starts without stale effects");
+                ConnectionSpawnPlan replay = director.QueueProfile("basic-threat");
+                Check(replay.ConnectionId == first.ConnectionId,
+                    "manual first spawn ID replays from seed");
+                host.StepSimulation(24f);
+                Check(host.Occurrences.Count == 1 &&
+                    host.Occurrences[0].ConnectionId == replay.ConnectionId &&
+                    host.Occurrences[0].TimeSeconds == 24f,
+                    "WORK completed inside a step emits once at the completed step time");
+
+                host.ResetSimulation();
+                ConnectionSpawnPlan arc = director.QueueProfile("indexing");
+                host.StepSimulation(0.5f);
+                LogicalConnectionState arcState = host.FindConnection(arc.ConnectionId);
+                steps = 0;
+                while (arcState.CurrentOperationIndex == 0 && steps++ < 100)
+                    host.StepSimulation(0.5f);
+                Check(arcState.IsActive && arcState.IsTransitioning &&
+                    arcState.CurrentOperationIndex == 1 && arcState.ConnectionId == arc.ConnectionId &&
+                    host.Occurrences.Count == 0,
+                    "manual benign arc uses normal next-step operation transition");
+                host.StepSimulation(0.5f);
+                Check(arcState.CompletedWork > 0f && !arcState.IsTransitioning,
+                    "manual benign second operation starts through normal allocator");
+                steps = 0;
+                while (!arcState.IsComplete && steps++ < 100)
+                    host.StepSimulation(0.5f);
+                Check(arcState.Resolution == ConnectionResolution.Completed &&
+                    host.Occurrences.Count == 0,
+                    "manual multi-operation benign profile completes without delivery");
+
+                Debug.Log("TrafficWitness manual profiles: expected queued dispatch, contention, " +
+                    "kill prevention and release, two independent deliveries, replay, and benign arc; " +
+                    "observed matching states and occurrences.");
+            }
+            finally
+            {
+                host.EffectOccurred -= onEffect;
+                host.ResetSimulation();
             }
         }
 
@@ -179,8 +304,8 @@ namespace Uptime.Connections.EditorTools
                 "ID reservation does not shift profile, route, LOAD, or WORK draws");
             director.QueueSpawnPlan(generatedFirst);
             host.StepSimulation(0.1f);
-            Check(host.BlockConnection(explicitPlan.ConnectionId) &&
-                host.BlockConnection(generatedFirst.ConnectionId.ToUpperInvariant()) &&
+            Check(host.KillConnection(explicitPlan.ConnectionId) &&
+                host.KillConnection(generatedFirst.ConnectionId.ToUpperInvariant()) &&
                 host.FindConnection(generatedFirst.ConnectionId.ToUpperInvariant()) != null,
                 "generated and explicit IDs remain case-insensitive and inspectable after resolution");
 

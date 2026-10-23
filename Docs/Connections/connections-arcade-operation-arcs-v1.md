@@ -2,6 +2,8 @@
 
 **Current status (October 22, 2026):** Integrated operation-arc contract from [PR #5](https://github.com/abeering/uptime-game/pull/5), with inspect presentation refined in [#8](https://github.com/abeering/uptime-game/pull/8). The closing deferral of traffic and spawning is historical to this phase; generated traffic later merged in [#6](https://github.com/abeering/uptime-game/pull/6) and recording in [#7](https://github.com/abeering/uptime-game/pull/7). Target-changing or conditional arcs, threat mechanics, and scoring are not established by those merges. See [Connections Current State](Current_State.md).
 
+Threats V0 Slice 1 subsequently attaches an optional completion effect to an operation. After ordinary WORK completion, the host receives the completed operation index, records that boundary, asks the connection instance for its one-shot effect, then resolves the connection if that was its final operation. `kill` interrupts without invoking the WORK-completion effect. Operation kind and LOAD do not imply hostility or payload delivery. See [Threats V0](connections-threats-v0.md) for the implemented first profile and deferred behaviors.
+
 Phase 2 adds authored, ordered operations to one logical connection. Packet is unchanged.
 
 ## Stage model

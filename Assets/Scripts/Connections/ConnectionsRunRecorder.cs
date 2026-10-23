@@ -54,6 +54,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class ProfileConfiguration
     {
         public string id;
+        public bool isHostile;
         public string claimedPurpose;
         public string[] eligibleTargetIds;
         public float ambientWeight;
@@ -63,6 +64,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class OperationRange
     {
         public string kind;
+        public string completionEffect;
         public string activityDescription;
         public float minimumLoad;
         public float maximumLoad;
@@ -82,6 +84,8 @@ namespace Uptime.Connections
         public ConnectionDefinitionRecord definition;
         public int operationIndex;
         public string operationKind;
+        public string effectType;
+        public string targetNodeId;
         public float completedWork;
         public float actualDurationSeconds;
         public float desiredLoad;
@@ -96,6 +100,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class ConnectionDefinitionRecord
     {
         public string profileId;
+        public bool isHostile;
         public string claimedPurpose;
         public string origin;
         public string target;
@@ -106,6 +111,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class OperationRecord
     {
         public string kind;
+        public string completionEffect;
         public string activityDescription;
         public float desiredLoad;
         public float totalWork;
@@ -345,6 +351,16 @@ namespace Uptime.Connections
                 entry.actualDurationSeconds = Mathf.Max(0f, time - started);
         }
 
+        public void RecordEffect(ConnectionEffectOccurrence occurrence)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("effect", occurrence.TimeSeconds);
+            entry.connectionId = occurrence.ConnectionId;
+            entry.operationIndex = occurrence.OperationIndex;
+            entry.effectType = occurrence.Type.ToString();
+            entry.targetNodeId = occurrence.TargetNodeId;
+        }
+
         public void RecordResolution(LogicalConnectionState state, ConnectionResolution reason, float time)
         {
             if (!IsRecording) return;
@@ -438,6 +454,7 @@ namespace Uptime.Connections
             {
                 ConnectionTrafficProfile source = configuredProfiles[i];
                 var profile = new ProfileConfiguration { id = source.id,
+                    isHostile = source.isHostile,
                     claimedPurpose = source.claimedPurpose,
                     ambientWeight = source.ambientWeight,
                     eligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
@@ -446,6 +463,7 @@ namespace Uptime.Connections
                 {
                     ConnectionOperationProfile operation = source.operations[j];
                     profile.operations[j] = new OperationRange { kind = operation.operation.ToString(),
+                        completionEffect = operation.completionEffect.ToString(),
                         activityDescription = operation.activityDescription,
                         minimumLoad = operation.minimumLoad, maximumLoad = operation.maximumLoad,
                         minimumDurationSeconds = operation.minimumDuration,
@@ -460,6 +478,7 @@ namespace Uptime.Connections
         private static ConnectionDefinitionRecord Definition(LogicalConnectionDefinition definition)
         {
             var result = new ConnectionDefinitionRecord { profileId = definition.ProfileId,
+                isHostile = definition.IsHostile,
                 claimedPurpose = definition.ClaimedPurpose,
                 route = new string[definition.Route.Length],
                 operations = new OperationRecord[definition.OperationCount] };
@@ -471,6 +490,7 @@ namespace Uptime.Connections
             {
                 float load = definition.LoadAt(i);
                 result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
+                    completionEffect = definition.EffectAt(i).ToString(),
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
                     totalWork = definition.WorkAt(i),
                     nominalDurationSeconds = load > 0f ? definition.WorkAt(i) / load : 0f };

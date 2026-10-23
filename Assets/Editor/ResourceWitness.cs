@@ -188,7 +188,7 @@ namespace Uptime.Connections.EditorTools
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
                 var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
-                CheckHeader(fields, "C1", "Record Retrieval", false, accent);
+                CheckHeader(fields, "c1", "Record Retrieval", false, accent);
                 Check(((Image)fields.FindProperty("progressFill").objectReferenceValue).color == accent &&
                     ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == accent,
                     "active inspect progress and identity chrome use assigned accent");
@@ -288,7 +288,7 @@ namespace Uptime.Connections.EditorTools
                 var activity = (TMP_Text)fields.FindProperty("bottleneck").objectReferenceValue;
                 var eta = (TMP_Text)fields.FindProperty("eta").objectReferenceValue;
                 var progress = (Image)fields.FindProperty("progressFill").objectReferenceValue;
-                CheckHeader(fields, "C3", "Record Indexing", true);
+                CheckHeader(fields, "c3", "Record Indexing", true);
                 Check(tokens.Length == 2 && tokens[0].Text == "WRITE → DB" &&
                     tokens[1].Text == "READ → DB" && tokens.All(t => t.HasCheckmark && !t.HasOutline),
                     "completed operations remain subdued and visible");

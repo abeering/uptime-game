@@ -13,6 +13,7 @@ namespace Uptime.Connections
         [Min(0.01f)] public float maximumLoad = 3f;
         [Min(0.01f)] public float minimumDuration = 40f;
         [Min(0.01f)] public float maximumDuration = 75f;
+        public CompletionEffect completionEffect;
     }
 
     [Serializable]
@@ -22,6 +23,7 @@ namespace Uptime.Connections
         public string claimedPurpose;
         public string[] eligibleTargetIds;
         [Min(0f)] public float ambientWeight = 1f;
+        public bool isHostile;
         public ConnectionOperationProfile[] operations;
     }
 
@@ -96,10 +98,10 @@ namespace Uptime.Connections
             host.Recorder?.RecordPlanQueued(plan, source, host.SimulationTimeSeconds);
         }
 
-        public void Tick(float simulationTime)
+        public void Tick(float simulationTime, bool allowAmbient)
         {
             if (random == null) ResetDirector();
-            if (autoGenerationEnabled && !idsExhausted)
+            if (allowAmbient && autoGenerationEnabled && !idsExhausted)
             {
                 while (nextAmbientAt <= simulationTime + 0.00001f)
                 {
@@ -121,6 +123,28 @@ namespace Uptime.Connections
                 queue.RemoveAt(0);
                 host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
             }
+        }
+
+        // Development command producer. It uses the same profile-to-plan path as ambient
+        // generation; queue dispatch remains independent of the ambient toggle.
+        public ConnectionSpawnPlan QueueProfile(string profileId)
+        {
+            if (random == null) ResetDirector();
+            ConnectionTrafficProfile selected = null;
+            foreach (ConnectionTrafficProfile profile in profiles)
+                if (profile != null && string.Equals(profile.id, profileId,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    selected = profile;
+                    break;
+                }
+            if (selected == null)
+                throw new InvalidOperationException("Unknown traffic profile: " + profileId);
+            ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds);
+            if (plan == null)
+                throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
+            QueueSpawnPlan(plan, "manual");
+            return plan;
         }
 
         // Opt-in mechanical witness. Normal ambient selection excludes profiles with weight zero.
@@ -148,8 +172,6 @@ namespace Uptime.Connections
             foreach (ConnectionTrafficProfile profile in profiles)
                 if (profile != null) total += Mathf.Max(0f, profile.ambientWeight);
             if (total <= 0f) return null;
-            string id = NewId();
-            if (id == null) return null;
             float choice = (float)random.NextDouble() * total;
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
@@ -159,6 +181,13 @@ namespace Uptime.Connections
                 choice -= profile.ambientWeight;
                 if (choice < 0f) break;
             }
+            return BuildPlan(selected, atTime);
+        }
+
+        private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime)
+        {
+            string id = NewId();
+            if (id == null) return null;
             NodeView origin = FindNode(ambientOriginId);
             string targetId = selected.eligibleTargetIds[random.Next(selected.eligibleTargetIds.Length)];
             NodeView[] route = FindRoute(origin, FindNode(targetId));
@@ -169,10 +198,10 @@ namespace Uptime.Connections
                 float load = Range(spec.minimumLoad, spec.maximumLoad);
                 float duration = Range(spec.minimumDuration, spec.maximumDuration);
                 stages[i] = new OperationStage(spec.operation, load * duration, load,
-                    spec.activityDescription);
+                    spec.activityDescription, spec.completionEffect);
             }
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
-                selected.claimedPurpose, stages);
+                selected.claimedPurpose, stages, selected.isHostile);
         }
 
         private string NewId()
@@ -233,7 +262,19 @@ namespace Uptime.Connections
                 Stage(OperationKind.Write, "Applying updates", 1.5f, 3f, 20f, 35f),
                 Stage(OperationKind.Read, "Verifying updates", 1f, 2.5f, 20f, 35f)),
             Profile("quick-lookup", "Quick Record Lookup", "DB", 0.35f,
-                Stage(OperationKind.Read, "Looking up a record", 0.5f, 1.5f, 4f, 8f))
+                Stage(OperationKind.Read, "Looking up a record", 0.5f, 1.5f, 4f, 8f)),
+            new ConnectionTrafficProfile
+            {
+                id = "basic-threat", claimedPurpose = "Database Maintenance",
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                operations = new[] { new ConnectionOperationProfile
+                {
+                    operation = OperationKind.Write, activityDescription = "Writing records",
+                    minimumLoad = 12f, maximumLoad = 12f,
+                    minimumDuration = 20f, maximumDuration = 20f,
+                    completionEffect = CompletionEffect.InfectionDelivery
+                } }
+            }
         };
         private static ConnectionTrafficProfile Profile(string id, string purpose, string target,
             float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile

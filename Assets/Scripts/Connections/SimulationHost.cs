@@ -25,6 +25,8 @@ namespace Uptime.Connections
         private readonly Dictionary<string, LogicalConnectionState> history =
             new Dictionary<string, LogicalConnectionState>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> usedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<ConnectionEffectOccurrence> occurrences =
+            new List<ConnectionEffectOccurrence>();
         private float simulationTimeSeconds;
 
         public NodeResources[] Nodes => nodes;
@@ -34,9 +36,11 @@ namespace Uptime.Connections
         public float SimulationTimeSeconds => simulationTimeSeconds;
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
+        public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
+        public event Action<ConnectionEffectOccurrence> EffectOccurred;
         public bool HasEverUsedId(string id) => usedIds.Contains(id);
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
@@ -90,19 +94,9 @@ namespace Uptime.Connections
             if (runtimeConnections == null)
                 ResetSimulation();
 
-            if (runMode == ConnectionRunMode.Generated)
-                trafficDirector?.Tick(simulationTimeSeconds);
-
-            bool observing = recorder != null && recorder.IsRecording;
-            var previousOperation = observing ? new Dictionary<LogicalConnectionState, int>() : null;
-            var runningBeforeStep = observing ? new HashSet<LogicalConnectionState>() : null;
+            trafficDirector?.Tick(simulationTimeSeconds, runMode == ConnectionRunMode.Generated);
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                if (observing)
-                {
-                    previousOperation.Add(connection, connection.CurrentOperationIndex);
-                    if (!connection.IsComplete) runningBeforeStep.Add(connection);
-                }
                 if (connection.IsPending && simulationTimeSeconds >= connection.Definition.StartDelaySeconds)
                 {
                     connection.Lifecycle = Lifecycle.Active;
@@ -112,13 +106,20 @@ namespace Uptime.Connections
                 else if (connection.IsTransitioning)
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
             }
-            ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
+            List<ResourceAllocator.OperationCompletion> completed =
+                ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
             simulationTimeSeconds += deltaSeconds;
-            if (observing)
-                foreach (LogicalConnectionState state in runtimeConnections)
-                    if (runningBeforeStep.Contains(state) &&
-                        (state.CurrentOperationIndex != previousOperation[state] || state.IsComplete))
-                        recorder.RecordOperationCompleted(state, previousOperation[state], simulationTimeSeconds);
+            foreach (ResourceAllocator.OperationCompletion completion in completed)
+            {
+                recorder?.RecordOperationCompleted(completion.State, completion.Index,
+                    simulationTimeSeconds);
+                ConnectionEffectOccurrence occurrence = completion.State.OnWorkCompleted(
+                    completion.Index, simulationTimeSeconds);
+                if (occurrence == null) continue;
+                occurrences.Add(occurrence);
+                recorder?.RecordEffect(occurrence);
+                EffectOccurred?.Invoke(occurrence);
+            }
             if (runMode == ConnectionRunMode.Generated)
             {
                 var remaining = new List<LogicalConnectionState>(runtimeConnections.Length);
@@ -162,7 +163,7 @@ namespace Uptime.Connections
             BuildState(LogicalConnectionDefinition.FromPlan(plan));
         }
 
-        public bool BlockConnection(string id)
+        public bool KillConnection(string id)
         {
             if (runtimeConnections == null || id == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
@@ -170,7 +171,7 @@ namespace Uptime.Connections
                 {
                     state.Lifecycle = Lifecycle.Complete;
                     state.AllocatedLoad = 0f;
-                    Resolve(state, ConnectionResolution.Blocked);
+                    Resolve(state, ConnectionResolution.Killed);
                     var next = new List<LogicalConnectionState>(runtimeConnections);
                     next.Remove(state);
                     runtimeConnections = next.ToArray();
@@ -201,6 +202,7 @@ namespace Uptime.Connections
             simulationTimeSeconds = 0f;
             history.Clear();
             usedIds.Clear();
+            occurrences.Clear();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
             {
@@ -216,8 +218,7 @@ namespace Uptime.Connections
 
             states.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             runtimeConnections = states.ToArray();
-            if (runMode == ConnectionRunMode.Generated)
-                trafficDirector?.ResetDirector();
+            trafficDirector?.ResetDirector();
             if (Application.isPlaying)
             {
                 recorder?.BeginRun();
@@ -255,8 +256,9 @@ namespace Uptime.Connections
                 if (definition.WorkAt(i) <= 0f || definition.LoadAt(i) <= 0f ||
                     float.IsNaN(definition.WorkAt(i)) || float.IsInfinity(definition.WorkAt(i)) ||
                     float.IsNaN(definition.LoadAt(i)) || float.IsInfinity(definition.LoadAt(i)) ||
-                    !Enum.IsDefined(typeof(OperationKind), definition.OperationAt(i)))
-                    throw new InvalidOperationException("Connection operation needs finite positive WORK and LOAD.");
+                    !Enum.IsDefined(typeof(OperationKind), definition.OperationAt(i)) ||
+                    !Enum.IsDefined(typeof(CompletionEffect), definition.EffectAt(i)))
+                    throw new InvalidOperationException("Connection operation needs finite positive WORK/LOAD and valid kinds/effects.");
             var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
             for (int i = 0; i < routeLinks.Length; i++)
             {

@@ -497,11 +497,11 @@ namespace Uptime.Connections.EditorTools
                 Check(apiState.CurrentOperation == OperationKind.Execute &&
                     apiView.TerminalMarker.gameObject.activeSelf,
                     "local EXECUTE retains target marker");
-                Check(host.BlockConnection(dbState.ConnectionId), "block marker test connection");
+                Check(host.KillConnection(dbState.ConnectionId), "kill marker test connection");
                 dbView.AdvanceVisual(0.2f);
                 Check(dbView.TerminalMarker.color.a < 0.6f &&
                     dbView.TerminalMarker.color.a > 0f,
-                    "blocked marker fades with path departure");
+                    "killed marker fades with path departure");
                 Image retired = dbView.TerminalMarker;
                 dbView.ReleaseTerminalMarker();
                 UnityEngine.Object.DestroyImmediate(dbView.gameObject);
