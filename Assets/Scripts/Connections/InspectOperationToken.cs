@@ -19,17 +19,34 @@ namespace Uptime.Connections
         public bool HasCheckmark => checkmark != null && checkmark.activeSelf;
         public Color OutlineColor => outline != null ? outline.color : Color.clear;
 
-        public void ShowOperation(OperationKind operation, string target, bool completed, Color activeColor)
+        public float Measure(string text, float padding) =>
+            label != null ? Mathf.Ceil(label.GetPreferredValues(text).x + padding) : 0f;
+
+        public static string OperationLabel(OperationKind operation, string target, bool shortLabel = false) =>
+            operation.ToString().ToUpperInvariant() + (shortLabel ? string.Empty : " → " + target);
+
+        public void ShowOperation(OperationKind operation, string target, bool completed, Color activeColor,
+            bool shortLabel = false)
         {
-            string text = operation.ToString().ToUpperInvariant() + " → " + target;
-            Configure(text, completed ? completedColor : activeColor, !completed, completed,
+            string text = OperationLabel(operation, target, shortLabel);
+            Configure(text, completed ? completedColor : activeColor, true, completed,
                 completed ? 32f : 24f, completed ? 24f : 12f);
             if (!completed) SetActiveColor(activeColor);
         }
 
+        public void ShowCompletedCount(int count)
+        {
+            Configure("+" + count, completedColor, true, true, 32f, 24f);
+        }
+
         public void ShowFuture(int count)
         {
-            Configure("+" + count, futureColor, false, false, 0f, 0f);
+            Configure("+" + count, futureColor, true, false, 20f, 10f);
+        }
+
+        public void ShowLoad(float requested, Color color)
+        {
+            Configure($"LOAD {requested:0.#}", color, true, false, 20f, 10f);
         }
 
         public void SetActiveColor(Color color)
@@ -39,6 +56,12 @@ namespace Uptime.Connections
             if (label != null) label.color = color;
         }
 
+        public void ConstrainWidth(float width)
+        {
+            if (layout != null) layout.preferredWidth = Mathf.Max(0f, width);
+            if (label != null) label.overflowMode = TextOverflowModes.Ellipsis;
+        }
+
         private void Configure(string text, Color textColor, bool showOutline, bool showCheck,
             float totalPadding, float leftInset)
         {
@@ -46,6 +69,7 @@ namespace Uptime.Connections
             label.text = text;
             label.color = textColor;
             if (outline != null) outline.gameObject.SetActive(showOutline);
+            if (showOutline && outline != null) outline.SetOutline(textColor);
             if (checkmark != null) checkmark.SetActive(showCheck);
             RectTransform labelRect = label.rectTransform;
             labelRect.offsetMin = new Vector2(leftInset, labelRect.offsetMin.y);

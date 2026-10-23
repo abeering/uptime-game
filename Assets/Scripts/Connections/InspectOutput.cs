@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
+    public enum InspectPresentationMode { Compact, Verbose }
+
     // Each block owns its bindings. Destroying a history entry also stops its updates.
     public sealed class InspectOutput : MonoBehaviour
     {
@@ -11,22 +13,28 @@ namespace Uptime.Connections
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.2f;
         [SerializeField, Min(1f)] private float activeEntryHeight = 186f;
         [SerializeField, Min(1f)] private float completeEntryHeight = 124f;
+        [SerializeField, Min(1f)] private float compactEntryHeight = 90f;
         [SerializeField, Min(0f)] private float topPadding = 8f;
         [SerializeField, Min(0f)] private float entryGap = 10f;
         [SerializeField, Min(0f)] private float bottomPadding = 8f;
 
         private LogicalConnectionState[] states;
         private ConnectionIdentityPalette palette;
+        private InspectPresentationMode mode;
         private bool[] frozen;
         private float nextRefresh;
 
+        public int Capacity => entries?.Length ?? 0;
+
         public void Bind(LogicalConnectionState[] selected,
-            ConnectionIdentityPalette identityPalette = null)
+            ConnectionIdentityPalette identityPalette = null,
+            InspectPresentationMode presentationMode = InspectPresentationMode.Compact)
         {
             if (selected == null || selected.Length == 0 || selected.Length > entries.Length)
                 return;
             states = selected;
             palette = identityPalette;
+            mode = presentationMode;
             enabled = true;
             frozen = new bool[selected.Length];
             for (int i = 0; i < entries.Length; i++)
@@ -45,6 +53,7 @@ namespace Uptime.Connections
 
         private void Refresh()
         {
+            FitWidth();
             bool allFrozen = true;
             for (int i = 0; i < states.Length; i++)
             {
@@ -52,7 +61,7 @@ namespace Uptime.Connections
                     continue;
                 Color? accent = palette != null && palette.TryGet(states[i], out Color color) ?
                     color : (Color?)null;
-                entries[i].Render(states[i], accent);
+                entries[i].Render(states[i], accent, mode);
                 if (states[i].IsComplete)
                     frozen[i] = true;
                 else
@@ -63,12 +72,25 @@ namespace Uptime.Connections
                 enabled = false;
         }
 
+        private void FitWidth()
+        {
+            RectTransform root = (RectTransform)transform;
+            RectTransform parent = transform.parent as RectTransform;
+            float available = parent != null && parent.rect.width > 0f ?
+                Mathf.Min(580f, parent.rect.width) : root.rect.width;
+            root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, available);
+            float cardWidth = Mathf.Max(0f, available - 20f);
+            foreach (InspectEntry entry in entries)
+                entry.SetCardWidth(cardWidth);
+        }
+
         private void Reflow()
         {
             float y = topPadding;
             for (int i = 0; i < states.Length; i++)
             {
-                float height = states[i].IsComplete ? completeEntryHeight : activeEntryHeight;
+                float height = mode == InspectPresentationMode.Compact ? compactEntryHeight :
+                    states[i].IsComplete ? completeEntryHeight : activeEntryHeight;
                 RectTransform entry = (RectTransform)entries[i].transform;
                 entry.anchoredPosition = new Vector2(entry.anchoredPosition.x, -y);
                 entries[i].SetHeight(height);

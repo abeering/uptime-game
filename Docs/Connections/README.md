@@ -12,6 +12,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Route-aware lanes](route-aware-lanes-v1.md) — path continuity and physical-link lane ordering.
 - [Threats V0, Slices 1–3B](connections-threats-v0.md) — manual threats, operation-completion delivery, `kill` interception, and reusable OVERLOAD/SPIKING LOAD behaviors.
 - [Behavior and modifier foundation](connections-behavior-foundation-v0.md) — connection and operation behavior scopes, effective WORK/LOAD, modifier history, and Slice 3B fixed-step keyword timing.
+- [Inspect V2](connections-inspect-v2.md) — compact default, verbose command mode, width-aware operation pills, and current effective LOAD badge.
 
 ## Selected phase plans (not yet implemented)
 

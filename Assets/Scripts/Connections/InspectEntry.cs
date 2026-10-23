@@ -12,6 +12,9 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text purpose;
         [SerializeField] private RectTransform operationRow;
         [SerializeField] private InspectOperationToken operationTokenPrefab;
+        [SerializeField] private InspectOperationToken loadBadge;
+        [SerializeField, Min(60f)] private float loadBadgeWidth = 126f;
+        [SerializeField, Min(0f)] private float loadBadgeGap = 12f;
         [SerializeField] private TMP_Text work;
         [SerializeField] private TMP_Text throughput;
         [SerializeField] private TMP_Text bottleneck;
@@ -35,6 +38,8 @@ namespace Uptime.Connections
         private int renderedStage = -1;
         private int renderedOperationCount = -1;
         private bool renderedComplete;
+        private float renderedTimelineWidth = -1f;
+        private InspectOperationToken activeToken;
 
         public void SetHeight(float height)
         {
@@ -43,8 +48,43 @@ namespace Uptime.Connections
                 stateTag.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
 
-        public void Render(LogicalConnectionState state, Color? identityAccent = null)
+        public void SetCardWidth(float width)
         {
+            RectTransform card = (RectTransform)transform;
+            card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+            float contentWidth = Mathf.Max(0f, width - 24f);
+            if (operationRow != null)
+                operationRow.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(0f, contentWidth - loadBadgeWidth - loadBadgeGap));
+            if (loadBadge != null)
+            {
+                RectTransform badge = (RectTransform)loadBadge.transform;
+                badge.anchorMin = badge.anchorMax = new Vector2(1f, 1f);
+                badge.pivot = new Vector2(1f, 1f);
+                badge.anchoredPosition = new Vector2(-12f, -41f);
+                badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, loadBadgeWidth);
+                badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 40f);
+            }
+            SetTextWidth(throughput, contentWidth);
+            SetTextWidth(work, contentWidth);
+            SetTextWidth(purpose, Mathf.Max(0f, width - 202f));
+            SetTextWidth(bottleneck, Mathf.Max(0f, width - 150f));
+            if (eta != null)
+            {
+                RectTransform rect = eta.rectTransform;
+                rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(1f, 1f);
+                rect.anchoredPosition = new Vector2(-12f, -163f);
+            }
+            if (progressFill != null)
+                progressFill.transform.parent.GetComponent<RectTransform>()
+                    .SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentWidth);
+        }
+
+        public void Render(LogicalConnectionState state, Color? identityAccent = null,
+            InspectPresentationMode mode = InspectPresentationMode.Compact)
+        {
+            bool verbose = mode == InspectPresentationMode.Verbose;
             Color accent = identityAccent ?? activeColor;
             Set(identity, "INSPECT /");
             Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
@@ -67,10 +107,17 @@ namespace Uptime.Connections
                 state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
             if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex ||
-                renderedOperationCount != state.OperationCount || renderedComplete != state.IsComplete)
+                renderedOperationCount != state.OperationCount || renderedComplete != state.IsComplete ||
+                (operationRow != null &&
+                    Mathf.Abs(renderedTimelineWidth - operationRow.rect.width) > 0.5f))
                 RebuildOperations(state, tint);
-            else if (!state.IsComplete && renderedStage < operationTokens.Count)
-                operationTokens[renderedStage].SetActiveColor(tint);
+            else if (!state.IsComplete && activeToken != null)
+                activeToken.SetActiveColor(tint);
+            Color badgeColor = state.IsComplete || state.IsPending || state.IsTransitioning ?
+                quietColor : state.Performance == LoadPerformance.Slowed ? limitedColor :
+                state.Performance == LoadPerformance.Stalled ? stalledColor : quietColor;
+            if (loadBadge != null)
+                loadBadge.ShowLoad(state.IsDemanding ? state.DesiredLoad : 0f, badgeColor);
             NodeResources target = state.TargetResources;
             string status = state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
@@ -82,7 +129,7 @@ namespace Uptime.Connections
                     " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
                     " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
             Set(throughput, state.IsComplete ? status :
-                $"{status} · LOAD {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
+                $"{status} · ALLOC {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
             if (throughput != null) throughput.color = tint;
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
@@ -90,11 +137,12 @@ namespace Uptime.Connections
             string remaining = state.IsComplete ? "00:00" : state.IsPending ? "--:--" :
                 state.ActualWorkRate <= 0f ? "--:--" : FormatSeconds(state.RemainingWork / state.ActualWorkRate);
             Set(eta, "ETA  " + remaining);
-            if (work != null) work.gameObject.SetActive(!state.IsComplete);
-            if (bottleneck != null) bottleneck.gameObject.SetActive(!state.IsComplete);
-            if (eta != null) eta.gameObject.SetActive(!state.IsComplete);
+            if (throughput != null) throughput.gameObject.SetActive(verbose);
+            if (work != null) work.gameObject.SetActive(verbose && !state.IsComplete);
+            if (bottleneck != null) bottleneck.gameObject.SetActive(verbose && !state.IsComplete);
+            if (eta != null) eta.gameObject.SetActive(verbose && !state.IsComplete);
             if (progressFill != null)
-                progressFill.transform.parent.gameObject.SetActive(!state.IsComplete);
+                progressFill.transform.parent.gameObject.SetActive(verbose && !state.IsComplete);
 
             if (progressFill != null)
             {
@@ -117,26 +165,116 @@ namespace Uptime.Connections
                 else DestroyImmediate(token.gameObject);
             }
             operationTokens.Clear();
+            activeToken = null;
             if (operationRow == null || operationTokenPrefab == null) return;
             string target = state.TargetNode.NodeId;
-            for (int i = 0; i < state.OperationCount; i++)
+            int current = state.CurrentOperationIndex;
+            int completedCount = completedNormally ? state.OperationCount - 1 : current;
+            int futureCount = completedNormally ? 0 : state.OperationCount - current - 1;
+            int olderCount = Mathf.Max(0, completedCount - 1);
+            bool currentCompleted = completedNormally;
+            string currentLabel = InspectOperationToken.OperationLabel(
+                state.Definition.OperationAt(current), target);
+            float available = Mathf.Max(0f, operationRow.rect.width);
+            float spacing = operationRow.GetComponent<HorizontalLayoutGroup>()?.spacing ?? 0f;
+            float currentWidth = operationTokenPrefab.Measure(currentLabel,
+                currentCompleted ? 32f : 24f);
+            float historyWidth = completedCount > 0 ?
+                operationTokenPrefab.Measure("+" + completedCount, 32f) : 0f;
+            float futureWidth = futureCount > 0 ?
+                operationTokenPrefab.Measure("+" + futureCount, 20f) : 0f;
+            float shortWidth = operationTokenPrefab.Measure(InspectOperationToken.OperationLabel(
+                state.Definition.OperationAt(current), target, true),
+                currentCompleted ? 32f : 24f);
+            int fullGroups = VisibleGroups(currentWidth, historyWidth, futureWidth,
+                available, spacing);
+            int shortGroups = VisibleGroups(shortWidth, historyWidth, futureWidth,
+                available, spacing);
+            bool shortCurrent = currentWidth > available || shortGroups > fullGroups;
+            if (shortCurrent) currentWidth = shortWidth;
+            float widths = currentWidth;
+            int items = 1;
+            bool showHistory = completedCount > 0 &&
+                Fits(widths + historyWidth, items + 1, available, spacing);
+            if (showHistory) { widths += historyWidth; items++; }
+            bool showFuture = futureCount > 0 &&
+                Fits(widths + futureWidth, items + 1, available, spacing);
+            if (showFuture) { widths += futureWidth; items++; }
+            bool showPrevious = false;
+            bool shortPrevious = false;
+            bool showOlder = false;
+            if (completedCount > 0)
             {
-                if (i > state.CurrentOperationIndex && !completedNormally)
+                float previousWidth = operationTokenPrefab.Measure(
+                    InspectOperationToken.OperationLabel(state.Definition.OperationAt(current - 1),
+                        target), 32f);
+                float olderWidth = olderCount > 0 ?
+                    operationTokenPrefab.Measure("+" + olderCount, 32f) : 0f;
+                float replacement = previousWidth + (olderCount > 0 ? olderWidth : 0f);
+                int replacementItems = 1 + (olderCount > 0 ? 1 : 0);
+                float candidateWidths = widths - (showHistory ? historyWidth : 0f) + replacement;
+                int candidateItems = items - (showHistory ? 1 : 0) + replacementItems;
+                if (!Fits(candidateWidths, candidateItems, available, spacing))
                 {
-                    InspectOperationToken future = Instantiate(operationTokenPrefab, operationRow);
-                    future.ShowFuture(state.OperationCount - i);
-                    operationTokens.Add(future);
-                    break;
+                    float shortPreviousWidth = operationTokenPrefab.Measure(
+                        InspectOperationToken.OperationLabel(
+                            state.Definition.OperationAt(current - 1), target, true), 32f);
+                    candidateWidths = candidateWidths - previousWidth + shortPreviousWidth;
+                    shortPrevious = true;
                 }
-                InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
-                token.ShowOperation(state.Definition.OperationAt(i), target,
-                    i < state.CurrentOperationIndex || completedNormally, tint);
-                operationTokens.Add(token);
+                if (Fits(candidateWidths, candidateItems, available, spacing))
+                {
+                    showPrevious = true;
+                    showOlder = olderCount > 0;
+                    showHistory = false;
+                }
             }
+            if (showOlder) AddToken().ShowCompletedCount(olderCount);
+            else if (showHistory) AddToken().ShowCompletedCount(completedCount);
+            if (showPrevious)
+                AddToken().ShowOperation(state.Definition.OperationAt(current - 1), target, true,
+                    quietColor, shortPrevious);
+            activeToken = AddToken();
+            activeToken.ShowOperation(state.Definition.OperationAt(current), target,
+                currentCompleted, tint, shortCurrent);
+            if (currentWidth > available) activeToken.ConstrainWidth(available);
+            if (showFuture) AddToken().ShowFuture(futureCount);
             renderedState = state;
             renderedStage = state.CurrentOperationIndex;
             renderedOperationCount = state.OperationCount;
             renderedComplete = state.IsComplete;
+            renderedTimelineWidth = available;
+        }
+
+        private InspectOperationToken AddToken()
+        {
+            InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
+            operationTokens.Add(token);
+            return token;
+        }
+
+        private static bool Fits(float widths, int count, float available, float spacing) =>
+            widths + Mathf.Max(0, count - 1) * spacing <= available + 0.5f;
+
+        private static int VisibleGroups(float currentWidth, float historyWidth, float futureWidth,
+            float available, float spacing)
+        {
+            float widths = currentWidth;
+            int count = 1;
+            if (historyWidth > 0f && Fits(widths + historyWidth, count + 1, available, spacing))
+            {
+                widths += historyWidth;
+                count++;
+            }
+            if (futureWidth > 0f && Fits(widths + futureWidth, count + 1, available, spacing))
+                count++;
+            return count;
+        }
+
+        private static void SetTextWidth(TMP_Text label, float width)
+        {
+            if (label != null)
+                label.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
         }
 
         private static string FormatSeconds(float seconds)
