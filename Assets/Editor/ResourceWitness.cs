@@ -206,7 +206,7 @@ namespace Uptime.Connections.EditorTools
                 Check(ReferenceEquals(tokens[0], TimelineTokens(entry)[0]),
                     "live LOAD refresh keeps authored operation token");
                 Check(((LayoutElement)new SerializedObject(output).FindProperty("layout")
-                    .objectReferenceValue).preferredHeight == 202f, "single active entry height");
+                    .objectReferenceValue).preferredHeight == 212f, "single active entry height");
             }
             finally
             {
@@ -297,11 +297,11 @@ namespace Uptime.Connections.EditorTools
                 Check(!work.gameObject.activeSelf && !activity.gameObject.activeSelf &&
                     !eta.gameObject.activeSelf && !progress.transform.parent.gameObject.activeSelf,
                     "completed progress and supporting info hidden");
-                Check(((RectTransform)activeEntry.transform).rect.height == 186f &&
-                    ((RectTransform)completedEntry.transform).rect.height == 124f,
+                Check(((RectTransform)activeEntry.transform).rect.height == 188f &&
+                    ((RectTransform)completedEntry.transform).rect.height == 126f,
                     "completed entry is shorter than active entry");
                 Check(((LayoutElement)serialized.FindProperty("layout").objectReferenceValue)
-                    .preferredHeight == 336f, "mixed entries reflow within terminal history");
+                    .preferredHeight == 350f, "mixed entries reflow within terminal history");
             }
             finally
             {

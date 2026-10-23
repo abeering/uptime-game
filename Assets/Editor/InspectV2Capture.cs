@@ -73,6 +73,7 @@ namespace Uptime.Connections.EditorTools
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
                 canvas.worldCamera = camera;
                 canvas.planeDistance = 1f;
+                canvas.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1;
                 canvas.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
                 RectTransform root = (RectTransform)canvas.transform;
                 root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1920f);
@@ -100,7 +101,7 @@ namespace Uptime.Connections.EditorTools
                 Capture(camera, target, terminal, prefab, "inspect -v d4",
                     new[] { host.FindConnection("d4") }, InspectPresentationMode.Verbose,
                     "verbose-long-1920x1080.png");
-                Capture(camera, target, terminal, prefab, "inspect a1 b2 / inspect c3 d4",
+                Capture(camera, target, terminal, prefab, "inspect a1 b2 c3 d4",
                     new[] { host.FindConnection("a1"), host.FindConnection("b2"),
                         host.FindConnection("c3"), host.FindConnection("d4") },
                     InspectPresentationMode.Compact, "compact-consecutive-1920x1080.png");
@@ -131,18 +132,13 @@ namespace Uptime.Connections.EditorTools
             try
             {
                 Heading(content, "> " + command, new Vector2(0f, 0f), 18);
-                int blocks = (states.Length + 1) / 2;
-                for (int i = 0; i < blocks; i++)
-                {
-                    LogicalConnectionState[] pair = states.Skip(i * 2).Take(2).ToArray();
-                    InspectOutput output = PrefabUtility.InstantiatePrefab(prefab, content) as InspectOutput;
-                    if (output == null) throw new InvalidOperationException("Could not instantiate inspect prefab");
-                    RectTransform rect = (RectTransform)output.transform;
-                    rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
-                    rect.pivot = new Vector2(0f, 1f);
-                    rect.anchoredPosition = new Vector2(0f, -40f - i * 236f);
-                    output.Bind(pair, presentationMode: mode);
-                }
+                InspectOutput output = PrefabUtility.InstantiatePrefab(prefab, content) as InspectOutput;
+                if (output == null) throw new InvalidOperationException("Could not instantiate inspect prefab");
+                RectTransform rect = (RectTransform)output.transform;
+                rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -40f);
+                output.Bind(states, presentationMode: mode);
                 Canvas.ForceUpdateCanvases();
                 camera.Render();
                 RenderTexture previous = RenderTexture.active;
@@ -187,7 +183,7 @@ namespace Uptime.Connections.EditorTools
             text.text = content;
             text.fontSize = size;
             text.color = new Color(0.7f, 0.9f, 0.83f);
-            text.enableWordWrapping = false;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
         }
 
         private static ConnectionSpawnPlan Plan(string id, NodeView[] route, OperationStage[] stages) =>

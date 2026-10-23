@@ -15,6 +15,7 @@ namespace Uptime.Connections
         [SerializeField] private InspectOperationToken loadBadge;
         [SerializeField, Min(60f)] private float loadBadgeWidth = 126f;
         [SerializeField, Min(0f)] private float loadBadgeGap = 12f;
+        [SerializeField, Min(0f)] private float contentInset = 16f;
         [SerializeField] private TMP_Text work;
         [SerializeField] private TMP_Text throughput;
         [SerializeField] private TMP_Text bottleneck;
@@ -41,6 +42,23 @@ namespace Uptime.Connections
         private float renderedTimelineWidth = -1f;
         private InspectOperationToken activeToken;
 
+        public void ClearRuntimeTokens()
+        {
+            if (operationRow == null) return;
+            foreach (InspectOperationToken token in
+                operationRow.GetComponentsInChildren<InspectOperationToken>(true))
+            {
+                if (Application.isPlaying) Destroy(token.gameObject);
+                else DestroyImmediate(token.gameObject);
+            }
+            operationTokens.Clear();
+            activeToken = null;
+            renderedState = null;
+            renderedStage = -1;
+            renderedOperationCount = -1;
+            renderedTimelineWidth = -1f;
+        }
+
         public void SetHeight(float height)
         {
             ((RectTransform)transform).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
@@ -52,33 +70,51 @@ namespace Uptime.Connections
         {
             RectTransform card = (RectTransform)transform;
             card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
-            float contentWidth = Mathf.Max(0f, width - 24f);
+            float contentWidth = Mathf.Max(0f, width - contentInset * 2f);
+            if (identity != null)
+                identity.rectTransform.anchoredPosition = new Vector2(contentInset, -7f);
+            if (headerIdentityPill != null)
+                ((RectTransform)headerIdentityPill.transform).anchoredPosition =
+                    new Vector2(151f + contentInset - 12f, -19f);
+            if (purpose != null)
+                purpose.rectTransform.anchoredPosition =
+                    new Vector2(190f + contentInset - 12f, -7f);
             if (operationRow != null)
+            {
+                operationRow.anchoredPosition = new Vector2(contentInset, -43f);
                 operationRow.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
                     Mathf.Max(0f, contentWidth - loadBadgeWidth - loadBadgeGap));
+            }
             if (loadBadge != null)
             {
                 RectTransform badge = (RectTransform)loadBadge.transform;
                 badge.anchorMin = badge.anchorMax = new Vector2(1f, 1f);
                 badge.pivot = new Vector2(1f, 1f);
-                badge.anchoredPosition = new Vector2(-12f, -41f);
+                badge.anchoredPosition = new Vector2(-contentInset, -43f);
                 badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, loadBadgeWidth);
                 badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 40f);
             }
             SetTextWidth(throughput, contentWidth);
             SetTextWidth(work, contentWidth);
-            SetTextWidth(purpose, Mathf.Max(0f, width - 202f));
+            SetTextWidth(purpose, Mathf.Max(0f, width - 178f - contentInset * 2f));
             SetTextWidth(bottleneck, Mathf.Max(0f, width - 150f));
+            SetLeftInset(throughput, contentInset);
+            SetLeftInset(work, contentInset);
+            SetLeftInset(bottleneck, contentInset);
             if (eta != null)
             {
                 RectTransform rect = eta.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
                 rect.pivot = new Vector2(1f, 1f);
-                rect.anchoredPosition = new Vector2(-12f, -163f);
+                rect.anchoredPosition = new Vector2(-contentInset, -163f);
             }
             if (progressFill != null)
+            {
+                RectTransform progress = progressFill.transform.parent.GetComponent<RectTransform>();
+                progress.anchoredPosition = new Vector2(contentInset, progress.anchoredPosition.y);
                 progressFill.transform.parent.GetComponent<RectTransform>()
                     .SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentWidth);
+            }
         }
 
         public void Render(LogicalConnectionState state, Color? identityAccent = null,
@@ -275,6 +311,13 @@ namespace Uptime.Connections
         {
             if (label != null)
                 label.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+        }
+
+        private static void SetLeftInset(TMP_Text label, float inset)
+        {
+            if (label != null)
+                label.rectTransform.anchoredPosition =
+                    new Vector2(inset, label.rectTransform.anchoredPosition.y);
         }
 
         private static string FormatSeconds(float seconds)

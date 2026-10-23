@@ -245,6 +245,7 @@ MonoBehaviour:
   loadBadge: {fileID: 680440541820507890}
   loadBadgeWidth: 126
   loadBadgeGap: 12
+  contentInset: 16
   work: {fileID: 1889591523199373350}
   throughput: {fileID: 5643530123618302694}
   bottleneck: {fileID: 2002123210900289975}
@@ -1639,12 +1640,12 @@ MonoBehaviour:
   - {fileID: 4674007658338814172}
   layout: {fileID: 6779502979335242074}
   refreshSeconds: 0.2
-  activeEntryHeight: 186
-  completeEntryHeight: 124
-  compactEntryHeight: 90
-  topPadding: 8
-  entryGap: 10
-  bottomPadding: 8
+  activeEntryHeight: 188
+  completeEntryHeight: 126
+  compactEntryHeight: 94
+  topPadding: 12
+  entryGap: 12
+  bottomPadding: 12
 --- !u!1 &4732462879565034368
 GameObject:
   m_ObjectHideFlags: 0
@@ -1828,6 +1829,7 @@ MonoBehaviour:
   loadBadge: {fileID: 3412336778968757539}
   loadBadgeWidth: 126
   loadBadgeGap: 12
+  contentInset: 16
   work: {fileID: 3590236810256333891}
   throughput: {fileID: 1789918860066361027}
   bottleneck: {fileID: 8865388841748117658}

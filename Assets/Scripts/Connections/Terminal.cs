@@ -195,9 +195,9 @@ namespace Uptime.Connections
                     break;
                 case "help":
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id]  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id]  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #endif
                     break;
                 default:
@@ -210,7 +210,7 @@ namespace Uptime.Connections
 
         private void Inspect(string[] tokens)
         {
-            if (!TryParseInspect(tokens, inspectPrefab != null ? inspectPrefab.Capacity : 2,
+            if (!TryParseInspect(tokens,
                 out InspectPresentationMode mode, out string[] ids, out string error))
             {
                 AppendText(error, errorColor);
@@ -245,14 +245,14 @@ namespace Uptime.Connections
                 block.Bind(selected.ToArray(), simulationHost.PresentationPalette, mode);
         }
 
-        public static bool TryParseInspect(string[] tokens, int capacity,
+        public static bool TryParseInspect(string[] tokens,
             out InspectPresentationMode mode, out string[] ids, out string error)
         {
-            const string usage = "USAGE  inspect [-v|--verbose] <id> [id]";
+            const string usage = "USAGE  inspect [-v|--verbose] <id> [id ...]";
             mode = InspectPresentationMode.Compact;
             ids = System.Array.Empty<string>();
             error = usage;
-            if (tokens == null || tokens.Length == 0 || capacity < 1)
+            if (tokens == null || tokens.Length == 0)
                 return false;
             int firstId = 1;
             if (tokens.Length > 1 &&
@@ -269,7 +269,7 @@ namespace Uptime.Connections
                     return false;
                 }
             int count = tokens.Length - firstId;
-            if (count < 1 || count > capacity)
+            if (count < 1)
                 return false;
             ids = new string[count];
             System.Array.Copy(tokens, firstId, ids, 0, count);
