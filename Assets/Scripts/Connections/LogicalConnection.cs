@@ -48,17 +48,29 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float desiredLoad = 5f;
         [SerializeField] private string activityDescription;
         [SerializeField] private CompletionEffect completionEffect;
+        [SerializeField] private TimedModifierBehaviorDefinition[] behaviors;
 
         public OperationKind Operation => operation;
         public float TotalWork => Mathf.Max(0f, totalWork);
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public string ActivityDescription => activityDescription;
         public CompletionEffect EffectOnCompletion => completionEffect;
+        public TimedModifierBehaviorDefinition[] Behaviors => behaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public OperationStage() { }
         public OperationStage(OperationKind kind, float work, float load, string description,
-            CompletionEffect effect = CompletionEffect.None)
+            CompletionEffect effect = CompletionEffect.None,
+            TimedModifierBehaviorDefinition[] behaviors = null)
         { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
-            completionEffect = effect; }
+            completionEffect = effect; this.behaviors = CopyBehaviors(behaviors); }
+
+        internal static TimedModifierBehaviorDefinition[] CopyBehaviors(
+            TimedModifierBehaviorDefinition[] source)
+        {
+            if (source == null || source.Length == 0) return Array.Empty<TimedModifierBehaviorDefinition>();
+            var result = new TimedModifierBehaviorDefinition[source.Length];
+            for (int i = 0; i < result.Length; i++) result[i] = source[i]?.Copy();
+            return result;
+        }
     }
 
     [Serializable]
@@ -79,6 +91,7 @@ namespace Uptime.Connections
         private float startDelaySeconds;
         [SerializeField, Tooltip("Ordered operation arc. Empty preserves the legacy single-operation fields above.")]
         private OperationStage[] operations;
+        [SerializeField] private TimedModifierBehaviorDefinition[] connectionBehaviors;
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
@@ -98,6 +111,10 @@ namespace Uptime.Connections
         public string ActivityAt(int index) => HasArc ? StageAt(index).ActivityDescription : activityDescription;
         public CompletionEffect EffectAt(int index) => HasArc ? StageAt(index).EffectOnCompletion :
             CompletionEffect.None;
+        public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
+            connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
+        public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
+            StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
         private bool HasArc => operations != null && operations.Length > 0;
         private OperationStage StageAt(int index) => operations[index] ??
             throw new InvalidOperationException($"Connection {connectionId} has an empty operation stage.");
@@ -113,14 +130,16 @@ namespace Uptime.Connections
                 activityDescription = plan.Operations[0].ActivityDescription,
                 currentOperation = plan.Operations[0].Operation,
                 route = new RouteNode[plan.Route.Length],
-                operations = new OperationStage[plan.Operations.Length]
+                operations = new OperationStage[plan.Operations.Length],
+                connectionBehaviors = OperationStage.CopyBehaviors(plan.ConnectionBehaviors)
             };
             for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
             for (int i = 0; i < result.operations.Length; i++)
             {
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
-                    stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion);
+                    stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
+                    stage.Behaviors);
             }
             return result;
         }
@@ -159,6 +178,7 @@ namespace Uptime.Connections
             RouteLinks = routeLinks;
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
+            Behaviors = new ConnectionBehaviorRuntime(definition);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Active;
         }
 
@@ -166,14 +186,17 @@ namespace Uptime.Connections
 
         public LogicalConnectionDefinition Definition { get; }
         public NodeResources TargetResources { get; }
+        public ConnectionBehaviorRuntime Behaviors { get; }
         internal PhysicalLinkReference[] RouteLinks { get; }
         public string ConnectionId => Definition.ConnectionId;
         public bool IsHostile => Definition.IsHostile;
         public int CurrentOperationIndex { get; internal set; }
         public int OperationCount => Definition.OperationCount;
         public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
-        public float CurrentTotalWork => Definition.WorkAt(CurrentOperationIndex);
-        public float DesiredLoad => Definition.LoadAt(CurrentOperationIndex);
+        public float BaseWork => Definition.WorkAt(CurrentOperationIndex);
+        public float BaseLoad => Definition.LoadAt(CurrentOperationIndex);
+        public float CurrentTotalWork => Behaviors.EffectiveWork(CurrentOperationIndex);
+        public float DesiredLoad => Behaviors.EffectiveLoad(CurrentOperationIndex);
         public string ActivityDescription => Definition.ActivityAt(CurrentOperationIndex);
         public NodeView TargetNode => Definition.TargetNode;
         public float CompletedWork { get; internal set; }
@@ -206,7 +229,7 @@ namespace Uptime.Connections
 
         internal void FinishOperation()
         {
-            CompletedWork = CurrentTotalWork;
+            CompletedWork = Mathf.Max(CompletedWork, CurrentTotalWork);
             AllocatedLoad = 0f;
             if (CurrentOperationIndex + 1 == OperationCount)
                 Lifecycle = Lifecycle.Complete;

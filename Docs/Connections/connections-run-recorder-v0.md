@@ -25,6 +25,8 @@ Threats V0 Slice 1 adds manual `plan_queued` events (`source: manual`), Killed r
 
 Slice 2's `delayed-threat` uses the same event schema. Its READ completes at index 0 without an effect; its WRITE starts on the following simulation step and completes at index 1, followed by one infection-delivery event and final resolution. A kill during WRITE retains the READ completion event and records a Killed resolution without delivery.
 
+Slice 3A adds optional behavior definitions to recorded plan/profile metadata, effective and base WORK/LOAD in snapshots, and `modifier_added`/`modifier_removed` events with modifier ID, behavior ID, scope, associated operation index, WORK/LOAD deltas, and simulation time. The connection's runtime owns the authoritative active collection and append-only modifier history; the run recorder observes those changes. An operation-completion event records its effective required WORK and accomplished WORK, which can differ if required WORK fell below already accomplished progress.
+
 [`connections-run-recorder-example.json`](examples/connections-run-recorder-example.json) is the complete file saved by a Recorder Witness run. It includes a two-operation connection, a bookmark, autosave, and a blocked high-demand connection.
 
 Snapshots are taken at about one-second **simulation** intervals after allocation, plus immediately for markers and blocks. Each contains authoritative requested and allocated LOAD for every node and current WORK, operation, demand, allocation, and performance for pending or active connections. A large manual simulation step yields one snapshot at the actual observed time; the recorder does not invent intermediate states. Autosaves use **real elapsed** time, including while simulation time is paused.

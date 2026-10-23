@@ -91,6 +91,8 @@ namespace Uptime.Connections
         // Explicit step seam for deterministic Editor witnesses. Play mode calls it only from FixedUpdate.
         public void StepSimulation(float deltaSeconds)
         {
+            if (deltaSeconds <= 0f || float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds))
+                throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
             if (runtimeConnections == null)
                 ResetSimulation();
 
@@ -101,10 +103,17 @@ namespace Uptime.Connections
                 {
                     connection.Lifecycle = Lifecycle.Active;
                     connection.EstablishedAtSeconds = simulationTimeSeconds;
+                    connection.Behaviors.StartConnection();
+                    connection.Behaviors.StartOperation(connection.CurrentOperationIndex);
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
                 }
                 else if (connection.IsTransitioning)
+                {
+                    connection.Behaviors.StartOperation(connection.CurrentOperationIndex);
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
+                }
+                if (connection.IsActive)
+                    connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
             }
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
@@ -112,13 +121,19 @@ namespace Uptime.Connections
             foreach (ResourceAllocator.OperationCompletion completion in completed)
             {
                 recorder?.RecordOperationCompleted(completion.State, completion.Index,
-                    simulationTimeSeconds);
+                    completion.CompletedWork, completion.RequiredWork,
+                    completion.DesiredLoad, simulationTimeSeconds);
                 ConnectionEffectOccurrence occurrence = completion.State.OnWorkCompleted(
                     completion.Index, simulationTimeSeconds);
-                if (occurrence == null) continue;
-                occurrences.Add(occurrence);
-                recorder?.RecordEffect(occurrence);
-                EffectOccurred?.Invoke(occurrence);
+                if (occurrence != null)
+                {
+                    occurrences.Add(occurrence);
+                    recorder?.RecordEffect(occurrence);
+                    EffectOccurred?.Invoke(occurrence);
+                }
+                completion.State.Behaviors.EndOperation(simulationTimeSeconds);
+                if (completion.State.IsComplete)
+                    completion.State.Behaviors.EndConnection(simulationTimeSeconds);
             }
             if (runMode == ConnectionRunMode.Generated)
             {
@@ -145,6 +160,11 @@ namespace Uptime.Connections
             if (!usedIds.Add(state.ConnectionId))
                 throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
             state.EstablishedAtSeconds = simulationTimeSeconds;
+            if (state.IsActive)
+            {
+                state.Behaviors.StartConnection();
+                state.Behaviors.StartOperation(state.CurrentOperationIndex);
+            }
             var next = new List<LogicalConnectionState>(runtimeConnections) { state };
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
@@ -171,6 +191,7 @@ namespace Uptime.Connections
                 {
                     state.Lifecycle = Lifecycle.Complete;
                     state.AllocatedLoad = 0f;
+                    state.Behaviors.EndConnection(simulationTimeSeconds);
                     Resolve(state, ConnectionResolution.Killed);
                     var next = new List<LogicalConnectionState>(runtimeConnections);
                     next.Remove(state);
@@ -213,6 +234,11 @@ namespace Uptime.Connections
                         throw new InvalidOperationException("Logical connections require unique IDs.");
                     states.Add(state);
                     history.Add(state.ConnectionId, state);
+                    if (state.IsActive)
+                    {
+                        state.Behaviors.StartConnection();
+                        state.Behaviors.StartOperation(state.CurrentOperationIndex);
+                    }
                 }
             }
 
@@ -253,12 +279,16 @@ namespace Uptime.Connections
                     !visited.Add(requirement.Node))
                     throw new InvalidOperationException("Connection has an invalid or repeated route node.");
             for (int i = 0; i < definition.OperationCount; i++)
+            {
                 if (definition.WorkAt(i) <= 0f || definition.LoadAt(i) <= 0f ||
                     float.IsNaN(definition.WorkAt(i)) || float.IsInfinity(definition.WorkAt(i)) ||
                     float.IsNaN(definition.LoadAt(i)) || float.IsInfinity(definition.LoadAt(i)) ||
                     !Enum.IsDefined(typeof(OperationKind), definition.OperationAt(i)) ||
                     !Enum.IsDefined(typeof(CompletionEffect), definition.EffectAt(i)))
                     throw new InvalidOperationException("Connection operation needs finite positive WORK/LOAD and valid kinds/effects.");
+                ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
+            }
+            ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
             var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
             for (int i = 0; i < routeLinks.Length; i++)
             {
@@ -274,7 +304,32 @@ namespace Uptime.Connections
                 }
                 if (routeLinks[i] == null) throw new InvalidOperationException("Route has no physical link.");
             }
-            return new LogicalConnectionState(definition, routeLinks, nodeByView[definition.TargetNode]);
+            var state = new LogicalConnectionState(definition, routeLinks,
+                nodeByView[definition.TargetNode]);
+            state.Behaviors.ModifierChanged += change => recorder?.RecordModifierChange(state, change);
+            return state;
+        }
+
+        private static void ValidateBehaviors(TimedModifierBehaviorDefinition[] definitions,
+            BehaviorScope scope)
+        {
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (TimedModifierBehaviorDefinition behavior in definitions)
+                if (behavior == null || string.IsNullOrWhiteSpace(behavior.Id) ||
+                    !ids.Add(behavior.Id) ||
+                    float.IsNaN(behavior.StartAfterSeconds) ||
+                    float.IsInfinity(behavior.StartAfterSeconds) ||
+                    behavior.StartAfterSeconds < 0f ||
+                    float.IsNaN(behavior.StopAfterSeconds) ||
+                    float.IsInfinity(behavior.StopAfterSeconds) ||
+                    behavior.StopAfterSeconds < 0f ||
+                    (behavior.StopAfterSeconds > 0f &&
+                        behavior.StopAfterSeconds <= behavior.StartAfterSeconds) ||
+                    float.IsNaN(behavior.WorkDelta) || float.IsInfinity(behavior.WorkDelta) ||
+                    (scope == BehaviorScope.Connection && behavior.WorkDelta != 0f) ||
+                    float.IsNaN(behavior.LoadDelta) || float.IsInfinity(behavior.LoadDelta))
+                    throw new InvalidOperationException("Behavior needs a unique ID, finite deltas, " +
+                        "a valid start/stop window, and connection-scope WORK delta zero.");
         }
 
         private void ClearAllocatedUsage()

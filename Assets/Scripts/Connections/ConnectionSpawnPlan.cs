@@ -14,10 +14,12 @@ namespace Uptime.Connections
         public bool IsHostile { get; }
         public string ClaimedPurpose { get; }
         public OperationStage[] Operations { get; }
+        public TimedModifierBehaviorDefinition[] ConnectionBehaviors { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
-            bool isHostile = false)
+            bool isHostile = false,
+            TimedModifierBehaviorDefinition[] connectionBehaviors = null)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -27,7 +29,15 @@ namespace Uptime.Connections
             ProfileId = profileId;
             IsHostile = isHostile;
             ClaimedPurpose = claimedPurpose;
-            Operations = operations != null ? (OperationStage[])operations.Clone() : Array.Empty<OperationStage>();
+            Operations = new OperationStage[operations?.Length ?? 0];
+            for (int i = 0; i < Operations.Length; i++)
+            {
+                OperationStage stage = operations[i];
+                Operations[i] = stage == null ? null : new OperationStage(stage.Operation,
+                    stage.TotalWork, stage.DesiredLoad, stage.ActivityDescription,
+                    stage.EffectOnCompletion, stage.Behaviors);
+            }
+            ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
         }
     }
 }

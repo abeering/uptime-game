@@ -1,6 +1,6 @@
 # Connections — Threats V0: selected baseline and phased plan
 
-**Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C) are implemented; Phases D–E remain plans.**
+**Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C) are implemented. Slice 3A implements the base/effective requirements and behavior-scope foundation of Phase D; gameplay keywords and the rest of Phases D–E remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 
 ## Objective and first playable slice
@@ -28,6 +28,10 @@ Each operation definition can carry a completion effect independently of its REA
 `delayed-threat` is a second manual-only hostile profile (`ambientWeight = 0`) through the same `spawn <profileId>` and concrete-plan queue. It claims Database Maintenance and follows EXT1–API–DB throughout. Its first operation is an ordinary READ requesting 2 LOAD for 16 fixed WORK, with no completion effect. Its second operation reuses `basic-threat`'s WRITE definition: 12 requested LOAD, 240 fixed WORK, and one infection-delivery effect on normal completion. No extra lifecycle or target change is involved.
 
 READ completion emits no delivery and leaves the connection transitioning. The WRITE starts on the next fixed step with the same ID, path, target, and inspect history; its requested LOAD, WORK, ETA, and pulse direction follow the active operation. Normal WRITE completion emits one occurrence at operation index 1. Killing during READ prevents WRITE and delivery; killing during WRITE preserves the completed READ in history and prevents its pending delivery. Concurrent instances own separate delivery state. The terminal does not reveal hostile classification before delivery.
+
+## Slice 3A implementation — behavior foundation
+
+The [behavior foundation](connections-behavior-foundation-v0.md) introduces connection-owned runtime behavior state, passive active modifiers, base and effective WORK/LOAD, and append-only modifier history. Both connection and operation definition scopes use the same narrow timed adjustment executor in deterministic witness plans. Connection-scope WORK remains intentionally unsupported until its association semantics are designed. No new hostile profile or gameplay keyword uses this foundation yet; the existing threats and completion effects are unchanged.
 
 ## Reconciliation with the October 22–23 idea archive
 
@@ -90,7 +94,7 @@ Later, effective demand changes must be applied **before allocation** each fixed
 - Third hostile example: otherwise normal-looking operation that spikes according to its keyword. Validate that benign operations can use the same keyword without infection delivery.
 - Keep threat classification and payload delivery independent of these operation-arc modifiers.
 
-Phase C is implemented as Slice 2. Phases D–E remain planned direction and are outside both completed slices.
+Phase C is implemented as Slice 2. Slice 3A covers only the base/effective and behavior-scope foundation of Phase D. SPIKING, OVERLOAD, and remaining dynamic behavior decisions are still planned direction.
 
 ## Deterministic witnesses and review criteria
 

@@ -12,6 +12,8 @@ This phase gives Connections a continuous benign traffic rhythm. Packet remains 
 
 Threats V0 Slice 1 adds development-only `spawn <profileId>` through the same profile-to-plan builder and `QueueSpawnPlan` path used by ambient generation. The command reports a queued ID or unknown-profile error. Queued plans dispatch even with ambient generation disabled, and authored witness mode suppresses ambient generation while retaining explicit queue dispatch. Slice 2 adds `spawn delayed-threat` to that catalog; it uses the same queue and registration path. Manual spawns are not a Level Director or a scheduling language.
 
+Slice 3A allows connection- and operation-scope behavior definitions to travel through the existing profile-to-concrete-plan path. The default profile catalog supplies none; the behavior witness queues explicit plans to exercise the foundation without changing ambient traffic or adding a threat profile. A Connection Plan describes intended operations and behaviors, while `ConnectionSpawnPlan` remains the scheduled concrete arrival. See the [behavior foundation](connections-behavior-foundation-v0.md).
+
 The Packet game's separation between procedural traffic, concrete spawn plans, and level events informed this seam. Its tick schedules, modifiers, threat generation, and runtime code are not reused. Connections uses its existing simulation clock and LOAD allocator.
 
 ## Modes and tuning assumptions

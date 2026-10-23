@@ -14,6 +14,7 @@ namespace Uptime.Connections
         [Min(0.01f)] public float minimumDuration = 40f;
         [Min(0.01f)] public float maximumDuration = 75f;
         public CompletionEffect completionEffect;
+        public TimedModifierBehaviorDefinition[] behaviors;
     }
 
     [Serializable]
@@ -24,6 +25,7 @@ namespace Uptime.Connections
         public string[] eligibleTargetIds;
         [Min(0f)] public float ambientWeight = 1f;
         public bool isHostile;
+        public TimedModifierBehaviorDefinition[] connectionBehaviors;
         public ConnectionOperationProfile[] operations;
     }
 
@@ -198,10 +200,11 @@ namespace Uptime.Connections
                 float load = Range(spec.minimumLoad, spec.maximumLoad);
                 float duration = Range(spec.minimumDuration, spec.maximumDuration);
                 stages[i] = new OperationStage(spec.operation, load * duration, load,
-                    spec.activityDescription, spec.completionEffect);
+                    spec.activityDescription, spec.completionEffect, spec.behaviors);
             }
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
-                selected.claimedPurpose, stages, selected.isHostile);
+                selected.claimedPurpose, stages, selected.isHostile,
+                selected.connectionBehaviors);
         }
 
         private string NewId()

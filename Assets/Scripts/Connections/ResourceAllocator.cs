@@ -11,10 +11,15 @@ namespace Uptime.Connections
 
         internal readonly struct OperationCompletion
         {
-            public OperationCompletion(LogicalConnectionState state, int index)
-            { State = state; Index = index; }
+            public OperationCompletion(LogicalConnectionState state, int index,
+                float completedWork, float requiredWork, float desiredLoad)
+            { State = state; Index = index; CompletedWork = completedWork;
+                RequiredWork = requiredWork; DesiredLoad = desiredLoad; }
             public LogicalConnectionState State { get; }
             public int Index { get; }
+            public float CompletedWork { get; }
+            public float RequiredWork { get; }
+            public float DesiredLoad { get; }
         }
 
         internal static List<OperationCompletion> Step(NodeResources[] nodes,
@@ -52,12 +57,15 @@ namespace Uptime.Connections
                 float available = Mathf.Max(0f, target.LoadCapacity - target.BaselineLoad);
                 float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
                 connection.AllocatedLoad = connection.DesiredLoad * fraction;
-                connection.CompletedWork = Mathf.Min(connection.CurrentTotalWork,
-                    connection.CompletedWork + connection.ActualWorkRate * deltaSeconds);
+                // A reduced requirement cannot erase WORK already accomplished.
+                connection.CompletedWork = Mathf.Max(connection.CompletedWork,
+                    Mathf.Min(connection.CurrentTotalWork,
+                        connection.CompletedWork + connection.ActualWorkRate * deltaSeconds));
                 if (connection.RemainingWork > Epsilon)
                     continue;
 
-                completed.Add(new OperationCompletion(connection, connection.CurrentOperationIndex));
+                completed.Add(new OperationCompletion(connection, connection.CurrentOperationIndex,
+                    connection.CompletedWork, connection.CurrentTotalWork, connection.DesiredLoad));
                 connection.FinishOperation();
             }
 
