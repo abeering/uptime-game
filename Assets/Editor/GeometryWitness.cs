@@ -86,6 +86,15 @@ namespace Uptime.Connections.EditorTools
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/LogicalPath.prefab");
             Check(prefab != null && prefab.GetComponent<LogicalPathView>() != null &&
                 prefab.GetComponent<PathGraphic>() != null, "authored path prefab");
+            Material lineMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Shaders/ConnectionsLine.mat");
+            Check(lineMaterial != null && lineMaterial.shader != null &&
+                lineMaterial.shader.name == "Uptime/Connections/AntialiasedLine" &&
+                prefab.GetComponent<PathGraphic>().material == lineMaterial,
+                "logical paths use the shared antialiased line material");
+            foreach (PhysicalLinkView link in links)
+                Check(link.GetComponent<AntialiasedLineGraphic>() != null &&
+                    link.GetComponent<AntialiasedLineGraphic>().material == lineMaterial,
+                    link.LinkId + " physical line uses the shared antialiased material");
             LogicalPathView activity = prefab.GetComponent<LogicalPathView>();
             Check(LogicalPathView.DirectionFor(OperationKind.Write) == 1 &&
                 LogicalPathView.DirectionFor(OperationKind.Read) == -1 &&

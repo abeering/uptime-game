@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
     // Only transient UI geometry lives here. The simulation never reads this path.
-    public sealed class PathGraphic : MaskableGraphic
+    public sealed class PathGraphic : AntialiasedLineGraphic
     {
         private Vector2[] starts;
         private Vector2[] ends;
@@ -50,9 +51,15 @@ namespace Uptime.Connections
             if (!changed)
                 return;
 
-            starts = (Vector2[])segmentStarts.Clone();
-            ends = (Vector2[])segmentEnds.Clone();
-            widths = (float[])segmentWidths.Clone();
+            if (starts == null || starts.Length != segmentStarts.Length)
+            {
+                starts = new Vector2[segmentStarts.Length];
+                ends = new Vector2[segmentStarts.Length];
+                widths = new float[segmentStarts.Length];
+            }
+            Array.Copy(segmentStarts, starts, starts.Length);
+            Array.Copy(segmentEnds, ends, ends.Length);
+            Array.Copy(segmentWidths, widths, widths.Length);
             reveal = nextReveal;
             SetVerticesDirty();
         }
@@ -81,15 +88,7 @@ namespace Uptime.Connections
                     distanceBefore += length;
                     continue;
                 }
-                Vector2 normal = new Vector2(-direction.y, direction.x).normalized * (widths[i] * 0.5f);
-                int index = mesh.currentVertCount;
-                Color32 tint = color;
-                mesh.AddVert(starts[i] - normal, tint, Vector2.zero);
-                mesh.AddVert(starts[i] + normal, tint, Vector2.zero);
-                mesh.AddVert(end + normal, tint, Vector2.zero);
-                mesh.AddVert(end - normal, tint, Vector2.zero);
-                mesh.AddTriangle(index, index + 1, index + 2);
-                mesh.AddTriangle(index, index + 2, index + 3);
+                AddLine(mesh, starts[i], end, widths[i], color);
                 if (pulseSpacing > 1f && pulseOpacity > 0f)
                 {
                     float visibleLength = Mathf.Min(length, remaining);
@@ -102,14 +101,8 @@ namespace Uptime.Connections
                         float to = Mathf.Min(visibleLength, from + Mathf.Min(12f, pulseSpacing * 0.42f));
                         if (to <= from)
                             continue;
-                        Vector2 pulseNormal = normal * 0.72f;
-                        int pulseIndex = mesh.currentVertCount;
-                        mesh.AddVert(starts[i] + direction.normalized * from - pulseNormal, pulseTint, Vector2.zero);
-                        mesh.AddVert(starts[i] + direction.normalized * from + pulseNormal, pulseTint, Vector2.zero);
-                        mesh.AddVert(starts[i] + direction.normalized * to + pulseNormal, pulseTint, Vector2.zero);
-                        mesh.AddVert(starts[i] + direction.normalized * to - pulseNormal, pulseTint, Vector2.zero);
-                        mesh.AddTriangle(pulseIndex, pulseIndex + 1, pulseIndex + 2);
-                        mesh.AddTriangle(pulseIndex, pulseIndex + 2, pulseIndex + 3);
+                        AddLine(mesh, starts[i] + direction / length * from,
+                            starts[i] + direction / length * to, widths[i] * 0.72f, pulseTint);
                     }
                 }
                 remaining -= length;
