@@ -16,14 +16,17 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float bottomPadding = 8f;
 
         private LogicalConnectionState[] states;
+        private ConnectionIdentityPalette palette;
         private bool[] frozen;
         private float nextRefresh;
 
-        public void Bind(LogicalConnectionState[] selected)
+        public void Bind(LogicalConnectionState[] selected,
+            ConnectionIdentityPalette identityPalette = null)
         {
             if (selected == null || selected.Length == 0 || selected.Length > entries.Length)
                 return;
             states = selected;
+            palette = identityPalette;
             enabled = true;
             frozen = new bool[selected.Length];
             for (int i = 0; i < entries.Length; i++)
@@ -47,7 +50,9 @@ namespace Uptime.Connections
             {
                 if (frozen[i])
                     continue;
-                entries[i].Render(states[i]);
+                Color? accent = palette != null && palette.TryGet(states[i], out Color color) ?
+                    color : (Color?)null;
+                entries[i].Render(states[i], accent);
                 if (states[i].IsComplete)
                     frozen[i] = true;
                 else
@@ -78,6 +83,7 @@ namespace Uptime.Connections
         private void OnDestroy()
         {
             states = null;
+            palette = null;
             frozen = null;
         }
     }

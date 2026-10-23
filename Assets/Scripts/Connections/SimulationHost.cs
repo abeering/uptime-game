@@ -34,6 +34,8 @@ namespace Uptime.Connections
         public float SimulationTimeSeconds => simulationTimeSeconds;
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
+        public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
+            pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
         public bool HasEverUsedId(string id) => usedIds.Contains(id);
         public LogicalConnectionState FindConnection(string id) =>
@@ -316,7 +318,7 @@ namespace Uptime.Connections
             var output = new StringBuilder("CONNECTIONS  •  allocated / desired LOAD; 1 LOAD = 1 WORK/s");
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                output.Append('\n').Append(connection.ConnectionId).Append(' ')
+                output.Append('\n').Append(connection.ConnectionId.ToLowerInvariant()).Append(' ')
                     .Append(connection.CurrentOperation.ToString().ToUpperInvariant())
                     .Append(' ').Append(connection.CurrentOperationIndex + 1)
                     .Append('/').Append(connection.OperationCount).Append(' ');

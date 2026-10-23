@@ -44,9 +44,13 @@ namespace Uptime.Connections
         }
         private readonly List<Queued> queue = new List<Queued>();
         private readonly HashSet<string> reservedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private const string IdLetters = "abcdefghijklmnopqrstuvwxyz";
+        private const string IdDigits = "0123456789";
+        private string[] shuffledIds;
+        private int nextIdIndex;
+        private bool idsExhausted;
         private System.Random random;
         private float nextAmbientAt;
-        private int nextId;
         private long nextOrder;
 
         public bool AutoGenerationEnabled { get => autoGenerationEnabled; set => autoGenerationEnabled = value; }
@@ -62,7 +66,19 @@ namespace Uptime.Connections
             random = new System.Random(seed);
             queue.Clear();
             reservedIds.Clear();
-            nextId = 1;
+            shuffledIds = new string[IdLetters.Length * IdDigits.Length];
+            for (int i = 0; i < shuffledIds.Length; i++)
+                shuffledIds[i] = new string(new[] { IdLetters[i / IdDigits.Length],
+                    IdDigits[i % IdDigits.Length] });
+            // A separate stream means ID changes cannot shift traffic/profile draws.
+            var idRandom = new System.Random(unchecked(seed ^ (int)0x5EED1D5));
+            for (int i = shuffledIds.Length - 1; i > 0; i--)
+            {
+                int swap = idRandom.Next(i + 1);
+                (shuffledIds[i], shuffledIds[swap]) = (shuffledIds[swap], shuffledIds[i]);
+            }
+            nextIdIndex = 0;
+            idsExhausted = false;
             nextOrder = 0;
             nextAmbientAt = initialGraceSeconds;
             if (profiles == null || profiles.Length == 0)
@@ -83,12 +99,13 @@ namespace Uptime.Connections
         public void Tick(float simulationTime)
         {
             if (random == null) ResetDirector();
-            if (autoGenerationEnabled)
+            if (autoGenerationEnabled && !idsExhausted)
             {
                 while (nextAmbientAt <= simulationTime + 0.00001f)
                 {
                     ConnectionSpawnPlan plan = GeneratePlan(nextAmbientAt);
                     if (plan != null) QueueSpawnPlan(plan, "ambient");
+                    if (idsExhausted) break;
                     nextAmbientAt += Mathf.Max(0.01f, spawnIntervalSeconds +
                         Range(-spawnJitterSeconds, spawnJitterSeconds));
                 }
@@ -113,8 +130,11 @@ namespace Uptime.Connections
             NodeView origin = FindNode(ambientOriginId);
             NodeView target = FindNode(targetId);
             NodeView[] route = FindRoute(origin, target);
+            string id = NewId();
+            if (id == null)
+                throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
             float load = obvious ? Range(10f, 12f) : Range(7f, 9f);
-            var plan = new ConnectionSpawnPlan(host.SimulationTimeSeconds, NewId(), route,
+            var plan = new ConnectionSpawnPlan(host.SimulationTimeSeconds, id, route,
                 "high-demand-witness", "High Demand Test",
                 new[] { new OperationStage(OperationKind.Read, load * 50f, load, "High demand test") });
             QueueSpawnPlan(plan, "high-demand-witness");
@@ -128,6 +148,8 @@ namespace Uptime.Connections
             foreach (ConnectionTrafficProfile profile in profiles)
                 if (profile != null) total += Mathf.Max(0f, profile.ambientWeight);
             if (total <= 0f) return null;
+            string id = NewId();
+            if (id == null) return null;
             float choice = (float)random.NextDouble() * total;
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
@@ -149,15 +171,22 @@ namespace Uptime.Connections
                 stages[i] = new OperationStage(spec.operation, load * duration, load,
                     spec.activityDescription);
             }
-            return new ConnectionSpawnPlan(atTime, NewId(), route, selected.id,
+            return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages);
         }
 
         private string NewId()
         {
-            string id;
-            do { id = "c" + nextId++; } while (reservedIds.Contains(id) || host.HasEverUsedId(id));
-            return id;
+            while (nextIdIndex < shuffledIds.Length)
+            {
+                string id = shuffledIds[nextIdIndex++];
+                if (!reservedIds.Contains(id) && !host.HasEverUsedId(id))
+                    return id;
+            }
+            if (!idsExhausted)
+                Debug.LogWarning("All 260 generated connection IDs are reserved; ambient spawning has stopped.", this);
+            idsExhausted = true;
+            return null;
         }
         private float Range(float min, float max) => min + (float)random.NextDouble() * (max - min);
         private NodeView FindNode(string id)

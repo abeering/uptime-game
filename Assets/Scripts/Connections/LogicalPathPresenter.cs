@@ -10,6 +10,7 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private LogicalPathView pathPrefab;
         [SerializeField] private IdentityPresenter identityPresenter;
+        [SerializeField] private ConnectionIdentityPalette identityPalette = new ConnectionIdentityPalette();
         [Header("Logical line geometry (UI pixels)")]
         [SerializeField, Min(0.1f)] private float maxLineWidth = 12f;
         [SerializeField, Min(0f)] private float minLineGap = 3f;
@@ -29,6 +30,7 @@ namespace Uptime.Connections
         public float MaxLineWidth => Mathf.Max(0.1f, maxLineWidth);
         public float MinLineGap => Mathf.Max(0f, minLineGap);
         public float MinLineWidth => Mathf.Max(0.1f, minLineWidth);
+        public ConnectionIdentityPalette IdentityPalette => identityPalette;
 
         public void SetPreviewMode(bool enabled)
         {
@@ -51,16 +53,21 @@ namespace Uptime.Connections
                 return;
             foreach (LogicalPathView oldView in views.Values)
                 if (oldView != null)
+                {
+                    oldView.Destroyed -= OnPathDestroyed;
                     Destroy(oldView.gameObject);
+                }
             views.Clear();
             warnedLinks.Clear();
             laneOrder.Clear();
+            identityPalette.Reset();
             connections = states;
             foreach (LogicalConnectionState connection in connections)
             {
                 LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
                 view.name = "Logical path " + connection.ConnectionId;
                 view.Bind(connection, networkArea);
+                view.Destroyed += OnPathDestroyed;
                 view.gameObject.SetActive(!previewMode);
                 views.Add(connection, view);
             }
@@ -76,6 +83,7 @@ namespace Uptime.Connections
             LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
             view.name = "Logical path " + state.ConnectionId;
             view.Bind(state, networkArea);
+            view.Destroyed += OnPathDestroyed;
             view.gameObject.SetActive(!previewMode);
             views.Add(state, view);
             UpdateLayouts();
@@ -90,6 +98,12 @@ namespace Uptime.Connections
             // The view keeps its state through its own departure animation.
             views.Remove(state);
             UpdateLayouts();
+        }
+
+        private void OnPathDestroyed(LogicalConnectionState state)
+        {
+            identityPalette.Release(state);
+            views.Remove(state);
         }
 
         private void LateUpdate()
@@ -110,6 +124,8 @@ namespace Uptime.Connections
             {
                 if (!connection.IsActive)
                     continue;
+                Color accent = identityPalette.Assign(connection);
+                views[connection].SetIdentityColor(accent);
                 var nodes = new NodeView[connection.Definition.Route.Length];
                 var links = new PhysicalLinkView[connection.RouteLinks.Length];
                 for (int i = 0; i < nodes.Length; i++)
@@ -152,6 +168,7 @@ namespace Uptime.Connections
             {
                 if (!connection.IsActive)
                     continue;
+                Color accent = identityPalette.Assign(connection);
                 float[] offsets = new float[connection.RouteLinks.Length];
                 float[] widths = new float[offsets.Length];
                 for (int edge = 0; edge < offsets.Length; edge++)
@@ -180,7 +197,7 @@ namespace Uptime.Connections
                         Vector2 targetEnd = EdgeGeometry.CardEdge(routeB,
                             networkArea, -direction, -offsets[edge]);
                         bool hasVisual = views[connection].TryGetVisualSegment(edge, out Vector2 visualStart,
-                            out Vector2 visualEnd, out float visibleFraction, out Color lineColor);
+                            out Vector2 visualEnd, out float visibleFraction, out _);
                         if (!hasVisual)
                         {
                             visualStart = targetStart;
@@ -193,7 +210,7 @@ namespace Uptime.Connections
                             identitiesByLink.Add(linkView, lines);
                         }
                         lines.Add(new IdentityPresenter.LiveLine(connection.ConnectionId,
-                            targetStart, targetEnd, visualStart, visualEnd, lineColor, visibleFraction,
+                            targetStart, targetEnd, visualStart, visualEnd, accent, visibleFraction,
                             width));
                     }
                     if (width < minLineWidth)

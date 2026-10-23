@@ -95,13 +95,15 @@ namespace Uptime.Connections
                     break;
                 case "block":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  block c17", errorColor);
+                        AppendText("USAGE  block a7", errorColor);
                     else
                     {
                         bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
                         recorder?.RecordPlayerAction(command, tokens[1], blocked);
-                        AppendText(blocked ? "BLOCKED  " + tokens[1] :
-                            "BLOCK  no active connection " + tokens[1], blocked ? normalColor : errorColor);
+                        string displayId = tokens[1].ToLowerInvariant();
+                        AppendText(blocked ? "BLOCKED  " + displayId :
+                            "BLOCK  no active connection " + displayId,
+                            blocked ? normalColor : errorColor);
                     }
                     break;
                 case "demandtest":
@@ -110,9 +112,17 @@ namespace Uptime.Connections
                         AppendText("DEMANDTEST  generated mode required", errorColor);
                     else
                     {
-                        ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
-                        recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
-                        AppendText("QUEUED  " + plan.ConnectionId + " high demand to DB", normalColor);
+                        try
+                        {
+                            ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
+                            recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
+                            AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
+                                " high demand to DB", normalColor);
+                        }
+                        catch (System.InvalidOperationException error)
+                        {
+                            AppendText("DEMANDTEST  " + error.Message, errorColor);
+                        }
                     }
                     break;
                 case "mark":
@@ -155,7 +165,7 @@ namespace Uptime.Connections
         {
             if (tokens.Length < 2 || tokens.Length > 3)
             {
-                AppendText("USAGE  inspect c1 [c2]", errorColor);
+                AppendText("USAGE  inspect a7 [b4]", errorColor);
                 return;
             }
             if (simulationHost == null || simulationHost.RuntimeConnections == null)
@@ -171,12 +181,12 @@ namespace Uptime.Connections
                 match = simulationHost.FindConnection(tokens[i]);
                 if (match == null)
                 {
-                    AppendText("INSPECT  unknown connection " + tokens[i], errorColor);
+                    AppendText("INSPECT  unknown connection " + tokens[i].ToLowerInvariant(), errorColor);
                     return;
                 }
                 if (selected.Contains(match))
                 {
-                    AppendText("INSPECT  duplicate connection " + tokens[i], errorColor);
+                    AppendText("INSPECT  duplicate connection " + tokens[i].ToLowerInvariant(), errorColor);
                     return;
                 }
                 selected.Add(match);
@@ -185,7 +195,7 @@ namespace Uptime.Connections
             if (block == null)
                 AppendText("INSPECT  output unavailable", errorColor);
             else
-                block.Bind(selected.ToArray());
+                block.Bind(selected.ToArray(), simulationHost.PresentationPalette);
         }
 
         public TextRow AppendText(string message, Color color)

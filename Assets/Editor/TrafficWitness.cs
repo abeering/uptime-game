@@ -29,6 +29,7 @@ namespace Uptime.Connections.EditorTools
                 var replay = Enumerable.Range(0, 200).Select(i => director.GeneratePlan(i * 13f)).ToArray();
                 for (int i = 0; i < first.Length; i++)
                     Check(Signature(first[i]) == Signature(replay[i]), "seeded plan replay " + i);
+                CheckGeneratedIdentifiers(host, director);
                 foreach (ConnectionSpawnPlan plan in replay)
                 {
                     Check(plan.Route.Length >= 2 && plan.Origin.NodeId == "EXT1" &&
@@ -150,6 +151,64 @@ namespace Uptime.Connections.EditorTools
             p.ConnectionId + "|" + p.ProfileId + "|" + string.Join(">", p.Route.Select(n => n.NodeId)) +
             "|" + string.Join(";", p.Operations.Select(o => o.Operation + ":" +
                 o.DesiredLoad.ToString("R") + ":" + o.TotalWork.ToString("R")));
+
+        private static string TrafficSignature(ConnectionSpawnPlan p) => p.ScheduledSpawnTime + "|" +
+            p.ProfileId + "|" + string.Join(">", p.Route.Select(n => n.NodeId)) +
+            "|" + string.Join(";", p.Operations.Select(o => o.Operation + ":" +
+                o.DesiredLoad.ToString("R") + ":" + o.TotalWork.ToString("R")));
+
+        private static void CheckGeneratedIdentifiers(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            director.ResetDirector();
+            ConnectionSpawnPlan referenceFirst = director.GeneratePlan(0f);
+            ConnectionSpawnPlan referenceSecond = director.GeneratePlan(13f);
+            ConnectionSpawnPlan referenceThird = director.GeneratePlan(26f);
+            host.ResetSimulation();
+            var explicitPlan = new ConnectionSpawnPlan(0f, referenceSecond.ConnectionId,
+                referenceFirst.Route, "test", "Explicit two-character reservation",
+                new[] { new OperationStage(OperationKind.Read, 100f, 1f, "Read") });
+            director.QueueSpawnPlan(explicitPlan);
+            ConnectionSpawnPlan generatedFirst = director.GeneratePlan(0f);
+            ConnectionSpawnPlan generatedSecond = director.GeneratePlan(13f);
+            Check(generatedFirst.ConnectionId == referenceFirst.ConnectionId &&
+                generatedSecond.ConnectionId == referenceThird.ConnectionId,
+                "explicit queued ID is skipped in deterministic pool order");
+            Check(TrafficSignature(referenceFirst) == TrafficSignature(generatedFirst) &&
+                TrafficSignature(referenceSecond) == TrafficSignature(generatedSecond),
+                "ID reservation does not shift profile, route, LOAD, or WORK draws");
+            director.QueueSpawnPlan(generatedFirst);
+            host.StepSimulation(0.1f);
+            Check(host.BlockConnection(explicitPlan.ConnectionId) &&
+                host.BlockConnection(generatedFirst.ConnectionId.ToUpperInvariant()) &&
+                host.FindConnection(generatedFirst.ConnectionId.ToUpperInvariant()) != null,
+                "generated and explicit IDs remain case-insensitive and inspectable after resolution");
+
+            var seen = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { explicitPlan.ConnectionId };
+            foreach (ConnectionSpawnPlan plan in new[] { generatedFirst, generatedSecond })
+                Check(seen.Add(plan.ConnectionId), "early generated IDs are unique");
+            ConnectionSpawnPlan next;
+            while ((next = director.GeneratePlan(26f)) != null)
+            {
+                Check(next.ConnectionId.Length == 2 &&
+                    next.ConnectionId[0] >= 'a' && next.ConnectionId[0] <= 'z' &&
+                    next.ConnectionId[1] >= '0' && next.ConnectionId[1] <= '9',
+                    "generated ID is a lowercase letter followed by a digit");
+                Check(seen.Add(next.ConnectionId), "all generated IDs are unique across run history");
+            }
+            Check(seen.Count == 260 && director.GeneratePlan(39f) == null,
+                "all 260 IDs exhaust safely without recycling");
+            Check(seen.All(id => id.Length == 2 &&
+                id[0] >= 'a' && id[0] <= 'z' && id[1] >= '0' && id[1] <= '9'),
+                "every generated or reserved pool ID is letter then digit");
+            bool demandRejected = false;
+            try { director.QueueHighDemandWitness(); }
+            catch (InvalidOperationException) { demandRejected = true; }
+            Check(demandRejected, "high-demand request reports exhausted IDs");
+            Debug.Log("TrafficWitness IDs: 260 distinct letter-digit IDs, deterministic replay, " +
+                "explicit reservation, retained history, independent traffic RNG, safe exhaustion.");
+        }
         private static NodeView Node(SimulationHost host, string id) =>
             host.Nodes.First(n => n.View.NodeId == id).View;
         private static void Near(float observed, float expected, string name) =>

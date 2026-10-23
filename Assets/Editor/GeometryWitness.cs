@@ -179,6 +179,7 @@ namespace Uptime.Connections.EditorTools
             host.StepSimulation(0.1f);
             Check(c1.ActualWorkRate > sharedRate, "released capacity accelerates c1");
             host.ResetSimulation();
+            CheckIdentityColors(presenter, host, nodes);
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
                 "rendered pill visibility at reference size and 6 px gap, rotated pill clearance " +
                 "and cycle coverage, short edges, establishment and completion.");
@@ -238,6 +239,76 @@ namespace Uptime.Connections.EditorTools
         {
             if (!condition)
                 throw new InvalidOperationException("GeometryWitness failed: " + name);
+        }
+
+        private static void CheckIdentityColors(LogicalPathPresenter presenter,
+            SimulationHost host, NodeView[] nodes)
+        {
+            host.SetRunMode(ConnectionRunMode.Generated);
+            ConnectionIdentityPalette palette = presenter.IdentityPalette;
+            Check(palette != null && ConnectionIdentityPalette.SlotCount == 6,
+                "authored six-color identity palette");
+            palette.Reset();
+            var colors = Enumerable.Range(0, 6).Select(palette.ColorAt).ToArray();
+            Check(colors.Distinct().Count() == 6, "six distinct authored accents");
+            NodeView ext = nodes.First(n => n.NodeId == "EXT1");
+            NodeView api = nodes.First(n => n.NodeId == "API");
+            var states = new System.Collections.Generic.List<LogicalConnectionState>();
+            for (int i = 0; i < 8; i++)
+            {
+                string id = "palette" + i;
+                var plan = new ConnectionSpawnPlan(0f, id, new[] { ext, api },
+                    "test", "Palette", new[] { new OperationStage(OperationKind.Read,
+                        100f, 1f, "Read") });
+                LogicalConnectionState state = host.RegisterConnection(
+                    LogicalConnectionDefinition.FromPlan(plan));
+                states.Add(state);
+                Color assigned = palette.Assign(state);
+                Check(palette.Assign(state) == assigned,
+                    "identity accent is stable for the same state");
+                if (i < 6) Check(assigned == colors[i], "first six arrivals rotate through palette");
+                else Check(assigned == colors[i - 6], "overflow reuses slots deterministically");
+            }
+            palette.Release(states[1]);
+            palette.Release(states[7]);
+            Check(!palette.TryGet(states[1], out _) && states[1].ConnectionId == "palette1",
+                "slot release keeps historical connection identity");
+            var ninth = new ConnectionSpawnPlan(0f, "palette8", new[] { ext, api },
+                "test", "Palette", new[] { new OperationStage(OperationKind.Read, 100f, 1f, "Read") });
+            LogicalConnectionState reused = host.RegisterConnection(
+                LogicalConnectionDefinition.FromPlan(ninth));
+            Check(palette.Assign(reused) == colors[1],
+                "released color is reused from rotating cursor");
+
+            var pathPrefab = AssetDatabase.LoadAssetAtPath<LogicalPathView>(
+                "Assets/Prefabs/Connections/LogicalPath.prefab");
+            LogicalPathView path = UnityEngine.Object.Instantiate(pathPrefab);
+            try
+            {
+                path.SetIdentityColor(colors[0]);
+                Color slowed = new SerializedObject(path).FindProperty("constrainedColor").colorValue;
+                Color stalled = new SerializedObject(path).FindProperty("stalledColor").colorValue;
+                Check(path.BeamColorFor(LoadPerformance.AtSpeed) == colors[0] &&
+                    path.BeamColorFor(LoadPerformance.Slowed) == slowed &&
+                    path.BeamColorFor(LoadPerformance.Stalled) == stalled &&
+                    slowed != colors[0] && stalled != colors[0],
+                    "identity beam leaves warning treatments distinct");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(path.gameObject); }
+
+            var pillPrefab = AssetDatabase.LoadAssetAtPath<IdentityPillView>(
+                "Assets/Prefabs/Connections/IdentityPill.prefab");
+            IdentityPillView pill = UnityEngine.Object.Instantiate(pillPrefab);
+            try
+            {
+                pill.Bind("A7", colors[0]);
+                Check(pill.DisplayedId == "a7" && pill.AccentColor == colors[0],
+                    "pill displays lowercase ID and keeps identity accent");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(pill.gameObject); }
+
+            palette.Reset();
+            host.ResetSimulation();
         }
 
         private static void CheckRouteLaneOrdering(LogicalPathPresenter presenter,

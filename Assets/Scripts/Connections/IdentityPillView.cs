@@ -11,11 +11,13 @@ namespace Uptime.Connections
         [SerializeField, Min(8f)] private float fontSize = 16f;
 
         public Vector2 Size => new Vector2(Mathf.Max(32f, dimensions.x), Mathf.Max(23f, dimensions.y));
+        public Color AccentColor => plate != null ? plate.color : Color.clear;
+        public string DisplayedId => idText != null ? idText.text : string.Empty;
 
-        public void Bind(string connectionId, Color lineColor)
+        public void Bind(string connectionId, Color accent)
         {
-            idText.text = connectionId.ToUpperInvariant();
-            plate.SetOutline(lineColor);
+            idText.text = connectionId.ToLowerInvariant();
+            plate.SetOutline(accent);
             plate.raycastTarget = false;
             idText.raycastTarget = false;
             ApplySize();
@@ -33,7 +35,7 @@ namespace Uptime.Connections
             rect.localRotation = Quaternion.Euler(0f, 0f, angle);
         }
 
-        public void SetLineColor(Color lineColor) => plate.SetOutline(lineColor);
+        public void SetAccentColor(Color accent) => plate.SetOutline(accent);
 
         private void OnValidate() => ApplySize();
 

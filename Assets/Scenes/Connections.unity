@@ -4166,6 +4166,13 @@ MonoBehaviour:
   pathLayer: {fileID: 1033840603}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
   identityPresenter: {fileID: 901162628}
+  identityPalette:
+    cyan: {r: 0.36, g: 0.87, b: 0.91, a: 1}
+    teal: {r: 0.35, g: 0.91, b: 0.76, a: 1}
+    blueGreen: {r: 0.43, g: 0.82, b: 0.92, a: 1}
+    seafoam: {r: 0.43, g: 0.89, b: 0.79, a: 1}
+    turquoise: {r: 0.31, g: 0.85, b: 0.84, a: 1}
+    coolMint: {r: 0.49, g: 0.87, b: 0.75, a: 1}
   maxLineWidth: 12
   minLineGap: 6
   minLineWidth: 2.5
