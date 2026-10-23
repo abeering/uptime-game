@@ -100,8 +100,10 @@ namespace Uptime.Connections
                     {
                         bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
                         recorder?.RecordPlayerAction(command, tokens[1], blocked);
-                        AppendText(blocked ? "BLOCKED  " + tokens[1].ToUpperInvariant() :
-                            "BLOCK  no active connection " + tokens[1], blocked ? normalColor : errorColor);
+                        string displayId = tokens[1].ToLowerInvariant();
+                        AppendText(blocked ? "BLOCKED  " + displayId :
+                            "BLOCK  no active connection " + displayId,
+                            blocked ? normalColor : errorColor);
                     }
                     break;
                 case "demandtest":
@@ -114,7 +116,7 @@ namespace Uptime.Connections
                         {
                             ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
                             recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
-                            AppendText("QUEUED  " + plan.ConnectionId.ToUpperInvariant() +
+                            AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                 " high demand to DB", normalColor);
                         }
                         catch (System.InvalidOperationException error)
@@ -179,12 +181,12 @@ namespace Uptime.Connections
                 match = simulationHost.FindConnection(tokens[i]);
                 if (match == null)
                 {
-                    AppendText("INSPECT  unknown connection " + tokens[i], errorColor);
+                    AppendText("INSPECT  unknown connection " + tokens[i].ToLowerInvariant(), errorColor);
                     return;
                 }
                 if (selected.Contains(match))
                 {
-                    AppendText("INSPECT  duplicate connection " + tokens[i], errorColor);
+                    AppendText("INSPECT  duplicate connection " + tokens[i].ToLowerInvariant(), errorColor);
                     return;
                 }
                 selected.Add(match);

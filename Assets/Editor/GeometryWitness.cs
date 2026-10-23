@@ -301,9 +301,9 @@ namespace Uptime.Connections.EditorTools
             IdentityPillView pill = UnityEngine.Object.Instantiate(pillPrefab);
             try
             {
-                pill.Bind("a7", colors[0]);
-                Check(pill.DisplayedId == "A7" && pill.AccentColor == colors[0],
-                    "pill uppercases ID and keeps identity accent");
+                pill.Bind("A7", colors[0]);
+                Check(pill.DisplayedId == "a7" && pill.AccentColor == colors[0],
+                    "pill displays lowercase ID and keeps identity accent");
             }
             finally { UnityEngine.Object.DestroyImmediate(pill.gameObject); }
 

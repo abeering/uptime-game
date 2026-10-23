@@ -16,7 +16,7 @@ namespace Uptime.Connections
 
         public void Bind(string connectionId, Color accent)
         {
-            idText.text = connectionId.ToUpperInvariant();
+            idText.text = connectionId.ToLowerInvariant();
             plate.SetOutline(accent);
             plate.raycastTarget = false;
             idText.raycastTarget = false;

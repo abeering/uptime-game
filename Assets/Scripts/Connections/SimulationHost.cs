@@ -318,7 +318,7 @@ namespace Uptime.Connections
             var output = new StringBuilder("CONNECTIONS  •  allocated / desired LOAD; 1 LOAD = 1 WORK/s");
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                output.Append('\n').Append(connection.ConnectionId.ToUpperInvariant()).Append(' ')
+                output.Append('\n').Append(connection.ConnectionId.ToLowerInvariant()).Append(' ')
                     .Append(connection.CurrentOperation.ToString().ToUpperInvariant())
                     .Append(' ').Append(connection.CurrentOperationIndex + 1)
                     .Append('/').Append(connection.OperationCount).Append(' ');
