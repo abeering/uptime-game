@@ -37,7 +37,7 @@ namespace Uptime.Connections
         private Color identityColor;
         private bool hasIdentityColor;
         private Image terminalMarker;
-        private Vector2 markerSize;
+        private Vector2 markerPadding;
 
         public event Action<LogicalConnectionState> Destroyed;
         public Image TerminalMarker => terminalMarker;
@@ -73,7 +73,8 @@ namespace Uptime.Connections
                 terminalMarker = Instantiate(terminalMarkerPrefab, markerLayer, false);
                 terminalMarker.name = "Terminal marker " + connection.ConnectionId;
                 terminalMarker.raycastTarget = false;
-                markerSize = terminalMarker.rectTransform.rect.size;
+                TerminalMarkerStyle style = terminalMarker.GetComponent<TerminalMarkerStyle>();
+                markerPadding = style != null ? style.Padding : Vector2.zero;
                 terminalMarker.gameObject.SetActive(false);
             }
         }
@@ -94,6 +95,33 @@ namespace Uptime.Connections
             verticalSide = xGap < yGap || Mathf.Abs(xGap - yGap) < 0.001f &&
                 Mathf.Abs(towardSource.x) >= Mathf.Abs(towardSource.y);
             return point;
+        }
+
+        // The beam is a strip perpendicular to its direction. Its intersection with
+        // a card edge is wider at oblique angles; clip that span at the card corners.
+        // Prefab padding is then added in screen X and Y, independently of edge side.
+        public static Rect TerminalMarkerRect(Rect card, Vector2 towardSource,
+            float laneOffset, float lineWidth, Vector2 padding)
+        {
+            Vector2 direction = towardSource.normalized;
+            Vector2 point = TerminalBorderPoint(card, direction, laneOffset,
+                out bool verticalSide);
+            float normalComponent = Mathf.Abs(verticalSide ? direction.x : direction.y);
+            float halfSpan = Mathf.Max(0f, lineWidth) * 0.5f /
+                Mathf.Max(0.001f, normalComponent);
+            float coordinate = verticalSide ? point.y : point.x;
+            float low = verticalSide ? card.yMin : card.xMin;
+            float high = verticalSide ? card.yMax : card.xMax;
+            float start = Mathf.Clamp(coordinate - halfSpan, low, high);
+            float end = Mathf.Clamp(coordinate + halfSpan, low, high);
+            float center = (start + end) * 0.5f;
+            float span = end - start;
+            Vector2 size = verticalSide ?
+                new Vector2(Mathf.Max(0f, padding.x), span + Mathf.Max(0f, padding.y)) :
+                new Vector2(span + Mathf.Max(0f, padding.x), Mathf.Max(0f, padding.y));
+            Vector2 position = verticalSide ? new Vector2(point.x, center) :
+                new Vector2(center, point.y);
+            return new Rect(position - size * 0.5f, size);
         }
 
         public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
@@ -218,11 +246,10 @@ namespace Uptime.Connections
                         state.Definition.Route[last].Node.transform.position);
                     Vector2 to = networkArea.InverseTransformPoint(target.transform.position);
                     Vector2 towardSource = (from - to).normalized;
-                    Vector2 border = TerminalBorderPoint(EdgeGeometry.CardRect(target, networkArea),
-                        towardSource, -laneOffsets[last], out bool verticalSide);
-                    terminalMarker.rectTransform.position = networkArea.TransformPoint(border);
-                    terminalMarker.rectTransform.sizeDelta = verticalSide ?
-                        new Vector2(markerSize.y, markerSize.x) : markerSize;
+                    Rect marker = TerminalMarkerRect(EdgeGeometry.CardRect(target, networkArea),
+                        towardSource, -laneOffsets[last], lineWidths[last], markerPadding);
+                    terminalMarker.rectTransform.position = networkArea.TransformPoint(marker.center);
+                    terminalMarker.rectTransform.sizeDelta = marker.size;
                     Color markerColor = hasIdentityColor ? identityColor : healthyColor;
                     markerColor.a *= fade;
                     terminalMarker.color = markerColor;

@@ -320,7 +320,8 @@ namespace Uptime.Connections.EditorTools
             var markerPrefab = AssetDatabase.LoadAssetAtPath<Image>(
                 "Assets/Prefabs/Connections/TerminalMarker.prefab");
             Check(markerPrefab != null && !markerPrefab.raycastTarget &&
-                markerPrefab.rectTransform.sizeDelta == new Vector2(14f, 4f) &&
+                markerPrefab.GetComponent<TerminalMarkerStyle>() != null &&
+                markerPrefab.GetComponent<TerminalMarkerStyle>().Padding == new Vector2(4f, 4f) &&
                 new SerializedObject(pathPrefab).FindProperty("terminalMarkerPrefab")
                     .objectReferenceValue == markerPrefab &&
                 presenter.MarkerLayer != null && presenter.MarkerLayer.GetSiblingIndex() >
@@ -336,6 +337,21 @@ namespace Uptime.Connections.EditorTools
                 new Vector2(1f, 1f).normalized, 8f, out vertical);
             Check(!vertical && Mathf.Abs(diagonal.y - synthetic.yMax) < 0.001f,
                 "diagonal approach uses the visible horizontal border");
+            Vector2 padding = markerPrefab.GetComponent<TerminalMarkerStyle>().Padding;
+            Rect straightMark = LogicalPathView.TerminalMarkerRect(synthetic, Vector2.left,
+                0f, 8f, padding);
+            Rect diagonalMark = LogicalPathView.TerminalMarkerRect(synthetic,
+                new Vector2(1f, 1f), 0f, 8f, padding);
+            Check(Mathf.Abs(straightMark.width - 4f) < 0.001f &&
+                Mathf.Abs(straightMark.height - 12f) < 0.001f,
+                "straight arrival uses beam width plus prefab padding");
+            Check(Mathf.Abs(diagonalMark.width - (8f * Mathf.Sqrt(2f) + 4f)) < 0.01f &&
+                Mathf.Abs(diagonalMark.height - 4f) < 0.001f,
+                "diagonal arrival covers its wider border footprint");
+            Rect cornerMark = LogicalPathView.TerminalMarkerRect(new Rect(-20f, -20f, 40f, 40f),
+                new Vector2(1f, 1f), 0f, 8f, Vector2.zero);
+            Check(cornerMark.xMax <= 20.001f && cornerMark.yMax <= 20.001f,
+                "border footprint clips at card corner before padding");
 
             var area = presenter.NetworkArea;
             NodeView ext = nodes.First(n => n.NodeId == "EXT1");
@@ -422,6 +438,11 @@ namespace Uptime.Connections.EditorTools
                 Check((dbPoint - secondPoint).sqrMagnitude > 1f &&
                     dbView.TerminalMarker != secondView.TerminalMarker,
                     "two DB targets retain distinct border markers");
+                Rect expectedDbMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
+                    8f, 8f, padding);
+                Check((dbView.TerminalMarker.rectTransform.sizeDelta -
+                    expectedDbMarker.size).sqrMagnitude < 0.01f,
+                    "live diagonal marker uses final segment width");
                 Check(dbView.TerminalMarker.color == dbColor &&
                     dbView.BeamColorFor(LoadPerformance.Stalled) != dbColor,
                     "terminal marker keeps identity accent during beam warning");
@@ -429,15 +450,21 @@ namespace Uptime.Connections.EditorTools
                 Check((dbPoint - hiddenEnd).sqrMagnitude > 0.1f,
                     "marker uses visible border instead of hidden underlap");
 
-                dbView.SetLayout(new[] { 0f, 8f }, new[] { 8f, 8f });
+                dbView.SetLayout(new[] { 0f, 8f }, new[] { 8f, 4f });
                 dbView.AdvanceVisual(0.15f);
                 dbPoint = area.InverseTransformPoint(dbView.TerminalMarker.rectTransform.position);
                 expectedDb = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, 0f, out _);
                 Vector2 finalPoint = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, -8f,
                     out _);
+                Rect reflowMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
+                    0f, 6f, padding);
                 Check((dbPoint - expectedDb).sqrMagnitude < 0.01f &&
                     (dbPoint - finalPoint).sqrMagnitude > 1f,
                     "marker follows interpolated lane instead of snapping to final offset");
+                Check((dbView.TerminalMarker.rectTransform.sizeDelta -
+                    reflowMarker.size).sqrMagnitude < 0.01f &&
+                    dbView.TerminalMarker.rectTransform.sizeDelta.x < expectedDbMarker.width,
+                    "marker width follows interpolated beam width during reflow");
                 dbView.SetPresentationActive(false);
                 Check(!dbView.TerminalMarker.gameObject.activeSelf,
                     "preview hides marker with its owning path");

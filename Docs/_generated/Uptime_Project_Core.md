@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:6ac94e8759f17350bebf8c65cd917bfcdfa510638537544ef6744925bd7378cb`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:07557c57437068daabdd119a09033b54bfdce9f569f87e5b8ed9e58c2f61bfa4`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -220,7 +220,7 @@ Logical paths now use [route-aware lane ordering](https://github.com/abeering/up
 
 Generated connections use [randomized lowercase letter-digit IDs and six rotating identity accents](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/identity-presentation-v1.md). The ID pool is deterministic per traffic seed and separate from traffic random draws; explicit authored IDs remain valid. Active at-speed paths and identity pill outlines carry the assigned accent, while slowed and stalled paths retain warning colors. Active Inspect cards share the accent and completed history stays muted.
 
-Active paths now show [one small identity-colored terminal marker](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/terminal-markers-v1.md) where their final lane meets the target-node border. Transit nodes have no marker. It tracks lane reflow, appears after establishment reaches the target, and fades with path departure. This is presentation of the existing target-node LOAD model.
+Active paths now show [one identity-colored terminal marker](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/terminal-markers-v1.md) where their final lane meets the target-node border. Transit nodes have no marker. Its size follows the beam width and arrival angle, with prefab padding; it tracks lane reflow, appears after establishment reaches the target, and fades with path departure. This is presentation of the existing target-node LOAD model.
 
 `ConnectionsRunRecorder` automatically starts a new JSON recording on Play start, saves the same file every 30 seconds of real elapsed time, and saves on Play stop. `mark <note>` records a bookmark with an immediate snapshot and saves; `log save`, `log dir`, and Editor-only `log folder` expose the file. Editor logs go to `<project-root>/Logs/UptimeRuns/`, which Git ignores. This is observational run evidence, **not** a game save, score ledger, replay engine, or source of random traffic. See the [recorder document](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-run-recorder-v0.md) and its [example JSON](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/examples/connections-run-recorder-example.json).
 
