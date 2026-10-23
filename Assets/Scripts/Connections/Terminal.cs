@@ -95,7 +95,7 @@ namespace Uptime.Connections
                     break;
                 case "block":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  block ab", errorColor);
+                        AppendText("USAGE  block a7", errorColor);
                     else
                     {
                         bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
@@ -163,7 +163,7 @@ namespace Uptime.Connections
         {
             if (tokens.Length < 2 || tokens.Length > 3)
             {
-                AppendText("USAGE  inspect ab [cd]", errorColor);
+                AppendText("USAGE  inspect a7 [b4]", errorColor);
                 return;
             }
             if (simulationHost == null || simulationHost.RuntimeConnections == null)

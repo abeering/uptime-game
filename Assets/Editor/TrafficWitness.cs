@@ -191,21 +191,22 @@ namespace Uptime.Connections.EditorTools
             ConnectionSpawnPlan next;
             while ((next = director.GeneratePlan(26f)) != null)
             {
-                Check(next.ConnectionId.Length == 2 && next.ConnectionId.All(c =>
-                    c >= 'a' && c <= 'z' || c >= '0' && c <= '9'),
-                    "generated ID has exactly two lowercase alphanumeric characters");
+                Check(next.ConnectionId.Length == 2 &&
+                    next.ConnectionId[0] >= 'a' && next.ConnectionId[0] <= 'z' &&
+                    next.ConnectionId[1] >= '0' && next.ConnectionId[1] <= '9',
+                    "generated ID is a lowercase letter followed by a digit");
                 Check(seen.Add(next.ConnectionId), "all generated IDs are unique across run history");
             }
-            Check(seen.Count == 1296 && director.GeneratePlan(39f) == null,
-                "all 1296 IDs exhaust safely without recycling");
-            Check(seen.All(id => id.Length == 2 && id.All(c =>
-                c >= 'a' && c <= 'z' || c >= '0' && c <= '9')),
-                "every generated or reserved pool ID is lowercase alphanumeric");
+            Check(seen.Count == 260 && director.GeneratePlan(39f) == null,
+                "all 260 IDs exhaust safely without recycling");
+            Check(seen.All(id => id.Length == 2 &&
+                id[0] >= 'a' && id[0] <= 'z' && id[1] >= '0' && id[1] <= '9'),
+                "every generated or reserved pool ID is letter then digit");
             bool demandRejected = false;
             try { director.QueueHighDemandWitness(); }
             catch (InvalidOperationException) { demandRejected = true; }
             Check(demandRejected, "high-demand request reports exhausted IDs");
-            Debug.Log("TrafficWitness IDs: 1296 distinct two-character IDs, deterministic replay, " +
+            Debug.Log("TrafficWitness IDs: 260 distinct letter-digit IDs, deterministic replay, " +
                 "explicit reservation, retained history, independent traffic RNG, safe exhaustion.");
         }
         private static NodeView Node(SimulationHost host, string id) =>

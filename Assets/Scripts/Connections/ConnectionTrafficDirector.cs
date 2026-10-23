@@ -44,7 +44,8 @@ namespace Uptime.Connections
         }
         private readonly List<Queued> queue = new List<Queued>();
         private readonly HashSet<string> reservedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private const string IdCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
+        private const string IdLetters = "abcdefghijklmnopqrstuvwxyz";
+        private const string IdDigits = "0123456789";
         private string[] shuffledIds;
         private int nextIdIndex;
         private bool idsExhausted;
@@ -65,10 +66,10 @@ namespace Uptime.Connections
             random = new System.Random(seed);
             queue.Clear();
             reservedIds.Clear();
-            shuffledIds = new string[IdCharacters.Length * IdCharacters.Length];
+            shuffledIds = new string[IdLetters.Length * IdDigits.Length];
             for (int i = 0; i < shuffledIds.Length; i++)
-                shuffledIds[i] = new string(new[] { IdCharacters[i / IdCharacters.Length],
-                    IdCharacters[i % IdCharacters.Length] });
+                shuffledIds[i] = new string(new[] { IdLetters[i / IdDigits.Length],
+                    IdDigits[i % IdDigits.Length] });
             // A separate stream means ID changes cannot shift traffic/profile draws.
             var idRandom = new System.Random(unchecked(seed ^ (int)0x5EED1D5));
             for (int i = shuffledIds.Length - 1; i > 0; i--)
@@ -131,7 +132,7 @@ namespace Uptime.Connections
             NodeView[] route = FindRoute(origin, target);
             string id = NewId();
             if (id == null)
-                throw new InvalidOperationException("All 1,296 generated connection IDs are reserved for this run.");
+                throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
             float load = obvious ? Range(10f, 12f) : Range(7f, 9f);
             var plan = new ConnectionSpawnPlan(host.SimulationTimeSeconds, id, route,
                 "high-demand-witness", "High Demand Test",
@@ -183,7 +184,7 @@ namespace Uptime.Connections
                     return id;
             }
             if (!idsExhausted)
-                Debug.LogWarning("All 1,296 generated connection IDs are reserved; ambient spawning has stopped.", this);
+                Debug.LogWarning("All 260 generated connection IDs are reserved; ambient spawning has stopped.", this);
             idsExhausted = true;
             return null;
         }
