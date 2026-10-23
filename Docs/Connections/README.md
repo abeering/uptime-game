@@ -1,0 +1,21 @@
+# Connections documentation
+
+Connections is Uptime's active gameplay prototype, separate from the retained Packet prototype. **Executable behavior** is defined by runtime code and the serialized Unity scene. Treat working ideas as hypotheses rather than implemented mechanics.
+
+## Current state and integrated contracts
+
+- [Current State](Current_State.md) — implementation baseline, validation, and source authority.
+- [LOAD foundation](connections-arcade-load-v1.md) — target-node LOAD capacity, proportional allocation, and WORK.
+- [Operation arcs](connections-arcade-operation-arcs-v1.md) — READ/WRITE/EXECUTE stages and visual presentation.
+- [Traffic generation](connections-arcade-traffic-v0.md) — generated benign profiles, spawn plans, and cadence.
+- [Run recorder](connections-run-recorder-v0.md) — Play Mode JSON telemetry and terminal commands.
+- [Route-aware lanes](route-aware-lanes-v1.md) — path continuity and physical-link lane ordering.
+
+## Working designs, not implemented contracts
+
+- [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
+- [Lane-spacing continuity](../research/connections-lane-spacing-continuity.md) — parked visual-layout research.
+
+## Broader Uptime design
+
+Shared [Uptime Design](../Design/Uptime_Design.md), [infection ideas](../Design/infections.md), and [clean minigames](../Design/clean-minigames.md) provide context, but their vocabulary and examples do not automatically become Connections gameplay rules. The [Packet prototype](../Packet/Current_State.md) has independent mechanics.
