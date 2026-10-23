@@ -6,6 +6,8 @@ Threats V0 Slice 1 subsequently attaches an optional completion effect to an ope
 
 Threats V0 Slice 2 uses that same arc and effect path for manual-only `delayed-threat`: a 2-LOAD, 16-WORK READ with no effect, then a 12-LOAD, 240-WORK WRITE with one infection-delivery effect on normal completion. READ completion records its boundary and leaves the WRITE waiting until the following fixed step. The ID, route, target, path, and inspect history remain the same. Killing during either operation interrupts the arc without delivering an unfinished WRITE effect.
 
+Slice 3A calls the existing ordered logical definition a **Connection Plan**, while retaining the serialized `operations` field and older arc terminology for compatibility. It adds optional connection- and operation-scope behavior definitions without changing operation order or next-step transitions. The [behavior foundation](connections-behavior-foundation-v0.md) defines its narrow timing, effective requirements, and history rules. `ConnectionSpawnPlan` still means the concrete scheduled arrival, not the Connection Plan.
+
 Phase 2 adds authored, ordered operations to one logical connection. Packet is unchanged.
 
 ## Stage model

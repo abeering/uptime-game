@@ -4,6 +4,8 @@
 
 **Scope:** Phase 1 implementation contract for `Assets/Scenes/Connections.unity`. This replaces the earlier CPU, memory, disk I/O, and bandwidth allocation rules for the Connections game. The older V0 briefs remain historical context. Packet is independent.
 
+Slice 3A adds optional additive modifiers to an operation's authored WORK and requested LOAD. The current allocator now consumes the **effective** values computed before each step's allocation; one allocated LOAD still advances one WORK unit per second. Previously accomplished WORK is not reduced when effective required WORK falls. The original authored witness has no modifiers and retains the figures below. See the [behavior foundation](connections-behavior-foundation-v0.md).
+
 ## Mechanical model
 
 - A route's final node is its current target. Earlier nodes and physical links remain visible route geometry and do not consume or constrain LOAD.

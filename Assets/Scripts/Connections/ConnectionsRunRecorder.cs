@@ -58,6 +58,7 @@ namespace Uptime.Connections
         public string claimedPurpose;
         public string[] eligibleTargetIds;
         public float ambientWeight;
+        public BehaviorRecord[] connectionBehaviors;
         public OperationRange[] operations;
     }
 
@@ -66,10 +67,20 @@ namespace Uptime.Connections
         public string kind;
         public string completionEffect;
         public string activityDescription;
+        public BehaviorRecord[] behaviors;
         public float minimumLoad;
         public float maximumLoad;
         public float minimumDurationSeconds;
         public float maximumDurationSeconds;
+    }
+
+    [Serializable] public sealed class BehaviorRecord
+    {
+        public string id;
+        public float startAfterSeconds;
+        public float stopAfterSeconds;
+        public float workDelta;
+        public float loadDelta;
     }
 
     [Serializable] public sealed class RunEvent
@@ -86,7 +97,13 @@ namespace Uptime.Connections
         public string operationKind;
         public string effectType;
         public string targetNodeId;
+        public string modifierId;
+        public string behaviorId;
+        public string modifierScope;
+        public float workDelta;
+        public float loadDelta;
         public float completedWork;
+        public float requiredWork;
         public float actualDurationSeconds;
         public float desiredLoad;
         public string resolutionReason;
@@ -105,6 +122,7 @@ namespace Uptime.Connections
         public string origin;
         public string target;
         public string[] route;
+        public BehaviorRecord[] connectionBehaviors;
         public OperationRecord[] operations;
     }
 
@@ -113,6 +131,7 @@ namespace Uptime.Connections
         public string kind;
         public string completionEffect;
         public string activityDescription;
+        public BehaviorRecord[] behaviors;
         public float desiredLoad;
         public float totalWork;
         public float nominalDurationSeconds;
@@ -143,9 +162,11 @@ namespace Uptime.Connections
         public string operationKind;
         public string target;
         public float desiredLoad;
+        public float baseLoad;
         public float allocatedLoad;
         public float completedWork;
         public float totalWork;
+        public float baseWork;
         public string performance;
     }
 
@@ -338,15 +359,17 @@ namespace Uptime.Connections
             entry.desiredLoad = state.DesiredLoad;
         }
 
-        public void RecordOperationCompleted(LogicalConnectionState state, int completedIndex, float time)
+        public void RecordOperationCompleted(LogicalConnectionState state, int completedIndex,
+            float completedWork, float requiredWork, float desiredLoad, float time)
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent("operation_completed", time);
             entry.connectionId = state.ConnectionId;
             entry.operationIndex = completedIndex;
             entry.operationKind = state.Definition.OperationAt(completedIndex).ToString();
-            entry.completedWork = state.Definition.WorkAt(completedIndex);
-            entry.desiredLoad = state.Definition.LoadAt(completedIndex);
+            entry.completedWork = completedWork;
+            entry.requiredWork = requiredWork;
+            entry.desiredLoad = desiredLoad;
             if (operationStartedAt.TryGetValue(OperationKey(state.ConnectionId, completedIndex), out float started))
                 entry.actualDurationSeconds = Mathf.Max(0f, time - started);
         }
@@ -359,6 +382,20 @@ namespace Uptime.Connections
             entry.operationIndex = occurrence.OperationIndex;
             entry.effectType = occurrence.Type.ToString();
             entry.targetNodeId = occurrence.TargetNodeId;
+        }
+
+        public void RecordModifierChange(LogicalConnectionState state, ModifierHistoryEntry change)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("modifier_" + change.Action.ToString().ToLowerInvariant(),
+                change.TimeSeconds);
+            entry.connectionId = state.ConnectionId;
+            entry.operationIndex = change.OperationIndex;
+            entry.modifierId = change.ModifierId;
+            entry.behaviorId = change.SourceId;
+            entry.modifierScope = change.Scope.ToString();
+            entry.workDelta = change.WorkDelta;
+            entry.loadDelta = change.LoadDelta;
         }
 
         public void RecordResolution(LogicalConnectionState state, ConnectionResolution reason, float time)
@@ -411,8 +448,10 @@ namespace Uptime.Connections
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
-                    desiredLoad = state.DesiredLoad, allocatedLoad = state.AllocatedLoad,
+                    desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
+                    allocatedLoad = state.AllocatedLoad,
                     completedWork = state.CompletedWork, totalWork = state.CurrentTotalWork,
+                    baseWork = state.BaseWork,
                     performance = state.IsPending ? null : state.Performance.ToString() });
             }
             snapshot.connections = active.ToArray();
@@ -458,6 +497,7 @@ namespace Uptime.Connections
                     claimedPurpose = source.claimedPurpose,
                     ambientWeight = source.ambientWeight,
                     eligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
+                    connectionBehaviors = Behaviors(source.connectionBehaviors),
                     operations = new OperationRange[source.operations.Length] };
                 for (int j = 0; j < profile.operations.Length; j++)
                 {
@@ -465,6 +505,7 @@ namespace Uptime.Connections
                     profile.operations[j] = new OperationRange { kind = operation.operation.ToString(),
                         completionEffect = operation.completionEffect.ToString(),
                         activityDescription = operation.activityDescription,
+                        behaviors = Behaviors(operation.behaviors),
                         minimumLoad = operation.minimumLoad, maximumLoad = operation.maximumLoad,
                         minimumDurationSeconds = operation.minimumDuration,
                         maximumDurationSeconds = operation.maximumDuration };
@@ -481,6 +522,7 @@ namespace Uptime.Connections
                 isHostile = definition.IsHostile,
                 claimedPurpose = definition.ClaimedPurpose,
                 route = new string[definition.Route.Length],
+                connectionBehaviors = Behaviors(definition.ConnectionBehaviors),
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;
@@ -492,9 +534,22 @@ namespace Uptime.Connections
                 result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
                     completionEffect = definition.EffectAt(i).ToString(),
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
+                    behaviors = Behaviors(definition.BehaviorsAt(i)),
                     totalWork = definition.WorkAt(i),
                     nominalDurationSeconds = load > 0f ? definition.WorkAt(i) / load : 0f };
             }
+            return result;
+        }
+
+        private static BehaviorRecord[] Behaviors(TimedModifierBehaviorDefinition[] source)
+        {
+            if (source == null) return Array.Empty<BehaviorRecord>();
+            var result = new BehaviorRecord[source.Length];
+            for (int i = 0; i < source.Length; i++)
+                result[i] = new BehaviorRecord { id = source[i].Id,
+                    startAfterSeconds = source[i].StartAfterSeconds,
+                    stopAfterSeconds = source[i].StopAfterSeconds,
+                    workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta };
             return result;
         }
 
