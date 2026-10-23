@@ -321,7 +321,7 @@ namespace Uptime.Connections.EditorTools
                 "Assets/Prefabs/Connections/TerminalMarker.prefab");
             Check(markerPrefab != null && !markerPrefab.raycastTarget &&
                 markerPrefab.GetComponent<TerminalMarkerStyle>() != null &&
-                markerPrefab.GetComponent<TerminalMarkerStyle>().Padding == new Vector2(4f, 4f) &&
+                markerPrefab.GetComponent<TerminalMarkerStyle>().Padding == new Vector2(8f, 8f) &&
                 new SerializedObject(pathPrefab).FindProperty("terminalMarkerPrefab")
                     .objectReferenceValue == markerPrefab &&
                 presenter.MarkerLayer != null && presenter.MarkerLayer.GetSiblingIndex() >
@@ -342,11 +342,11 @@ namespace Uptime.Connections.EditorTools
                 0f, 8f, padding);
             Rect diagonalMark = LogicalPathView.TerminalMarkerRect(synthetic,
                 new Vector2(1f, 1f), 0f, 8f, padding);
-            Check(Mathf.Abs(straightMark.width - 4f) < 0.001f &&
-                Mathf.Abs(straightMark.height - 12f) < 0.001f,
+            Check(Mathf.Abs(straightMark.width - 8f) < 0.001f &&
+                Mathf.Abs(straightMark.height - 16f) < 0.001f,
                 "straight arrival uses beam width plus prefab padding");
-            Check(Mathf.Abs(diagonalMark.width - (8f * Mathf.Sqrt(2f) + 4f)) < 0.01f &&
-                Mathf.Abs(diagonalMark.height - 4f) < 0.001f,
+            Check(Mathf.Abs(diagonalMark.width - (8f * Mathf.Sqrt(2f) + 8f)) < 0.01f &&
+                Mathf.Abs(diagonalMark.height - 8f) < 0.001f,
                 "diagonal arrival covers its wider border footprint");
             Rect cornerMark = LogicalPathView.TerminalMarkerRect(new Rect(-20f, -20f, 40f, 40f),
                 new Vector2(1f, 1f), 0f, 8f, Vector2.zero);
