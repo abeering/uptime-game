@@ -317,6 +317,7 @@ namespace Uptime.Connections
             foreach (TimedModifierBehaviorDefinition behavior in definitions)
                 if (behavior == null || string.IsNullOrWhiteSpace(behavior.Id) ||
                     !ids.Add(behavior.Id) ||
+                    !Enum.IsDefined(typeof(ConnectionBehaviorKind), behavior.Kind) ||
                     float.IsNaN(behavior.StartAfterSeconds) ||
                     float.IsInfinity(behavior.StartAfterSeconds) ||
                     behavior.StartAfterSeconds < 0f ||
@@ -327,9 +328,20 @@ namespace Uptime.Connections
                         behavior.StopAfterSeconds <= behavior.StartAfterSeconds) ||
                     float.IsNaN(behavior.WorkDelta) || float.IsInfinity(behavior.WorkDelta) ||
                     (scope == BehaviorScope.Connection && behavior.WorkDelta != 0f) ||
-                    float.IsNaN(behavior.LoadDelta) || float.IsInfinity(behavior.LoadDelta))
+                    float.IsNaN(behavior.LoadDelta) || float.IsInfinity(behavior.LoadDelta) ||
+                    (behavior.Kind != ConnectionBehaviorKind.TimedAdjustment &&
+                        (behavior.WorkDelta != 0f || behavior.LoadDelta <= 0f)) ||
+                    (behavior.Kind == ConnectionBehaviorKind.Overload &&
+                        behavior.StopAfterSeconds != 0f) ||
+                    (behavior.Kind == ConnectionBehaviorKind.Spiking &&
+                        (float.IsNaN(behavior.NormalIntervalSeconds) ||
+                         float.IsInfinity(behavior.NormalIntervalSeconds) ||
+                         float.IsNaN(behavior.ElevatedIntervalSeconds) ||
+                         float.IsInfinity(behavior.ElevatedIntervalSeconds) ||
+                         behavior.NormalIntervalSeconds <= 0f ||
+                         behavior.ElevatedIntervalSeconds <= 0f)))
                     throw new InvalidOperationException("Behavior needs a unique ID, finite deltas, " +
-                        "a valid start/stop window, and connection-scope WORK delta zero.");
+                        "valid timing and positive keyword LOAD, and connection-scope WORK delta zero.");
         }
 
         private void ClearAllocatedUsage()
