@@ -180,9 +180,10 @@ namespace Uptime.Connections.EditorTools
             Check(c1.ActualWorkRate > sharedRate, "released capacity accelerates c1");
             host.ResetSimulation();
             CheckIdentityColors(presenter, host, nodes);
+            CheckTerminalMarkers(presenter, host, nodes);
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
                 "rendered pill visibility at reference size and 6 px gap, rotated pill clearance " +
-                "and cycle coverage, short edges, establishment and completion.");
+                "and cycle coverage, short edges, terminal markers, establishment and completion.");
             host.SetRunMode(ConnectionRunMode.Generated);
         }
 
@@ -309,6 +310,215 @@ namespace Uptime.Connections.EditorTools
 
             palette.Reset();
             host.ResetSimulation();
+        }
+
+        private static void CheckTerminalMarkers(LogicalPathPresenter presenter,
+            SimulationHost host, NodeView[] nodes)
+        {
+            var pathPrefab = AssetDatabase.LoadAssetAtPath<LogicalPathView>(
+                "Assets/Prefabs/Connections/LogicalPath.prefab");
+            var markerPrefab = AssetDatabase.LoadAssetAtPath<Image>(
+                "Assets/Prefabs/Connections/TerminalMarker.prefab");
+            Check(markerPrefab != null && !markerPrefab.raycastTarget &&
+                markerPrefab.GetComponent<TerminalMarkerStyle>() != null &&
+                markerPrefab.GetComponent<TerminalMarkerStyle>().Padding == new Vector2(8f, 8f) &&
+                new SerializedObject(pathPrefab).FindProperty("terminalMarkerPrefab")
+                    .objectReferenceValue == markerPrefab &&
+                presenter.MarkerLayer != null && presenter.MarkerLayer.GetSiblingIndex() >
+                    nodes[0].transform.parent.GetSiblingIndex(),
+                "authored marker and overlay above node cards");
+
+            Rect synthetic = new Rect(-120f, -40f, 240f, 80f);
+            Vector2 side = LogicalPathView.TerminalBorderPoint(synthetic, Vector2.left, 0f,
+                out bool vertical);
+            Check(vertical && Mathf.Abs(side.x - synthetic.xMin) < 0.001f,
+                "horizontal approach uses a vertical border marker");
+            Vector2 diagonal = LogicalPathView.TerminalBorderPoint(synthetic,
+                new Vector2(1f, 1f).normalized, 8f, out vertical);
+            Check(!vertical && Mathf.Abs(diagonal.y - synthetic.yMax) < 0.001f,
+                "diagonal approach uses the visible horizontal border");
+            Vector2 padding = markerPrefab.GetComponent<TerminalMarkerStyle>().Padding;
+            Rect straightMark = LogicalPathView.TerminalMarkerRect(synthetic, Vector2.left,
+                0f, 8f, padding);
+            Rect diagonalMark = LogicalPathView.TerminalMarkerRect(synthetic,
+                new Vector2(1f, 1f), 0f, 8f, padding);
+            Check(Mathf.Abs(straightMark.width - 8f) < 0.001f &&
+                Mathf.Abs(straightMark.height - 16f) < 0.001f,
+                "straight arrival uses beam width plus prefab padding");
+            Check(Mathf.Abs(diagonalMark.width - (8f * Mathf.Sqrt(2f) + 8f)) < 0.01f &&
+                Mathf.Abs(diagonalMark.height - 8f) < 0.001f,
+                "diagonal arrival covers its wider border footprint");
+            Rect cornerMark = LogicalPathView.TerminalMarkerRect(new Rect(-20f, -20f, 40f, 40f),
+                new Vector2(1f, 1f), 0f, 8f, Vector2.zero);
+            Check(cornerMark.xMax <= 20.001f && cornerMark.yMax <= 20.001f,
+                "border footprint clips at card corner before padding");
+
+            var area = presenter.NetworkArea;
+            NodeView ext = nodes.First(n => n.NodeId == "EXT1");
+            NodeView api = nodes.First(n => n.NodeId == "API");
+            NodeView db = nodes.First(n => n.NodeId == "DB");
+            var views = new System.Collections.Generic.List<LogicalPathView>();
+            try
+            {
+                host.SetRunMode(ConnectionRunMode.AuthoredWitness);
+                LogicalConnectionState pending = host.RuntimeConnections.First(c => c.ConnectionId == "c2");
+                LogicalPathView pendingView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                views.Add(pendingView);
+                pendingView.Bind(pending, area, presenter.MarkerLayer);
+                pendingView.SetLayout(new float[pending.Definition.Route.Length - 1],
+                    Enumerable.Repeat(8f, pending.Definition.Route.Length - 1).ToArray());
+                pendingView.AdvanceVisual(1f);
+                Check(!pendingView.TerminalMarker.gameObject.activeSelf,
+                    "pending connection has no terminal marker");
+
+                host.SetRunMode(ConnectionRunMode.Generated);
+                LogicalConnectionState apiState = host.RegisterConnection(
+                    LogicalConnectionDefinition.FromPlan(new ConnectionSpawnPlan(0f, "marker_api",
+                        new[] { ext, api }, "test", "API target", new[] {
+                            new OperationStage(OperationKind.Read, 0.1f, 1f, "Read"),
+                            new OperationStage(OperationKind.Execute, 500f, 1f, "Execute") })));
+                LogicalConnectionState dbState = host.RegisterConnection(
+                    LogicalConnectionDefinition.FromPlan(new ConnectionSpawnPlan(0f, "marker_db",
+                        new[] { ext, api, db }, "test", "DB target", new[] {
+                            new OperationStage(OperationKind.Read, 500f, 1f, "Read") })));
+                LogicalConnectionState secondDb = host.RegisterConnection(
+                    LogicalConnectionDefinition.FromPlan(new ConnectionSpawnPlan(0f, "marker_db2",
+                        new[] { ext, api, db }, "test", "Second DB target", new[] {
+                            new OperationStage(OperationKind.Write, 500f, 1f, "Write") })));
+                Color apiColor = presenter.IdentityPalette.ColorAt(0);
+                Color dbColor = presenter.IdentityPalette.ColorAt(1);
+                LogicalPathView apiView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                LogicalPathView dbView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                LogicalPathView secondView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                views.Add(apiView);
+                views.Add(dbView);
+                views.Add(secondView);
+                apiView.Bind(apiState, area, presenter.MarkerLayer);
+                dbView.Bind(dbState, area, presenter.MarkerLayer);
+                secondView.Bind(secondDb, area, presenter.MarkerLayer);
+                apiView.SetIdentityColor(apiColor);
+                dbView.SetIdentityColor(dbColor);
+                secondView.SetIdentityColor(presenter.IdentityPalette.ColorAt(2));
+                apiView.SetLayout(new[] { 0f }, new[] { 8f });
+                dbView.SetLayout(new[] { 0f, -8f }, new[] { 8f, 8f });
+                secondView.SetLayout(new[] { 0f, 8f }, new[] { 8f, 8f });
+                apiView.AdvanceVisual(0.3f);
+                dbView.AdvanceVisual(0.3f);
+                Check(!apiView.TerminalMarker.gameObject.activeSelf &&
+                    !dbView.TerminalMarker.gameObject.activeSelf,
+                    "markers wait until establishment reaches target");
+                apiView.AdvanceVisual(0.3f);
+                dbView.AdvanceVisual(0.3f);
+                secondView.AdvanceVisual(0.6f);
+                Check(apiView.TerminalMarker.gameObject.activeSelf &&
+                    dbView.TerminalMarker.gameObject.activeSelf &&
+                    secondView.TerminalMarker.gameObject.activeSelf,
+                    "each established route has one terminal marker");
+                Rect apiCard = EdgeGeometry.CardRect(api, area);
+                Rect dbCard = EdgeGeometry.CardRect(db, area);
+                Vector2 apiPoint = area.InverseTransformPoint(apiView.TerminalMarker.rectTransform.position);
+                Vector2 dbPoint = area.InverseTransformPoint(dbView.TerminalMarker.rectTransform.position);
+                Vector2 secondPoint = area.InverseTransformPoint(secondView.TerminalMarker.rectTransform.position);
+                Vector2 towardApi = (area.InverseTransformPoint(ext.transform.position) -
+                    area.InverseTransformPoint(api.transform.position)).normalized;
+                Vector2 towardDb = (area.InverseTransformPoint(api.transform.position) -
+                    area.InverseTransformPoint(db.transform.position)).normalized;
+                Vector2 expectedApi = LogicalPathView.TerminalBorderPoint(apiCard, towardApi, 0f,
+                    out _);
+                Vector2 expectedDb = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, 8f,
+                    out _);
+                Check((apiPoint - expectedApi).sqrMagnitude < 0.01f &&
+                    (dbPoint - expectedDb).sqrMagnitude < 0.01f &&
+                    !apiCard.Contains(dbPoint),
+                    "API target marks API; DB route passes API and marks DB");
+                Check((dbPoint - secondPoint).sqrMagnitude > 1f &&
+                    dbView.TerminalMarker != secondView.TerminalMarker,
+                    "two DB targets retain distinct border markers");
+                Rect expectedDbMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
+                    8f, 8f, padding);
+                Check((dbView.TerminalMarker.rectTransform.sizeDelta -
+                    expectedDbMarker.size).sqrMagnitude < 0.01f,
+                    "live diagonal marker uses final segment width");
+                Check(dbView.TerminalMarker.color == dbColor &&
+                    dbView.BeamColorFor(LoadPerformance.Stalled) != dbColor,
+                    "terminal marker keeps identity accent during beam warning");
+                Vector2 hiddenEnd = EdgeGeometry.CardUnderlap(dbCard, towardDb, 8f, 8f);
+                Check((dbPoint - hiddenEnd).sqrMagnitude > 0.1f,
+                    "marker uses visible border instead of hidden underlap");
+
+                dbView.SetLayout(new[] { 0f, 8f }, new[] { 8f, 4f });
+                dbView.AdvanceVisual(0.15f);
+                dbPoint = area.InverseTransformPoint(dbView.TerminalMarker.rectTransform.position);
+                expectedDb = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, 0f, out _);
+                Vector2 finalPoint = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, -8f,
+                    out _);
+                Rect reflowMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
+                    0f, 6f, padding);
+                Check((dbPoint - expectedDb).sqrMagnitude < 0.01f &&
+                    (dbPoint - finalPoint).sqrMagnitude > 1f,
+                    "marker follows interpolated lane instead of snapping to final offset");
+                Check((dbView.TerminalMarker.rectTransform.sizeDelta -
+                    reflowMarker.size).sqrMagnitude < 0.01f &&
+                    dbView.TerminalMarker.rectTransform.sizeDelta.x < expectedDbMarker.width,
+                    "marker width follows interpolated beam width during reflow");
+                dbView.SetPresentationActive(false);
+                Check(!dbView.TerminalMarker.gameObject.activeSelf,
+                    "preview hides marker with its owning path");
+                dbView.SetPresentationActive(true);
+                dbView.AdvanceVisual(0f);
+                Check(dbView.TerminalMarker.gameObject.activeSelf,
+                    "marker returns with its owning path");
+
+                LogicalConnectionState shortState = host.RegisterConnection(
+                    LogicalConnectionDefinition.FromPlan(new ConnectionSpawnPlan(0f, "marker_done",
+                        new[] { ext, api }, "test", "Short API target", new[] {
+                            new OperationStage(OperationKind.Write, 0.1f, 1f, "Write") })));
+                LogicalPathView shortView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                views.Add(shortView);
+                shortView.Bind(shortState, area, presenter.MarkerLayer);
+                shortView.SetIdentityColor(presenter.IdentityPalette.ColorAt(3));
+                shortView.SetLayout(new[] { 8f }, new[] { 8f });
+                shortView.AdvanceVisual(0.6f);
+                host.StepSimulation(0.2f);
+                Check(shortState.IsComplete && apiState.IsTransitioning &&
+                    apiView.TerminalMarker.gameObject.activeSelf,
+                    "completion fades its marker while operation transition keeps its own");
+                shortView.AdvanceVisual(0.2f);
+                Check(shortView.TerminalMarker.color.a < 0.6f &&
+                    shortView.TerminalMarker.color.a > 0f,
+                    "completed marker fades with path departure");
+                host.StepSimulation(0.1f);
+                apiView.AdvanceVisual(0f);
+                Check(apiState.CurrentOperation == OperationKind.Execute &&
+                    apiView.TerminalMarker.gameObject.activeSelf,
+                    "local EXECUTE retains target marker");
+                Check(host.BlockConnection(dbState.ConnectionId), "block marker test connection");
+                dbView.AdvanceVisual(0.2f);
+                Check(dbView.TerminalMarker.color.a < 0.6f &&
+                    dbView.TerminalMarker.color.a > 0f,
+                    "blocked marker fades with path departure");
+                Image retired = dbView.TerminalMarker;
+                dbView.ReleaseTerminalMarker();
+                UnityEngine.Object.DestroyImmediate(dbView.gameObject);
+                Check(retired == null || !retired.gameObject.activeSelf,
+                    "marker disappears with its owning path");
+                views.Remove(dbView);
+            }
+            finally
+            {
+                foreach (LogicalPathView view in views)
+                    if (view != null)
+                    {
+                        view.ReleaseTerminalMarker();
+                        UnityEngine.Object.DestroyImmediate(view.gameObject);
+                    }
+                host.SetRunMode(ConnectionRunMode.Generated);
+            }
         }
 
         private static void CheckRouteLaneOrdering(LogicalPathPresenter presenter,

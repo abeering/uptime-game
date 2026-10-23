@@ -8,6 +8,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform pathLayer;
+        [SerializeField] private RectTransform markerLayer;
         [SerializeField] private LogicalPathView pathPrefab;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionIdentityPalette identityPalette = new ConnectionIdentityPalette();
@@ -26,6 +27,7 @@ namespace Uptime.Connections
 
         public RectTransform NetworkArea => networkArea;
         public RectTransform PathLayer => pathLayer;
+        public RectTransform MarkerLayer => markerLayer;
         public PathGraphic PathGraphicPrefab => pathPrefab != null ? pathPrefab.GetComponent<PathGraphic>() : null;
         public float MaxLineWidth => Mathf.Max(0.1f, maxLineWidth);
         public float MinLineGap => Mathf.Max(0f, minLineGap);
@@ -39,7 +41,7 @@ namespace Uptime.Connections
             previewMode = enabled;
             foreach (LogicalPathView view in views.Values)
                 if (view != null)
-                    view.gameObject.SetActive(!enabled);
+                    view.SetPresentationActive(!enabled);
             if (enabled && identityPresenter != null)
             {
                 identityPresenter.BeginFrame();
@@ -55,6 +57,7 @@ namespace Uptime.Connections
                 if (oldView != null)
                 {
                     oldView.Destroyed -= OnPathDestroyed;
+                    oldView.ReleaseTerminalMarker();
                     Destroy(oldView.gameObject);
                 }
             views.Clear();
@@ -66,9 +69,9 @@ namespace Uptime.Connections
             {
                 LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
                 view.name = "Logical path " + connection.ConnectionId;
-                view.Bind(connection, networkArea);
+                view.Bind(connection, networkArea, markerLayer);
                 view.Destroyed += OnPathDestroyed;
-                view.gameObject.SetActive(!previewMode);
+                view.SetPresentationActive(!previewMode);
                 views.Add(connection, view);
             }
             UpdateLayouts();
@@ -82,9 +85,9 @@ namespace Uptime.Connections
             if (networkArea == null || pathLayer == null || pathPrefab == null) return;
             LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
             view.name = "Logical path " + state.ConnectionId;
-            view.Bind(state, networkArea);
+            view.Bind(state, networkArea, markerLayer);
             view.Destroyed += OnPathDestroyed;
-            view.gameObject.SetActive(!previewMode);
+            view.SetPresentationActive(!previewMode);
             views.Add(state, view);
             UpdateLayouts();
         }
