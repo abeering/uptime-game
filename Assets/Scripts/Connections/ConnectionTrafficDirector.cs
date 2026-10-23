@@ -267,14 +267,25 @@ namespace Uptime.Connections
             {
                 id = "basic-threat", claimedPurpose = "Database Maintenance",
                 eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
-                operations = new[] { new ConnectionOperationProfile
+                operations = new[] { ThreatWriteStage() }
+            },
+            new ConnectionTrafficProfile
+            {
+                id = "delayed-threat", claimedPurpose = "Database Maintenance",
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                operations = new[]
                 {
-                    operation = OperationKind.Write, activityDescription = "Writing records",
-                    minimumLoad = 12f, maximumLoad = 12f,
-                    minimumDuration = 20f, maximumDuration = 20f,
-                    completionEffect = CompletionEffect.InfectionDelivery
-                } }
+                    Stage(OperationKind.Read, "Reading records", 2f, 2f, 8f, 8f),
+                    ThreatWriteStage()
+                }
             }
+        };
+        private static ConnectionOperationProfile ThreatWriteStage() => new ConnectionOperationProfile
+        {
+            operation = OperationKind.Write, activityDescription = "Writing records",
+            minimumLoad = 12f, maximumLoad = 12f,
+            minimumDuration = 20f, maximumDuration = 20f,
+            completionEffect = CompletionEffect.InfectionDelivery
         };
         private static ConnectionTrafficProfile Profile(string id, string purpose, string target,
             float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile

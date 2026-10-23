@@ -51,8 +51,9 @@ namespace Uptime.Connections.EditorTools
                 }
                 Check(replay.Select(p => p.ProfileId).Distinct().Count() == 5,
                     "weighted catalog includes ordinary and incidental profiles");
-                Check(replay.All(p => p.ProfileId != "basic-threat"),
-                    "manual threat is absent from ambient traffic");
+                Check(replay.All(p => p.ProfileId != "basic-threat" &&
+                    p.ProfileId != "delayed-threat"),
+                    "manual threats are absent from ambient traffic");
                 ConnectionTrafficProfile quick = director.Profiles.First(p => p.id == "quick-lookup");
                 Check(quick.operations.Length == 1 && quick.operations[0].operation == OperationKind.Read &&
                     quick.operations[0].minimumDuration == 4f && quick.operations[0].maximumDuration == 8f,
@@ -141,6 +142,7 @@ namespace Uptime.Connections.EditorTools
                 Debug.Log("TrafficWitness burst: expected 12 arrivals, DB 120 requested/10 allocated; " +
                     $"observed 12 and {dbResources.RequestedLoad:0.#} after kill release.");
                 CheckManualProfilesAndThreats(host, director);
+                CheckDelayedThreat(host, director);
                 Debug.Log("TrafficWitness PASS");
             }
             finally
@@ -270,6 +272,121 @@ namespace Uptime.Connections.EditorTools
                 host.EffectOccurred -= onEffect;
                 host.ResetSimulation();
             }
+        }
+
+        private static void CheckDelayedThreat(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            host.ResetSimulation();
+            ConnectionTrafficProfile profile = director.Profiles.Single(p => p.id == "delayed-threat");
+            ConnectionTrafficProfile basic = director.Profiles.Single(p => p.id == "basic-threat");
+            ConnectionSpawnPlan plan = director.QueueProfile("delayed-threat");
+            Check(profile.isHostile && profile.ambientWeight == 0f &&
+                plan.IsHostile && plan.Operations.Length == 2 &&
+                plan.Operations[0].Operation == OperationKind.Read &&
+                plan.Operations[0].DesiredLoad == 2f && plan.Operations[0].TotalWork == 16f &&
+                plan.Operations[0].EffectOnCompletion == CompletionEffect.None &&
+                plan.Operations[1].Operation == OperationKind.Write &&
+                plan.Operations[1].DesiredLoad == 12f && plan.Operations[1].TotalWork == 240f &&
+                plan.Operations[1].EffectOnCompletion == CompletionEffect.InfectionDelivery &&
+                basic.operations[0].minimumLoad == 12f &&
+                basic.operations[0].completionEffect == CompletionEffect.InfectionDelivery &&
+                plan.Route.Select(n => n.NodeId).SequenceEqual(new[] { "EXT1", "API", "DB" }),
+                "manual delayed threat has ordinary READ and unchanged high-LOAD WRITE");
+
+            host.StepSimulation(0.1f);
+            LogicalConnectionState state = host.FindConnection(plan.ConnectionId);
+            Near(state.AllocatedLoad, 2f, "READ receives ordinary LOAD");
+            Near(state.CompletedWork, 0.2f, "READ advances ordinary WORK");
+            host.StepSimulation(7.9f);
+            Check(state.IsActive && state.IsTransitioning &&
+                state.CurrentOperationIndex == 1 && state.CurrentOperation == OperationKind.Write &&
+                state.CompletedWork == 0f && state.DesiredLoad == 12f &&
+                host.FindConnection(plan.ConnectionId) == state &&
+                state.Definition.Route.Select(n => n.Node.NodeId)
+                    .SequenceEqual(plan.Route.Select(n => n.NodeId)) &&
+                host.Occurrences.Count == 0,
+                "READ completes without delivery and keeps identity and route for WRITE");
+            NodeResources db = host.Nodes.Single(n => n.View.NodeId == "DB");
+            Near(db.RequestedLoad, 0f, "next operation waits until the following step");
+            host.StepSimulation(0.1f);
+            Check(!state.IsTransitioning && state.CurrentOperationIndex == 1 &&
+                state.CompletedWork > 0f && state.ActualWorkRate == 10f,
+                "WRITE begins on next step with normal capacity allocation");
+            Near(db.RequestedLoad, 12f, "WRITE requests high LOAD");
+            host.StepSimulation(24f);
+            Check(state.Resolution == ConnectionResolution.Completed &&
+                host.Occurrences.Count == 1 &&
+                host.Occurrences[0].ConnectionId == plan.ConnectionId &&
+                host.Occurrences[0].OperationIndex == 1 &&
+                host.Occurrences[0].Type == CompletionEffect.InfectionDelivery &&
+                host.Occurrences[0].TargetNodeId == "DB" &&
+                host.FindConnection(plan.ConnectionId) == state,
+                "normal WRITE completion delivers once and retains inspection history");
+            Near(host.Occurrences[0].TimeSeconds, host.SimulationTimeSeconds,
+                "delivery uses WRITE completion time");
+            host.StepSimulation(0.1f);
+            Check(host.Occurrences.Count == 1, "completed WRITE does not deliver twice");
+
+            host.ResetSimulation();
+            ConnectionSpawnPlan readKill = director.QueueProfile("delayed-threat");
+            host.StepSimulation(0.1f);
+            LogicalConnectionState readState = host.FindConnection(readKill.ConnectionId);
+            float readWork = readState.CompletedWork;
+            Check(host.KillConnection(readKill.ConnectionId) &&
+                readState.Resolution == ConnectionResolution.Killed &&
+                readState.CurrentOperationIndex == 0 && readState.CompletedWork == readWork &&
+                host.Occurrences.Count == 0,
+                "kill during READ retains partial READ and prevents later operations");
+            host.StepSimulation(40f);
+            Check(host.Occurrences.Count == 0 && readState.CurrentOperationIndex == 0,
+                "killed READ never starts WRITE");
+
+            host.ResetSimulation();
+            ConnectionSpawnPlan writeKill = director.QueueProfile("delayed-threat");
+            host.StepSimulation(8f);
+            LogicalConnectionState writeState = host.FindConnection(writeKill.ConnectionId);
+            host.StepSimulation(0.1f);
+            float writeWork = writeState.CompletedWork;
+            Check(writeState.CurrentOperationIndex == 1 && writeWork > 0f &&
+                host.KillConnection(writeKill.ConnectionId) &&
+                writeState.Resolution == ConnectionResolution.Killed &&
+                writeState.CompletedWork == writeWork && host.Occurrences.Count == 0,
+                "kill during WRITE retains completed READ and partial WRITE without delivery");
+            Near(db.RequestedLoad, 0f, "kill during WRITE releases requested LOAD");
+            host.StepSimulation(40f);
+            Check(host.Occurrences.Count == 0, "killed WRITE never delivers");
+
+            host.ResetSimulation();
+            ConnectionSpawnPlan first = director.QueueProfile("delayed-threat");
+            ConnectionSpawnPlan second = director.QueueProfile("delayed-threat");
+            host.StepSimulation(8f);
+            Check(host.Occurrences.Count == 0 &&
+                host.FindConnection(first.ConnectionId).CurrentOperationIndex == 1 &&
+                host.FindConnection(second.ConnectionId).CurrentOperationIndex == 1,
+                "concurrent READ completions do not share effects");
+            host.StepSimulation(0.1f);
+            Near(db.RequestedLoad, 24f, "concurrent WRITEs share high demand");
+            host.StepSimulation(48f);
+            Check(host.Occurrences.Count == 2 &&
+                host.Occurrences.Select(o => o.ConnectionId).Distinct().Count() == 2 &&
+                host.Occurrences.All(o => o.OperationIndex == 1 && o.TargetNodeId == "DB"),
+                "concurrent instances each deliver once from their own WRITE");
+            host.ResetSimulation();
+            ConnectionSpawnPlan replay = director.QueueProfile("delayed-threat");
+            Check(replay.ConnectionId == first.ConnectionId &&
+                host.Occurrences.Count == 0,
+                "reset replays ID and clears prior deliveries");
+            host.StepSimulation(8f);
+            host.StepSimulation(24f);
+            Check(host.Occurrences.Count == 1 &&
+                host.Occurrences[0].ConnectionId == replay.ConnectionId &&
+                host.Occurrences[0].OperationIndex == 1,
+                "replayed arc delivers once from WRITE");
+            host.ResetSimulation();
+            Debug.Log("TrafficWitness delayed threat: expected READ 2 LOAD/16 WORK with no " +
+                "delivery, next-step WRITE 12 LOAD/240 WORK, one delivery at index 1, " +
+                "kill prevention in either operation, independent concurrent replay; observed matching states.");
         }
 
         private static string Signature(ConnectionSpawnPlan p) => p.ScheduledSpawnTime + "|" +
