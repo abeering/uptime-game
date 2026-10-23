@@ -11,6 +11,10 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Run recorder](connections-run-recorder-v0.md) — Play Mode JSON telemetry and terminal commands.
 - [Route-aware lanes](route-aware-lanes-v1.md) — path continuity and physical-link lane ordering.
 
+## Selected phase plans (not yet implemented)
+
+- [Threats V0 — selected baseline](connections-threats-v0.md) — phased first hostile WRITE, operation-completion delivery observation, kill interception, later operation modifiers (`OVERLOAD`/`SPIKING`). This newer design baseline takes precedence over the older exploratory archive for Threats V0 scope.
+
 ## Working designs, not implemented contracts
 
 - [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
