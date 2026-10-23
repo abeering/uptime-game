@@ -38,13 +38,22 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 1 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 6,
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 7,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");
                 Check(threatProfile.isHostile && threatProfile.ambientWeight == 0f &&
                     threatProfile.operations[0].completionEffect == "InfectionDelivery",
                     "recorded catalog includes manual-only threat behavior");
+                ProfileConfiguration delayedProfile = initial.run.traffic.profiles.Single(p =>
+                    p.id == "delayed-threat");
+                Check(delayedProfile.isHostile && delayedProfile.ambientWeight == 0f &&
+                    delayedProfile.operations.Length == 2 &&
+                    delayedProfile.operations[0].kind == "Read" &&
+                    delayedProfile.operations[0].completionEffect == "None" &&
+                    delayedProfile.operations[1].kind == "Write" &&
+                    delayedProfile.operations[1].completionEffect == "InfectionDelivery",
+                    "recorded catalog scopes delayed delivery to WRITE");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");
@@ -152,6 +161,57 @@ namespace Uptime.Connections.EditorTools
                 Check(threatSpawn.definition.isHostile &&
                     threatSpawn.definition.operations[0].completionEffect == "InfectionDelivery",
                     "concrete manual threat definition is recorded");
+                ConnectionSpawnPlan delayed = director.QueueProfile("delayed-threat");
+                host.StepSimulation(8f);
+                Check(recorder.CurrentLog.events.Count(e => e.type == "operation_completed" &&
+                    e.connectionId == delayed.ConnectionId && e.operationIndex == 0) == 1 &&
+                    recorder.CurrentLog.events.All(e => e.connectionId != delayed.ConnectionId ||
+                        e.type != "operation_started" || e.operationIndex == 0) &&
+                    recorder.CurrentLog.events.All(e => e.type != "effect" ||
+                        e.connectionId != delayed.ConnectionId),
+                    "recorded READ completion has neither WRITE start nor delivery yet");
+                host.StepSimulation(0.1f);
+                host.StepSimulation(24f);
+                RunEvent[] delayedEvents = recorder.CurrentLog.events.Where(e =>
+                    e.connectionId == delayed.ConnectionId &&
+                    (e.type == "operation_started" || e.type == "operation_completed" ||
+                        e.type == "effect" || e.type == "connection_resolved")).ToArray();
+                Check(delayedEvents.Length == 6 &&
+                    delayedEvents.Select(e => e.type).SequenceEqual(new[]
+                    {
+                        "operation_started", "operation_completed", "operation_started",
+                        "operation_completed", "effect", "connection_resolved"
+                    }) &&
+                    delayedEvents[1].operationIndex == 0 &&
+                    delayedEvents[2].operationIndex == 1 &&
+                    delayedEvents[2].timeSeconds == delayedEvents[1].timeSeconds &&
+                    delayedEvents[3].operationIndex == 1 &&
+                    delayedEvents[4].operationIndex == 1 &&
+                    delayedEvents[4].effectType == "InfectionDelivery" &&
+                    delayedEvents[4].targetNodeId == "DB" &&
+                    delayedEvents[4].timeSeconds == delayedEvents[3].timeSeconds &&
+                    delayedEvents[5].resolutionReason == "Completed",
+                    "delayed arc records READ, next-step WRITE, one indexed delivery, then resolution");
+                RunEvent delayedSpawn = recorder.CurrentLog.events.Single(e =>
+                    e.type == "connection_spawned" && e.connectionId == delayed.ConnectionId);
+                Check(delayedSpawn.definition.isHostile &&
+                    delayedSpawn.definition.operations.Length == 2 &&
+                    delayedSpawn.definition.operations[0].completionEffect == "None" &&
+                    delayedSpawn.definition.operations[1].completionEffect == "InfectionDelivery",
+                    "concrete delayed profile retains operation-scoped effect metadata");
+
+                ConnectionSpawnPlan interrupted = director.QueueProfile("delayed-threat");
+                host.StepSimulation(8f);
+                host.StepSimulation(0.1f);
+                Check(host.KillConnection(interrupted.ConnectionId),
+                    "kill delayed threat during WRITE");
+                Check(recorder.CurrentLog.events.Count(e => e.connectionId == interrupted.ConnectionId &&
+                    e.type == "operation_completed" && e.operationIndex == 0) == 1 &&
+                    recorder.CurrentLog.events.All(e => e.connectionId != interrupted.ConnectionId ||
+                        e.type != "effect") &&
+                    recorder.CurrentLog.events.Last(e => e.connectionId == interrupted.ConnectionId &&
+                        e.type == "connection_resolved").operationIndex == 1,
+                    "killed WRITE retains recorded READ completion without delivery");
                 recorder.EndRun();
                 Check(!string.IsNullOrEmpty(Read(firstPath).run.endedUtc), "final save contains end timestamp");
 

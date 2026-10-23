@@ -1,6 +1,6 @@
 # Connections — Threats V0: selected baseline and phased plan
 
-**Status:** Selected design direction and proposed implementation sequence, October 23, 2026. **Slice 1 is implemented on the focused implementation branch; Phases C–E remain plans.**
+**Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C) are implemented; Phases D–E remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 
 ## Objective and first playable slice
@@ -22,6 +22,12 @@ A high LOAD request alone is not the definition of a threat. Benign connections 
 Each operation definition can carry a completion effect independently of its READ/WRITE/EXECUTE kind and LOAD. The allocator returns completed operation indices after normal WORK progress. `SimulationHost` records the operation completion, asks that connection instance for its effect, records and emits any resulting occurrence, then resolves a final connection. The instance owns a per-operation delivery flag. An infection-delivery occurrence has effect type, connection ID, operation index, target-node ID, and simulation time. The terminal announces delivery; the run recorder stores an `effect` event. No persistent node infection state is created.
 
 `kill <connectionId>` immediately resolves an active connection as Killed and publishes released target LOAD. An unfinished operation produces no completion effect. The old per-connection `block <id>` command is removed; `block <source>` remains reserved for future source prevention.
+
+## Slice 2 implementation — operation scope
+
+`delayed-threat` is a second manual-only hostile profile (`ambientWeight = 0`) through the same `spawn <profileId>` and concrete-plan queue. It claims Database Maintenance and follows EXT1–API–DB throughout. Its first operation is an ordinary READ requesting 2 LOAD for 16 fixed WORK, with no completion effect. Its second operation reuses `basic-threat`'s WRITE definition: 12 requested LOAD, 240 fixed WORK, and one infection-delivery effect on normal completion. No extra lifecycle or target change is involved.
+
+READ completion emits no delivery and leaves the connection transitioning. The WRITE starts on the next fixed step with the same ID, path, target, and inspect history; its requested LOAD, WORK, ETA, and pulse direction follow the active operation. Normal WRITE completion emits one occurrence at operation index 1. Killing during READ prevents WRITE and delivery; killing during WRITE preserves the completed READ in history and prevents its pending delivery. Concurrent instances own separate delivery state. The terminal does not reveal hostile classification before delivery.
 
 ## Reconciliation with the October 22–23 idea archive
 
@@ -67,6 +73,7 @@ Later, effective demand changes must be applied **before allocation** each fixed
 - No actual infection or cleaning systems.
 
 ### Phase C — Second threat, operation scope
+- Implemented in Slice 2 through `delayed-threat`; the bullets below describe the delivered scope.
 - Normal first operation followed by a high-LOAD WRITE with a completion delivery.
 - Verify that the first operation completing does **not** deliver the second operation's effect; delivery at its intended operation does not require final-connection special casing.
 - Preserve inspection history, arc identity, next-step transition, target/route, and LOAD release.
@@ -83,7 +90,7 @@ Later, effective demand changes must be applied **before allocation** each fixed
 - Third hostile example: otherwise normal-looking operation that spikes according to its keyword. Validate that benign operations can use the same keyword without infection delivery.
 - Keep threat classification and payload delivery independent of these operation-arc modifiers.
 
-Phases C–E are planned direction, **not** a request to implement them in the first PR. Prefer a small reviewable PR for A–B, then reassess based on gameplay and code.
+Phase C is implemented as Slice 2. Phases D–E remain planned direction and are outside both completed slices.
 
 ## Deterministic witnesses and review criteria
 
@@ -106,6 +113,8 @@ Later witnesses should prove dynamic requested LOAD changes before allocation, r
 - Do not modify the generated `Docs/_generated/Uptime_Project_Core.md` directly. If canonical Core-included sources change, regenerate via `scripts/build_uptime_project_core.py` and verify `--check`. This docs-only branch adds an indexed plan and does not need a Core regeneration.
 - This documentation branch is intentionally **based on PR #15's head** and targeted at `main`. Merge PR #15 first; after it merges, the follow-on PR should reduce to just this plan and index changes. Recheck diff if PR #15 is modified or squash-merged.
 
-## Codex handoff — recommended first implementation
+## Historical Codex handoff — recommended first implementation
+
+The following handoff was written before Slice 1 and is retained as provenance, not as an instruction for Slice 2.
 
 > Start from current `main` after the documentation PRs are merged. Read `Docs/Connections/README.md`, this selected Threats V0 baseline, the older exploratory threat/investigation archive, Connections Current State, operation arcs, traffic and LOAD contracts, plus relevant Packet threat/infection runtime for architecture lessons. Treat **this baseline** as authoritative on selected Threats V0 decisions and the archive as deferred hypotheses. Audit the actual code for current `kill` versus `block` command semantics before editing. Implement **only Phase A and Phase B**, using the narrowest shared operation-lifecycle seam: a single reproducible hostile high-LOAD WRITE with an operation-WORK-completion infection-delivery occurrence, console feedback, correct interruption via `kill`, deterministic witnesses, and no persistent infection state or clean gameplay. Keep benign traffic, proportional allocation, and existing arc invariants intact. Report design tradeoffs, tests, and Play Mode review steps in a PR. Do not implement SPIKING, OVERLOAD, trace, source blocking, probes, scans, infection state, or a generalized modifier engine in this PR.

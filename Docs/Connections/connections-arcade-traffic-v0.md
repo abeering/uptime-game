@@ -10,7 +10,7 @@ This phase gives Connections a continuous benign traffic rhythm. Packet remains 
 
 `SimulationHost` validates node membership, route links, uniqueness, finite positive operations, and operation kinds. It owns active states, LOAD allocation, WORK, stage transitions, resolution timestamps and reasons, and inspection history. Completed generated states leave the active array after the allocation step and keep a history reference. `kill <id>` removes active ownership immediately and publishes released node demand; peers receive new allocation on the next step. `ConnectionResolved` exposes Completed and Killed outcomes. No scoring or FLOW effect is attached.
 
-Threats V0 Slice 1 adds development-only `spawn <profileId>` through the same profile-to-plan builder and `QueueSpawnPlan` path used by ambient generation. The command reports a queued ID or unknown-profile error. Queued plans dispatch even with ambient generation disabled, and authored witness mode suppresses ambient generation while retaining explicit queue dispatch. Manual spawns are not a Level Director or a scheduling language.
+Threats V0 Slice 1 adds development-only `spawn <profileId>` through the same profile-to-plan builder and `QueueSpawnPlan` path used by ambient generation. The command reports a queued ID or unknown-profile error. Queued plans dispatch even with ambient generation disabled, and authored witness mode suppresses ambient generation while retaining explicit queue dispatch. Slice 2 adds `spawn delayed-threat` to that catalog; it uses the same queue and registration path. Manual spawns are not a Level Director or a scheduling language.
 
 The Packet game's separation between procedural traffic, concrete spawn plans, and level events informed this seam. Its tick schedules, modifiers, threat generation, and runtime code are not reused. Connections uses its existing simulation clock and LOAD allocator.
 
@@ -28,8 +28,11 @@ The initial profile catalog is the director's default when no Inspector profiles
 | Application Updates | API | WRITE → READ | 1.5–3, then 1–2.5 | 20–35 s per stage, 40–70 s total |
 | Quick Record Lookup | DB | READ | 0.5–1.5 | 4–8 s |
 | Basic Threat (`basic-threat`, manual only) | DB | WRITE with completion delivery | 12 | 20 s (240 WORK) |
+| Delayed Threat (`delayed-threat`, manual only) | DB | READ without effect, then WRITE with completion delivery | 2, then 12 | 8 s (16 WORK), then 20 s (240 WORK) |
 
-Relative ambient weights of the five benign profiles are 1, 0.8, 1, 0.8, and 0.35 respectively; Basic Threat has weight zero. The seed is 1701, grace period 3 s, interval 13.5 s with ±1.5 s jitter, and ordinary origin EXT1. Routes are found from the configured physical topology in stable link order. Node capacities come from the scene, currently 10 LOAD for each node. The optional `demandtest` command queues one 10–12 LOAD READ to DB through the same pipeline; `QueueHighDemandWitness(..., false)` covers the 7–9 LOAD range. Neither the demand witness nor Basic Threat belongs to the ambient mix.
+Both threat profiles have ambient weight zero. The delayed profile's READ is deliberately short for manual review, and its WRITE uses the same authored high-demand stage definition as `basic-threat`. Its actual duration grows under contention because WORK uses allocated LOAD.
+
+Relative ambient weights of the five benign profiles are 1, 0.8, 1, 0.8, and 0.35 respectively. The seed is 1701, grace period 3 s, interval 13.5 s with ±1.5 s jitter, and ordinary origin EXT1. Routes are found from the configured physical topology in stable link order. Node capacities come from the scene, currently 10 LOAD for each node. The optional `demandtest` command queues one 10–12 LOAD READ to DB through the same pipeline; `QueueHighDemandWitness(..., false)` covers the 7–9 LOAD range. Neither the demand witness nor either threat belongs to the ambient mix.
 
 The arrival cadence does not observe active population. Completion time depends on allocated LOAD and may increase during contention. There is no target concurrency, replenishment, or gameplay cap. A congested network can accumulate more connections; tuning should be adjusted after playtesting rather than hidden by population control.
 
