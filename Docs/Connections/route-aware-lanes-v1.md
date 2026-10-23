@@ -1,0 +1,9 @@
+# Connections: route-aware lane ordering, phase 1
+
+This phase changes only Connections presentation. Physical links remain route geometry, and the LOAD, WORK, traffic, and Packet implementations are unchanged.
+
+`RouteLaneOrder` assigns an ordered list of active connection IDs to each physical link in its authored NodeA-to-NodeB frame. It starts with the prior order, retains existing IDs, and inserts new IDs deterministically. A bounded adjacent-swap search scores the whole active network after each candidate swap. The score favors consistent relative position for pairs crossing the same two ports, the geometric sides of different branches, and adjacent connections that share a continuation. A small penalty for reversing an existing pair resists incidental motion. Terminal routes take a central branch value. IDs and link IDs break ties; they do not encode topology-specific rules.
+
+The presenter re-solves when active IDs, routes, or node positions change beyond half a UI pixel. It still updates visual geometry each frame. Existing per-link line width, minimum gap, pill packing, identity cycling, establishment, departure, pulses, and performance color remain in their original owners. `LogicalPathView.SetLayout` interpolates a changed assignment over its authored 0.3 seconds, starting from current displayed offsets when interrupted. `IdentityPresenter` accepts the same lane order as the path presenter and reuses pill instances by connection ID.
+
+The Geometry Witness checks the four-connection DB/API/AUTH branch, reverse traversal, deterministic arrival and removal, unchanged solve stability, and a dense set of routes. Its existing width, card coverage, packing, and dense fallback checks still apply. Review the 16:9 Game View in Play Mode as generated connections arrive and depart, especially pill tracking during overlapping animations and terminal input focus. This phase does not set route-wide widths or per-connection colors.

@@ -26,6 +26,7 @@ namespace Uptime.Connections.EditorTools
             Check(presenter.NetworkArea != null && presenter.PathLayer != null && presenter.PathGraphicPrefab != null,
                 "path prefab and area references");
             Check(nodes.Length == 4 && links.Length == 3, "four nodes and three links");
+            CheckRouteLaneOrdering(presenter, nodes, links);
             foreach (NodeView node in nodes)
                 foreach (Vector2 direction in new[] { Vector2.up, Vector2.up + Vector2.right, Vector2.right,
                     Vector2.down + Vector2.right, Vector2.down, Vector2.down + Vector2.left,
@@ -47,7 +48,14 @@ namespace Uptime.Connections.EditorTools
                     float first = EdgeGeometry.Offset(0, count, width, presenter.MinLineGap);
                     float last = EdgeGeometry.Offset(count - 1, count, width, presenter.MinLineGap);
                     Check(Mathf.Abs(first + last) < 0.001f, "centered bundle");
-                    Check(last + width * 0.5f <= budget * 0.5f + 0.001f, "bundle within budget");
+                    bool gapFits = (count - 1) * presenter.MinLineGap <= budget + 0.001f;
+                    if (gapFits)
+                        Check(last + width * 0.5f <= budget * 0.5f + 0.001f,
+                            "bundle within budget");
+                    else
+                        Check(width == 0f && EdgeGeometry.BelowMinimum(budget, count,
+                            presenter.MinLineGap, presenter.MaxLineWidth, presenter.MinLineWidth),
+                            "dense bundle reports saturated gap");
                     for (int i = 1; i < count; i++)
                     {
                         float previous = EdgeGeometry.Offset(i - 1, count, width, presenter.MinLineGap);
@@ -57,7 +65,7 @@ namespace Uptime.Connections.EditorTools
                     if (count % 2 == 1)
                         Check(Mathf.Abs(EdgeGeometry.Offset(count / 2, count, width,
                             presenter.MinLineGap)) < 0.001f, "odd center lane");
-                    for (int i = 0; i < count; i++)
+                    for (int i = 0; gapFits && i < count; i++)
                     {
                         float offset = EdgeGeometry.Offset(i, count, width, presenter.MinLineGap);
                         Check(EndCovered(sourceCard, EdgeGeometry.CardUnderlap(sourceCard,
@@ -230,6 +238,94 @@ namespace Uptime.Connections.EditorTools
         {
             if (!condition)
                 throw new InvalidOperationException("GeometryWitness failed: " + name);
+        }
+
+        private static void CheckRouteLaneOrdering(LogicalPathPresenter presenter,
+            NodeView[] nodes, PhysicalLinkView[] links)
+        {
+            NodeView ext = nodes.First(n => n.NodeId == "EXT1");
+            NodeView api = nodes.First(n => n.NodeId == "API");
+            NodeView db = nodes.First(n => n.NodeId == "DB");
+            NodeView auth = nodes.First(n => n.NodeId == "AUTH");
+            PhysicalLinkView e1 = links.First(l => l.LinkId == "E1");
+            PhysicalLinkView e2 = links.First(l => l.LinkId == "E2");
+            PhysicalLinkView e3 = links.First(l => l.LinkId == "E3");
+            var area = presenter.NetworkArea;
+            var solver = new RouteLaneOrder();
+            var routes = new System.Collections.Generic.List<RouteLaneOrder.Route>
+            {
+                new RouteLaneOrder.Route("C1", new[] { ext, api, db }, new[] { e1, e2 }),
+                new RouteLaneOrder.Route("C2", new[] { ext, api }, new[] { e1 }),
+                new RouteLaneOrder.Route("C3", new[] { ext, api, auth }, new[] { e1, e3 }),
+                new RouteLaneOrder.Route("C4", new[] { ext, api, db }, new[] { e1, e2 })
+            };
+            solver.Update(routes, area);
+            var incoming = solver.Orders[e1];
+            Check(Mathf.Abs(incoming.IndexOf("C1") - incoming.IndexOf("C4")) == 1,
+                "DB routes stay adjacent before API");
+            Vector2 from = area.InverseTransformPoint(e1.NodeA.transform.position);
+            Vector2 to = area.InverseTransformPoint(e1.NodeB.transform.position);
+            Vector2 normal = new Vector2(-(to - from).normalized.y, (to - from).normalized.x);
+            float dbSide = Vector2.Dot((area.InverseTransformPoint(db.transform.position) -
+                area.InverseTransformPoint(api.transform.position)).normalized, normal);
+            float authSide = Vector2.Dot((area.InverseTransformPoint(auth.transform.position) -
+                area.InverseTransformPoint(api.transform.position)).normalized, normal);
+            int dbRank = incoming.IndexOf("C1");
+            int authRank = incoming.IndexOf("C3");
+            Check((dbRank - authRank) * (dbSide - authSide) > 0,
+                "DB and AUTH branches take their geometric sides");
+            Check(incoming.IndexOf("C2") > Mathf.Min(dbRank, incoming.IndexOf("C4")) &&
+                incoming.IndexOf("C2") < authRank,
+                "terminal API route stays between branches");
+            string initial = string.Join(",", incoming);
+            int solveCount = solver.SolveCount;
+            solver.Update(routes, area);
+            Check(solver.SolveCount == solveCount && string.Join(",", solver.Orders[e1]) == initial,
+                "unchanged route input does not re-solve or move lanes");
+            Vector3 apiPosition = api.transform.localPosition;
+            try
+            {
+                api.transform.localPosition = apiPosition + Vector3.right * 3f;
+                Canvas.ForceUpdateCanvases();
+                solver.Update(routes, area);
+                Check(solver.SolveCount == solveCount + 1,
+                    "node geometry change triggers route ordering");
+            }
+            finally
+            {
+                api.transform.localPosition = apiPosition;
+                Canvas.ForceUpdateCanvases();
+                solver.Update(routes, area);
+            }
+
+            // A connection using the same two ports in reverse must retain physical lane order.
+            routes.Add(new RouteLaneOrder.Route("C5", new[] { auth, api, ext },
+                new[] { e3, e1 }));
+            solver.Update(routes, area);
+            Check(solver.Orders[e1].IndexOf("C3") < solver.Orders[e1].IndexOf("C5") ==
+                (solver.Orders[e3].IndexOf("C3") < solver.Orders[e3].IndexOf("C5")),
+                "reverse traversal preserves canonical side across API");
+            Check(solver.Orders[e1].IndexOf("C1") < solver.Orders[e1].IndexOf("C4"),
+                "arrival preserves the existing DB pair order");
+            routes.RemoveAt(routes.Count - 1);
+            solver.Update(routes, area);
+            Check(string.Join(",", solver.Orders[e1]) == initial,
+                "departure restores stable four-route order");
+
+            var dense = new System.Collections.Generic.List<RouteLaneOrder.Route>(routes);
+            for (int i = 6; i <= 14; i++)
+                dense.Add(new RouteLaneOrder.Route("C" + i,
+                    i % 2 == 0 ? new[] { ext, api, db } : new[] { ext, api, auth },
+                    i % 2 == 0 ? new[] { e1, e2 } : new[] { e1, e3 }));
+            solver.Update(dense, area);
+            Check(solver.Orders[e1].Count == dense.Count &&
+                solver.Orders[e1].Distinct().Count() == dense.Count,
+                "dense routes retain one unique lane each");
+            string denseOrder = string.Join(",", solver.Orders[e1]);
+            solveCount = solver.SolveCount;
+            solver.Update(dense, area);
+            Check(solver.SolveCount == solveCount && string.Join(",", solver.Orders[e1]) == denseOrder,
+                "dense unchanged layout remains stable");
         }
 
         private static void CheckRenderedPillsAtReferenceSize(LogicalPathPresenter presenter,

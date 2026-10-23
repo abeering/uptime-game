@@ -178,7 +178,6 @@ namespace Uptime.Connections
             state.Seen = true;
             state.Lines.Clear();
             state.Lines.AddRange(liveLines);
-            state.Lines.Sort((a, b) => StringComparer.Ordinal.Compare(a.Id, b.Id));
             bool idsChanged = state.PillIds.Count != state.Lines.Count;
             if (!idsChanged)
                 for (int i = 0; i < state.Lines.Count; i++)
