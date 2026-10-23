@@ -57,6 +57,8 @@ namespace Uptime.Connections.EditorTools
                 while (c3.IsPending && steps++ < 50)
                     host.StepSimulation(0.1f);
                 Check(c2.IsActive && c3.IsActive, "authored delayed establishment");
+                var palette = new ConnectionIdentityPalette();
+                Color c3Accent = palette.Assign(c3);
                 Check(c3.CurrentOperation == OperationKind.Write && c3.CurrentOperationIndex == 0,
                     "arc begins with WRITE");
                 Near(db.RequestedLoad, 13f, "authored DB requested LOAD");
@@ -79,6 +81,8 @@ namespace Uptime.Connections.EditorTools
                     "WRITE completes into READ without completing connection");
                 Check(ReferenceEquals(c3, State(host, "c3")) && c3.ConnectionId == "c3",
                     "arc retains connection identity and runtime state");
+                Check(palette.TryGet(c3, out Color afterTransition) && afterTransition == c3Accent,
+                    "identity accent survives operation transition");
                 Near(db.RequestedLoad, 5f, "transition defers next operation LOAD");
                 host.StepSimulation(0.1f);
                 Near(c3.AllocatedLoad, 4f, "READ uses its independent LOAD");
@@ -174,15 +178,20 @@ namespace Uptime.Connections.EditorTools
             var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>("Assets/Prefabs/Connections/InspectOutput.prefab");
             Check(prefab != null, "inspect prefab");
             InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            ConnectionIdentityPalette palette = host.PresentationPalette;
+            Color accent = palette.Assign(c1);
             try
             {
-                output.Bind(new[] { c1 });
+                output.Bind(new[] { c1 }, palette);
                 var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
                     .GetArrayElementAtIndex(0).objectReferenceValue;
                 SerializedObject fields = new SerializedObject(entry);
                 string load = ((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text;
                 var tokens = entry.GetComponentsInChildren<InspectOperationToken>();
-                CheckHeader(fields, "C1", "Record Retrieval", false);
+                CheckHeader(fields, "C1", "Record Retrieval", false, accent);
+                Check(((Image)fields.FindProperty("progressFill").objectReferenceValue).color == accent &&
+                    ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == accent,
+                    "active inspect progress and identity chrome use assigned accent");
                 Check(load.Contains("SLOWED") && load.Contains("LOAD 3.8/5") &&
                     load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
                 Check(tokens.Length == 1 && tokens[0].Text == "READ → DB" &&
@@ -193,7 +202,7 @@ namespace Uptime.Connections.EditorTools
                     "slowed operation outline uses orange performance color");
                 Check(tokens[0].GetComponent<LayoutElement>().preferredHeight == 40f,
                     "operation pill has full authored height");
-                entry.Render(c1);
+                entry.Render(c1, accent);
                 Check(ReferenceEquals(tokens[0], entry.GetComponentInChildren<InspectOperationToken>()),
                     "live LOAD refresh keeps authored operation token");
                 Check(((LayoutElement)new SerializedObject(output).FindProperty("layout")
@@ -202,6 +211,7 @@ namespace Uptime.Connections.EditorTools
             finally
             {
                 UnityEngine.Object.DestroyImmediate(output.gameObject);
+                palette.Release(c1);
             }
             foreach (PhysicalLinkReference link in host.PhysicalLinks)
             {
@@ -347,7 +357,7 @@ namespace Uptime.Connections.EditorTools
         }
 
         private static void CheckHeader(SerializedObject fields, string id,
-            string purpose, bool complete)
+            string purpose, bool complete, Color? activeAccent = null)
         {
             var prefix = (TMP_Text)fields.FindProperty("identity").objectReferenceValue;
             var purposeText = (TMP_Text)fields.FindProperty("purpose").objectReferenceValue;
@@ -363,7 +373,8 @@ namespace Uptime.Connections.EditorTools
             var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(nestedPill);
             Check(AssetDatabase.GetAssetPath(source) == "Assets/Prefabs/Connections/IdentityPill.prefab",
                 "inspect header reuses network identity pill prefab");
-            Color expected = fields.FindProperty(complete ? "quietColor" : "activeColor").colorValue;
+            Color expected = complete ? fields.FindProperty("quietColor").colorValue :
+                (activeAccent ?? fields.FindProperty("activeColor").colorValue);
             Check(pill.GetComponent<PillGraphic>().color == expected &&
                 pill.Size == new Vector2(54f, 28f),
                 "inspect header pill keeps authored geometry and chrome color");

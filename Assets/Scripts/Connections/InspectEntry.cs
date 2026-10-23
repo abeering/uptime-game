@@ -43,20 +43,21 @@ namespace Uptime.Connections
                 stateTag.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
 
-        public void Render(LogicalConnectionState state)
+        public void Render(LogicalConnectionState state, Color? identityAccent = null)
         {
+            Color accent = identityAccent ?? activeColor;
             Set(identity, "INSPECT /");
             Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
                 string.Empty : "- " + state.Definition.ClaimedPurpose);
-            if (identity != null) identity.color = state.IsComplete ? quietColor : activeColor;
-            if (purpose != null) purpose.color = state.IsComplete ? quietColor : activeColor;
+            if (identity != null) identity.color = state.IsComplete ? quietColor : accent;
+            if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)
             {
-                Color identityColor = state.IsComplete ? quietColor : activeColor;
+                Color identityColor = state.IsComplete ? quietColor : accent;
                 if (!ReferenceEquals(renderedState, state))
                     headerIdentityPill.Bind(state.ConnectionId, identityColor);
                 else
-                    headerIdentityPill.SetLineColor(identityColor);
+                    headerIdentityPill.SetAccentColor(identityColor);
             }
             if (panelBackground != null)
                 panelBackground.color = state.IsComplete ? completeBackground : activeBackground;
@@ -101,7 +102,7 @@ namespace Uptime.Connections
                 if (Mathf.Abs(anchor.x - fraction) > 0.0005f)
                     progressFill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(fraction), anchor.y);
             }
-            Color chrome = state.IsComplete ? quietColor : activeColor;
+            Color chrome = state.IsComplete ? quietColor : accent;
             if (progressFill != null && progressFill.color != chrome) progressFill.color = chrome;
             if (stateTag != null && stateTag.color != chrome) stateTag.color = chrome;
         }

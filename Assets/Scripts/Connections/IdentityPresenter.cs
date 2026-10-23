@@ -14,12 +14,12 @@ namespace Uptime.Connections
             public Vector2 TargetEnd;
             public Vector2 VisualStart;
             public Vector2 VisualEnd;
-            public Color Color;
+            public Color Accent;
             public float VisibleFraction;
             public float Width;
 
             public LiveLine(string id, Vector2 targetStart, Vector2 targetEnd,
-                Vector2 visualStart, Vector2 visualEnd, Color color, float visibleFraction,
+                Vector2 visualStart, Vector2 visualEnd, Color accent, float visibleFraction,
                 float width)
             {
                 Id = id;
@@ -27,7 +27,7 @@ namespace Uptime.Connections
                 TargetEnd = targetEnd;
                 VisualStart = visualStart;
                 VisualEnd = visualEnd;
-                Color = color;
+                Accent = accent;
                 VisibleFraction = visibleFraction;
                 Width = width;
             }
@@ -205,7 +205,7 @@ namespace Uptime.Connections
                     else
                         old.Remove(line.Id);
                     pill.name = $"{link.LinkId} identity {line.Id}";
-                    pill.Bind(line.Id, line.Color);
+                    pill.Bind(line.Id, line.Accent);
                     state.Pills.Add(pill);
                     state.PillIds.Add(line.Id);
                 }
@@ -319,7 +319,7 @@ namespace Uptime.Connections
                 {
                     displayed.Add(new IdentityPacking.Placement(i, fraction, bounds));
                     pill.SetPose(bounds.Center, bounds.Along);
-                    pill.SetLineColor(line.Color);
+                    pill.SetAccentColor(line.Accent);
                 }
             }
         }

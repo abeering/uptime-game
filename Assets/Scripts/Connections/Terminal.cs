@@ -95,12 +95,12 @@ namespace Uptime.Connections
                     break;
                 case "block":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  block c17", errorColor);
+                        AppendText("USAGE  block ab", errorColor);
                     else
                     {
                         bool blocked = simulationHost != null && simulationHost.BlockConnection(tokens[1]);
                         recorder?.RecordPlayerAction(command, tokens[1], blocked);
-                        AppendText(blocked ? "BLOCKED  " + tokens[1] :
+                        AppendText(blocked ? "BLOCKED  " + tokens[1].ToUpperInvariant() :
                             "BLOCK  no active connection " + tokens[1], blocked ? normalColor : errorColor);
                     }
                     break;
@@ -110,9 +110,17 @@ namespace Uptime.Connections
                         AppendText("DEMANDTEST  generated mode required", errorColor);
                     else
                     {
-                        ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
-                        recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
-                        AppendText("QUEUED  " + plan.ConnectionId + " high demand to DB", normalColor);
+                        try
+                        {
+                            ConnectionSpawnPlan plan = trafficDirector.QueueHighDemandWitness();
+                            recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
+                            AppendText("QUEUED  " + plan.ConnectionId.ToUpperInvariant() +
+                                " high demand to DB", normalColor);
+                        }
+                        catch (System.InvalidOperationException error)
+                        {
+                            AppendText("DEMANDTEST  " + error.Message, errorColor);
+                        }
                     }
                     break;
                 case "mark":
@@ -155,7 +163,7 @@ namespace Uptime.Connections
         {
             if (tokens.Length < 2 || tokens.Length > 3)
             {
-                AppendText("USAGE  inspect c1 [c2]", errorColor);
+                AppendText("USAGE  inspect ab [cd]", errorColor);
                 return;
             }
             if (simulationHost == null || simulationHost.RuntimeConnections == null)
@@ -185,7 +193,7 @@ namespace Uptime.Connections
             if (block == null)
                 AppendText("INSPECT  output unavailable", errorColor);
             else
-                block.Bind(selected.ToArray());
+                block.Bind(selected.ToArray(), simulationHost.PresentationPalette);
         }
 
         public TextRow AppendText(string message, Color color)

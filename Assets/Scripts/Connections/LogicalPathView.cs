@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Uptime.Connections
@@ -31,12 +32,27 @@ namespace Uptime.Connections
         private float departureElapsed;
         private bool establishedVisual;
         private float pulseTravel;
+        private Color identityColor;
+        private bool hasIdentityColor;
+
+        public event Action<LogicalConnectionState> Destroyed;
 
         public float PulseSpacingFor(float requestedLoad) =>
             Mathf.Max(18f, pulseSpacingAtOneLoad /
                 (1f + spacingReductionPerLoad * Mathf.Max(0f, requestedLoad - 1f)));
         public static int DirectionFor(OperationKind operation) =>
             operation == OperationKind.Read ? -1 : operation == OperationKind.Write ? 1 : 0;
+
+        public void SetIdentityColor(Color color)
+        {
+            identityColor = color;
+            hasIdentityColor = true;
+        }
+
+        public Color BeamColorFor(LoadPerformance performance) =>
+            performance == LoadPerformance.AtSpeed ?
+                (hasIdentityColor ? identityColor : healthyColor) :
+            performance == LoadPerformance.Slowed ? constrainedColor : stalledColor;
 
         public void Bind(LogicalConnectionState connection, RectTransform area)
         {
@@ -138,8 +154,7 @@ namespace Uptime.Connections
             float reveal = Mathf.Clamp01(establishmentElapsed / establishmentSeconds);
             float fade = state.IsComplete ? 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
             LoadPerformance performance = state.Performance;
-            Color tint = performance == LoadPerformance.AtSpeed ? healthyColor :
-                performance == LoadPerformance.Slowed ? constrainedColor : stalledColor;
+            Color tint = BeamColorFor(performance);
             tint.a *= fade;
             if (path.color != tint)
                 path.color = tint;
@@ -168,6 +183,8 @@ namespace Uptime.Connections
                 interrupted ? 0f : 0.9f;
             path.SetActivity(spacing, phase, opacity);
         }
+
+        private void OnDestroy() => Destroyed?.Invoke(state);
 
     }
 }
