@@ -110,6 +110,7 @@ namespace Uptime.Connections
                         block.Bind("PRESENTATION CHECK", "Authored UI block inside terminal history.", "PHASE 0", "STATIC", 0.42f);
                     break;
                 case "inspect":
+                case "i":
                     Inspect(tokens);
                     break;
                 case "kill":
@@ -194,9 +195,9 @@ namespace Uptime.Connections
                     break;
                 case "help":
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    AppendText("COMMANDS  inspect  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
-                    AppendText("COMMANDS  inspect  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #endif
                     break;
                 default:
@@ -209,9 +210,10 @@ namespace Uptime.Connections
 
         private void Inspect(string[] tokens)
         {
-            if (tokens.Length < 2 || tokens.Length > 3)
+            if (!TryParseInspect(tokens,
+                out InspectPresentationMode mode, out string[] ids, out string error))
             {
-                AppendText("USAGE  inspect a7 [b4]", errorColor);
+                AppendText(error, errorColor);
                 return;
             }
             if (simulationHost == null || simulationHost.RuntimeConnections == null)
@@ -221,18 +223,17 @@ namespace Uptime.Connections
             }
 
             var selected = new List<LogicalConnectionState>();
-            for (int i = 1; i < tokens.Length; i++)
+            foreach (string id in ids)
             {
-                LogicalConnectionState match = null;
-                match = simulationHost.FindConnection(tokens[i]);
+                LogicalConnectionState match = simulationHost.FindConnection(id);
                 if (match == null)
                 {
-                    AppendText("INSPECT  unknown connection " + tokens[i].ToLowerInvariant(), errorColor);
+                    AppendText("INSPECT  unknown connection " + id.ToLowerInvariant(), errorColor);
                     return;
                 }
                 if (selected.Contains(match))
                 {
-                    AppendText("INSPECT  duplicate connection " + tokens[i].ToLowerInvariant(), errorColor);
+                    AppendText("INSPECT  duplicate connection " + id.ToLowerInvariant(), errorColor);
                     return;
                 }
                 selected.Add(match);
@@ -241,7 +242,39 @@ namespace Uptime.Connections
             if (block == null)
                 AppendText("INSPECT  output unavailable", errorColor);
             else
-                block.Bind(selected.ToArray(), simulationHost.PresentationPalette);
+                block.Bind(selected.ToArray(), simulationHost.PresentationPalette, mode);
+        }
+
+        public static bool TryParseInspect(string[] tokens,
+            out InspectPresentationMode mode, out string[] ids, out string error)
+        {
+            const string usage = "USAGE  inspect [-v|--verbose] <id> [id ...]";
+            mode = InspectPresentationMode.Compact;
+            ids = System.Array.Empty<string>();
+            error = usage;
+            if (tokens == null || tokens.Length == 0)
+                return false;
+            int firstId = 1;
+            if (tokens.Length > 1 &&
+                (tokens[1].Equals("-v", System.StringComparison.OrdinalIgnoreCase) ||
+                 tokens[1].Equals("--verbose", System.StringComparison.OrdinalIgnoreCase)))
+            {
+                mode = InspectPresentationMode.Verbose;
+                firstId++;
+            }
+            for (int i = firstId; i < tokens.Length; i++)
+                if (tokens[i].StartsWith("-", System.StringComparison.Ordinal))
+                {
+                    error = "INSPECT  invalid flag " + tokens[i] + " // " + usage;
+                    return false;
+                }
+            int count = tokens.Length - firstId;
+            if (count < 1)
+                return false;
+            ids = new string[count];
+            System.Array.Copy(tokens, firstId, ids, 0, count);
+            error = null;
+            return true;
         }
 
         public TextRow AppendText(string message, Color color)

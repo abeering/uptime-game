@@ -8,7 +8,9 @@ namespace Uptime.Connections
     {
         [SerializeField, Min(0f)] private float cornerRadius = 7f;
         [SerializeField, Min(0f)] private float borderThickness = 2f;
-        [SerializeField] private Color fillColor = new Color(0.025f, 0.075f, 0.10f, 1f);
+        // Legacy fallback fill. The antialiased material owns the shared pill fill color.
+        [SerializeField, HideInInspector] private Color fillColor =
+            new Color(0.025f, 0.075f, 0.10f, 1f);
 
         public void SetOutline(Color outline)
         {
@@ -19,6 +21,49 @@ namespace Uptime.Connections
         protected override void OnPopulateMesh(VertexHelper mesh)
         {
             mesh.Clear();
+            if (material != null && material.shader != null &&
+                material.shader.name == "Uptime/Connections/AntialiasedPill")
+            {
+                PopulateAntialiasedMesh(mesh);
+                return;
+            }
+            PopulatePolygonMesh(mesh);
+        }
+
+        private void PopulateAntialiasedMesh(VertexHelper mesh)
+        {
+            Rect rect = rectTransform.rect;
+            if (rect.width <= 0f || rect.height <= 0f) return;
+            float radius = Mathf.Min(cornerRadius, rect.width * 0.5f, rect.height * 0.5f);
+            float border = Mathf.Min(borderThickness, rect.width * 0.5f, rect.height * 0.5f);
+            float padding = 1.5f / Mathf.Max(0.01f, canvas != null ? canvas.scaleFactor : 1f);
+            Vector2 halfSize = rect.size * 0.5f;
+            AddAntialiasedVertex(mesh, rect.center, new Vector2(rect.xMin - padding,
+                rect.yMin - padding), halfSize, radius, border);
+            AddAntialiasedVertex(mesh, rect.center, new Vector2(rect.xMin - padding,
+                rect.yMax + padding), halfSize, radius, border);
+            AddAntialiasedVertex(mesh, rect.center, new Vector2(rect.xMax + padding,
+                rect.yMax + padding), halfSize, radius, border);
+            AddAntialiasedVertex(mesh, rect.center, new Vector2(rect.xMax + padding,
+                rect.yMin - padding), halfSize, radius, border);
+            mesh.AddTriangle(0, 1, 2);
+            mesh.AddTriangle(0, 2, 3);
+        }
+
+        private void AddAntialiasedVertex(VertexHelper mesh, Vector2 center, Vector2 position,
+            Vector2 halfSize, float radius, float border)
+        {
+            UIVertex vertex = UIVertex.simpleVert;
+            vertex.position = position;
+            vertex.color = color;
+            vertex.uv0 = new Vector4(position.x - center.x, position.y - center.y,
+                halfSize.x, halfSize.y);
+            vertex.uv1 = new Vector4(radius, border, 0f, 0f);
+            mesh.AddVert(vertex);
+        }
+
+        private void PopulatePolygonMesh(VertexHelper mesh)
+        {
             Rect outer = GetPixelAdjustedRect();
             if (outer.width <= 0f || outer.height <= 0f)
                 return;

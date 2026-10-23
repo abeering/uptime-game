@@ -8,7 +8,7 @@ Scope: Connections presentation only. The shader, material, and graphics below d
 - `Connections.unity` uses a Screen Space Overlay canvas (`m_RenderMode: 0`). Camera post-processing is not a smoothing pass over these graphics. Increasing camera AA is therefore not the targeted fix for these lines.
 - The current High quality level and graphics default reference `Assets/UniversalRenderPipelineAsset.asset`: MSAA is disabled (`m_MSAA: 1`), render scale is 1. Other quality levels reference a separate 4x-MSAA asset. The Quality Settings AA fields alone do not establish the effective URP configuration. Shared pipeline settings were left unchanged.
 - The Canvas targets 1920×1080, scales with screen size, and has Pixel Perfect disabled. Fractional placement is appropriate for animated diagonal geometry; rounding every position would add visible stepping. A scaled Game View preview can introduce additional resampling beyond the native framebuffer.
-- Identity pill outlines are separate rounded polygon meshes (`PillGraphic`); they are not covered by this line shader. The target markers are axis-aligned Images. Interactive review should distinguish these elements from the path beams and pulses.
+- Identity pill outlines were separate rounded polygon meshes (`PillGraphic`) at this review baseline; they were not covered by the line shader. The later [Inspect V2 follow-up](../ConnectionsInspectV2/README.md) applies the same fragment-coverage idea through a pill-specific material. The target markers remain axis-aligned Images.
 
 The audit used the serialized scene, both pipeline assets, `QualitySettings.asset`, `GraphicsSettings.asset`, the installed URP 17.3.0 and uGUI sources, and the Connections runtime/prefab code. Unity's [URP antialiasing documentation](https://docs.unity3d.com/6000.3/Documentation/Manual/urp/anti-aliasing.html) explains the different camera/pipeline AA techniques and their costs.
 
@@ -42,6 +42,6 @@ Unity 6000.3.11f1 ran against an isolated copy of Assets, Packages, ProjectSetti
 ## Manual Unity review
 
 1. Reload `Connections.unity` and review the Game View at 16:9, ideally native 1920×1080 at 100% display scale. Also check a smaller window and Retina scaling.
-2. In Play Mode, review shallow/steep physical links, roughly 4–6 concurrent paths, narrow crowded lanes, moving READ/WRITE pulses, establishment/reflow/departure, and warning colors. Look for smoother edges without apparent gap loss or flickering end caps. Pill outlines still use their existing renderer.
+2. In Play Mode, review shallow/steep physical links, roughly 4–6 concurrent paths, narrow crowded lanes, moving READ/WRITE pulses, establishment/reflow/departure, and warning colors. Look for smoother edges without apparent gap loss or flickering end caps. At this review baseline, pill outlines still used their existing renderer; the later Inspect V2 follow-up gives them a separate antialiased material.
 3. Confirm the node headings and LOAD bars remain legible, identity labels do not crowd them, `inspect` output renders normally, and command input retains focus.
 4. For a performance claim, capture CPU UI rebuild/batching, batches/draw calls, and GPU time at typical and dense traffic in the Unity Profiler/Frame Debugger. Nested canvases or further pulse/shader changes should follow that evidence.

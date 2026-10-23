@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb6eaa87d3b74a64a603592281778515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PillGraphic
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 040ce472315f4130a403a25b2cb45a55, type: 2}
   m_Color: {r: 0.36, g: 0.95, b: 0.74, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}

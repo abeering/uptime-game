@@ -23,7 +23,7 @@ Phase 2 adds authored, ordered operations to one logical connection. Packet is u
 - The existing line mesh gets bright pulse ticks without changing route geometry, width, identity pills, packing, or cycling. WRITE moves origin to target; READ moves target to origin; EXECUTE has stationary, neutral ticks.
 - Pulse spacing shrinks with desired LOAD using `pulseSpacingAtOneLoad / (1 + spacingReductionPerLoad * (LOAD - 1))`, capped at 18 pixels. Pulse speed is separately configurable. An 8-LOAD connection therefore has denser activity than a 2-LOAD connection regardless of its allocation.
 - AT SPEED is smooth green; SLOWED is orange with repeated pauses; STALLED is red with faint stationary ticks. These are performance states, not threat labels. Cosmetic time never advances WORK.
-- The authored inspection block now has a single-height timeline row, a colored status line with allocated/desired LOAD and capacity-derived reason, current-stage WORK percentage and bar, activity, and secondary ETA. Completed pills are muted; only the current operation is highlighted; future stages show a count without details.
+- The authored inspection block has an operation timeline. Inspect V2 presents it in compact form by default with a right-aligned effective requested LOAD badge; `-v`/`--verbose` reveals the colored status and allocated/requested LOAD line, current-stage WORK percentage and bar, activity, and ETA. All visible timeline items use pills; completed stages are muted and older history and future stages collapse to counts when width is limited. See the [current inspect contract](connections-inspect-v2.md).
 
 ## Authored witness and review
 
