@@ -15,7 +15,13 @@ namespace Uptime.Connections.EditorTools
         private const string Active = "Uptime.Stress.Active";
         private const string Phase = "Uptime.Stress.Phase";
         private const string Index = "Uptime.Stress.Index";
-        private const string Output = "Docs/research/topology-stress-v0";
+        private const string Mode = "Uptime.Stress.Mode";
+        private const string OutputV0 = "Docs/research/topology-stress-v0";
+        private const string OutputV1 = "Docs/research/topology-placement-v1";
+        private const string BaseColumns =
+            "nodes,topology_seed,traffic_seed,density,links,origins,active_connections,node_overlaps,node_overflow,links_through_other_nodes,min_visible_link_px,below_min_width_links,rotating_links,overlaid_links,unavailable_links,visible_ids_first_phase,total_active_link_uses";
+        private const string PlacementColumns =
+            ",link_crossings,links_below_120_px,links_below_180_px,occupied_links_below_120_px,occupied_links_below_180_px,legacy_link_crossings,legacy_links_below_120_px,legacy_links_below_180_px,legacy_occupied_links_below_120_px,legacy_occupied_links_below_180_px";
         private static readonly int[] Counts = { 4, 8, 12, 16, 20, 24, 28 };
         private static readonly int[] Seeds = { 1701, 3141, 9001 };
         private static double captureAt;
@@ -23,18 +29,30 @@ namespace Uptime.Connections.EditorTools
         static TopologyStressBatch() => EditorApplication.update += Tick;
 
         // Run in an isolated project with -batchmode, without -quit. The runner exits Unity.
-        public static void Run()
+        public static void Run() => Start(StressPlacementMode.LegacyV0);
+
+        public static void RunPlacementV1() => Start(StressPlacementMode.OptimizedV1);
+
+        private static void Start(StressPlacementMode mode)
         {
             if (!Application.isBatchMode || SessionState.GetBool(Active, false))
                 throw new InvalidOperationException("Run once in an isolated batch Editor.");
-            Directory.CreateDirectory(Output);
-            File.WriteAllText(Path.Combine(Output, "measurements.csv"),
-                "nodes,topology_seed,traffic_seed,density,links,origins,active_connections,node_overlaps,node_overflow,links_through_other_nodes,min_visible_link_px,below_min_width_links,rotating_links,overlaid_links,unavailable_links,visible_ids_first_phase,total_active_link_uses\n");
+            string output = mode == StressPlacementMode.LegacyV0 ? OutputV0 : OutputV1;
+            Directory.CreateDirectory(output);
+            File.WriteAllText(Path.Combine(output, "measurements.csv"), BaseColumns +
+                (mode == StressPlacementMode.OptimizedV1 ? PlacementColumns : "") + "\n");
             SessionState.SetBool(Active, true);
             SessionState.SetInt(Index, 0);
             SessionState.SetInt(Phase, 0);
-            Debug.Log("TopologyStressBatch: starting 21 real-traffic configurations.");
+            SessionState.SetInt(Mode, (int)mode);
+            Debug.Log("TopologyStressBatch: starting 21 " + mode + " real-traffic configurations.");
         }
+
+        private static StressPlacementMode CurrentMode =>
+            (StressPlacementMode)SessionState.GetInt(Mode, 0);
+
+        private static string CurrentOutput =>
+            CurrentMode == StressPlacementMode.LegacyV0 ? OutputV0 : OutputV1;
 
         private static void Tick()
         {
@@ -45,7 +63,8 @@ namespace Uptime.Connections.EditorTools
                 if (index >= Counts.Length * Seeds.Length)
                 {
                     SessionState.SetBool(Active, false);
-                    Debug.Log("TopologyStressBatch PASS: 21 captures and measurements.");
+                    Debug.Log("TopologyStressBatch PASS: 21 " + CurrentMode +
+                        " captures and measurements.");
                     EditorApplication.Exit(0);
                     return;
                 }
@@ -58,6 +77,7 @@ namespace Uptime.Connections.EditorTools
                     int count = Counts[index % Counts.Length];
                     int seed = Seeds[index / Counts.Length];
                     harness.Configure(count, seed, 2401, StressTrafficDensity.Typical);
+                    harness.SetPlacementMode(CurrentMode);
                     SessionState.SetInt(Phase, 1);
                     EditorApplication.isPlaying = true;
                 }
@@ -109,7 +129,7 @@ namespace Uptime.Connections.EditorTools
             var identity = UnityEngine.Object.FindFirstObjectByType<IdentityPresenter>();
             string file = $"n{harness.NodeCount:00}-s{harness.TopologySeed}.png";
             string measurement = null;
-            Render(Path.Combine(Output, file), presenter, () =>
+            Render(Path.Combine(CurrentOutput, file), presenter, () =>
             {
                 foreach (PhysicalLinkView link in harness.GeneratedLinks)
                     link.SendMessage("LateUpdate");
@@ -122,7 +142,7 @@ namespace Uptime.Connections.EditorTools
                 Canvas.ForceUpdateCanvases();
                 measurement = Measure(harness, host, presenter, identity);
             });
-            File.AppendAllText(Path.Combine(Output, "measurements.csv"), measurement);
+            File.AppendAllText(Path.Combine(CurrentOutput, "measurements.csv"), measurement);
             Debug.Log("TopologyStressBatch captured " + file);
         }
 
@@ -144,6 +164,8 @@ namespace Uptime.Connections.EditorTools
             float shortest = float.PositiveInfinity;
             int narrow = 0, rotating = 0, overlaid = 0, unavailable = 0;
             int visibleIds = 0, linkUses = 0;
+            var usersByLink = new int[links.Count];
+            int linkIndex = 0;
             foreach (PhysicalLinkView link in links)
             {
                 int aIndex = IndexOf(nodes, link.NodeA);
@@ -167,6 +189,7 @@ namespace Uptime.Connections.EditorTools
                             users++;
                 }
                 linkUses += users;
+                usersByLink[linkIndex++] = users;
                 if (users == 0) continue;
                 IdentityPacking.Layout layout = identity.ResolveLayout(link, users,
                     presenter.MaxLineWidth, presenter.MinLineWidth, presenter.MinLineGap);
@@ -176,11 +199,33 @@ namespace Uptime.Connections.EditorTools
                 if (layout.Stage == IdentityPacking.ReadabilityStage.Unavailable) unavailable++;
                 if (layout.Schedule.Count > 0) visibleIds += layout.Schedule[0].Count;
             }
-            return
+            string row =
                 $"{harness.NodeCount},{harness.TopologySeed},{harness.TrafficSeed},{harness.Density}," +
                 $"{links.Count},{harness.Graph.Nodes.Count(n => n.External)}," +
                 $"{host.RuntimeConnections.Count(c => c.IsActive)},{overlaps},{overflow},{crossings}," +
-                $"{shortest:0.##},{narrow},{rotating},{overlaid},{unavailable},{visibleIds},{linkUses}\n";
+                $"{shortest:0.##},{narrow},{rotating},{overlaid},{unavailable},{visibleIds},{linkUses}";
+            if (CurrentMode == StressPlacementMode.LegacyV0) return row + "\n";
+            var centers = cards.Select(card => card.center).ToArray();
+            Vector2 cardSize = cards[0].size;
+            TopologyStressGeometry.Measurements current = TopologyStressGeometry.Measure(
+                harness.Graph, centers, area.rect.size, cardSize);
+            Vector2[] legacyPositions = StressTopologyPlacement.Place(harness.Graph,
+                area.rect.size, harness.TopologySeed);
+            TopologyStressGeometry.Measurements legacy = TopologyStressGeometry.Measure(
+                harness.Graph, legacyPositions, area.rect.size, cardSize);
+            int currentOccupied120 = 0, currentOccupied180 = 0;
+            int legacyOccupied120 = 0, legacyOccupied180 = 0;
+            for (int i = 0; i < usersByLink.Length; i++)
+            {
+                if (usersByLink[i] == 0) continue;
+                if (current.VisibleLengths[i] < 120f) currentOccupied120++;
+                if (current.VisibleLengths[i] < 180f) currentOccupied180++;
+                if (legacy.VisibleLengths[i] < 120f) legacyOccupied120++;
+                if (legacy.VisibleLengths[i] < 180f) legacyOccupied180++;
+            }
+            return row + $",{current.LinkCrossings},{current.Below120},{current.Below180}," +
+                $"{currentOccupied120},{currentOccupied180},{legacy.LinkCrossings}," +
+                $"{legacy.Below120},{legacy.Below180},{legacyOccupied120},{legacyOccupied180}\n";
         }
 
         private static int IndexOf(IReadOnlyList<NodeView> nodes, NodeView node)

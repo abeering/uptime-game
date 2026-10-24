@@ -7,6 +7,7 @@ using UnityEngine.UI;
 namespace Uptime.Connections
 {
     public enum StressTrafficDensity { Light, Typical, Heavy }
+    public enum StressPlacementMode { LegacyV0, OptimizedV1 }
 
     // Opt-in scene component. It builds copies of authored UI, then queues ordinary plans.
     [DefaultExecutionOrder(-100)]
@@ -17,6 +18,7 @@ namespace Uptime.Connections
         [SerializeField] private int topologySeed = 1701;
         [SerializeField] private int trafficSeed = 2401;
         [SerializeField] private StressTrafficDensity density = StressTrafficDensity.Typical;
+        [SerializeField] private StressPlacementMode placementMode = StressPlacementMode.OptimizedV1;
         [Header("Authored scene references")]
         [SerializeField] private RectTransform topologyArea;
         [SerializeField] private NodeView nodeTemplate;
@@ -37,6 +39,7 @@ namespace Uptime.Connections
         public int TopologySeed => topologySeed;
         public int TrafficSeed => trafficSeed;
         public StressTrafficDensity Density => density;
+        public StressPlacementMode PlacementMode => placementMode;
         public StressTopologyGraph Graph => graph;
         public IReadOnlyList<NodeView> GeneratedNodes => views;
         public IReadOnlyList<PhysicalLinkView> GeneratedLinks => links;
@@ -49,6 +52,8 @@ namespace Uptime.Connections
             density = traffic;
         }
 
+        public void SetPlacementMode(StressPlacementMode mode) => placementMode = mode;
+
         private void Awake()
         {
             if (!Application.isPlaying) return;
@@ -58,10 +63,16 @@ namespace Uptime.Connections
                 throw new InvalidOperationException("Topology stress scene has missing authored references.");
             Canvas.ForceUpdateCanvases();
             graph = StressTopologyGraph.Generate(nodeCount, topologySeed);
+            string placementTag = placementMode == StressPlacementMode.LegacyV0 ||
+                nodeCount == 4 ? "V0" : "V1";
             statusLabel.text = $"{nodeCount} NODES  //  {graph.Edges.Count} LINKS  //  " +
-                $"{density.ToString().ToUpperInvariant()} TRAFFIC  //  SEED {topologySeed}";
-            Vector2[] positions = StressTopologyPlacement.Place(graph, ReferenceTopologySize(),
-                topologySeed);
+                $"{density.ToString().ToUpperInvariant()} TRAFFIC  //  SEED {topologySeed}  //  " +
+                placementTag;
+            Vector2 areaSize = ReferenceTopologySize();
+            Vector2[] positions = placementMode == StressPlacementMode.LegacyV0 ?
+                StressTopologyPlacement.Place(graph, areaSize, topologySeed) :
+                TopologyStressPlacementV1.Place(graph, areaSize,
+                    ((RectTransform)nodeTemplate.transform).rect.size, topologySeed);
             views = new NodeView[graph.Nodes.Count];
             for (int i = 0; i < views.Length; i++)
             {
@@ -69,7 +80,15 @@ namespace Uptime.Connections
                 view.gameObject.name = "Stress " + graph.Nodes[i].Id;
                 view.gameObject.SetActive(true);
                 view.ConfigureStressNode(graph.Nodes[i].Id, graph.Nodes[i].Role);
-                ((RectTransform)view.transform).anchoredPosition = positions[i];
+                RectTransform card = (RectTransform)view.transform;
+                if (placementMode == StressPlacementMode.OptimizedV1 && nodeCount != 4)
+                {
+                    // The authored template is anchored at y=0.51. V1 slots are
+                    // measured from the center of the topology rectangle.
+                    card.anchorMin = new Vector2(0.5f, 0.5f);
+                    card.anchorMax = card.anchorMin;
+                }
+                card.anchoredPosition = positions[i];
                 views[i] = view;
             }
             links = new PhysicalLinkView[graph.Edges.Count];
@@ -320,5 +339,339 @@ namespace Uptime.Connections
             }
             return positions;
         }
+    }
+
+    // Geometry of the experimental full-size cards. No presentation solver runs in the search.
+    public static class TopologyStressGeometry
+    {
+        public sealed class Measurements
+        {
+            public int NodeOverlaps;
+            public int NodeOverflow;
+            public int LinksThroughNodes;
+            public int LinkCrossings;
+            public int Below120;
+            public int Below180;
+            public int Below60;
+            public int Deficit180;
+            public int CrowdedApproaches;
+            public float ShortestVisible = float.PositiveInfinity;
+            public float[] VisibleLengths;
+        }
+
+        public static Rect Card(Vector2 center, Vector2 size)
+            => new Rect(center - size * 0.5f, size);
+
+        public static float VisibleLength(Vector2 a, Vector2 b, Vector2 cardSize)
+        {
+            Vector2 direction = (b - a).normalized;
+            return Vector2.Distance(
+                EdgeGeometry.CardEdge(Card(a, cardSize), direction, 0f),
+                EdgeGeometry.CardEdge(Card(b, cardSize), -direction, 0f));
+        }
+
+        public static Measurements Measure(StressTopologyGraph graph, Vector2[] positions,
+            Vector2 areaSize, Vector2 cardSize)
+        {
+            if (graph == null || positions == null || positions.Length != graph.Nodes.Count ||
+                areaSize.x <= 0f || areaSize.y <= 0f || cardSize.x <= 0f || cardSize.y <= 0f)
+                throw new ArgumentException("Invalid stress topology geometry.");
+            int count = positions.Length;
+            var result = new Measurements { VisibleLengths = new float[graph.Edges.Count] };
+            var cards = new Rect[count];
+            Rect area = Card(Vector2.zero, areaSize);
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 point = positions[i];
+                if (float.IsNaN(point.x) || float.IsNaN(point.y) ||
+                    float.IsInfinity(point.x) || float.IsInfinity(point.y))
+                    throw new ArgumentException("Nonfinite stress topology position.");
+                cards[i] = Card(point, cardSize);
+                if (!area.Contains(cards[i].min) || !area.Contains(cards[i].max))
+                    result.NodeOverflow++;
+                for (int j = 0; j < i; j++)
+                    if (cards[i].Overlaps(cards[j])) result.NodeOverlaps++;
+            }
+            for (int i = 0; i < graph.Edges.Count; i++)
+            {
+                StressTopologyGraph.Edge edge = graph.Edges[i];
+                Vector2 a = positions[edge.A], b = positions[edge.B];
+                float visible = VisibleLength(a, b, cardSize);
+                result.VisibleLengths[i] = visible;
+                result.ShortestVisible = Mathf.Min(result.ShortestVisible, visible);
+                if (visible < 60f) result.Below60++;
+                if (visible < 120f) result.Below120++;
+                if (visible < 180f) result.Below180++;
+                result.Deficit180 += Mathf.RoundToInt(Mathf.Max(0f, 180f - visible));
+                for (int node = 0; node < count; node++)
+                    if (node != edge.A && node != edge.B &&
+                        SegmentIntersectsRect(a, b, cards[node]))
+                        result.LinksThroughNodes++;
+                for (int j = 0; j < i; j++)
+                {
+                    StressTopologyGraph.Edge other = graph.Edges[j];
+                    if (edge.A == other.A || edge.A == other.B ||
+                        edge.B == other.A || edge.B == other.B) continue;
+                    if (SegmentsCross(a, b, positions[other.A], positions[other.B]))
+                        result.LinkCrossings++;
+                }
+            }
+            for (int node = 0; node < count; node++)
+            {
+                var directions = new List<Vector2>();
+                foreach (StressTopologyGraph.Edge edge in graph.Edges)
+                {
+                    int other = edge.A == node ? edge.B : edge.B == node ? edge.A : -1;
+                    if (other >= 0) directions.Add((positions[other] - positions[node]).normalized);
+                }
+                for (int i = 0; i < directions.Count; i++)
+                    for (int j = 0; j < i; j++)
+                        if (Vector2.Dot(directions[i], directions[j]) > 0.82f)
+                            result.CrowdedApproaches++;
+            }
+            return result;
+        }
+
+        public static bool SegmentsCross(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+        {
+            float first = Cross(b - a, c - a), second = Cross(b - a, d - a);
+            float third = Cross(d - c, a - c), fourth = Cross(d - c, b - c);
+            return first * second < -0.001f && third * fourth < -0.001f;
+        }
+
+        private static float Cross(Vector2 a, Vector2 b) => a.x * b.y - a.y * b.x;
+
+        public static bool SegmentIntersectsRect(Vector2 a, Vector2 b, Rect rect)
+        {
+            float low = 0f, high = 1f;
+            Vector2 delta = b - a;
+            return Clip(-delta.x, a.x - rect.xMin, ref low, ref high) &&
+                   Clip(delta.x, rect.xMax - a.x, ref low, ref high) &&
+                   Clip(-delta.y, a.y - rect.yMin, ref low, ref high) &&
+                   Clip(delta.y, rect.yMax - a.y, ref low, ref high) && low <= high;
+        }
+
+        private static bool Clip(float p, float q, ref float low, ref float high)
+        {
+            if (Mathf.Abs(p) < 0.00001f) return q >= 0f;
+            float t = q / p;
+            if (p < 0f) low = Mathf.Max(low, t);
+            else high = Mathf.Min(high, t);
+            return low <= high;
+        }
+    }
+
+    // Bounded multistart assignment search for the fixed experimental trees.
+    public static class TopologyStressPlacementV1
+    {
+        public const int StartsPerGrid = 3;
+        public const int SwapPasses = 3;
+
+        private readonly struct Score : IComparable<Score>
+        {
+            private readonly int overlaps, overflow, obstructions, severe, short120,
+                crossings, short180, deficit, crowding, ingress, totalLength, balance;
+
+            public Score(TopologyStressGeometry.Measurements geometry,
+                StressTopologyGraph graph, Vector2[] positions, Vector2 areaSize)
+            {
+                overlaps = geometry.NodeOverlaps;
+                overflow = geometry.NodeOverflow;
+                obstructions = geometry.LinksThroughNodes;
+                severe = geometry.Below60;
+                short120 = geometry.Below120;
+                crossings = geometry.LinkCrossings;
+                short180 = geometry.Below180;
+                deficit = geometry.Deficit180;
+                crowding = geometry.CrowdedApproaches;
+                float ingressCost = 0f;
+                for (int i = 0; i < graph.Nodes.Count; i++)
+                    if (graph.Nodes[i].External)
+                        for (int j = 0; j < i; j++)
+                            if (graph.Nodes[j].External)
+                                ingressCost += Mathf.Max(0f, areaSize.x * 0.7f -
+                                    Vector2.Distance(positions[i], positions[j]));
+                ingress = Mathf.RoundToInt(ingressCost);
+                float length = 0f;
+                foreach (StressTopologyGraph.Edge edge in graph.Edges)
+                    length += Vector2.Distance(positions[edge.A], positions[edge.B]);
+                totalLength = Mathf.RoundToInt(length);
+                Vector2 middle = Vector2.zero;
+                foreach (Vector2 point in positions) middle += point;
+                balance = Mathf.RoundToInt((middle / positions.Length).magnitude);
+            }
+
+            public int CompareTo(Score other)
+            {
+                int result = overlaps.CompareTo(other.overlaps);
+                if (result != 0) return result;
+                result = overflow.CompareTo(other.overflow);
+                if (result != 0) return result;
+                result = obstructions.CompareTo(other.obstructions);
+                if (result != 0) return result;
+                result = severe.CompareTo(other.severe);
+                if (result != 0) return result;
+                result = short120.CompareTo(other.short120);
+                if (result != 0) return result;
+                result = crossings.CompareTo(other.crossings);
+                if (result != 0) return result;
+                result = short180.CompareTo(other.short180);
+                if (result != 0) return result;
+                result = deficit.CompareTo(other.deficit);
+                if (result != 0) return result;
+                result = crowding.CompareTo(other.crowding);
+                if (result != 0) return result;
+                result = ingress.CompareTo(other.ingress);
+                if (result != 0) return result;
+                result = totalLength.CompareTo(other.totalLength);
+                return result != 0 ? result : balance.CompareTo(other.balance);
+            }
+        }
+
+        public static Vector2[] Place(StressTopologyGraph graph, Vector2 areaSize,
+            Vector2 cardSize, int seed)
+        {
+            if (graph == null || graph.Nodes.Count < 2 || areaSize.x <= cardSize.x ||
+                areaSize.y <= cardSize.y || cardSize.x <= 0f || cardSize.y <= 0f)
+                throw new ArgumentException("Invalid V1 placement input.");
+            // At four nodes the geometry-only search turns a second busy link
+            // toward the narrower diagonal attachment budget. Keep that control.
+            if (graph.Nodes.Count == 4)
+                return StressTopologyPlacement.Place(graph, areaSize, seed);
+            Vector2[] best = null;
+            Score bestScore = default;
+            int startsPerGrid = graph.Nodes.Count <= 12 ? StartsPerGrid : 2;
+            int swapPasses = graph.Nodes.Count <= 12 ? SwapPasses : 1;
+            int maxColumns = Mathf.Min(4, Mathf.FloorToInt((areaSize.x - 16f) / cardSize.x));
+            int maxRows = Mathf.FloorToInt((areaSize.y - 16f) / cardSize.y);
+            for (int columns = 2; columns <= maxColumns; columns++)
+            {
+                int rows = Mathf.CeilToInt((float)graph.Nodes.Count / columns);
+                if (rows > maxRows) continue;
+                for (int start = 0; start < startsPerGrid; start++)
+                {
+                    Vector2[] slots = Slots(graph.Nodes.Count, columns, rows,
+                        areaSize, cardSize);
+                    int mixedSeed = unchecked(seed * 1103515245 + columns * 7919 + start * 104729);
+                    var random = new System.Random(mixedSeed);
+                    Vector2[] positions = InitialAssignment(graph, slots, areaSize,
+                        cardSize, start, random);
+                    Score score = Evaluate(graph, positions, areaSize, cardSize);
+                    for (int pass = 0; pass < swapPasses; pass++)
+                    {
+                        int chosenA = -1, chosenB = -1;
+                        Score improved = score;
+                        for (int a = 0; a < positions.Length; a++)
+                            for (int b = a + 1; b < positions.Length; b++)
+                            {
+                                Swap(positions, a, b);
+                                Score candidate = Evaluate(graph, positions, areaSize, cardSize);
+                                Swap(positions, a, b);
+                                if (candidate.CompareTo(improved) >= 0) continue;
+                                improved = candidate;
+                                chosenA = a;
+                                chosenB = b;
+                            }
+                        if (chosenA < 0) break;
+                        Swap(positions, chosenA, chosenB);
+                        score = improved;
+                    }
+                    if (best == null || score.CompareTo(bestScore) < 0)
+                    {
+                        best = positions;
+                        bestScore = score;
+                    }
+                }
+            }
+            if (best == null) throw new InvalidOperationException("No V1 grid fits the node cards.");
+            return best;
+        }
+
+        private static Vector2[] Slots(int count, int columns, int rows,
+            Vector2 areaSize, Vector2 cardSize)
+        {
+            var slots = new Vector2[count];
+            float extentX = areaSize.x * 0.5f - cardSize.x * 0.5f - 8f;
+            float extentY = areaSize.y * 0.5f - cardSize.y * 0.5f - 8f;
+            for (int i = 0; i < count; i++)
+            {
+                int row = i / columns, column = i % columns;
+                int inRow = Mathf.Min(columns, count - row * columns);
+                float x = inRow == 1 ? 0f : Mathf.Lerp(-extentX, extentX,
+                    (float)column / (inRow - 1));
+                float y = rows == 1 ? 0f : Mathf.Lerp(extentY, -extentY,
+                    (float)row / (rows - 1));
+                slots[i] = new Vector2(x, y);
+            }
+            return slots;
+        }
+
+        private static Vector2[] InitialAssignment(StressTopologyGraph graph,
+            Vector2[] slots, Vector2 areaSize, Vector2 cardSize, int start,
+            System.Random random)
+        {
+            var positions = new Vector2[graph.Nodes.Count];
+            var taken = new bool[slots.Length];
+            Vector2[] ingress = { new Vector2(-1f, 1f), new Vector2(1f, -1f),
+                new Vector2(-1f, -1f), new Vector2(1f, 1f) };
+            int external = 0;
+            for (int i = 0; i < graph.Nodes.Count; i++)
+            {
+                if (!graph.Nodes[i].External) continue;
+                Vector2 target = ingress[(external + start) % ingress.Length];
+                int slot = NearestFree(slots, taken,
+                    Vector2.Scale(target, areaSize * 0.5f));
+                positions[i] = slots[slot];
+                taken[slot] = true;
+                external++;
+            }
+            int root = NearestFree(slots, taken, Vector2.zero);
+            positions[0] = slots[root];
+            taken[root] = true;
+            for (int i = 1; i < graph.Nodes.Count; i++)
+            {
+                if (graph.Nodes[i].External) continue;
+                int parent = graph.Nodes[i].Parent;
+                int chosen = -1;
+                float best = float.PositiveInfinity;
+                for (int slot = 0; slot < slots.Length; slot++)
+                {
+                    if (taken[slot]) continue;
+                    float visible = TopologyStressGeometry.VisibleLength(
+                        positions[parent], slots[slot], cardSize);
+                    float cost = Mathf.Abs(visible - 240f) +
+                        5f * Mathf.Max(0f, 120f - visible) +
+                        (float)random.NextDouble() * 110f;
+                    if (cost >= best) continue;
+                    best = cost;
+                    chosen = slot;
+                }
+                positions[i] = slots[chosen];
+                taken[chosen] = true;
+            }
+            return positions;
+        }
+
+        private static int NearestFree(Vector2[] slots, bool[] taken, Vector2 target)
+        {
+            int chosen = -1;
+            float best = float.PositiveInfinity;
+            for (int i = 0; i < slots.Length; i++)
+            {
+                float distance = (slots[i] - target).sqrMagnitude;
+                if (taken[i] || distance >= best) continue;
+                chosen = i;
+                best = distance;
+            }
+            return chosen;
+        }
+
+        private static Score Evaluate(StressTopologyGraph graph, Vector2[] positions,
+            Vector2 areaSize, Vector2 cardSize)
+            => new Score(TopologyStressGeometry.Measure(graph, positions, areaSize,
+                cardSize), graph, positions, areaSize);
+
+        private static void Swap(Vector2[] positions, int a, int b)
+            => (positions[a], positions[b]) = (positions[b], positions[a]);
     }
 }
