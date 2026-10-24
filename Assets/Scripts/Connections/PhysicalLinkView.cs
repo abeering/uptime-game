@@ -20,6 +20,19 @@ namespace Uptime.Connections
         public NodeView NodeB => nodeB;
         public RectTransform ResourceLabel => label;
 
+        // Rebind an authored link copy in the opt-in stress scene.
+        public void ConfigureStressLink(string id, NodeView a, NodeView b,
+            RectTransform area, RectTransform newLabel, TMP_Text newReadout)
+        {
+            linkId = id;
+            nodeA = a;
+            nodeB = b;
+            networkArea = area;
+            label = newLabel;
+            resourceReadout = newReadout;
+            RenderLink();
+        }
+
         public float BundleWidth(RectTransform area)
         {
             Vector2 a = area.InverseTransformPoint(nodeA.transform.position);

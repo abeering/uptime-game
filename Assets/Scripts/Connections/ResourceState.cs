@@ -19,6 +19,14 @@ namespace Uptime.Connections
         public float RequestedLoad => BaselineLoad + requestedByConnections;
         public float AllocatedLoad => BaselineLoad + allocatedToConnections;
 
+        public NodeResources(NodeView node, float capacity, float baseline = 0f)
+        {
+            view = node;
+            loadCapacity = capacity;
+            baselineLoad = baseline;
+            ClampToCapacity();
+        }
+
         internal void ClearUsage()
         {
             requestedByConnections = 0f;
@@ -44,5 +52,6 @@ namespace Uptime.Connections
     {
         [SerializeField] private PhysicalLinkView view;
         public PhysicalLinkView View => view;
+        public PhysicalLinkReference(PhysicalLinkView link) { view = link; }
     }
 }

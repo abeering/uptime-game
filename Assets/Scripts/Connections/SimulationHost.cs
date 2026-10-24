@@ -45,6 +45,17 @@ namespace Uptime.Connections
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
 
+        // Awake-time configuration for the separate generated-topology stress scene.
+        public void ConfigureStressTopology(NodeResources[] generatedNodes,
+            PhysicalLinkReference[] generatedLinks)
+        {
+            if (runtimeConnections != null)
+                throw new InvalidOperationException("Configure stress topology before the simulation starts.");
+            nodes = generatedNodes ?? throw new ArgumentNullException(nameof(generatedNodes));
+            physicalLinks = generatedLinks ?? throw new ArgumentNullException(nameof(generatedLinks));
+            runMode = ConnectionRunMode.Generated;
+        }
+
         public void SetRunMode(ConnectionRunMode mode)
         {
             runMode = mode;

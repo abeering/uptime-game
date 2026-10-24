@@ -8,4 +8,6 @@ This folder keeps useful exploration that has not become current implementation 
 - [connections-lane-spacing-continuity.md](connections-lane-spacing-continuity.md) — parked Connections presentation research on route-coherent lane spacing, occupancy-responsive gaps, and placing identity pills after geometry; no implementation work is authorized.
 - [connections-geometry-capacity-v0.md](connections-geometry-capacity-v0.md) — measured Connections node/link/pill capacity, compact-footprint and local-junction comparisons, and static 16:9 references; no production geometry changes or full-topology feasibility claim.
 
+- [connections-topology-stress-v0.md](connections-topology-stress-v0.md) — opt-in generated Connections trees with real traffic, 21 native 16:9 captures, diagnostics, and tier-by-tier presentation findings; no production topology progression or node-count limit is established.
+
 Research may be promoted through an explicit design decision. Keep its original alternatives and examples available when doing so.

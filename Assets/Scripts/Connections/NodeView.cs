@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 namespace Uptime.Connections
@@ -18,6 +19,19 @@ namespace Uptime.Connections
 
         public string NodeId => nodeId;
         public NodeLoadBar LoadBar => loadBar;
+
+        // Used by the opt-in topology stress scene on copies of its authored node.
+        public void ConfigureStressNode(string id, string role)
+        {
+            nodeId = id;
+            Transform heading = transform.Find("NodeHeading");
+            TMP_Text idLabel = heading != null ? heading.Find("NodeId")?.GetComponent<TMP_Text>() : null;
+            TMP_Text roleLabel = heading != null ? heading.Find("NodeRole")?.GetComponent<TMP_Text>() : null;
+            if (idLabel == null || roleLabel == null)
+                throw new System.InvalidOperationException("Stress node template needs NodeHeading/NodeId and NodeRole.");
+            idLabel.text = id;
+            roleLabel.text = role;
+        }
 
         public float BundleWidthToward(Vector2 direction)
         {
