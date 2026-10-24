@@ -4856,6 +4856,7 @@ MonoBehaviour:
   topologySeed: 1701
   trafficSeed: 2401
   density: 1
+  placementMode: 1
   topologyArea: {fileID: 772389560}
   nodeTemplate: {fileID: 252751404}
   linkTemplate: {fileID: 726002155}

@@ -212,10 +212,16 @@ namespace Uptime.Connections
                 List<Placement> cycle = BestPackWithPriority(lanes, remaining, size,
                     pillGap, step, inset, obstacles);
                 if (cycle == null || cycle.Count == 0)
-                    break; // A very short edge may be unable to hold even one full-size pill.
+                    return new List<List<Placement>>();
+                int before = remaining.Count;
                 schedule.Add(cycle);
                 foreach (Placement placement in cycle)
                     remaining.Remove(placement.LaneIndex);
+                // A fallback cycle can contain only lanes already scheduled. That
+                // cannot cover the pending IDs, so report Unavailable instead of
+                // looping forever or presenting an incomplete rotation schedule.
+                if (remaining.Count == before)
+                    return new List<List<Placement>>();
             }
             foreach (List<Placement> cycle in schedule)
                 cycle.Sort((a, b) => a.LaneIndex.CompareTo(b.LaneIndex));
