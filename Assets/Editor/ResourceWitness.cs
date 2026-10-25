@@ -192,7 +192,7 @@ namespace Uptime.Connections.EditorTools
                 Check(((Image)fields.FindProperty("progressFill").objectReferenceValue).color == accent &&
                     ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == accent,
                     "active inspect progress and identity chrome use assigned accent");
-                Check(load.Contains("SLOWED") && load.Contains("ALLOC 3.8/5") &&
+                Check(load.Contains("SLOWED") && !load.Contains("ALLOC") &&
                     load.Contains("DB OVERLOADED"), "inspect agrees with node LOAD and performance");
                 Check(tokens.Length == 1 && tokens[0].Text == "READ → DB" &&
                     tokens[0].HasOutline && !tokens[0].HasCheckmark,
@@ -258,10 +258,9 @@ namespace Uptime.Connections.EditorTools
                     Check(((TMP_Text)fields.FindProperty("identity").objectReferenceValue).color == chrome &&
                         ((Image)fields.FindProperty("stateTag").objectReferenceValue).color == chrome &&
                         ((Image)fields.FindProperty("progressFill").objectReferenceValue).color == chrome,
-                        "title and panel accents keep blue-green chrome color");
+                        "identity rail and progress keep blue-green chrome color");
                     Check(work.Contains("/60"), "inspection WORK uses READ stage");
-                    Check(status.Contains("AT SPEED") && status.Contains("ALLOC 4/4"),
-                        "inspection uses READ allocation");
+                    Check(status == "AT SPEED", "inspection retains READ performance status");
                 }
             }
             finally

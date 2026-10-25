@@ -100,7 +100,7 @@ namespace Uptime.Connections.EditorTools
                         "five-ID verbose output keeps each detailed card");
                     var detail = new SerializedObject(EntryComponent(verbose, 0));
                     Check(((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
-                            .text.Contains("ALLOC 2/2") &&
+                            .text == "AT SPEED" &&
                         ((TMP_Text)detail.FindProperty("work").objectReferenceValue)
                             .text.Contains("WORK") &&
                         ((TMP_Text)detail.FindProperty("bottleneck").objectReferenceValue)
@@ -327,6 +327,7 @@ namespace Uptime.Connections.EditorTools
                 new SerializedObject(plate).FindProperty("borderThickness").floatValue == 3f,
                 "authored large ID pill typography, border, padding, and antialiasing");
             Check(rail.rectTransform.rect.height == card.rect.height &&
+                entry.transform.Find("TitleBar") == null &&
                 rail.rectTransform.anchoredPosition.x == 0f &&
                 pillRect.anchoredPosition == new Vector2(16f, -12f) &&
                 purpose.rectTransform.anchoredPosition.x >= pillRect.anchoredPosition.x + pill.Size.x + 12f &&

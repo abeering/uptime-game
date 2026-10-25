@@ -25,7 +25,6 @@ namespace Uptime.Connections
         [SerializeField] private Image progressFill;
         [SerializeField] private Image stateTag;
         [SerializeField] private Image panelBackground;
-        [SerializeField] private Image titleBar;
         [SerializeField] private Color activeColor = new Color(0.35f, 0.92f, 0.72f);
         [SerializeField] private Color atSpeedColor = new Color(0.56f, 0.89f, 0.40f);
         [SerializeField] private Color limitedColor = new Color(1f, 0.69f, 0.34f);
@@ -33,8 +32,6 @@ namespace Uptime.Connections
         [SerializeField] private Color quietColor = new Color(0.52f, 0.67f, 0.66f);
         [SerializeField] private Color activeBackground = new Color(0.035f, 0.105f, 0.13f);
         [SerializeField] private Color completeBackground = new Color(0.026f, 0.078f, 0.095f);
-        [SerializeField] private Color activeTitleBar = new Color(0.055f, 0.16f, 0.19f);
-        [SerializeField] private Color completeTitleBar = new Color(0.04f, 0.11f, 0.13f);
 
         private readonly List<InspectOperationToken> operationTokens = new List<InspectOperationToken>();
         private LogicalConnectionState renderedState;
@@ -160,8 +157,6 @@ namespace Uptime.Connections
             }
             if (panelBackground != null)
                 panelBackground.color = state.IsComplete ? completeBackground : activeBackground;
-            if (titleBar != null)
-                titleBar.color = state.IsComplete ? completeTitleBar : activeTitleBar;
             Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
                 state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
@@ -187,8 +182,7 @@ namespace Uptime.Connections
                 reason = target.LoadCapacity - target.BaselineLoad <= 0.0001f ?
                     " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
                     " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
-            Set(throughput, state.IsComplete ? status :
-                $"{status} · ALLOC {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
+            Set(throughput, status + reason);
             if (throughput != null) throughput.color = tint;
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
