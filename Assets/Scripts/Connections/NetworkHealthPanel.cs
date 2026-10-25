@@ -16,11 +16,16 @@ namespace Uptime.Connections
         [SerializeField] private GameObject expandedContent;
         [SerializeField] private TMP_Text clockText;
         [SerializeField] private TMP_Text valueText;
+        [SerializeField] private TMP_Text rateText;
+        [SerializeField] private TMP_Text headingText;
         [SerializeField] private TMP_Text trendText;
         [SerializeField] private TMP_Text serviceText;
         [SerializeField] private TMP_Text causesText;
         [SerializeField] private TMP_Text eventsText;
         [SerializeField] private Image healthFill;
+        [SerializeField] private Color degradingColor = new Color(1f, 0.63f, 0.39f);
+        [SerializeField] private Color recoveringColor = new Color(0.52f, 0.84f, 0.72f);
+        [SerializeField] private Color stableColor = new Color(0.47f, 0.63f, 0.62f);
         [SerializeField, Range(0, 23)] private int shiftStartHour = 9;
         [SerializeField, Range(0, 59)] private int shiftStartMinute;
         [SerializeField, Range(0, 23)] private int shiftEndHour = 17;
@@ -82,7 +87,9 @@ namespace Uptime.Connections
             float parentHeight = ((RectTransform)panel.parent).rect.height;
             float height = expanded ? parentHeight * expandedHeightFraction : compactHeight;
             panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
-            terminalPanel.offsetMax = new Vector2(terminalPanel.offsetMax.x, -height - 6f);
+            var terminal = terminalPanel.GetComponent<Terminal>();
+            if (terminal != null) terminal.SetTopInset(height + 6f);
+            else terminalPanel.offsetMax = new Vector2(terminalPanel.offsetMax.x, -height - 6f);
             if (expandedContent != null) expandedContent.SetActive(expanded);
         }
 
@@ -97,12 +104,38 @@ namespace Uptime.Connections
             if (health == null) return;
             if (valueText != null) valueText.text = $"HEALTH {health.Value:0.#}";
             if (healthFill != null) healthFill.fillAmount = health.Value / 100f;
+            float displayRate = Mathf.Abs(health.NetRate) < 0.005f ? 0f : health.NetRate;
+            Color rateColor = displayRate < 0f ? degradingColor :
+                displayRate > 0f ? recoveringColor : stableColor;
+            string state = displayRate < 0f ? "DEGRADING" :
+                displayRate > 0f ? "RECOVERING" : "STABLE";
+            if (rateText != null)
+            {
+                rateText.text = $"{displayRate:+0.00;-0.00;0.00}/s";
+                rateText.color = rateColor;
+            }
             if (trendText != null) trendText.text =
-                $"TREND {health.NetRate:+0.000;-0.000;0.000}/s   REC +{health.RecoveryRate:0.000}   DRAIN -{health.DegradationRate:0.000}";
+                $"{state}   {displayRate:+0.00;-0.00;0.00}/s";
+            if (trendText != null) trendText.color = rateColor;
             if (serviceText != null) serviceText.text =
-                $"SERVICE  {health.SlowedCount} SLOWED   {health.OverdueCount} OVERDUE";
-            if (causesText != null) causesText.text = health.Impacts.Count == 0 ?
-                "CAUSES  NONE" : $"CAUSES  {health.OverdueCount} LATE / {health.SlowedCount} LOAD LIMITED";
+                $"SLOWED CONNECTIONS   {health.SlowedCount}";
+            if (causesText != null) causesText.text =
+                $"OVERDUE CONNECTIONS  {health.OverdueCount}";
+            if (headingText != null)
+            {
+                NodeResources peak = null;
+                float peakFraction = -1f;
+                foreach (NodeResources node in host.Nodes)
+                {
+                    float fraction = node.LoadCapacity > 0f ?
+                        node.RequestedLoad / node.LoadCapacity : 0f;
+                    if (fraction <= peakFraction) continue;
+                    peak = node;
+                    peakFraction = fraction;
+                }
+                headingText.text = peak == null ? "NETWORK HEALTH" :
+                    $"NETWORK HEALTH  /  PEAK LOAD {peak.View.NodeId} {peak.RequestedLoad:0.#}/{peak.LoadCapacity:0.#}";
+            }
             if (eventsText != null) eventsText.text = health.RecentEvents.Count == 0 ?
                 (health.Failed ? "NETWORK FAILURE" : "RECENT IMPACTS  NONE") :
                 $"RECENT IMPACT  SERVICE INTERRUPTED {health.RecentEvents[0].Amount:0.#}" +

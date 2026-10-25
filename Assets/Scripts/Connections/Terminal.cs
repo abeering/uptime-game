@@ -301,9 +301,39 @@ namespace Uptime.Connections
                 entryCount--;
             }
 
-            if (!scrollPending)
+            if (!scrollPending && (historyScroll == null ||
+                historyScroll.verticalNormalizedPosition <= 0.01f))
                 StartCoroutine(ScrollToBottomNextFrame());
             return instance;
+        }
+
+        // Keep the top visible history location when the workstation changes height.
+        public void SetTopInset(float inset)
+        {
+            var terminalRect = (RectTransform)transform;
+            bool atBottom = historyScroll == null ||
+                historyScroll.verticalNormalizedPosition <= 0.01f;
+            float offsetFromTop = 0f;
+            if (historyScroll != null && !atBottom)
+            {
+                Canvas.ForceUpdateCanvases();
+                var corners = new Vector3[4];
+                historyContent.GetWorldCorners(corners);
+                offsetFromTop = historyScroll.viewport.InverseTransformPoint(corners[1]).y -
+                    historyScroll.viewport.rect.yMax;
+            }
+            terminalRect.offsetMax = new Vector2(terminalRect.offsetMax.x, -inset);
+            if (historyScroll == null) return;
+            Canvas.ForceUpdateCanvases();
+            if (atBottom)
+                historyScroll.verticalNormalizedPosition = 0f;
+            else
+            {
+                float travel = Mathf.Max(0f,
+                    historyContent.rect.height - historyScroll.viewport.rect.height);
+                historyScroll.verticalNormalizedPosition = travel > 0f ?
+                    1f - Mathf.Clamp01(offsetFromTop / travel) : 0f;
+            }
         }
 
         private IEnumerator ScrollToBottomNextFrame()

@@ -9,11 +9,11 @@ namespace Uptime.Connections
     {
         // Provisional V0 values; tune against actual play sessions.
         [Min(0f)] public float deadlineTolerance = 1.5f;
-        [Min(0f)] public float slowdownDrainPerSecond = 0.025f;
-        [Min(0f)] public float overdueDrainPerSecond = 0.12f;
-        [Min(0f)] public float overdueEscalationPerSecond = 0.006f;
-        [Min(0f)] public float recoveryPerSecond = 0.02f;
-        [Min(0f)] public float incorrectKillPenalty = 5f;
+        [Min(0f)] public float slowdownDrainPerSecond = 0.25f;
+        [Min(0f)] public float overdueDrainPerSecond = 0.50f;
+        [Min(0f)] public float overdueEscalationPerSecond = 0.02f;
+        [Min(0f)] public float recoveryPerSecond = 0.35f;
+        [Min(0f)] public float incorrectKillPenalty = 10f;
         [Range(0f, 1f)] public float substantialSlowdownThreshold = 0.98f;
     }
 
@@ -60,8 +60,18 @@ namespace Uptime.Connections
     // Owned by SimulationHost and updated only from its simulation step and resolution seam.
     public sealed class NetworkHealth
     {
+        private readonly struct ServiceCondition
+        {
+            public ServiceCondition(bool slowed, bool overdue)
+            { Slowed = slowed; Overdue = overdue; }
+            public bool Slowed { get; }
+            public bool Overdue { get; }
+        }
+
         private readonly NetworkHealthTuning tuning;
         private readonly List<NetworkHealthEvent> events = new List<NetworkHealthEvent>();
+        private readonly Dictionary<string, ServiceCondition> observed =
+            new Dictionary<string, ServiceCondition>(StringComparer.OrdinalIgnoreCase);
         private NetworkHealthSnapshot snapshot;
         private float value = 100f;
         private bool failed;
@@ -75,6 +85,7 @@ namespace Uptime.Connections
             value = 100f;
             failed = false;
             events.Clear();
+            observed.Clear();
             snapshot = new NetworkHealthSnapshot(value, 0f, 0f, 0f, 0, 0, false,
                 Array.Empty<NetworkHealthImpact>(), Array.Empty<NetworkHealthEvent>());
         }
@@ -96,9 +107,10 @@ namespace Uptime.Connections
             var impacts = new List<NetworkHealthImpact>();
             float degradation = 0f;
             int slowed = 0, overdue = 0;
+            observed.Clear();
             foreach (LogicalConnectionState connection in connections)
             {
-                if (!connection.IsDemanding || connection.IsHostile) continue;
+                if (!connection.IsDemanding) continue;
                 float activeDuration = connection.ActualWorkRate > 0f ?
                     Mathf.Min(durationSeconds, connection.RemainingWork / connection.ActualWorkRate) :
                     durationSeconds;
@@ -108,12 +120,15 @@ namespace Uptime.Connections
                 bool isOverdue = startSeconds + activeDuration > connection.HealthDeadlineSeconds;
                 if (isSlowed) { slowed++; connection.HealthWasSubstantiallySlowed = true; }
                 if (isOverdue) { overdue++; connection.HealthBecameLate = true; }
+                observed.Add(connection.ConnectionId, new ServiceCondition(isSlowed, isOverdue));
+                if (connection.IsHostile) continue;
 
                 float deadline = connection.HealthDeadlineSeconds;
                 float ordinaryDuration = Mathf.Clamp(deadline - startSeconds, 0f, activeDuration);
                 float overdueDuration = activeDuration - ordinaryDuration;
-                float ordinaryDamage = Mathf.Max(0f, tuning.slowdownDrainPerSecond) *
-                    (1f - satisfaction) * ordinaryDuration;
+                float ordinaryDamage = isSlowed ?
+                    Mathf.Max(0f, tuning.slowdownDrainPerSecond) *
+                    (1f - satisfaction) * ordinaryDuration : 0f;
                 float overdueStart = Mathf.Max(startSeconds, deadline) - deadline;
                 float overdueDamage = overdueDuration *
                     (Mathf.Max(0f, tuning.overdueDrainPerSecond) +
@@ -127,7 +142,8 @@ namespace Uptime.Connections
                         isOverdue, isSlowed));
                 }
             }
-            float recovery = value < 100f ? Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
+            float recovery = degradation == 0f && value < 100f ?
+                Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
             float oldValue = value;
             value = Mathf.Clamp(value + (recovery - degradation) * durationSeconds, 0f, 100f);
             if (value <= 0f) failed = true;
@@ -139,6 +155,7 @@ namespace Uptime.Connections
         public void Resolve(LogicalConnectionState connection, ConnectionResolution reason,
             float timeSeconds)
         {
+            observed.Remove(connection.ConnectionId);
             var remaining = new List<NetworkHealthImpact>();
             foreach (NetworkHealthImpact impact in snapshot.Impacts)
                 if (impact.ConnectionId != connection.ConnectionId) remaining.Add(impact);
@@ -153,14 +170,18 @@ namespace Uptime.Connections
             float degradation = 0f;
             int overdue = 0, slowed = 0;
             foreach (NetworkHealthImpact impact in remaining)
-            {
                 degradation += impact.Rate;
-                if (impact.Overdue) overdue++;
-                if (impact.Slowed) slowed++;
+            foreach (ServiceCondition condition in observed.Values)
+            {
+                if (condition.Overdue) overdue++;
+                if (condition.Slowed) slowed++;
             }
-            float recovery = value < 100f ? Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
+            float recovery = degradation == 0f && value < 100f ?
+                Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
+            float net = recovery - degradation;
+            if ((value <= 0f && net < 0f) || (value >= 100f && net > 0f)) net = 0f;
             snapshot = new NetworkHealthSnapshot(value, degradation, recovery,
-                recovery - degradation, slowed, overdue, failed,
+                net, slowed, overdue, failed,
                 remaining.ToArray(), events.ToArray());
         }
     }
