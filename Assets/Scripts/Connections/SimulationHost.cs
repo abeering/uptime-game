@@ -20,6 +20,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionRunMode runMode;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
+        [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -28,12 +29,14 @@ namespace Uptime.Connections
         private readonly List<ConnectionEffectOccurrence> occurrences =
             new List<ConnectionEffectOccurrence>();
         private float simulationTimeSeconds;
+        private NetworkHealth health;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
         public LogicalConnectionDefinition[] Definitions => connections;
         public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
+        public NetworkHealthSnapshot Health => health?.Snapshot;
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
@@ -114,6 +117,7 @@ namespace Uptime.Connections
                 {
                     connection.Lifecycle = Lifecycle.Active;
                     connection.EstablishedAtSeconds = simulationTimeSeconds;
+                    health.Activate(connection, simulationTimeSeconds);
                     connection.Behaviors.StartConnection();
                     connection.Behaviors.StartOperation(connection.CurrentOperationIndex);
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
@@ -127,7 +131,8 @@ namespace Uptime.Connections
                     connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
             }
             List<ResourceAllocator.OperationCompletion> completed =
-                ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds);
+                ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds,
+                    allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds));
             simulationTimeSeconds += deltaSeconds;
             foreach (ResourceAllocator.OperationCompletion completion in completed)
             {
@@ -144,7 +149,10 @@ namespace Uptime.Connections
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
                 if (completion.State.IsComplete)
+                {
                     completion.State.Behaviors.EndConnection(simulationTimeSeconds);
+                    Resolve(completion.State, ConnectionResolution.Completed);
+                }
             }
             if (runMode == ConnectionRunMode.Generated)
             {
@@ -153,7 +161,6 @@ namespace Uptime.Connections
                 {
                     if (state.IsComplete)
                     {
-                        Resolve(state, ConnectionResolution.Completed);
                         pathPresenter?.Retire(state);
                     }
                     else remaining.Add(state);
@@ -173,6 +180,7 @@ namespace Uptime.Connections
             state.EstablishedAtSeconds = simulationTimeSeconds;
             if (state.IsActive)
             {
+                health.Activate(state, simulationTimeSeconds);
                 state.Behaviors.StartConnection();
                 state.Behaviors.StartOperation(state.CurrentOperationIndex);
             }
@@ -224,6 +232,7 @@ namespace Uptime.Connections
         {
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
+            health.Resolve(state, reason, simulationTimeSeconds);
             recorder?.RecordResolution(state, reason, simulationTimeSeconds);
             ConnectionResolved?.Invoke(state, reason);
         }
@@ -232,6 +241,7 @@ namespace Uptime.Connections
         {
             ClearAllocatedUsage();
             simulationTimeSeconds = 0f;
+            health = new NetworkHealth(healthTuning ?? new NetworkHealthTuning());
             history.Clear();
             usedIds.Clear();
             occurrences.Clear();
@@ -247,6 +257,7 @@ namespace Uptime.Connections
                     history.Add(state.ConnectionId, state);
                     if (state.IsActive)
                     {
+                        health.Activate(state, simulationTimeSeconds);
                         state.Behaviors.StartConnection();
                         state.Behaviors.StartOperation(state.CurrentOperationIndex);
                     }

@@ -217,6 +217,11 @@ namespace Uptime.Connections
         public float EstablishedAtSeconds { get; internal set; }
         public float ResolvedAtSeconds { get; internal set; }
         public ConnectionResolution? Resolution { get; internal set; }
+        // Service evidence is retained with the resolved connection for later evaluation systems.
+        public float HealthNominalDurationSeconds { get; internal set; }
+        public float HealthDeadlineSeconds { get; internal set; }
+        public bool HealthWasSubstantiallySlowed { get; internal set; }
+        public bool HealthBecameLate { get; internal set; }
 
         internal ConnectionEffectOccurrence OnWorkCompleted(int operationIndex, float timeSeconds)
         {
