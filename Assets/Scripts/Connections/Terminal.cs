@@ -82,6 +82,7 @@ namespace Uptime.Connections
 
         private char ValidateCommandCharacter(string text, int position, char character)
         {
+            if (character == '\t') return '\0';
             if ((character == '`' || character == '~') && Keyboard.current != null &&
                 Keyboard.current.backquoteKey.wasPressedThisFrame)
                 return '\0';

@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:abecdb93abef54ce2910d0c5813e60214935c13b69afd0cbc5c19e5025326805`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:37a7a14d113a6bce37cd8bce23cd0f0da724b456b60d8250ef684cdd256cffa3`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -229,6 +229,8 @@ Generated connections use [randomized lowercase letter-digit IDs and six rotatin
 Active paths now show [one identity-colored terminal marker](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/terminal-markers-v1.md) where their final lane meets the target-node border. Transit nodes have no marker. Its size follows the beam width and arrival angle, with prefab padding; it tracks lane reflow, appears after establishment reaches the target, and fades with path departure. This is presentation of the existing target-node LOAD model.
 
 `ConnectionsRunRecorder` automatically starts a new JSON recording on Play start, saves the same file every 30 seconds of real elapsed time, and saves on Play stop. `mark <note>` records a bookmark with an immediate snapshot and saves; `log save`, `log dir`, and Editor-only `log folder` expose the file. Editor logs go to `<project-root>/Logs/UptimeRuns/`, which Git ignores. This is observational run evidence, **not** a game save, score ledger, replay engine, or source of random traffic. See the [recorder document](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-run-recorder-v0.md) and its [example JSON](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/examples/connections-run-recorder-example.json).
+
+[Network Health V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-network-health-v0.md) is a Connections-only, live service instrument. A fixed deadline per connection comes from the authored operation plan at activation. The simulation applies LOAD-shortfall or escalating overdue drain to legitimate active service, independent recovery, and one immediate penalty for killing a legitimate connection. Hostile traffic can cause indirect contention but no direct Health penalty. Zero latches failure without ending the run. Lifecycle service facts remain with the connection for future evaluation. A compact clock/Health row sits above the terminal; TAB expands the same instrument while keeping the terminal and topology visible. The display-only 24-hour clock has configurable shift bounds and simulation-time mapping; shift progression and Performance scoring are not implemented. The model and values are provisional.
 
 ## Authority and provenance
 

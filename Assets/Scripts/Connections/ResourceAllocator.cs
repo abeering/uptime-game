@@ -23,7 +23,8 @@ namespace Uptime.Connections
         }
 
         internal static List<OperationCompletion> Step(NodeResources[] nodes,
-            LogicalConnectionState[] connections, float deltaSeconds)
+            LogicalConnectionState[] connections, float deltaSeconds,
+            Action<IReadOnlyList<LogicalConnectionState>> afterAllocation = null)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
@@ -57,6 +58,11 @@ namespace Uptime.Connections
                 float available = Mathf.Max(0f, target.LoadCapacity - target.BaselineLoad);
                 float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
                 connection.AllocatedLoad = connection.DesiredLoad * fraction;
+            }
+            afterAllocation?.Invoke(ordered);
+            foreach (LogicalConnectionState connection in ordered)
+            {
+                if (!connection.IsDemanding) continue;
                 // A reduced requirement cannot erase WORK already accomplished.
                 connection.CompletedWork = Mathf.Max(connection.CompletedWork,
                     Mathf.Min(connection.CurrentTotalWork,
