@@ -13,6 +13,7 @@ namespace Uptime.Connections
         [Min(0.01f)] public float maximumLoad = 3f;
         [Min(0.01f)] public float minimumDuration = 40f;
         [Min(0.01f)] public float maximumDuration = 75f;
+        [Min(0f)] public float meanWork;
         public CompletionEffect completionEffect;
         public TimedModifierBehaviorDefinition[] behaviors;
     }
@@ -24,6 +25,7 @@ namespace Uptime.Connections
         public string claimedPurpose;
         public string[] eligibleTargetIds;
         [Min(0f)] public float ambientWeight = 1f;
+        public bool purposeTemplate;
         public bool isHostile;
         public TimedModifierBehaviorDefinition[] connectionBehaviors;
         public ConnectionOperationProfile[] operations;
@@ -49,6 +51,13 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionTrafficProfile[] profiles;
         [Tooltip("Optional ambient weights by profile ID. Built-in profile operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
         [SerializeField] private AmbientWeightOverride[] ambientWeightOverrides;
+        [Header("Purpose generation (provisional playtest rates)")]
+        [SerializeField, Range(0f, 1f)] private float hostileChance = 0.25f;
+        [SerializeField, Range(0f, 1f)] private float deliveryChance = 0.5f;
+        [SerializeField, Range(0f, 1f)] private float benignOutlierChance = 0.08f;
+        [SerializeField, Range(0f, 1f)] private float secondAnomalyChance = 0.15f;
+        [SerializeField, Range(0f, 1f)] private float subtleDeliveryChance = 0.1f;
+        [SerializeField, Range(0f, 0.5f)] private float normalWorkSpread = 0.25f;
 
         private sealed class Queued
         {
@@ -75,6 +84,12 @@ namespace Uptime.Connections
         public float SpawnIntervalSeconds => spawnIntervalSeconds;
         public float SpawnJitterSeconds => spawnJitterSeconds;
         public string AmbientOriginId => ambientOriginId;
+        public float HostileChance => hostileChance;
+        public float DeliveryChance => deliveryChance;
+        public float BenignOutlierChance => benignOutlierChance;
+        public float SecondAnomalyChance => secondAnomalyChance;
+        public float SubtleDeliveryChance => subtleDeliveryChance;
+        public float NormalWorkSpread => normalWorkSpread;
         public float EffectiveAmbientWeight(string profileId) =>
             profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
 
@@ -222,10 +237,11 @@ namespace Uptime.Connections
                 choice -= EffectiveAmbientWeight(profile.id);
                 if (choice < 0f) break;
             }
-            return BuildPlan(selected, atTime);
+            return BuildPlan(selected, atTime, true);
         }
 
-        private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime)
+        private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime,
+            bool ambient = false)
         {
             string id = NewId();
             if (id == null) return null;
@@ -237,14 +253,132 @@ namespace Uptime.Connections
             {
                 ConnectionOperationProfile spec = selected.operations[i];
                 float load = Range(spec.minimumLoad, spec.maximumLoad);
-                float duration = Range(spec.minimumDuration, spec.maximumDuration);
-                stages[i] = new OperationStage(spec.operation, load * duration, load,
+                float work = selected.purposeTemplate
+                    ? spec.meanWork * Range(1f - normalWorkSpread, 1f + normalWorkSpread)
+                    : load * Range(spec.minimumDuration, spec.maximumDuration);
+                stages[i] = new OperationStage(spec.operation, work, load,
                     spec.activityDescription, spec.completionEffect, spec.behaviors);
             }
+            if (selected.purposeTemplate)
+                return BuildPurposePlan(selected, atTime, id, route, stages, ambient);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors);
         }
+
+        private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
+            string id, NodeView[] route, OperationStage[] normal, bool ambient)
+        {
+            bool hostile = ambient && random.NextDouble() < hostileChance;
+            string objective = hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
+            var stages = new List<OperationStage>(normal);
+            var anomalies = new List<string>();
+            if (objective == "LOADER")
+            {
+                ApplyAnomaly(stages, "high-load", true);
+                anomalies.Add("high-load");
+                if (random.NextDouble() < secondAnomalyChance)
+                {
+                    ApplyAnomaly(stages, "work-deviation", true);
+                    anomalies.Add("work-deviation");
+                }
+                // The keyword engine is shared with benign traffic; this does not label intent.
+                if (random.NextDouble() < 0.25) AddKeyword(stages);
+            }
+            else if (objective == "DELIVERY")
+            {
+                if (random.NextDouble() >= subtleDeliveryChance)
+                {
+                    string anomaly = RandomAnomaly();
+                    ApplyAnomaly(stages, anomaly, false);
+                    anomalies.Add(anomaly);
+                    if (random.NextDouble() < secondAnomalyChance)
+                    {
+                        anomaly = RandomAnomaly();
+                        ApplyAnomaly(stages, anomaly, false);
+                        anomalies.Add(anomaly);
+                    }
+                }
+                int last = stages.Count - 1;
+                OperationStage stage = stages[last];
+                stages[last] = Changed(stage, effect: CompletionEffect.InfectionDelivery);
+            }
+            else if (ambient && random.NextDouble() < benignOutlierChance)
+            {
+                if (random.NextDouble() < 0.25) AddKeyword(stages);
+                else
+                {
+                    string anomaly = RandomAnomaly();
+                    ApplyAnomaly(stages, anomaly, false);
+                    anomalies.Add(anomaly);
+                }
+            }
+            var trace = new ConnectionGenerationTrace
+            {
+                purposeId = purpose.id, objective = objective, anomalies = anomalies.ToArray(),
+                normalOperations = ConnectionGenerationTrace.Capture(normal),
+                finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray())
+            };
+            return new ConnectionSpawnPlan(atTime, id, route, purpose.id, purpose.claimedPurpose,
+                stages.ToArray(), hostile, purpose.connectionBehaviors, trace);
+        }
+
+        private string RandomAnomaly()
+        {
+            switch (random.Next(4))
+            {
+                case 0: return "operation-deviation";
+                case 1: return "high-load";
+                case 2: return "low-load";
+                default: return "work-deviation";
+            }
+        }
+
+        private void ApplyAnomaly(List<OperationStage> stages, string anomaly, bool sustainedWork)
+        {
+            int index = random.Next(stages.Count);
+            OperationStage stage = stages[index];
+            switch (anomaly)
+            {
+                case "operation-deviation":
+                    OperationKind other = (OperationKind)(((int)stage.Operation + 1 + random.Next(2)) % 3);
+                    if (random.NextDouble() < 0.5)
+                        stages.Add(Changed(stage, kind: other, description: Activity(other)));
+                    else stages[index] = Changed(stage, kind: other, description: Activity(other));
+                    break;
+                case "high-load":
+                    stages[index] = Changed(stage, load: stage.DesiredLoad * Range(2.5f, 4f));
+                    break;
+                case "low-load":
+                    stages[index] = Changed(stage, load: stage.DesiredLoad * Range(0.2f, 0.5f));
+                    break;
+                case "work-deviation":
+                    stages[index] = Changed(stage, work: stage.TotalWork * (sustainedWork ||
+                        random.NextDouble() < 0.5 ? Range(2f, 4f) : Range(0.25f, 0.5f)));
+                    break;
+            }
+        }
+
+        private void AddKeyword(List<OperationStage> stages)
+        {
+            int index = random.Next(stages.Count);
+            OperationStage stage = stages[index];
+            var behaviors = new List<TimedModifierBehaviorDefinition>(stage.Behaviors);
+            behaviors.Add(random.NextDouble() < 0.5
+                ? TimedModifierBehaviorDefinition.Overload("OVERLOAD", 5f, 5f)
+                : TimedModifierBehaviorDefinition.Spiking("SPIKING", 5f, 2f, 5f));
+            stages[index] = Changed(stage, behaviors: behaviors.ToArray());
+        }
+
+        private static OperationStage Changed(OperationStage stage, OperationKind? kind = null,
+            float? load = null, float? work = null, string description = null,
+            CompletionEffect? effect = null, TimedModifierBehaviorDefinition[] behaviors = null) =>
+            new OperationStage(kind ?? stage.Operation, work ?? stage.TotalWork,
+                load ?? stage.DesiredLoad, description ?? stage.ActivityDescription,
+                effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors);
+
+        private static string Activity(OperationKind kind) => kind == OperationKind.Read
+            ? "Reading records" : kind == OperationKind.Write ? "Writing records" : "Processing request";
 
         private string NewId()
         {
@@ -293,28 +427,42 @@ namespace Uptime.Connections
 
         private static ConnectionTrafficProfile[] DefaultProfiles() => new[]
         {
-            Profile("retrieval", "Record Retrieval", "DB", 1f,
+            Purpose("product-lookup", "Product Detail Retrieval", "DB", 1.5f,
+                PurposeStage(OperationKind.Read, "Retrieving product details", 0.5f, 1.1f, 24f)),
+            Purpose("customer-login", "Customer Authentication", "AUTH", 1f,
+                PurposeStage(OperationKind.Execute, "Authenticating customer", 0.8f, 1.6f, 24f)),
+            Purpose("cart-pricing", "Cart Price Calculation", "API", 1f,
+                PurposeStage(OperationKind.Execute, "Calculating cart price", 1f, 2f, 35f)),
+            Purpose("order-submit", "Checkout Order Submission", "API", 0.9f,
+                PurposeStage(OperationKind.Write, "Submitting order", 1.5f, 3f, 60f),
+                PurposeStage(OperationKind.Read, "Reading order confirmation", 0.6f, 1.3f, 18f)),
+            Purpose("inventory-sync", "Inventory Reconciliation", "DB", 0.6f,
+                PurposeStage(OperationKind.Read, "Reading inventory", 1f, 1.8f, 40f),
+                PurposeStage(OperationKind.Write, "Updating inventory", 1.7f, 3.2f, 65f)),
+            Purpose("sales-export", "Sales Report Export", "DB", 0.25f,
+                PurposeStage(OperationKind.Read, "Exporting sales report", 2.5f, 4.5f, 145f)),
+            Profile("retrieval", "Record Retrieval", "DB", 0f,
                 Stage(OperationKind.Read, "Reading records", 1f, 2.5f, 40f, 70f)),
-            Profile("indexing", "Record Indexing", "DB", 0.8f,
+            Profile("indexing", "Record Indexing", "DB", 0f,
                 Stage(OperationKind.Write, "Updating the DB index", 1.5f, 3f, 20f, 35f),
                 Stage(OperationKind.Read, "Reading the updated index", 1f, 2.5f, 20f, 35f)),
-            Profile("auth", "Customer Authentications", "AUTH", 1f,
+            Profile("auth", "Customer Authentications", "AUTH", 0f,
                 Stage(OperationKind.Execute, "Processing authentications", 1f, 2.5f, 40f, 70f)),
-            Profile("updates", "Application Updates", "API", 0.8f,
+            Profile("updates", "Application Updates", "API", 0f,
                 Stage(OperationKind.Write, "Applying updates", 1.5f, 3f, 20f, 35f),
                 Stage(OperationKind.Read, "Verifying updates", 1f, 2.5f, 20f, 35f)),
-            Profile("quick-lookup", "Quick Record Lookup", "DB", 0.35f,
+            Profile("quick-lookup", "Quick Record Lookup", "DB", 0f,
                 Stage(OperationKind.Read, "Looking up a record", 0.5f, 1.5f, 4f, 8f)),
             new ConnectionTrafficProfile
             {
                 id = "basic-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.42f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
                 operations = new[] { ThreatWriteStage() }
             },
             new ConnectionTrafficProfile
             {
                 id = "delayed-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.37f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
                 operations = new[]
                 {
                     Stage(OperationKind.Read, "Reading records", 2f, 2f, 8f, 8f),
@@ -324,19 +472,19 @@ namespace Uptime.Connections
             new ConnectionTrafficProfile
             {
                 id = "spiking-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.26f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
                 operations = new[] { SpikingWriteStage(CompletionEffect.InfectionDelivery) }
             },
             new ConnectionTrafficProfile
             {
                 id = "spiking-benign", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.16f,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
                 operations = new[] { SpikingWriteStage(CompletionEffect.None) }
             },
             new ConnectionTrafficProfile
             {
                 id = "overload-demo", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.11f,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
                 operations = new[] { new ConnectionOperationProfile
                 {
                     operation = OperationKind.Write, activityDescription = "Writing records",
@@ -368,6 +516,14 @@ namespace Uptime.Connections
             float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile
             { id = id, claimedPurpose = purpose, eligibleTargetIds = new[] { target },
                 ambientWeight = weight, operations = stages };
+        private static ConnectionTrafficProfile Purpose(string id, string purpose, string target,
+            float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile
+            { id = id, claimedPurpose = purpose, eligibleTargetIds = new[] { target },
+                ambientWeight = weight, purposeTemplate = true, operations = stages };
+        private static ConnectionOperationProfile PurposeStage(OperationKind kind, string description,
+            float lowLoad, float highLoad, float meanWork) => new ConnectionOperationProfile
+            { operation = kind, activityDescription = description, minimumLoad = lowLoad,
+                maximumLoad = highLoad, meanWork = meanWork };
         private static ConnectionOperationProfile Stage(OperationKind kind, string description,
             float lowLoad, float highLoad, float lowSeconds, float highSeconds) => new ConnectionOperationProfile
             { operation = kind, activityDescription = description, minimumLoad = lowLoad,

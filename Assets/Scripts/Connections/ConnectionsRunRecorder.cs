@@ -48,6 +48,12 @@ namespace Uptime.Connections
         public float openingGraceSeconds;
         public float spawnIntervalSeconds;
         public float spawnJitterSeconds;
+        public float hostileChance;
+        public float deliveryChance;
+        public float benignOutlierChance;
+        public float secondAnomalyChance;
+        public float subtleDeliveryChance;
+        public float normalWorkSpread;
         public ProfileConfiguration[] profiles;
     }
 
@@ -55,6 +61,7 @@ namespace Uptime.Connections
     {
         public string id;
         public bool isHostile;
+        public bool purposeTemplate;
         public string claimedPurpose;
         public string[] eligibleTargetIds;
         public float ambientWeight;
@@ -72,6 +79,7 @@ namespace Uptime.Connections
         public float maximumLoad;
         public float minimumDurationSeconds;
         public float maximumDurationSeconds;
+        public float meanWork;
     }
 
     [Serializable] public sealed class BehaviorRecord
@@ -95,6 +103,7 @@ namespace Uptime.Connections
         public string source;
         public float scheduledSpawnTime;
         public string profileId;
+        public ConnectionGenerationTrace generation;
         public ConnectionDefinitionRecord definition;
         public int operationIndex;
         public string operationKind;
@@ -352,6 +361,7 @@ namespace Uptime.Connections
             entry.source = source;
             entry.scheduledSpawnTime = plan.ScheduledSpawnTime;
             entry.profileId = plan.ProfileId;
+            entry.generation = plan.GenerationTrace?.Copy();
         }
 
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
@@ -521,12 +531,19 @@ namespace Uptime.Connections
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
                 spawnIntervalSeconds = trafficDirector.SpawnIntervalSeconds,
                 spawnJitterSeconds = trafficDirector.SpawnJitterSeconds,
+                hostileChance = trafficDirector.HostileChance,
+                deliveryChance = trafficDirector.DeliveryChance,
+                benignOutlierChance = trafficDirector.BenignOutlierChance,
+                secondAnomalyChance = trafficDirector.SecondAnomalyChance,
+                subtleDeliveryChance = trafficDirector.SubtleDeliveryChance,
+                normalWorkSpread = trafficDirector.NormalWorkSpread,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
             for (int i = 0; i < traffic.profiles.Length; i++)
             {
                 ConnectionTrafficProfile source = configuredProfiles[i];
                 var profile = new ProfileConfiguration { id = source.id,
                     isHostile = source.isHostile,
+                    purposeTemplate = source.purposeTemplate,
                     claimedPurpose = source.claimedPurpose,
                     ambientWeight = trafficDirector.EffectiveAmbientWeight(source.id),
                     eligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
@@ -541,7 +558,8 @@ namespace Uptime.Connections
                         behaviors = Behaviors(operation.behaviors),
                         minimumLoad = operation.minimumLoad, maximumLoad = operation.maximumLoad,
                         minimumDurationSeconds = operation.minimumDuration,
-                        maximumDurationSeconds = operation.maximumDuration };
+                        maximumDurationSeconds = operation.maximumDuration,
+                        meanWork = operation.meanWork };
                 }
                 traffic.profiles[i] = profile;
             }
