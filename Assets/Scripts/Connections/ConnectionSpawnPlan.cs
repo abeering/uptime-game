@@ -50,6 +50,9 @@ namespace Uptime.Connections
     {
         public string purposeId;
         public string objective;
+        // Explains whether anomaly omission was intentional, and distinguishes benign outliers.
+        public string generationDecision;
+        public string selectedKeyword;
         public string[] anomalies;
         public GeneratedOperationValue[] normalOperations;
         public GeneratedOperationValue[] finalOperations;
@@ -57,6 +60,7 @@ namespace Uptime.Connections
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
             purposeId = purposeId, objective = objective,
+            generationDecision = generationDecision, selectedKeyword = selectedKeyword,
             anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
             normalOperations = CopyValues(normalOperations),
             finalOperations = CopyValues(finalOperations)
