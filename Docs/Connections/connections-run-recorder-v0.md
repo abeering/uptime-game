@@ -2,6 +2,12 @@
 
 **Current status (October 22, 2026):** Integrated run-recording contract from [PR #7](https://github.com/abeering/uptime-game/pull/7). The example and witness results below belong to that milestone; the listed interactive Play Mode checks were not completed during integration. See [Connections Current State](Current_State.md).
 
+**Generated Hostile Traffic V0 update (October 24, 2026):** `schemaVersion` stays at `1` because this is an additive change: older version-1 readers can ignore new fields, and existing fields keep their meanings. Each profile's recorded `ambientWeight` is the **effective** weight after Inspector overrides. Every new `NetworkSnapshot` includes `health` with `value`, signed `netRate`, `recoveryRate`, `degradationRate`, `slowedCount`, `overdueCount`, and latched `failed`, copied from the authoritative host snapshot. Counts include benign and hostile connections; degradation tracks legitimate service only. A legitimate kill emits one `health_penalty` event with `connectionId`, simulation `timeSeconds`, signed negative `healthPenaltyAmount`, and `healthAfter`, adjacent to its ordinary Killed resolution. Hostile kills emit no penalty event. The original linked example is a historical version-1 run without these additive fields; new files contain them. Illustrative excerpt (other snapshot and event fields omitted):
+
+```json
+{"snapshots":[{"timeSeconds":1,"health":{"value":99.67,"netRate":-0.33,"recoveryRate":0,"degradationRate":0.33,"slowedCount":3,"overdueCount":0,"failed":false}}],"events":[{"type":"health_penalty","timeSeconds":17,"connectionId":"a1","healthPenaltyAmount":-10,"healthAfter":75.2}]}
+```
+
 Connections records each Play Mode run automatically. The recording starts when `SimulationHost` resets at Play start, creates a JSON file immediately, saves it every 30 seconds of real elapsed time, and saves once more when Play Mode stops. Saving updates the same run file. A reset or new Play Mode session gets a new UTC timestamp and random run ID in its filename.
 
 In the Unity Editor, find files at `<project-root>/Logs/UptimeRuns/`. The folder is created automatically and ignored by Git. Standalone builds use `Application.persistentDataPath/UptimeRuns/`. Filenames follow `uptime_YYYYMMDD_HHMMSS_seed-XXXXX_RUNID.json`, using the run's UTC start time. The output is ordinary UTF-8 JSON and can be attached directly to a ChatGPT conversation.

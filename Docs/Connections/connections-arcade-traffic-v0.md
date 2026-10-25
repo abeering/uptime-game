@@ -2,6 +2,10 @@
 
 **Current status (October 22, 2026):** Integrated generated-traffic contract from [PR #6](https://github.com/abeering/uptime-game/pull/6). The closing "no run telemetry" limit records this traffic phase's original boundary; automatic run recording later merged in [#7](https://github.com/abeering/uptime-game/pull/7). The other listed limits remain subject to current runtime truth. See [Connections Current State](Current_State.md).
 
+**Generated Hostile Traffic V0 update (October 24, 2026):** The original benign-only and later manual-only passages below preserve their phase provenance. Current Generated mode selects all ten built-in profiles from one ambient scheduler. The five ordinary weights remain `1, 0.8, 1, 0.8, 0.35` (3.95 total); added weights are `basic-threat: 0.42`, `delayed-threat: 0.37`, `spiking-threat: 0.26`, `spiking-benign: 0.16`, and `overload-demo: 0.11` (5.27 total). The ordinary share is about 75%; the five additions are provisional playtest tuning, not balance rules. Scene cadence remains 3 s grace, 13.5 s interval, ±1.5 s jitter. All operation definitions, behavior timing, WORK/LOAD rules, effects, and internal classification remain unchanged.
+
+The director's **Ambient Weight Overrides** Inspector array accepts profile ID and nonnegative finite weight. Leave it empty to use built-in defaults; add only the IDs whose weights need tuning, without copying operation definitions. Overrides apply to custom Inspector profile arrays too. Unknown IDs, duplicate IDs (case insensitive), missing IDs, and invalid weights fail clearly on reset. Zero removes a profile from ambient selection but leaves `spawn <profileId>` available. Changes take effect on reset; the run recorder stores effective weights, and a seed plus unchanged configuration replays the same plan and ID streams. Explicit queues still dispatch with ambient disabled. No independent hostile clock, ramp, or population cap was introduced.
+
 This phase gives Connections a continuous benign traffic rhythm. Packet remains an independent game and its traffic classes are unchanged.
 
 ## Ownership and spawn pipeline

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -28,6 +29,7 @@ namespace Uptime.Connections.EditorTools
                 host.SetRunMode(ConnectionRunMode.Generated);
                 recorder.BeginRun(); // Edit Mode witness; Play Mode calls this automatically from host reset.
                 recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+                Check(recorder.Save(false), "initial Health snapshot saved");
                 string firstPath = recorder.OutputPath;
                 Check(File.Exists(firstPath) && firstPath.StartsWith(ConnectionsRunRecorder.LogDirectory),
                     "new recording is saved in the expected directory");
@@ -42,12 +44,12 @@ namespace Uptime.Connections.EditorTools
                     "copied run metadata and generator configuration");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");
-                Check(threatProfile.isHostile && threatProfile.ambientWeight == 0f &&
+                Check(threatProfile.isHostile && threatProfile.ambientWeight == 0.42f &&
                     threatProfile.operations[0].completionEffect == "InfectionDelivery",
-                    "recorded catalog includes manual-only threat behavior");
+                    "recorded catalog includes effective basic-threat ambient weight");
                 ProfileConfiguration delayedProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "delayed-threat");
-                Check(delayedProfile.isHostile && delayedProfile.ambientWeight == 0f &&
+                Check(delayedProfile.isHostile && delayedProfile.ambientWeight == 0.37f &&
                     delayedProfile.operations.Length == 2 &&
                     delayedProfile.operations[0].kind == "Read" &&
                     delayedProfile.operations[0].completionEffect == "None" &&
@@ -62,13 +64,15 @@ namespace Uptime.Connections.EditorTools
                     p.id == "overload-demo");
                 Check(spikingThreat.isHostile && !spikingBenign.isHostile &&
                     !overloadDemo.isHostile &&
-                    spikingThreat.ambientWeight == 0f &&
-                    spikingBenign.ambientWeight == 0f &&
-                    overloadDemo.ambientWeight == 0f &&
+                    spikingThreat.ambientWeight == 0.26f &&
+                    spikingBenign.ambientWeight == 0.16f &&
+                    overloadDemo.ambientWeight == 0.11f &&
                     spikingThreat.operations[0].behaviors[0].kind == "Spiking" &&
                     spikingBenign.operations[0].behaviors[0].kind == "Spiking" &&
                     overloadDemo.operations[0].behaviors[0].kind == "Overload",
-                    "recorded manual keyword catalog keeps demand behavior separate from hostility");
+                    "recorded mixed keyword catalog keeps demand behavior separate from hostility");
+                Near(initial.snapshots.Last().health.value, host.Health.Value,
+                    "initial authoritative Health snapshot");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");
@@ -90,6 +94,8 @@ namespace Uptime.Connections.EditorTools
                 Near(dbSnapshot.allocatedLoad, host.Nodes.First(n => n.View == db).AllocatedLoad,
                     "authoritative allocated LOAD snapshot");
                 Near(connectionSnapshot.completedWork, live.CompletedWork, "authoritative WORK snapshot");
+                Near(liveSnapshot.health.value, host.Health.Value, "live Health value snapshot");
+                Near(liveSnapshot.health.netRate, host.Health.NetRate, "live signed Health rate");
                 Check(recorder.Save(true) && Read(firstPath).snapshots.Any(s =>
                     s.connections.Any(c => c.id == "rec1" && c.lifecycle == "Active")),
                     "partway-through save is valid and includes live state");
@@ -150,6 +156,10 @@ namespace Uptime.Connections.EditorTools
                 float enabledWork = stressed.CompletedWork;
                 float enabledLoad = stressed.AllocatedLoad;
                 Check(host.KillConnection("rec2"), "kill active connection");
+                RunEvent rec2Penalty = recorder.CurrentLog.events.Single(e =>
+                    e.type == "health_penalty" && e.connectionId == "rec2");
+                Near(rec2Penalty.healthPenaltyAmount, -10f, "attributable signed kill penalty");
+                Near(rec2Penalty.healthAfter, host.Health.Value, "Health after legitimate kill");
                 Check(recorder.CurrentLog.events.Last(e => e.type == "connection_resolved")
                     .resolutionReason == "Killed", "killed resolution recorded separately");
                 Check(recorder.CurrentLog.snapshots.Last().nodes.First(n => n.id == "DB")
@@ -254,6 +264,7 @@ namespace Uptime.Connections.EditorTools
                     recorder.CurrentLog.events.Count(e => e.type == "connection_spawned") == 3,
                     "authored mode records its own configuration and connections");
                 recorder.EndRun();
+                CheckHealthRecording(host, director, recorder, route);
                 Debug.Log("RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, " +
                     "JSON saves, autosave, kill, distinct runs, authored mode, and " +
                     "enabled/disabled parity. " + firstPath);
@@ -264,6 +275,112 @@ namespace Uptime.Connections.EditorTools
                 recorder.RecordingEnabled = oldRecording;
                 director.AutoGenerationEnabled = oldAuto;
                 host.SetRunMode(ConnectionRunMode.Generated);
+            }
+        }
+
+        private static void CheckHealthRecording(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder, NodeView[] route)
+        {
+            host.SetRunMode(ConnectionRunMode.Generated);
+            recorder.BeginRun();
+            foreach (string id in new[] { "health-a", "health-b", "health-hostile" })
+                director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, id, route, "health-test",
+                    "Service", new[] { new OperationStage(OperationKind.Read, 100f, 10f, "Read") },
+                    id == "health-hostile"));
+            host.StepSimulation(1f);
+            recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            HealthSnapshotRecord slowed = recorder.CurrentLog.snapshots.Last().health;
+            Check(slowed.slowedCount == 3 && slowed.overdueCount == 0 &&
+                slowed.degradationRate > 0f && slowed.recoveryRate == 0f,
+                "recorder counts hostile slowdown but records legitimate degradation");
+            Near(slowed.value, host.Health.Value, "contended Health value");
+            host.StepSimulation(16f);
+            recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            HealthSnapshotRecord late = recorder.CurrentLog.snapshots.Last().health;
+            Check(late.overdueCount == 3 && late.degradationRate > slowed.degradationRate,
+                "recorder observes overdue service escalation");
+            float beforeHostile = host.Health.Value;
+            Check(host.KillConnection("health-hostile"), "hostile kill for recorder");
+            Near(host.Health.Value, beforeHostile, "hostile kill has no direct Health penalty");
+            Check(recorder.CurrentLog.events.All(e => e.type != "health_penalty" ||
+                e.connectionId != "health-hostile"), "hostile kill has no penalty event");
+            Check(host.KillConnection("health-a") && host.KillConnection("health-b"),
+                "legitimate kills for recorder");
+            RunEvent[] penalties = recorder.CurrentLog.events.Where(e =>
+                e.type == "health_penalty").ToArray();
+            Check(penalties.Length == 2 && penalties[0].connectionId == "health-a" &&
+                penalties[1].connectionId == "health-b" &&
+                penalties.All(e => e.healthPenaltyAmount == -10f),
+                "each legitimate kill yields one ordered attributable penalty");
+            Check(!host.KillConnection("health-a") && recorder.CurrentLog.events.Count(e =>
+                e.type == "health_penalty") == 2,
+                "inactive repeated kill cannot duplicate a Health penalty");
+            Near(penalties[1].healthAfter, host.Health.Value, "second resulting Health");
+            float beforeRecovery = host.Health.Value;
+            host.StepSimulation(1f);
+            recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            HealthSnapshotRecord recovering = recorder.CurrentLog.snapshots.Last().health;
+            Check(recovering.recoveryRate > 0f && recovering.degradationRate == 0f &&
+                recovering.slowedCount == 0 && recovering.overdueCount == 0 &&
+                recovering.value > beforeRecovery,
+                "recorder observes recovery after contention release");
+            recorder.EndRun();
+            host.ResetSimulation();
+            recorder.BeginRun();
+            recorder.CaptureSnapshot(0f);
+            Check(recorder.CurrentLog.events.Count == 0 &&
+                recorder.CurrentLog.snapshots.Last().health.value == 100f &&
+                !recorder.CurrentLog.snapshots.Last().health.failed,
+                "new run has no stale Health or penalty events");
+            recorder.EndRun();
+            var penaltySetting = new SerializedObject(host).FindProperty("healthTuning")
+                .FindPropertyRelative("incorrectKillPenalty");
+            float originalPenalty = penaltySetting.floatValue;
+            try
+            {
+                penaltySetting.floatValue = 100f;
+                penaltySetting.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                host.ResetSimulation();
+                recorder.BeginRun();
+                director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "health-failure", route,
+                    "health-test", "Service",
+                    new[] { new OperationStage(OperationKind.Read, 100f, 10f, "Read") }));
+                host.StepSimulation(0.1f);
+                Check(host.KillConnection("health-failure") &&
+                    recorder.CurrentLog.snapshots.Last().health.failed &&
+                    recorder.CurrentLog.snapshots.Last().health.value == 0f,
+                    "kill snapshot records latched Health failure");
+                host.StepSimulation(1f);
+                recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+                Check(recorder.CurrentLog.snapshots.Last().health.failed &&
+                    recorder.CurrentLog.snapshots.Last().health.value > 0f,
+                    "recovery does not clear recorded failure latch");
+                recorder.EndRun();
+            }
+            finally
+            {
+                penaltySetting.floatValue = originalPenalty;
+                penaltySetting.serializedObject.ApplyModifiedPropertiesWithoutUndo();
+                host.ResetSimulation();
+            }
+            FieldInfo overridesField = typeof(ConnectionTrafficDirector).GetField(
+                "ambientWeightOverrides", BindingFlags.Instance | BindingFlags.NonPublic);
+            var originalOverrides = (AmbientWeightOverride[])overridesField.GetValue(director);
+            try
+            {
+                overridesField.SetValue(director, new[] { new AmbientWeightOverride
+                    { profileId = "basic-threat", weight = 0f } });
+                host.ResetSimulation();
+                recorder.BeginRun();
+                Check(recorder.CurrentLog.run.traffic.profiles.Single(p =>
+                    p.id == "basic-threat").ambientWeight == 0f,
+                    "run metadata stores effective Inspector weight");
+                recorder.EndRun();
+            }
+            finally
+            {
+                overridesField.SetValue(director, originalOverrides);
+                host.ResetSimulation();
             }
         }
 
