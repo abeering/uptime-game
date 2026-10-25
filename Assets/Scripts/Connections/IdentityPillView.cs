@@ -9,6 +9,7 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text idText;
         [SerializeField] private Vector2 dimensions = new Vector2(54f, 28f);
         [SerializeField, Min(8f)] private float fontSize = 16f;
+        [SerializeField] private bool tintTextWithAccent;
 
         public Vector2 Size => new Vector2(Mathf.Max(32f, dimensions.x), Mathf.Max(23f, dimensions.y));
         public Color AccentColor => plate != null ? plate.color : Color.clear;
@@ -17,7 +18,7 @@ namespace Uptime.Connections
         public void Bind(string connectionId, Color accent)
         {
             idText.text = connectionId.ToLowerInvariant();
-            plate.SetOutline(accent);
+            SetAccentColor(accent);
             plate.raycastTarget = false;
             idText.raycastTarget = false;
             ApplySize();
@@ -35,7 +36,11 @@ namespace Uptime.Connections
             rect.localRotation = Quaternion.Euler(0f, 0f, angle);
         }
 
-        public void SetAccentColor(Color accent) => plate.SetOutline(accent);
+        public void SetAccentColor(Color accent)
+        {
+            plate.SetOutline(accent);
+            if (tintTextWithAccent && idText != null) idText.color = accent;
+        }
 
         private void OnValidate() => ApplySize();
 

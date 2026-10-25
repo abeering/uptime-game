@@ -16,6 +16,8 @@ namespace Uptime.Connections
         [SerializeField, Min(60f)] private float loadBadgeWidth = 126f;
         [SerializeField, Min(0f)] private float loadBadgeGap = 12f;
         [SerializeField, Min(0f)] private float contentInset = 16f;
+        [SerializeField, Min(0f)] private float identityPillTop = 12f;
+        [SerializeField, Min(0f)] private float identityPillGap = 12f;
         [SerializeField] private TMP_Text work;
         [SerializeField] private TMP_Text throughput;
         [SerializeField] private TMP_Text bottleneck;
@@ -23,7 +25,6 @@ namespace Uptime.Connections
         [SerializeField] private Image progressFill;
         [SerializeField] private Image stateTag;
         [SerializeField] private Image panelBackground;
-        [SerializeField] private Image titleBar;
         [SerializeField] private Color activeColor = new Color(0.35f, 0.92f, 0.72f);
         [SerializeField] private Color atSpeedColor = new Color(0.56f, 0.89f, 0.40f);
         [SerializeField] private Color limitedColor = new Color(1f, 0.69f, 0.34f);
@@ -31,8 +32,6 @@ namespace Uptime.Connections
         [SerializeField] private Color quietColor = new Color(0.52f, 0.67f, 0.66f);
         [SerializeField] private Color activeBackground = new Color(0.035f, 0.105f, 0.13f);
         [SerializeField] private Color completeBackground = new Color(0.026f, 0.078f, 0.095f);
-        [SerializeField] private Color activeTitleBar = new Color(0.055f, 0.16f, 0.19f);
-        [SerializeField] private Color completeTitleBar = new Color(0.04f, 0.11f, 0.13f);
 
         private readonly List<InspectOperationToken> operationTokens = new List<InspectOperationToken>();
         private LogicalConnectionState renderedState;
@@ -41,6 +40,9 @@ namespace Uptime.Connections
         private bool renderedComplete;
         private float renderedTimelineWidth = -1f;
         private InspectOperationToken activeToken;
+        private bool stackedUpper;
+
+        public float ExtraHeight => stackedUpper ? 52f : 0f;
 
         public void ClearRuntimeTokens()
         {
@@ -71,47 +73,65 @@ namespace Uptime.Connections
             RectTransform card = (RectTransform)transform;
             card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             float contentWidth = Mathf.Max(0f, width - contentInset * 2f);
-            if (identity != null)
-                identity.rectTransform.anchoredPosition = new Vector2(contentInset, -7f);
+            float upperLeft = contentInset;
             if (headerIdentityPill != null)
-                ((RectTransform)headerIdentityPill.transform).anchoredPosition =
-                    new Vector2(151f + contentInset - 12f, -19f);
+            {
+                RectTransform pill = (RectTransform)headerIdentityPill.transform;
+                pill.anchorMin = pill.anchorMax = new Vector2(0f, 1f);
+                pill.pivot = new Vector2(0f, 1f);
+                pill.anchoredPosition = new Vector2(contentInset, -identityPillTop);
+                upperLeft += headerIdentityPill.Size.x + identityPillGap;
+            }
+            float upperWidth = Mathf.Max(0f, width - upperLeft - contentInset);
+            stackedUpper = upperWidth - loadBadgeWidth - loadBadgeGap < 100f;
+            float detailOffset = stackedUpper ? 52f : 0f;
             if (purpose != null)
-                purpose.rectTransform.anchoredPosition =
-                    new Vector2(190f + contentInset - 12f, -7f);
+                purpose.rectTransform.anchoredPosition = new Vector2(upperLeft, -9f);
             if (operationRow != null)
             {
-                operationRow.anchoredPosition = new Vector2(contentInset, -43f);
+                operationRow.anchoredPosition = new Vector2(
+                    stackedUpper ? contentInset : upperLeft,
+                    stackedUpper ? -90f : -39f);
                 operationRow.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                    Mathf.Max(0f, contentWidth - loadBadgeWidth - loadBadgeGap));
+                    Mathf.Max(0f, (stackedUpper ? contentWidth : upperWidth) -
+                        loadBadgeWidth - loadBadgeGap));
             }
             if (loadBadge != null)
             {
                 RectTransform badge = (RectTransform)loadBadge.transform;
                 badge.anchorMin = badge.anchorMax = new Vector2(1f, 1f);
                 badge.pivot = new Vector2(1f, 1f);
-                badge.anchoredPosition = new Vector2(-contentInset, -43f);
+                badge.anchoredPosition = new Vector2(-contentInset,
+                    stackedUpper ? -90f : -39f);
                 badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, loadBadgeWidth);
                 badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 40f);
             }
-            SetTextWidth(throughput, contentWidth);
+            SetTextWidth(throughput, stackedUpper ? contentWidth : upperWidth);
             SetTextWidth(work, contentWidth);
-            SetTextWidth(purpose, Mathf.Max(0f, width - 178f - contentInset * 2f));
-            SetTextWidth(bottleneck, Mathf.Max(0f, width - 150f));
-            SetLeftInset(throughput, contentInset);
+            SetTextWidth(purpose, upperWidth);
+            SetTextWidth(bottleneck, Mathf.Max(0f, contentWidth - 120f));
+            if (throughput != null)
+                throughput.rectTransform.anchoredPosition = new Vector2(
+                    stackedUpper ? contentInset : upperLeft, -84f - detailOffset);
             SetLeftInset(work, contentInset);
             SetLeftInset(bottleneck, contentInset);
+            if (work != null)
+                work.rectTransform.anchoredPosition = new Vector2(contentInset,
+                    -120f - detailOffset);
+            if (bottleneck != null)
+                bottleneck.rectTransform.anchoredPosition = new Vector2(contentInset,
+                    -172f - detailOffset);
             if (eta != null)
             {
                 RectTransform rect = eta.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
                 rect.pivot = new Vector2(1f, 1f);
-                rect.anchoredPosition = new Vector2(-contentInset, -163f);
+                rect.anchoredPosition = new Vector2(-contentInset, -172f - detailOffset);
             }
             if (progressFill != null)
             {
                 RectTransform progress = progressFill.transform.parent.GetComponent<RectTransform>();
-                progress.anchoredPosition = new Vector2(contentInset, progress.anchoredPosition.y);
+                progress.anchoredPosition = new Vector2(contentInset, -148f - detailOffset);
                 progressFill.transform.parent.GetComponent<RectTransform>()
                     .SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentWidth);
             }
@@ -122,9 +142,9 @@ namespace Uptime.Connections
         {
             bool verbose = mode == InspectPresentationMode.Verbose;
             Color accent = identityAccent ?? activeColor;
-            Set(identity, "INSPECT /");
+            Set(identity, string.Empty);
             Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
-                string.Empty : "- " + state.Definition.ClaimedPurpose);
+                string.Empty : state.Definition.ClaimedPurpose);
             if (identity != null) identity.color = state.IsComplete ? quietColor : accent;
             if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)
@@ -137,8 +157,6 @@ namespace Uptime.Connections
             }
             if (panelBackground != null)
                 panelBackground.color = state.IsComplete ? completeBackground : activeBackground;
-            if (titleBar != null)
-                titleBar.color = state.IsComplete ? completeTitleBar : activeTitleBar;
             Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
                 state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
@@ -164,8 +182,7 @@ namespace Uptime.Connections
                 reason = target.LoadCapacity - target.BaselineLoad <= 0.0001f ?
                     " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
                     " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
-            Set(throughput, state.IsComplete ? status :
-                $"{status} · ALLOC {state.AllocatedLoad:0.#}/{state.DesiredLoad:0.#}{reason}");
+            Set(throughput, status + reason);
             if (throughput != null) throughput.color = tint;
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");

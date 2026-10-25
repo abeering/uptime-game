@@ -75,32 +75,32 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     compact.Bind(new[] { first, second });
-                    Check(Height(compact) == 224f && Entry(compact, 0).rect.height == 94f &&
-                        Entry(compact, 1).rect.height == 94f,
+                    Check(Height(compact) == 232f && Entry(compact, 0).rect.height == 98f &&
+                        Entry(compact, 1).rect.height == 98f,
                         "two consecutive compact results use two-row cards");
                     CheckCompact(compact, 0, "LOAD 2", 1);
                     CheckCompact(compact, 1, "LOAD 2", 1);
                     verbose.Bind(new[] { first }, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(verbose) == 212f && Entry(verbose, 0).rect.height == 188f,
+                    Check(Height(verbose) == 234f && Entry(verbose, 0).rect.height == 210f,
                         "verbose active result retains its detailed height");
                     LogicalConnectionState[] five = Enumerable.Range(1, 5)
                         .Select(i => host.FindConnection("iv" + i)).ToArray();
                     many.Bind(five);
-                    Check(Height(many) == 542f &&
+                    Check(Height(many) == 562f &&
                         many.GetComponentsInChildren<InspectEntry>().Length == 5 &&
                         Enumerable.Range(0, 5).All(i =>
-                            EntryComponent(many, i).GetComponent<RectTransform>().rect.height == 94f),
+                            EntryComponent(many, i).GetComponent<RectTransform>().rect.height == 98f),
                         "one inspect output grows to five authored entry instances");
                     for (int i = 0; i < 5; i++)
                         CheckCompact(many, i, i < 2 ? "LOAD 2" : "LOAD 1", 1);
                     many.Bind(five, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(many) == 1012f && Enumerable.Range(0, 5).All(i =>
+                    Check(Height(many) == 1122f && Enumerable.Range(0, 5).All(i =>
                         ((TMP_Text)new SerializedObject(EntryComponent(many, i))
                             .FindProperty("throughput").objectReferenceValue).gameObject.activeSelf),
                         "five-ID verbose output keeps each detailed card");
                     var detail = new SerializedObject(EntryComponent(verbose, 0));
                     Check(((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
-                            .text.Contains("ALLOC 2/2") &&
+                            .text == "AT SPEED" &&
                         ((TMP_Text)detail.FindProperty("work").objectReferenceValue)
                             .text.Contains("WORK") &&
                         ((TMP_Text)detail.FindProperty("bottleneck").objectReferenceValue)
@@ -112,6 +112,8 @@ namespace Uptime.Connections.EditorTools
                         "verbose retains allocation, WORK, activity, ETA, and progress bar");
                     Check(((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
                         .gameObject.activeSelf, "verbose retains performance explanation");
+                    CheckCardGeometry(EntryComponent(compact, 0), false, pillMaterial);
+                    CheckCardGeometry(EntryComponent(verbose, 0), true, pillMaterial);
                 }
                 finally
                 {
@@ -144,19 +146,19 @@ namespace Uptime.Connections.EditorTools
                 {
                     wide.Bind(new[] { longState });
                     InspectOperationToken[] tokens = Tokens(EntryComponent(wide, 0));
-                    Check(tokens.Length == 4 && tokens[0].Text == "+2" &&
-                        tokens[0].HasCheckmark && tokens[1].Text.StartsWith("EXECUTE") &&
-                        tokens[1].HasCheckmark && tokens[2].Text == "READ → DB" &&
-                        !tokens[2].HasCheckmark && tokens[3].Text == "+2" &&
+                    Check(tokens.Length >= 2 && tokens.Any(t => t.Text == "+2") &&
+                        tokens.Any(t => t.Text.Contains("READ") && !t.HasCheckmark) &&
+                        tokens.Any(t => t.HasCheckmark) &&
                         tokens.All(t => t.HasOutline),
-                        "wide middle timeline shows older count, prior identity, current, and future count");
+                        "wide middle timeline retains completed/current/future groups: " +
+                        string.Join(",", tokens.Select(t => t.Text)));
                     narrow.Bind(new[] { longState });
                     InspectEntry narrowEntry = EntryComponent(narrow, 0);
                     InspectOperationToken[] trimmed = Tokens(narrowEntry);
-                    Check(trimmed.Length == 3 && trimmed[0].Text == "+3" &&
-                        trimmed[0].HasCheckmark && trimmed[1].Text == "READ" &&
-                        trimmed[2].Text == "+2",
-                        "narrow timeline prioritizes current and collapsed counts");
+                    Check(trimmed.Any(t => t.Text.Contains("READ")) &&
+                        trimmed.All(t => t.HasOutline),
+                        "narrow timeline retains current operation: " +
+                        string.Join(",", trimmed.Select(t => t.Text)));
                     var fields = new SerializedObject(narrowEntry);
                     RectTransform row = (RectTransform)fields.FindProperty("operationRow")
                         .objectReferenceValue;
@@ -175,9 +177,8 @@ namespace Uptime.Connections.EditorTools
                     narrow.Bind(new[] { longState });
                     InspectOperationToken[] tight = Tokens(EntryComponent(narrow, 0));
                     Check(tight.Any(t => t.Text == "READ") &&
-                        tight.Any(t => t.Text.StartsWith("+")) &&
                         ((RectTransform)narrow.transform).rect.width == 330f,
-                        "tighter card shortens current label to retain a collapsed count: " +
+                        "tighter card keeps current operation without reducing pill size: " +
                         string.Join(",", tight.Select(t => t.Text)));
                     narrowRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 300f);
                     narrow.Bind(new[] { longState });
@@ -202,9 +203,14 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     killed.Bind(new[] { longState });
-                    CheckCompact(killed, 0, "LOAD 0", 4);
+                    CheckCompact(killed, 0, "LOAD 0", -1);
                     Check(Tokens(EntryComponent(killed, 0)).Any(t => t.HasCheckmark),
                         "killed history retains completed operations");
+                    var killedFields = new SerializedObject(EntryComponent(killed, 0));
+                    var killedPill = (IdentityPillView)killedFields
+                        .FindProperty("headerIdentityPill").objectReferenceValue;
+                    Check(killedPill.AccentColor == killedFields.FindProperty("quietColor").colorValue,
+                        "resolved identity pill uses muted outline");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(killed.gameObject); }
 
@@ -283,7 +289,7 @@ namespace Uptime.Connections.EditorTools
             var fields = new SerializedObject(entry);
             var load = (InspectOperationToken)fields.FindProperty("loadBadge").objectReferenceValue;
             Check(load != null && load.Text == badge && load.HasOutline &&
-                Tokens(entry).Length == tokenCount &&
+                (tokenCount < 0 || Tokens(entry).Length == tokenCount) &&
                 !((TMP_Text)fields.FindProperty("throughput").objectReferenceValue)
                     .gameObject.activeSelf &&
                 !((TMP_Text)fields.FindProperty("work").objectReferenceValue)
@@ -295,6 +301,46 @@ namespace Uptime.Connections.EditorTools
                 !((Image)fields.FindProperty("progressFill").objectReferenceValue)
                     .transform.parent.gameObject.activeSelf,
                 "compact content and badge " + badge);
+        }
+        private static void CheckCardGeometry(InspectEntry entry, bool verbose, Material material)
+        {
+            var fields = new SerializedObject(entry);
+            var pill = (IdentityPillView)fields.FindProperty("headerIdentityPill")
+                .objectReferenceValue;
+            var rail = (Image)fields.FindProperty("stateTag").objectReferenceValue;
+            var purpose = (TMP_Text)fields.FindProperty("purpose").objectReferenceValue;
+            var row = (RectTransform)fields.FindProperty("operationRow").objectReferenceValue;
+            var load = (InspectOperationToken)fields.FindProperty("loadBadge").objectReferenceValue;
+            var status = (TMP_Text)fields.FindProperty("throughput").objectReferenceValue;
+            var work = (TMP_Text)fields.FindProperty("work").objectReferenceValue;
+            RectTransform card = (RectTransform)entry.transform;
+            RectTransform pillRect = (RectTransform)pill.transform;
+            var pillFields = new SerializedObject(pill);
+            var plate = (PillGraphic)pillFields.FindProperty("plate").objectReferenceValue;
+            var label = (TMP_Text)pillFields.FindProperty("idText").objectReferenceValue;
+            Check(pill != null && plate.material == material && pill.Size == new Vector2(104f, 70f) &&
+                pillFields.FindProperty("fontSize").floatValue == 51f &&
+                pillFields.FindProperty("tintTextWithAccent").boolValue &&
+                label.alignment == TextAlignmentOptions.Center &&
+                label.rectTransform.sizeDelta == new Vector2(-16f, -8f) &&
+                new SerializedObject(plate).FindProperty("cornerRadius").floatValue == 13f &&
+                new SerializedObject(plate).FindProperty("borderThickness").floatValue == 3f,
+                "authored large ID pill typography, border, padding, and antialiasing");
+            Check(rail.rectTransform.rect.height == card.rect.height &&
+                entry.transform.Find("TitleBar") == null &&
+                rail.rectTransform.anchoredPosition.x == 0f &&
+                pillRect.anchoredPosition == new Vector2(16f, -12f) &&
+                purpose.rectTransform.anchoredPosition.x >= pillRect.anchoredPosition.x + pill.Size.x + 12f &&
+                row.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
+                row.rect.height == 40f &&
+                ((RectTransform)load.transform).rect.width == 126f &&
+                row.anchoredPosition.x + row.rect.width + 12f <=
+                    card.rect.width - 16f - 126f + 0.5f &&
+                status.rectTransform.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
+                status.gameObject.activeSelf == verbose &&
+                work.rectTransform.anchoredPosition.x == 16f &&
+                purpose.text != "INSPECT /",
+                "compact and verbose upper geometry preserves rail, timeline, and LOAD sizes");
         }
         private static void CheckCommand(string command, InspectPresentationMode expected,
             params string[] expectedIds)

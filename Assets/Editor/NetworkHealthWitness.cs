@@ -220,9 +220,76 @@ namespace Uptime.Connections.EditorTools
                     tuning.serializedObject.ApplyModifiedPropertiesWithoutUndo();
                     host.ResetSimulation();
                 }
+                CheckMultiKillCommands(host);
                 Debug.Log("NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.");
             }
             finally { director.AutoGenerationEnabled = auto; }
+        }
+
+        private static void CheckMultiKillCommands(SimulationHost host)
+        {
+            var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
+            var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
+            Check(terminal != null && recorder != null, "terminal and recorder for command kills");
+            MethodInfo kill = typeof(Terminal).GetMethod("Kill",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Check(kill != null, "terminal kill command handler");
+            bool oldRecording = recorder.RecordingEnabled;
+            try
+            {
+                recorder.RecordingEnabled = true;
+                host.ResetSimulation();
+                recorder.BeginRun();
+                var done = Add(host, "done", "DB", false,
+                    new OperationStage(OperationKind.Read, 1f, 1f, "done"));
+                host.StepSimulation(1f);
+                Check(done.IsComplete, "inactive completed ID prepared");
+                var m7 = Add(host, "m7", "DB", false,
+                    new OperationStage(OperationKind.Read, 100f, 2f, "m7"));
+                var f3 = Add(host, "f3", "DB", true,
+                    new OperationStage(OperationKind.Write, 100f, 2f, "f3"));
+                var a8 = Add(host, "a8", "AUTH", false,
+                    new OperationStage(OperationKind.Read, 100f, 2f, "a8"));
+                float before = host.Health.Value;
+                kill.Invoke(terminal, new object[] {
+                    new[] { "kill", "m7", "missing", "f3", "M7", "done" },
+                    "kill m7 missing f3 M7 done" });
+                Near(host.Health.Value, before - 10f,
+                    "first batch penalizes one legitimate kill only");
+                kill.Invoke(terminal, new object[] {
+                    new[] { "k", "a8", "f3", "unknown", "A8" },
+                    "k a8 f3 unknown A8" });
+                Near(host.Health.Value, before - 20f,
+                    "alias batch penalizes one further legitimate kill only");
+                Check(m7.Resolution == ConnectionResolution.Killed &&
+                    f3.Resolution == ConnectionResolution.Killed &&
+                    a8.Resolution == ConnectionResolution.Killed &&
+                    done.Resolution == ConnectionResolution.Completed &&
+                    host.RuntimeConnections.Count == 0,
+                    "mixed failures and duplicates do not block later kills");
+                var actions = recorder.CurrentLog.events.Where(e => e.type == "player_action")
+                    .ToArray();
+                Check(actions.Select(e => e.connectionId).SequenceEqual(new[] {
+                    "m7", "missing", "f3", "done", "a8", "f3", "unknown" }) &&
+                    actions.Select(e => e.success).SequenceEqual(new[] {
+                    true, false, true, false, true, false, false }) &&
+                    actions.Take(4).All(e => e.command == "kill m7 missing f3 M7 done") &&
+                    actions.Skip(4).All(e => e.command == "k a8 f3 unknown A8"),
+                    "recorder attributes each unique attempt in command order");
+                Check(recorder.CurrentLog.events.Where(e =>
+                    e.type == "connection_resolved" && e.resolutionReason == "Killed")
+                    .Select(e => e.connectionId).SequenceEqual(new[] { "m7", "f3", "a8" }),
+                    "successful resolutions are recorded once in command order");
+                Debug.Log("NetworkHealthWitness multi-kill: expected -20 Health, 3 kills, " +
+                    "7 recorded attempts; observed " + host.Health.Value + " Health, " +
+                    actions.Length + " attempts.");
+            }
+            finally
+            {
+                recorder.EndRun();
+                recorder.RecordingEnabled = oldRecording;
+                host.ResetSimulation();
+            }
         }
 
         private static LogicalConnectionState Add(SimulationHost host, string id, string target,
