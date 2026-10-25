@@ -14,7 +14,7 @@ namespace Uptime.Connections
         [Min(0f)] public float overdueEscalationPerSecond = 0.02f;
         [Min(0f)] public float recoveryPerSecond = 0.35f;
         [Min(0f)] public float incorrectKillPenalty = 10f;
-        [Min(0f)] public float outageDrainPerSecond = 2f;
+        [Min(0f)] public float benignCancellationPenalty = 5f;
         [Range(0f, 1f)] public float substantialSlowdownThreshold = 0.98f;
     }
 
@@ -41,12 +41,10 @@ namespace Uptime.Connections
     {
         internal NetworkHealthSnapshot(float value, float degradationRate, float recoveryRate,
             float netRate, int slowedCount, int overdueCount, bool failed,
-            NetworkHealthImpact[] impacts, NetworkHealthEvent[] events,
-            int blackoutNodeCount = 0, float outageDrainRate = 0f)
+            NetworkHealthImpact[] impacts, NetworkHealthEvent[] events)
         { Value = value; DegradationRate = degradationRate; RecoveryRate = recoveryRate;
             NetRate = netRate; SlowedCount = slowedCount; OverdueCount = overdueCount;
-            Failed = failed; BlackoutNodeCount = blackoutNodeCount;
-            OutageDrainRate = outageDrainRate; Impacts = Array.AsReadOnly(impacts);
+            Failed = failed; Impacts = Array.AsReadOnly(impacts);
             RecentEvents = Array.AsReadOnly(events); }
         public float Value { get; }
         public float DegradationRate { get; }
@@ -55,8 +53,6 @@ namespace Uptime.Connections
         public int SlowedCount { get; }
         public int OverdueCount { get; }
         public bool Failed { get; }
-        public int BlackoutNodeCount { get; }
-        public float OutageDrainRate { get; }
         // Connection IDs are internal causal evidence. The panel deliberately presents aggregates.
         public IReadOnlyList<NetworkHealthImpact> Impacts { get; }
         public IReadOnlyList<NetworkHealthEvent> RecentEvents { get; }
@@ -85,36 +81,6 @@ namespace Uptime.Connections
         { this.tuning = tuning ?? throw new ArgumentNullException(nameof(tuning)); Reset(); }
         public NetworkHealthSnapshot Snapshot => snapshot;
 
-        public void RefreshOutage(int blackoutNodeCount)
-        {
-            float outageRate = Mathf.Max(0f, tuning.outageDrainPerSecond) *
-                Mathf.Max(0, blackoutNodeCount);
-            float degradation = Mathf.Max(0f,
-                snapshot.DegradationRate - snapshot.OutageDrainRate) + outageRate;
-            float recovery = degradation == 0f && value < 100f ?
-                Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
-            float net = recovery - degradation;
-            if ((value <= 0f && net < 0f) || (value >= 100f && net > 0f)) net = 0f;
-            snapshot = new NetworkHealthSnapshot(value, degradation, recovery,
-                net, snapshot.SlowedCount, snapshot.OverdueCount, failed,
-                CopyImpacts(snapshot.Impacts), CopyEvents(snapshot.RecentEvents),
-                blackoutNodeCount, outageRate);
-        }
-
-        private static NetworkHealthImpact[] CopyImpacts(IReadOnlyList<NetworkHealthImpact> source)
-        {
-            var result = new NetworkHealthImpact[source.Count];
-            for (int i = 0; i < result.Length; i++) result[i] = source[i];
-            return result;
-        }
-
-        private static NetworkHealthEvent[] CopyEvents(IReadOnlyList<NetworkHealthEvent> source)
-        {
-            var result = new NetworkHealthEvent[source.Count];
-            for (int i = 0; i < result.Length; i++) result[i] = source[i];
-            return result;
-        }
-
         public void Reset()
         {
             value = 100f;
@@ -137,7 +103,7 @@ namespace Uptime.Connections
 
         // Called after grants are computed and before completion clears the final operation grant.
         public void Step(IReadOnlyList<LogicalConnectionState> connections,
-            float startSeconds, float durationSeconds, int blackoutNodeCount = 0)
+            float startSeconds, float durationSeconds)
         {
             var impacts = new List<NetworkHealthImpact>();
             float degradation = 0f;
@@ -177,9 +143,6 @@ namespace Uptime.Connections
                         isOverdue, isSlowed));
                 }
             }
-            float outageRate = Mathf.Max(0f, tuning.outageDrainPerSecond) *
-                Mathf.Max(0, blackoutNodeCount);
-            degradation += outageRate;
             float recovery = degradation == 0f && value < 100f ?
                 Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
             float oldValue = value;
@@ -187,7 +150,7 @@ namespace Uptime.Connections
             if (value <= 0f) failed = true;
             snapshot = new NetworkHealthSnapshot(value, degradation, recovery,
                 (value - oldValue) / durationSeconds, slowed, overdue, failed,
-                impacts.ToArray(), events.ToArray(), blackoutNodeCount, outageRate);
+                impacts.ToArray(), events.ToArray());
         }
 
         public NetworkHealthEvent Resolve(LogicalConnectionState connection, ConnectionResolution reason,
@@ -198,16 +161,18 @@ namespace Uptime.Connections
             var remaining = new List<NetworkHealthImpact>();
             foreach (NetworkHealthImpact impact in snapshot.Impacts)
                 if (impact.ConnectionId != connection.ConnectionId) remaining.Add(impact);
-            if (reason == ConnectionResolution.Killed && !connection.IsHostile)
+            if ((reason == ConnectionResolution.Killed || reason == ConnectionResolution.Canceled) &&
+                !connection.IsHostile)
             {
-                float amount = Mathf.Max(0f, tuning.incorrectKillPenalty);
+                float amount = Mathf.Max(0f, reason == ConnectionResolution.Killed ?
+                    tuning.incorrectKillPenalty : tuning.benignCancellationPenalty);
                 value = Mathf.Max(0f, value - amount);
                 if (value <= 0f) failed = true;
                 penalty = new NetworkHealthEvent(connection.ConnectionId, timeSeconds, -amount);
                 events.Insert(0, penalty);
                 if (events.Count > 5) events.RemoveAt(events.Count - 1);
             }
-            float degradation = snapshot.OutageDrainRate;
+            float degradation = 0f;
             int overdue = 0, slowed = 0;
             foreach (NetworkHealthImpact impact in remaining)
                 degradation += impact.Rate;
@@ -222,8 +187,7 @@ namespace Uptime.Connections
             if ((value <= 0f && net < 0f) || (value >= 100f && net > 0f)) net = 0f;
             snapshot = new NetworkHealthSnapshot(value, degradation, recovery,
                 net, slowed, overdue, failed,
-                remaining.ToArray(), events.ToArray(), snapshot.BlackoutNodeCount,
-                snapshot.OutageDrainRate);
+                remaining.ToArray(), events.ToArray());
             return penalty;
         }
     }

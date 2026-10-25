@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using TMPro;
 using Uptime.Connections;
 using UnityEditor;
@@ -37,6 +38,10 @@ namespace Uptime.Connections.EditorTools
                         AdditionalCanvasShaderChannels.TexCoord1) != 0),
                 "identity and operation pills use supported antialiased material and UV channel");
             bool oldAuto = director.AutoGenerationEnabled;
+            FieldInfo travelField = typeof(SimulationHost).GetField(
+                "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            travelField.SetValue(host, 0.000001f); // LifecycleWitness checks travel presentation.
             try
             {
                 CheckCommand("inspect a1", InspectPresentationMode.Compact, "a1");
@@ -265,9 +270,9 @@ namespace Uptime.Connections.EditorTools
                         presentationMode: InspectPresentationMode.Verbose);
                     var status = new SerializedObject(EntryComponent(interrupted, 0));
                     Check(((TMP_Text)status.FindProperty("throughput").objectReferenceValue)
-                            .text == "BLACKOUT" &&
+                            .text == "CANCELED" &&
                         !Tokens(EntryComponent(interrupted, 0))[0].HasCheckmark,
-                        "inspect shows Blackout outcome without marking unfinished operation complete");
+                        "inspect shows canceled outcome without marking unfinished operation complete");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(interrupted.gameObject); }
                 host.ResetSimulation();
@@ -297,10 +302,11 @@ namespace Uptime.Connections.EditorTools
                 finally { UnityEngine.Object.DestroyImmediate(hidden.gameObject); }
                 Debug.Log("InspectV2Witness PASS: command modes, multi-ID, compact/verbose, " +
                     "width-aware six-stage timeline, fixed badge, live effective LOAD, " +
-                    "Blackout outcome, and history.");
+                    "canceled outcome, and history.");
             }
             finally
             {
+                travelField.SetValue(host, originalTravel);
                 director.AutoGenerationEnabled = oldAuto;
                 host.SetRunMode(ConnectionRunMode.Generated);
             }

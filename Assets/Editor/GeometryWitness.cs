@@ -23,6 +23,12 @@ namespace Uptime.Connections.EditorTools
             var links = UnityEngine.Object.FindObjectsByType<PhysicalLinkView>(FindObjectsSortMode.None);
             Check(presenter != null && preview != null && host != null && identity != null, "scene components");
             host.SetRunMode(ConnectionRunMode.AuthoredWitness);
+            var travelField = typeof(SimulationHost).GetField("connectionTravelSecondsPerLink",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            // Geometry cases isolate lane and marker behavior; LifecycleWitness uses
+            // the scene's real travel timing and checks the partial reveal.
+            travelField.SetValue(host, 0.000001f);
             Check(presenter.NetworkArea != null && presenter.PathLayer != null && presenter.PathGraphicPrefab != null,
                 "path prefab and area references");
             Check(nodes.Length == 4 && links.Length == 3, "four nodes and three links");
@@ -177,9 +183,10 @@ namespace Uptime.Connections.EditorTools
             var c1 = host.RuntimeConnections.First(c => c.ConnectionId == "c1");
             var c2 = host.RuntimeConnections.First(c => c.ConnectionId == "c2");
             var c3 = host.RuntimeConnections.First(c => c.ConnectionId == "c3");
+            host.StepSimulation(0.1f);
             Check(c1.IsActive && c2.IsPending && c3.IsPending, "pending excludes delayed lanes");
             int startSteps = 0;
-            while (c3.IsPending && startSteps++ < 50) host.StepSimulation(0.1f);
+            while (!c3.IsActive && startSteps++ < 50) host.StepSimulation(0.1f);
             Check(c1.IsActive && c2.IsActive && c3.IsActive, "delayed establishment includes c2/c3");
             float sharedRate = c1.ActualWorkRate;
             int steps = 0;
@@ -193,6 +200,7 @@ namespace Uptime.Connections.EditorTools
             Debug.Log("GeometryWitness PASS: scene references, edge budgets and stages, " +
                 "rendered pill visibility at reference size and 6 px gap, rotated pill clearance " +
                 "and cycle coverage, short edges, terminal markers, establishment and completion.");
+            travelField.SetValue(host, originalTravel);
             host.SetRunMode(ConnectionRunMode.Generated);
         }
 
@@ -420,6 +428,7 @@ namespace Uptime.Connections.EditorTools
                 Check(!apiView.TerminalMarker.gameObject.activeSelf &&
                     !dbView.TerminalMarker.gameObject.activeSelf,
                     "markers wait until establishment reaches target");
+                host.StepSimulation(0.1f);
                 apiView.AdvanceVisual(0.3f);
                 dbView.AdvanceVisual(0.3f);
                 secondView.AdvanceVisual(0.6f);
@@ -494,9 +503,9 @@ namespace Uptime.Connections.EditorTools
                 shortView.SetLayout(new[] { 8f }, new[] { 8f });
                 shortView.AdvanceVisual(0.6f);
                 host.StepSimulation(0.2f);
-                Check(shortState.IsComplete && apiState.IsTransitioning &&
+                Check(shortState.IsComplete && apiState.CurrentOperationIndex == 1 &&
                     apiView.TerminalMarker.gameObject.activeSelf,
-                    "completion fades its marker while operation transition keeps its own");
+                    "completion fades its marker while the next operation keeps its own");
                 shortView.AdvanceVisual(0.2f);
                 Check(shortView.TerminalMarker.color.a < 0.6f &&
                     shortView.TerminalMarker.color.a > 0f,
@@ -507,10 +516,18 @@ namespace Uptime.Connections.EditorTools
                     apiView.TerminalMarker.gameObject.activeSelf,
                     "local EXECUTE retains target marker");
                 Check(host.KillConnection(dbState.ConnectionId), "kill marker test connection");
-                dbView.AdvanceVisual(0.2f);
-                Check(dbView.TerminalMarker.color.a < 0.6f &&
-                    dbView.TerminalMarker.color.a > 0f,
-                    "killed marker fades with path departure");
+                dbView.AdvanceVisual(0f);
+                Check(dbView.TerminalMarker.color.r > 0.9f &&
+                    dbView.TerminalMarker.color.g < 0.2f &&
+                    dbView.GetComponent<PathGraphic>().color.r > 0.9f &&
+                    dbView.DisplayAccent.r > 0.9f,
+                    "killed marker begins bright red failure flash");
+                dbView.AdvanceVisual(0.25f);
+                Check(dbView.TerminalMarker.color.r > 0.9f &&
+                    dbView.TerminalMarker.color.g < 0.2f &&
+                    dbView.GetComponent<PathGraphic>().color.r > 0.9f &&
+                    dbView.DisplayAccent.r > 0.9f,
+                    "killed marker flashes red a second time");
                 Image retired = dbView.TerminalMarker;
                 dbView.ReleaseTerminalMarker();
                 UnityEngine.Object.DestroyImmediate(dbView.gameObject);

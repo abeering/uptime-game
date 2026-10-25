@@ -14,6 +14,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Behavior and modifier foundation](connections-behavior-foundation-v0.md) — connection and operation behavior scopes, effective WORK/LOAD, modifier history, and Slice 3B fixed-step keyword timing.
 - [Inspect V2](connections-inspect-v2.md) — compact default, verbose command mode, width-aware operation pills, and current effective LOAD badge.
 - [Network Health V0](connections-network-health-v0.md) — live service Health, deadlines, recovery, failure latch, and compact/expanded instrument.
+- [Lifecycle V1](connections-lifecycle-v1.md) — Connecting route traversal, cancellation receipts, and connection-only Health.
 - [Infections V0: Phantom LOAD](connections-infections-v0.md) — typed operation delivery, persistent node demand, developer controls, and recorder evidence.
 
 ## Selected phase plans (not yet implemented)

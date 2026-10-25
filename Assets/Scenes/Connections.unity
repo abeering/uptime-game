@@ -6536,10 +6536,11 @@ MonoBehaviour:
     overdueEscalationPerSecond: 0.02
     recoveryPerSecond: 0.35
     incorrectKillPenalty: 10
-    outageDrainPerSecond: 2
+    benignCancellationPenalty: 5
     substantialSlowdownThreshold: 0.98
   defaultPhantomLoad: 8
   defaultSpawnerCadence: 20
+  connectionTravelSecondsPerLink: 0.6
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0

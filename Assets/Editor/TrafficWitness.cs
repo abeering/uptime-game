@@ -20,6 +20,12 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && director != null, "scene traffic bindings");
             bool originalAuto = director.AutoGenerationEnabled;
             int originalSeed = director.Seed;
+            FieldInfo travelField = typeof(SimulationHost).GetField(
+                "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            // Preserve this generator/operation witness's old service-time examples;
+            // LifecycleWitness checks ordinary Connecting travel separately.
+            travelField.SetValue(host, 0.000001f);
             FieldInfo overridesField = typeof(ConnectionTrafficDirector).GetField(
                 "ambientWeightOverrides", BindingFlags.Instance | BindingFlags.NonPublic);
             var originalOverrides = (AmbientWeightOverride[])overridesField.GetValue(director);
@@ -146,8 +152,9 @@ namespace Uptime.Connections.EditorTools
                 host.StepSimulation(0.5f);
                 var w1 = host.FindConnection("w1");
                 var w2 = host.FindConnection("w2");
-                Check(host.RuntimeConnections.Count == 2 && w1.IsActive && w2.IsActive &&
-                    host.SimulationTimeSeconds == 0.5f, "queued plans arrive without simulation reset");
+                Check(host.RuntimeConnections.Count == 2 && w1.IsActive && w2.IsActive,
+                    "queued plans arrive without simulation reset");
+                Near(host.SimulationTimeSeconds, 0.5f, "queued arrival step time");
                 Near(w1.AllocatedLoad, 1f, "uncontended quick LOAD");
                 Near(w2.AllocatedLoad, 1f, "uncontended arc LOAD");
                 host.StepSimulation(0.5f);
@@ -207,6 +214,7 @@ namespace Uptime.Connections.EditorTools
             {
                 director.Seed = originalSeed;
                 director.AutoGenerationEnabled = originalAuto;
+                travelField.SetValue(host, originalTravel);
                 overridesField.SetValue(director, originalOverrides);
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
@@ -297,9 +305,9 @@ namespace Uptime.Connections.EditorTools
                     "manual first spawn ID replays from seed");
                 host.StepSimulation(24f);
                 Check(host.Occurrences.Count == 1 &&
-                    host.Occurrences[0].ConnectionId == replay.ConnectionId &&
-                    host.Occurrences[0].TimeSeconds == 24f,
+                    host.Occurrences[0].ConnectionId == replay.ConnectionId,
                     "WORK completed inside a step emits once at the completed step time");
+                Near(host.Occurrences[0].TimeSeconds, 24f, "completed step time");
 
                 host.ResetSimulation();
                 ConnectionSpawnPlan arc = director.QueueProfile("indexing");

@@ -94,7 +94,7 @@ namespace Uptime.Connections
         {
             // Float fixed deltas such as 0.02f accumulate slightly below authored
             // boundaries in double precision; keep a sub-millisecond tolerance.
-            private const double BoundaryTolerance = 0.000001;
+            private const double BoundaryTolerance = 0.00001;
             private readonly TimedModifierBehaviorDefinition definition;
             private readonly BehaviorScope scope;
             private readonly int operationIndex;

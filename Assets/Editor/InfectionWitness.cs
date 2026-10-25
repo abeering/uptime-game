@@ -32,7 +32,7 @@ namespace Uptime.Connections.EditorTools
                 recorder.RecordingEnabled = true;
                 host.SetRunMode(ConnectionRunMode.Generated);
                 Check(host.DefaultPhantomLoad == 8f && host.DefaultSpawnerCadence == 20f &&
-                    host.OutageDrainPerSecond == 2f &&
+                    host.ConnectionTravelSecondsPerLink == 0.6f &&
                     director.PhantomLoadWeight == 1f && director.BlackoutWeight == 1f &&
                     director.SpawnerWeight == 1f && host.Infections.Count == 0,
                     "authored default and clean initial state");
@@ -159,7 +159,7 @@ namespace Uptime.Connections.EditorTools
                 host.FindConnection(plan.ConnectionId) == null && host.Infections.Count == 0,
                 "forced plan is queued without immediate infection");
             host.StepSimulation(0.1f);
-            Check(host.FindConnection(plan.ConnectionId).IsActive &&
+            Check(host.FindConnection(plan.ConnectionId).IsConnecting &&
                 host.Infections.Count == 0, "real carrier exists before delivery");
             Check(host.KillConnection(plan.ConnectionId), "carrier can be interrupted");
             host.StepSimulation(100f);
@@ -217,7 +217,7 @@ namespace Uptime.Connections.EditorTools
                         new InfectionPayload(InfectionKind.PhantomLoad, 3f))
                 }, true);
             director.QueueSpawnPlan(duplicate);
-            host.StepSimulation(1f);
+            host.StepSimulation(2.2f);
             Check(host.Infections.Count == 1 && ReferenceEquals(host.Infections[0], applied) &&
                 recorder.CurrentLog.events.Count(e => e.type == "infection_rejected") == 1 &&
                 recorder.CurrentLog.events.Last(e => e.type == "infection_rejected")
@@ -278,7 +278,7 @@ namespace Uptime.Connections.EditorTools
                 director.QueueSpawnPlan(new ConnectionSpawnPlan(host.SimulationTimeSeconds,
                     id, route, "witness", "Service",
                     new[] { new OperationStage(OperationKind.Read, 100f, 5f, "Service") }));
-            host.StepSimulation(1f);
+            host.StepSimulation(2.2f);
             LogicalConnectionState a = host.FindConnection("ben1");
             LogicalConnectionState b = host.FindConnection("ben2");
             Near(a.AllocatedLoad, 1f, "first 5-LOAD connection gets 1");
@@ -330,7 +330,7 @@ namespace Uptime.Connections.EditorTools
                     new[] { Node(host, "EXT1").View, Node(host, "API").View, db.View },
                     "witness", "Service",
                     new[] { new OperationStage(OperationKind.Read, 100f, 5f, "Service") }));
-                host.StepSimulation(1f);
+                host.StepSimulation(1.3f);
                 Near(db.BaselineLoad, 2f, "authored baseline retained");
                 Near(db.InfectionAllocatedLoad, 8f, "infection follows baseline");
                 Near(host.FindConnection("base1").AllocatedLoad, 0f,
@@ -378,94 +378,50 @@ namespace Uptime.Connections.EditorTools
             recorder.BeginRun();
             var route = new[] { Node(host, "EXT1").View, Node(host, "API").View,
                 Node(host, "DB").View };
-            var operation = new OperationStage(OperationKind.Write, 100f, 1f,
-                "Unfinished delivery", CompletionEffect.InfectionDelivery, null,
-                new InfectionPayload(InfectionKind.PhantomLoad, 5f));
-            LogicalConnectionDefinition active = LogicalConnectionDefinition.FromPlan(
-                new ConnectionSpawnPlan(0f, "route-active", route, "witness", "Service",
-                    new[] { operation }));
-            LogicalConnectionDefinition pending = LogicalConnectionDefinition.FromPlan(
-                new ConnectionSpawnPlan(0f, "route-pending", route, "witness", "Service",
-                    new[] { operation }));
-            typeof(LogicalConnectionDefinition).GetField("startDelaySeconds",
-                BindingFlags.Instance | BindingFlags.NonPublic).SetValue(pending, 100f);
-            host.RegisterConnection(active);
-            host.RegisterConnection(pending);
-            Check(host.FindConnection("route-pending").IsPending, "pending transit setup");
-            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
-                host.FindConnection("route-active").Resolution == ConnectionResolution.Blackout &&
-                host.FindConnection("route-pending").Resolution == ConnectionResolution.Blackout &&
-                host.RuntimeConnections.Count == 0 && host.Occurrences.Count == 0 &&
-                host.Infections.Count == 1 && host.Health.Value == 100f &&
-                host.Health.OutageDrainRate == 2f,
-                "Blackout interrupts active and pending transit without payload or kill penalty");
-            Check(recorder.CurrentLog.events.Count(e => e.type == "blackout_interruption") == 2 &&
-                recorder.CurrentLog.events.Where(e => e.type == "connection_resolved")
-                    .All(e => e.resolutionReason == "Blackout"),
-                "recorder distinguishes Blackout from player kill");
-            director.QueueSpawnPlan(new ConnectionSpawnPlan(host.SimulationTimeSeconds,
-                "route-rejected", route, "witness", "Service",
-                new[] { new OperationStage(OperationKind.Read, 10f, 1f, "Read") }));
-            host.StepSimulation(1f);
-            Check(host.FindConnection("route-rejected") == null &&
-                recorder.CurrentLog.events.Any(e => e.type == "arrival_rejected" &&
-                    e.connectionId == "route-rejected" && e.blockedNodeId == "API" &&
-                    e.definition.route.Length == 3) &&
-                !recorder.CurrentLog.events.Any(e => e.type == "connection_spawned" &&
-                    e.connectionId == "route-rejected") &&
-                host.Health.BlackoutNodeCount == 1 && host.Health.OutageDrainRate == 2f,
-                "offline arrival rejected with route evidence and outage attribution");
-            Near(host.Health.Value, 98f, "Blackout drains Health with zero connections");
+            var work = new OperationStage(OperationKind.Read, 100f, 1f, "Service");
+            var benign = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
+                new ConnectionSpawnPlan(0f, "route-benign", route, "witness",
+                    "Service", new[] { work })));
+            var hostile = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
+                new ConnectionSpawnPlan(0f, "route-hostile", route, "witness",
+                    "Service", new[] { work }, true)));
+            Check(benign.IsConnecting && hostile.IsConnecting &&
+                host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
+                benign.IsConnecting && hostile.IsConnecting &&
+                host.Health.Value == 100f,
+                "Blackout ahead does not reject attempts or drain Health");
+            host.StepSimulation(0.6f);
+            Check(benign.Resolution == ConnectionResolution.Canceled &&
+                hostile.Resolution == ConnectionResolution.Canceled &&
+                benign.FailureNodeId == "API" && hostile.FailureNodeId == "API" &&
+                host.Health.Value == 95f &&
+                recorder.CurrentLog.events.Count(e => e.type == "connection_resolved") == 2,
+                "offline intermediate arrival cancels benign once and hostile without penalty");
             Check(host.TryRemoveInfection("API", InfectionKind.Blackout, out _),
                 "Blackout removal succeeds");
             host.StepSimulation(1f);
-            Check(host.Health.BlackoutNodeCount == 0 && host.Health.Value > 98f,
-                "outage stops and recovery resumes after removal");
-            director.QueueSpawnPlan(new ConnectionSpawnPlan(host.SimulationTimeSeconds,
-                "route-restored", route, "witness", "Service",
-                new[] { new OperationStage(OperationKind.Read, 10f, 1f, "Read") }));
-            host.StepSimulation(0.1f);
-            Check(host.FindConnection("route-restored")?.IsActive == true,
-                "route availability restored after removal");
+            Check(host.Health.Value > 95f, "idle Health recovers after cancellation");
 
             host.ResetSimulation();
             recorder.BeginRun();
-            ConnectionSpawnPlan carrier = director.QueueProfile("product-lookup",
-                new ConnectionSpawnOverrides(ManualObjective.Delivery, InfectionKind.Blackout));
+            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _),
+                "offline route setup");
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "route-attempt",
+                route, "witness", "Service", new[] { work }));
             host.StepSimulation(0.1f);
-            StepUntilComplete(host, carrier.ConnectionId);
-            Check(host.FindConnection(carrier.ConnectionId).Resolution == ConnectionResolution.Completed &&
-                host.Infections.Single().Payload.Kind == InfectionKind.Blackout,
-                "Blackout carrier completes normally before route interruptions");
-
-            host.ResetSimulation();
-            recorder.BeginRun();
-            var fastBlackout = new OperationStage(OperationKind.Write, 1f, 1f,
-                "Blackout delivery", CompletionEffect.InfectionDelivery, null,
-                new InfectionPayload(InfectionKind.Blackout, 0f, 0f));
-            var slowDelivery = new OperationStage(OperationKind.Write, 100f, 1f,
-                "Unfinished delivery", CompletionEffect.InfectionDelivery, null,
-                new InfectionPayload(InfectionKind.PhantomLoad, 5f));
-            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-db",
-                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "DB").View },
-                "witness", "Blackout", new[] { fastBlackout }, true));
-            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-auth",
-                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "AUTH").View },
-                "witness", "Blackout", new[] { fastBlackout }, true));
-            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-unfinished",
-                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "DB").View },
-                "witness", "Unfinished", new[] { slowDelivery }, true));
-            host.StepSimulation(1f);
-            Check(host.FindConnection("same-db").Resolution == ConnectionResolution.Completed &&
-                host.FindConnection("same-auth").Resolution == ConnectionResolution.Completed &&
-                host.FindConnection("same-unfinished").Resolution == ConnectionResolution.Blackout &&
-                host.Infections.Count(i => i.Payload.Kind == InfectionKind.Blackout) == 2 &&
-                host.Infections.All(i => i.Payload.Kind != InfectionKind.PhantomLoad) &&
-                recorder.CurrentLog.events.Count(e => e.type == "connection_resolved" &&
-                    e.connectionId == "same-unfinished") == 1,
-                "same-step Blackouts complete carriers and interrupt unfinished route once");
+            Check(host.FindConnection("route-attempt")?.IsConnecting == true &&
+                recorder.CurrentLog.events.Any(e => e.type == "connection_spawned" &&
+                    e.connectionId == "route-attempt"),
+                "offline route is still a recorded attempt");
+            Check(host.TryRemoveInfection("API", InfectionKind.Blackout, out _),
+                "clear before arrival");
+            host.StepSimulation(1.1f);
+            Check(host.FindConnection("route-attempt")?.IsActive == true,
+                "cleared route establishes at destination");
+            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
+                host.FindConnection("route-attempt").Resolution == ConnectionResolution.Canceled,
+                "Blackout immediately cancels established dependent route");
         }
-
         private static void CheckSpawner(SimulationHost host,
             ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
         {
@@ -491,7 +447,7 @@ namespace Uptime.Connections.EditorTools
                     e.connectionId == first.connectionId),
                 "child plan has internal route, payload, and parent lineage");
             host.StepSimulation(0.1f);
-            Check(host.FindConnection(first.connectionId)?.IsActive == true &&
+            Check(host.FindConnection(first.connectionId)?.IsConnecting == true &&
                 host.KillConnection(first.connectionId) && host.Infections.Count == 1,
                 "killing a child leaves parent Spawner active");
             host.StepSimulation(2f);
@@ -502,7 +458,7 @@ namespace Uptime.Connections.EditorTools
             Check(host.TryRemoveInfection("DB", InfectionKind.Spawner, out _) &&
                 host.Infections.Count == 0, "parent removal leaves child plan independent");
             host.StepSimulation(0.1f);
-            Check(host.FindConnection(queued[1].connectionId)?.IsActive == true,
+            Check(host.FindConnection(queued[1].connectionId)?.IsConnecting == true,
                 "queued child arrives after parent removal");
             StepUntilComplete(host, queued[1].connectionId);
             Check(host.Infections.Count == 1 &&
@@ -590,21 +546,21 @@ namespace Uptime.Connections.EditorTools
                 host.TryInjectInfection("DB", InfectionKind.Blackout, 0f, out _) &&
                 host.Infections.Count == 3, "distinct kinds coexist on one node");
             host.StepSimulation(2f);
-            Check(recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&
-                e.reason == "origin_offline"), "offline Spawner skip is recorded");
+            RunEvent offlineChild = recorder.CurrentLog.events.Last(e =>
+                e.type == "plan_queued" && e.source == "spawner");
+            host.StepSimulation(0.1f);
+            Check(host.FindConnection(offlineChild.connectionId)?.Resolution ==
+                    ConnectionResolution.Canceled &&
+                recorder.CurrentLog.events.Any(e => e.type == "connection_spawned" &&
+                    e.connectionId == offlineChild.connectionId) &&
+                recorder.CurrentLog.events.Any(e => e.type == "connection_resolved" &&
+                    e.connectionId == offlineChild.connectionId &&
+                    e.failureNodeId == "DB" && e.resolutionCause == "Blackout"),
+                "offline Spawner origin still produces attempt and cancellation receipt");
             host.ResetSimulation();
-            Check(host.Infections.Count == 0 && host.Health.BlackoutNodeCount == 0,
-                "reset clears overlapping infections and outage state");
+            Check(host.Infections.Count == 0 && host.Health.DegradationRate == 0f,
+                "reset clears overlapping infections and Health impact");
 
-            recorder.BeginRun();
-            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
-                host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
-                "no-route setup");
-            host.StepSimulation(1f);
-            Check(recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&
-                e.reason == "no_available_internal_route"),
-                "unreachable internal targets are skipped with reason");
-            host.ResetSimulation();
             recorder.BeginRun();
             Check(Parse("spawn customer-login obj:delivery inf:spawner infp:cadence=3",
                 out string purpose, out ConnectionSpawnOverrides options, out _),
@@ -621,7 +577,6 @@ namespace Uptime.Connections.EditorTools
                 host.Infections.Single().Payload.CadenceSeconds == 3f,
                 "manual Spawner carrier delivers parameterized persistent infection");
         }
-
         private static void StepUntilComplete(SimulationHost host, string id)
         {
             for (int i = 0; i < 1000 && !host.FindConnection(id).IsComplete; i++)

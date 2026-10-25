@@ -21,6 +21,12 @@ namespace Uptime.Connections.EditorTools
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             Check(host != null, "simulation host");
             host.SetRunMode(ConnectionRunMode.AuthoredWitness);
+            FieldInfo travelField = typeof(SimulationHost).GetField(
+                "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            // Keep this allocator witness's authored timing effectively immediate;
+            // LifecycleWitness covers the real route travel and arrival timing.
+            travelField.SetValue(host, 0.000001f);
             var c1Definition = host.Definitions.First(c => c.ConnectionId == "c1");
             var c2Definition = host.Definitions.First(c => c.ConnectionId == "c2");
             var c3Definition = host.Definitions.First(c => c.ConnectionId == "c3");
@@ -54,7 +60,7 @@ namespace Uptime.Connections.EditorTools
                 Debug.Log($"ResourceWitness uncontended: expected c1 5, DB 5/10, API baseline 1; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.LoadCapacity:0.###}, {api.RequestedLoad:0.###}");
 
                 int steps = 0;
-                while (c3.IsPending && steps++ < 50)
+                while (!c3.IsActive && steps++ < 50)
                     host.StepSimulation(0.1f);
                 Check(c2.IsActive && c3.IsActive, "authored delayed establishment");
                 var palette = new ConnectionIdentityPalette();
@@ -162,6 +168,7 @@ namespace Uptime.Connections.EditorTools
                 SetField(c2Definition, "startDelaySeconds", originalC2Delay);
                 SetField(c3Definition, "startDelaySeconds", originalC3Delay);
                 SetField(db, "baselineLoad", originalDbBaseline);
+                travelField.SetValue(host, originalTravel);
                 host.ResetSimulation();
                 host.SetRunMode(ConnectionRunMode.Generated);
             }

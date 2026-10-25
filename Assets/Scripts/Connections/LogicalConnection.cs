@@ -239,11 +239,13 @@ namespace Uptime.Connections
     public enum Lifecycle
     {
         Pending,
+        Connecting,
         Active,
         Complete
     }
 
-    public enum ConnectionResolution { Completed, Killed, Blackout }
+    public enum ConnectionResolution { Completed, Killed, Canceled }
+    public enum ConnectionTerminationCause { None, Player, Blackout }
 
     public enum LoadPerformance
     {
@@ -263,7 +265,7 @@ namespace Uptime.Connections
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
             Behaviors = new ConnectionBehaviorRuntime(definition);
-            Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Active;
+            Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
 
         private readonly bool[] deliveredEffects;
@@ -287,7 +289,7 @@ namespace Uptime.Connections
         public float RemainingWork => Mathf.Max(0f, CurrentTotalWork - CompletedWork);
         public float AllocatedLoad { get; internal set; }
         public float ActualWorkRate => AllocatedLoad;
-        public float Satisfaction => IsComplete ? 1f : IsPending || IsTransitioning ? 0f : DesiredLoad > 0f ?
+        public float Satisfaction => IsComplete ? 1f : !IsActive || IsTransitioning ? 0f : DesiredLoad > 0f ?
             AllocatedLoad / DesiredLoad : 0f;
         public bool IsTransitioning { get; internal set; }
         public bool IsDemanding => IsActive && !IsTransitioning;
@@ -296,11 +298,26 @@ namespace Uptime.Connections
             Satisfaction >= 0.98f ? LoadPerformance.AtSpeed : LoadPerformance.Slowed;
         public Lifecycle Lifecycle { get; internal set; }
         public bool IsPending => Lifecycle == Lifecycle.Pending;
+        public bool IsConnecting => Lifecycle == Lifecycle.Connecting;
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
         public bool IsActive => Lifecycle == Lifecycle.Active;
         public float EstablishedAtSeconds { get; internal set; }
+        public bool HasEstablished { get; internal set; }
+        public float SpawnedAtSeconds { get; internal set; }
+        public float LinkTravelElapsedSeconds { get; internal set; }
+        public int ReachedRouteNodeIndex { get; internal set; }
+        public float RouteReveal => IsActive ? 1f :
+            Mathf.Clamp01((ReachedRouteNodeIndex +
+                (RouteLinks.Length > ReachedRouteNodeIndex ? LinkTravelElapsedSeconds /
+                    Mathf.Max(0.001f, TravelSecondsPerLink) : 0f)) /
+                Mathf.Max(1, RouteLinks.Length));
+        public float TravelSecondsPerLink { get; internal set; } = 0.6f;
         public float ResolvedAtSeconds { get; internal set; }
         public ConnectionResolution? Resolution { get; internal set; }
+        public ConnectionTerminationCause TerminationCause { get; internal set; }
+        public Lifecycle TerminationPhase { get; internal set; }
+        public string FailureNodeId { get; internal set; }
+        public float HealthPenaltyAmount { get; internal set; }
         // Service evidence is retained with the resolved connection for later evaluation systems.
         public float HealthNominalDurationSeconds { get; internal set; }
         public float HealthDeadlineSeconds { get; internal set; }

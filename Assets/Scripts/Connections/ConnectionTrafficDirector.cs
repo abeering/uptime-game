@@ -286,8 +286,6 @@ namespace Uptime.Connections
         {
             if (random == null) ResetDirector();
             NodeView origin = parent.Target.View;
-            if (host.IsNodeOffline(origin))
-            { reason = "origin_offline"; return null; }
             var choices = new List<(ConnectionTrafficProfile profile, NodeView target)>();
             foreach (ConnectionTrafficProfile profile in profiles)
             {
@@ -300,16 +298,14 @@ namespace Uptime.Connections
                         NodeView target = FindNode(targetId);
                         if (target == origin || string.Equals(target.NodeId,
                             ambientOriginId, StringComparison.OrdinalIgnoreCase)) continue;
-                        NodeView[] route = FindRoute(origin, target);
-                        bool offline = false;
-                        foreach (NodeView node in route) offline |= host.IsNodeOffline(node);
-                        if (!offline) choices.Add((profile, target));
+                        FindRoute(origin, target);
+                        choices.Add((profile, target));
                     }
                     catch (InvalidOperationException) { }
                 }
             }
             if (choices.Count == 0)
-            { reason = "no_available_internal_route"; return null; }
+            { reason = "no_physical_internal_route"; return null; }
             if (nextIdIndex >= shuffledIds.Length)
             { reason = "ids_exhausted"; return null; }
             System.Random ambientRandom = random;

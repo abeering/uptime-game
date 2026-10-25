@@ -1,6 +1,8 @@
 # Connections Infections V0 — Phantom LOAD, Blackout, and Spawner
 
-**Status:** Phantom LOAD is on `main` through PR #32. Blackout and Spawner are implemented on the focused Connections branch for review. Packet remains independent.
+**Lifecycle V1 update (October 25, 2026):** The Blackout and Spawner extension below records the merged PR #33 behavior. Its route rejection, pending-route interruption, offline-origin child filtering, and direct outage Health drain are superseded by [Lifecycle V1](connections-lifecycle-v1.md). A physically valid plan always becomes a Connecting attempt with a receipt. Blackout is checked at reached nodes and never directly changes Health; Spawner children from an offline origin are attempted and canceled at ingress. The `OFFLINE` symptom remains.
+
+**Status:** Phantom LOAD merged through PR #32; Blackout and Spawner merged through PR #33. Lifecycle V1 is on the current review branch. Packet remains independent.
 
 ## Delivery and ownership
 
@@ -36,7 +38,7 @@ At 16:9 in `Connections.unity` Play Mode:
 2. Use `infect DB phantom-load 8` with no connection active, then `infections` and `uninfect DB`. Watch DB LOAD rise and return. With benign traffic to DB, compare its progress before and after removal.
 3. Use `mark phantom load review` and `log save`; inspect the JSON for queued payload/forced decisions, infection events, active infection snapshots, and node LOAD breakdown. Test terminal focus after commands.
 
-## Blackout and Spawner extension
+## Blackout and Spawner extension (PR #33 baseline, superseded where noted above)
 
 Blackout makes a node unavailable immediately. After the current fixed step's completed operations and their effects are processed in order, the host resolves every still-active or pending connection whose authored route includes that node as `Blackout`. This includes transit routes. An already completed carrier resolves `Completed`; interrupted connections deliver no unfinished effects and incur no incorrect-kill penalty. A queued arrival with an offline route node is rejected at dispatch without a successful spawn or automatic reroute. The recorder keeps its full queued plan, an `arrival_rejected` event with route and blocked node, and a distinct interruption resolution. Node headings display `OFFLINE` as a service symptom without naming the infection in ordinary inspection.
 

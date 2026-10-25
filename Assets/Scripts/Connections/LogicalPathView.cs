@@ -8,8 +8,9 @@ namespace Uptime.Connections
     {
         [SerializeField] private PathGraphic path;
         [SerializeField] private Image terminalMarkerPrefab;
-        [SerializeField, Range(0.1f, 2f)] private float establishmentSeconds = 0.6f;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
+        [SerializeField, Range(0.05f, 1f)] private float failureFlashHalfCycleSeconds = 0.12f;
+        [SerializeField] private Color failureColor = new Color(1f, 0.12f, 0.12f);
         [SerializeField, Range(0.05f, 1f)] private float relayoutSeconds = 0.3f;
         [SerializeField] private Color healthyColor = new Color(0.36f, 0.95f, 0.74f);
         [SerializeField] private Color constrainedColor = new Color(1f, 0.69f, 0.34f);
@@ -30,8 +31,8 @@ namespace Uptime.Connections
         private float relayoutElapsed;
         private Vector2[] starts;
         private Vector2[] ends;
-        private float establishmentElapsed;
         private float departureElapsed;
+        private float failureElapsed;
         private bool establishedVisual;
         private float pulseTravel;
         private Color identityColor;
@@ -41,6 +42,10 @@ namespace Uptime.Connections
 
         public event Action<LogicalConnectionState> Destroyed;
         public Image TerminalMarker => terminalMarker;
+        public Color DisplayAccent => state != null && state.IsComplete &&
+            state.Resolution != ConnectionResolution.Completed &&
+            Mathf.FloorToInt(failureElapsed / failureFlashHalfCycleSeconds) % 2 == 0 ?
+            failureColor : identityColor;
 
         public float PulseSpacingFor(float requestedLoad) =>
             Mathf.Max(18f, pulseSpacingAtOneLoad /
@@ -146,9 +151,27 @@ namespace Uptime.Connections
             float segmentLength = Vector2.Distance(start, end);
             if (segmentLength < 0.01f)
                 return false;
-            visibleFraction = Mathf.Clamp01((total * Mathf.Clamp01(establishmentElapsed / establishmentSeconds) - before) /
+            visibleFraction = Mathf.Clamp01((total * CurrentReveal() - before) /
                 segmentLength);
             return true;
+        }
+
+        private float CurrentReveal()
+        {
+            if (state.IsActive || state.IsComplete &&
+                (state.Resolution == ConnectionResolution.Completed ||
+                 state.TerminationPhase == Lifecycle.Active)) return 1f;
+            float total = 0f, visible = 0f;
+            for (int i = 0; i < starts.Length; i++)
+            {
+                float length = Vector2.Distance(starts[i], ends[i]);
+                total += length;
+                if (i < state.ReachedRouteNodeIndex) visible += length;
+                else if (i == state.ReachedRouteNodeIndex)
+                    visible += length * Mathf.Clamp01(state.LinkTravelElapsedSeconds /
+                        state.TravelSecondsPerLink);
+            }
+            return total > 0f ? visible / total : 0f;
         }
 
         public void SetLayout(float[] offsets, float[] widths)
@@ -198,13 +221,15 @@ namespace Uptime.Connections
             if (!establishedVisual)
             {
                 establishedVisual = true;
-                establishmentElapsed = 0f;
             }
 
             if (state.IsComplete)
             {
                 departureElapsed += deltaSeconds;
-                if (departureElapsed >= departureSeconds)
+                bool failure = state.Resolution != ConnectionResolution.Completed;
+                if (failure) failureElapsed += deltaSeconds;
+                if (failure ? failureElapsed >= failureFlashHalfCycleSeconds * 4f :
+                    departureElapsed >= departureSeconds)
                 {
                     if (terminalMarker != null)
                         terminalMarker.gameObject.SetActive(false);
@@ -212,13 +237,12 @@ namespace Uptime.Connections
                     return;
                 }
             }
-            else
-                establishmentElapsed += deltaSeconds;
-
-            float reveal = Mathf.Clamp01(establishmentElapsed / establishmentSeconds);
-            float fade = state.IsComplete ? 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
+            float reveal = CurrentReveal();
+            float fade = state.IsComplete && state.Resolution == ConnectionResolution.Completed ?
+                1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
             LoadPerformance performance = state.Performance;
-            Color tint = BeamColorFor(performance);
+            Color tint = state.IsComplete && state.Resolution != ConnectionResolution.Completed ?
+                DisplayAccent : state.IsConnecting ? identityColor : BeamColorFor(performance);
             tint.a *= fade;
             if (path.color != tint)
                 path.color = tint;
@@ -250,7 +274,8 @@ namespace Uptime.Connections
                         towardSource, -laneOffsets[last], lineWidths[last], markerPadding);
                     terminalMarker.rectTransform.position = networkArea.TransformPoint(marker.center);
                     terminalMarker.rectTransform.sizeDelta = marker.size;
-                    Color markerColor = hasIdentityColor ? identityColor : healthyColor;
+                    Color markerColor = state.IsComplete && state.Resolution != ConnectionResolution.Completed ?
+                        DisplayAccent : hasIdentityColor ? identityColor : healthyColor;
                     markerColor.a *= fade;
                     terminalMarker.color = markerColor;
                 }

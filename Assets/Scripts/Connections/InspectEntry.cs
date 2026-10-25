@@ -157,7 +157,7 @@ namespace Uptime.Connections
             }
             if (panelBackground != null)
                 panelBackground.color = state.IsComplete ? completeBackground : activeBackground;
-            Color tint = state.IsComplete || state.IsPending || state.IsTransitioning ? quietColor :
+            Color tint = state.IsComplete || !state.IsActive || state.IsTransitioning ? quietColor :
                 state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
             if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex ||
@@ -167,15 +167,16 @@ namespace Uptime.Connections
                 RebuildOperations(state, tint);
             else if (!state.IsComplete && activeToken != null)
                 activeToken.SetActiveColor(tint);
-            Color badgeColor = state.IsComplete || state.IsPending || state.IsTransitioning ?
+            Color badgeColor = state.IsComplete || !state.IsActive || state.IsTransitioning ?
                 quietColor : state.Performance == LoadPerformance.Slowed ? limitedColor :
                 state.Performance == LoadPerformance.Stalled ? stalledColor : quietColor;
             if (loadBadge != null)
                 loadBadge.ShowLoad(state.IsDemanding ? state.DesiredLoad : 0f, badgeColor);
             NodeResources target = state.TargetResources;
-            string status = state.Resolution == ConnectionResolution.Blackout ? "BLACKOUT" :
+            string status = state.Resolution == ConnectionResolution.Canceled ? "CANCELED" :
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
+                state.IsConnecting ? "CONNECTING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
             string reason = string.Empty;
@@ -188,7 +189,7 @@ namespace Uptime.Connections
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
             Set(bottleneck, state.ActivityDescription);
-            string remaining = state.IsComplete ? "00:00" : state.IsPending ? "--:--" :
+            string remaining = state.IsComplete ? "00:00" : !state.IsActive ? "--:--" :
                 state.ActualWorkRate <= 0f ? "--:--" : FormatSeconds(state.RemainingWork / state.ActualWorkRate);
             Set(eta, "ETA  " + remaining);
             if (throughput != null) throughput.gameObject.SetActive(verbose);

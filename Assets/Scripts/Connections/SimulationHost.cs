@@ -23,6 +23,7 @@ namespace Uptime.Connections
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
         [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
+        [SerializeField, Min(0.01f)] private float connectionTravelSecondsPerLink = 0.6f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -46,7 +47,7 @@ namespace Uptime.Connections
         public IReadOnlyList<NodeInfection> Infections => infections;
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
-        public float OutageDrainPerSecond => healthTuning?.outageDrainPerSecond ?? 2f;
+        public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
         public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
@@ -100,6 +101,9 @@ namespace Uptime.Connections
                 defaultPhantomLoad <= 0f) defaultPhantomLoad = 8f;
             if (float.IsNaN(defaultSpawnerCadence) || float.IsInfinity(defaultSpawnerCadence) ||
                 defaultSpawnerCadence <= 0f) defaultSpawnerCadence = 20f;
+            if (float.IsNaN(connectionTravelSecondsPerLink) ||
+                float.IsInfinity(connectionTravelSecondsPerLink) ||
+                connectionTravelSecondsPerLink <= 0f) connectionTravelSecondsPerLink = 0.6f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -124,29 +128,60 @@ namespace Uptime.Connections
                 ResetSimulation();
 
             trafficDirector?.Tick(simulationTimeSeconds, runMode == ConnectionRunMode.Generated);
+            float remaining = deltaSeconds;
+            var completedThisStep = new HashSet<LogicalConnectionState>();
+            while (remaining > 0.000001f)
+            {
+                BeginDueConnections();
+                float segment = remaining;
+                foreach (LogicalConnectionState connection in runtimeConnections)
+                {
+                    if (connection.IsConnecting)
+                        segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                            connection.TravelSecondsPerLink - connection.LinkTravelElapsedSeconds));
+                    if (connection.IsPending)
+                        segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                            connection.Definition.StartDelaySeconds - simulationTimeSeconds));
+                }
+                StepSegment(segment, completedThisStep);
+                AdvanceConnecting(segment);
+                remaining -= segment;
+            }
+            BeginDueConnections();
+            StepSpawners();
+            recorder?.CaptureDueSnapshot(simulationTimeSeconds);
+            RefreshDisplays();
+        }
+
+        private void BeginDueConnections()
+        {
+            foreach (LogicalConnectionState connection in runtimeConnections)
+                if (connection.IsPending && simulationTimeSeconds + 0.00001f >=
+                    connection.Definition.StartDelaySeconds)
+                {
+                    connection.Lifecycle = Lifecycle.Connecting;
+                    if (IsNodeOffline(connection.Definition.Route[0].Node))
+                        CancelConnection(connection, connection.Definition.Route[0].Node.NodeId);
+                }
+        }
+
+        private void StepSegment(float deltaSeconds,
+            HashSet<LogicalConnectionState> completedThisStep)
+        {
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                if (connection.IsPending && simulationTimeSeconds >= connection.Definition.StartDelaySeconds)
-                {
-                    connection.Lifecycle = Lifecycle.Active;
-                    connection.EstablishedAtSeconds = simulationTimeSeconds;
-                    health.Activate(connection, simulationTimeSeconds);
-                    connection.Behaviors.StartConnection();
-                    connection.Behaviors.StartOperation(connection.CurrentOperationIndex);
-                    recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
-                }
-                else if (connection.IsTransitioning)
+                if (connection.IsTransitioning && !completedThisStep.Contains(connection))
                 {
                     connection.Behaviors.StartOperation(connection.CurrentOperationIndex);
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
                 }
-                if (connection.IsActive)
+                if (connection.IsActive && !completedThisStep.Contains(connection))
                     connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
             }
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
-                    allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds,
-                        CountBlackouts()));
+                    allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
+                    connection => !completedThisStep.Contains(connection));
             simulationTimeSeconds += deltaSeconds;
             var newlyBlackout = new List<NodeResources>();
             foreach (ResourceAllocator.OperationCompletion completion in completed)
@@ -172,8 +207,11 @@ namespace Uptime.Connections
                     EffectOccurred?.Invoke(occurrence);
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
+                if (completion.State.IsTransitioning)
+                    completedThisStep.Add(completion.State);
                 if (completion.State.IsComplete)
                 {
+                    completion.State.TerminationPhase = Lifecycle.Active;
                     completion.State.Behaviors.EndConnection(simulationTimeSeconds);
                     Resolve(completion.State, ConnectionResolution.Completed);
                 }
@@ -193,38 +231,54 @@ namespace Uptime.Connections
                 }
                 runtimeConnections = remaining.ToArray();
             }
-            StepSpawners();
-            recorder?.CaptureDueSnapshot(simulationTimeSeconds);
-            RefreshDisplays();
+        }
+
+        private void AdvanceConnecting(float deltaSeconds)
+        {
+            var ordered = new List<LogicalConnectionState>(runtimeConnections);
+            ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
+            foreach (LogicalConnectionState state in ordered)
+            {
+                if (!state.IsConnecting) continue;
+                state.LinkTravelElapsedSeconds += deltaSeconds;
+                if (state.LinkTravelElapsedSeconds + 0.00001f < state.TravelSecondsPerLink)
+                    continue;
+                state.LinkTravelElapsedSeconds = 0f;
+                state.ReachedRouteNodeIndex++;
+                NodeView arrived = state.Definition.Route[state.ReachedRouteNodeIndex].Node;
+                recorder?.RecordNodeArrival(state, arrived.NodeId, simulationTimeSeconds);
+                if (IsNodeOffline(arrived))
+                {
+                    CancelConnection(state, arrived.NodeId);
+                    continue;
+                }
+                if (state.ReachedRouteNodeIndex != state.RouteLinks.Length) continue;
+                state.Lifecycle = Lifecycle.Active;
+                state.HasEstablished = true;
+                state.EstablishedAtSeconds = simulationTimeSeconds;
+                health.Activate(state, simulationTimeSeconds);
+                state.Behaviors.StartConnection();
+                state.Behaviors.StartOperation(state.CurrentOperationIndex);
+                recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
+                recorder?.RecordOperationStarted(state, simulationTimeSeconds);
+            }
         }
 
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
         {
             if (runtimeConnections == null) ResetSimulation();
-            NodeView blocked = FirstOfflineNode(definition.Route);
-            if (blocked != null)
-            {
-                recorder?.RecordArrivalRejected(definition, blocked.NodeId,
-                    simulationTimeSeconds);
-                return null;
-            }
             LogicalConnectionState state = BuildState(definition);
             if (!usedIds.Add(state.ConnectionId))
                 throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
-            state.EstablishedAtSeconds = simulationTimeSeconds;
-            if (state.IsActive)
-            {
-                health.Activate(state, simulationTimeSeconds);
-                state.Behaviors.StartConnection();
-                state.Behaviors.StartOperation(state.CurrentOperationIndex);
-            }
+            state.SpawnedAtSeconds = simulationTimeSeconds;
+            state.TravelSecondsPerLink = connectionTravelSecondsPerLink;
             var next = new List<LogicalConnectionState>(runtimeConnections) { state };
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
             recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
-            if (state.IsActive)
-                recorder?.RecordOperationStarted(state, simulationTimeSeconds);
             if (Application.isPlaying) pathPresenter?.Add(state);
+            if (state.IsConnecting && IsNodeOffline(state.Definition.Route[0].Node))
+                CancelConnection(state, state.Definition.Route[0].Node.NodeId);
             return state;
         }
 
@@ -240,11 +294,15 @@ namespace Uptime.Connections
         {
             if (runtimeConnections == null || id == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
-                if (string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase) && state.IsActive)
+                if (string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase) &&
+                    (state.IsActive || state.IsConnecting))
                 {
+                    bool wasActive = state.IsActive;
+                    state.TerminationPhase = state.Lifecycle;
+                    state.TerminationCause = ConnectionTerminationCause.Player;
                     state.Lifecycle = Lifecycle.Complete;
                     state.AllocatedLoad = 0f;
-                    state.Behaviors.EndConnection(simulationTimeSeconds);
+                    if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
                     Resolve(state, ConnectionResolution.Killed);
                     var next = new List<LogicalConnectionState>(runtimeConnections);
                     next.Remove(state);
@@ -268,6 +326,7 @@ namespace Uptime.Connections
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
             NetworkHealthEvent penalty = health.Resolve(state, reason, simulationTimeSeconds);
+            state.HealthPenaltyAmount = penalty?.Amount ?? 0f;
             if (penalty != null) recorder?.RecordHealthPenalty(penalty, health.Snapshot.Value);
             recorder?.RecordResolution(state, reason, simulationTimeSeconds);
             ConnectionResolved?.Invoke(state, reason);
@@ -324,7 +383,6 @@ namespace Uptime.Connections
             infections.Remove(existing);
             recorder?.RecordInfection("infection_removed", existing, simulationTimeSeconds,
                 "debug_removal");
-            health?.RefreshOutage(CountBlackouts());
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections,
                 infections);
             RefreshDisplays();
@@ -349,7 +407,6 @@ namespace Uptime.Connections
             infections.Add(infection);
             recorder?.RecordInfection("infection_applied", infection,
                 simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
-            health?.RefreshOutage(CountBlackouts());
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
             RefreshDisplays();
             return true;
@@ -359,52 +416,45 @@ namespace Uptime.Connections
             infections.Exists(infection => infection.Target.View == view &&
                 infection.Payload.Kind == InfectionKind.Blackout);
 
-        private int CountBlackouts()
-        {
-            int count = 0;
-            foreach (NodeInfection infection in infections)
-                if (infection.Payload.Kind == InfectionKind.Blackout) count++;
-            return count;
-        }
-
-        private NodeView FirstOfflineNode(RouteNode[] route)
-        {
-            if (route == null) return null;
-            foreach (RouteNode node in route)
-                if (IsNodeOffline(node?.Node)) return node.Node;
-            return null;
-        }
-
         private void InterruptRoutesThrough(NodeResources offline)
         {
             var interrupted = new List<LogicalConnectionState>();
             foreach (LogicalConnectionState state in runtimeConnections)
             {
-                if (!state.IsPending && !state.IsActive) continue;
-                foreach (RouteNode routeNode in state.Definition.Route)
-                    if (routeNode.Node == offline.View)
-                    { interrupted.Add(state); break; }
+                if (state.IsActive) {
+                    foreach (RouteNode routeNode in state.Definition.Route)
+                        if (routeNode.Node == offline.View)
+                        { interrupted.Add(state); break; }
+                }
+                else if (state.IsConnecting)
+                    for (int i = 0; i <= state.ReachedRouteNodeIndex; i++)
+                        if (state.Definition.Route[i].Node == offline.View)
+                        { interrupted.Add(state); break; }
             }
             interrupted.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             foreach (LogicalConnectionState state in interrupted)
             {
-                bool wasPending = state.IsPending;
-                state.Lifecycle = Lifecycle.Complete;
-                state.AllocatedLoad = 0f;
-                if (!wasPending) state.Behaviors.EndConnection(simulationTimeSeconds);
-                Resolve(state, ConnectionResolution.Blackout);
-                recorder?.RecordBlackoutInterruption(state, offline.View.NodeId,
-                    simulationTimeSeconds);
-                pathPresenter?.Retire(state);
-            }
-            if (interrupted.Count > 0)
-            {
-                var next = new List<LogicalConnectionState>(runtimeConnections);
-                foreach (LogicalConnectionState state in interrupted) next.Remove(state);
-                runtimeConnections = next.ToArray();
-                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+                CancelConnection(state, offline.View.NodeId);
             }
             RefreshDisplays();
+        }
+
+        private void CancelConnection(LogicalConnectionState state, string failureNodeId)
+        {
+            if (state.Resolution.HasValue) return;
+            bool wasActive = state.IsActive;
+            state.TerminationPhase = state.Lifecycle;
+            state.TerminationCause = ConnectionTerminationCause.Blackout;
+            state.FailureNodeId = failureNodeId;
+            state.Lifecycle = Lifecycle.Complete;
+            state.AllocatedLoad = 0f;
+            if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
+            Resolve(state, ConnectionResolution.Canceled);
+            var next = new List<LogicalConnectionState>(runtimeConnections);
+            next.Remove(state);
+            runtimeConnections = next.ToArray();
+            pathPresenter?.Retire(state);
+            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
         }
 
         private void StepSpawners()
@@ -464,12 +514,8 @@ namespace Uptime.Connections
                         throw new InvalidOperationException("Logical connections require unique IDs.");
                     states.Add(state);
                     history.Add(state.ConnectionId, state);
-                    if (state.IsActive)
-                    {
-                        health.Activate(state, simulationTimeSeconds);
-                        state.Behaviors.StartConnection();
-                        state.Behaviors.StartOperation(state.CurrentOperationIndex);
-                    }
+                    state.SpawnedAtSeconds = simulationTimeSeconds;
+                    state.TravelSecondsPerLink = connectionTravelSecondsPerLink;
                 }
             }
 
@@ -482,7 +528,6 @@ namespace Uptime.Connections
                 foreach (LogicalConnectionState state in runtimeConnections)
                 {
                     recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
-                    if (state.IsActive) recorder?.RecordOperationStarted(state, simulationTimeSeconds);
                 }
                 recorder?.CaptureSnapshot(simulationTimeSeconds);
                 recorder?.Save(false);
@@ -643,6 +688,14 @@ namespace Uptime.Connections
                 {
                     output.Append("PENDING  starts ")
                         .Append(connection.Definition.StartDelaySeconds.ToString("0.#")).Append(" s");
+                    continue;
+                }
+
+                if (connection.IsConnecting)
+                {
+                    output.Append("CONNECTING  ")
+                        .Append(Mathf.RoundToInt(connection.RouteReveal * 100f))
+                        .Append("% route");
                     continue;
                 }
 

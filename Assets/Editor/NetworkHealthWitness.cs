@@ -35,6 +35,8 @@ namespace Uptime.Connections.EditorTools
                 "scene recovery tuning");
             Near(settings.FindPropertyRelative("incorrectKillPenalty").floatValue, 10f,
                 "scene kill tuning");
+            Near(settings.FindPropertyRelative("benignCancellationPenalty").floatValue, 5f,
+                "scene cancellation tuning");
             Near(settings.FindPropertyRelative("substantialSlowdownThreshold").floatValue, 0.98f,
                 "scene substantial slowdown threshold");
             bool auto = director.AutoGenerationEnabled;
@@ -298,10 +300,21 @@ namespace Uptime.Connections.EditorTools
             NodeView ext = host.Nodes.First(x => x.View.NodeId == "EXT1").View;
             NodeView api = host.Nodes.First(x => x.View.NodeId == "API").View;
             NodeView destination = host.Nodes.First(x => x.View.NodeId == target).View;
-            return host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
+            LogicalConnectionState state = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
                 new ConnectionSpawnPlan(host.SimulationTimeSeconds, id,
                     new[] { ext, api, destination }, "health-witness", "Service",
                     operations, hostile)));
+            // This witness isolates established-service Health math. LifecycleWitness
+            // exercises the actual Connecting path and its Health penalties.
+            typeof(LogicalConnectionState).GetProperty("Lifecycle").SetValue(state,
+                Lifecycle.Active);
+            typeof(LogicalConnectionState).GetProperty("HasEstablished").SetValue(state, true);
+            typeof(LogicalConnectionState).GetProperty("EstablishedAtSeconds").SetValue(state,
+                host.SimulationTimeSeconds);
+            var health = (NetworkHealth)typeof(SimulationHost).GetField("health",
+                BindingFlags.Instance | BindingFlags.NonPublic).GetValue(host);
+            health.Activate(state, host.SimulationTimeSeconds);
+            return state;
         }
         private static void CheckPanelBindings(SimulationHost host)
         {
