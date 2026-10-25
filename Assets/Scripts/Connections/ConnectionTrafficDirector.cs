@@ -58,6 +58,10 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 1f)] private float secondAnomalyChance = 0.15f;
         [SerializeField, Range(0f, 1f)] private float subtleDeliveryChance = 0.1f;
         [SerializeField, Range(0f, 0.5f)] private float normalWorkSpread = 0.25f;
+        [Header("Delivery infection weights")]
+        [SerializeField, Min(0f)] private float phantomLoadWeight = 1f;
+        [SerializeField, Min(0f)] private float blackoutWeight = 1f;
+        [SerializeField, Min(0f)] private float spawnerWeight = 1f;
 
         private sealed class Queued
         {
@@ -72,6 +76,7 @@ namespace Uptime.Connections
         private int nextIdIndex;
         private bool idsExhausted;
         private System.Random random;
+        private System.Random spawnerRandom;
         private float nextAmbientAt;
         private long nextOrder;
         private readonly Dictionary<string, float> effectiveWeights =
@@ -90,12 +95,16 @@ namespace Uptime.Connections
         public float SecondAnomalyChance => secondAnomalyChance;
         public float SubtleDeliveryChance => subtleDeliveryChance;
         public float NormalWorkSpread => normalWorkSpread;
+        public float PhantomLoadWeight => phantomLoadWeight;
+        public float BlackoutWeight => blackoutWeight;
+        public float SpawnerWeight => spawnerWeight;
         public float EffectiveAmbientWeight(string profileId) =>
             profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
 
         public void ResetDirector()
         {
             random = new System.Random(seed);
+            spawnerRandom = new System.Random(unchecked(seed ^ (int)0x53A7B10));
             queue.Clear();
             reservedIds.Clear();
             shuffledIds = new string[IdLetters.Length * IdDigits.Length];
@@ -204,18 +213,26 @@ namespace Uptime.Connections
                 if (!Enum.IsDefined(typeof(ManualObjective), overrides.Objective))
                     throw new InvalidOperationException("Unknown objective override.");
                 if (overrides.Objective != ManualObjective.Delivery &&
-                    (overrides.InfectionKind.HasValue || overrides.InfectionLoad.HasValue))
+                    (overrides.InfectionKind.HasValue || overrides.InfectionLoad.HasValue ||
+                     overrides.InfectionCadence.HasValue))
                     throw new InvalidOperationException("Infection options require obj:delivery.");
                 if (overrides.InfectionKind.HasValue &&
-                    overrides.InfectionKind.Value != InfectionKind.PhantomLoad)
+                    !Enum.IsDefined(typeof(InfectionKind), overrides.InfectionKind.Value))
                     throw new InvalidOperationException("Unknown infection type.");
-                if (overrides.InfectionLoad.HasValue && !overrides.InfectionKind.HasValue)
+                if (overrides.InfectionLoad.HasValue && overrides.InfectionKind != InfectionKind.PhantomLoad)
                     throw new InvalidOperationException("infp:load requires inf:phantom-load.");
+                if (overrides.InfectionCadence.HasValue && overrides.InfectionKind != InfectionKind.Spawner)
+                    throw new InvalidOperationException("infp:cadence requires inf:spawner.");
                 if (overrides.InfectionLoad.HasValue &&
                     (overrides.InfectionLoad.Value <= 0f ||
                      float.IsNaN(overrides.InfectionLoad.Value) ||
                      float.IsInfinity(overrides.InfectionLoad.Value)))
                     throw new InvalidOperationException("infp:load requires a finite positive number.");
+                if (overrides.InfectionCadence.HasValue &&
+                    (overrides.InfectionCadence.Value <= 0f ||
+                     float.IsNaN(overrides.InfectionCadence.Value) ||
+                     float.IsInfinity(overrides.InfectionCadence.Value)))
+                    throw new InvalidOperationException("infp:cadence requires a finite positive number.");
             }
             ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds, false,
                 overrides);
@@ -262,14 +279,72 @@ namespace Uptime.Connections
             return BuildPlan(selected, atTime, true);
         }
 
+        // Uses the purpose recipe with a separate random stream. The child is queued now and
+        // dispatched by Tick on the following simulation step.
+        public ConnectionSpawnPlan QueueSpawnerChild(NodeInfection parent, float atTime,
+            out string reason)
+        {
+            if (random == null) ResetDirector();
+            NodeView origin = parent.Target.View;
+            if (host.IsNodeOffline(origin))
+            { reason = "origin_offline"; return null; }
+            var choices = new List<(ConnectionTrafficProfile profile, NodeView target)>();
+            foreach (ConnectionTrafficProfile profile in profiles)
+            {
+                if (profile == null || !profile.purposeTemplate || profile.eligibleTargetIds == null)
+                    continue;
+                foreach (string targetId in profile.eligibleTargetIds)
+                {
+                    try
+                    {
+                        NodeView target = FindNode(targetId);
+                        if (target == origin || string.Equals(target.NodeId,
+                            ambientOriginId, StringComparison.OrdinalIgnoreCase)) continue;
+                        NodeView[] route = FindRoute(origin, target);
+                        bool offline = false;
+                        foreach (NodeView node in route) offline |= host.IsNodeOffline(node);
+                        if (!offline) choices.Add((profile, target));
+                    }
+                    catch (InvalidOperationException) { }
+                }
+            }
+            if (choices.Count == 0)
+            { reason = "no_available_internal_route"; return null; }
+            if (nextIdIndex >= shuffledIds.Length)
+            { reason = "ids_exhausted"; return null; }
+            System.Random ambientRandom = random;
+            random = spawnerRandom;
+            try
+            {
+                var chosen = choices[random.Next(choices.Count)];
+                InfectionKind kind = ChooseInfection();
+                var overrides = new ConnectionSpawnOverrides(ManualObjective.Delivery, kind);
+                ConnectionSpawnPlan basePlan = BuildPlan(chosen.profile, atTime, false,
+                    overrides, origin, chosen.target);
+                if (basePlan == null)
+                { reason = "ids_exhausted"; return null; }
+                var child = new ConnectionSpawnPlan(basePlan.ScheduledSpawnTime,
+                    basePlan.ConnectionId, basePlan.Route, basePlan.ProfileId,
+                    basePlan.ClaimedPurpose, basePlan.Operations, basePlan.IsHostile,
+                    basePlan.ConnectionBehaviors, basePlan.GenerationTrace,
+                    origin.NodeId, parent.SourceConnectionId, parent.AppliedAtSeconds);
+                QueueSpawnPlan(child, "spawner");
+                reason = null;
+                return child;
+            }
+            finally { random = ambientRandom; }
+        }
+
         private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime,
-            bool ambient = false, ConnectionSpawnOverrides overrides = null)
+            bool ambient = false, ConnectionSpawnOverrides overrides = null,
+            NodeView originOverride = null, NodeView targetOverride = null)
         {
             string id = NewId();
             if (id == null) return null;
-            NodeView origin = FindNode(ambientOriginId);
-            string targetId = selected.eligibleTargetIds[random.Next(selected.eligibleTargetIds.Length)];
-            NodeView[] route = FindRoute(origin, FindNode(targetId));
+            NodeView origin = originOverride != null ? originOverride : FindNode(ambientOriginId);
+            NodeView target = targetOverride != null ? targetOverride :
+                FindNode(selected.eligibleTargetIds[random.Next(selected.eligibleTargetIds.Length)]);
+            NodeView[] route = FindRoute(origin, target);
             var stages = new OperationStage[selected.operations.Length];
             for (int i = 0; i < stages.Length; i++)
             {
@@ -335,9 +410,10 @@ namespace Uptime.Connections
                 }
                 int last = stages.Count - 1;
                 OperationStage stage = stages[last];
+                InfectionKind kind = overrides != null ?
+                    overrides.InfectionKind ?? InfectionKind.PhantomLoad : ChooseInfection();
                 stages[last] = Changed(stage, effect: CompletionEffect.InfectionDelivery,
-                    payload: new InfectionPayload(InfectionKind.PhantomLoad,
-                        overrides?.InfectionLoad ?? host.DefaultPhantomLoad));
+                    payload: Payload(kind, overrides));
             }
             else if (ambient && random.NextDouble() < benignOutlierChance)
             {
@@ -354,6 +430,9 @@ namespace Uptime.Connections
             {
                 purposeId = purpose.id, objective = objective,
                 generationDecision = generationDecision,
+                selectedInfectionKind = stages[stages.Count - 1].InfectionPayload?.Kind.ToString(),
+                selectedInfectionLoad = stages[stages.Count - 1].InfectionPayload?.RequestedLoad ?? 0f,
+                selectedInfectionCadence = stages[stages.Count - 1].InfectionPayload?.CadenceSeconds ?? 0f,
                 selectedKeywords = selectedKeywords.ToArray(),
                 anomalies = anomalies.ToArray(),
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
@@ -363,11 +442,30 @@ namespace Uptime.Connections
                     objective = objective,
                     infectionType = overrides.InfectionKind?.ToString(),
                     hasLoadParameter = overrides.InfectionLoad.HasValue,
-                    loadParameter = overrides.InfectionLoad ?? 0f
+                    loadParameter = overrides.InfectionLoad ?? 0f,
+                    hasCadenceParameter = overrides.InfectionCadence.HasValue,
+                    cadenceParameter = overrides.InfectionCadence ?? 0f
                 }
             };
             return new ConnectionSpawnPlan(atTime, id, route, purpose.id, purpose.claimedPurpose,
                 stages.ToArray(), hostile, purpose.connectionBehaviors, trace);
+        }
+
+        private InfectionPayload Payload(InfectionKind kind, ConnectionSpawnOverrides overrides) =>
+            new InfectionPayload(kind,
+                kind == InfectionKind.PhantomLoad ? overrides?.InfectionLoad ?? host.DefaultPhantomLoad : 0f,
+                kind == InfectionKind.Spawner ? overrides?.InfectionCadence ?? host.DefaultSpawnerCadence : 0f);
+
+        private InfectionKind ChooseInfection()
+        {
+            float phantom = Mathf.Max(0f, phantomLoadWeight);
+            float blackout = Mathf.Max(0f, blackoutWeight);
+            float spawner = Mathf.Max(0f, spawnerWeight);
+            float total = phantom + blackout + spawner;
+            if (total <= 0f) throw new InvalidOperationException("Delivery infection weights must include a positive kind.");
+            float draw = (float)random.NextDouble() * total;
+            return draw < phantom ? InfectionKind.PhantomLoad :
+                draw < phantom + blackout ? InfectionKind.Blackout : InfectionKind.Spawner;
         }
 
         private string RandomAnomaly()

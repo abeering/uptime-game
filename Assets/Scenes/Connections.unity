@@ -6536,8 +6536,10 @@ MonoBehaviour:
     overdueEscalationPerSecond: 0.02
     recoveryPerSecond: 0.35
     incorrectKillPenalty: 10
+    outageDrainPerSecond: 2
     substantialSlowdownThreshold: 0.98
   defaultPhantomLoad: 8
+  defaultSpawnerCadence: 20
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
@@ -6580,6 +6582,9 @@ MonoBehaviour:
   secondAnomalyChance: 0.15
   subtleDeliveryChance: 0.1
   normalWorkSpread: 0.25
+  phantomLoadWeight: 1
+  blackoutWeight: 1
+  spawnerWeight: 1
 --- !u!114 &1996901018
 MonoBehaviour:
   m_ObjectHideFlags: 0

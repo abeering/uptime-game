@@ -22,6 +22,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
+        [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -44,6 +45,8 @@ namespace Uptime.Connections
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
         public float DefaultPhantomLoad => defaultPhantomLoad;
+        public float DefaultSpawnerCadence => defaultSpawnerCadence;
+        public float OutageDrainPerSecond => healthTuning?.outageDrainPerSecond ?? 2f;
         public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
@@ -87,6 +90,7 @@ namespace Uptime.Connections
         {
             ClearAllocatedUsage();
             infections.Clear();
+            RefreshDisplays();
             runtimeConnections = null;
         }
 
@@ -94,6 +98,8 @@ namespace Uptime.Connections
         {
             if (float.IsNaN(defaultPhantomLoad) || float.IsInfinity(defaultPhantomLoad) ||
                 defaultPhantomLoad <= 0f) defaultPhantomLoad = 8f;
+            if (float.IsNaN(defaultSpawnerCadence) || float.IsInfinity(defaultSpawnerCadence) ||
+                defaultSpawnerCadence <= 0f) defaultSpawnerCadence = 20f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -139,8 +145,10 @@ namespace Uptime.Connections
             }
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
-                    allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds));
+                    allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds,
+                        CountBlackouts()));
             simulationTimeSeconds += deltaSeconds;
+            var newlyBlackout = new List<NodeResources>();
             foreach (ResourceAllocator.OperationCompletion completion in completed)
             {
                 recorder?.RecordOperationCompleted(completion.State, completion.Index,
@@ -153,9 +161,14 @@ namespace Uptime.Connections
                     occurrences.Add(occurrence);
                     recorder?.RecordEffect(occurrence);
                     if (occurrence.Type == CompletionEffect.InfectionDelivery)
-                        ApplyInfection(FindNodeResources(occurrence.TargetNodeId),
+                    {
+                        NodeResources target = FindNodeResources(occurrence.TargetNodeId);
+                        bool applied = ApplyInfection(target,
                             occurrence.Payload, occurrence.ConnectionId,
                             occurrence.OperationIndex);
+                        if (applied && occurrence.Payload.Kind == InfectionKind.Blackout)
+                            newlyBlackout.Add(target);
+                    }
                     EffectOccurred?.Invoke(occurrence);
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
@@ -165,6 +178,8 @@ namespace Uptime.Connections
                     Resolve(completion.State, ConnectionResolution.Completed);
                 }
             }
+            foreach (NodeResources offline in newlyBlackout)
+                InterruptRoutesThrough(offline);
             if (runMode == ConnectionRunMode.Generated)
             {
                 var remaining = new List<LogicalConnectionState>(runtimeConnections.Length);
@@ -178,6 +193,7 @@ namespace Uptime.Connections
                 }
                 runtimeConnections = remaining.ToArray();
             }
+            StepSpawners();
             recorder?.CaptureDueSnapshot(simulationTimeSeconds);
             RefreshDisplays();
         }
@@ -185,6 +201,13 @@ namespace Uptime.Connections
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
         {
             if (runtimeConnections == null) ResetSimulation();
+            NodeView blocked = FirstOfflineNode(definition.Route);
+            if (blocked != null)
+            {
+                recorder?.RecordArrivalRejected(definition, blocked.NodeId,
+                    simulationTimeSeconds);
+                return null;
+            }
             LogicalConnectionState state = BuildState(definition);
             if (!usedIds.Add(state.ConnectionId))
                 throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
@@ -241,6 +264,7 @@ namespace Uptime.Connections
 
         private void Resolve(LogicalConnectionState state, ConnectionResolution reason)
         {
+            if (state.Resolution.HasValue) return;
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
             NetworkHealthEvent penalty = health.Resolve(state, reason, simulationTimeSeconds);
@@ -250,6 +274,10 @@ namespace Uptime.Connections
         }
 
         public bool TryInjectPhantomLoad(string nodeId, float load, out string error)
+            => TryInjectInfection(nodeId, InfectionKind.PhantomLoad, load, out error);
+
+        public bool TryInjectInfection(string nodeId, InfectionKind kind, float parameter,
+            out string error)
         {
             NodeResources target = FindNodeResources(nodeId);
             if (target == null)
@@ -257,19 +285,28 @@ namespace Uptime.Connections
                 error = "Unknown node: " + nodeId;
                 return false;
             }
-            if (load <= 0f || float.IsNaN(load) || float.IsInfinity(load))
+            if (!Enum.IsDefined(typeof(InfectionKind), kind) ||
+                (kind != InfectionKind.Blackout &&
+                 (parameter <= 0f || float.IsNaN(parameter) || float.IsInfinity(parameter))) ||
+                kind == InfectionKind.Blackout && parameter != 0f)
             {
-                error = "Phantom LOAD requires a finite positive LOAD amount.";
+                error = "Infection parameter must be finite and positive for Phantom LOAD or Spawner; Blackout takes none.";
                 return false;
             }
             if (runtimeConnections == null) ResetSimulation();
-            bool applied = ApplyInfection(target, new InfectionPayload(InfectionKind.PhantomLoad,
-                load), null, -1);
-            error = applied ? null : "Phantom LOAD is already active on " + target.View.NodeId;
+            var payload = new InfectionPayload(kind,
+                kind == InfectionKind.PhantomLoad ? parameter : 0f,
+                kind == InfectionKind.Spawner ? parameter : 0f);
+            bool applied = ApplyInfection(target, payload, null, -1);
+            if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
+            error = applied ? null : kind + " is already active on " + target.View.NodeId;
             return applied;
         }
 
         public bool TryRemovePhantomLoad(string nodeId, out string error)
+            => TryRemoveInfection(nodeId, InfectionKind.PhantomLoad, out error);
+
+        public bool TryRemoveInfection(string nodeId, InfectionKind kind, out string error)
         {
             NodeResources target = FindNodeResources(nodeId);
             if (target == null)
@@ -278,15 +315,16 @@ namespace Uptime.Connections
                 return false;
             }
             NodeInfection existing = infections.Find(infection =>
-                infection.Target == target && infection.Payload.Kind == InfectionKind.PhantomLoad);
+                infection.Target == target && infection.Payload.Kind == kind);
             if (existing == null)
             {
-                error = "No Phantom LOAD on " + target.View.NodeId;
+                error = "No " + kind + " on " + target.View.NodeId;
                 return false;
             }
             infections.Remove(existing);
             recorder?.RecordInfection("infection_removed", existing, simulationTimeSeconds,
                 "debug_removal");
+            health?.RefreshOutage(CountBlackouts());
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections,
                 infections);
             RefreshDisplays();
@@ -311,9 +349,91 @@ namespace Uptime.Connections
             infections.Add(infection);
             recorder?.RecordInfection("infection_applied", infection,
                 simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
+            health?.RefreshOutage(CountBlackouts());
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
             RefreshDisplays();
             return true;
+        }
+
+        public bool IsNodeOffline(NodeView view) => view != null &&
+            infections.Exists(infection => infection.Target.View == view &&
+                infection.Payload.Kind == InfectionKind.Blackout);
+
+        private int CountBlackouts()
+        {
+            int count = 0;
+            foreach (NodeInfection infection in infections)
+                if (infection.Payload.Kind == InfectionKind.Blackout) count++;
+            return count;
+        }
+
+        private NodeView FirstOfflineNode(RouteNode[] route)
+        {
+            if (route == null) return null;
+            foreach (RouteNode node in route)
+                if (IsNodeOffline(node?.Node)) return node.Node;
+            return null;
+        }
+
+        private void InterruptRoutesThrough(NodeResources offline)
+        {
+            var interrupted = new List<LogicalConnectionState>();
+            foreach (LogicalConnectionState state in runtimeConnections)
+            {
+                if (!state.IsPending && !state.IsActive) continue;
+                foreach (RouteNode routeNode in state.Definition.Route)
+                    if (routeNode.Node == offline.View)
+                    { interrupted.Add(state); break; }
+            }
+            interrupted.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
+            foreach (LogicalConnectionState state in interrupted)
+            {
+                bool wasPending = state.IsPending;
+                state.Lifecycle = Lifecycle.Complete;
+                state.AllocatedLoad = 0f;
+                if (!wasPending) state.Behaviors.EndConnection(simulationTimeSeconds);
+                Resolve(state, ConnectionResolution.Blackout);
+                recorder?.RecordBlackoutInterruption(state, offline.View.NodeId,
+                    simulationTimeSeconds);
+                pathPresenter?.Retire(state);
+            }
+            if (interrupted.Count > 0)
+            {
+                var next = new List<LogicalConnectionState>(runtimeConnections);
+                foreach (LogicalConnectionState state in interrupted) next.Remove(state);
+                runtimeConnections = next.ToArray();
+                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            }
+            RefreshDisplays();
+        }
+
+        private void StepSpawners()
+        {
+            if (trafficDirector == null) return;
+            // Copy avoids effects from subsequently queued or delivered children changing iteration.
+            NodeInfection[] current = infections.ToArray();
+            foreach (NodeInfection infection in current)
+            {
+                if (infection.Payload.Kind != InfectionKind.Spawner || !infections.Contains(infection))
+                    continue;
+                int attempts = 0;
+                while (simulationTimeSeconds + 0.00001f >= infection.NextSpawnAtSeconds &&
+                    attempts++ < 128)
+                {
+                    float attemptAt = infection.NextSpawnAtSeconds;
+                    infection.NextSpawnAtSeconds += infection.Payload.CadenceSeconds;
+                    ConnectionSpawnPlan child = trafficDirector.QueueSpawnerChild(infection,
+                        simulationTimeSeconds, out string reason);
+                    recorder?.RecordSpawnerAttempt(infection, child, reason, attemptAt);
+                }
+                if (simulationTimeSeconds + 0.00001f >= infection.NextSpawnAtSeconds)
+                {
+                    recorder?.RecordSpawnerAttempt(infection, null,
+                        "step_attempt_limit", simulationTimeSeconds);
+                    infection.NextSpawnAtSeconds = simulationTimeSeconds +
+                        Mathf.Max(Time.fixedDeltaTime, infection.Payload.CadenceSeconds);
+                }
+            }
         }
 
         private NodeResources FindNodeResources(string id)
@@ -399,10 +519,7 @@ namespace Uptime.Connections
                     throw new InvalidOperationException("Connection operation needs finite positive WORK/LOAD and valid kinds/effects.");
                 InfectionPayload payload = definition.PayloadAt(i);
                 if (definition.EffectAt(i) == CompletionEffect.InfectionDelivery &&
-                    (payload == null || payload.Kind != InfectionKind.PhantomLoad ||
-                     payload.RequestedLoad <= 0f ||
-                     float.IsNaN(payload.RequestedLoad) ||
-                     float.IsInfinity(payload.RequestedLoad)))
+                    (payload == null || !payload.IsValid))
                     throw new InvalidOperationException("Delivery needs a valid typed infection payload.");
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
@@ -479,7 +596,10 @@ namespace Uptime.Connections
                 foreach (NodeResources node in nodes)
                 {
                     if (node?.View != null)
+                    {
                         node.View.RenderResources(node);
+                        node.View.RenderAvailability(IsNodeOffline(node.View));
+                    }
                 }
             }
 

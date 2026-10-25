@@ -173,7 +173,8 @@ namespace Uptime.Connections
             if (loadBadge != null)
                 loadBadge.ShowLoad(state.IsDemanding ? state.DesiredLoad : 0f, badgeColor);
             NodeResources target = state.TargetResources;
-            string status = state.Resolution == ConnectionResolution.Killed ? "KILLED" :
+            string status = state.Resolution == ConnectionResolution.Blackout ? "BLACKOUT" :
+                state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
@@ -210,7 +211,7 @@ namespace Uptime.Connections
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
         {
-            bool completedNormally = state.IsComplete && state.Resolution != ConnectionResolution.Killed;
+            bool completedNormally = state.Resolution == ConnectionResolution.Completed;
             foreach (InspectOperationToken token in operationTokens)
             {
                 token.gameObject.SetActive(false);

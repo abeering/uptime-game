@@ -9,13 +9,16 @@ namespace Uptime.Connections
         public ManualObjective Objective { get; }
         public InfectionKind? InfectionKind { get; }
         public float? InfectionLoad { get; }
+        public float? InfectionCadence { get; }
 
         public ConnectionSpawnOverrides(ManualObjective objective,
-            InfectionKind? infectionKind = null, float? infectionLoad = null)
+            InfectionKind? infectionKind = null, float? infectionLoad = null,
+            float? infectionCadence = null)
         {
             Objective = objective;
             InfectionKind = infectionKind;
             InfectionLoad = infectionLoad;
+            InfectionCadence = infectionCadence;
         }
     }
 
@@ -33,12 +36,17 @@ namespace Uptime.Connections
         public OperationStage[] Operations { get; }
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors { get; }
         public ConnectionGenerationTrace GenerationTrace { get; }
+        public string ParentNodeId { get; }
+        public string ParentConnectionId { get; }
+        public float ParentInfectionAppliedAtSeconds { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
             bool isHostile = false,
             TimedModifierBehaviorDefinition[] connectionBehaviors = null,
-            ConnectionGenerationTrace generationTrace = null)
+            ConnectionGenerationTrace generationTrace = null,
+            string parentNodeId = null, string parentConnectionId = null,
+            float parentInfectionAppliedAtSeconds = 0f)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -58,6 +66,9 @@ namespace Uptime.Connections
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
+            ParentNodeId = parentNodeId;
+            ParentConnectionId = parentConnectionId;
+            ParentInfectionAppliedAtSeconds = parentInfectionAppliedAtSeconds;
         }
     }
 
@@ -69,6 +80,9 @@ namespace Uptime.Connections
         public string objective;
         // Explains whether anomaly omission was intentional, and distinguishes benign outliers.
         public string generationDecision;
+        public string selectedInfectionKind;
+        public float selectedInfectionLoad;
+        public float selectedInfectionCadence;
         public GeneratedKeywordSelection[] selectedKeywords;
         public string[] anomalies;
         public GeneratedOperationValue[] normalOperations;
@@ -79,6 +93,9 @@ namespace Uptime.Connections
         {
             purposeId = purposeId, objective = objective,
             generationDecision = generationDecision,
+            selectedInfectionKind = selectedInfectionKind,
+            selectedInfectionLoad = selectedInfectionLoad,
+            selectedInfectionCadence = selectedInfectionCadence,
             selectedKeywords = CopyKeywords(selectedKeywords),
             anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
             normalOperations = CopyValues(normalOperations),
@@ -127,11 +144,14 @@ namespace Uptime.Connections
         public string infectionType;
         public bool hasLoadParameter;
         public float loadParameter;
+        public bool hasCadenceParameter;
+        public float cadenceParameter;
 
         public ForcedGenerationOptions Copy() => new ForcedGenerationOptions
         {
             objective = objective, infectionType = infectionType,
-            hasLoadParameter = hasLoadParameter, loadParameter = loadParameter
+            hasLoadParameter = hasLoadParameter, loadParameter = loadParameter,
+            hasCadenceParameter = hasCadenceParameter, cadenceParameter = cadenceParameter
         };
     }
 

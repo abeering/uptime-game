@@ -21,16 +21,25 @@ namespace Uptime.Connections
 
     public enum CompletionEffect { None, InfectionDelivery }
 
-    public enum InfectionKind { PhantomLoad }
+    public enum InfectionKind { PhantomLoad, Blackout, Spawner }
 
     [Serializable]
     public sealed class InfectionPayload
     {
         [SerializeField] private InfectionKind kind;
         [SerializeField] private float requestedLoad;
+        [SerializeField] private float cadenceSeconds;
 
         public InfectionKind Kind => kind;
         public float RequestedLoad => requestedLoad;
+        public float CadenceSeconds => cadenceSeconds;
+        public bool IsValid => kind == InfectionKind.PhantomLoad ?
+            requestedLoad > 0f && !float.IsNaN(requestedLoad) &&
+            !float.IsInfinity(requestedLoad) && cadenceSeconds == 0f :
+            kind == InfectionKind.Blackout ? requestedLoad == 0f && cadenceSeconds == 0f :
+            kind == InfectionKind.Spawner && requestedLoad == 0f &&
+            cadenceSeconds > 0f && !float.IsNaN(cadenceSeconds) &&
+            !float.IsInfinity(cadenceSeconds);
 
         public InfectionPayload(InfectionKind kind, float requestedLoad)
         {
@@ -44,7 +53,25 @@ namespace Uptime.Connections
             this.requestedLoad = requestedLoad;
         }
 
-        public InfectionPayload Copy() => new InfectionPayload(kind, requestedLoad);
+        public InfectionPayload(InfectionKind kind, float requestedLoad, float cadenceSeconds)
+        {
+            if (!Enum.IsDefined(typeof(InfectionKind), kind))
+                throw new ArgumentOutOfRangeException(nameof(kind));
+            if (kind == InfectionKind.PhantomLoad &&
+                (requestedLoad <= 0f || float.IsNaN(requestedLoad) || float.IsInfinity(requestedLoad)))
+                throw new ArgumentOutOfRangeException(nameof(requestedLoad));
+            if (kind == InfectionKind.Spawner &&
+                (cadenceSeconds <= 0f || float.IsNaN(cadenceSeconds) || float.IsInfinity(cadenceSeconds)))
+                throw new ArgumentOutOfRangeException(nameof(cadenceSeconds));
+            if (kind != InfectionKind.PhantomLoad && requestedLoad != 0f ||
+                kind != InfectionKind.Spawner && cadenceSeconds != 0f)
+                throw new ArgumentException("Infection parameters do not match the kind.");
+            this.kind = kind;
+            this.requestedLoad = requestedLoad;
+            this.cadenceSeconds = cadenceSeconds;
+        }
+
+        public InfectionPayload Copy() => new InfectionPayload(kind, requestedLoad, cadenceSeconds);
     }
 
     public sealed class NodeInfection
@@ -57,6 +84,8 @@ namespace Uptime.Connections
             AppliedAtSeconds = appliedAtSeconds;
             SourceConnectionId = sourceConnectionId;
             SourceOperationIndex = sourceOperationIndex;
+            NextSpawnAtSeconds = payload.Kind == InfectionKind.Spawner ?
+                appliedAtSeconds + payload.CadenceSeconds : 0f;
         }
 
         public NodeResources Target { get; }
@@ -64,6 +93,7 @@ namespace Uptime.Connections
         public float AppliedAtSeconds { get; }
         public string SourceConnectionId { get; }
         public int SourceOperationIndex { get; }
+        public float NextSpawnAtSeconds { get; internal set; }
     }
 
     public sealed class ConnectionEffectOccurrence
@@ -213,7 +243,7 @@ namespace Uptime.Connections
         Complete
     }
 
-    public enum ConnectionResolution { Completed, Killed }
+    public enum ConnectionResolution { Completed, Killed, Blackout }
 
     public enum LoadPerformance
     {
