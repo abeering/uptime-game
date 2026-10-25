@@ -9,7 +9,7 @@ Uptime is one game being explored through two different gameplay prototypes. **P
 | Prototype | Scene and runtime | Current posture |
 |---|---|---|
 | Packet | `Assets/Scenes/GameScene.unity` and `Assets/Scenes/ABScene.unity`; principally `Assets/Scripts/` outside `Connections/` | Parked, not deprecated. Tick/packet traversal, scan/trace, blocking, infections, cleaning, scoring, and notifications have implementation code. See [Packet Current State](Packet/Current_State.md) for the evidence and limits of that summary. |
-| Connections | `Assets/Scenes/Connections.unity`; `Assets/Scripts/Connections/` and `Assets/Prefabs/Connections/` | Active experiment. The scene defaults to generated benign traffic on its four-node, three-link network; Authored Witness mode remains available. See [Connections Current State](Connections/Current_State.md). |
+| Connections | `Assets/Scenes/Connections.unity`; `Assets/Scripts/Connections/` and `Assets/Prefabs/Connections/` | Active experiment. The scene defaults to generated benign and hostile traffic on its four-node, three-link network; Authored Witness mode remains available. Its first persistent infection is Phantom LOAD. See [Connections Current State](Connections/Current_State.md). |
 
 The scenes and simulation paths are separate. `Assets/Scripts/TrafficDirector.cs` drives Packet; `Assets/Scripts/Connections/ConnectionTrafficDirector.cs` drives Connections. Packet's `ConnectionView.cs` names a physical edge, not a Connections logical connection. Sharing a game vision does not make their current mechanical rules interchangeable.
 
@@ -34,4 +34,4 @@ Current executable and serialized state wins a disagreement about **what is impl
 
 ## Open work, without implied authorization
 
-Company contracts, hacker adversaries, multi-day runs, upgrades, scoring for Connections, network growth, infrastructure events, infections, cleaning, and narrative notification systems remain important parts of the broader Uptime direction. Their exact mechanics and integration into Connections are unresolved. Packet already implements portions of some of these themes using packet-specific rules. The next task should name its shared-design or prototype scope and inspect the relevant current state before changing behavior.
+Company contracts, hacker adversaries, multi-day runs, upgrades, scoring for Connections, network growth, infrastructure events, additional infection kinds, cleaning, and narrative notification systems remain important parts of the broader Uptime direction. Connections implements only the Phantom LOAD infection slice; the other mechanics and their integration remain unresolved. Packet already implements portions of some of these themes using packet-specific rules. The next task should name its shared-design or prototype scope and inspect the relevant current state before changing behavior.

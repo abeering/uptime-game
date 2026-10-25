@@ -183,7 +183,8 @@ namespace Uptime.Connections
 
         // Development command producer. It uses the same profile-to-plan path as ambient
         // generation; queue dispatch remains independent of the ambient toggle.
-        public ConnectionSpawnPlan QueueProfile(string profileId)
+        public ConnectionSpawnPlan QueueProfile(string profileId,
+            ConnectionSpawnOverrides overrides = null)
         {
             if (random == null) ResetDirector();
             ConnectionTrafficProfile selected = null;
@@ -196,7 +197,28 @@ namespace Uptime.Connections
                 }
             if (selected == null)
                 throw new InvalidOperationException("Unknown traffic profile: " + profileId);
-            ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds);
+            if (overrides != null)
+            {
+                if (!selected.purposeTemplate)
+                    throw new InvalidOperationException("Objective overrides require a purpose ID: " + profileId);
+                if (!Enum.IsDefined(typeof(ManualObjective), overrides.Objective))
+                    throw new InvalidOperationException("Unknown objective override.");
+                if (overrides.Objective != ManualObjective.Delivery &&
+                    (overrides.InfectionKind.HasValue || overrides.InfectionLoad.HasValue))
+                    throw new InvalidOperationException("Infection options require obj:delivery.");
+                if (overrides.InfectionKind.HasValue &&
+                    overrides.InfectionKind.Value != InfectionKind.PhantomLoad)
+                    throw new InvalidOperationException("Unknown infection type.");
+                if (overrides.InfectionLoad.HasValue && !overrides.InfectionKind.HasValue)
+                    throw new InvalidOperationException("infp:load requires inf:phantom-load.");
+                if (overrides.InfectionLoad.HasValue &&
+                    (overrides.InfectionLoad.Value <= 0f ||
+                     float.IsNaN(overrides.InfectionLoad.Value) ||
+                     float.IsInfinity(overrides.InfectionLoad.Value)))
+                    throw new InvalidOperationException("infp:load requires a finite positive number.");
+            }
+            ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds, false,
+                overrides);
             if (plan == null)
                 throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
             QueueSpawnPlan(plan, "manual");
@@ -241,7 +263,7 @@ namespace Uptime.Connections
         }
 
         private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime,
-            bool ambient = false)
+            bool ambient = false, ConnectionSpawnOverrides overrides = null)
         {
             string id = NewId();
             if (id == null) return null;
@@ -257,20 +279,26 @@ namespace Uptime.Connections
                     ? spec.meanWork * Range(1f - normalWorkSpread, 1f + normalWorkSpread)
                     : load * Range(spec.minimumDuration, spec.maximumDuration);
                 stages[i] = new OperationStage(spec.operation, work, load,
-                    spec.activityDescription, spec.completionEffect, spec.behaviors);
+                    spec.activityDescription, spec.completionEffect, spec.behaviors,
+                    spec.completionEffect == CompletionEffect.InfectionDelivery ?
+                        new InfectionPayload(InfectionKind.PhantomLoad,
+                            host.DefaultPhantomLoad) : null);
             }
             if (selected.purposeTemplate)
-                return BuildPurposePlan(selected, atTime, id, route, stages, ambient);
+                return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
+                    overrides);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors);
         }
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
-            string id, NodeView[] route, OperationStage[] normal, bool ambient)
+            string id, NodeView[] route, OperationStage[] normal, bool ambient,
+            ConnectionSpawnOverrides overrides)
         {
-            bool hostile = ambient && random.NextDouble() < hostileChance;
-            string objective = hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
+            bool hostile = overrides != null || ambient && random.NextDouble() < hostileChance;
+            string objective = overrides != null ? overrides.Objective.ToString().ToUpperInvariant() :
+                hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
             var stages = new List<OperationStage>(normal);
             var anomalies = new List<string>();
             string generationDecision = ambient ? "BENIGN_NORMAL" : "MANUAL_BENIGN";
@@ -307,7 +335,9 @@ namespace Uptime.Connections
                 }
                 int last = stages.Count - 1;
                 OperationStage stage = stages[last];
-                stages[last] = Changed(stage, effect: CompletionEffect.InfectionDelivery);
+                stages[last] = Changed(stage, effect: CompletionEffect.InfectionDelivery,
+                    payload: new InfectionPayload(InfectionKind.PhantomLoad,
+                        overrides?.InfectionLoad ?? host.DefaultPhantomLoad));
             }
             else if (ambient && random.NextDouble() < benignOutlierChance)
             {
@@ -327,7 +357,14 @@ namespace Uptime.Connections
                 selectedKeywords = selectedKeywords.ToArray(),
                 anomalies = anomalies.ToArray(),
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
-                finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray())
+                finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray()),
+                forcedOptions = overrides == null ? null : new ForcedGenerationOptions
+                {
+                    objective = objective,
+                    infectionType = overrides.InfectionKind?.ToString(),
+                    hasLoadParameter = overrides.InfectionLoad.HasValue,
+                    loadParameter = overrides.InfectionLoad ?? 0f
+                }
             };
             return new ConnectionSpawnPlan(atTime, id, route, purpose.id, purpose.claimedPurpose,
                 stages.ToArray(), hostile, purpose.connectionBehaviors, trace);
@@ -388,10 +425,12 @@ namespace Uptime.Connections
 
         private static OperationStage Changed(OperationStage stage, OperationKind? kind = null,
             float? load = null, float? work = null, string description = null,
-            CompletionEffect? effect = null, TimedModifierBehaviorDefinition[] behaviors = null) =>
+            CompletionEffect? effect = null, TimedModifierBehaviorDefinition[] behaviors = null,
+            InfectionPayload payload = null) =>
             new OperationStage(kind ?? stage.Operation, work ?? stage.TotalWork,
                 load ?? stage.DesiredLoad, description ?? stage.ActivityDescription,
-                effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors);
+                effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors,
+                payload ?? stage.InfectionPayload);
 
         private static string Activity(OperationKind kind) => kind == OperationKind.Read
             ? "Reading records" : kind == OperationKind.Write ? "Writing records" : "Processing request";

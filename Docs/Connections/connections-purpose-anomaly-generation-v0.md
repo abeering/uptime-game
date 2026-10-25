@@ -1,5 +1,7 @@
 # Connections — Purpose & Anomaly Generation V0
 
+**Infections V0 Slice 1 follow-up:** DELIVERY plans now include a concrete Phantom LOAD payload and apply it on operation completion. Developer `spawn <purposeId>` objective overrides reuse purpose sampling and anomaly recipes while bypassing ambient objective probability rolls. See [the infection contract](connections-infections-v0.md). The original generation-phase description below records its pre-infection behavior.
+
 **Status:** Focused Connections implementation, stacked on Generated Hostile Traffic V0. The source proposal is `Uptime_Connections_Purpose_Anomaly_Generation_V0.md` supplied for this task. Its numbers are provisional playtest guesses, not a settled balance contract. Packet gameplay is unchanged.
 
 ## Current generator

@@ -30,6 +30,7 @@ namespace Uptime.Connections
         public string mode;
         public int seed;
         public float fixedStepSeconds;
+        public float defaultPhantomLoad;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
     }
@@ -109,6 +110,12 @@ namespace Uptime.Connections
         public string operationKind;
         public string effectType;
         public string targetNodeId;
+        public string infectionKind;
+        public float infectionLoad;
+        public float infectionAppliedAtSeconds;
+        public string sourceConnectionId;
+        public int sourceOperationIndex = -1;
+        public string reason;
         public string modifierId;
         public string behaviorId;
         public string modifierScope;
@@ -144,6 +151,8 @@ namespace Uptime.Connections
     {
         public string kind;
         public string completionEffect;
+        public string infectionKind;
+        public float infectionLoad;
         public string activityDescription;
         public BehaviorRecord[] behaviors;
         public float desiredLoad;
@@ -157,7 +166,18 @@ namespace Uptime.Connections
         public int activeConnections;
         public HealthSnapshotRecord health;
         public NodeSnapshot[] nodes;
+        public InfectionSnapshot[] infections;
         public ConnectionSnapshot[] connections;
+    }
+
+    [Serializable] public sealed class InfectionSnapshot
+    {
+        public string targetNodeId;
+        public string kind;
+        public float requestedLoad;
+        public float appliedAtSeconds;
+        public string sourceConnectionId;
+        public int sourceOperationIndex;
     }
 
     [Serializable] public sealed class HealthSnapshotRecord
@@ -176,6 +196,10 @@ namespace Uptime.Connections
         public string id;
         public float loadCapacity;
         public float baselineLoad;
+        public float infectionRequestedLoad;
+        public float infectionAllocatedLoad;
+        public float connectionRequestedLoad;
+        public float connectionAllocatedLoad;
         public float requestedLoad;
         public float allocatedLoad;
     }
@@ -411,6 +435,26 @@ namespace Uptime.Connections
             entry.operationIndex = occurrence.OperationIndex;
             entry.effectType = occurrence.Type.ToString();
             entry.targetNodeId = occurrence.TargetNodeId;
+            entry.infectionKind = occurrence.Payload?.Kind.ToString();
+            entry.infectionLoad = occurrence.Payload?.RequestedLoad ?? 0f;
+        }
+
+        public void RecordInfection(string type, NodeInfection infection, float time,
+            string reason)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.connectionId = infection.SourceConnectionId;
+            entry.operationIndex = infection.SourceOperationIndex;
+            entry.targetNodeId = infection.Target.View.NodeId;
+            entry.infectionKind = infection.Payload.Kind.ToString();
+            entry.infectionLoad = infection.Payload.RequestedLoad;
+            entry.infectionAppliedAtSeconds = infection.AppliedAtSeconds;
+            entry.sourceConnectionId = infection.SourceConnectionId;
+            entry.sourceOperationIndex = infection.SourceOperationIndex;
+            entry.source = reason.StartsWith("debug_", StringComparison.Ordinal) ||
+                infection.SourceConnectionId == null ? "debug" : "delivery";
+            entry.reason = reason;
         }
 
         public void RecordModifierChange(LogicalConnectionState state, ModifierHistoryEntry change)
@@ -483,7 +527,25 @@ namespace Uptime.Connections
                 NodeResources node = host.Nodes[i];
                 snapshot.nodes[i] = new NodeSnapshot { id = node.View.NodeId,
                     loadCapacity = node.LoadCapacity, baselineLoad = node.BaselineLoad,
+                    infectionRequestedLoad = node.InfectionRequestedLoad,
+                    infectionAllocatedLoad = node.InfectionAllocatedLoad,
+                    connectionRequestedLoad = node.ConnectionRequestedLoad,
+                    connectionAllocatedLoad = node.ConnectionAllocatedLoad,
                     requestedLoad = node.RequestedLoad, allocatedLoad = node.AllocatedLoad };
+            }
+            snapshot.infections = new InfectionSnapshot[host.Infections.Count];
+            for (int i = 0; i < snapshot.infections.Length; i++)
+            {
+                NodeInfection infection = host.Infections[i];
+                snapshot.infections[i] = new InfectionSnapshot
+                {
+                    targetNodeId = infection.Target.View.NodeId,
+                    kind = infection.Payload.Kind.ToString(),
+                    requestedLoad = infection.Payload.RequestedLoad,
+                    appliedAtSeconds = infection.AppliedAtSeconds,
+                    sourceConnectionId = infection.SourceConnectionId,
+                    sourceOperationIndex = infection.SourceOperationIndex
+                };
             }
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
@@ -519,6 +581,7 @@ namespace Uptime.Connections
                 sceneName = SceneManager.GetActiveScene().name,
                 mode = host.RunMode.ToString(), seed = seed,
                 fixedStepSeconds = Time.fixedDeltaTime,
+                defaultPhantomLoad = host.DefaultPhantomLoad,
                 nodes = new NodeConfiguration[host.Nodes.Length] };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
@@ -586,6 +649,8 @@ namespace Uptime.Connections
                 float load = definition.LoadAt(i);
                 result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
                     completionEffect = definition.EffectAt(i).ToString(),
+                    infectionKind = definition.PayloadAt(i)?.Kind.ToString(),
+                    infectionLoad = definition.PayloadAt(i)?.RequestedLoad ?? 0f,
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
                     behaviors = Behaviors(definition.BehaviorsAt(i)),
                     totalWork = definition.WorkAt(i),

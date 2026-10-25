@@ -1,5 +1,7 @@
 # Connections — Threats V0: selected baseline and phased plan
 
+**Infections V0 Slice 1 follow-up:** The earlier delivery occurrence now carries a concrete Phantom LOAD payload and applies persistent node demand on normal operation completion. The historical no-node-state limits below describe this document's original slices; see [the current infection contract](connections-infections-v0.md).
+
 **Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C), the Slice 3A behavior foundation, and Slice 3B OVERLOAD/SPIKING keywords are implemented. The remaining Phases D–E ideas remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 

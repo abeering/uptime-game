@@ -21,6 +21,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
+        [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -28,6 +29,7 @@ namespace Uptime.Connections
         private readonly HashSet<string> usedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly List<ConnectionEffectOccurrence> occurrences =
             new List<ConnectionEffectOccurrence>();
+        private readonly List<NodeInfection> infections = new List<NodeInfection>();
         private float simulationTimeSeconds;
         private NetworkHealth health;
 
@@ -40,6 +42,8 @@ namespace Uptime.Connections
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
+        public IReadOnlyList<NodeInfection> Infections => infections;
+        public float DefaultPhantomLoad => defaultPhantomLoad;
         public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
@@ -82,11 +86,14 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             ClearAllocatedUsage();
+            infections.Clear();
             runtimeConnections = null;
         }
 
         private void OnValidate()
         {
+            if (float.IsNaN(defaultPhantomLoad) || float.IsInfinity(defaultPhantomLoad) ||
+                defaultPhantomLoad <= 0f) defaultPhantomLoad = 8f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -131,7 +138,7 @@ namespace Uptime.Connections
                     connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
             }
             List<ResourceAllocator.OperationCompletion> completed =
-                ResourceAllocator.Step(nodes, runtimeConnections, deltaSeconds,
+                ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds));
             simulationTimeSeconds += deltaSeconds;
             foreach (ResourceAllocator.OperationCompletion completion in completed)
@@ -145,6 +152,10 @@ namespace Uptime.Connections
                 {
                     occurrences.Add(occurrence);
                     recorder?.RecordEffect(occurrence);
+                    if (occurrence.Type == CompletionEffect.InfectionDelivery)
+                        ApplyInfection(FindNodeResources(occurrence.TargetNodeId),
+                            occurrence.Payload, occurrence.ConnectionId,
+                            occurrence.OperationIndex);
                     EffectOccurred?.Invoke(occurrence);
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
@@ -217,7 +228,7 @@ namespace Uptime.Connections
                     runtimeConnections = next.ToArray();
                     pathPresenter?.Retire(state);
                     // Publish released LOAD immediately; peers receive new allocations next step.
-                    foreach (NodeResources node in nodes) node.ClearUsage();
+                    foreach (NodeResources node in nodes) node.ClearConnectionUsage();
                     foreach (LogicalConnectionState live in runtimeConnections)
                         if (live.IsDemanding)
                             live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
@@ -238,6 +249,82 @@ namespace Uptime.Connections
             ConnectionResolved?.Invoke(state, reason);
         }
 
+        public bool TryInjectPhantomLoad(string nodeId, float load, out string error)
+        {
+            NodeResources target = FindNodeResources(nodeId);
+            if (target == null)
+            {
+                error = "Unknown node: " + nodeId;
+                return false;
+            }
+            if (load <= 0f || float.IsNaN(load) || float.IsInfinity(load))
+            {
+                error = "Phantom LOAD requires a finite positive LOAD amount.";
+                return false;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            bool applied = ApplyInfection(target, new InfectionPayload(InfectionKind.PhantomLoad,
+                load), null, -1);
+            error = applied ? null : "Phantom LOAD is already active on " + target.View.NodeId;
+            return applied;
+        }
+
+        public bool TryRemovePhantomLoad(string nodeId, out string error)
+        {
+            NodeResources target = FindNodeResources(nodeId);
+            if (target == null)
+            {
+                error = "Unknown node: " + nodeId;
+                return false;
+            }
+            NodeInfection existing = infections.Find(infection =>
+                infection.Target == target && infection.Payload.Kind == InfectionKind.PhantomLoad);
+            if (existing == null)
+            {
+                error = "No Phantom LOAD on " + target.View.NodeId;
+                return false;
+            }
+            infections.Remove(existing);
+            recorder?.RecordInfection("infection_removed", existing, simulationTimeSeconds,
+                "debug_removal");
+            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections,
+                infections);
+            RefreshDisplays();
+            error = null;
+            return true;
+        }
+
+        private bool ApplyInfection(NodeResources target, InfectionPayload payload,
+            string sourceConnectionId, int sourceOperationIndex)
+        {
+            if (target == null || payload == null)
+                throw new InvalidOperationException("Infection delivery needs a target and typed payload.");
+            var infection = new NodeInfection(target, payload, simulationTimeSeconds,
+                sourceConnectionId, sourceOperationIndex);
+            if (infections.Exists(existing => existing.Target == target &&
+                existing.Payload.Kind == payload.Kind))
+            {
+                recorder?.RecordInfection("infection_rejected", infection,
+                    simulationTimeSeconds, "already_active");
+                return false;
+            }
+            infections.Add(infection);
+            recorder?.RecordInfection("infection_applied", infection,
+                simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
+            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            RefreshDisplays();
+            return true;
+        }
+
+        private NodeResources FindNodeResources(string id)
+        {
+            if (id == null || nodes == null) return null;
+            foreach (NodeResources node in nodes)
+                if (node?.View != null && string.Equals(node.View.NodeId, id,
+                    StringComparison.OrdinalIgnoreCase)) return node;
+            return null;
+        }
+
         public void ResetSimulation()
         {
             ClearAllocatedUsage();
@@ -246,6 +333,7 @@ namespace Uptime.Connections
             history.Clear();
             usedIds.Clear();
             occurrences.Clear();
+            infections.Clear();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
             {
@@ -309,6 +397,13 @@ namespace Uptime.Connections
                     !Enum.IsDefined(typeof(OperationKind), definition.OperationAt(i)) ||
                     !Enum.IsDefined(typeof(CompletionEffect), definition.EffectAt(i)))
                     throw new InvalidOperationException("Connection operation needs finite positive WORK/LOAD and valid kinds/effects.");
+                InfectionPayload payload = definition.PayloadAt(i);
+                if (definition.EffectAt(i) == CompletionEffect.InfectionDelivery &&
+                    (payload == null || payload.Kind != InfectionKind.PhantomLoad ||
+                     payload.RequestedLoad <= 0f ||
+                     float.IsNaN(payload.RequestedLoad) ||
+                     float.IsInfinity(payload.RequestedLoad)))
+                    throw new InvalidOperationException("Delivery needs a valid typed infection payload.");
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
@@ -371,7 +466,10 @@ namespace Uptime.Connections
         {
             if (nodes != null)
                 foreach (NodeResources node in nodes)
-                    node?.ClearUsage();
+                {
+                    node?.ClearConnectionUsage();
+                    node?.SetInfectionUsage(0f, 0f);
+                }
         }
 
         public void RefreshDisplays()

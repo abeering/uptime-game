@@ -21,16 +21,63 @@ namespace Uptime.Connections
 
     public enum CompletionEffect { None, InfectionDelivery }
 
+    public enum InfectionKind { PhantomLoad }
+
+    [Serializable]
+    public sealed class InfectionPayload
+    {
+        [SerializeField] private InfectionKind kind;
+        [SerializeField] private float requestedLoad;
+
+        public InfectionKind Kind => kind;
+        public float RequestedLoad => requestedLoad;
+
+        public InfectionPayload(InfectionKind kind, float requestedLoad)
+        {
+            if (kind != InfectionKind.PhantomLoad)
+                throw new ArgumentOutOfRangeException(nameof(kind));
+            if (requestedLoad <= 0f || float.IsNaN(requestedLoad) ||
+                float.IsInfinity(requestedLoad))
+                throw new ArgumentOutOfRangeException(nameof(requestedLoad),
+                    "Phantom LOAD requires a finite positive LOAD amount.");
+            this.kind = kind;
+            this.requestedLoad = requestedLoad;
+        }
+
+        public InfectionPayload Copy() => new InfectionPayload(kind, requestedLoad);
+    }
+
+    public sealed class NodeInfection
+    {
+        public NodeInfection(NodeResources target, InfectionPayload payload, float appliedAtSeconds,
+            string sourceConnectionId, int sourceOperationIndex)
+        {
+            Target = target;
+            Payload = payload.Copy();
+            AppliedAtSeconds = appliedAtSeconds;
+            SourceConnectionId = sourceConnectionId;
+            SourceOperationIndex = sourceOperationIndex;
+        }
+
+        public NodeResources Target { get; }
+        public InfectionPayload Payload { get; }
+        public float AppliedAtSeconds { get; }
+        public string SourceConnectionId { get; }
+        public int SourceOperationIndex { get; }
+    }
+
     public sealed class ConnectionEffectOccurrence
     {
         public ConnectionEffectOccurrence(CompletionEffect type, string connectionId,
-            int operationIndex, string targetNodeId, float timeSeconds)
+            int operationIndex, string targetNodeId, float timeSeconds,
+            InfectionPayload payload = null)
         {
             Type = type;
             ConnectionId = connectionId;
             OperationIndex = operationIndex;
             TargetNodeId = targetNodeId;
             TimeSeconds = timeSeconds;
+            Payload = payload?.Copy();
         }
 
         public CompletionEffect Type { get; }
@@ -38,6 +85,7 @@ namespace Uptime.Connections
         public int OperationIndex { get; }
         public string TargetNodeId { get; }
         public float TimeSeconds { get; }
+        public InfectionPayload Payload { get; }
     }
 
     [Serializable]
@@ -48,6 +96,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float desiredLoad = 5f;
         [SerializeField] private string activityDescription;
         [SerializeField] private CompletionEffect completionEffect;
+        [SerializeField] private InfectionPayload infectionPayload;
         [SerializeField] private TimedModifierBehaviorDefinition[] behaviors;
 
         public OperationKind Operation => operation;
@@ -55,13 +104,17 @@ namespace Uptime.Connections
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public string ActivityDescription => activityDescription;
         public CompletionEffect EffectOnCompletion => completionEffect;
+        public InfectionPayload InfectionPayload => infectionPayload;
         public TimedModifierBehaviorDefinition[] Behaviors => behaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public OperationStage() { }
         public OperationStage(OperationKind kind, float work, float load, string description,
             CompletionEffect effect = CompletionEffect.None,
-            TimedModifierBehaviorDefinition[] behaviors = null)
+            TimedModifierBehaviorDefinition[] behaviors = null,
+            InfectionPayload payload = null)
         { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
-            completionEffect = effect; this.behaviors = CopyBehaviors(behaviors); }
+            completionEffect = effect; this.behaviors = CopyBehaviors(behaviors);
+            infectionPayload = effect == CompletionEffect.InfectionDelivery ?
+                (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null; }
 
         internal static TimedModifierBehaviorDefinition[] CopyBehaviors(
             TimedModifierBehaviorDefinition[] source)
@@ -111,6 +164,7 @@ namespace Uptime.Connections
         public string ActivityAt(int index) => HasArc ? StageAt(index).ActivityDescription : activityDescription;
         public CompletionEffect EffectAt(int index) => HasArc ? StageAt(index).EffectOnCompletion :
             CompletionEffect.None;
+        public InfectionPayload PayloadAt(int index) => HasArc ? StageAt(index).InfectionPayload : null;
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
             connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
@@ -139,7 +193,7 @@ namespace Uptime.Connections
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
                     stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
-                    stage.Behaviors);
+                    stage.Behaviors, stage.InfectionPayload);
             }
             return result;
         }
@@ -229,7 +283,7 @@ namespace Uptime.Connections
             if (effect == CompletionEffect.None || deliveredEffects[operationIndex]) return null;
             deliveredEffects[operationIndex] = true;
             return new ConnectionEffectOccurrence(effect, ConnectionId, operationIndex,
-                TargetNode.NodeId, timeSeconds);
+                TargetNode.NodeId, timeSeconds, Definition.PayloadAt(operationIndex));
         }
 
         internal void FinishOperation()

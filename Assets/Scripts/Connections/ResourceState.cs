@@ -12,12 +12,18 @@ namespace Uptime.Connections
 
         [NonSerialized] private float requestedByConnections;
         [NonSerialized] private float allocatedToConnections;
+        [NonSerialized] private float requestedByInfections;
+        [NonSerialized] private float allocatedToInfections;
 
         public NodeView View => view;
         public float LoadCapacity => Mathf.Max(0f, loadCapacity);
         public float BaselineLoad => Mathf.Clamp(baselineLoad, 0f, LoadCapacity);
-        public float RequestedLoad => BaselineLoad + requestedByConnections;
-        public float AllocatedLoad => BaselineLoad + allocatedToConnections;
+        public float ConnectionRequestedLoad => requestedByConnections;
+        public float ConnectionAllocatedLoad => allocatedToConnections;
+        public float InfectionRequestedLoad => requestedByInfections;
+        public float InfectionAllocatedLoad => allocatedToInfections;
+        public float RequestedLoad => BaselineLoad + requestedByInfections + requestedByConnections;
+        public float AllocatedLoad => BaselineLoad + allocatedToInfections + allocatedToConnections;
 
         public NodeResources(NodeView node, float capacity, float baseline = 0f)
         {
@@ -27,10 +33,16 @@ namespace Uptime.Connections
             ClampToCapacity();
         }
 
-        internal void ClearUsage()
+        internal void ClearConnectionUsage()
         {
             requestedByConnections = 0f;
             allocatedToConnections = 0f;
+        }
+
+        internal void SetInfectionUsage(float requested, float allocated)
+        {
+            requestedByInfections = requested;
+            allocatedToInfections = allocated;
         }
 
         internal void AddUsage(float requested, float allocated)

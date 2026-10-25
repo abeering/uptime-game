@@ -222,6 +222,9 @@ namespace Uptime.Connections.EditorTools
                 Check(threatSpawn.definition.isHostile &&
                     threatSpawn.definition.operations[0].completionEffect == "InfectionDelivery",
                     "concrete manual threat definition is recorded");
+                Check(host.Infections.Count == 1 &&
+                    host.TryRemovePhantomLoad("DB", out _),
+                    "clear delivered Phantom LOAD before the independent delayed-arc timing case");
                 ConnectionSpawnPlan delayed = director.QueueProfile("delayed-threat");
                 host.StepSimulation(8f);
                 Check(recorder.CurrentLog.events.Count(e => e.type == "operation_completed" &&

@@ -2,6 +2,23 @@ using System;
 
 namespace Uptime.Connections
 {
+    public enum ManualObjective { Delivery, Loader }
+
+    public sealed class ConnectionSpawnOverrides
+    {
+        public ManualObjective Objective { get; }
+        public InfectionKind? InfectionKind { get; }
+        public float? InfectionLoad { get; }
+
+        public ConnectionSpawnOverrides(ManualObjective objective,
+            InfectionKind? infectionKind = null, float? infectionLoad = null)
+        {
+            Objective = objective;
+            InfectionKind = infectionKind;
+            InfectionLoad = infectionLoad;
+        }
+    }
+
     // A fully generated arrival. Copies its route and operations so a queued plan cannot drift.
     public sealed class ConnectionSpawnPlan
     {
@@ -37,7 +54,7 @@ namespace Uptime.Connections
                 OperationStage stage = operations[i];
                 Operations[i] = stage == null ? null : new OperationStage(stage.Operation,
                     stage.TotalWork, stage.DesiredLoad, stage.ActivityDescription,
-                    stage.EffectOnCompletion, stage.Behaviors);
+                    stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload);
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
@@ -56,6 +73,7 @@ namespace Uptime.Connections
         public string[] anomalies;
         public GeneratedOperationValue[] normalOperations;
         public GeneratedOperationValue[] finalOperations;
+        public ForcedGenerationOptions forcedOptions;
 
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
@@ -64,7 +82,8 @@ namespace Uptime.Connections
             selectedKeywords = CopyKeywords(selectedKeywords),
             anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
             normalOperations = CopyValues(normalOperations),
-            finalOperations = CopyValues(finalOperations)
+            finalOperations = CopyValues(finalOperations),
+            forcedOptions = forcedOptions?.Copy()
         };
 
         private static GeneratedOperationValue[] CopyValues(GeneratedOperationValue[] values)
@@ -99,6 +118,21 @@ namespace Uptime.Connections
             }
             return result;
         }
+    }
+
+    [Serializable]
+    public sealed class ForcedGenerationOptions
+    {
+        public string objective;
+        public string infectionType;
+        public bool hasLoadParameter;
+        public float loadParameter;
+
+        public ForcedGenerationOptions Copy() => new ForcedGenerationOptions
+        {
+            objective = objective, infectionType = infectionType,
+            hasLoadParameter = hasLoadParameter, loadParameter = loadParameter
+        };
     }
 
     [Serializable]
