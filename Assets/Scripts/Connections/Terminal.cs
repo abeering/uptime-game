@@ -120,15 +120,17 @@ namespace Uptime.Connections
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "spawn":
-                    if (tokens.Length != 2)
-                        AppendText("USAGE  spawn <profileId>", errorColor);
+                    if (!TryParseSpawn(tokens, out string profileId,
+                        out ConnectionSpawnOverrides spawnOverrides, out string spawnError))
+                        AppendText(spawnError, errorColor);
                     else if (trafficDirector == null || simulationHost == null)
                         AppendText("SPAWN  simulation unavailable", errorColor);
                     else
                     {
                         try
                         {
-                            ConnectionSpawnPlan plan = trafficDirector.QueueProfile(tokens[1]);
+                            ConnectionSpawnPlan plan = trafficDirector.QueueProfile(profileId,
+                                spawnOverrides);
                             recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
                             AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                 " from profile " + plan.ProfileId, normalColor);
@@ -139,6 +141,58 @@ namespace Uptime.Connections
                             AppendText("SPAWN  " + error.Message, errorColor);
                         }
                     }
+                    break;
+                case "infect":
+                    float debugLoad = 0f;
+                    if ((tokens.Length != 3 && tokens.Length != 4) ||
+                        !tokens[2].Equals("phantom-load", System.StringComparison.OrdinalIgnoreCase))
+                        AppendText("USAGE  infect <nodeId> phantom-load [load]", errorColor);
+                    else if (simulationHost == null)
+                        AppendText("INFECT  simulation unavailable", errorColor);
+                    else if (tokens.Length == 4 &&
+                        (!float.TryParse(tokens[3], System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture, out debugLoad) ||
+                         debugLoad <= 0f || float.IsNaN(debugLoad) || float.IsInfinity(debugLoad)))
+                        AppendText("INFECT  load must be a finite positive number", errorColor);
+                    else
+                    {
+                        float load = tokens.Length == 4 ? debugLoad : simulationHost.DefaultPhantomLoad;
+                        bool applied = simulationHost.TryInjectPhantomLoad(tokens[1], load,
+                            out string infectionError);
+                        recorder?.RecordPlayerAction(command, null, applied);
+                        AppendText(applied ? "INJECTED  Phantom LOAD " + load.ToString("0.##") +
+                            " on " + tokens[1].ToUpperInvariant() : "INFECT  " + infectionError,
+                            applied ? normalColor : errorColor);
+                    }
+                    break;
+                case "uninfect":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  uninfect <nodeId>", errorColor);
+                    else if (simulationHost == null)
+                        AppendText("UNINFECT  simulation unavailable", errorColor);
+                    else
+                    {
+                        bool removed = simulationHost.TryRemovePhantomLoad(tokens[1],
+                            out string removalError);
+                        recorder?.RecordPlayerAction(command, null, removed);
+                        AppendText(removed ? "REMOVED  Phantom LOAD from " +
+                            tokens[1].ToUpperInvariant() : "UNINFECT  " + removalError,
+                            removed ? normalColor : errorColor);
+                    }
+                    break;
+                case "infections":
+                    if (tokens.Length != 1 || simulationHost == null)
+                        AppendText("USAGE  infections", errorColor);
+                    else if (simulationHost.Infections.Count == 0)
+                        AppendText("INFECTIONS  none", mutedColor);
+                    else
+                        foreach (NodeInfection infection in simulationHost.Infections)
+                            AppendText("INFECTION  " + infection.Target.View.NodeId + " " +
+                                infection.Payload.Kind + " load=" +
+                                infection.Payload.RequestedLoad.ToString("0.##") + " at=" +
+                                infection.AppliedAtSeconds.ToString("0.##") + "s source=" +
+                                (infection.SourceConnectionId ?? "debug") + " op=" +
+                                infection.SourceOperationIndex, mutedColor);
                     break;
 #endif
                 case "demandtest":
@@ -188,7 +242,9 @@ namespace Uptime.Connections
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    AppendText("MORE  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load] [infp:load=N]", mutedColor);
+                    AppendText("DEV  infect <nodeId> phantom-load [load]  uninfect <nodeId>  infections", mutedColor);
+                    AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #endif
@@ -199,6 +255,66 @@ namespace Uptime.Connections
             }
 
             StartCoroutine(FocusInputNextFrame());
+        }
+
+        public static bool TryParseSpawn(string[] tokens, out string profileId,
+            out ConnectionSpawnOverrides overrides, out string error)
+        {
+            const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
+                "[inf:phantom-load] [infp:load=N]";
+            profileId = null;
+            overrides = null;
+            error = usage;
+            if (tokens == null || tokens.Length < 2) return false;
+            profileId = tokens[1];
+            ManualObjective? objective = null;
+            InfectionKind? kind = null;
+            float? load = null;
+            for (int i = 2; i < tokens.Length; i++)
+            {
+                string token = tokens[i];
+                if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (objective.HasValue) { error = "SPAWN  duplicate obj option"; return false; }
+                    string value = token.Substring(4);
+                    if (value.Equals("delivery", System.StringComparison.OrdinalIgnoreCase))
+                        objective = ManualObjective.Delivery;
+                    else if (value.Equals("loader", System.StringComparison.OrdinalIgnoreCase))
+                        objective = ManualObjective.Loader;
+                    else { error = "SPAWN  unknown objective: " + value; return false; }
+                }
+                else if (token.StartsWith("inf:", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (kind.HasValue) { error = "SPAWN  duplicate inf option"; return false; }
+                    string value = token.Substring(4);
+                    if (!value.Equals("phantom-load", System.StringComparison.OrdinalIgnoreCase))
+                    { error = "SPAWN  unknown infection type: " + value; return false; }
+                    kind = InfectionKind.PhantomLoad;
+                }
+                else if (token.StartsWith("infp:", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (load.HasValue) { error = "SPAWN  duplicate infp option"; return false; }
+                    string value = token.Substring(5);
+                    if (!value.StartsWith("load=", System.StringComparison.OrdinalIgnoreCase) ||
+                        !float.TryParse(value.Substring(5),
+                            System.Globalization.NumberStyles.Float,
+                            System.Globalization.CultureInfo.InvariantCulture, out float amount) ||
+                        amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount))
+                    { error = "SPAWN  infp requires finite positive load=N"; return false; }
+                    load = amount;
+                }
+                else { error = "SPAWN  unknown option: " + token; return false; }
+            }
+            if (!objective.HasValue && (kind.HasValue || load.HasValue))
+            { error = "SPAWN  infection options require obj:delivery"; return false; }
+            if (objective == ManualObjective.Loader && (kind.HasValue || load.HasValue))
+            { error = "SPAWN  obj:loader cannot carry an infection"; return false; }
+            if (load.HasValue && !kind.HasValue)
+            { error = "SPAWN  infp:load requires inf:phantom-load"; return false; }
+            if (objective.HasValue)
+                overrides = new ConnectionSpawnOverrides(objective.Value, kind, load);
+            error = null;
+            return true;
         }
 
         private void Kill(string[] tokens, string command)

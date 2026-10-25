@@ -6537,6 +6537,7 @@ MonoBehaviour:
     recoveryPerSecond: 0.35
     incorrectKillPenalty: 10
     substantialSlowdownThreshold: 0.98
+  defaultPhantomLoad: 8
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
