@@ -85,11 +85,24 @@ namespace Uptime.Connections.EditorTools
                 RunEvent generation = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
                 Check(generation.generation != null && generation.generation.purposeId ==
                     generated.ProfileId && generation.generation.normalOperations.Length > 0 &&
-                    generation.generation.finalOperations.Length == generated.Operations.Length,
+                    generation.generation.finalOperations.Length == generated.Operations.Length &&
+                    !string.IsNullOrEmpty(generation.generation.generationDecision) &&
+                    generation.generation.selectedKeywords != null &&
+                    generation.definition != null &&
+                    generation.definition.route.SequenceEqual(generated.Route.Select(n => n.NodeId)) &&
+                    generation.definition.operations.Length == generated.Operations.Length &&
+                    host.FindConnection(generated.ConnectionId) == null,
                     "queued generation decision retains normal and final values");
-                Check(recorder.Save(false) && Read(firstPath).events.Last(e => e.type ==
-                    "plan_queued").generation.purposeId == generated.ProfileId,
-                    "generation provenance survives JSON save");
+                Check(recorder.Save(false), "generation event saved");
+                RunEvent persistedPlan = Read(firstPath).events.Last(e => e.type == "plan_queued");
+                Check(persistedPlan.generation.purposeId == generated.ProfileId &&
+                    persistedPlan.generation.generationDecision ==
+                        generated.GenerationTrace.generationDecision &&
+                    persistedPlan.definition.operations[0].desiredLoad ==
+                        generated.Operations[0].DesiredLoad &&
+                    persistedPlan.definition.operations[0].totalWork ==
+                        generated.Operations[0].TotalWork,
+                    "generation decision and full queued plan survive JSON save");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");
@@ -99,6 +112,12 @@ namespace Uptime.Connections.EditorTools
                     new[] { new OperationStage(OperationKind.Write, 1f, 1f, "Write"),
                         new OperationStage(OperationKind.Read, 1f, 2f, "Read") });
                 director.QueueSpawnPlan(arc);
+                RunEvent queuedArc = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
+                Check(queuedArc.generation == null && queuedArc.definition.operations.Length == 2 &&
+                    queuedArc.definition.operations[1].kind == "Read" &&
+                    queuedArc.definition.operations[1].desiredLoad == 2f &&
+                    host.FindConnection("rec1") == null,
+                    "manual plan is complete when queued, before its connection spawns");
                 host.StepSimulation(0.5f);
                 LogicalConnectionState live = host.FindConnection("rec1");
                 Check(live.IsActive && live.CompletedWork == 0.5f, "recorded run retains gameplay progression");

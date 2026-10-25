@@ -50,6 +50,9 @@ namespace Uptime.Connections
     {
         public string purposeId;
         public string objective;
+        // Explains whether anomaly omission was intentional, and distinguishes benign outliers.
+        public string generationDecision;
+        public GeneratedKeywordSelection[] selectedKeywords;
         public string[] anomalies;
         public GeneratedOperationValue[] normalOperations;
         public GeneratedOperationValue[] finalOperations;
@@ -57,6 +60,8 @@ namespace Uptime.Connections
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
             purposeId = purposeId, objective = objective,
+            generationDecision = generationDecision,
+            selectedKeywords = CopyKeywords(selectedKeywords),
             anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
             normalOperations = CopyValues(normalOperations),
             finalOperations = CopyValues(finalOperations)
@@ -66,6 +71,14 @@ namespace Uptime.Connections
         {
             if (values == null) return Array.Empty<GeneratedOperationValue>();
             var copy = new GeneratedOperationValue[values.Length];
+            for (int i = 0; i < values.Length; i++) copy[i] = values[i]?.Copy();
+            return copy;
+        }
+
+        private static GeneratedKeywordSelection[] CopyKeywords(GeneratedKeywordSelection[] values)
+        {
+            if (values == null) return Array.Empty<GeneratedKeywordSelection>();
+            var copy = new GeneratedKeywordSelection[values.Length];
             for (int i = 0; i < values.Length; i++) copy[i] = values[i]?.Copy();
             return copy;
         }
@@ -86,6 +99,19 @@ namespace Uptime.Connections
             }
             return result;
         }
+    }
+
+    [Serializable]
+    public sealed class GeneratedKeywordSelection
+    {
+        public int operationIndex;
+        public string behaviorId;
+        public string behaviorKind;
+
+        public GeneratedKeywordSelection Copy() => new GeneratedKeywordSelection
+        {
+            operationIndex = operationIndex, behaviorId = behaviorId, behaviorKind = behaviorKind
+        };
     }
 
     [Serializable]

@@ -83,6 +83,8 @@ namespace Uptime.Connections.EditorTools
                     replay.Any(p => p.ProfileId == "sales-export" && !p.IsHostile),
                     "six purpose mix includes both objectives, benign outliers, subtle delivery, and sales export");
                 CheckAnomalyIndependence(replay);
+                CheckGenerationDecisions(replay);
+                CheckQueuedPlanRecording(host, director, replay);
                 float total = director.Profiles.Sum(p => director.EffectiveAmbientWeight(p.id));
                 Near(total, 5.25f, "default total purpose weight");
                 foreach (var expected in new[] { ("product-lookup", 1.5f),
@@ -509,6 +511,181 @@ namespace Uptime.Connections.EditorTools
                     "operation deviation changes one kind or appends one stage");
             }
         }
+
+        private static void CheckGenerationDecisions(ConnectionSpawnPlan[] plans)
+        {
+            foreach (ConnectionSpawnPlan plan in plans)
+            {
+                ConnectionGenerationTrace trace = plan.GenerationTrace;
+                Check(trace.selectedKeywords != null, "keyword decisions are explicit, including none");
+                switch (trace.generationDecision)
+                {
+                    case "BENIGN_NORMAL":
+                        Check(!plan.IsHostile && trace.objective == "NONE" &&
+                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0,
+                            "ordinary benign decision is explicit");
+                        break;
+                    case "BENIGN_OUTLIER":
+                        Check(!plan.IsHostile && trace.objective == "NONE" &&
+                            trace.anomalies.Length + trace.selectedKeywords.Length == 1,
+                            "benign outlier records its anomaly or keyword choice");
+                        break;
+                    case "LOADER":
+                        Check(plan.IsHostile && trace.objective == "LOADER" &&
+                            trace.anomalies[0] == "high-load",
+                            "loader decision records high-demand selection");
+                        break;
+                    case "DELIVERY_SUBTLE":
+                        Check(plan.IsHostile && trace.objective == "DELIVERY" &&
+                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0,
+                            "intentional subtle delivery is distinguished from omitted evidence");
+                        break;
+                    case "DELIVERY_ANOMALOUS":
+                        Check(plan.IsHostile && trace.objective == "DELIVERY" &&
+                            trace.anomalies.Length >= 1,
+                            "anomalous delivery records its mutation choice");
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown generation decision: " +
+                            trace.generationDecision);
+                }
+                foreach (GeneratedKeywordSelection selection in trace.selectedKeywords)
+                {
+                    Check(selection.operationIndex >= 0 &&
+                        selection.operationIndex < plan.Operations.Length &&
+                        plan.Operations[selection.operationIndex].Behaviors.Any(behavior =>
+                            behavior.Id == selection.behaviorId &&
+                            behavior.Kind.ToString() == selection.behaviorKind) &&
+                        trace.finalOperations[selection.operationIndex].behaviorIds
+                            .Contains(selection.behaviorId),
+                        "selected keyword records kind and operation index of concrete behavior");
+                }
+            }
+            foreach (string decision in new[] { "BENIGN_NORMAL", "BENIGN_OUTLIER", "LOADER",
+                "DELIVERY_SUBTLE", "DELIVERY_ANOMALOUS" })
+                Check(plans.Any(p => p.GenerationTrace.generationDecision == decision),
+                    "seeded sample includes decision " + decision);
+            Check(plans.Any(p => p.GenerationTrace.generationDecision == "BENIGN_OUTLIER" &&
+                    p.GenerationTrace.selectedKeywords.Length == 1) &&
+                plans.Any(p => p.GenerationTrace.generationDecision == "LOADER" &&
+                    p.GenerationTrace.selectedKeywords.Length == 1),
+                "seeded sample includes selected keyword for benign and loader intent");
+        }
+
+        private static void CheckQueuedPlanRecording(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionSpawnPlan[] plans)
+        {
+            ConnectionsRunRecorder recorder = host.Recorder;
+            bool originalRecording = recorder.RecordingEnabled;
+            try
+            {
+                host.ResetSimulation();
+                recorder.RecordingEnabled = true;
+                recorder.BeginRun();
+                var representatives = new[]
+                {
+                    plans.First(p => p.GenerationTrace.generationDecision == "DELIVERY_SUBTLE"),
+                    plans.First(p => p.GenerationTrace.generationDecision == "BENIGN_OUTLIER" &&
+                        p.GenerationTrace.selectedKeywords.Length == 1),
+                    plans.First(p => p.GenerationTrace.generationDecision == "LOADER" &&
+                        p.GenerationTrace.selectedKeywords.Length == 1)
+                };
+                foreach (ConnectionSpawnPlan plan in representatives)
+                {
+                    director.QueueSpawnPlan(plan, "ambient");
+                    RunEvent entry = recorder.CurrentLog.events.Last();
+                    Check(entry.type == "plan_queued" && entry.source == "ambient" &&
+                        host.FindConnection(plan.ConnectionId) == null &&
+                        entry.generation != null &&
+                        JsonUtility.ToJson(entry.generation) == JsonUtility.ToJson(plan.GenerationTrace),
+                        "queued decision is recorded before connection registration");
+                    CheckQueuedDefinition(entry, plan);
+                }
+                ConnectionSpawnPlan manualPurpose = director.QueueProfile("product-lookup");
+                RunEvent manualEntry = recorder.CurrentLog.events.Last();
+                Check(manualEntry.source == "manual" &&
+                    manualEntry.generation.generationDecision == "MANUAL_BENIGN" &&
+                    manualEntry.generation.anomalies.Length == 0 &&
+                    manualEntry.generation.selectedKeywords.Length == 0 &&
+                    host.FindConnection(manualPurpose.ConnectionId) == null,
+                    "manual purpose records an explicit ordinary decision before spawn");
+                CheckQueuedDefinition(manualEntry, manualPurpose);
+                NodeView[] route = { Node(host, "EXT1"), Node(host, "API"), Node(host, "DB") };
+                var explicitPlan = new ConnectionSpawnPlan(3000f, "proof1", route,
+                    "manual-proof", "Manual Probe", new[]
+                    {
+                        new OperationStage(OperationKind.Read, 23f, 1.2f, "Read probe"),
+                        new OperationStage(OperationKind.Write, 47f, 2.4f, "Write probe",
+                            CompletionEffect.InfectionDelivery, new[]
+                            {
+                                TimedModifierBehaviorDefinition.Spiking("SPIKING", 3f, 2f, 4f)
+                            })
+                    }, true, new[] { TimedModifierBehaviorDefinition.Overload("OVERLOAD", 5f, 7f) });
+                director.QueueSpawnPlan(explicitPlan);
+                RunEvent explicitEntry = recorder.CurrentLog.events.Last();
+                Check(explicitEntry.source == "explicit" && explicitEntry.generation == null &&
+                    host.FindConnection(explicitPlan.ConnectionId) == null,
+                    "manual queue has full plan without fabricated generation choices");
+                CheckQueuedDefinition(explicitEntry, explicitPlan);
+                ConnectionsRunLog roundTrip = JsonUtility.FromJson<ConnectionsRunLog>(
+                    JsonUtility.ToJson(recorder.CurrentLog));
+                Check(roundTrip.events.Count(e => e.type == "plan_queued") == 5 &&
+                    roundTrip.events.Last().definition.operations[1].behaviors[0].kind == "Spiking" &&
+                    roundTrip.events.Any(e => e.generation != null &&
+                        e.generation.generationDecision == "DELIVERY_SUBTLE"),
+                    "full queued plans and explicit decisions survive JSON serialization");
+            }
+            finally
+            {
+                recorder.EndRun();
+                recorder.RecordingEnabled = originalRecording;
+                host.ResetSimulation();
+            }
+        }
+
+        private static void CheckQueuedDefinition(RunEvent entry, ConnectionSpawnPlan plan)
+        {
+            ConnectionDefinitionRecord definition = entry.definition;
+            Check(entry.connectionId == plan.ConnectionId &&
+                entry.scheduledSpawnTime == plan.ScheduledSpawnTime &&
+                entry.profileId == plan.ProfileId && definition != null &&
+                definition.profileId == plan.ProfileId &&
+                definition.isHostile == plan.IsHostile &&
+                definition.claimedPurpose == plan.ClaimedPurpose &&
+                definition.origin == plan.Origin.NodeId &&
+                definition.target == plan.Target.NodeId &&
+                definition.route.SequenceEqual(plan.Route.Select(node => node.NodeId)) &&
+                definition.operations.Length == plan.Operations.Length,
+                "plan_queued includes identity, schedule, route, claim, intent, and all stages");
+            for (int i = 0; i < plan.Operations.Length; i++)
+            {
+                OperationRecord recorded = definition.operations[i];
+                OperationStage stage = plan.Operations[i];
+                Check(recorded.kind == stage.Operation.ToString() &&
+                    recorded.activityDescription == stage.ActivityDescription &&
+                    recorded.totalWork == stage.TotalWork &&
+                    recorded.desiredLoad == stage.DesiredLoad &&
+                    recorded.completionEffect == stage.EffectOnCompletion.ToString() &&
+                    recorded.behaviors.Length == stage.Behaviors.Length,
+                    "queued stage records exact WORK, LOAD, activity, effect, and behaviors");
+                for (int j = 0; j < stage.Behaviors.Length; j++)
+                    CheckBehavior(recorded.behaviors[j], stage.Behaviors[j]);
+            }
+            Check(definition.connectionBehaviors.Length == plan.ConnectionBehaviors.Length,
+                "queued plan records connection-scope behavior count");
+            for (int i = 0; i < plan.ConnectionBehaviors.Length; i++)
+                CheckBehavior(definition.connectionBehaviors[i], plan.ConnectionBehaviors[i]);
+        }
+
+        private static void CheckBehavior(BehaviorRecord recorded,
+            TimedModifierBehaviorDefinition behavior) => Check(
+            recorded.id == behavior.Id && recorded.kind == behavior.Kind.ToString() &&
+            recorded.startAfterSeconds == behavior.StartAfterSeconds &&
+            recorded.stopAfterSeconds == behavior.StopAfterSeconds &&
+            recorded.normalIntervalSeconds == behavior.NormalIntervalSeconds &&
+            recorded.elevatedIntervalSeconds == behavior.ElevatedIntervalSeconds &&
+            recorded.workDelta == behavior.WorkDelta && recorded.loadDelta == behavior.LoadDelta,
+            "queued behavior records all concrete parameters");
 
         private static void CheckGeneratedPurposeRuntime(SimulationHost host,
             ConnectionTrafficDirector director)
