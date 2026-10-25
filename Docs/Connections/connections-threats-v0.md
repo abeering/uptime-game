@@ -3,7 +3,9 @@
 **Status:** Selected design direction and phased plan, October 23, 2026. **Slices 1 and 2 (Phase C), the Slice 3A behavior foundation, and Slice 3B OVERLOAD/SPIKING keywords are implemented. The remaining Phases D–E ideas remain plans.**
 **Authority:** The October 23 Threats V0 design conversation is the baseline for threat architecture and first-phase scope. The earlier [threat/investigation idea archive](connections-threat-investigation-ideas.md) remains useful for subsequent mechanics, but does not override decisions here. Runtime code and serialized Unity scenes remain authoritative for implemented behavior.
 
-**Later Generated Hostile Traffic V0 update:** The profiles described below were manual-only when their slices were introduced. `basic-threat`, `delayed-threat`, and `spiking-threat` now have nonzero default ambient weights in the single Connections traffic scheduler. `spiking-benign` and `overload-demo` also enter the ambient mix. Their definitions and threat/effect distinctions are unchanged. See [traffic](connections-arcade-traffic-v0.md) for current weights and Inspector tuning.
+**Later Generated Hostile Traffic V0 update:** The profiles described below were manual-only when their slices were introduced. `basic-threat`, `delayed-threat`, and `spiking-threat` gained nonzero default ambient weights in the single Connections traffic scheduler. `spiking-benign` and `overload-demo` also entered that ambient mix. Their definitions and threat/effect distinctions were unchanged. See [traffic](connections-arcade-traffic-v0.md) for that phase's weights and Inspector tuning.
+
+**Purpose & Anomaly Generation V0 update (October 25, 2026):** The fixed profiles above now have zero default ambient weight again, while remaining manually spawnable and available through weight overrides. Generated hostile traffic imitates one of six purpose templates and selects an internal LOADER or DELIVERY objective. See [current generation](connections-purpose-anomaly-generation-v0.md).
 
 ## Objective and first playable slice
 

@@ -40,16 +40,23 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 1 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 10,
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
+                    initial.run.traffic.hostileChance == 0.25f &&
+                    initial.run.traffic.normalWorkSpread == 0.25f,
                     "copied run metadata and generator configuration");
+                ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
+                    p.id == "product-lookup");
+                Check(purposeProfile.purposeTemplate && purposeProfile.ambientWeight == 1.5f &&
+                    purposeProfile.operations[0].meanWork == 24f,
+                    "purpose template and independent WORK mean recorded");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");
-                Check(threatProfile.isHostile && threatProfile.ambientWeight == 0.42f &&
+                Check(threatProfile.isHostile && threatProfile.ambientWeight == 0f &&
                     threatProfile.operations[0].completionEffect == "InfectionDelivery",
                     "recorded catalog includes effective basic-threat ambient weight");
                 ProfileConfiguration delayedProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "delayed-threat");
-                Check(delayedProfile.isHostile && delayedProfile.ambientWeight == 0.37f &&
+                Check(delayedProfile.isHostile && delayedProfile.ambientWeight == 0f &&
                     delayedProfile.operations.Length == 2 &&
                     delayedProfile.operations[0].kind == "Read" &&
                     delayedProfile.operations[0].completionEffect == "None" &&
@@ -64,15 +71,38 @@ namespace Uptime.Connections.EditorTools
                     p.id == "overload-demo");
                 Check(spikingThreat.isHostile && !spikingBenign.isHostile &&
                     !overloadDemo.isHostile &&
-                    spikingThreat.ambientWeight == 0.26f &&
-                    spikingBenign.ambientWeight == 0.16f &&
-                    overloadDemo.ambientWeight == 0.11f &&
+                    spikingThreat.ambientWeight == 0f &&
+                    spikingBenign.ambientWeight == 0f &&
+                    overloadDemo.ambientWeight == 0f &&
                     spikingThreat.operations[0].behaviors[0].kind == "Spiking" &&
                     spikingBenign.operations[0].behaviors[0].kind == "Spiking" &&
                     overloadDemo.operations[0].behaviors[0].kind == "Overload",
                     "recorded mixed keyword catalog keeps demand behavior separate from hostility");
                 Near(initial.snapshots.Last().health.value, host.Health.Value,
                     "initial authoritative Health snapshot");
+                ConnectionSpawnPlan generated = director.GeneratePlan(1000f);
+                director.QueueSpawnPlan(generated, "ambient");
+                RunEvent generation = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
+                Check(generation.generation != null && generation.generation.purposeId ==
+                    generated.ProfileId && generation.generation.normalOperations.Length > 0 &&
+                    generation.generation.finalOperations.Length == generated.Operations.Length &&
+                    !string.IsNullOrEmpty(generation.generation.generationDecision) &&
+                    generation.generation.selectedKeywords != null &&
+                    generation.definition != null &&
+                    generation.definition.route.SequenceEqual(generated.Route.Select(n => n.NodeId)) &&
+                    generation.definition.operations.Length == generated.Operations.Length &&
+                    host.FindConnection(generated.ConnectionId) == null,
+                    "queued generation decision retains normal and final values");
+                Check(recorder.Save(false), "generation event saved");
+                RunEvent persistedPlan = Read(firstPath).events.Last(e => e.type == "plan_queued");
+                Check(persistedPlan.generation.purposeId == generated.ProfileId &&
+                    persistedPlan.generation.generationDecision ==
+                        generated.GenerationTrace.generationDecision &&
+                    persistedPlan.definition.operations[0].desiredLoad ==
+                        generated.Operations[0].DesiredLoad &&
+                    persistedPlan.definition.operations[0].totalWork ==
+                        generated.Operations[0].TotalWork,
+                    "generation decision and full queued plan survive JSON save");
 
                 NodeView ext = Node(host, "EXT1");
                 NodeView api = Node(host, "API");
@@ -82,6 +112,12 @@ namespace Uptime.Connections.EditorTools
                     new[] { new OperationStage(OperationKind.Write, 1f, 1f, "Write"),
                         new OperationStage(OperationKind.Read, 1f, 2f, "Read") });
                 director.QueueSpawnPlan(arc);
+                RunEvent queuedArc = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
+                Check(queuedArc.generation == null && queuedArc.definition.operations.Length == 2 &&
+                    queuedArc.definition.operations[1].kind == "Read" &&
+                    queuedArc.definition.operations[1].desiredLoad == 2f &&
+                    host.FindConnection("rec1") == null,
+                    "manual plan is complete when queued, before its connection spawns");
                 host.StepSimulation(0.5f);
                 LogicalConnectionState live = host.FindConnection("rec1");
                 Check(live.IsActive && live.CompletedWork == 0.5f, "recorded run retains gameplay progression");

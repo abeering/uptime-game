@@ -6573,6 +6573,12 @@ MonoBehaviour:
   ambientOriginId: EXT1
   profiles: []
   ambientWeightOverrides: []
+  hostileChance: 0.25
+  deliveryChance: 0.5
+  benignOutlierChance: 0.08
+  secondAnomalyChance: 0.15
+  subtleDeliveryChance: 0.1
+  normalWorkSpread: 0.25
 --- !u!114 &1996901018
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,11 +15,13 @@ namespace Uptime.Connections
         public string ClaimedPurpose { get; }
         public OperationStage[] Operations { get; }
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors { get; }
+        public ConnectionGenerationTrace GenerationTrace { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
             bool isHostile = false,
-            TimedModifierBehaviorDefinition[] connectionBehaviors = null)
+            TimedModifierBehaviorDefinition[] connectionBehaviors = null,
+            ConnectionGenerationTrace generationTrace = null)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -38,6 +40,94 @@ namespace Uptime.Connections
                     stage.EffectOnCompletion, stage.Behaviors);
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
+            GenerationTrace = generationTrace?.Copy();
         }
+    }
+
+    // Internal generation evidence. This travels with the queued plan and recorder, never inspection.
+    [Serializable]
+    public sealed class ConnectionGenerationTrace
+    {
+        public string purposeId;
+        public string objective;
+        // Explains whether anomaly omission was intentional, and distinguishes benign outliers.
+        public string generationDecision;
+        public GeneratedKeywordSelection[] selectedKeywords;
+        public string[] anomalies;
+        public GeneratedOperationValue[] normalOperations;
+        public GeneratedOperationValue[] finalOperations;
+
+        public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
+        {
+            purposeId = purposeId, objective = objective,
+            generationDecision = generationDecision,
+            selectedKeywords = CopyKeywords(selectedKeywords),
+            anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
+            normalOperations = CopyValues(normalOperations),
+            finalOperations = CopyValues(finalOperations)
+        };
+
+        private static GeneratedOperationValue[] CopyValues(GeneratedOperationValue[] values)
+        {
+            if (values == null) return Array.Empty<GeneratedOperationValue>();
+            var copy = new GeneratedOperationValue[values.Length];
+            for (int i = 0; i < values.Length; i++) copy[i] = values[i]?.Copy();
+            return copy;
+        }
+
+        private static GeneratedKeywordSelection[] CopyKeywords(GeneratedKeywordSelection[] values)
+        {
+            if (values == null) return Array.Empty<GeneratedKeywordSelection>();
+            var copy = new GeneratedKeywordSelection[values.Length];
+            for (int i = 0; i < values.Length; i++) copy[i] = values[i]?.Copy();
+            return copy;
+        }
+
+        public static GeneratedOperationValue[] Capture(OperationStage[] stages)
+        {
+            var result = new GeneratedOperationValue[stages.Length];
+            for (int i = 0; i < stages.Length; i++)
+            {
+                OperationStage stage = stages[i];
+                result[i] = new GeneratedOperationValue
+                {
+                    kind = stage.Operation.ToString(), desiredLoad = stage.DesiredLoad,
+                    totalWork = stage.TotalWork,
+                    completionEffect = stage.EffectOnCompletion.ToString(),
+                    behaviorIds = Array.ConvertAll(stage.Behaviors, behavior => behavior.Id)
+                };
+            }
+            return result;
+        }
+    }
+
+    [Serializable]
+    public sealed class GeneratedKeywordSelection
+    {
+        public int operationIndex;
+        public string behaviorId;
+        public string behaviorKind;
+
+        public GeneratedKeywordSelection Copy() => new GeneratedKeywordSelection
+        {
+            operationIndex = operationIndex, behaviorId = behaviorId, behaviorKind = behaviorKind
+        };
+    }
+
+    [Serializable]
+    public sealed class GeneratedOperationValue
+    {
+        public string kind;
+        public float desiredLoad;
+        public float totalWork;
+        public string completionEffect;
+        public string[] behaviorIds;
+
+        public GeneratedOperationValue Copy() => new GeneratedOperationValue
+        {
+            kind = kind, desiredLoad = desiredLoad, totalWork = totalWork,
+            completionEffect = completionEffect,
+            behaviorIds = behaviorIds != null ? (string[])behaviorIds.Clone() : Array.Empty<string>()
+        };
     }
 }
