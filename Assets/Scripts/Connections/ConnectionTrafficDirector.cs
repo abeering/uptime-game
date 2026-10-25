@@ -273,8 +273,11 @@ namespace Uptime.Connections
             string objective = hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
             var stages = new List<OperationStage>(normal);
             var anomalies = new List<string>();
+            string generationDecision = ambient ? "BENIGN_NORMAL" : "MANUAL_BENIGN";
+            string selectedKeyword = "";
             if (objective == "LOADER")
             {
+                generationDecision = "LOADER";
                 ApplyAnomaly(stages, "high-load", true);
                 anomalies.Add("high-load");
                 if (random.NextDouble() < secondAnomalyChance)
@@ -283,11 +286,14 @@ namespace Uptime.Connections
                     anomalies.Add("work-deviation");
                 }
                 // The keyword engine is shared with benign traffic; this does not label intent.
-                if (random.NextDouble() < 0.25) AddKeyword(stages);
+                if (random.NextDouble() < 0.25) selectedKeyword = AddKeyword(stages);
             }
             else if (objective == "DELIVERY")
             {
-                if (random.NextDouble() >= subtleDeliveryChance)
+                // Preserve the same one-roll branch: true means no anomaly was intentionally selected.
+                bool subtle = random.NextDouble() < subtleDeliveryChance;
+                generationDecision = subtle ? "DELIVERY_SUBTLE" : "DELIVERY_ANOMALOUS";
+                if (!subtle)
                 {
                     string anomaly = RandomAnomaly();
                     ApplyAnomaly(stages, anomaly, false);
@@ -305,7 +311,8 @@ namespace Uptime.Connections
             }
             else if (ambient && random.NextDouble() < benignOutlierChance)
             {
-                if (random.NextDouble() < 0.25) AddKeyword(stages);
+                generationDecision = "BENIGN_OUTLIER";
+                if (random.NextDouble() < 0.25) selectedKeyword = AddKeyword(stages);
                 else
                 {
                     string anomaly = RandomAnomaly();
@@ -315,7 +322,9 @@ namespace Uptime.Connections
             }
             var trace = new ConnectionGenerationTrace
             {
-                purposeId = purpose.id, objective = objective, anomalies = anomalies.ToArray(),
+                purposeId = purpose.id, objective = objective,
+                generationDecision = generationDecision, selectedKeyword = selectedKeyword,
+                anomalies = anomalies.ToArray(),
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
                 finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray())
             };
@@ -359,15 +368,17 @@ namespace Uptime.Connections
             }
         }
 
-        private void AddKeyword(List<OperationStage> stages)
+        private string AddKeyword(List<OperationStage> stages)
         {
             int index = random.Next(stages.Count);
             OperationStage stage = stages[index];
             var behaviors = new List<TimedModifierBehaviorDefinition>(stage.Behaviors);
-            behaviors.Add(random.NextDouble() < 0.5
+            var keyword = random.NextDouble() < 0.5
                 ? TimedModifierBehaviorDefinition.Overload("OVERLOAD", 5f, 5f)
-                : TimedModifierBehaviorDefinition.Spiking("SPIKING", 5f, 2f, 5f));
+                : TimedModifierBehaviorDefinition.Spiking("SPIKING", 5f, 2f, 5f);
+            behaviors.Add(keyword);
             stages[index] = Changed(stage, behaviors: behaviors.ToArray());
+            return keyword.Id;
         }
 
         private static OperationStage Changed(OperationStage stage, OperationKind? kind = null,
