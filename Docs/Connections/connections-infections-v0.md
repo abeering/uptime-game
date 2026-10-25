@@ -1,6 +1,6 @@
-# Connections Infections V0 — Slice 1: Phantom LOAD
+# Connections Infections V0 — Phantom LOAD, Blackout, and Spawner
 
-**Status:** Connections implementation on the Phantom LOAD V0 branch. This contract describes the first persistent node infection only; Packet remains independent.
+**Status:** Phantom LOAD is on `main` through PR #32. Blackout and Spawner are implemented on the focused Connections branch for review. Packet remains independent.
 
 ## Delivery and ownership
 
@@ -36,4 +36,23 @@ At 16:9 in `Connections.unity` Play Mode:
 2. Use `infect DB phantom-load 8` with no connection active, then `infections` and `uninfect DB`. Watch DB LOAD rise and return. With benign traffic to DB, compare its progress before and after removal.
 3. Use `mark phantom load review` and `log save`; inspect the JSON for queued payload/forced decisions, infection events, active infection snapshots, and node LOAD breakdown. Test terminal focus after commands.
 
-This slice defers Blackout, Spawner, Throttle, cleaning, infection investigation, timers, scoring, and Packet integration.
+## Blackout and Spawner extension
+
+Blackout makes a node unavailable immediately. After the current fixed step's completed operations and their effects are processed in order, the host resolves every still-active or pending connection whose authored route includes that node as `Blackout`. This includes transit routes. An already completed carrier resolves `Completed`; interrupted connections deliver no unfinished effects and incur no incorrect-kill penalty. A queued arrival with an offline route node is rejected at dispatch without a successful spawn or automatic reroute. The recorder keeps its full queued plan, an `arrival_rejected` event with route and blocked node, and a distinct interruption resolution. Node headings display `OFFLINE` as a service symptom without naming the infection in ordinary inspection.
+
+Each blacked-out node causes the Network Health tuning's default **2 Health per simulation second** outage drain even when there are no connections. This joins ordinary degradation, suppresses recovery, and appears as `blackoutNodeCount` and `outageDrainRate` in Health snapshots. Removal stops future outage drain and restores route availability; reset clears the infection.
+
+Spawner waits a finite positive cadence, default **20 simulation seconds**, before each attempt. Every attempt is recorded. A successful attempt queues one ordinary hostile DELIVERY connection for dispatch on the next fixed step. It starts at the infected node, chooses a different reachable internal target using existing physical routes and purpose templates, and carries a concrete Phantom LOAD, Blackout, or Spawner payload. Its ID, operations, LOAD, WORK, completion and kill behavior are ordinary logical-connection behavior. The parent and child remain independent: killing a child prevents its delivery; removing a parent stops future attempts but retains queued and active children. An offline origin or lack of an available internal route skips an attempt with a recorded reason. Child generation uses a separate seeded random stream from ambient purpose/anomaly generation; IDs retain the existing separate ID stream. `plan_queued` and `spawner_attempt` evidence links the parent node, source carrier, infection application time, child ID, route, and payload.
+
+Generated DELIVERY purpose plans choose one of the three kinds with serialized nonnegative weights (1/1/1 initially), recording the concrete payload in the queued plan. A forced `obj:delivery` without `inf:` retains the earlier Phantom LOAD default. LOADER still carries no infection.
+
+Development controls additionally accept `inf:blackout`, `inf:spawner`, and `infp:cadence=N` with a matching Spawner kind. `infect <node> blackout` and `infect <node> spawner [cadence]` inject directly; `uninfect <node> <kind>` removes the named kind. Bare `uninfect <node>` still removes Phantom LOAD. Different kinds may coexist on one node, while a duplicate of one kind is rejected. These controls remain internal mechanical tooling, not player cleaning or investigation.
+
+The Infection Witness exercises interruption and rejected routes, outage Health, Spawner cadence and removal, child delivery of all three kinds, seeded replay, overlap/reset, and saved causal JSON. Interactive 16:9 Play Mode review remains necessary:
+
+1. Inject `infect API blackout` during ordinary traffic. Confirm the node reads `OFFLINE`, affected paths depart, later arrivals are rejected, and Health falls without active connections.
+2. Run `uninfect API blackout`; confirm the node returns to its role label, route arrivals resume, and outage drain stops.
+3. Run `infect DB spawner 20`; watch a child originate at DB only after the cadence, inspect its normal operation, and kill it before delivery. Let the next child finish and confirm a persistent infection at its target.
+4. Queue `spawn product-lookup obj:delivery inf:blackout`, then observe its completed carrier and any interrupted routes. Use `infections`, `mark`, and `log save` to compare the visible symptoms with the internal causal JSON. Check terminal focus, route/label crowding, and propagation under ambient traffic.
+
+Throttle, cleaning, infection investigation, scoring, and Packet integration remain outside this work.

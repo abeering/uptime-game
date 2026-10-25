@@ -706,7 +706,8 @@ namespace Uptime.Connections.EditorTools
 
             host.ResetSimulation();
             delivery = Enumerable.Range(0, 100).Select(i => director.GeneratePlan(0f))
-                .First(p => p.GenerationTrace.objective == "DELIVERY");
+                .First(p => p.GenerationTrace.objective == "DELIVERY" &&
+                    p.Operations.Last().InfectionPayload.Kind == InfectionKind.PhantomLoad);
             director.QueueSpawnPlan(delivery);
             for (int i = 0; i < delivery.Operations.Length + 1; i++)
                 host.StepSimulation(1000f);

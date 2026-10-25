@@ -31,6 +31,8 @@ namespace Uptime.Connections
         public int seed;
         public float fixedStepSeconds;
         public float defaultPhantomLoad;
+        public float defaultSpawnerCadence;
+        public float outageDrainPerSecond;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
     }
@@ -55,6 +57,9 @@ namespace Uptime.Connections
         public float secondAnomalyChance;
         public float subtleDeliveryChance;
         public float normalWorkSpread;
+        public float phantomLoadWeight;
+        public float blackoutWeight;
+        public float spawnerWeight;
         public ProfileConfiguration[] profiles;
     }
 
@@ -112,7 +117,12 @@ namespace Uptime.Connections
         public string targetNodeId;
         public string infectionKind;
         public float infectionLoad;
+        public float infectionCadence;
         public float infectionAppliedAtSeconds;
+        public float parentInfectionAppliedAtSeconds;
+        public string parentNodeId;
+        public string parentConnectionId;
+        public string blockedNodeId;
         public string sourceConnectionId;
         public int sourceOperationIndex = -1;
         public string reason;
@@ -153,6 +163,7 @@ namespace Uptime.Connections
         public string completionEffect;
         public string infectionKind;
         public float infectionLoad;
+        public float infectionCadence;
         public string activityDescription;
         public BehaviorRecord[] behaviors;
         public float desiredLoad;
@@ -175,6 +186,8 @@ namespace Uptime.Connections
         public string targetNodeId;
         public string kind;
         public float requestedLoad;
+        public float cadenceSeconds;
+        public float nextSpawnAtSeconds;
         public float appliedAtSeconds;
         public string sourceConnectionId;
         public int sourceOperationIndex;
@@ -189,6 +202,8 @@ namespace Uptime.Connections
         public int slowedCount;
         public int overdueCount;
         public bool failed;
+        public int blackoutNodeCount;
+        public float outageDrainRate;
     }
 
     [Serializable] public sealed class NodeSnapshot
@@ -328,7 +343,17 @@ namespace Uptime.Connections
                 log.run.lastSavedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture);
                 string json = JsonUtility.ToJson(log, true);
                 File.WriteAllText(temporary, json, new UTF8Encoding(false));
-                if (File.Exists(outputPath)) File.Replace(temporary, outputPath, null);
+                if (File.Exists(outputPath))
+                {
+                    try { File.Replace(temporary, outputPath, null); }
+                    catch (IOException)
+                    {
+                        // Some Windows Editor sessions refuse Replace on the existing log.
+                        // Preserve the current run by updating that file from the complete temp JSON.
+                        File.Copy(temporary, outputPath, true);
+                        File.Delete(temporary);
+                    }
+                }
                 else File.Move(temporary, outputPath);
                 LastError = null;
                 if (explicitRequest) Debug.Log("[ConnectionsRunRecorder] Saved " + outputPath);
@@ -386,6 +411,9 @@ namespace Uptime.Connections
             entry.scheduledSpawnTime = plan.ScheduledSpawnTime;
             entry.profileId = plan.ProfileId;
             entry.generation = plan.GenerationTrace?.Copy();
+            entry.parentNodeId = plan.ParentNodeId;
+            entry.parentConnectionId = plan.ParentConnectionId;
+            entry.parentInfectionAppliedAtSeconds = plan.ParentInfectionAppliedAtSeconds;
             // A queued plan is complete evidence even if the connection never spawns.
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
         }
@@ -437,6 +465,7 @@ namespace Uptime.Connections
             entry.targetNodeId = occurrence.TargetNodeId;
             entry.infectionKind = occurrence.Payload?.Kind.ToString();
             entry.infectionLoad = occurrence.Payload?.RequestedLoad ?? 0f;
+            entry.infectionCadence = occurrence.Payload?.CadenceSeconds ?? 0f;
         }
 
         public void RecordInfection(string type, NodeInfection infection, float time,
@@ -449,12 +478,53 @@ namespace Uptime.Connections
             entry.targetNodeId = infection.Target.View.NodeId;
             entry.infectionKind = infection.Payload.Kind.ToString();
             entry.infectionLoad = infection.Payload.RequestedLoad;
+            entry.infectionCadence = infection.Payload.CadenceSeconds;
             entry.infectionAppliedAtSeconds = infection.AppliedAtSeconds;
             entry.sourceConnectionId = infection.SourceConnectionId;
             entry.sourceOperationIndex = infection.SourceOperationIndex;
             entry.source = reason.StartsWith("debug_", StringComparison.Ordinal) ||
                 infection.SourceConnectionId == null ? "debug" : "delivery";
             entry.reason = reason;
+        }
+
+        public void RecordBlackoutInterruption(LogicalConnectionState state,
+            string blockedNodeId, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("blackout_interruption", time);
+            entry.connectionId = state.ConnectionId;
+            entry.blockedNodeId = blockedNodeId;
+            entry.reason = "route_offline";
+        }
+
+        public void RecordArrivalRejected(LogicalConnectionDefinition definition,
+            string blockedNodeId, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("arrival_rejected", time);
+            entry.connectionId = definition.ConnectionId;
+            entry.blockedNodeId = blockedNodeId;
+            entry.reason = "route_offline";
+            entry.definition = Definition(definition);
+        }
+
+        public void RecordSpawnerAttempt(NodeInfection parent, ConnectionSpawnPlan child,
+            string reason, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("spawner_attempt", time);
+            entry.targetNodeId = parent.Target.View.NodeId;
+            entry.sourceConnectionId = parent.SourceConnectionId;
+            entry.infectionAppliedAtSeconds = parent.AppliedAtSeconds;
+            entry.infectionCadence = parent.Payload.CadenceSeconds;
+            entry.connectionId = child?.ConnectionId;
+            entry.reason = child == null ? reason : "queued";
+            if (child != null)
+            {
+                entry.definition = Definition(LogicalConnectionDefinition.FromPlan(child));
+                entry.generation = child.GenerationTrace?.Copy();
+                entry.infectionKind = child.Operations[child.Operations.Length - 1].InfectionPayload?.Kind.ToString();
+            }
         }
 
         public void RecordModifierChange(LogicalConnectionState state, ModifierHistoryEntry change)
@@ -521,7 +591,8 @@ namespace Uptime.Connections
                     netRate = health.NetRate, recoveryRate = health.RecoveryRate,
                     degradationRate = health.DegradationRate,
                     slowedCount = health.SlowedCount, overdueCount = health.OverdueCount,
-                    failed = health.Failed };
+                    failed = health.Failed, blackoutNodeCount = health.BlackoutNodeCount,
+                    outageDrainRate = health.OutageDrainRate };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
                 NodeResources node = host.Nodes[i];
@@ -542,6 +613,8 @@ namespace Uptime.Connections
                     targetNodeId = infection.Target.View.NodeId,
                     kind = infection.Payload.Kind.ToString(),
                     requestedLoad = infection.Payload.RequestedLoad,
+                    cadenceSeconds = infection.Payload.CadenceSeconds,
+                    nextSpawnAtSeconds = infection.NextSpawnAtSeconds,
                     appliedAtSeconds = infection.AppliedAtSeconds,
                     sourceConnectionId = infection.SourceConnectionId,
                     sourceOperationIndex = infection.SourceOperationIndex
@@ -582,6 +655,8 @@ namespace Uptime.Connections
                 mode = host.RunMode.ToString(), seed = seed,
                 fixedStepSeconds = Time.fixedDeltaTime,
                 defaultPhantomLoad = host.DefaultPhantomLoad,
+                defaultSpawnerCadence = host.DefaultSpawnerCadence,
+                outageDrainPerSecond = host.OutageDrainPerSecond,
                 nodes = new NodeConfiguration[host.Nodes.Length] };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
@@ -602,6 +677,9 @@ namespace Uptime.Connections
                 secondAnomalyChance = trafficDirector.SecondAnomalyChance,
                 subtleDeliveryChance = trafficDirector.SubtleDeliveryChance,
                 normalWorkSpread = trafficDirector.NormalWorkSpread,
+                phantomLoadWeight = trafficDirector.PhantomLoadWeight,
+                blackoutWeight = trafficDirector.BlackoutWeight,
+                spawnerWeight = trafficDirector.SpawnerWeight,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
             for (int i = 0; i < traffic.profiles.Length; i++)
             {
@@ -651,6 +729,7 @@ namespace Uptime.Connections
                     completionEffect = definition.EffectAt(i).ToString(),
                     infectionKind = definition.PayloadAt(i)?.Kind.ToString(),
                     infectionLoad = definition.PayloadAt(i)?.RequestedLoad ?? 0f,
+                    infectionCadence = definition.PayloadAt(i)?.CadenceSeconds ?? 0f,
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
                     behaviors = Behaviors(definition.BehaviorsAt(i)),
                     totalWork = definition.WorkAt(i),

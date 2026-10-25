@@ -31,7 +31,10 @@ namespace Uptime.Connections.EditorTools
                 director.Seed = 1701;
                 recorder.RecordingEnabled = true;
                 host.SetRunMode(ConnectionRunMode.Generated);
-                Check(host.DefaultPhantomLoad == 8f && host.Infections.Count == 0,
+                Check(host.DefaultPhantomLoad == 8f && host.DefaultSpawnerCadence == 20f &&
+                    host.OutageDrainPerSecond == 2f &&
+                    director.PhantomLoadWeight == 1f && director.BlackoutWeight == 1f &&
+                    director.SpawnerWeight == 1f && host.Infections.Count == 0,
                     "authored default and clean initial state");
                 CheckParserAndDeterminism(director);
                 CheckKilledCarrier(host, director, recorder);
@@ -39,9 +42,13 @@ namespace Uptime.Connections.EditorTools
                 CheckDirectInjectionAndAllocation(host, director, recorder);
                 CheckBaselinePriority(host, director);
                 CheckLegacyProfile(host, director);
+                CheckBlackout(host, director, recorder);
+                CheckSpawner(host, director, recorder);
+                CheckChildKinds(host, director, recorder);
+                CheckSpawnerReplay(host, director, recorder);
                 Debug.Log("InfectionWitness PASS: queued payload, interruption, completion, " +
-                    "persistence, duplicate rejection, direct controls, capacity, Health, " +
-                    "recorder JSON, deterministic generation, and legacy profile.");
+                    "persistence, duplicate rejection, Blackout routing/Health, Spawner " +
+                    "propagation/replay, recorder JSON, and legacy profile.");
             }
             finally
             {
@@ -58,10 +65,14 @@ namespace Uptime.Connections.EditorTools
             foreach (string text in new[]
             {
                 "spawn product-lookup obj:bogus",
-                "spawn product-lookup obj:delivery inf:blackout",
+                "spawn product-lookup obj:delivery inf:unknown",
                 "spawn product-lookup obj:delivery inf:phantom-load infp:load=-1",
                 "spawn product-lookup obj:delivery inf:phantom-load infp:load=NaN",
                 "spawn product-lookup obj:delivery infp:load=8",
+                "spawn product-lookup obj:delivery inf:blackout infp:load=8",
+                "spawn product-lookup obj:delivery inf:spawner infp:cadence=0",
+                "spawn product-lookup obj:delivery inf:spawner infp:load=8",
+                "spawn product-lookup obj:delivery inf:phantom-load infp:cadence=20",
                 "spawn product-lookup obj:loader inf:phantom-load",
                 "spawn product-lookup obj:delivery route:DB"
             })
@@ -75,6 +86,14 @@ namespace Uptime.Connections.EditorTools
             Check(Parse("spawn product-lookup obj:loader", out _,
                 out ConnectionSpawnOverrides loader, out _) &&
                 loader.Objective == ManualObjective.Loader, "loader command parses");
+            Check(Parse("spawn product-lookup obj:delivery inf:blackout", out _,
+                out ConnectionSpawnOverrides blackout, out _) &&
+                blackout.InfectionKind == InfectionKind.Blackout,
+                "blackout command parses");
+            Check(Parse("spawn customer-login obj:delivery inf:spawner infp:cadence=20",
+                out _, out ConnectionSpawnOverrides spawner, out _) &&
+                spawner.InfectionKind == InfectionKind.Spawner &&
+                spawner.InfectionCadence == 20f, "spawner cadence command parses");
             Check(Parse("spawn basic-threat", out _, out ConnectionSpawnOverrides legacy,
                 out _) && legacy == null, "legacy command parses unchanged");
             bool invalidProfileOverride = false;
@@ -109,13 +128,15 @@ namespace Uptime.Connections.EditorTools
                 .Select(i => director.GeneratePlan(i * 13f)).ToArray();
             Check(generated.Any(plan => plan.GenerationTrace.objective == "DELIVERY") &&
                 generated.Where(plan => plan.GenerationTrace.objective == "DELIVERY")
-                    .All(plan => plan.Operations.Last().InfectionPayload?.Kind ==
-                        InfectionKind.PhantomLoad &&
-                        plan.Operations.Last().InfectionPayload.RequestedLoad == 8f) &&
+                    .All(plan => plan.Operations.Last().InfectionPayload != null &&
+                        plan.GenerationTrace.selectedInfectionKind ==
+                            plan.Operations.Last().InfectionPayload.Kind.ToString()) &&
+                generated.Where(plan => plan.GenerationTrace.objective == "DELIVERY")
+                    .Select(plan => plan.Operations.Last().InfectionPayload.Kind).Distinct().Count() == 3 &&
                 generated.Where(plan => plan.GenerationTrace.objective != "DELIVERY")
                     .All(plan => plan.Operations.All(stage =>
                         stage.InfectionPayload == null)),
-                "all natural DELIVERY plans carry Phantom LOAD and other plans do not");
+                "natural DELIVERY plans select all three kinds; other plans do not deliver");
             var first = generated.Select(PayloadSignature).ToArray();
             director.ResetDirector();
             var second = Enumerable.Range(0, 120).Select(i => director.GeneratePlan(i * 13f))
@@ -350,6 +371,257 @@ namespace Uptime.Connections.EditorTools
                 "forced loader uses anomaly machinery without delivery");
         }
 
+        private static void CheckBlackout(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            host.ResetSimulation();
+            recorder.BeginRun();
+            var route = new[] { Node(host, "EXT1").View, Node(host, "API").View,
+                Node(host, "DB").View };
+            var operation = new OperationStage(OperationKind.Write, 100f, 1f,
+                "Unfinished delivery", CompletionEffect.InfectionDelivery, null,
+                new InfectionPayload(InfectionKind.PhantomLoad, 5f));
+            LogicalConnectionDefinition active = LogicalConnectionDefinition.FromPlan(
+                new ConnectionSpawnPlan(0f, "route-active", route, "witness", "Service",
+                    new[] { operation }));
+            LogicalConnectionDefinition pending = LogicalConnectionDefinition.FromPlan(
+                new ConnectionSpawnPlan(0f, "route-pending", route, "witness", "Service",
+                    new[] { operation }));
+            typeof(LogicalConnectionDefinition).GetField("startDelaySeconds",
+                BindingFlags.Instance | BindingFlags.NonPublic).SetValue(pending, 100f);
+            host.RegisterConnection(active);
+            host.RegisterConnection(pending);
+            Check(host.FindConnection("route-pending").IsPending, "pending transit setup");
+            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
+                host.FindConnection("route-active").Resolution == ConnectionResolution.Blackout &&
+                host.FindConnection("route-pending").Resolution == ConnectionResolution.Blackout &&
+                host.RuntimeConnections.Count == 0 && host.Occurrences.Count == 0 &&
+                host.Infections.Count == 1 && host.Health.Value == 100f &&
+                host.Health.OutageDrainRate == 2f,
+                "Blackout interrupts active and pending transit without payload or kill penalty");
+            Check(recorder.CurrentLog.events.Count(e => e.type == "blackout_interruption") == 2 &&
+                recorder.CurrentLog.events.Where(e => e.type == "connection_resolved")
+                    .All(e => e.resolutionReason == "Blackout"),
+                "recorder distinguishes Blackout from player kill");
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(host.SimulationTimeSeconds,
+                "route-rejected", route, "witness", "Service",
+                new[] { new OperationStage(OperationKind.Read, 10f, 1f, "Read") }));
+            host.StepSimulation(1f);
+            Check(host.FindConnection("route-rejected") == null &&
+                recorder.CurrentLog.events.Any(e => e.type == "arrival_rejected" &&
+                    e.connectionId == "route-rejected" && e.blockedNodeId == "API" &&
+                    e.definition.route.Length == 3) &&
+                !recorder.CurrentLog.events.Any(e => e.type == "connection_spawned" &&
+                    e.connectionId == "route-rejected") &&
+                host.Health.BlackoutNodeCount == 1 && host.Health.OutageDrainRate == 2f,
+                "offline arrival rejected with route evidence and outage attribution");
+            Near(host.Health.Value, 98f, "Blackout drains Health with zero connections");
+            Check(host.TryRemoveInfection("API", InfectionKind.Blackout, out _),
+                "Blackout removal succeeds");
+            host.StepSimulation(1f);
+            Check(host.Health.BlackoutNodeCount == 0 && host.Health.Value > 98f,
+                "outage stops and recovery resumes after removal");
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(host.SimulationTimeSeconds,
+                "route-restored", route, "witness", "Service",
+                new[] { new OperationStage(OperationKind.Read, 10f, 1f, "Read") }));
+            host.StepSimulation(0.1f);
+            Check(host.FindConnection("route-restored")?.IsActive == true,
+                "route availability restored after removal");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            ConnectionSpawnPlan carrier = director.QueueProfile("product-lookup",
+                new ConnectionSpawnOverrides(ManualObjective.Delivery, InfectionKind.Blackout));
+            host.StepSimulation(0.1f);
+            StepUntilComplete(host, carrier.ConnectionId);
+            Check(host.FindConnection(carrier.ConnectionId).Resolution == ConnectionResolution.Completed &&
+                host.Infections.Single().Payload.Kind == InfectionKind.Blackout,
+                "Blackout carrier completes normally before route interruptions");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            var fastBlackout = new OperationStage(OperationKind.Write, 1f, 1f,
+                "Blackout delivery", CompletionEffect.InfectionDelivery, null,
+                new InfectionPayload(InfectionKind.Blackout, 0f, 0f));
+            var slowDelivery = new OperationStage(OperationKind.Write, 100f, 1f,
+                "Unfinished delivery", CompletionEffect.InfectionDelivery, null,
+                new InfectionPayload(InfectionKind.PhantomLoad, 5f));
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-db",
+                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "DB").View },
+                "witness", "Blackout", new[] { fastBlackout }, true));
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-auth",
+                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "AUTH").View },
+                "witness", "Blackout", new[] { fastBlackout }, true));
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "same-unfinished",
+                new[] { Node(host, "EXT1").View, Node(host, "API").View, Node(host, "DB").View },
+                "witness", "Unfinished", new[] { slowDelivery }, true));
+            host.StepSimulation(1f);
+            Check(host.FindConnection("same-db").Resolution == ConnectionResolution.Completed &&
+                host.FindConnection("same-auth").Resolution == ConnectionResolution.Completed &&
+                host.FindConnection("same-unfinished").Resolution == ConnectionResolution.Blackout &&
+                host.Infections.Count(i => i.Payload.Kind == InfectionKind.Blackout) == 2 &&
+                host.Infections.All(i => i.Payload.Kind != InfectionKind.PhantomLoad) &&
+                recorder.CurrentLog.events.Count(e => e.type == "connection_resolved" &&
+                    e.connectionId == "same-unfinished") == 1,
+                "same-step Blackouts complete carriers and interrupt unfinished route once");
+        }
+
+        private static void CheckSpawner(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            host.ResetSimulation();
+            recorder.BeginRun();
+            Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 2f, out _) &&
+                host.Infections.Single().NextSpawnAtSeconds == 2f,
+                "Spawner has finite cadence and no immediate child");
+            Check(!host.TryInjectInfection("DB", InfectionKind.Spawner, 3f, out _) &&
+                !host.TryInjectInfection("DB", InfectionKind.Spawner, float.NaN, out _),
+                "duplicate and invalid Spawner injection rejected");
+            host.StepSimulation(1f);
+            Check(!recorder.CurrentLog.events.Any(e => e.source == "spawner"),
+                "no child before cadence");
+            host.StepSimulation(1f);
+            RunEvent first = recorder.CurrentLog.events.Single(e => e.type == "plan_queued" &&
+                e.source == "spawner");
+            Check(first.parentNodeId == "DB" && first.definition.origin == "DB" &&
+                first.definition.target != "DB" &&
+                first.definition.operations.Last().infectionKind != null &&
+                first.definition.route.Length >= 2 &&
+                recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&
+                    e.connectionId == first.connectionId),
+                "child plan has internal route, payload, and parent lineage");
+            host.StepSimulation(0.1f);
+            Check(host.FindConnection(first.connectionId)?.IsActive == true &&
+                host.KillConnection(first.connectionId) && host.Infections.Count == 1,
+                "killing a child leaves parent Spawner active");
+            host.StepSimulation(2f);
+            RunEvent[] queued = recorder.CurrentLog.events.Where(e => e.type == "plan_queued" &&
+                e.source == "spawner").ToArray();
+            Check(queued.Length == 2 && queued[0].connectionId != queued[1].connectionId,
+                "parent queues a second unique child");
+            Check(host.TryRemoveInfection("DB", InfectionKind.Spawner, out _) &&
+                host.Infections.Count == 0, "parent removal leaves child plan independent");
+            host.StepSimulation(0.1f);
+            Check(host.FindConnection(queued[1].connectionId)?.IsActive == true,
+                "queued child arrives after parent removal");
+            StepUntilComplete(host, queued[1].connectionId);
+            Check(host.Infections.Count == 1 &&
+                host.Infections.Single().SourceConnectionId == queued[1].connectionId,
+                "child delivery persists after parent removal");
+            Check(recorder.Save(false), "propagation JSON saved");
+            ConnectionsRunLog saved = JsonUtility.FromJson<ConnectionsRunLog>(
+                File.ReadAllText(recorder.OutputPath));
+            Check(saved.events.Any(e => e.type == "plan_queued" && e.source == "spawner" &&
+                e.parentNodeId == "DB" && e.definition.operations.Last().infectionKind != null) &&
+                saved.events.Any(e => e.type == "infection_applied" &&
+                    e.sourceConnectionId == queued[1].connectionId),
+                "saved JSON reconstructs parent-to-child infection chain");
+        }
+
+        private static void CheckChildKinds(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            string[] fields = { "phantomLoadWeight", "blackoutWeight", "spawnerWeight" };
+            FieldInfo[] weights = fields.Select(name => typeof(ConnectionTrafficDirector)
+                .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)).ToArray();
+            float[] original = weights.Select(field => (float)field.GetValue(director)).ToArray();
+            try
+            {
+                foreach (InfectionKind kind in Enum.GetValues(typeof(InfectionKind)))
+                {
+                    host.ResetSimulation();
+                    recorder.BeginRun();
+                    for (int i = 0; i < weights.Length; i++)
+                        weights[i].SetValue(director, i == (int)kind ? 1f : 0f);
+                    Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
+                        "kind-specific parent injection");
+                    host.StepSimulation(1f);
+                    RunEvent plan = recorder.CurrentLog.events.Single(e =>
+                        e.type == "plan_queued" && e.source == "spawner");
+                    Check(plan.definition.operations.Last().infectionKind == kind.ToString(),
+                        "child selects forced witness kind " + kind);
+                    Check(host.TryRemoveInfection("DB", InfectionKind.Spawner, out _),
+                        "remove parent before child delivery");
+                    host.StepSimulation(0.1f);
+                    StepUntilComplete(host, plan.connectionId);
+                    Check(host.Infections.Single().Payload.Kind == kind &&
+                        host.FindConnection(plan.connectionId).Resolution == ConnectionResolution.Completed,
+                        "child delivers " + kind + " through ordinary completion");
+                    if (kind == InfectionKind.Spawner)
+                    {
+                        NodeInfection propagated = host.Infections.Single();
+                        host.StepSimulation(propagated.Payload.CadenceSeconds);
+                        Check(recorder.CurrentLog.events.Any(e => e.type == "plan_queued" &&
+                            e.source == "spawner" &&
+                            e.parentNodeId == propagated.Target.View.NodeId &&
+                            e.parentConnectionId == plan.connectionId),
+                            "delivered Spawner queues a second-generation child with lineage");
+                    }
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < weights.Length; i++) weights[i].SetValue(director, original[i]);
+                host.ResetSimulation();
+            }
+        }
+
+        private static void CheckSpawnerReplay(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            string[] signatures = new string[2];
+            for (int replay = 0; replay < 2; replay++)
+            {
+                host.ResetSimulation();
+                recorder.BeginRun();
+                Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 2f, out _),
+                    "replay parent injection");
+                host.StepSimulation(2f);
+                RunEvent child = recorder.CurrentLog.events.Single(e =>
+                    e.type == "plan_queued" && e.source == "spawner");
+                signatures[replay] = child.timeSeconds + ":" + child.connectionId + ":" +
+                    string.Join(",", child.definition.route) + ":" +
+                    child.definition.operations.Last().infectionKind + ":" +
+                    child.definition.operations.Last().infectionLoad + ":" +
+                    child.definition.operations.Last().infectionCadence;
+            }
+            Check(signatures[0] == signatures[1], "seeded Spawner timing/ID/route/payload replay");
+            Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 3f, out _) &&
+                host.TryInjectInfection("DB", InfectionKind.Blackout, 0f, out _) &&
+                host.Infections.Count == 3, "distinct kinds coexist on one node");
+            host.StepSimulation(2f);
+            Check(recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&
+                e.reason == "origin_offline"), "offline Spawner skip is recorded");
+            host.ResetSimulation();
+            Check(host.Infections.Count == 0 && host.Health.BlackoutNodeCount == 0,
+                "reset clears overlapping infections and outage state");
+
+            recorder.BeginRun();
+            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
+                host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
+                "no-route setup");
+            host.StepSimulation(1f);
+            Check(recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&
+                e.reason == "no_available_internal_route"),
+                "unreachable internal targets are skipped with reason");
+            host.ResetSimulation();
+            recorder.BeginRun();
+            Check(Parse("spawn customer-login obj:delivery inf:spawner infp:cadence=3",
+                out string purpose, out ConnectionSpawnOverrides options, out _),
+                "manual Spawner carrier parse");
+            ConnectionSpawnPlan carrier = director.QueueProfile(purpose, options);
+            Check(carrier.Operations.Last().InfectionPayload.CadenceSeconds == 3f &&
+                recorder.CurrentLog.events.Last().definition.operations.Last().infectionCadence == 3f &&
+                recorder.CurrentLog.events.Last().generation.forcedOptions.hasCadenceParameter,
+                "manual cadence propagates into queued plan and decisions");
+            host.StepSimulation(0.1f);
+            Check(host.Infections.Count == 0, "manual Spawner waits for operation completion");
+            StepUntilComplete(host, carrier.ConnectionId);
+            Check(host.Infections.Single().Payload.Kind == InfectionKind.Spawner &&
+                host.Infections.Single().Payload.CadenceSeconds == 3f,
+                "manual Spawner carrier delivers parameterized persistent infection");
+        }
+
         private static void StepUntilComplete(SimulationHost host, string id)
         {
             for (int i = 0; i < 1000 && !host.FindConnection(id).IsComplete; i++)
@@ -362,7 +634,8 @@ namespace Uptime.Connections.EditorTools
             string.Join(",", plan.Operations.Select(o => o.Operation + "/" +
                 o.TotalWork.ToString("R") + "/" + o.DesiredLoad.ToString("R") + "/" +
                 o.EffectOnCompletion + "/" + o.InfectionPayload?.Kind + "/" +
-                o.InfectionPayload?.RequestedLoad.ToString("R")));
+                o.InfectionPayload?.RequestedLoad.ToString("R") + "/" +
+                o.InfectionPayload?.CadenceSeconds.ToString("R")));
 
         private static bool Parse(string command, out string profile,
             out ConnectionSpawnOverrides options, out string error) =>

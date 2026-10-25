@@ -143,39 +143,46 @@ namespace Uptime.Connections
                     }
                     break;
                 case "infect":
-                    float debugLoad = 0f;
                     if ((tokens.Length != 3 && tokens.Length != 4) ||
-                        !tokens[2].Equals("phantom-load", System.StringComparison.OrdinalIgnoreCase))
-                        AppendText("USAGE  infect <nodeId> phantom-load [load]", errorColor);
+                        !TryParseInfectionKind(tokens[2], out InfectionKind injectKind) ||
+                        injectKind == InfectionKind.Blackout && tokens.Length == 4)
+                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner [load|cadence]", errorColor);
                     else if (simulationHost == null)
                         AppendText("INFECT  simulation unavailable", errorColor);
                     else if (tokens.Length == 4 &&
                         (!float.TryParse(tokens[3], System.Globalization.NumberStyles.Float,
-                            System.Globalization.CultureInfo.InvariantCulture, out debugLoad) ||
-                         debugLoad <= 0f || float.IsNaN(debugLoad) || float.IsInfinity(debugLoad)))
-                        AppendText("INFECT  load must be a finite positive number", errorColor);
+                            System.Globalization.CultureInfo.InvariantCulture, out float parsedParameter) ||
+                         parsedParameter <= 0f || float.IsNaN(parsedParameter) ||
+                         float.IsInfinity(parsedParameter)))
+                        AppendText("INFECT  parameter must be a finite positive number", errorColor);
                     else
                     {
-                        float load = tokens.Length == 4 ? debugLoad : simulationHost.DefaultPhantomLoad;
-                        bool applied = simulationHost.TryInjectPhantomLoad(tokens[1], load,
+                        float parameter = tokens.Length == 4 ?
+                            float.Parse(tokens[3], System.Globalization.CultureInfo.InvariantCulture) :
+                            injectKind == InfectionKind.PhantomLoad ? simulationHost.DefaultPhantomLoad :
+                            injectKind == InfectionKind.Spawner ? simulationHost.DefaultSpawnerCadence : 0f;
+                        bool applied = simulationHost.TryInjectInfection(tokens[1], injectKind, parameter,
                             out string infectionError);
                         recorder?.RecordPlayerAction(command, null, applied);
-                        AppendText(applied ? "INJECTED  Phantom LOAD " + load.ToString("0.##") +
-                            " on " + tokens[1].ToUpperInvariant() : "INFECT  " + infectionError,
+                        AppendText(applied ? "INJECTED  " + injectKind + " on " +
+                            tokens[1].ToUpperInvariant() : "INFECT  " + infectionError,
                             applied ? normalColor : errorColor);
                     }
                     break;
                 case "uninfect":
-                    if (tokens.Length != 2)
-                        AppendText("USAGE  uninfect <nodeId>", errorColor);
+                    if ((tokens.Length != 2 && tokens.Length != 3) ||
+                        tokens.Length == 3 && !TryParseInfectionKind(tokens[2], out _))
+                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner]", errorColor);
                     else if (simulationHost == null)
                         AppendText("UNINFECT  simulation unavailable", errorColor);
                     else
                     {
-                        bool removed = simulationHost.TryRemovePhantomLoad(tokens[1],
+                        InfectionKind removeKind = InfectionKind.PhantomLoad;
+                        if (tokens.Length == 3) TryParseInfectionKind(tokens[2], out removeKind);
+                        bool removed = simulationHost.TryRemoveInfection(tokens[1], removeKind,
                             out string removalError);
                         recorder?.RecordPlayerAction(command, null, removed);
-                        AppendText(removed ? "REMOVED  Phantom LOAD from " +
+                        AppendText(removed ? "REMOVED  " + removeKind + " from " +
                             tokens[1].ToUpperInvariant() : "UNINFECT  " + removalError,
                             removed ? normalColor : errorColor);
                     }
@@ -189,7 +196,9 @@ namespace Uptime.Connections
                         foreach (NodeInfection infection in simulationHost.Infections)
                             AppendText("INFECTION  " + infection.Target.View.NodeId + " " +
                                 infection.Payload.Kind + " load=" +
-                                infection.Payload.RequestedLoad.ToString("0.##") + " at=" +
+                                infection.Payload.RequestedLoad.ToString("0.##") + " cadence=" +
+                                infection.Payload.CadenceSeconds.ToString("0.##") + " next=" +
+                                infection.NextSpawnAtSeconds.ToString("0.##") + " at=" +
                                 infection.AppliedAtSeconds.ToString("0.##") + "s source=" +
                                 (infection.SourceConnectionId ?? "debug") + " op=" +
                                 infection.SourceOperationIndex, mutedColor);
@@ -242,8 +251,8 @@ namespace Uptime.Connections
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load] [infp:load=N]", mutedColor);
-                    AppendText("DEV  infect <nodeId> phantom-load [load]  uninfect <nodeId>  infections", mutedColor);
+                    AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
@@ -261,7 +270,7 @@ namespace Uptime.Connections
             out ConnectionSpawnOverrides overrides, out string error)
         {
             const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
-                "[inf:phantom-load] [infp:load=N]";
+                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]";
             profileId = null;
             overrides = null;
             error = usage;
@@ -270,6 +279,7 @@ namespace Uptime.Connections
             ManualObjective? objective = null;
             InfectionKind? kind = null;
             float? load = null;
+            float? cadence = null;
             for (int i = 2; i < tokens.Length; i++)
             {
                 string token = tokens[i];
@@ -287,34 +297,51 @@ namespace Uptime.Connections
                 {
                     if (kind.HasValue) { error = "SPAWN  duplicate inf option"; return false; }
                     string value = token.Substring(4);
-                    if (!value.Equals("phantom-load", System.StringComparison.OrdinalIgnoreCase))
+                    if (!TryParseInfectionKind(value, out InfectionKind parsedKind))
                     { error = "SPAWN  unknown infection type: " + value; return false; }
-                    kind = InfectionKind.PhantomLoad;
+                    kind = parsedKind;
                 }
                 else if (token.StartsWith("infp:", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    if (load.HasValue) { error = "SPAWN  duplicate infp option"; return false; }
+                    if (load.HasValue || cadence.HasValue) { error = "SPAWN  duplicate infp option"; return false; }
                     string value = token.Substring(5);
-                    if (!value.StartsWith("load=", System.StringComparison.OrdinalIgnoreCase) ||
-                        !float.TryParse(value.Substring(5),
+                    bool isLoad = value.StartsWith("load=", System.StringComparison.OrdinalIgnoreCase);
+                    bool isCadence = value.StartsWith("cadence=", System.StringComparison.OrdinalIgnoreCase);
+                    if ((!isLoad && !isCadence) ||
+                        !float.TryParse(value.Substring(isLoad ? 5 : 8),
                             System.Globalization.NumberStyles.Float,
                             System.Globalization.CultureInfo.InvariantCulture, out float amount) ||
                         amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount))
-                    { error = "SPAWN  infp requires finite positive load=N"; return false; }
-                    load = amount;
+                    { error = "SPAWN  infp requires finite positive load=N or cadence=N"; return false; }
+                    if (isLoad) load = amount;
+                    else cadence = amount;
                 }
                 else { error = "SPAWN  unknown option: " + token; return false; }
             }
-            if (!objective.HasValue && (kind.HasValue || load.HasValue))
+            if (!objective.HasValue && (kind.HasValue || load.HasValue || cadence.HasValue))
             { error = "SPAWN  infection options require obj:delivery"; return false; }
-            if (objective == ManualObjective.Loader && (kind.HasValue || load.HasValue))
+            if (objective == ManualObjective.Loader && (kind.HasValue || load.HasValue || cadence.HasValue))
             { error = "SPAWN  obj:loader cannot carry an infection"; return false; }
-            if (load.HasValue && !kind.HasValue)
+            if (load.HasValue && kind != InfectionKind.PhantomLoad)
             { error = "SPAWN  infp:load requires inf:phantom-load"; return false; }
+            if (cadence.HasValue && kind != InfectionKind.Spawner)
+            { error = "SPAWN  infp:cadence requires inf:spawner"; return false; }
             if (objective.HasValue)
-                overrides = new ConnectionSpawnOverrides(objective.Value, kind, load);
+                overrides = new ConnectionSpawnOverrides(objective.Value, kind, load, cadence);
             error = null;
             return true;
+        }
+
+        public static bool TryParseInfectionKind(string text, out InfectionKind kind)
+        {
+            kind = InfectionKind.PhantomLoad;
+            if (text == null) return false;
+            if (text.Equals("phantom-load", System.StringComparison.OrdinalIgnoreCase)) return true;
+            if (text.Equals("blackout", System.StringComparison.OrdinalIgnoreCase))
+            { kind = InfectionKind.Blackout; return true; }
+            if (text.Equals("spawner", System.StringComparison.OrdinalIgnoreCase))
+            { kind = InfectionKind.Spawner; return true; }
+            return false;
         }
 
         private void Kill(string[] tokens, string command)

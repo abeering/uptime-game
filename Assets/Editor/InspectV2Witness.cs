@@ -253,6 +253,24 @@ namespace Uptime.Connections.EditorTools
                 }
                 finally { UnityEngine.Object.DestroyImmediate(done.gameObject); }
                 host.ResetSimulation();
+                director.QueueSpawnPlan(Plan("offline", route,
+                    new[] { Stage(OperationKind.Read, 100f, 2f) }));
+                host.StepSimulation(0.1f);
+                Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _),
+                    "Blackout inspection setup");
+                InspectOutput interrupted = UnityEngine.Object.Instantiate(prefab);
+                try
+                {
+                    interrupted.Bind(new[] { host.FindConnection("offline") },
+                        presentationMode: InspectPresentationMode.Verbose);
+                    var status = new SerializedObject(EntryComponent(interrupted, 0));
+                    Check(((TMP_Text)status.FindProperty("throughput").objectReferenceValue)
+                            .text == "BLACKOUT" &&
+                        !Tokens(EntryComponent(interrupted, 0))[0].HasCheckmark,
+                        "inspect shows Blackout outcome without marking unfinished operation complete");
+                }
+                finally { UnityEngine.Object.DestroyImmediate(interrupted.gameObject); }
+                host.ResetSimulation();
                 ConnectionSpawnPlan hiddenThreat = director.QueueProfile("spiking-threat");
                 ConnectionSpawnPlan matchingBenign = director.QueueProfile("spiking-benign");
                 host.StepSimulation(0.1f);
@@ -278,7 +296,8 @@ namespace Uptime.Connections.EditorTools
                 }
                 finally { UnityEngine.Object.DestroyImmediate(hidden.gameObject); }
                 Debug.Log("InspectV2Witness PASS: command modes, multi-ID, compact/verbose, " +
-                    "width-aware six-stage timeline, fixed badge, live effective LOAD, and history.");
+                    "width-aware six-stage timeline, fixed badge, live effective LOAD, " +
+                    "Blackout outcome, and history.");
             }
             finally
             {
