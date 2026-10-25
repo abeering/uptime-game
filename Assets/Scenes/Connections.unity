@@ -6572,6 +6572,7 @@ MonoBehaviour:
   spawnJitterSeconds: 1.5
   ambientOriginId: EXT1
   profiles: []
+  ambientWeightOverrides: []
 --- !u!114 &1996901018
 MonoBehaviour:
   m_ObjectHideFlags: 0

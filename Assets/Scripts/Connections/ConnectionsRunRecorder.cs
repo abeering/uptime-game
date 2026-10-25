@@ -113,6 +113,8 @@ namespace Uptime.Connections
         public float elapsedLifetimeSeconds;
         public string command;
         public bool success;
+        public float healthPenaltyAmount;
+        public float healthAfter;
         public string note;
         public int snapshotIndex = -1;
     }
@@ -144,8 +146,20 @@ namespace Uptime.Connections
     {
         public float timeSeconds;
         public int activeConnections;
+        public HealthSnapshotRecord health;
         public NodeSnapshot[] nodes;
         public ConnectionSnapshot[] connections;
+    }
+
+    [Serializable] public sealed class HealthSnapshotRecord
+    {
+        public float value;
+        public float netRate;
+        public float recoveryRate;
+        public float degradationRate;
+        public int slowedCount;
+        public int overdueCount;
+        public bool failed;
     }
 
     [Serializable] public sealed class NodeSnapshot
@@ -422,6 +436,15 @@ namespace Uptime.Connections
             entry.success = success;
         }
 
+        public void RecordHealthPenalty(NetworkHealthEvent penalty, float resultingHealth)
+        {
+            if (!IsRecording || penalty == null) return;
+            RunEvent entry = NewEvent("health_penalty", penalty.TimeSeconds);
+            entry.connectionId = penalty.ConnectionId;
+            entry.healthPenaltyAmount = penalty.Amount;
+            entry.healthAfter = resultingHealth;
+        }
+
         public void CaptureDueSnapshot(float simulationTime)
         {
             if (!IsRecording || simulationTime + 0.00001f < nextSnapshotAt) return;
@@ -436,6 +459,13 @@ namespace Uptime.Connections
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
+            NetworkHealthSnapshot health = host.Health;
+            if (health != null)
+                snapshot.health = new HealthSnapshotRecord { value = health.Value,
+                    netRate = health.NetRate, recoveryRate = health.RecoveryRate,
+                    degradationRate = health.DegradationRate,
+                    slowedCount = health.SlowedCount, overdueCount = health.OverdueCount,
+                    failed = health.Failed };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
                 NodeResources node = host.Nodes[i];
@@ -498,7 +528,7 @@ namespace Uptime.Connections
                 var profile = new ProfileConfiguration { id = source.id,
                     isHostile = source.isHostile,
                     claimedPurpose = source.claimedPurpose,
-                    ambientWeight = source.ambientWeight,
+                    ambientWeight = trafficDirector.EffectiveAmbientWeight(source.id),
                     eligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
                     connectionBehaviors = Behaviors(source.connectionBehaviors),
                     operations = new OperationRange[source.operations.Length] };

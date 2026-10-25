@@ -2,6 +2,8 @@
 
 **Status:** Slice 3A foundation merged; Slice 3B adds reusable OVERLOAD and SPIKING LOAD keywords and manual-only examples. The Slice 3A timed adjustment remains for deterministic witnesses.
 
+**Later Generated Hostile Traffic V0 update:** The Slice 3B examples now have nonzero default ambient weights. The keyword executor and behavior definitions remain as described below; both benign and hostile SPIKING use the same visible demand behavior.
+
 ## Ownership and terms
 
 The **Connection Plan** is the intended sequence in `LogicalConnectionDefinition`: ordered operation definitions, completion effects, and optional behavior definitions. `ConnectionSpawnPlan` remains a different object: a concrete scheduled arrival with an ID, route, and copied plan data. Existing `basic-threat`, `delayed-threat`, and benign profiles have no modifier behaviors and retain their previous mechanics.

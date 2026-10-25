@@ -232,7 +232,8 @@ namespace Uptime.Connections
         {
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
-            health.Resolve(state, reason, simulationTimeSeconds);
+            NetworkHealthEvent penalty = health.Resolve(state, reason, simulationTimeSeconds);
+            if (penalty != null) recorder?.RecordHealthPenalty(penalty, health.Snapshot.Value);
             recorder?.RecordResolution(state, reason, simulationTimeSeconds);
             ConnectionResolved?.Invoke(state, reason);
         }

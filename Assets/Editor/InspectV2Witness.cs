@@ -252,6 +252,31 @@ namespace Uptime.Connections.EditorTools
                         "completed history remains inspectable in compact mode");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(done.gameObject); }
+                host.ResetSimulation();
+                ConnectionSpawnPlan hiddenThreat = director.QueueProfile("spiking-threat");
+                ConnectionSpawnPlan matchingBenign = director.QueueProfile("spiking-benign");
+                host.StepSimulation(0.1f);
+                InspectOutput hidden = UnityEngine.Object.Instantiate(prefab);
+                try
+                {
+                    var threatState = host.FindConnection(hiddenThreat.ConnectionId);
+                    var benignState = host.FindConnection(matchingBenign.ConnectionId);
+                    Check(threatState.IsHostile && !benignState.IsHostile &&
+                        threatState.Definition.ProfileId != benignState.Definition.ProfileId,
+                        "test pair differs in internal intent and profile ID");
+                    hidden.Bind(new[] { threatState, benignState },
+                        presentationMode: InspectPresentationMode.Verbose);
+                    string visible = string.Join(" ", hidden.GetComponentsInChildren<TMP_Text>(true)
+                        .Select(label => label.text));
+                    Check(!visible.Contains("spiking-threat") &&
+                        !visible.Contains("spiking-benign") &&
+                        !visible.Contains("InfectionDelivery") &&
+                        !visible.Contains("HOSTILE") &&
+                        Tokens(EntryComponent(hidden, 0))[0].Text ==
+                            Tokens(EntryComponent(hidden, 1))[0].Text,
+                        "multi-ID verbose inspect keeps internal intent, profile, and future effect hidden");
+                }
+                finally { UnityEngine.Object.DestroyImmediate(hidden.gameObject); }
                 Debug.Log("InspectV2Witness PASS: command modes, multi-ID, compact/verbose, " +
                     "width-aware six-stage timeline, fixed badge, live effective LOAD, and history.");
             }

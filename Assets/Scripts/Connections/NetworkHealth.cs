@@ -152,9 +152,10 @@ namespace Uptime.Connections
                 impacts.ToArray(), events.ToArray());
         }
 
-        public void Resolve(LogicalConnectionState connection, ConnectionResolution reason,
+        public NetworkHealthEvent Resolve(LogicalConnectionState connection, ConnectionResolution reason,
             float timeSeconds)
         {
+            NetworkHealthEvent penalty = null;
             observed.Remove(connection.ConnectionId);
             var remaining = new List<NetworkHealthImpact>();
             foreach (NetworkHealthImpact impact in snapshot.Impacts)
@@ -164,7 +165,8 @@ namespace Uptime.Connections
                 float amount = Mathf.Max(0f, tuning.incorrectKillPenalty);
                 value = Mathf.Max(0f, value - amount);
                 if (value <= 0f) failed = true;
-                events.Insert(0, new NetworkHealthEvent(connection.ConnectionId, timeSeconds, -amount));
+                penalty = new NetworkHealthEvent(connection.ConnectionId, timeSeconds, -amount);
+                events.Insert(0, penalty);
                 if (events.Count > 5) events.RemoveAt(events.Count - 1);
             }
             float degradation = 0f;
@@ -183,6 +185,7 @@ namespace Uptime.Connections
             snapshot = new NetworkHealthSnapshot(value, degradation, recovery,
                 net, slowed, overdue, failed,
                 remaining.ToArray(), events.ToArray());
+            return penalty;
         }
     }
 }

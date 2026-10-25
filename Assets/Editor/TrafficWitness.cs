@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -19,6 +20,9 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && director != null, "scene traffic bindings");
             bool originalAuto = director.AutoGenerationEnabled;
             int originalSeed = director.Seed;
+            FieldInfo overridesField = typeof(ConnectionTrafficDirector).GetField(
+                "ambientWeightOverrides", BindingFlags.Instance | BindingFlags.NonPublic);
+            var originalOverrides = (AmbientWeightOverride[])overridesField.GetValue(director);
             try
             {
                 director.AutoGenerationEnabled = false;
@@ -49,11 +53,35 @@ namespace Uptime.Connections.EditorTools
                             "generated LOAD and duration within configured ranges");
                     }
                 }
-                Check(replay.Select(p => p.ProfileId).Distinct().Count() == 5,
-                    "weighted catalog includes ordinary and incidental profiles");
-                Check(replay.All(p => p.ProfileId != "basic-threat" &&
-                    p.ProfileId != "delayed-threat"),
-                    "manual threats are absent from ambient traffic");
+                Check(director.Profiles.Count == 10 &&
+                    replay.Select(p => p.ProfileId).Distinct().Count() == 10 &&
+                    replay.Any(p => p.IsHostile) && replay.Any(p => !p.IsHostile),
+                    "one weighted ambient catalog includes ordinary, hostile, and benign behavior profiles");
+                float total = director.Profiles.Sum(p => director.EffectiveAmbientWeight(p.id));
+                Near(total, 5.27f, "default total ambient weight");
+                Near(director.Profiles.Take(5).Sum(p => director.EffectiveAmbientWeight(p.id)) / total,
+                    3.95f / 5.27f, "ordinary share keeps five original relative weights");
+                foreach (var expected in new[] { ("basic-threat", 0.42f),
+                    ("delayed-threat", 0.37f), ("spiking-threat", 0.26f),
+                    ("spiking-benign", 0.16f), ("overload-demo", 0.11f) })
+                    Near(director.EffectiveAmbientWeight(expected.Item1), expected.Item2,
+                        "default weight " + expected.Item1);
+                ConnectionTrafficProfile spikingThreat = director.Profiles.Single(p =>
+                    p.id == "spiking-threat");
+                ConnectionTrafficProfile spikingBenign = director.Profiles.Single(p =>
+                    p.id == "spiking-benign");
+                Check(spikingThreat.isHostile && !spikingBenign.isHostile &&
+                    spikingThreat.claimedPurpose == spikingBenign.claimedPurpose &&
+                    spikingThreat.operations[0].operation == spikingBenign.operations[0].operation &&
+                    spikingThreat.operations[0].minimumLoad == spikingBenign.operations[0].minimumLoad &&
+                    spikingThreat.operations[0].maximumLoad == spikingBenign.operations[0].maximumLoad &&
+                    spikingThreat.operations[0].minimumDuration == spikingBenign.operations[0].minimumDuration &&
+                    spikingThreat.operations[0].behaviors[0].LoadDelta ==
+                        spikingBenign.operations[0].behaviors[0].LoadDelta,
+                    "hostile and benign SPIKING have equivalent visible demand definitions");
+                CheckWeightOverrides(host, director, overridesField);
+                CheckCustomProfiles(host, director, overridesField);
+                CheckAmbientScheduleReplay(host, director);
                 ConnectionTrafficProfile quick = director.Profiles.First(p => p.id == "quick-lookup");
                 Check(quick.operations.Length == 1 && quick.operations[0].operation == OperationKind.Read &&
                     quick.operations[0].minimumDuration == 4f && quick.operations[0].maximumDuration == 8f,
@@ -63,7 +91,7 @@ namespace Uptime.Connections.EditorTools
                     indexing.operations.Sum(o => o.maximumDuration) <= 75f,
                     "multi-stage lifetime is a total, not per-stage range");
                 Debug.Log("TrafficWitness seeded 200-plan replay: expected identical; observed identical. " +
-                    "Catalog: five weighted profiles, quick READ 4-8s, multi-stage total <=75s.");
+                    "Catalog: ten weighted profiles, quick READ 4-8s, multi-stage total <=75s.");
 
                 host.ResetSimulation();
                 NodeView ext = Node(host, "EXT1");
@@ -149,6 +177,7 @@ namespace Uptime.Connections.EditorTools
             {
                 director.Seed = originalSeed;
                 director.AutoGenerationEnabled = originalAuto;
+                overridesField.SetValue(director, originalOverrides);
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
         }
@@ -281,7 +310,7 @@ namespace Uptime.Connections.EditorTools
             ConnectionTrafficProfile profile = director.Profiles.Single(p => p.id == "delayed-threat");
             ConnectionTrafficProfile basic = director.Profiles.Single(p => p.id == "basic-threat");
             ConnectionSpawnPlan plan = director.QueueProfile("delayed-threat");
-            Check(profile.isHostile && profile.ambientWeight == 0f &&
+            Check(profile.isHostile && director.EffectiveAmbientWeight(profile.id) == 0.37f &&
                 plan.IsHostile && plan.Operations.Length == 2 &&
                 plan.Operations[0].Operation == OperationKind.Read &&
                 plan.Operations[0].DesiredLoad == 2f && plan.Operations[0].TotalWork == 16f &&
@@ -393,6 +422,136 @@ namespace Uptime.Connections.EditorTools
             p.ConnectionId + "|" + p.ProfileId + "|" + string.Join(">", p.Route.Select(n => n.NodeId)) +
             "|" + string.Join(";", p.Operations.Select(o => o.Operation + ":" +
                 o.DesiredLoad.ToString("R") + ":" + o.TotalWork.ToString("R")));
+
+        private static void CheckWeightOverrides(SimulationHost host,
+            ConnectionTrafficDirector director, FieldInfo field)
+        {
+            var original = (AmbientWeightOverride[])field.GetValue(director);
+            var excluded = new[] { "basic-threat", "delayed-threat", "spiking-threat",
+                "spiking-benign", "overload-demo" };
+            try
+            {
+                host.ResetSimulation();
+                string[] originalIds = Enumerable.Range(0, 20)
+                    .Select(i => director.GeneratePlan(i * 13f).ConnectionId).ToArray();
+                field.SetValue(director, excluded.Select(id =>
+                    new AmbientWeightOverride { profileId = id, weight = 0f }).ToArray());
+                host.ResetSimulation();
+                Check(excluded.All(id => director.EffectiveAmbientWeight(id) == 0f),
+                    "Inspector overrides exclude all special profiles");
+                var plans = Enumerable.Range(0, 100).Select(i => director.GeneratePlan(i * 13f)).ToArray();
+                Check(plans.All(p => !excluded.Contains(p.ProfileId)) &&
+                    plans.Select(p => p.ProfileId).Distinct().Count() == 5,
+                    "zero weights leave original benign mix in ambient selection");
+                Check(plans.Take(20).Select(p => p.ConnectionId).SequenceEqual(originalIds),
+                    "profile-roll changes do not change shuffled ID stream");
+                host.ResetSimulation();
+                ConnectionSpawnPlan explicitThreat = director.QueueProfile("basic-threat");
+                Check(explicitThreat.IsHostile, "zero-weight profile still spawns explicitly");
+                field.SetValue(director, new[] { new AmbientWeightOverride
+                    { profileId = "missing", weight = 1f } });
+                CheckResetRejected(director, "Unknown ambient weight profile");
+                field.SetValue(director, new[] { new AmbientWeightOverride
+                    { profileId = "retrieval", weight = 0f }, new AmbientWeightOverride
+                    { profileId = "RETRIEVAL", weight = 1f } });
+                CheckResetRejected(director, "Duplicate ambient weight override");
+                field.SetValue(director, new[] { new AmbientWeightOverride
+                    { profileId = "retrieval", weight = float.NaN } });
+                CheckResetRejected(director, "finite nonnegative weight");
+            }
+            finally
+            {
+                field.SetValue(director, original);
+                host.ResetSimulation();
+            }
+        }
+
+        private static void CheckResetRejected(ConnectionTrafficDirector director, string message)
+        {
+            bool rejected = false;
+            try { director.ResetDirector(); }
+            catch (InvalidOperationException error) { rejected = error.Message.Contains(message); }
+            Check(rejected, "invalid override reports " + message);
+        }
+
+        private static void CheckCustomProfiles(SimulationHost host,
+            ConnectionTrafficDirector director, FieldInfo overridesField)
+        {
+            FieldInfo profilesField = typeof(ConnectionTrafficDirector).GetField(
+                "profiles", BindingFlags.Instance | BindingFlags.NonPublic);
+            var originalProfiles = (ConnectionTrafficProfile[])profilesField.GetValue(director);
+            var originalOverrides = (AmbientWeightOverride[])overridesField.GetValue(director);
+            try
+            {
+                profilesField.SetValue(director, new[]
+                {
+                    originalProfiles.Single(p => p.id == "retrieval"),
+                    originalProfiles.Single(p => p.id == "spiking-benign")
+                });
+                overridesField.SetValue(director, new[] { new AmbientWeightOverride
+                    { profileId = "retrieval", weight = 0f } });
+                host.ResetSimulation();
+                Check(Enumerable.Range(0, 10).All(i =>
+                    director.GeneratePlan(i * 13f).ProfileId == "spiking-benign"),
+                    "custom Inspector profile array and keyed override drive ambient selection");
+                Check(director.QueueProfile("retrieval").ProfileId == "retrieval",
+                    "zero-weight custom profile remains explicitly spawnable");
+            }
+            finally
+            {
+                profilesField.SetValue(director, originalProfiles);
+                overridesField.SetValue(director, originalOverrides);
+                host.ResetSimulation();
+            }
+        }
+
+        private static void CheckAmbientScheduleReplay(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            var recorder = host.Recorder;
+            bool oldRecording = recorder.RecordingEnabled;
+            bool oldAuto = director.AutoGenerationEnabled;
+            int oldSeed = director.Seed;
+            try
+            {
+                recorder.RecordingEnabled = true;
+                director.AutoGenerationEnabled = true;
+                string first = AmbientRunSignature(host, recorder, out string firstMix);
+                string replay = AmbientRunSignature(host, recorder, out string replayMix);
+                Check(first == replay, "same seed and configuration replay ambient schedule and concrete plans");
+                Check(firstMix == replayMix, "same seed replays ambient profile mix");
+                director.Seed = oldSeed + 1;
+                string different = AmbientRunSignature(host, recorder, out string differentMix);
+                Check(first != different && firstMix != differentMix,
+                    "a different seed changes generated plans and mix");
+            }
+            finally
+            {
+                recorder.EndRun();
+                recorder.RecordingEnabled = oldRecording;
+                director.AutoGenerationEnabled = oldAuto;
+                director.Seed = oldSeed;
+                host.ResetSimulation();
+            }
+        }
+
+        private static string AmbientRunSignature(SimulationHost host,
+            ConnectionsRunRecorder recorder, out string mix)
+        {
+            host.ResetSimulation();
+            recorder.BeginRun();
+            for (int i = 0; i < 80; i++) host.StepSimulation(1f);
+            RunEvent[] arrivals = recorder.CurrentLog.events.Where(e =>
+                e.type == "plan_queued" && e.source == "ambient").ToArray();
+            Check(arrivals.Length >= 5 && arrivals[0].scheduledSpawnTime == 3f,
+                "single ambient scheduler keeps scene grace and interval");
+            mix = string.Join("|", arrivals.Select(e => e.profileId));
+            string signature = string.Join("|", recorder.CurrentLog.events.Where(e =>
+                e.type == "plan_queued" || e.type == "connection_spawned")
+                .Select(e => JsonUtility.ToJson(e)));
+            recorder.EndRun();
+            return signature;
+        }
 
         private static string TrafficSignature(ConnectionSpawnPlan p) => p.ScheduledSpawnTime + "|" +
             p.ProfileId + "|" + string.Join(">", p.Route.Select(n => n.NodeId)) +

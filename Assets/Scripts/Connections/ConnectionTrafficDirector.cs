@@ -29,6 +29,13 @@ namespace Uptime.Connections
         public ConnectionOperationProfile[] operations;
     }
 
+    [Serializable]
+    public sealed class AmbientWeightOverride
+    {
+        public string profileId;
+        [Min(0f)] public float weight;
+    }
+
     // Owns only generation and scheduling. SimulationHost owns every live connection.
     public sealed class ConnectionTrafficDirector : MonoBehaviour
     {
@@ -40,6 +47,8 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float spawnJitterSeconds = 1.5f;
         [SerializeField] private string ambientOriginId = "EXT1";
         [SerializeField] private ConnectionTrafficProfile[] profiles;
+        [Tooltip("Optional ambient weights by profile ID. Built-in profile operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
+        [SerializeField] private AmbientWeightOverride[] ambientWeightOverrides;
 
         private sealed class Queued
         {
@@ -56,6 +65,8 @@ namespace Uptime.Connections
         private System.Random random;
         private float nextAmbientAt;
         private long nextOrder;
+        private readonly Dictionary<string, float> effectiveWeights =
+            new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
 
         public bool AutoGenerationEnabled { get => autoGenerationEnabled; set => autoGenerationEnabled = value; }
         public int Seed { get => seed; set => seed = value; }
@@ -64,6 +75,8 @@ namespace Uptime.Connections
         public float SpawnIntervalSeconds => spawnIntervalSeconds;
         public float SpawnJitterSeconds => spawnJitterSeconds;
         public string AmbientOriginId => ambientOriginId;
+        public float EffectiveAmbientWeight(string profileId) =>
+            profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
 
         public void ResetDirector()
         {
@@ -87,6 +100,32 @@ namespace Uptime.Connections
             nextAmbientAt = initialGraceSeconds;
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
+            RebuildEffectiveWeights();
+        }
+
+        private void RebuildEffectiveWeights()
+        {
+            effectiveWeights.Clear();
+            foreach (ConnectionTrafficProfile profile in profiles)
+                if (profile != null && !string.IsNullOrWhiteSpace(profile.id))
+                {
+                    if (effectiveWeights.ContainsKey(profile.id))
+                        throw new InvalidOperationException("Duplicate traffic profile ID: " + profile.id);
+                    effectiveWeights.Add(profile.id, profile.ambientWeight);
+                }
+            if (ambientWeightOverrides == null) return;
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (AmbientWeightOverride entry in ambientWeightOverrides)
+            {
+                if (entry == null || string.IsNullOrWhiteSpace(entry.profileId) ||
+                    float.IsNaN(entry.weight) || float.IsInfinity(entry.weight) || entry.weight < 0f)
+                    throw new InvalidOperationException("Ambient weight overrides require an ID and finite nonnegative weight.");
+                if (!seen.Add(entry.profileId))
+                    throw new InvalidOperationException("Duplicate ambient weight override: " + entry.profileId);
+                if (!effectiveWeights.ContainsKey(entry.profileId))
+                    throw new InvalidOperationException("Unknown ambient weight profile: " + entry.profileId);
+                effectiveWeights[entry.profileId] = entry.weight;
+            }
         }
 
         public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
@@ -172,15 +211,15 @@ namespace Uptime.Connections
             if (random == null) ResetDirector();
             float total = 0f;
             foreach (ConnectionTrafficProfile profile in profiles)
-                if (profile != null) total += Mathf.Max(0f, profile.ambientWeight);
+                if (profile != null) total += Mathf.Max(0f, EffectiveAmbientWeight(profile.id));
             if (total <= 0f) return null;
             float choice = (float)random.NextDouble() * total;
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
             {
-                if (profile == null || profile.ambientWeight <= 0f) continue;
+                if (profile == null || EffectiveAmbientWeight(profile.id) <= 0f) continue;
                 selected = profile;
-                choice -= profile.ambientWeight;
+                choice -= EffectiveAmbientWeight(profile.id);
                 if (choice < 0f) break;
             }
             return BuildPlan(selected, atTime);
@@ -269,13 +308,13 @@ namespace Uptime.Connections
             new ConnectionTrafficProfile
             {
                 id = "basic-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.42f, isHostile = true,
                 operations = new[] { ThreatWriteStage() }
             },
             new ConnectionTrafficProfile
             {
                 id = "delayed-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.37f, isHostile = true,
                 operations = new[]
                 {
                     Stage(OperationKind.Read, "Reading records", 2f, 2f, 8f, 8f),
@@ -285,19 +324,19 @@ namespace Uptime.Connections
             new ConnectionTrafficProfile
             {
                 id = "spiking-threat", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f, isHostile = true,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.26f, isHostile = true,
                 operations = new[] { SpikingWriteStage(CompletionEffect.InfectionDelivery) }
             },
             new ConnectionTrafficProfile
             {
                 id = "spiking-benign", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.16f,
                 operations = new[] { SpikingWriteStage(CompletionEffect.None) }
             },
             new ConnectionTrafficProfile
             {
                 id = "overload-demo", claimedPurpose = "Database Maintenance",
-                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0f,
+                eligibleTargetIds = new[] { "DB" }, ambientWeight = 0.11f,
                 operations = new[] { new ConnectionOperationProfile
                 {
                     operation = OperationKind.Write, activityDescription = "Writing records",
