@@ -13,9 +13,9 @@ namespace Uptime.Connections.EditorTools
     // Deterministic Editor previews using the scene simulation and authored inspect prefab.
     public static class InspectV2Capture
     {
-        private const string Output = "Docs/Review/ConnectionsInspectV2";
+        private const string Output = "Docs/Review/ConnectionsTerminalInspectCleanup";
 
-        [MenuItem("Tools/Connections/Capture Inspect V2 Review")]
+        [MenuItem("Tools/Connections/Capture Terminal Inspect Cleanup Review")]
         public static void Run()
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
@@ -57,6 +57,14 @@ namespace Uptime.Connections.EditorTools
                     Stage(OperationKind.Execute, 2f, 2f)
                 }));
                 for (int i = 0; i < 4; i++) host.StepSimulation(1f);
+                director.QueueSpawnPlan(Plan("e5", route, new[]
+                {
+                    Stage(OperationKind.Read, 2f, 2f)
+                }));
+                host.StepSimulation(1f);
+                host.StepSimulation(1f);
+                if (!host.FindConnection("e5").IsComplete)
+                    throw new InvalidOperationException("Editor preview completed connection did not resolve");
 
                 GameObject cameraObject = new GameObject("Inspect V2 capture camera", typeof(Camera));
                 camera = cameraObject.GetComponent<Camera>();
@@ -86,7 +94,7 @@ namespace Uptime.Connections.EditorTools
                     new Vector2(0f, 1f), new Vector2(0f, 1f), Vector2.zero,
                     new Color(0.06f, 0.15f, 0.18f));
                 Heading(terminal, "CONNECTIONS // TERMINAL", new Vector2(25f, -16f), 24);
-                Heading(terminal, "INSPECT V2  /  EDITOR REVIEW", new Vector2(25f, -86f), 17);
+                Heading(terminal, "TERMINAL INSPECT  /  EDITOR PREVIEW", new Vector2(25f, -86f), 17);
 
                 Directory.CreateDirectory(Output);
                 Capture(camera, target, terminal, prefab, "inspect a1",
@@ -101,11 +109,15 @@ namespace Uptime.Connections.EditorTools
                 Capture(camera, target, terminal, prefab, "inspect -v d4",
                     new[] { host.FindConnection("d4") }, InspectPresentationMode.Verbose,
                     "verbose-long-1920x1080.png");
-                Capture(camera, target, terminal, prefab, "inspect a1 b2 c3 d4",
+                Capture(camera, target, terminal, prefab, "inspect a1 b2 c3 d4 e5",
                     new[] { host.FindConnection("a1"), host.FindConnection("b2"),
-                        host.FindConnection("c3"), host.FindConnection("d4") },
-                    InspectPresentationMode.Compact, "compact-consecutive-1920x1080.png");
-                Debug.Log("InspectV2Capture PASS: five 1920x1080 Editor renders in " + Output);
+                        host.FindConnection("c3"), host.FindConnection("d4"),
+                        host.FindConnection("e5") },
+                    InspectPresentationMode.Compact, "compact-multiple-completed-1920x1080.png");
+                Capture(camera, target, terminal, prefab, "inspect -v a1 e5",
+                    new[] { host.FindConnection("a1"), host.FindConnection("e5") },
+                    InspectPresentationMode.Verbose, "verbose-multiple-completed-1920x1080.png");
+                Debug.Log("InspectV2Capture PASS: six 1920x1080 Editor previews in " + Output);
             }
             finally
             {

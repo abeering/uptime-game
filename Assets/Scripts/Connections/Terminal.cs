@@ -115,17 +115,8 @@ namespace Uptime.Connections
                     Inspect(tokens);
                     break;
                 case "kill":
-                    if (tokens.Length != 2)
-                        AppendText("USAGE  kill a7", errorColor);
-                    else
-                    {
-                        bool killed = simulationHost != null && simulationHost.KillConnection(tokens[1]);
-                        recorder?.RecordPlayerAction(command, tokens[1], killed);
-                        string displayId = tokens[1].ToLowerInvariant();
-                        AppendText(killed ? "KILLED  " + displayId :
-                            "KILL  no active connection " + displayId,
-                            killed ? normalColor : errorColor);
-                    }
+                case "k":
+                    Kill(tokens, command);
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "spawn":
@@ -195,10 +186,11 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("MORE  spawn <profileId> (dev)  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill  demandtest  mark  log save|dir|folder  test  help", mutedColor);
+                    AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #endif
                     break;
                 default:
@@ -207,6 +199,31 @@ namespace Uptime.Connections
             }
 
             StartCoroutine(FocusInputNextFrame());
+        }
+
+        private void Kill(string[] tokens, string command)
+        {
+            if (tokens.Length < 2)
+            {
+                AppendText("USAGE  kill|k <id> [id ...]", errorColor);
+                return;
+            }
+            var attempted = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+            for (int i = 1; i < tokens.Length; i++)
+            {
+                string id = tokens[i];
+                string displayId = id.ToLowerInvariant();
+                if (!attempted.Add(id))
+                {
+                    AppendText("KILL  duplicate connection " + displayId + " (skipped)", errorColor);
+                    continue;
+                }
+                bool killed = simulationHost != null && simulationHost.KillConnection(id);
+                recorder?.RecordPlayerAction(command, id, killed);
+                AppendText(killed ? "KILLED  " + displayId :
+                    "KILL  no active connection " + displayId,
+                    killed ? normalColor : errorColor);
+            }
         }
 
         private void Inspect(string[] tokens)

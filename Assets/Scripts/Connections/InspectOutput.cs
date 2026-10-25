@@ -12,9 +12,9 @@ namespace Uptime.Connections
         [SerializeField] private InspectEntry[] entries;
         [SerializeField] private LayoutElement layout;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.2f;
-        [SerializeField, Min(1f)] private float activeEntryHeight = 188f;
-        [SerializeField, Min(1f)] private float completeEntryHeight = 126f;
-        [SerializeField, Min(1f)] private float compactEntryHeight = 94f;
+        [SerializeField, Min(1f)] private float activeEntryHeight = 210f;
+        [SerializeField, Min(1f)] private float completeEntryHeight = 128f;
+        [SerializeField, Min(1f)] private float compactEntryHeight = 98f;
         [SerializeField, Min(0f)] private float topPadding = 12f;
         [SerializeField, Min(0f)] private float entryGap = 12f;
         [SerializeField, Min(0f)] private float bottomPadding = 12f;
@@ -99,6 +99,7 @@ namespace Uptime.Connections
             {
                 float height = mode == InspectPresentationMode.Compact ? compactEntryHeight :
                     states[i].IsComplete ? completeEntryHeight : activeEntryHeight;
+                height += cards[i].ExtraHeight;
                 RectTransform entry = (RectTransform)cards[i].transform;
                 entry.anchoredPosition = new Vector2(14f, -y);
                 cards[i].SetHeight(height);
