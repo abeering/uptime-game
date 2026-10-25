@@ -362,6 +362,8 @@ namespace Uptime.Connections
             entry.scheduledSpawnTime = plan.ScheduledSpawnTime;
             entry.profileId = plan.ProfileId;
             entry.generation = plan.GenerationTrace?.Copy();
+            // A queued plan is complete evidence even if the connection never spawns.
+            entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
         }
 
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
