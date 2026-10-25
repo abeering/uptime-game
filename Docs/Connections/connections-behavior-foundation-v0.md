@@ -2,7 +2,9 @@
 
 **Status:** Slice 3A foundation merged; Slice 3B adds reusable OVERLOAD and SPIKING LOAD keywords and manual-only examples. The Slice 3A timed adjustment remains for deterministic witnesses.
 
-**Later Generated Hostile Traffic V0 update:** The Slice 3B examples now have nonzero default ambient weights. The keyword executor and behavior definitions remain as described below; both benign and hostile SPIKING use the same visible demand behavior.
+**Later Generated Hostile Traffic V0 update:** The Slice 3B examples gained nonzero default ambient weights in that phase. The keyword executor and behavior definitions remain as described below; both benign and hostile SPIKING use the same visible demand behavior.
+
+**Purpose & Anomaly Generation V0 update (October 25, 2026):** Those fixed examples have zero default ambient weight again and remain manually spawnable. Generated purposes may attach the same shared OVERLOAD and SPIKING behaviors; the keywords still do not reveal intent. See [current generation](connections-purpose-anomaly-generation-v0.md).
 
 ## Ownership and terms
 
