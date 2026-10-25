@@ -274,7 +274,7 @@ namespace Uptime.Connections
             var stages = new List<OperationStage>(normal);
             var anomalies = new List<string>();
             string generationDecision = ambient ? "BENIGN_NORMAL" : "MANUAL_BENIGN";
-            string selectedKeyword = "";
+            var selectedKeywords = new List<GeneratedKeywordSelection>();
             if (objective == "LOADER")
             {
                 generationDecision = "LOADER";
@@ -286,7 +286,7 @@ namespace Uptime.Connections
                     anomalies.Add("work-deviation");
                 }
                 // The keyword engine is shared with benign traffic; this does not label intent.
-                if (random.NextDouble() < 0.25) selectedKeyword = AddKeyword(stages);
+                if (random.NextDouble() < 0.25) selectedKeywords.Add(AddKeyword(stages));
             }
             else if (objective == "DELIVERY")
             {
@@ -312,7 +312,7 @@ namespace Uptime.Connections
             else if (ambient && random.NextDouble() < benignOutlierChance)
             {
                 generationDecision = "BENIGN_OUTLIER";
-                if (random.NextDouble() < 0.25) selectedKeyword = AddKeyword(stages);
+                if (random.NextDouble() < 0.25) selectedKeywords.Add(AddKeyword(stages));
                 else
                 {
                     string anomaly = RandomAnomaly();
@@ -323,7 +323,8 @@ namespace Uptime.Connections
             var trace = new ConnectionGenerationTrace
             {
                 purposeId = purpose.id, objective = objective,
-                generationDecision = generationDecision, selectedKeyword = selectedKeyword,
+                generationDecision = generationDecision,
+                selectedKeywords = selectedKeywords.ToArray(),
                 anomalies = anomalies.ToArray(),
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
                 finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray())
@@ -368,7 +369,7 @@ namespace Uptime.Connections
             }
         }
 
-        private string AddKeyword(List<OperationStage> stages)
+        private GeneratedKeywordSelection AddKeyword(List<OperationStage> stages)
         {
             int index = random.Next(stages.Count);
             OperationStage stage = stages[index];
@@ -378,7 +379,11 @@ namespace Uptime.Connections
                 : TimedModifierBehaviorDefinition.Spiking("SPIKING", 5f, 2f, 5f);
             behaviors.Add(keyword);
             stages[index] = Changed(stage, behaviors: behaviors.ToArray());
-            return keyword.Id;
+            return new GeneratedKeywordSelection
+            {
+                operationIndex = index, behaviorId = keyword.Id,
+                behaviorKind = keyword.Kind.ToString()
+            };
         }
 
         private static OperationStage Changed(OperationStage stage, OperationKind? kind = null,
