@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     public enum ConnectionRunMode { AuthoredWitness, Generated }
+    public enum CleanResult { Complete, NoInfection, UnknownNode }
 
     // The only clock and owner of resource state for the Connections game.
     [ExecuteAlways]
@@ -201,6 +202,7 @@ namespace Uptime.Connections
                         bool applied = ApplyInfection(target,
                             occurrence.Payload, occurrence.ConnectionId,
                             occurrence.OperationIndex);
+                        occurrence.InfectionApplied = applied;
                         if (applied && occurrence.Payload.Kind == InfectionKind.Blackout)
                             newlyBlackout.Add(target);
                     }
@@ -364,6 +366,32 @@ namespace Uptime.Connections
 
         public bool TryRemovePhantomLoad(string nodeId, out string error)
             => TryRemoveInfection(nodeId, InfectionKind.PhantomLoad, out error);
+
+        // One player action removes the node's current infections as a batch.
+        public CleanResult CleanNode(string nodeId, string command)
+        {
+            NodeResources target = FindNodeResources(nodeId);
+            if (target == null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, nodeId, "unknown_node");
+                return CleanResult.UnknownNode;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            var removed = infections.FindAll(infection => infection.Target == target);
+            bool success = removed.Count > 0;
+            int actionSequence = recorder != null ? recorder.RecordPlayerAction(command,
+                null, success, target.View.NodeId, success ? "clean_complete" : "no_infection") : 0;
+            if (!success) return CleanResult.NoInfection;
+
+            infections.RemoveAll(infection => infection.Target == target);
+            foreach (NodeInfection infection in removed)
+                recorder?.RecordInfection("infection_removed", infection, simulationTimeSeconds,
+                    "player_clean", actionSequence);
+            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            RefreshDisplays();
+            recorder?.CaptureSnapshot(simulationTimeSeconds);
+            return CleanResult.Complete;
+        }
 
         public bool TryRemoveInfection(string nodeId, InfectionKind kind, out string error)
         {

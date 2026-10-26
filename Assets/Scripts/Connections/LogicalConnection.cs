@@ -116,6 +116,8 @@ namespace Uptime.Connections
         public string TargetNodeId { get; }
         public float TimeSeconds { get; }
         public InfectionPayload Payload { get; }
+        // Filled by the host before publishing the existing completion occurrence.
+        public bool? InfectionApplied { get; internal set; }
     }
 
     [Serializable]

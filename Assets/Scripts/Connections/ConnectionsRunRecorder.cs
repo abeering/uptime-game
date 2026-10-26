@@ -145,6 +145,7 @@ namespace Uptime.Connections
         public float elapsedLifetimeSeconds;
         public string command;
         public bool success;
+        public int actionSequence;
         public float healthPenaltyAmount;
         public float healthAfter;
         public string note;
@@ -473,7 +474,7 @@ namespace Uptime.Connections
         }
 
         public void RecordInfection(string type, NodeInfection infection, float time,
-            string reason)
+            string reason, int actionSequence = 0)
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent(type, time);
@@ -486,9 +487,11 @@ namespace Uptime.Connections
             entry.infectionAppliedAtSeconds = infection.AppliedAtSeconds;
             entry.sourceConnectionId = infection.SourceConnectionId;
             entry.sourceOperationIndex = infection.SourceOperationIndex;
-            entry.source = reason.StartsWith("debug_", StringComparison.Ordinal) ||
-                infection.SourceConnectionId == null ? "debug" : "delivery";
+            entry.source = reason == "player_clean" ? "player_clean" :
+                (reason.StartsWith("debug_", StringComparison.Ordinal) ||
+                infection.SourceConnectionId == null ? "debug" : "delivery");
             entry.reason = reason;
+            entry.actionSequence = actionSequence;
         }
 
         public void RecordSpawnerAttempt(NodeInfection parent, ConnectionSpawnPlan child,
@@ -562,13 +565,17 @@ namespace Uptime.Connections
             entry.establishedAtSeconds = time;
         }
 
-        public void RecordPlayerAction(string command, string connectionId, bool success)
+        public int RecordPlayerAction(string command, string connectionId, bool success,
+            string targetNodeId = null, string reason = null)
         {
-            if (!IsRecording) return;
+            if (!IsRecording) return 0;
             RunEvent entry = NewEvent("player_action", host.SimulationTimeSeconds);
             entry.command = command;
             entry.connectionId = connectionId;
+            entry.targetNodeId = targetNodeId;
             entry.success = success;
+            entry.reason = reason;
+            return entry.sequence;
         }
 
         public void RecordHealthPenalty(NetworkHealthEvent penalty, float resultingHealth)

@@ -60,9 +60,16 @@ namespace Uptime.Connections
         private void OnEffectOccurred(ConnectionEffectOccurrence occurrence)
         {
             if (occurrence.Type == CompletionEffect.InfectionDelivery)
-                AppendText("[THREAT] " + occurrence.ConnectionId.ToLowerInvariant() +
-                    " delivered infection payload to " + occurrence.TargetNodeId, errorColor);
+                AppendText(DeliveryMessage(occurrence),
+                    occurrence.InfectionApplied == true ? errorColor : mutedColor);
         }
+
+        public static string DeliveryMessage(ConnectionEffectOccurrence occurrence) =>
+            occurrence.InfectionApplied == true ?
+                "PAYLOAD INSTALLED  " + occurrence.ConnectionId.ToLowerInvariant() +
+                    "  " + occurrence.TargetNodeId :
+                "PAYLOAD NOT INSTALLED  " + occurrence.ConnectionId.ToLowerInvariant() +
+                    "  " + occurrence.TargetNodeId;
 
         private void OnDestroy()
         {
@@ -117,6 +124,9 @@ namespace Uptime.Connections
                 case "kill":
                 case "k":
                     Kill(tokens, command);
+                    break;
+                case "clean":
+                    Clean(tokens, command);
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "spawn":
@@ -249,7 +259,7 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  clean <nodeId>", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
@@ -366,6 +376,25 @@ namespace Uptime.Connections
                 AppendText(killed ? "KILLED  " + displayId :
                     "KILL  no active connection " + displayId,
                     killed ? normalColor : errorColor);
+            }
+        }
+
+        private void Clean(string[] tokens, string command)
+        {
+            if (tokens.Length != 2)
+                AppendText("USAGE  clean <nodeId>", errorColor);
+            else if (simulationHost == null)
+                AppendText("CLEAN FAILED  simulation unavailable", errorColor);
+            else
+            {
+                CleanResult result = simulationHost.CleanNode(tokens[1], command);
+                string nodeId = tokens[1].ToUpperInvariant();
+                AppendText(result == CleanResult.Complete ? "CLEAN COMPLETE  " + nodeId :
+                    result == CleanResult.NoInfection ?
+                        "CLEAN  NO INFECTION DETECTED  " + nodeId :
+                        "CLEAN FAILED  UNKNOWN NODE " + nodeId,
+                    result == CleanResult.Complete ? normalColor :
+                    result == CleanResult.NoInfection ? mutedColor : errorColor);
             }
         }
 
