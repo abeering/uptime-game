@@ -48,6 +48,24 @@ namespace Uptime.Connections.EditorTools
                     Math.Abs(first.EstablishedAtSeconds - 1.2f) < 0.001f &&
                     first.CompletedWork == 0f && first.HealthDeadlineSeconds > 1.2f,
                     "destination arrival begins service and deadline");
+                Near(first.AllocatedLoad, 1f, "arrival publishes LOAD before presentation");
+                Check(first.Performance == LoadPerformance.AtSpeed,
+                    "healthy arrival does not display a stalled red frame");
+                var presenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
+                Check(presenter != null, "path presenter for arrival tint");
+                LogicalPathView arrivalView = UnityEngine.Object.Instantiate(pathPrefab,
+                    presenter.PathLayer, false);
+                try
+                {
+                    Color identity = presenter.IdentityPalette.ColorAt(0);
+                    arrivalView.Bind(first, presenter.NetworkArea, presenter.MarkerLayer);
+                    arrivalView.SetIdentityColor(identity);
+                    arrivalView.SetLayout(new[] { 0f, 0f }, new[] { 8f, 8f });
+                    arrivalView.AdvanceVisual(0f);
+                    Check(arrivalView.GetComponent<PathGraphic>().color == identity,
+                        "first established frame renders identity color, not failure red");
+                }
+                finally { UnityEngine.Object.DestroyImmediate(arrivalView.gameObject); }
                 Check(recorder.CurrentLog.events.Where(e => e.type == "connection_node_arrived" &&
                     e.connectionId == "travel").Select(e => e.targetNodeId)
                     .SequenceEqual(new[] { "API", "DB" }), "arrival order");
@@ -57,6 +75,16 @@ namespace Uptime.Connections.EditorTools
                 Check(host.KillConnection("travel") && first.Resolution == ConnectionResolution.Killed &&
                     first.TerminationPhase == Lifecycle.Active, "active kill outcome");
                 Near(host.Health.Value, beforeKill - 10f, "active benign kill penalty");
+
+                host.ResetSimulation(); recorder.BeginRun();
+                var simultaneousA = Spawn(host, "arrival-a", false);
+                var simultaneousB = Spawn(host, "arrival-b", false);
+                host.StepSimulation(1.2f);
+                Check(simultaneousA.IsActive && simultaneousB.IsActive &&
+                    simultaneousA.CompletedWork == 0f && simultaneousB.CompletedWork == 0f,
+                    "same-step arrivals start service without advancing WORK");
+                Near(simultaneousA.AllocatedLoad, 1f, "first same-step arrival allocated");
+                Near(simultaneousB.AllocatedLoad, 1f, "second same-step arrival allocated");
 
                 host.ResetSimulation(); recorder.BeginRun();
                 var connecting = Spawn(host, "connecting-kill", false);
