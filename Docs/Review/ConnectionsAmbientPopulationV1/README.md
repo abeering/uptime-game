@@ -1,5 +1,22 @@
 # Connections Ambient Population V1 — playtest amendment
 
+## Final canonical WORK tuning
+
+After the population-ramp comparison below, all six built-in canonical PURPOSE profiles doubled their normal-operation mean WORK. Requested LOAD, purpose weights, ±25% WORK spread, and the coverage controller stayed unchanged. A fixed-seed rerun used the same 0.2-second samples. The comparison here is **ramped PR #40 before WORK tuning → after WORK tuning**.
+
+| Seed 1701, normal generation | Mean before → after | Peak before → after | Time at ≥5 before → after |
+|---|---:|---:|---:|
+| 0–30 s | 0.72 → 0.85 | 1 → 1 | 0% → 0% |
+| 30–60 s | 2.11 → 2.55 | 3 → 3 | 0% → 0% |
+| 60–90 s | 1.03 → 2.78 | 2 → 3 | 0% → 0% |
+| 90–180 s | 0.12 → 1.04 | 2 → 5 | 0% → 2.4% |
+
+The other normal-run 0–30-second peaks stayed **2, 1, and 3** for seeds 456, 90210, and 42. At 30–60 seconds, their peaks changed **3→5, 2→2, and 3→3**. Ordinary hostile plan counts through 600 seconds remained **13, 10, 13, and 10** across the four seeds. Later outcomes diverge because each generated connection lives longer.
+
+In the seed-1701 **healthy 600-second run** with hostile generation disabled, mean established benign occupancy rose **3.15→5.10**, peak **6→8**, time at ≥5 **10.5%→70.8%**, and the longest uninterrupted ≥5 stretch **27.2→272.6 seconds**. In its 90–180-second window, mean was **3.01→4.30** and time at ≥5 was **15.1%→39.6%**. The controller continues to produce a low opening without a 0–30-second surge, but it does **not** keep sustained healthy occupancy near its goal of 3 with these longer lifetimes. This is a final review caveat; no compensating population or WORK-rate change is included.
+
+Unity 6000.3.11f1 compiled the amended source. Traffic, Recorder, Resource, Network Health, Lifecycle, and Infection Witnesses passed. The image below was captured for the earlier ramp amendment, before this WORK tuning; it is retained as ramp review evidence, not a visual validation of the longer lifetimes.
+
 ![Seed 1701 at about 30 simulation seconds](play-mode-seed1701-30s-1458x820.png)
 
 This 1458×820 (approximately 16:9) frame was captured in rendered Unity 6000.3.11f1 **Editor Play Mode** from an isolated project copy. Randomize Seed was off, Seed was 1701, and an Editor script advanced the host by 300 fixed 0.1-second steps after Play initialization. It reported two runtime connections at 30.14 seconds. The network heading's “NO ACTIVE CONNECTIONS” is static authored copy. This automated capture checks rendering, not interactive terminal input, inspection, focus, or player action. Those still need manual 16:9 Editor review.

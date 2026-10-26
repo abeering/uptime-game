@@ -61,7 +61,7 @@ namespace Uptime.Connections.EditorTools
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "product-lookup");
                 Check(purposeProfile.purposeTemplate && purposeProfile.ambientWeight == 1.5f &&
-                    purposeProfile.operations[0].meanWork == 24f,
+                    purposeProfile.operations[0].meanWork == 48f,
                     "purpose template and independent WORK mean recorded");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");

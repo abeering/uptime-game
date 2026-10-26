@@ -1,5 +1,7 @@
 # Connections — Purpose & Anomaly Generation V0
 
+**Ambient Population V1 final WORK tuning (October 26, 2026):** The six built-in canonical PURPOSE recipes now use twice their original mean WORK at every normal operation. The table below gives the current values; the original means were 24, 24, 35, 60/18, 40/65, and 145 respectively. Requested LOAD ranges, purpose weights, ±25% WORK spread, generation rules, and the population controller are unchanged. Hostile plans derived from these PURPOSE baselines inherit the larger WORK; threat-specific duration behavior is deferred.
+
 **Infections V0 Slice 1 follow-up:** DELIVERY plans now include a concrete Phantom LOAD payload and apply it on operation completion. Developer `spawn <purposeId>` objective overrides reuse purpose sampling and anomaly recipes while bypassing ambient objective probability rolls. See [the infection contract](connections-infections-v0.md). The original generation-phase description below records its pre-infection behavior.
 
 **Status:** Focused Connections implementation, stacked on Generated Hostile Traffic V0. The source proposal is `Uptime_Connections_Purpose_Anomaly_Generation_V0.md` supplied for this task. Its numbers are provisional playtest guesses, not a settled balance contract. Packet gameplay is unchanged.
@@ -10,12 +12,12 @@ The single seeded ambient scheduler first selects a purpose using the existing e
 
 | Purpose ID / claim | Target | Normal operations: kind [LOAD; mean WORK] | Weight |
 |---|---|---|---:|
-| `product-lookup` / Product Detail Retrieval | DB | READ [0.5–1.1; 24] | 1.5 |
-| `customer-login` / Customer Authentication | AUTH | EXECUTE [0.8–1.6; 24] | 1.0 |
-| `cart-pricing` / Cart Price Calculation | API | EXECUTE [1.0–2.0; 35] | 1.0 |
-| `order-submit` / Checkout Order Submission | API | WRITE [1.5–3.0; 60] → READ [0.6–1.3; 18] | 0.9 |
-| `inventory-sync` / Inventory Reconciliation | DB | READ [1.0–1.8; 40] → WRITE [1.7–3.2; 65] | 0.6 |
-| `sales-export` / Sales Report Export | DB | READ [2.5–4.5; 145] | 0.25 |
+| `product-lookup` / Product Detail Retrieval | DB | READ [0.5–1.1; 48] | 1.5 |
+| `customer-login` / Customer Authentication | AUTH | EXECUTE [0.8–1.6; 48] | 1.0 |
+| `cart-pricing` / Cart Price Calculation | API | EXECUTE [1.0–2.0; 70] | 1.0 |
+| `order-submit` / Checkout Order Submission | API | WRITE [1.5–3.0; 120] → READ [0.6–1.3; 36] | 0.9 |
+| `inventory-sync` / Inventory Reconciliation | DB | READ [1.0–1.8; 80] → WRITE [1.7–3.2; 130] | 0.6 |
+| `sales-export` / Sales Report Export | DB | READ [2.5–4.5; 290] | 0.25 |
 
 The director's serialized rates start at 25% hostile, 50% DELIVERY among hostile, 8% benign outlier, 15% optional second hostile anomaly, and 10% subtle DELIVERY with no anomaly. These are independent generation rolls, not a separate hostile arrival clock. Manual `spawn <purposeId>` builds a normal benign purpose plan; all ten earlier fixed profiles remain manually spawnable. Their default ambient weights are zero, and the existing keyed weight override can re-enable any profile. Custom Inspector profile arrays retain the legacy duration-based builder unless marked as purpose templates with a positive mean WORK.
 

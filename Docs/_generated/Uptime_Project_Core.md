@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:435931e38461a2e9b5774f9c04d025ed9385c65395f931709e8769d9980af18c`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:3bfa62f51f65d487fec516dc9b297c8a4bb3a6f8332102d27f71707a8007506a`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Canonical PURPOSE lifetime tuning (October 26, 2026, PR #40):** The six built-in PURPOSE profiles now double each normal operation's mean WORK, extending typical uncontended lifetimes while keeping their requested LOAD ranges, weights, and ±25% WORK spread. Derived hostile plans inherit the longer baseline. The population controller, runtime WORK rate, and legacy manual profiles are unchanged. Current operation values are listed in [Purpose & Anomaly Generation V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-purpose-anomaly-generation-v0.md). A [healthy seed-1701 sanity run](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsAmbientPopulationV1/README.md) retained the low opening but reached mean occupancy 5.10 over 600 seconds against the goal of 3; sustained later crowding needs review. This is provisional four-node playtest tuning, not a threat-specific duration rule.
 
 **Population / Coverage V1 playtest amendment (October 26, 2026):** The scene now ramps its effective benign goal from 1 to 3 over 75 simulated seconds. Each coverage opportunity samples a spawn decision; when established plus imminent benign attempts meet the effective goal, only a 4% chance remains, so crowding stays possible without automatic top-ups. Plans scheduled more than five seconds ahead do not count as imminent. During Blackout, recent benign cancellations reduce the chance of another supplemental attempt and cap the next retry interval at 20 seconds; cleaning the last Blackout clears that pressure and brings the next opportunity within about one simulated second. These values are provisional four-node playtest tuning. The ordinary ambient stream, canonical PURPOSE recipe, hostile generation, and resource rules are unchanged. The recorder stores the ramp settings and each opportunity's effective goal, selection chance, roll, population, and next schedule. See the [playtest comparison](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsAmbientPopulationV1/README.md).
 
