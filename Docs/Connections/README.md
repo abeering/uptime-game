@@ -2,6 +2,10 @@
 
 Connections is Uptime's active gameplay prototype, separate from the retained Packet prototype. **Executable behavior** is defined by runtime code and the serialized Unity scene. Treat working ideas as hypotheses rather than implemented mechanics.
 
+## Core working design
+
+- [THREATS — objective-first generation](THREATS.md) — canonical PURPOSE baselines, LOADER vs INFECTOR objectives, genus-specific spawn parameters, shared signatures/tactics, and open decisions. **A working design anchor, not an implemented contract.**
+
 ## Current state and integrated contracts
 
 - [Current State](Current_State.md) — implementation baseline, validation, and source authority.
