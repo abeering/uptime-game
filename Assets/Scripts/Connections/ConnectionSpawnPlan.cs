@@ -77,6 +77,26 @@ namespace Uptime.Connections
 
     public enum LoaderStructure { Single, Delayed }
     public enum LoaderPattern { Immediate, Overload, Spiking }
+    public enum InfectorStructure { Standard, Delayed }
+    public enum InfectorSignature { None, HighLoad, LowLoad, OperationDeviation, WorkLong }
+
+    // Internal generation evidence; the concrete operation plan remains authoritative.
+    [Serializable]
+    public sealed class InfectorGenerationRecord
+    {
+        public string structure;
+        public string primarySignature;
+        public string secondarySignature;
+        public int deliveryOperationIndex;
+        public float normalNominalDeliverySeconds;
+        public float composedNominalDeliverySeconds;
+        public float finalNominalDeliverySeconds;
+        public float finalOperationNominalSeconds;
+        public float deliveryWindowWorkAdded;
+        public string deliveryWindowCorrectionReason;
+
+        public InfectorGenerationRecord Copy() => (InfectorGenerationRecord)MemberwiseClone();
+    }
 
     // Internal, concrete attack intent; ordinary inspection never reads this plan.
     [Serializable]
@@ -113,6 +133,8 @@ namespace Uptime.Connections
         public GeneratedOperationValue[] finalOperations;
         public ForcedGenerationOptions forcedOptions;
         public LoaderAttackPlan loaderAttack;
+        public bool hasInfector;
+        public InfectorGenerationRecord infector;
 
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
@@ -126,7 +148,9 @@ namespace Uptime.Connections
             normalOperations = CopyValues(normalOperations),
             finalOperations = CopyValues(finalOperations),
             forcedOptions = forcedOptions?.Copy(),
-            loaderAttack = loaderAttack?.Copy()
+            loaderAttack = loaderAttack?.Copy(),
+            hasInfector = hasInfector,
+            infector = infector?.Copy()
         };
 
         private static GeneratedOperationValue[] CopyValues(GeneratedOperationValue[] values)

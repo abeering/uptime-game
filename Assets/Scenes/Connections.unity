@@ -6600,6 +6600,13 @@ MonoBehaviour:
   loaderSpikeElevatedSeconds: 2
   loaderMinDurationSeconds: 30
   loaderMaxDurationSeconds: 60
+  infectorDelayedChance: 0.33
+  infectorMinDeliverySeconds: 25
+  infectorMinFinalEvidenceSeconds: 18
+  infectorHighLoadWeight: 65
+  infectorLowLoadWeight: 10
+  infectorOperationWeight: 15
+  infectorWorkLongWeight: 10
   phantomLoadWeight: 1
   blackoutWeight: 1
   spawnerWeight: 1

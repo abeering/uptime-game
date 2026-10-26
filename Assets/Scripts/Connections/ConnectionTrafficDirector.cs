@@ -78,6 +78,14 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float loaderSpikeElevatedSeconds = 2f;
         [SerializeField, Min(0f)] private float loaderMinDurationSeconds = 30f;
         [SerializeField, Min(0f)] private float loaderMaxDurationSeconds = 60f;
+        [Header("INFECTOR (provisional)")]
+        [SerializeField, Range(0f, 1f)] private float infectorDelayedChance = 0.33f;
+        [SerializeField, Min(0f)] private float infectorMinDeliverySeconds = 25f;
+        [SerializeField, Min(0f)] private float infectorMinFinalEvidenceSeconds = 18f;
+        [SerializeField, Min(0f)] private float infectorHighLoadWeight = 65f;
+        [SerializeField, Min(0f)] private float infectorLowLoadWeight = 10f;
+        [SerializeField, Min(0f)] private float infectorOperationWeight = 15f;
+        [SerializeField, Min(0f)] private float infectorWorkLongWeight = 10f;
         [Header("Delivery infection weights")]
         [SerializeField, Min(0f)] private float phantomLoadWeight = 1f;
         [SerializeField, Min(0f)] private float blackoutWeight = 1f;
@@ -143,6 +151,13 @@ namespace Uptime.Connections
         public float LoaderSpikeElevatedSeconds => loaderSpikeElevatedSeconds;
         public float LoaderMinDurationSeconds => loaderMinDurationSeconds;
         public float LoaderMaxDurationSeconds => loaderMaxDurationSeconds;
+        public float InfectorDelayedChance => infectorDelayedChance;
+        public float InfectorMinDeliverySeconds => infectorMinDeliverySeconds;
+        public float InfectorMinFinalEvidenceSeconds => infectorMinFinalEvidenceSeconds;
+        public float InfectorHighLoadWeight => infectorHighLoadWeight;
+        public float InfectorLowLoadWeight => infectorLowLoadWeight;
+        public float InfectorOperationWeight => infectorOperationWeight;
+        public float InfectorWorkLongWeight => infectorWorkLongWeight;
         public float PhantomLoadWeight => phantomLoadWeight;
         public float BlackoutWeight => blackoutWeight;
         public float SpawnerWeight => spawnerWeight;
@@ -406,7 +421,26 @@ namespace Uptime.Connections
         {
             if (random == null) ResetDirector();
             string objective = random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER";
-            return GenerateWeightedPurposePlan(atTime, false, objective);
+            InfectionKind? infection = objective == "DELIVERY" ? ChooseInfection() : null;
+            return GenerateWeightedPurposePlan(atTime, false, objective,
+                selectedInfectionKind: infection);
+        }
+
+        // Witness seam: objective and optional dimensions are explicit; null dimensions use
+        // the same seeded choices as ordinary INFECTOR generation.
+        public ConnectionSpawnPlan GenerateInfectorPlanForWitness(float atTime,
+            InfectorStructure? structure = null, InfectorSignature? primary = null,
+            InfectorSignature? secondary = null, InfectionKind? infection = null)
+        {
+            if (random == null) ResetDirector();
+            if (structure.HasValue && !Enum.IsDefined(typeof(InfectorStructure), structure.Value) ||
+                primary.HasValue && !Enum.IsDefined(typeof(InfectorSignature), primary.Value) ||
+                secondary.HasValue && !Enum.IsDefined(typeof(InfectorSignature), secondary.Value))
+                throw new ArgumentOutOfRangeException(nameof(primary));
+            return GenerateWeightedPurposePlan(atTime, false, "DELIVERY",
+                infectorStructure: structure, infectorPrimary: primary,
+                infectorSecondary: secondary,
+                selectedInfectionKind: infection ?? ChooseInfection());
         }
 
         // Deterministic witness seam; the production clock samples these dimensions itself.
@@ -421,7 +455,9 @@ namespace Uptime.Connections
         }
 
         private ConnectionSpawnPlan GenerateWeightedPurposePlan(float atTime, bool benign,
-            string objective = null, LoaderStructure? structure = null, LoaderPattern? pattern = null)
+            string objective = null, LoaderStructure? structure = null, LoaderPattern? pattern = null,
+            InfectorStructure? infectorStructure = null, InfectorSignature? infectorPrimary = null,
+            InfectorSignature? infectorSecondary = null, InfectionKind? selectedInfectionKind = null)
         {
             float total = 0f;
             foreach (ConnectionTrafficProfile profile in profiles)
@@ -439,7 +475,10 @@ namespace Uptime.Connections
                 if (choice < 0f) break;
             }
             return BuildPlan(selected, atTime, true, forceBenign: benign,
-                selectedObjective: objective, loaderStructure: structure, loaderPattern: pattern);
+                selectedObjective: objective, loaderStructure: structure, loaderPattern: pattern,
+                infectorStructure: infectorStructure, infectorPrimary: infectorPrimary,
+                infectorSecondary: infectorSecondary,
+                selectedInfectionKind: selectedInfectionKind);
         }
 
         private static bool Compatible(ConnectionTrafficProfile purpose, string objective) =>
@@ -543,8 +582,8 @@ namespace Uptime.Connections
             random = spawnerRandom;
             try
             {
-                var chosen = choices[random.Next(choices.Count)];
                 InfectionKind kind = ChooseInfection();
+                var chosen = choices[random.Next(choices.Count)];
                 var overrides = new ConnectionSpawnOverrides(ManualObjective.Delivery, kind);
                 ConnectionSpawnPlan basePlan = BuildPlan(chosen.profile, atTime, false,
                     overrides, origin, chosen.target);
@@ -566,7 +605,11 @@ namespace Uptime.Connections
             bool ambient = false, ConnectionSpawnOverrides overrides = null,
             NodeView originOverride = null, NodeView targetOverride = null,
             bool forceBenign = false, string selectedObjective = null,
-            LoaderStructure? loaderStructure = null, LoaderPattern? loaderPattern = null)
+            LoaderStructure? loaderStructure = null, LoaderPattern? loaderPattern = null,
+            InfectorStructure? infectorStructure = null,
+            InfectorSignature? infectorPrimary = null,
+            InfectorSignature? infectorSecondary = null,
+            InfectionKind? selectedInfectionKind = null)
         {
             string id = NewId();
             if (id == null) return null;
@@ -590,7 +633,8 @@ namespace Uptime.Connections
             }
             if (selected.purposeTemplate)
                 return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
-                    overrides, forceBenign, selectedObjective, loaderStructure, loaderPattern);
+                    overrides, forceBenign, selectedObjective, loaderStructure, loaderPattern,
+                    infectorStructure, infectorPrimary, infectorSecondary, selectedInfectionKind);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors);
@@ -599,7 +643,9 @@ namespace Uptime.Connections
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
             string id, NodeView[] route, OperationStage[] normal, bool ambient,
             ConnectionSpawnOverrides overrides, bool forceBenign, string selectedObjective,
-            LoaderStructure? loaderStructure, LoaderPattern? loaderPattern)
+            LoaderStructure? loaderStructure, LoaderPattern? loaderPattern,
+            InfectorStructure? infectorStructure, InfectorSignature? infectorPrimary,
+            InfectorSignature? infectorSecondary, InfectionKind? selectedInfectionKind)
         {
             bool hostile = overrides != null || ambient && !forceBenign;
             string objective = overrides != null ? overrides.Objective.ToString().ToUpperInvariant() :
@@ -609,6 +655,7 @@ namespace Uptime.Connections
             string generationDecision = ambient ? "BENIGN_NORMAL" : "MANUAL_BENIGN";
             var selectedKeywords = new List<GeneratedKeywordSelection>();
             LoaderAttackPlan loaderAttack = null;
+            InfectorGenerationRecord infector = null;
             if (objective == "LOADER")
             {
                 generationDecision = "LOADER";
@@ -626,25 +673,16 @@ namespace Uptime.Connections
             }
             else if (objective == "DELIVERY")
             {
-                // Preserve the same one-roll branch: true means no anomaly was intentionally selected.
-                bool subtle = random.NextDouble() < subtleDeliveryChance;
+                bool subtle = infectorPrimary == InfectorSignature.None ||
+                    !infectorPrimary.HasValue && random.NextDouble() < subtleDeliveryChance;
                 generationDecision = subtle ? "DELIVERY_SUBTLE" : "DELIVERY_ANOMALOUS";
-                if (!subtle)
-                {
-                    string anomaly = RandomAnomaly();
-                    ApplyAnomaly(stages, anomaly, false);
-                    anomalies.Add(anomaly);
-                    if (random.NextDouble() < secondAnomalyChance)
-                    {
-                        anomaly = RandomAnomaly();
-                        ApplyAnomaly(stages, anomaly, false);
-                        anomalies.Add(anomaly);
-                    }
-                }
+                infector = ComposeInfector(stages, anomalies, subtle,
+                    infectorStructure, infectorPrimary, infectorSecondary);
                 int last = stages.Count - 1;
                 OperationStage stage = stages[last];
                 InfectionKind kind = overrides != null ?
-                    overrides.InfectionKind ?? InfectionKind.PhantomLoad : ChooseInfection();
+                    overrides.InfectionKind ?? InfectionKind.PhantomLoad :
+                    selectedInfectionKind ?? ChooseInfection();
                 stages[last] = Changed(stage, effect: CompletionEffect.InfectionDelivery,
                     payload: Payload(kind, overrides));
             }
@@ -671,6 +709,8 @@ namespace Uptime.Connections
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
                 finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray()),
                 loaderAttack = loaderAttack?.Copy(),
+                hasInfector = infector != null,
+                infector = infector?.Copy(),
                 forcedOptions = overrides == null ? null : new ForcedGenerationOptions
                 {
                     objective = objective,
@@ -739,6 +779,172 @@ namespace Uptime.Connections
                     loaderSpikeElevatedSeconds : 0f,
                 durationSeconds = duration
             };
+        }
+
+        private InfectorGenerationRecord ComposeInfector(List<OperationStage> stages,
+            List<string> anomalies, bool subtle, InfectorStructure? forcedStructure,
+            InfectorSignature? forcedPrimary, InfectorSignature? forcedSecondary)
+        {
+            float normalNominal = NominalSeconds(stages);
+            InfectorStructure structure = forcedStructure ?? (subtle ? InfectorStructure.Standard :
+                random.NextDouble() < infectorDelayedChance ?
+                    InfectorStructure.Delayed : InfectorStructure.Standard);
+            if (subtle && (structure != InfectorStructure.Standard ||
+                forcedSecondary.HasValue && forcedSecondary.Value != InfectorSignature.None))
+                throw new ArgumentException("A subtle INFECTOR must retain its normal PURPOSE arc.");
+            int earliestChange = int.MaxValue;
+            InfectorSignature primary = InfectorSignature.None;
+            InfectorSignature secondary = InfectorSignature.None;
+            if (!subtle)
+            {
+                if (structure == InfectorStructure.Delayed)
+                {
+                    OperationStage last = stages[stages.Count - 1];
+                    OperationKind kind = (OperationKind)random.Next(3);
+                    stages.Add(Changed(last, kind: kind,
+                        description: kind == last.Operation ? last.ActivityDescription : Activity(kind)));
+                    earliestChange = stages.Count - 1;
+                }
+                primary = forcedPrimary ?? ChooseInfectorSignature(InfectorSignature.None);
+                if (primary == InfectorSignature.None)
+                    throw new ArgumentException("An anomalous INFECTOR needs a signature.");
+                earliestChange = Mathf.Min(earliestChange,
+                    ApplyInfectorSignature(stages, structure, primary));
+                anomalies.Add(SignatureId(primary));
+                if (forcedSecondary.HasValue || random.NextDouble() < secondAnomalyChance)
+                {
+                    secondary = forcedSecondary ?? ChooseInfectorSignature(primary);
+                    if (secondary != InfectorSignature.None)
+                    {
+                        if (!CompatibleSignatures(primary, secondary))
+                            throw new ArgumentException("INFECTOR signatures conflict.");
+                        earliestChange = Mathf.Min(earliestChange,
+                            ApplyInfectorSignature(stages, structure, secondary));
+                        anomalies.Add(SignatureId(secondary));
+                    }
+                }
+            }
+            int deliveryIndex = stages.Count - 1;
+            float composedNominal = NominalSeconds(stages);
+            float finalNominal = stages[deliveryIndex].TotalWork /
+                stages[deliveryIndex].DesiredLoad;
+            float workAdded = 0f;
+            string reason = "none";
+            if (!subtle)
+            {
+                float totalShortfall = Mathf.Max(0f, infectorMinDeliverySeconds - composedNominal);
+                float finalShortfall = earliestChange == deliveryIndex ?
+                    Mathf.Max(0f, infectorMinFinalEvidenceSeconds - finalNominal) : 0f;
+                float secondsAdded = Mathf.Max(totalShortfall, finalShortfall);
+                if (secondsAdded > 0f)
+                {
+                    OperationStage last = stages[deliveryIndex];
+                    workAdded = secondsAdded * last.DesiredLoad;
+                    stages[deliveryIndex] = Changed(last, work: last.TotalWork + workAdded);
+                    reason = totalShortfall > 0f && finalShortfall > 0f ?
+                        "minimum_total_and_final_evidence" : totalShortfall > 0f ?
+                        "minimum_total" : "minimum_final_evidence";
+                }
+            }
+            else if (composedNominal < infectorMinDeliverySeconds)
+                reason = "subtle_natural_baseline";
+            return new InfectorGenerationRecord
+            {
+                structure = structure.ToString().ToUpperInvariant(),
+                primarySignature = SignatureId(primary),
+                secondarySignature = SignatureId(secondary),
+                deliveryOperationIndex = deliveryIndex,
+                normalNominalDeliverySeconds = normalNominal,
+                composedNominalDeliverySeconds = composedNominal,
+                finalNominalDeliverySeconds = NominalSeconds(stages),
+                finalOperationNominalSeconds = stages[deliveryIndex].TotalWork /
+                    stages[deliveryIndex].DesiredLoad,
+                deliveryWindowWorkAdded = workAdded,
+                deliveryWindowCorrectionReason = reason
+            };
+        }
+
+        private InfectorSignature ChooseInfectorSignature(InfectorSignature previous)
+        {
+            float high = CompatibleSignatures(previous, InfectorSignature.HighLoad) ?
+                Mathf.Max(0f, infectorHighLoadWeight) : 0f;
+            float low = CompatibleSignatures(previous, InfectorSignature.LowLoad) ?
+                Mathf.Max(0f, infectorLowLoadWeight) : 0f;
+            float operation = CompatibleSignatures(previous, InfectorSignature.OperationDeviation) ?
+                Mathf.Max(0f, infectorOperationWeight) : 0f;
+            float work = CompatibleSignatures(previous, InfectorSignature.WorkLong) ?
+                Mathf.Max(0f, infectorWorkLongWeight) : 0f;
+            float total = high + low + operation + work;
+            if (total <= 0f)
+                throw new InvalidOperationException("INFECTOR signature weights need a compatible positive choice.");
+            float draw = (float)random.NextDouble() * total;
+            return draw < high ? InfectorSignature.HighLoad :
+                draw < high + low ? InfectorSignature.LowLoad :
+                draw < high + low + operation ? InfectorSignature.OperationDeviation :
+                InfectorSignature.WorkLong;
+        }
+
+        private static bool CompatibleSignatures(InfectorSignature first, InfectorSignature next) =>
+            next != InfectorSignature.None &&
+            !(first == InfectorSignature.HighLoad && next == InfectorSignature.LowLoad ||
+              first == InfectorSignature.LowLoad && next == InfectorSignature.HighLoad ||
+              first == InfectorSignature.WorkLong &&
+                  (next == InfectorSignature.HighLoad || next == InfectorSignature.LowLoad) ||
+              next == InfectorSignature.WorkLong &&
+                  (first == InfectorSignature.HighLoad || first == InfectorSignature.LowLoad) ||
+              first == InfectorSignature.OperationDeviation &&
+                  next == InfectorSignature.OperationDeviation);
+
+        private int ApplyInfectorSignature(List<OperationStage> stages,
+            InfectorStructure structure, InfectorSignature signature)
+        {
+            int index = structure == InfectorStructure.Delayed ? stages.Count - 1 :
+                random.Next(stages.Count);
+            OperationStage stage = stages[index];
+            switch (signature)
+            {
+                case InfectorSignature.HighLoad:
+                    float highLoad = stage.DesiredLoad * Range(2.5f, 4f);
+                    stages[index] = Changed(stage, load: highLoad,
+                        work: stage.TotalWork * (highLoad / stage.DesiredLoad));
+                    break;
+                case InfectorSignature.LowLoad:
+                    stages[index] = Changed(stage,
+                        load: stage.DesiredLoad * Range(0.2f, 0.5f));
+                    break;
+                case InfectorSignature.WorkLong:
+                    stages[index] = Changed(stage, work: stage.TotalWork * Range(2f, 4f));
+                    break;
+                case InfectorSignature.OperationDeviation:
+                    OperationKind other = (OperationKind)(((int)stage.Operation +
+                        1 + random.Next(2)) % 3);
+                    OperationStage changed = Changed(stage, kind: other,
+                        description: Activity(other));
+                    if (structure == InfectorStructure.Standard && random.NextDouble() < 0.5)
+                    {
+                        stages.Add(changed);
+                        index = stages.Count - 1;
+                    }
+                    else stages[index] = changed;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(signature));
+            }
+            return index;
+        }
+
+        private static string SignatureId(InfectorSignature signature) =>
+            signature == InfectorSignature.HighLoad ? "high-load" :
+            signature == InfectorSignature.LowLoad ? "low-load" :
+            signature == InfectorSignature.OperationDeviation ? "operation-deviation" :
+            signature == InfectorSignature.WorkLong ? "work-deviation" : "none";
+
+        private static float NominalSeconds(IEnumerable<OperationStage> stages)
+        {
+            float seconds = 0f;
+            foreach (OperationStage stage in stages)
+                seconds += stage.TotalWork / stage.DesiredLoad;
+            return seconds;
         }
 
         private InfectionPayload Payload(InfectionKind kind, ConnectionSpawnOverrides overrides) =>

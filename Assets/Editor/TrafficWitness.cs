@@ -503,6 +503,7 @@ namespace Uptime.Connections.EditorTools
                 Check(plans.Any(p => p.GenerationTrace.anomalies.Contains(id)),
                     "sample includes " + id);
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
+                !p.IsHostile &&
                 p.GenerationTrace.anomalies.Length == 1 &&
                 (p.GenerationTrace.anomalies[0] == "high-load" ||
                  p.GenerationTrace.anomalies[0] == "low-load")))
@@ -526,6 +527,7 @@ namespace Uptime.Connections.EditorTools
                     p.GenerationTrace.anomalies[0] == "low-load"),
                 "both LOAD directions sampled");
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
+                !p.IsHostile &&
                 p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation"))
             {
@@ -544,7 +546,7 @@ namespace Uptime.Connections.EditorTools
             Check(plans.Any(p => p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation"),
                 "WORK deviation sampled");
-            Check(plans.Where(p => p.GenerationTrace.anomalies.Length == 1 &&
+            Check(plans.Where(p => !p.IsHostile && p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation")
                 .Any(p => p.GenerationTrace.finalOperations.Zip(
                     p.GenerationTrace.normalOperations, (a, b) => a.totalWork / b.totalWork)
@@ -586,12 +588,15 @@ namespace Uptime.Connections.EditorTools
                         break;
                     case "DELIVERY_SUBTLE":
                         Check(plan.IsHostile && trace.objective == "DELIVERY" &&
-                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0,
+                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0 &&
+                            trace.infector != null && trace.infector.structure == "STANDARD" &&
+                            trace.infector.deliveryWindowWorkAdded == 0f,
                             "intentional subtle delivery is distinguished from omitted evidence");
                         break;
                     case "DELIVERY_ANOMALOUS":
                         Check(plan.IsHostile && trace.objective == "DELIVERY" &&
-                            trace.anomalies.Length >= 1,
+                            trace.anomalies.Length >= 1 && trace.infector != null &&
+                            trace.infector.finalNominalDeliverySeconds >= 25f - 0.001f,
                             "anomalous delivery records its mutation choice");
                         break;
                     default:
