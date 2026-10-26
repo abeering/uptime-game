@@ -95,6 +95,8 @@ namespace Uptime.Connections
         public void Retire(LogicalConnectionState state)
         {
             if (connections == null) return;
+            if (state.Resolution != ConnectionResolution.Completed && views.ContainsKey(state))
+                return; // Keep the lane and ID visible through both failure flashes.
             var next = new List<LogicalConnectionState>(connections);
             next.Remove(state);
             connections = next.ToArray();
@@ -107,6 +109,13 @@ namespace Uptime.Connections
         {
             identityPalette.Release(state);
             views.Remove(state);
+            if (connections != null)
+            {
+                var next = new List<LogicalConnectionState>(connections);
+                next.Remove(state);
+                connections = next.ToArray();
+                UpdateLayouts();
+            }
         }
 
         private void LateUpdate()
@@ -125,7 +134,8 @@ namespace Uptime.Connections
             var routes = new List<RouteLaneOrder.Route>();
             foreach (LogicalConnectionState connection in connections)
             {
-                if (!connection.IsActive)
+                if (!connection.IsActive && !connection.IsConnecting &&
+                    !(connection.IsComplete && connection.Resolution != ConnectionResolution.Completed))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
@@ -169,7 +179,8 @@ namespace Uptime.Connections
                 identityPresenter.BeginFrame();
             foreach (LogicalConnectionState connection in connections)
             {
-                if (!connection.IsActive)
+                if (!connection.IsActive && !connection.IsConnecting &&
+                    !(connection.IsComplete && connection.Resolution != ConnectionResolution.Completed))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 float[] offsets = new float[connection.RouteLinks.Length];
@@ -213,7 +224,8 @@ namespace Uptime.Connections
                             identitiesByLink.Add(linkView, lines);
                         }
                         lines.Add(new IdentityPresenter.LiveLine(connection.ConnectionId,
-                            targetStart, targetEnd, visualStart, visualEnd, accent, visibleFraction,
+                            targetStart, targetEnd, visualStart, visualEnd,
+                            views[connection].DisplayAccent, visibleFraction,
                             width));
                     }
                     if (width < minLineWidth)

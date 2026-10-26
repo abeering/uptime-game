@@ -21,6 +21,10 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && director != null && recorder != null, "scene bindings");
             bool oldAuto = director.AutoGenerationEnabled;
             bool oldRecording = recorder.RecordingEnabled;
+            FieldInfo travelField = typeof(SimulationHost).GetField(
+                "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            travelField.SetValue(host, 0.000001f); // LifecycleWitness covers route travel.
             NodeResources db = host.Nodes.Single(n => n.View.NodeId == "DB");
             FieldInfo baseline = typeof(NodeResources).GetField("baselineLoad",
                 BindingFlags.Instance | BindingFlags.NonPublic);
@@ -133,17 +137,19 @@ namespace Uptime.Connections.EditorTools
                     new[] { Stage(OperationKind.Read, 5f, 2f, work) }));
                 for (int i = 0; i < 4; i++) host.StepSimulation(1f);
                 LogicalConnectionState workState = host.FindConnection("bw2");
-                Check(workState.IsActive && workState.CompletedWork == 8f &&
+                Check(workState.IsActive &&
                     workState.BaseWork == 5f && workState.CurrentTotalWork == 15f,
                     "WORK modifier raises effective requirement without changing base or progress");
+                Near(workState.CompletedWork, 8f, "WORK accomplished before requirement drops");
                 host.StepSimulation(1f);
                 Check(workState.Resolution == ConnectionResolution.Completed &&
-                    workState.CompletedWork == 8f && workState.Behaviors.History.Count == 2 &&
+                    workState.Behaviors.History.Count == 2 &&
                     workState.Behaviors.ActiveModifiers.Count == 0,
                     "lowering required WORK below accomplished WORK completes without rewriting progress");
                 RunEvent workCompletion = recorder.CurrentLog.events.Last(e =>
                     e.connectionId == "bw2" && e.type == "operation_completed");
-                Check(workCompletion.completedWork == 8f && workCompletion.requiredWork == 5f,
+                Check(Approx(workCompletion.completedWork, 8f) &&
+                    workCompletion.requiredWork == 5f,
                     "completion record preserves accomplished and effective required WORK separately");
 
                 host.ResetSimulation();
@@ -196,12 +202,12 @@ namespace Uptime.Connections.EditorTools
                 host.StepSimulation(1f);
                 Check(stalled.DesiredLoad == 5f && stalled.AllocatedLoad == 0f &&
                     stalled.Behaviors.History.Count == 1 &&
-                    stalled.Behaviors.History[0].TimeSeconds == 1f,
+                    Approx(stalled.Behaviors.History[0].TimeSeconds, 1f),
                     "time behavior adds LOAD despite zero allocation");
                 host.StepSimulation(1f);
                 Check(stalled.DesiredLoad == 2f && stalled.CompletedWork == 0f &&
                     stalled.Behaviors.History.Count == 2 &&
-                    stalled.Behaviors.History[1].TimeSeconds == 2f,
+                    Approx(stalled.Behaviors.History[1].TimeSeconds, 2f),
                     "time behavior removes LOAD despite zero allocation");
                 baseline.SetValue(db, oldBaseline);
 
@@ -263,6 +269,7 @@ namespace Uptime.Connections.EditorTools
                 recorder.EndRun();
                 recorder.RecordingEnabled = oldRecording;
                 director.AutoGenerationEnabled = oldAuto;
+                travelField.SetValue(host, originalTravel);
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
         }
@@ -281,18 +288,18 @@ namespace Uptime.Connections.EditorTools
             host.StepSimulation(1f);
             LogicalConnectionState overloaded = host.FindConnection("kw-overload");
             Check(overloaded.BaseLoad == 2f && overloaded.DesiredLoad == 12f &&
-                overloaded.AllocatedLoad == 10f && overloaded.CompletedWork == 10f &&
+                overloaded.AllocatedLoad == 10f && Approx(overloaded.CompletedWork, 10f) &&
                 overloaded.Behaviors.History.Count == 1 &&
-                overloaded.Behaviors.History[0].TimeSeconds == 0f,
+                Approx(overloaded.Behaviors.History[0].TimeSeconds, 0f),
                 "zero-delay OVERLOAD applies before first allocation through the normal allocator");
             host.StepSimulation(1f);
             Check(overloaded.Behaviors.History.Count == 1 && overloaded.DesiredLoad == 12f,
                 "OVERLOAD activates only once before its delayed companion");
             host.StepSimulation(1f);
             Check(overloaded.DesiredLoad == 15f && overloaded.AllocatedLoad == 10f &&
-                overloaded.CompletedWork == 30f &&
+                Approx(overloaded.CompletedWork, 30f) &&
                 overloaded.Behaviors.History.Count == 2 &&
-                overloaded.Behaviors.History[1].TimeSeconds == 2f &&
+                Approx(overloaded.Behaviors.History[1].TimeSeconds, 2f) &&
                 overloaded.Behaviors.History[1].Scope == BehaviorScope.Connection,
                 "delayed connection OVERLOAD combines with operation OVERLOAD at exact boundary");
             Check(host.KillConnection("kw-overload") &&
@@ -344,13 +351,13 @@ namespace Uptime.Connections.EditorTools
             }
             Check(spiking.Behaviors.History.Count == 4 &&
                 spiking.Behaviors.History[0].Action == ModifierChangeKind.Added &&
-                spiking.Behaviors.History[0].TimeSeconds == 3f &&
+                Approx(spiking.Behaviors.History[0].TimeSeconds, 3f) &&
                 spiking.Behaviors.History[1].Action == ModifierChangeKind.Removed &&
-                spiking.Behaviors.History[1].TimeSeconds == 4f &&
+                Approx(spiking.Behaviors.History[1].TimeSeconds, 4f) &&
                 spiking.Behaviors.History[2].ModifierId !=
                     spiking.Behaviors.History[0].ModifierId &&
-                spiking.Behaviors.History[2].TimeSeconds == 6f &&
-                spiking.Behaviors.History[3].TimeSeconds == 7f &&
+                Approx(spiking.Behaviors.History[2].TimeSeconds, 6f) &&
+                Approx(spiking.Behaviors.History[3].TimeSeconds, 7f) &&
                 spiking.Behaviors.ActiveModifiers.Count == 0,
                 "SPIKING repeats with distinct modifier IDs and exact boundary history");
             RunEvent[] spikeEvents = recorder.CurrentLog.events.Where(e =>
@@ -465,7 +472,7 @@ namespace Uptime.Connections.EditorTools
             Check(wide.Behaviors.History.Count == 5 &&
                 wide.Behaviors.ActiveModifiers.Count == 1 &&
                 wide.DesiredLoad == 12f &&
-                wide.Behaviors.History.All(e => e.TimeSeconds == 5f) &&
+                wide.Behaviors.History.All(e => Approx(e.TimeSeconds, 5f)) &&
                 wide.Behaviors.History.Select(e => e.ModifierId).Distinct().Count() == 3,
                 "wide step reconciles every crossed boundary in order at next step start");
             Near(wide.CompletedWork, 20f,
@@ -542,6 +549,8 @@ namespace Uptime.Connections.EditorTools
         private static void Near(float actual, float expected, string name) =>
             Check(Mathf.Abs(actual - expected) < 0.001f,
                 name + $": expected {expected:0.###}, observed {actual:0.###}");
+        private static bool Approx(float actual, float expected) =>
+            Mathf.Abs(actual - expected) < 0.001f;
         private static void Check(bool condition, string name)
         {
             if (!condition) throw new InvalidOperationException("BehaviorWitness failed: " + name);

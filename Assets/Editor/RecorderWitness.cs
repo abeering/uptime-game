@@ -22,6 +22,10 @@ namespace Uptime.Connections.EditorTools
                 "scene recorder binding");
             bool oldAuto = director.AutoGenerationEnabled;
             bool oldRecording = recorder.RecordingEnabled;
+            FieldInfo travelField = typeof(SimulationHost).GetField(
+                "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
+            float originalTravel = (float)travelField.GetValue(host);
+            travelField.SetValue(host, 0.000001f); // LifecycleWitness checks ordinary travel.
             try
             {
                 director.AutoGenerationEnabled = false;
@@ -37,7 +41,7 @@ namespace Uptime.Connections.EditorTools
                     Path.GetFileName(firstPath).Contains("_seed-" + director.Seed.ToString("00000") + "_"),
                     "stable timestamped seed filename");
                 ConnectionsRunLog initial = Read(firstPath);
-                Check(initial.schemaVersion == 1 && !string.IsNullOrEmpty(initial.run.runId) &&
+                Check(initial.schemaVersion == 2 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
                     initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
@@ -120,7 +124,8 @@ namespace Uptime.Connections.EditorTools
                     "manual plan is complete when queued, before its connection spawns");
                 host.StepSimulation(0.5f);
                 LogicalConnectionState live = host.FindConnection("rec1");
-                Check(live.IsActive && live.CompletedWork == 0.5f, "recorded run retains gameplay progression");
+                Check(live.IsActive, "recorded run establishes before progressing");
+                Near(live.CompletedWork, 0.5f, "recorded run retains gameplay progression");
                 recorder.CaptureSnapshot(host.SimulationTimeSeconds);
                 NetworkSnapshot liveSnapshot = recorder.CurrentLog.snapshots.Last();
                 NodeSnapshot dbSnapshot = liveSnapshot.nodes.First(n => n.id == "DB");
@@ -143,14 +148,18 @@ namespace Uptime.Connections.EditorTools
                     recorder.CurrentLog.events.Count(e => e.type == "operation_completed" &&
                     e.connectionId == "rec1") == 2,
                     "both operation boundaries recorded once");
-                Check(recorder.CurrentLog.events.Where(e => e.type == "operation_completed" &&
-                    e.connectionId == "rec1").Select(e => e.actualDurationSeconds)
-                    .SequenceEqual(new[] { 1f, 0.5f }), "actual stage durations");
+                float[] durations = recorder.CurrentLog.events.Where(e =>
+                    e.type == "operation_completed" && e.connectionId == "rec1")
+                    .Select(e => e.actualDurationSeconds).ToArray();
+                Check(durations.Length == 2, "two actual stage durations recorded");
+                Near(durations[0], 1f, "first actual stage duration");
+                Near(durations[1], 0.5f, "second actual stage duration");
                 RunEvent completion = recorder.CurrentLog.events.Single(e =>
                     e.type == "connection_resolved" && e.connectionId == "rec1");
-                Check(completion.resolutionReason == "Completed" && completion.timeSeconds == 1.5f &&
-                    completion.elapsedLifetimeSeconds == 1.5f,
+                Check(completion.resolutionReason == "Completed",
                     "natural resolution and lifetime");
+                Near(completion.timeSeconds, 1.5f, "natural resolution time");
+                Near(completion.elapsedLifetimeSeconds, 1.5f, "attempt lifetime");
                 RunEvent spawned = recorder.CurrentLog.events.Single(e =>
                     e.type == "connection_spawned" && e.connectionId == "rec1");
                 Check(spawned.definition.route.SequenceEqual(new[] { "EXT1", "API", "DB" }) &&
@@ -313,6 +322,7 @@ namespace Uptime.Connections.EditorTools
                 recorder.EndRun();
                 recorder.RecordingEnabled = oldRecording;
                 director.AutoGenerationEnabled = oldAuto;
+                travelField.SetValue(host, originalTravel);
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
         }

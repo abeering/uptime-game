@@ -25,7 +25,8 @@ namespace Uptime.Connections
         internal static List<OperationCompletion> Step(NodeResources[] nodes,
             LogicalConnectionState[] connections, IReadOnlyList<NodeInfection> infections,
             float deltaSeconds,
-            Action<IReadOnlyList<LogicalConnectionState>> afterAllocation = null)
+            Action<IReadOnlyList<LogicalConnectionState>> afterAllocation = null,
+            Func<LogicalConnectionState, bool> mayStartTransition = null)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
@@ -35,8 +36,10 @@ namespace Uptime.Connections
             ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             foreach (LogicalConnectionState connection in ordered)
             {
-                // A stage completed on the previous step begins requesting now.
-                connection.IsTransitioning = false;
+                // The host holds transitions completed in this outer fixed step,
+                // even when route arrivals split it into smaller allocation segments.
+                if (mayStartTransition == null || mayStartTransition(connection))
+                    connection.IsTransitioning = false;
             }
             Allocate(nodes, ordered, infections);
             afterAllocation?.Invoke(ordered);

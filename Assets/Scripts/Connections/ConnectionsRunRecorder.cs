@@ -13,7 +13,7 @@ namespace Uptime.Connections
 {
     [Serializable] public sealed class ConnectionsRunLog
     {
-        public int schemaVersion = 1;
+        public int schemaVersion = 2;
         public RunMetadata run;
         public List<RunEvent> events = new List<RunEvent>();
         public List<NetworkSnapshot> snapshots = new List<NetworkSnapshot>();
@@ -32,7 +32,7 @@ namespace Uptime.Connections
         public float fixedStepSeconds;
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
-        public float outageDrainPerSecond;
+        public float connectionTravelSecondsPerLink;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
     }
@@ -122,7 +122,6 @@ namespace Uptime.Connections
         public float parentInfectionAppliedAtSeconds;
         public string parentNodeId;
         public string parentConnectionId;
-        public string blockedNodeId;
         public string sourceConnectionId;
         public int sourceOperationIndex = -1;
         public string reason;
@@ -136,6 +135,13 @@ namespace Uptime.Connections
         public float actualDurationSeconds;
         public float desiredLoad;
         public string resolutionReason;
+        public string resolutionCause;
+        public string terminationPhase;
+        public string failureNodeId;
+        public float attemptTimeSeconds;
+        public bool established;
+        public float establishedAtSeconds;
+        public float resolvedAtSeconds;
         public float elapsedLifetimeSeconds;
         public string command;
         public bool success;
@@ -202,8 +208,6 @@ namespace Uptime.Connections
         public int slowedCount;
         public int overdueCount;
         public bool failed;
-        public int blackoutNodeCount;
-        public float outageDrainRate;
     }
 
     [Serializable] public sealed class NodeSnapshot
@@ -487,27 +491,6 @@ namespace Uptime.Connections
             entry.reason = reason;
         }
 
-        public void RecordBlackoutInterruption(LogicalConnectionState state,
-            string blockedNodeId, float time)
-        {
-            if (!IsRecording) return;
-            RunEvent entry = NewEvent("blackout_interruption", time);
-            entry.connectionId = state.ConnectionId;
-            entry.blockedNodeId = blockedNodeId;
-            entry.reason = "route_offline";
-        }
-
-        public void RecordArrivalRejected(LogicalConnectionDefinition definition,
-            string blockedNodeId, float time)
-        {
-            if (!IsRecording) return;
-            RunEvent entry = NewEvent("arrival_rejected", time);
-            entry.connectionId = definition.ConnectionId;
-            entry.blockedNodeId = blockedNodeId;
-            entry.reason = "route_offline";
-            entry.definition = Definition(definition);
-        }
-
         public void RecordSpawnerAttempt(NodeInfection parent, ConnectionSpawnPlan child,
             string reason, float time)
         {
@@ -547,10 +530,36 @@ namespace Uptime.Connections
             RunEvent entry = NewEvent("connection_resolved", time);
             entry.connectionId = state.ConnectionId;
             entry.resolutionReason = reason.ToString();
+            entry.resolutionCause = state.TerminationCause.ToString();
+            entry.terminationPhase = state.TerminationPhase.ToString();
+            entry.failureNodeId = state.FailureNodeId;
+            entry.definition = Definition(state.Definition);
+            entry.attemptTimeSeconds = state.SpawnedAtSeconds;
+            entry.established = state.HasEstablished;
+            entry.establishedAtSeconds = state.EstablishedAtSeconds;
+            entry.resolvedAtSeconds = time;
+            entry.healthPenaltyAmount = state.HealthPenaltyAmount;
+            entry.healthAfter = host.Health?.Value ?? 0f;
             entry.operationIndex = state.CurrentOperationIndex;
             entry.operationKind = state.CurrentOperation.ToString();
             entry.completedWork = state.CompletedWork;
-            entry.elapsedLifetimeSeconds = Mathf.Max(0f, time - state.EstablishedAtSeconds);
+            entry.elapsedLifetimeSeconds = Mathf.Max(0f, time - state.SpawnedAtSeconds);
+        }
+
+        public void RecordNodeArrival(LogicalConnectionState state, string nodeId, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("connection_node_arrived", time);
+            entry.connectionId = state.ConnectionId;
+            entry.targetNodeId = nodeId;
+        }
+
+        public void RecordConnectionEstablished(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("connection_established", time);
+            entry.connectionId = state.ConnectionId;
+            entry.establishedAtSeconds = time;
         }
 
         public void RecordPlayerAction(string command, string connectionId, bool success)
@@ -591,8 +600,7 @@ namespace Uptime.Connections
                     netRate = health.NetRate, recoveryRate = health.RecoveryRate,
                     degradationRate = health.DegradationRate,
                     slowedCount = health.SlowedCount, overdueCount = health.OverdueCount,
-                    failed = health.Failed, blackoutNodeCount = health.BlackoutNodeCount,
-                    outageDrainRate = health.OutageDrainRate };
+                    failed = health.Failed };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
                 NodeResources node = host.Nodes[i];
@@ -623,7 +631,7 @@ namespace Uptime.Connections
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
             {
-                if (!state.IsPending && !state.IsActive) continue;
+                if (!state.IsPending && !state.IsConnecting && !state.IsActive) continue;
                 if (state.IsActive) snapshot.activeConnections++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
@@ -632,7 +640,7 @@ namespace Uptime.Connections
                     allocatedLoad = state.AllocatedLoad,
                     completedWork = state.CompletedWork, totalWork = state.CurrentTotalWork,
                     baseWork = state.BaseWork,
-                    performance = state.IsPending ? null : state.Performance.ToString() });
+                    performance = state.IsActive ? state.Performance.ToString() : null });
             }
             snapshot.connections = active.ToArray();
             log.snapshots.Add(snapshot);
@@ -656,7 +664,7 @@ namespace Uptime.Connections
                 fixedStepSeconds = Time.fixedDeltaTime,
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
-                outageDrainPerSecond = host.OutageDrainPerSecond,
+                connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
                 nodes = new NodeConfiguration[host.Nodes.Length] };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
