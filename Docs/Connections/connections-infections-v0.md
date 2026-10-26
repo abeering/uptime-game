@@ -2,7 +2,9 @@
 
 **Lifecycle V1 update (October 25, 2026):** The Blackout and Spawner extension below records the merged PR #33 behavior. Its route rejection, pending-route interruption, offline-origin child filtering, and direct outage Health drain are superseded by [Lifecycle V1](connections-lifecycle-v1.md). A physically valid plan always becomes a Connecting attempt with a receipt. Blackout is checked at reached nodes and never directly changes Health; Spawner children from an offline origin are attempted and canceled at ingress. The `OFFLINE` symptom remains.
 
-**Status:** Phantom LOAD merged through PR #32; Blackout and Spawner merged through PR #33. Lifecycle V1 is on the current review branch. Packet remains independent.
+**Status:** Phantom LOAD merged through PR #32; Blackout and Spawner merged through PR #33; Lifecycle V1 merged through PR #34. Clean V0 is on the current review branch. Packet remains independent.
+
+**Clean V0 update:** On the current review branch, `clean <nodeId>` is a normal player command in Connections. It immediately removes every active infection on that node, including Phantom LOAD, Blackout, and Spawner, without advancing simulation time or directly changing Health. A clean of an uninfected node is a recorded no-op; an unknown node fails without changing state. Cleaning requires no prior identification, cost, or minigame. Ordinary feedback reveals only whether any infection was removed. The host refreshes allocation and presentation once after the batch, so freed LOAD is available immediately and an OFFLINE node becomes available immediately. Already-canceled attempts and their Health penalties remain final. A removed Spawner stops future child attempts while queued and existing children remain independent. One `player_action` receipt links by sequence to each `infection_removed` receipt, which retains the infection's delivery provenance. The recorder remains internal. A duplicate delivery emits `infection_rejected`; the terminal reports that its payload did not install. See the current [Lifecycle V1](connections-lifecycle-v1.md) arrival and Health rules.
 
 ## Delivery and ownership
 
@@ -10,7 +12,7 @@ A concrete connection plan carries an optional typed infection payload on an ope
 
 Normal WORK completion emits the existing delivery occurrence and applies its payload to that connection's target node. `kill` before completion prevents both. Application happens once per operation; killing or retiring the carrier afterward leaves the node infected. The simulation host owns infection instances independently of connections and clears all of them on reset. An instance records its target, kind, amount, simulation application time, and source connection ID and operation index. One instance of a kind may be active on a node. A repeated application is rejected and recorded without stacking or refreshing the original.
 
-The fixed-step clock is authoritative. There is no duration, automatic recovery, cleaning, or direct Health damage from application.
+The fixed-step clock is authoritative. There is no duration, automatic recovery, or direct Health damage from application. Player cleaning is immediate as described above.
 
 ## Resource effect
 
@@ -22,7 +24,7 @@ The existing node LOAD bar reads authoritative total requested LOAD. Ordinary in
 
 Editor and development builds support `spawn <profileId>` as before. For a purpose template, `spawn <purposeId> obj:loader` forces LOADER and runs the existing high-LOAD anomaly recipe. `spawn <purposeId> obj:delivery inf:phantom-load` forces DELIVERY and uses the scene's default infection amount; append `infp:load=8` to force an explicit positive amount. `obj:delivery` also defaults to Phantom LOAD when `inf:` is omitted. Forced objectives skip the ambient hostile and delivery probability rolls, while normal purpose sampling and the selected anomaly recipe still use the seeded generator. Infection options require DELIVERY; `infp:load` requires `inf:phantom-load`. Invalid options, unknown purposes, and invalid amounts return errors before a plan is queued. The command creates a real queued connection; infection application waits for its operation to complete. The older fixed profile IDs retain their plain `spawn <profileId>` behavior.
 
-For mechanical tests in Editor and development builds: `infect <nodeId> phantom-load [load]` injects directly, `uninfect <nodeId>` removes Phantom LOAD, and `infections` prints authoritative state. These are debug controls, not player investigation or `clean` gameplay. Direct injection and removal use the same host state and allocator as delivered infections.
+For mechanical tests in Editor and development builds: `infect <nodeId> phantom-load [load]` injects directly, `uninfect <nodeId>` removes Phantom LOAD, and `infections` prints authoritative state. These are debug controls, distinct from player `clean` gameplay. Direct injection and removal use the same host state and allocator as delivered infections.
 
 ## Internal recorder evidence
 
@@ -57,4 +59,4 @@ The Infection Witness exercises interruption and rejected routes, outage Health,
 3. Run `infect DB spawner 20`; watch a child originate at DB only after the cadence, inspect its normal operation, and kill it before delivery. Let the next child finish and confirm a persistent infection at its target.
 4. Queue `spawn product-lookup obj:delivery inf:blackout`, then observe its completed carrier and any interrupted routes. Use `infections`, `mark`, and `log save` to compare the visible symptoms with the internal causal JSON. Check terminal focus, route/label crowding, and propagation under ambient traffic.
 
-Throttle, cleaning, infection investigation, scoring, and Packet integration remain outside this work.
+Throttle, infection investigation, scoring, and Packet integration remain outside this work. Timed cleaning and cleaning minigames remain future design material.
