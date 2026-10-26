@@ -923,12 +923,21 @@ namespace Uptime.Connections.EditorTools
                 BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo weights = typeof(ConnectionTrafficDirector).GetField("ambientWeightOverrides",
                 BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            float oldStartupGoal = (float)startupGoal.GetValue(director);
             var oldWeights = (AmbientWeightOverride[])weights.GetValue(director);
             try
             {
                 travelField.SetValue(host, 0.6f);
                 director.Seed = 456;
                 director.AutoGenerationEnabled = true;
+                MethodInfo effectiveGoal = typeof(ConnectionTrafficDirector).GetMethod(
+                    "EffectiveCoverageGoal", BindingFlags.Instance | BindingFlags.NonPublic);
+                Check(Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 0f }) - 1f) < 0.001f &&
+                    Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 37.5f }) - 2f) < 0.001f &&
+                    Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 75f }) - 3f) < 0.001f,
+                    "configured startup coverage ramp reaches normal goal at 75 seconds");
                 string first = CoverageRunSignature(host, recorder, out string ordinary);
                 string replay = CoverageRunSignature(host, recorder, out string replayOrdinary);
                 Check(first == replay && ordinary == replayOrdinary,
@@ -948,6 +957,7 @@ namespace Uptime.Connections.EditorTools
                     .Select(p => new AmbientWeightOverride { profileId = p.id,
                         weight = p.id == "product-lookup" ? 1f : 0f }).ToArray();
                 weights.SetValue(director, onePurpose);
+                startupGoal.SetValue(director, 3f);
                 host.ResetSimulation(); recorder.BeginRun();
                 nextAmbient.SetValue(director, 1000f);
                 nextCoverage.SetValue(director, 0f);
@@ -997,11 +1007,23 @@ namespace Uptime.Connections.EditorTools
                 host.ResetSimulation(); recorder.BeginRun();
                 nextAmbient.SetValue(director, 1000f);
                 nextCoverage.SetValue(director, 0f);
+                ConnectionSpawnPlan imminent = director.QueueProfile("product-lookup");
+                director.QueueSpawnPlan(new ConnectionSpawnPlan(500f, "z9", imminent.Route,
+                    imminent.ProfileId, imminent.ClaimedPurpose, imminent.Operations), "future-test");
+                host.StepSimulation(0.1f);
+                Check(recorder.CurrentLog.events.Single(e => e.type == "coverage_opportunity")
+                    .anticipatedBenign == 1,
+                    "far-future queued plan does not suppress current coverage");
+
+                host.ResetSimulation(); recorder.BeginRun();
+                nextAmbient.SetValue(director, 1000f);
+                nextCoverage.SetValue(director, 0f);
                 for (int i = 0; i < 5; i++) director.QueueProfile("product-lookup");
                 host.StepSimulation(0.1f);
                 Check(recorder.CurrentLog.events.Single(e => e.type == "coverage_opportunity")
-                    .nextCoverageMeanSeconds > withManual.nextCoverageMeanSeconds,
-                    "high benign occupancy eases stochastic coverage opportunities");
+                    .reason == "probability_skip" &&
+                    recorder.CurrentLog.events.Count(e => e.source == "ambient_coverage") == 0,
+                    "high benign occupancy usually skips supplemental generation");
 
                 host.ResetSimulation(); recorder.BeginRun();
                 nextAmbient.SetValue(director, 1000f);
@@ -1043,6 +1065,21 @@ namespace Uptime.Connections.EditorTools
                 Check(recorder.CurrentLog.events.Single(e =>
                     e.type == "coverage_opportunity").recentCanceledBenign >= 1,
                     "recent canceled benign attempt eases repeated failed top-ups");
+                float outageNext = (float)nextCoverage.GetValue(director);
+                Check(outageNext <= host.SimulationTimeSeconds +
+                    director.CoverageOutageRetryMaxSeconds + 0.001f,
+                    "outage backoff remains bounded while Blackout persists");
+                Check(host.CleanNode("API", "clean API") == CleanResult.Complete,
+                    "coverage recovery test cleans Blackout");
+                host.StepSimulation(0.1f);
+                Check((float)nextCoverage.GetValue(director) <=
+                    host.SimulationTimeSeconds + 1f + 0.001f,
+                    "cleaning pulls next coverage opportunity forward");
+                host.StepSimulation(1.2f);
+                host.StepSimulation(0.1f);
+                Check(recorder.CurrentLog.events.Where(e => e.type == "coverage_opportunity")
+                    .Last().recentCanceledBenign == 0,
+                    "cleaned network does not retain Blackout cancellation pressure");
                 recorder.EndRun();
                 Debug.Log("TrafficWitness coverage: seeded replay, ordinary hostile stream, " +
                     "ambient toggle, manual and connecting anticipation, hostile exclusion, cancellation memory.");
@@ -1053,6 +1090,7 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = oldAuto;
                 director.Seed = oldSeed;
                 weights.SetValue(director, oldWeights);
+                startupGoal.SetValue(director, oldStartupGoal);
                 travelField.SetValue(host, oldTravel);
                 host.ResetSimulation();
             }
@@ -1073,13 +1111,14 @@ namespace Uptime.Connections.EditorTools
                 e.definition.route.Length >= 2),
                 "coverage uses canonical benign purpose plans and full recorded definitions");
             float[] times = coverage.Select(e => e.timeSeconds).ToArray();
-            Check(times.Length >= 3 &&
-                Enumerable.Range(1, times.Length - 1).Any(i => times[i] - times[i - 1] <= 1.1f) &&
-                Enumerable.Range(1, times.Length - 1).Any(i => times[i] - times[i - 1] >= 10f),
-                "fixed seed produces both close arrivals and a natural coverage lull");
+            Check(times.Length >= 1 && recorder.CurrentLog.events.Any(e =>
+                e.type == "coverage_opportunity" && e.reason == "probability_skip"),
+                "fixed seed produces coverage and skipped opportunities without a hard cap");
             Check(recorder.CurrentLog.events.Any(e => e.type == "coverage_opportunity" &&
-                e.nextCoverageMeanSeconds > 0f && e.nextCoverageIntervalSeconds > 0f),
-                "recorder explains coverage timing from occupancy");
+                e.nextCoverageMeanSeconds > 0f && e.nextCoverageIntervalSeconds > 0f &&
+                e.effectiveCoverageGoal > 0f &&
+                e.coverageSpawnChance > 0f),
+                "recorder explains ramp, selection, and timing from occupancy");
             ordinary = string.Join("|", plans.Where(e => e.source == "ambient")
                 .Select(e => e.scheduledSpawnTime + ":" + e.profileId + ":" +
                     JsonUtility.ToJson(e.generation)));

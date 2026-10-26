@@ -48,9 +48,14 @@ namespace Uptime.Connections.EditorTools
                     initial.run.traffic.hostileChance == 0.25f &&
                     initial.run.traffic.normalWorkSpread == 0.25f &&
                     initial.run.traffic.benignPopulationGoal == 3f &&
+                    initial.run.traffic.coverageStartupGoal == 1f &&
+                    initial.run.traffic.coverageRampSeconds == 75f &&
                     initial.run.traffic.coverageMeanIntervalSeconds == 10f &&
                     initial.run.traffic.coverageResponse == 0.6f &&
                     initial.run.traffic.coverageCancellationMemorySeconds == 60f &&
+                    initial.run.traffic.coverageAtGoalChance == 0.04f &&
+                    initial.run.traffic.coverageOutageRetryMaxSeconds == 20f &&
+                    initial.run.traffic.coverageImminentPlanSeconds == 5f &&
                     initial.run.traffic.coverageCanceledAttemptWeight == 2,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
@@ -337,6 +342,9 @@ namespace Uptime.Connections.EditorTools
             ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
         {
             bool oldAuto = director.AutoGenerationEnabled;
+            FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            float oldStartupGoal = (float)startupGoal.GetValue(director);
             FieldInfo nextAmbient = typeof(ConnectionTrafficDirector).GetField("nextAmbientAt",
                 BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
@@ -344,6 +352,7 @@ namespace Uptime.Connections.EditorTools
             try
             {
                 director.AutoGenerationEnabled = true;
+                startupGoal.SetValue(director, 3f);
                 host.ResetSimulation(); recorder.BeginRun();
                 nextAmbient.SetValue(director, 1000f);
                 nextCoverage.SetValue(director, 0f);
@@ -356,6 +365,9 @@ namespace Uptime.Connections.EditorTools
                 RunEvent plan = saved.events.Single(e =>
                     e.type == "plan_queued" && e.source == "ambient_coverage");
                 Check(coverage.anticipatedBenign == 1 &&
+                    coverage.effectiveCoverageGoal == 3f &&
+                    coverage.coverageSpawnChance == 1f &&
+                    coverage.coverageRoll < coverage.coverageSpawnChance &&
                     coverage.nextCoveragePressure >= 2 &&
                     coverage.nextCoverageMeanSeconds > 0f &&
                     coverage.nextCoverageIntervalSeconds > 0f &&
@@ -372,6 +384,7 @@ namespace Uptime.Connections.EditorTools
             }
             finally
             {
+                startupGoal.SetValue(director, oldStartupGoal);
                 recorder.EndRun();
                 director.AutoGenerationEnabled = oldAuto;
                 host.ResetSimulation();

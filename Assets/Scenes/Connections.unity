@@ -6576,9 +6576,13 @@ MonoBehaviour:
   spawnIntervalSeconds: 13.5
   spawnJitterSeconds: 1.5
   benignPopulationGoal: 3
+  coverageStartupGoal: 1
+  coverageRampSeconds: 75
   coverageMeanIntervalSeconds: 10
   coverageResponse: 0.6
   coverageCancellationMemorySeconds: 60
+  coverageAtGoalChance: 0.04
+  coverageOutageRetryMaxSeconds: 20
   ambientOriginId: EXT1
   profiles: []
   ambientWeightOverrides: []

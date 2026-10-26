@@ -52,9 +52,14 @@ namespace Uptime.Connections
         public float spawnIntervalSeconds;
         public float spawnJitterSeconds;
         public float benignPopulationGoal;
+        public float coverageStartupGoal;
+        public float coverageRampSeconds;
         public float coverageMeanIntervalSeconds;
         public float coverageResponse;
         public float coverageCancellationMemorySeconds;
+        public float coverageAtGoalChance;
+        public float coverageOutageRetryMaxSeconds;
+        public float coverageImminentPlanSeconds;
         public int coverageCanceledAttemptWeight;
         public float hostileChance;
         public float deliveryChance;
@@ -158,6 +163,9 @@ namespace Uptime.Connections
         public int establishedBenign;
         public int anticipatedBenign;
         public int recentCanceledBenign;
+        public float effectiveCoverageGoal;
+        public float coverageSpawnChance;
+        public float coverageRoll;
         public int nextCoveragePressure;
         public float nextCoverageMeanSeconds;
         public float nextCoverageIntervalSeconds;
@@ -439,7 +447,8 @@ namespace Uptime.Connections
         }
 
         public void RecordCoverageOpportunity(float time, int establishedBenign,
-            int anticipatedBenign, int recentCanceledBenign, int nextCoveragePressure,
+            int anticipatedBenign, int recentCanceledBenign, float effectiveGoal,
+            float spawnChance, float roll, int nextCoveragePressure,
             float nextMean, float nextInterval,
             float nextAt, string connectionId, string reason)
         {
@@ -449,6 +458,9 @@ namespace Uptime.Connections
             entry.establishedBenign = establishedBenign;
             entry.anticipatedBenign = anticipatedBenign;
             entry.recentCanceledBenign = recentCanceledBenign;
+            entry.effectiveCoverageGoal = effectiveGoal;
+            entry.coverageSpawnChance = spawnChance;
+            entry.coverageRoll = roll;
             entry.nextCoveragePressure = nextCoveragePressure;
             entry.nextCoverageMeanSeconds = nextMean;
             entry.nextCoverageIntervalSeconds = nextInterval;
@@ -726,10 +738,15 @@ namespace Uptime.Connections
                 spawnIntervalSeconds = trafficDirector.SpawnIntervalSeconds,
                 spawnJitterSeconds = trafficDirector.SpawnJitterSeconds,
                 benignPopulationGoal = trafficDirector.BenignPopulationGoal,
+                coverageStartupGoal = trafficDirector.CoverageStartupGoal,
+                coverageRampSeconds = trafficDirector.CoverageRampSeconds,
                 coverageMeanIntervalSeconds = trafficDirector.CoverageMeanIntervalSeconds,
                 coverageResponse = trafficDirector.CoverageResponse,
                 coverageCancellationMemorySeconds =
                     trafficDirector.CoverageCancellationMemorySeconds,
+                coverageAtGoalChance = trafficDirector.CoverageAtGoalChance,
+                coverageOutageRetryMaxSeconds = trafficDirector.CoverageOutageRetryMaxSeconds,
+                coverageImminentPlanSeconds = trafficDirector.CoverageImminentPlanSeconds,
                 coverageCanceledAttemptWeight =
                     trafficDirector.CoverageCanceledAttemptWeight,
                 hostileChance = trafficDirector.HostileChance,

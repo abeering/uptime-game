@@ -50,9 +50,13 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float spawnJitterSeconds = 1.5f;
         [Header("Benign population (soft coverage)")]
         [SerializeField, Min(0f)] private float benignPopulationGoal = 3f;
+        [SerializeField, Min(0f)] private float coverageStartupGoal = 1f;
+        [SerializeField, Min(0.01f)] private float coverageRampSeconds = 75f;
         [SerializeField, Min(0.01f)] private float coverageMeanIntervalSeconds = 10f;
         [SerializeField, Min(0f)] private float coverageResponse = 0.6f;
         [SerializeField, Min(0f)] private float coverageCancellationMemorySeconds = 60f;
+        [SerializeField, Range(0f, 1f)] private float coverageAtGoalChance = 0.04f;
+        [SerializeField, Min(0.1f)] private float coverageOutageRetryMaxSeconds = 20f;
         [SerializeField] private string ambientOriginId = "EXT1";
         [SerializeField] private ConnectionTrafficProfile[] profiles;
         [Tooltip("Optional ambient weights by profile ID. Built-in profile operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
@@ -80,6 +84,7 @@ namespace Uptime.Connections
         private const string IdLetters = "abcdefghijklmnopqrstuvwxyz";
         private const string IdDigits = "0123456789";
         private const int CanceledAttemptWeight = 2;
+        private const float ImminentPlanSeconds = 5f;
         private string[] shuffledIds;
         private int nextIdIndex;
         private bool idsExhausted;
@@ -88,6 +93,7 @@ namespace Uptime.Connections
         private System.Random coverageRandom;
         private float nextAmbientAt;
         private float nextCoverageAt;
+        private int lastBlackoutCount;
         private long nextOrder;
         private readonly Dictionary<string, float> effectiveWeights =
             new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
@@ -100,9 +106,14 @@ namespace Uptime.Connections
         public float SpawnIntervalSeconds => spawnIntervalSeconds;
         public float SpawnJitterSeconds => spawnJitterSeconds;
         public float BenignPopulationGoal => benignPopulationGoal;
+        public float CoverageStartupGoal => coverageStartupGoal;
+        public float CoverageRampSeconds => coverageRampSeconds;
         public float CoverageMeanIntervalSeconds => coverageMeanIntervalSeconds;
         public float CoverageResponse => coverageResponse;
         public float CoverageCancellationMemorySeconds => coverageCancellationMemorySeconds;
+        public float CoverageAtGoalChance => coverageAtGoalChance;
+        public float CoverageOutageRetryMaxSeconds => coverageOutageRetryMaxSeconds;
+        public float CoverageImminentPlanSeconds => ImminentPlanSeconds;
         public int CoverageCanceledAttemptWeight => CanceledAttemptWeight;
         public string AmbientOriginId => ambientOriginId;
         public float HostileChance => hostileChance;
@@ -166,7 +177,9 @@ namespace Uptime.Connections
             idsExhausted = false;
             nextOrder = 0;
             nextAmbientAt = initialGraceSeconds;
-            nextCoverageAt = initialGraceSeconds + CoverageDelay(0);
+            nextCoverageAt = initialGraceSeconds + CoverageDelay(0,
+                EffectiveCoverageGoal(initialGraceSeconds));
+            lastBlackoutCount = 0;
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
@@ -211,6 +224,17 @@ namespace Uptime.Connections
         public void Tick(float simulationTime, bool allowAmbient)
         {
             if (random == null) ResetDirector();
+            int blackoutCount = 0;
+            foreach (NodeInfection infection in host.Infections)
+                if (infection.Payload.Kind == InfectionKind.Blackout) blackoutCount++;
+            if (blackoutCount < lastBlackoutCount)
+            {
+                if (blackoutCount == 0) recentBenignCancellations.Clear();
+                // Cleaning restores a viable route; don't retain a long delay sampled
+                // while it was blocked. This reschedules only the coverage stream.
+                nextCoverageAt = Mathf.Min(nextCoverageAt, simulationTime + 1f);
+            }
+            lastBlackoutCount = blackoutCount;
             if (allowAmbient && autoGenerationEnabled && !idsExhausted)
             {
                 while (nextAmbientAt <= simulationTime + 0.00001f)
@@ -225,23 +249,33 @@ namespace Uptime.Connections
                 if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
                 {
                     int established, anticipated;
-                    CountBenignPopulation(out established, out anticipated);
+                    CountBenignPopulation(simulationTime, out established, out anticipated);
                     int cancellations = RecentBenignCancellations(simulationTime);
-                    ConnectionSpawnPlan plan = GenerateCoveragePlan(simulationTime);
+                    float goal = EffectiveCoverageGoal(simulationTime);
+                    int selectionPressure = established + anticipated +
+                        (blackoutCount > 0 ? CanceledAttemptWeight * cancellations : 0);
+                    float chance = Mathf.Lerp(coverageAtGoalChance, 1f,
+                        Mathf.Clamp01((goal - selectionPressure) / 2f));
+                    float roll = (float)coverageRandom.NextDouble();
+                    bool selected = roll < chance;
+                    ConnectionSpawnPlan plan = selected ? GenerateCoveragePlan(simulationTime) : null;
                     if (plan != null) QueueSpawnPlan(plan, "ambient_coverage");
                     int afterEstablished, afterAnticipated;
-                    CountBenignPopulation(out afterEstablished, out afterAnticipated);
+                    CountBenignPopulation(simulationTime, out afterEstablished, out afterAnticipated);
                     // Failed attempts remain recent evidence that another immediate
                     // attempt is unlikely to establish while an outage persists.
                     int nextPressure = afterEstablished + afterAnticipated +
                         CanceledAttemptWeight * cancellations;
-                    float mean = CoverageMean(nextPressure);
-                    float interval = CoverageDelay(nextPressure);
+                    float mean = CoverageMean(nextPressure, goal);
+                    float interval = CoverageDelay(nextPressure, goal);
+                    if (cancellations > 0 && blackoutCount > 0)
+                        interval = Mathf.Min(interval, coverageOutageRetryMaxSeconds);
                     nextCoverageAt = simulationTime + interval;
                     host.Recorder?.RecordCoverageOpportunity(simulationTime, established,
-                        anticipated, cancellations, nextPressure, mean, interval,
-                        nextCoverageAt, plan?.ConnectionId,
-                        plan == null ? (idsExhausted ? "ids_exhausted" : "no_weighted_purpose") : null);
+                        anticipated, cancellations, goal, chance, roll, nextPressure,
+                        mean, interval, nextCoverageAt, plan?.ConnectionId,
+                        plan != null ? null : !selected ? "probability_skip" :
+                            idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
                 }
             }
             queue.Sort((a, b) =>
@@ -346,7 +380,7 @@ namespace Uptime.Connections
             return BuildPlan(selected, atTime, true);
         }
 
-        private void CountBenignPopulation(out int established, out int anticipated)
+        private void CountBenignPopulation(float now, out int established, out int anticipated)
         {
             established = 0;
             anticipated = 0;
@@ -358,7 +392,8 @@ namespace Uptime.Connections
                     else if (state.IsConnecting || state.IsPending) anticipated++;
                 }
             foreach (Queued queued in queue)
-                if (!queued.Plan.IsHostile) anticipated++;
+                if (!queued.Plan.IsHostile &&
+                    queued.Plan.ScheduledSpawnTime <= now + ImminentPlanSeconds) anticipated++;
         }
 
         private int RecentBenignCancellations(float now)
@@ -368,19 +403,26 @@ namespace Uptime.Connections
             return recentBenignCancellations.Count;
         }
 
-        private float CoverageMean(int coveragePressure)
+        private float EffectiveCoverageGoal(float now)
+        {
+            return Mathf.Lerp(Mathf.Max(0f, coverageStartupGoal),
+                Mathf.Max(0f, benignPopulationGoal),
+                Mathf.Clamp01(now / Mathf.Max(0.01f, coverageRampSeconds)));
+        }
+
+        private float CoverageMean(int coveragePressure, float goal)
         {
             return Mathf.Max(0.01f, coverageMeanIntervalSeconds) *
                 Mathf.Exp(Mathf.Clamp(coverageResponse *
-                    (coveragePressure - benignPopulationGoal), -1.4f, 1.8f));
+                    (coveragePressure - goal), -1.4f, 1.8f));
         }
 
-        private float CoverageDelay(int coveragePressure)
+        private float CoverageDelay(int coveragePressure, float goal)
         {
             // Exponential waiting times allow both lulls and close arrivals. The occupancy
             // response changes their mean, without a hard floor or population cap.
             return Mathf.Max(0.1f, (float)(-Math.Log(1d - coverageRandom.NextDouble()) *
-                CoverageMean(coveragePressure)));
+                CoverageMean(coveragePressure, goal)));
         }
 
         private ConnectionSpawnPlan GenerateCoveragePlan(float atTime)
