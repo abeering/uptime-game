@@ -30,15 +30,15 @@ The conceptual recipe is:
 3. **Choose the connection's role.** It may remain benign (possibly with a benign outlier), or receive a hostile **genus and objective**.
 4. **Construct an objective-aware attack plan.** Decide the intended effect, strength, timing, target, and eligible tactics **before** finalizing abnormal numbers. This is where LOADER and INFECTOR differ.
 5. **Apply signatures and temporal behaviors to the normal sample.** Derive the final operation(s), requested LOAD, WORK, timed modifiers, and any infection payload so the concrete plan has a plausible opportunity to achieve its objective.
-6. **Validate and record.** Check that the chosen parameters are physically valid and mechanically consistent; queue a normal \`ConnectionSpawnPlan\` and retain baseline-vs-final and intent data **only in internal diagnostics**. The existing \`SimulationHost\` remains authoritative for allocation, advancement, delivery, and resolution.
+6. **Validate and record.** Check that the chosen parameters are physically valid and mechanically consistent; queue a normal `ConnectionSpawnPlan` and retain baseline-vs-final and intent data **only in internal diagnostics**. The existing `SimulationHost` remains authoritative for allocation, advancement, delivery, and resolution.
 
-The final connection should still obey universal simulation rules. An internally hostile objective does not automatically color it red, alter the allocator, or get revealed by \`inspect\`.
+The final connection should still obey universal simulation rules. An internally hostile objective does not automatically color it red, alter the allocator, or get revealed by `inspect`.
 
 ### Why a canonical PURPOSE matters
 
 A typical Customer Authentication is meaningful because it can be compared with other Customer Authentication operations—not with every operation in the network. It establishes a real, reusable expectation instead of making each threat's “normal” behavior arbitrary.
 
-This also gives the player a potential *company knowledge* reference for investigation without requiring hours of memorization. We have discussed comparing current LOAD with typical LOAD, and nominal operation duration with typical duration. Whether this appears in \`inspect -v\`, a service-reference tool, or a difficulty-assisted inspection mode is still open.
+This also gives the player a potential *company knowledge* reference for investigation without requiring hours of memorization. We have discussed comparing current LOAD with typical LOAD, and nominal operation duration with typical duration. Whether this appears in `inspect -v`, a service-reference tool, or a difficulty-assisted inspection mode is still open.
 
 ## The first two threat genera
 
@@ -132,9 +132,9 @@ Distinguish **ordinary network traffic** from **hostile opportunities**:
 - **Ambient network schedule:** How much legitimate company activity exists, which purposes are common, and how much natural contention/counterexample traffic appears.
 - **Threat opportunity schedule:** How often the adversary attempts something, which genus and target it chooses, how many hostile plans can overlap, and how attacks scale across a run.
 - **Genus-specific plan construction:** Starting from a concrete normal PURPOSE sample, generate a LOADER pressure plan or INFECTOR delivery plan with its own parameters and viability checks.
-- **Simulation execution:** Existing \`ConnectionSpawnPlan\`, \`SimulationHost\`, allocator, operation effects, timed modifiers, and infection state continue to execute the concrete plan.
+- **Simulation execution:** Existing `ConnectionSpawnPlan`, `SimulationHost`, allocator, operation effects, timed modifiers, and infection state continue to execute the concrete plan.
 
-A separate \`ThreatDirector\` **might** eventually own adversary scheduling and multi-surface campaigns. **Do not assume that new class is required for the next slice.** The near-term implementation could separate plan-building and scheduling responsibilities inside the existing \`ConnectionTrafficDirector\`, then extract them when needed.
+A separate `ThreatDirector` **might** eventually own adversary scheduling and multi-surface campaigns. **Do not assume that new class is required for the next slice.** The near-term implementation could separate plan-building and scheduling responsibilities inside the existing `ConnectionTrafficDirector`, then extract them when needed.
 
 The important architectural seam is **attack intent → objective-aware concrete plan**, not the MonoBehaviour name.
 
@@ -142,10 +142,10 @@ The important architectural seam is **attack intent → objective-aware concrete
 
 Current Connections code does **not yet** follow all of this intended recipe:
 
-- \`ConnectionTrafficDirector\` uses one ambient cadence and rolls hostile chance, then LOADER versus DELIVERY. This couples benign density and hostile frequency.
+- `ConnectionTrafficDirector` uses one ambient cadence and rolls hostile chance, then LOADER versus DELIVERY. This couples benign density and hostile frequency.
 - It samples six purpose templates with independent normal LOAD and WORK. LOADER currently applies high LOAD **without** automatically compensating WORK, optionally adds WORK deviation, and can add an OVERLOAD/SPIKING keyword; many generated examples therefore end too quickly to exert sustained pressure.
 - DELIVERY currently selects zero/one/occasionally two anomalies and attaches a typed infection-delivery effect to the **final operation**. A high-LOAD signature can unintentionally shorten the available interception period.
-- \`OVERLOAD\` and \`SPIKING\` exist as timed modifier behaviors; the earlier \`delayed-threat\` manual profile is an operation arc, **not** proof of a general DELAYED keyword.
+- `OVERLOAD` and `SPIKING` exist as timed modifier behaviors; the earlier `delayed-threat` manual profile is an operation arc, **not** proof of a general DELAYED keyword.
 - The recorder already captures the generated **normal** and **final** operation values and decision branch. Ordinary inspection does not currently provide a comparative baseline or intent diagnosis.
 - The simulation already supports Phantom LOAD, Blackout, Spawner, interruption, and player cleaning. Their exact effects and current scene defaults remain the responsibility of their focused contracts and runtime code.
 
