@@ -6591,6 +6591,15 @@ MonoBehaviour:
   secondAnomalyChance: 0.15
   subtleDeliveryChance: 0.1
   normalWorkSpread: 0.25
+  loaderDelayedChance: 0.35
+  loaderMinAttackCapacityFraction: 0.8
+  loaderMaxAttackCapacityFraction: 1.2
+  loaderMinOnsetSeconds: 5
+  loaderMaxOnsetSeconds: 15
+  loaderSpikeQuietSeconds: 5
+  loaderSpikeElevatedSeconds: 2
+  loaderMinDurationSeconds: 30
+  loaderMaxDurationSeconds: 60
   phantomLoadWeight: 1
   blackoutWeight: 1
   spawnerWeight: 1

@@ -6,6 +6,8 @@
 
 **Phase 2 implementation note:** The generic WORK rate foundation is implemented on the current review branch: scoped timed factors multiply (neutral 1×, explicit 0× valid), and allocated LOAD remains authoritative while productive WORK can pause. This does not yet put ambient LOADERs into attack-active mode or decide their termination policy. Earlier open questions below retain their design provenance; the basic factor composition and 0× inspection wording are now implemented for this slice.
 
+**Phase 3 implementation note (review branch):** Generated LOADERs now select their objective before a compatible weighted PURPOSE. Single and DELAYED structures combine independently with immediate, OVERLOAD, or SPIKING patterns. Elevated LOAD is sampled around 80–120% of target capacity and exceeds normal demand. OVERLOAD and SPIKING activate after a sampled 5–15 seconds in the attack operation; SPIKING then alternates 5 seconds quiet and 2 seconds elevated. Attack-active LOADERs keep requesting LOAD while productive WORK is 0×. They withdraw 30–60 simulated seconds after actual activation unless killed or canceled first. Withdrawal is a distinct resolution with no direct Health penalty. These are provisional four-node playtest values. The Phase 2 note and design questions below preserve their earlier provenance. See the [Phase 3 review](../Review/ConnectionsLoaderGenerationV0/README.md).
+
 ## The game-design premise
 
 Uptime's player is defending a network that is doing real, legitimate work. Hostile activity is interesting because it interferes with that work, blends into it, or exploits it—not because the simulation labels a connection as malicious.

@@ -137,9 +137,19 @@ namespace Uptime.Connections
             while (remaining > 0.000001f)
             {
                 BeginDueConnections();
+                WithdrawDueLoaders();
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
+                    if (connection.IsActive && connection.Definition.LoaderAttack != null)
+                    {
+                        // A coarse witness step must still observe timed attack activation
+                        // and withdrawal rather than run through the entire attack at once.
+                        segment = Mathf.Min(segment, 1f);
+                        if (connection.LoaderWithdrawAtSeconds >= 0f)
+                            segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                                connection.LoaderWithdrawAtSeconds - simulationTimeSeconds));
+                    }
                     if (connection.IsConnecting)
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             connection.TravelSecondsPerLink - connection.LinkTravelElapsedSeconds));
@@ -151,6 +161,7 @@ namespace Uptime.Connections
                 AdvanceConnecting(segment);
                 remaining -= segment;
             }
+            WithdrawDueLoaders();
             BeginDueConnections();
             StepSpawners();
             recorder?.CaptureDueSnapshot(simulationTimeSeconds);
@@ -606,6 +617,26 @@ namespace Uptime.Connections
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
+            LoaderAttackPlan attack = definition.LoaderAttack;
+            if (attack != null && (!definition.IsHostile ||
+                !Enum.IsDefined(typeof(LoaderStructure), attack.structure) ||
+                !Enum.IsDefined(typeof(LoaderPattern), attack.pattern) ||
+                attack.attackOperationIndex < 0 ||
+                attack.attackOperationIndex >= definition.OperationCount ||
+                attack.attackOperationIndex != definition.OperationCount - 1 ||
+                !FinitePositive(attack.targetCapacity) ||
+                !FinitePositive(attack.normalLoad) ||
+                !FinitePositive(attack.attackLoad) ||
+                attack.attackLoad <= attack.normalLoad ||
+                !FiniteNonnegative(attack.onsetSeconds) ||
+                !FinitePositive(attack.durationSeconds) ||
+                !FiniteNonnegative(attack.spikeQuietSeconds) ||
+                !FiniteNonnegative(attack.spikeElevatedSeconds) ||
+                !Array.Exists(definition.BehaviorsAt(attack.attackOperationIndex),
+                    behavior => behavior.Id == "LOADER_ACTIVE" &&
+                        behavior.WorkRateMultiplier == 0f &&
+                        behavior.StartAfterSeconds == attack.onsetSeconds)))
+                throw new InvalidOperationException("Generated LOADER needs a valid attack plan and activation behavior.");
             var routeLinks = new PhysicalLinkReference[definition.Route.Length - 1];
             for (int i = 0; i < routeLinks.Length; i++)
             {
@@ -623,8 +654,49 @@ namespace Uptime.Connections
             }
             var state = new LogicalConnectionState(definition, routeLinks,
                 nodeByView[definition.TargetNode]);
-            state.Behaviors.ModifierChanged += change => recorder?.RecordModifierChange(state, change);
+            state.Behaviors.ModifierChanged += change =>
+            {
+                recorder?.RecordModifierChange(state, change);
+                if (definition.LoaderAttack == null ||
+                    change.Action != ModifierChangeKind.Added ||
+                    change.SourceId != "LOADER_ACTIVE" ||
+                    change.OperationIndex != definition.LoaderAttack.attackOperationIndex ||
+                    state.LoaderActivatedAtSeconds >= 0f) return;
+                state.LoaderActivatedAtSeconds = change.TimeSeconds;
+                state.LoaderWithdrawAtSeconds = change.TimeSeconds +
+                    definition.LoaderAttack.durationSeconds;
+                recorder?.RecordLoaderActivated(state, change.TimeSeconds);
+            };
             return state;
+        }
+
+        private void WithdrawDueLoaders()
+        {
+            if (runtimeConnections == null) return;
+            var due = new List<LogicalConnectionState>();
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if (state.IsActive && state.Definition.LoaderAttack != null &&
+                    state.LoaderWithdrawAtSeconds >= 0f &&
+                    state.LoaderWithdrawAtSeconds <= simulationTimeSeconds + 0.00001f)
+                    due.Add(state);
+            due.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
+            foreach (LogicalConnectionState state in due)
+            {
+                if (state.Resolution.HasValue) continue;
+                state.TerminationPhase = state.Lifecycle;
+                state.TerminationCause = ConnectionTerminationCause.AttackerWithdrawal;
+                state.Lifecycle = Lifecycle.Complete;
+                state.AllocatedLoad = 0f;
+                state.Behaviors.EndConnection(simulationTimeSeconds);
+                recorder?.RecordLoaderWithdrawal(state, simulationTimeSeconds);
+                Resolve(state, ConnectionResolution.Withdrawn);
+                var next = new List<LogicalConnectionState>(runtimeConnections);
+                next.Remove(state);
+                runtimeConnections = next.ToArray();
+                pathPresenter?.Retire(state);
+            }
+            if (due.Count > 0)
+                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
         }
 
         private static void ValidateBehaviors(TimedModifierBehaviorDefinition[] definitions,
@@ -658,11 +730,19 @@ namespace Uptime.Connections
                          float.IsInfinity(behavior.NormalIntervalSeconds) ||
                          float.IsNaN(behavior.ElevatedIntervalSeconds) ||
                          float.IsInfinity(behavior.ElevatedIntervalSeconds) ||
+                         float.IsNaN(behavior.SpikeInitialDelayOverrideSeconds) ||
+                         float.IsInfinity(behavior.SpikeInitialDelayOverrideSeconds) ||
+                         behavior.SpikeInitialDelayOverrideSeconds < 0f ||
                          behavior.NormalIntervalSeconds <= 0f ||
                          behavior.ElevatedIntervalSeconds <= 0f)))
                     throw new InvalidOperationException("Behavior needs a unique ID, finite deltas, " +
                         "valid timing and positive keyword LOAD, and connection-scope WORK delta zero.");
         }
+
+        private static bool FinitePositive(float value) =>
+            value > 0f && !float.IsNaN(value) && !float.IsInfinity(value);
+        private static bool FiniteNonnegative(float value) =>
+            value >= 0f && !float.IsNaN(value) && !float.IsInfinity(value);
 
         private void ClearAllocatedUsage()
         {

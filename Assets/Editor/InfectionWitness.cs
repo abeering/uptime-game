@@ -366,9 +366,10 @@ namespace Uptime.Connections.EditorTools
                 new ConnectionSpawnOverrides(ManualObjective.Loader));
             Check(loader.IsHostile && loader.GenerationTrace.objective == "LOADER" &&
                 loader.GenerationTrace.forcedOptions.objective == "LOADER" &&
-                loader.GenerationTrace.anomalies.Contains("high-load") &&
+                loader.LoaderAttack != null &&
+                loader.LoaderAttack.attackLoad > loader.LoaderAttack.normalLoad &&
                 loader.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
-                "forced loader uses anomaly machinery without delivery");
+                "forced loader uses capacity-relative attack composition without delivery");
         }
 
         private static void CheckBlackout(SimulationHost host,

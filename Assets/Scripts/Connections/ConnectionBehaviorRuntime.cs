@@ -19,6 +19,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float stopAfterSeconds;
         [SerializeField, Min(0f)] private float normalIntervalSeconds;
         [SerializeField, Min(0f)] private float elevatedIntervalSeconds;
+        [SerializeField, Min(0f)] private float spikeInitialDelaySeconds;
         [SerializeField] private float workDelta;
         [SerializeField] private float loadDelta;
         // The presence flag keeps definitions serialized before rate factors at neutral 1x.
@@ -32,6 +33,9 @@ namespace Uptime.Connections
         public float StopAfterSeconds => stopAfterSeconds;
         public float NormalIntervalSeconds => normalIntervalSeconds;
         public float ElevatedIntervalSeconds => elevatedIntervalSeconds;
+        public float SpikeInitialDelaySeconds => spikeInitialDelaySeconds > 0f ?
+            spikeInitialDelaySeconds : normalIntervalSeconds;
+        public float SpikeInitialDelayOverrideSeconds => spikeInitialDelaySeconds;
         public float WorkDelta => workDelta;
         public float LoadDelta => loadDelta;
         public float WorkRateMultiplier => hasWorkRateMultiplier ? workRateMultiplier : 1f;
@@ -52,14 +56,17 @@ namespace Uptime.Connections
             float loadDelta) => new TimedModifierBehaviorDefinition(id, delaySeconds, 0f, 0f,
                 loadDelta) { kind = ConnectionBehaviorKind.Overload };
         public static TimedModifierBehaviorDefinition Spiking(string id, float normalSeconds,
-            float elevatedSeconds, float loadDelta) => new TimedModifierBehaviorDefinition(
+            float elevatedSeconds, float loadDelta, float firstDelaySeconds = 0f) =>
+            new TimedModifierBehaviorDefinition(
                 id, 0f, 0f, 0f, loadDelta)
                 { kind = ConnectionBehaviorKind.Spiking, normalIntervalSeconds = normalSeconds,
-                    elevatedIntervalSeconds = elevatedSeconds };
+                    elevatedIntervalSeconds = elevatedSeconds,
+                    spikeInitialDelaySeconds = firstDelaySeconds };
         public TimedModifierBehaviorDefinition Copy() => new TimedModifierBehaviorDefinition(
             id, startAfterSeconds, stopAfterSeconds, workDelta, loadDelta)
             { kind = kind, normalIntervalSeconds = normalIntervalSeconds,
                 elevatedIntervalSeconds = elevatedIntervalSeconds,
+                spikeInitialDelaySeconds = spikeInitialDelaySeconds,
                 hasWorkRateMultiplier = hasWorkRateMultiplier,
                 workRateMultiplier = workRateMultiplier };
     }
@@ -121,7 +128,7 @@ namespace Uptime.Connections
             public TimedInstance(TimedModifierBehaviorDefinition definition, BehaviorScope scope,
                 int operationIndex)
             { this.definition = definition; this.scope = scope; this.operationIndex = operationIndex;
-                nextSpikeTransition = definition.NormalIntervalSeconds; }
+                nextSpikeTransition = definition.SpikeInitialDelaySeconds; }
 
             public void Advance(ConnectionBehaviorRuntime owner, float delta, float time)
             {
