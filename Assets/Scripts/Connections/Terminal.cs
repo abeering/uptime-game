@@ -20,12 +20,16 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
+        [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
         [SerializeField] private Color errorColor = new(1f, 0.63f, 0.39f);
 
         private int entryCount;
         private bool scrollPending;
+        private Coroutine bottomScrollRoutine;
+        private Key heldScrollKey;
+        private float nextScrollRepeatAt;
         private TMP_InputField.OnValidateInput previousInputValidator;
 
         private void Awake()
@@ -82,9 +86,63 @@ namespace Uptime.Connections
 
         private void Update()
         {
-            if (Keyboard.current == null || !Keyboard.current.backquoteKey.wasPressedThisFrame)
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null) return;
+            if (keyboard.backquoteKey.wasPressedThisFrame)
+                identityPresenter?.CycleCongestedEdges();
+            UpdateHistoryScrolling(keyboard);
+        }
+
+        private void UpdateHistoryScrolling(Keyboard keyboard)
+        {
+            Key key = Key.None;
+            if (commandInput != null && commandInput.isFocused &&
+                !keyboard.altKey.isPressed && !keyboard.shiftKey.isPressed)
+            {
+                if (keyboard.pageUpKey.isPressed) key = Key.PageUp;
+                else if (keyboard.pageDownKey.isPressed) key = Key.PageDown;
+                else if (keyboard.ctrlKey.isPressed || keyboard.leftMetaKey.isPressed ||
+                    keyboard.rightMetaKey.isPressed)
+                {
+                    if (keyboard.upArrowKey.isPressed) key = Key.UpArrow;
+                    else if (keyboard.downArrowKey.isPressed) key = Key.DownArrow;
+                }
+            }
+
+            if (key == Key.None)
+            {
+                heldScrollKey = Key.None;
                 return;
-            identityPresenter?.CycleCongestedEdges();
+            }
+            bool firstPress = key != heldScrollKey || keyboard[key].wasPressedThisFrame;
+            if (!firstPress && Time.unscaledTime < nextScrollRepeatAt) return;
+            heldScrollKey = key;
+            nextScrollRepeatAt = Time.unscaledTime + (firstPress ? 0.35f : 0.06f);
+
+            bool page = key == Key.PageUp || key == Key.PageDown;
+            float direction = key == Key.UpArrow || key == Key.PageUp ? 1f : -1f;
+            ScrollHistory(direction, page);
+        }
+
+        private void ScrollHistory(float direction, bool page)
+        {
+            if (historyScroll == null || historyContent == null || historyScroll.viewport == null)
+                return;
+            if (bottomScrollRoutine != null)
+            {
+                StopCoroutine(bottomScrollRoutine);
+                bottomScrollRoutine = null;
+                scrollPending = false;
+            }
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContent);
+            float viewportHeight = historyScroll.viewport.rect.height;
+            float travel = Mathf.Max(0f, historyContent.rect.height - viewportHeight);
+            historyScroll.StopMovement();
+            if (travel <= 0f) return;
+            float distance = page ? viewportHeight * 0.9f : keyboardScrollStep;
+            historyScroll.verticalNormalizedPosition = Mathf.Clamp01(
+                historyScroll.verticalNormalizedPosition + direction * distance / travel);
         }
 
         private char ValidateCommandCharacter(string text, int position, char character)
@@ -260,6 +318,7 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  clean <nodeId>", mutedColor);
+                    AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
@@ -492,7 +551,7 @@ namespace Uptime.Connections
 
             if (!scrollPending && (historyScroll == null ||
                 historyScroll.verticalNormalizedPosition <= 0.01f))
-                StartCoroutine(ScrollToBottomNextFrame());
+                bottomScrollRoutine = StartCoroutine(ScrollToBottomNextFrame());
             return instance;
         }
 
@@ -535,6 +594,7 @@ namespace Uptime.Connections
             if (historyScroll != null)
                 historyScroll.verticalNormalizedPosition = 0f;
             scrollPending = false;
+            bottomScrollRoutine = null;
         }
 
         private IEnumerator FocusInputNextFrame()
