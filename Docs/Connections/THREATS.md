@@ -4,6 +4,8 @@
 >
 > **Scope:** Uptime's **Connections** prototype. Packet remains separate and playable. This page is the conceptual entry point for ambient threat generation; the linked focused contracts and current runtime/serialized scene remain authoritative for implemented behavior.
 
+**Phase 2 implementation note:** The generic WORK rate foundation is implemented on the current review branch: scoped timed factors multiply (neutral 1×, explicit 0× valid), and allocated LOAD remains authoritative while productive WORK can pause. This does not yet put ambient LOADERs into attack-active mode or decide their termination policy. Earlier open questions below retain their design provenance; the basic factor composition and 0× inspection wording are now implemented for this slice.
+
 ## The game-design premise
 
 Uptime's player is defending a network that is doing real, legitimate work. Hostile activity is interesting because it interferes with that work, blends into it, or exploits it—not because the simulation labels a connection as malicious.
@@ -107,11 +109,11 @@ Here **DELAYED is an arc-composition choice**, not a fourth competitor to OVERLO
 
 **Selected direction:** An attacking LOADER needs an **attack-active versus not-attack-active state**, and a general-purpose, real-time adjustable **WORK rate multiplier**. Attack mode changes productive progress, not the amount of requested/allocated LOAD or the connection's original total WORK.
 
-Current rule:
+Rule at this design document's pre-Phase-2 baseline:
 
     WORK progress per second = allocated LOAD
 
-Proposed universal rule:
+Universal rule now implemented by the Phase 2 foundation:
 
     WORK progress per second = allocated LOAD × workRateMultiplier
 
@@ -120,7 +122,7 @@ Proposed universal rule:
 - Other positive values, e.g. 0.25×, 0.5×, 2.0×, remain available for future scaling, throttling/efficiency mechanics, or finite variants. The scalar is a **general runtime dimension**, not a hardcoded LOADER-only exemption.
 - This is **different** from the current `workDelta` modifier, which changes the total WORK requirement rather than the **rate of WORK completion**. Do not silently reinterpret `workDelta`.
 - Existing proportional LOAD allocation stays authoritative. Zero productive progress does not mean zero resource consumption, nor necessarily “stalled due to allocation.”
-- The multiplier may be changed by appropriate connection- or operation-scoped behaviors in the future; the exact stacking/composition rule is not yet designed. Avoid building an overly broad general modifier framework ahead of this slice.
+- Connection- and operation-scoped timed behaviors can now change the factor. For the Phase 2 foundation, simultaneous factors multiply, with 1× neutral and 0× dominating. Avoid building an overly broad general modifier framework ahead of later slices.
 
 **SPIKING nuance:** Once a LOADER is in its *attack-active phase*, its WORK rate can remain 0× **during quiet intervals between spikes**. Attack-active state is distinct from “requested LOAD happens to be elevated at this instant.” The spike timer continues to progress in simulation time even while WORK progress is zero.
 
@@ -197,16 +199,16 @@ Separately, UNKNOWN/UNCATEGORIZED might represent genuinely unrecognized legitim
 
 PURPOSE is useful because legitimate traffic usually behaves consistently with it; attackers exploit or imitate that consistency. Activity descriptions and operation history may communicate the malicious phase, but should not replace actual simulated evidence.
 
-## Current code versus selected direction
+## Design baseline versus selected direction (historical)
 
-As of this document's review baseline, current Connections code already has:
+At this document's original review baseline, Connections code already had:
 
 - A seeded `ConnectionTrafficDirector` generating six ecommerce purpose templates, with sampled normal LOAD and independent WORK, plus a single 13.5 ± 1.5 second ambient arrival schedule, hostile chance, and LOADER/DELIVERY objective roll.
 - High/low LOAD, WORK, and operation mutations; benign outliers; OVERLOAD and SPIKING behaviors; manual delayed threat profiles; typed infection-delivery effects and persistent node infections.
 - A `ConnectionSpawnPlan` → `SimulationHost` execution path, proportional target-node allocation, operation arcs, and a run recorder storing original and final values and internal generation decisions.
 - `kill`, `inspect` / `inspect -v`, and basic node cleaning; the current inspector does not show a canonical-purpose baseline or work-rate scaling.
 
-**Not yet implemented by these design decisions:**
+**Not yet implemented at that review baseline** (Phase 1 ambient scheduling and Phase 2 WORK rate have since landed):
 
 - Occupancy/coverage-aware benign ambient generation; independently tunable benign/threat opportunity streams if chosen.
 - Objective-aware LOADER composition with capacity-relative attack strength, variable onset, DELAYED appended attack, and an attack-active state that changes productive WORK rate.
@@ -234,7 +236,7 @@ Throughout: retain seeded determinism, stable purpose baselines, source/target v
 2. **Hostile opportunity scheduling:** roll threat as part of ambient arrivals or maintain a separate tunable stochastic stream? Ensure near-simultaneous threats and long gaps remain possible.
 3. **LOADER lifetime:** Do ambient permanent 0× attacks need a finite termination/recovery mechanism, attacker-initiated exit, or just an explicit policy in the Level Director? What prevents unattended attacks accumulating without meaningful play?
 4. **Temporal variety:** weights for immediate/OVERLOAD/SPIKING and DELAYED, onset-delay ranges, peak capacity fractions, and the minimum useful number of spikes.
-5. **WORK rate semantics:** stacking priority, connection vs operation scope, and what 0× should display in inspection/ETA without leaking “malicious” as a label.
+5. **WORK rate semantics:** Phase 2 now uses multiplicative scoped factors and shows `WORK PAUSED` / `ETA PAUSED` at 0× with positive LOAD. Future attack-state priority and deeper player explanation remain open.
 6. **INFECTOR delivery timing:** how long should baseline and anomalous carriers take, and where should an appended delivery operation fit in that window?
 7. **PURPOSE / information evolution:** future node types, unknown/unclassified behavior, reference baselines, logs/probes/trace, and degree of trustworthy activity descriptions.
 8. **Future genera:** THROTTLER, TUNNELER, other attackers—are they distinct objectives, tactics, payloads, or attack surfaces?

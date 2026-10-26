@@ -646,6 +646,9 @@ namespace Uptime.Connections
                     float.IsNaN(behavior.WorkDelta) || float.IsInfinity(behavior.WorkDelta) ||
                     (scope == BehaviorScope.Connection && behavior.WorkDelta != 0f) ||
                     float.IsNaN(behavior.LoadDelta) || float.IsInfinity(behavior.LoadDelta) ||
+                    float.IsNaN(behavior.WorkRateMultiplier) ||
+                    float.IsInfinity(behavior.WorkRateMultiplier) ||
+                    behavior.WorkRateMultiplier < 0f ||
                     (behavior.Kind != ConnectionBehaviorKind.TimedAdjustment &&
                         (behavior.WorkDelta != 0f || behavior.LoadDelta <= 0f)) ||
                     (behavior.Kind == ConnectionBehaviorKind.Overload &&

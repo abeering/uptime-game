@@ -4,15 +4,15 @@
 
 **Scope:** Phase 1 implementation contract for `Assets/Scenes/Connections.unity`. This replaces the earlier CPU, memory, disk I/O, and bandwidth allocation rules for the Connections game. The older V0 briefs remain historical context. Packet is independent.
 
-Slice 3A adds optional additive modifiers to an operation's authored WORK and requested LOAD. The current allocator now consumes the **effective** values computed before each step's allocation; one allocated LOAD still advances one WORK unit per second. Previously accomplished WORK is not reduced when effective required WORK falls. The original authored witness has no modifiers and retains the figures below. See the [behavior foundation](connections-behavior-foundation-v0.md).
+Slice 3A adds optional additive modifiers to an operation's authored WORK and requested LOAD. The current allocator consumes the **effective** values computed before each step's allocation. Phase 2 adds an independent effective WORK rate multiplier: productive WORK per second is allocated LOAD × effective factor, with 1× preserving all original figures below. Previously accomplished WORK is not reduced when effective required WORK falls. The original authored witness has no modifiers. See the [behavior foundation](connections-behavior-foundation-v0.md).
 
 ## Mechanical model
 
 - A route's final node is its current target. Earlier nodes and physical links remain visible route geometry and do not consume or constrain LOAD.
 - A node has `loadCapacity` and optional `baselineLoad`. Baseline is reserved first and is clamped to capacity.
-- An active connection requests `desiredLoad` from its target. This phase uses **1 allocated LOAD = 1 WORK unit per second**. `totalWork` and `completedWork` stay operation-local; the current authored connections each have one operation.
+- An active connection requests `desiredLoad` from its target. At the neutral 1× factor, **1 allocated LOAD = 1 WORK unit per second**. A 0× factor still consumes its proportional LOAD allocation but produces no WORK. `totalWork` and `completedWork` stay operation-local; the current authored connections each have one operation.
 - At each fixed simulation step, total active request at a node is summed in stable connection-ID order. Every active connection at that target receives its requested LOAD multiplied by `min(1, (capacity - baseline) / total request)`. Different targets allocate independently.
-- Progress advances by allocated LOAD × step duration. A completing connection releases its LOAD in the published snapshot; peers receive the freed capacity on the next step. The completion/departure view still reads the same lifecycle state.
+- Progress advances by allocated LOAD × effective WORK rate multiplier × step duration. A completing connection releases its LOAD in the published snapshot; peers receive the freed capacity on the next step. The completion/departure view still reads the same lifecycle state.
 - `RequestedLoad` is baseline plus active requests and may exceed capacity. `AllocatedLoad` is baseline plus granted LOAD and must never exceed capacity. The node bar displays requested/capacity, caps its fill at 100%, and uses configurable ordinary, elevated, and overloaded colors. LOAD state does not indicate infection.
 
 ## Authored witness
