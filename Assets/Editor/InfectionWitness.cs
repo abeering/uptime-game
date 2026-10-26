@@ -103,31 +103,29 @@ namespace Uptime.Connections.EditorTools
             catch (InvalidOperationException) { invalidProfileOverride = true; }
             Check(invalidProfileOverride, "legacy profile rejects objective override");
 
-            FieldInfo hostileRate = typeof(ConnectionTrafficDirector).GetField("hostileChance",
-                BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo deliveryRate = typeof(ConnectionTrafficDirector).GetField("deliveryChance",
                 BindingFlags.Instance | BindingFlags.NonPublic);
-            float oldHostileRate = (float)hostileRate.GetValue(director);
+            bool oldHostileEnabled = director.HostileGenerationEnabled;
             float oldDeliveryRate = (float)deliveryRate.GetValue(director);
             try
             {
-                hostileRate.SetValue(director, 0f);
+                director.HostileGenerationEnabled = false;
                 deliveryRate.SetValue(director, 0f);
                 ConnectionSpawnPlan forced = director.QueueProfile("product-lookup", standard);
                 Check(forced.IsHostile && forced.GenerationTrace.objective == "DELIVERY" &&
                     forced.Operations.Last().EffectOnCompletion ==
                         CompletionEffect.InfectionDelivery,
-                    "manual objective bypasses zero hostile and delivery rates");
+                    "manual objective bypasses disabled ambient hostiles and zero delivery rate");
             }
             finally
             {
-                hostileRate.SetValue(director, oldHostileRate);
+                director.HostileGenerationEnabled = oldHostileEnabled;
                 deliveryRate.SetValue(director, oldDeliveryRate);
             }
 
             director.ResetDirector();
             ConnectionSpawnPlan[] generated = Enumerable.Range(0, 120)
-                .Select(i => director.GeneratePlan(i * 13f)).ToArray();
+                .Select(i => director.GenerateHostilePlan(i * 13f)).ToArray();
             Check(generated.Any(plan => plan.GenerationTrace.objective == "DELIVERY") &&
                 generated.Where(plan => plan.GenerationTrace.objective == "DELIVERY")
                     .All(plan => plan.Operations.Last().InfectionPayload != null &&
@@ -141,7 +139,7 @@ namespace Uptime.Connections.EditorTools
                 "natural DELIVERY plans select all three kinds; other plans do not deliver");
             var first = generated.Select(PayloadSignature).ToArray();
             director.ResetDirector();
-            var second = Enumerable.Range(0, 120).Select(i => director.GeneratePlan(i * 13f))
+            var second = Enumerable.Range(0, 120).Select(i => director.GenerateHostilePlan(i * 13f))
                 .Select(PayloadSignature).ToArray();
             Check(first.SequenceEqual(second), "seeded payload generation replay");
             director.ResetDirector();

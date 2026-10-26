@@ -1,6 +1,47 @@
 # Connections Ambient Population V1 — playtest amendment
 
-## Final canonical WORK tuning
+## Two-stream Traffic Director restructure — current PR #40
+
+The fixed mixed-arrival source is gone. Benign coverage is the sole ordinary benign producer, and a separate exponential clock produces hostile PURPOSE plans (scene mean: 54 seconds). The six canonical PURPOSE profiles retain their doubled mean WORK. The benign controller retains its 1→3 goal ramp over 75 simulated seconds; its scene tuning is an 8-second mean opportunity interval and a 12% chance at or above the effective goal. These values are four-node playtest tuning, not a cap.
+
+Unity 6000.3.11f1 ran deterministic Edit Mode simulations for seeds 1701, 456, 90210, and 42, with and without ambient hostiles. Each run advanced 600 simulated seconds in 0.2-second steps. Occupancy below counts **established benign** connections after each step; `benign` and `hostile` arrivals count their respective queued ambient plans. No player commands were issued. `HostileGenerationEnabled` was off for healthy runs and on for normal runs. This is automated simulation evidence, not interactive Play Mode validation.
+
+| Healthy 600 s seed | Mean / peak | Zero / one time | ≥5 time / longest stretch | Benign arrivals | LOAD contention | Health mean / min / end |
+|---|---:|---:|---:|---:|---:|---:|
+| 1701 | 2.59 / 4 | 0.7% / 9.9% | 0% / 0 s | 20 | 0% | 100 / 100 / 100 |
+| 456 | 2.63 / 4 | 0.8% / 5.4% | 0% / 0 s | 21 | 0% | 100 / 100 / 100 |
+| 90210 | 2.53 / 4 | 1.4% / 11.7% | 0% / 0 s | 21 | 0% | 100 / 100 / 100 |
+| 42 | 2.64 / 5 | 2.2% / 8.1% | 4.1% / 24.8 s | 25 | 0% | 100 / 100 / 100 |
+
+The healthy mean stays reasonably close to the goal of 3 while allowing quiet moments and, in seed 42, sustained crowding. Only 20–25 benign arrivals occur over 600 seconds, compared with more than 50 ordinary-plus-supplemental benign plans in the earlier additive model. The longer-lived connections therefore turn over much less often.
+
+| Normal 600 s seed | Mean / peak | Zero / one time | ≥5 time / longest stretch | Benign / hostile / Spawner plans | Benign cancellations | LOAD contention | Health mean / min / end |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 1701 | 2.20 / 4 | 7.9% / 28.6% | 0% / 0 s | 17 / 11 / 48 | 4 | 45.1% | 56.39 / 0 / 0 |
+| 456 | 2.86 / 5 | 0.8% / 3.6% | 0.8% / 4.6 s | 13 / 15 / 0 | 0 | 77.8% | 45.05 / 0 / 0 |
+| 90210 | 0.16 / 2 | 90.5% / 3.5% | 0% / 0 s | 17 / 12 / 0 | 16 | 0% | 98.67 / 90.35 / 100 |
+| 42 | 0.77 / 4 | 68.5% / 5.2% | 0% / 0 s | 22 / 16 / 0 | 16 | 2.9% | 97.47 / 82.59 / 100 |
+
+Blackout prevents establishment in the unattended 90210 and 42 runs; there was no player cleanup. Loader contention and Spawner children produce severe later Health outcomes in 1701 and 456. These outcomes reflect existing threat and Health mechanics, not a direct Health cost from infrastructure or the benign controller. The 54-second hostile mean yielded 11–16 arrivals over 600 seconds, roughly comparable in scale with the former 10–13 hostile plans, without preserving their exact sequence. Sampled next-arrival intervals ranged **2.43–164.37 s** (1701), **0.98–100.67 s** (456), **0.32–171.79 s** (90210), and **2.50–196.78 s** (42): close arrivals and long gaps both occur.
+
+The next table shows **mean / peak established benign occupancy** in each opening window. Every healthy 0–30-second peak is at most 3; no run immediately fills to the steady-state goal. Hostiles can change later windows through LOAD and Blackout.
+
+| Seed / mode | 0–30 s | 30–60 s | 60–90 s | 90–180 s |
+|---|---:|---:|---:|---:|
+| 1701 healthy | 1.63 / 2 | 1.56 / 2 | 1.75 / 3 | 2.60 / 4 |
+| 1701 normal | 1.63 / 2 | 1.56 / 2 | 1.75 / 3 | 2.60 / 4 |
+| 456 healthy | 1.55 / 3 | 1.67 / 2 | 2.12 / 3 | 2.85 / 3 |
+| 456 normal | 1.55 / 3 | 1.67 / 2 | 2.12 / 3 | 2.75 / 3 |
+| 90210 healthy | 0.90 / 2 | 2.00 / 2 | 2.23 / 3 | 2.49 / 3 |
+| 90210 normal | 0.90 / 2 | 2.00 / 2 | 0.21 / 2 | 0.00 / 0 |
+| 42 healthy | 0.83 / 1 | 1.83 / 3 | 2.95 / 3 | 2.91 / 4 |
+| 42 normal | 0.83 / 1 | 1.83 / 3 | 2.95 / 3 | 2.91 / 4 |
+
+Traffic and Recorder Witnesses verify seeded replay, stream and recorder attribution, schedule independence, hostile-disable behavior, complete concrete plans, canonical PURPOSE weighting, and Blackout cancellation/recovery without a catch-up burst. Resource, Network Health, Lifecycle, and Infection Witnesses cover the shared lifecycle, allocation, Health, infection delivery, and Spawner paths. Interactive 16:9 Play Mode review still needs to check arrival rhythm, path-label crowding, inspect retention, terminal focus, and cleaning during a live Blackout.
+
+## Earlier additive-controller evidence (superseded)
+
+### Canonical WORK tuning before the scheduler restructure
 
 After the population-ramp comparison below, all six built-in canonical PURPOSE profiles doubled their normal-operation mean WORK. Requested LOAD, purpose weights, ±25% WORK spread, and the coverage controller stayed unchanged. A fixed-seed rerun used the same 0.2-second samples. The comparison here is **ramped PR #40 before WORK tuning → after WORK tuning**.
 

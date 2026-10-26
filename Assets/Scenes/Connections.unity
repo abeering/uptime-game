@@ -6573,20 +6573,19 @@ MonoBehaviour:
   seed: 1701
   randomizeSeed: 1
   initialGraceSeconds: 3
-  spawnIntervalSeconds: 13.5
-  spawnJitterSeconds: 1.5
   benignPopulationGoal: 3
   coverageStartupGoal: 1
   coverageRampSeconds: 75
-  coverageMeanIntervalSeconds: 10
+  coverageMeanIntervalSeconds: 8
   coverageResponse: 0.6
   coverageCancellationMemorySeconds: 60
-  coverageAtGoalChance: 0.04
+  coverageAtGoalChance: 0.12
   coverageOutageRetryMaxSeconds: 20
   ambientOriginId: EXT1
   profiles: []
   ambientWeightOverrides: []
-  hostileChance: 0.25
+  hostileGenerationEnabled: 1
+  hostileMeanIntervalSeconds: 54
   deliveryChance: 0.5
   benignOutlierChance: 0.08
   secondAnomalyChance: 0.15

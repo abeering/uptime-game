@@ -45,15 +45,16 @@ namespace Uptime.Connections.EditorTools
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
                     initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
-                    initial.run.traffic.hostileChance == 0.25f &&
+                    initial.run.traffic.hostileGenerationEnabled &&
+                    initial.run.traffic.hostileMeanIntervalSeconds == 54f &&
                     initial.run.traffic.normalWorkSpread == 0.25f &&
                     initial.run.traffic.benignPopulationGoal == 3f &&
                     initial.run.traffic.coverageStartupGoal == 1f &&
                     initial.run.traffic.coverageRampSeconds == 75f &&
-                    initial.run.traffic.coverageMeanIntervalSeconds == 10f &&
+                    initial.run.traffic.coverageMeanIntervalSeconds == 8f &&
                     initial.run.traffic.coverageResponse == 0.6f &&
                     initial.run.traffic.coverageCancellationMemorySeconds == 60f &&
-                    initial.run.traffic.coverageAtGoalChance == 0.04f &&
+                    initial.run.traffic.coverageAtGoalChance == 0.12f &&
                     initial.run.traffic.coverageOutageRetryMaxSeconds == 20f &&
                     initial.run.traffic.coverageImminentPlanSeconds == 5f &&
                     initial.run.traffic.coverageCanceledAttemptWeight == 2,
@@ -94,8 +95,8 @@ namespace Uptime.Connections.EditorTools
                     "recorded mixed keyword catalog keeps demand behavior separate from hostility");
                 Near(initial.snapshots.Last().health.value, host.Health.Value,
                     "initial authoritative Health snapshot");
-                ConnectionSpawnPlan generated = director.GeneratePlan(1000f);
-                director.QueueSpawnPlan(generated, "ambient");
+                ConnectionSpawnPlan generated = director.GenerateHostilePlan(1000f);
+                director.QueueSpawnPlan(generated, "ambient_hostile");
                 RunEvent generation = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
                 Check(generation.generation != null && generation.generation.purposeId ==
                     generated.ProfileId && generation.generation.normalOperations.Length > 0 &&
@@ -345,7 +346,7 @@ namespace Uptime.Connections.EditorTools
             FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
                 BindingFlags.Instance | BindingFlags.NonPublic);
             float oldStartupGoal = (float)startupGoal.GetValue(director);
-            FieldInfo nextAmbient = typeof(ConnectionTrafficDirector).GetField("nextAmbientAt",
+            FieldInfo nextHostile = typeof(ConnectionTrafficDirector).GetField("nextHostileAt",
                 BindingFlags.Instance | BindingFlags.NonPublic);
             FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
                 BindingFlags.Instance | BindingFlags.NonPublic);
@@ -354,7 +355,7 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = true;
                 startupGoal.SetValue(director, 3f);
                 host.ResetSimulation(); recorder.BeginRun();
-                nextAmbient.SetValue(director, 1000f);
+                nextHostile.SetValue(director, 1000f);
                 nextCoverage.SetValue(director, 0f);
                 director.QueueProfile("product-lookup");
                 host.StepSimulation(0.1f);
@@ -363,7 +364,7 @@ namespace Uptime.Connections.EditorTools
                 ConnectionsRunLog saved = Read(recorder.OutputPath);
                 RunEvent coverage = saved.events.Single(e => e.type == "coverage_opportunity");
                 RunEvent plan = saved.events.Single(e =>
-                    e.type == "plan_queued" && e.source == "ambient_coverage");
+                    e.type == "plan_queued" && e.source == "ambient_benign");
                 Check(coverage.anticipatedBenign == 1 &&
                     coverage.effectiveCoverageGoal == 3f &&
                     coverage.coverageSpawnChance == 1f &&

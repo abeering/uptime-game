@@ -49,8 +49,8 @@ namespace Uptime.Connections
         public bool autoGenerationEnabled;
         public string ambientOriginId;
         public float openingGraceSeconds;
-        public float spawnIntervalSeconds;
-        public float spawnJitterSeconds;
+        public bool hostileGenerationEnabled;
+        public float hostileMeanIntervalSeconds;
         public float benignPopulationGoal;
         public float coverageStartupGoal;
         public float coverageRampSeconds;
@@ -61,7 +61,6 @@ namespace Uptime.Connections
         public float coverageOutageRetryMaxSeconds;
         public float coverageImminentPlanSeconds;
         public int coverageCanceledAttemptWeight;
-        public float hostileChance;
         public float deliveryChance;
         public float benignOutlierChance;
         public float secondAnomalyChance;
@@ -170,6 +169,9 @@ namespace Uptime.Connections
         public float nextCoverageMeanSeconds;
         public float nextCoverageIntervalSeconds;
         public float nextCoverageAtSeconds;
+        public float hostileMeanIntervalSeconds;
+        public float nextHostileIntervalSeconds;
+        public float nextHostileAtSeconds;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
@@ -468,6 +470,19 @@ namespace Uptime.Connections
             entry.reason = reason;
         }
 
+        public void RecordHostileOpportunity(float time, float dueAt, float mean,
+            float nextInterval, float nextAt, string connectionId, string reason)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("hostile_opportunity", time);
+            entry.scheduledSpawnTime = dueAt;
+            entry.connectionId = connectionId;
+            entry.hostileMeanIntervalSeconds = mean;
+            entry.nextHostileIntervalSeconds = nextInterval;
+            entry.nextHostileAtSeconds = nextAt;
+            entry.reason = reason;
+        }
+
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -735,8 +750,8 @@ namespace Uptime.Connections
             var traffic = new TrafficConfiguration { autoGenerationEnabled = trafficDirector.AutoGenerationEnabled,
                 ambientOriginId = trafficDirector.AmbientOriginId,
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
-                spawnIntervalSeconds = trafficDirector.SpawnIntervalSeconds,
-                spawnJitterSeconds = trafficDirector.SpawnJitterSeconds,
+                hostileGenerationEnabled = trafficDirector.HostileGenerationEnabled,
+                hostileMeanIntervalSeconds = trafficDirector.HostileMeanIntervalSeconds,
                 benignPopulationGoal = trafficDirector.BenignPopulationGoal,
                 coverageStartupGoal = trafficDirector.CoverageStartupGoal,
                 coverageRampSeconds = trafficDirector.CoverageRampSeconds,
@@ -749,7 +764,6 @@ namespace Uptime.Connections
                 coverageImminentPlanSeconds = trafficDirector.CoverageImminentPlanSeconds,
                 coverageCanceledAttemptWeight =
                     trafficDirector.CoverageCanceledAttemptWeight,
-                hostileChance = trafficDirector.HostileChance,
                 deliveryChance = trafficDirector.DeliveryChance,
                 benignOutlierChance = trafficDirector.BenignOutlierChance,
                 secondAnomalyChance = trafficDirector.SecondAnomalyChance,

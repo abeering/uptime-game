@@ -36,6 +36,8 @@ A separate `ThreatDirector` or threat-planning MonoBehaviour is **not an establi
 
 ### Ambient population / coverage objective
 
+**Phase 1 implementation note (PR #40):** Connections now uses option (b) from the earlier scheduling question below: a benign population controller and a separate stochastic hostile arrival clock in one Traffic Director. The exact long-term rates and Level Director controls remain open; the original alternatives below record the design question that led to this choice.
+
 Benign ambient activity exists to keep the network **occupied enough for attacks to have somewhere to hide**, without being perpetually crowded.
 
 The emerging tuning question is whether to replace or augment “spawn every N seconds ± jitter” with a **soft occupancy / coverage goal over time**:
