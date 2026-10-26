@@ -75,9 +75,11 @@ namespace Uptime.Connections.EditorTools
                         (plan.IsHostile == (plan.GenerationTrace.objective != "NONE")),
                         "trace matches concrete plan and internal objective");
                     if (plan.GenerationTrace.objective == "LOADER")
-                        Check(plan.GenerationTrace.anomalies.Contains("high-load") &&
+                        Check(plan.LoaderAttack != null &&
+                            plan.GenerationTrace.loaderAttack != null &&
+                            plan.LoaderAttack.attackLoad > plan.LoaderAttack.normalLoad &&
                             plan.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
-                            "loader raises demand without delivery");
+                            "loader has explicit capacity-relative demand without delivery");
                     if (plan.GenerationTrace.objective == "DELIVERY")
                         Check(plan.Operations.Last().EffectOnCompletion == CompletionEffect.InfectionDelivery &&
                             plan.Operations.Take(plan.Operations.Length - 1)
@@ -578,8 +580,9 @@ namespace Uptime.Connections.EditorTools
                         break;
                     case "LOADER":
                         Check(plan.IsHostile && trace.objective == "LOADER" &&
-                            trace.anomalies[0] == "high-load",
-                            "loader decision records high-demand selection");
+                            trace.loaderAttack != null &&
+                            trace.anomalies.Contains("loader-capacity-demand"),
+                            "loader decision records capacity-based attack intent");
                         break;
                     case "DELIVERY_SUBTLE":
                         Check(plan.IsHostile && trace.objective == "DELIVERY" &&

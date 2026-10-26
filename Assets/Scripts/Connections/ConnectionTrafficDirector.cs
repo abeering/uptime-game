@@ -68,6 +68,16 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 1f)] private float secondAnomalyChance = 0.15f;
         [SerializeField, Range(0f, 1f)] private float subtleDeliveryChance = 0.1f;
         [SerializeField, Range(0f, 0.5f)] private float normalWorkSpread = 0.25f;
+        [Header("LOADER (provisional)")]
+        [SerializeField, Range(0f, 1f)] private float loaderDelayedChance = 0.35f;
+        [SerializeField, Min(0f)] private float loaderMinAttackCapacityFraction = 0.8f;
+        [SerializeField, Min(0f)] private float loaderMaxAttackCapacityFraction = 1.2f;
+        [SerializeField, Min(0f)] private float loaderMinOnsetSeconds = 5f;
+        [SerializeField, Min(0f)] private float loaderMaxOnsetSeconds = 15f;
+        [SerializeField, Min(0f)] private float loaderSpikeQuietSeconds = 5f;
+        [SerializeField, Min(0f)] private float loaderSpikeElevatedSeconds = 2f;
+        [SerializeField, Min(0f)] private float loaderMinDurationSeconds = 30f;
+        [SerializeField, Min(0f)] private float loaderMaxDurationSeconds = 60f;
         [Header("Delivery infection weights")]
         [SerializeField, Min(0f)] private float phantomLoadWeight = 1f;
         [SerializeField, Min(0f)] private float blackoutWeight = 1f;
@@ -124,6 +134,15 @@ namespace Uptime.Connections
         public float SecondAnomalyChance => secondAnomalyChance;
         public float SubtleDeliveryChance => subtleDeliveryChance;
         public float NormalWorkSpread => normalWorkSpread;
+        public float LoaderDelayedChance => loaderDelayedChance;
+        public float LoaderMinAttackCapacityFraction => loaderMinAttackCapacityFraction;
+        public float LoaderMaxAttackCapacityFraction => loaderMaxAttackCapacityFraction;
+        public float LoaderMinOnsetSeconds => loaderMinOnsetSeconds;
+        public float LoaderMaxOnsetSeconds => loaderMaxOnsetSeconds;
+        public float LoaderSpikeQuietSeconds => loaderSpikeQuietSeconds;
+        public float LoaderSpikeElevatedSeconds => loaderSpikeElevatedSeconds;
+        public float LoaderMinDurationSeconds => loaderMinDurationSeconds;
+        public float LoaderMaxDurationSeconds => loaderMaxDurationSeconds;
         public float PhantomLoadWeight => phantomLoadWeight;
         public float BlackoutWeight => blackoutWeight;
         public float SpawnerWeight => spawnerWeight;
@@ -386,28 +405,46 @@ namespace Uptime.Connections
         public ConnectionSpawnPlan GenerateHostilePlan(float atTime)
         {
             if (random == null) ResetDirector();
-            return GenerateWeightedPurposePlan(atTime, false);
+            string objective = random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER";
+            return GenerateWeightedPurposePlan(atTime, false, objective);
         }
 
-        private ConnectionSpawnPlan GenerateWeightedPurposePlan(float atTime, bool benign)
+        // Deterministic witness seam; the production clock samples these dimensions itself.
+        public ConnectionSpawnPlan GenerateLoaderPlanForWitness(float atTime,
+            LoaderStructure structure, LoaderPattern pattern)
+        {
+            if (random == null) ResetDirector();
+            if (!Enum.IsDefined(typeof(LoaderStructure), structure) ||
+                !Enum.IsDefined(typeof(LoaderPattern), pattern))
+                throw new ArgumentOutOfRangeException(nameof(pattern));
+            return GenerateWeightedPurposePlan(atTime, false, "LOADER", structure, pattern);
+        }
+
+        private ConnectionSpawnPlan GenerateWeightedPurposePlan(float atTime, bool benign,
+            string objective = null, LoaderStructure? structure = null, LoaderPattern? pattern = null)
         {
             float total = 0f;
             foreach (ConnectionTrafficProfile profile in profiles)
-                if (profile != null && profile.purposeTemplate)
+                if (profile != null && profile.purposeTemplate && Compatible(profile, objective))
                     total += Mathf.Max(0f, EffectiveAmbientWeight(profile.id));
             if (total <= 0f) return null;
             float choice = (float)random.NextDouble() * total;
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
             {
-                if (profile == null || !profile.purposeTemplate ||
+                if (profile == null || !profile.purposeTemplate || !Compatible(profile, objective) ||
                     EffectiveAmbientWeight(profile.id) <= 0f) continue;
                 selected = profile;
                 choice -= EffectiveAmbientWeight(profile.id);
                 if (choice < 0f) break;
             }
-            return BuildPlan(selected, atTime, true, forceBenign: benign);
+            return BuildPlan(selected, atTime, true, forceBenign: benign,
+                selectedObjective: objective, loaderStructure: structure, loaderPattern: pattern);
         }
+
+        private static bool Compatible(ConnectionTrafficProfile purpose, string objective) =>
+            purpose.purposeTemplate && (objective == null || objective == "LOADER" ||
+                objective == "DELIVERY"); // The six current PURPOSES support both genera.
 
         private void CountBenignPopulation(float now, out int established, out int anticipated)
         {
@@ -528,7 +565,8 @@ namespace Uptime.Connections
         private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime,
             bool ambient = false, ConnectionSpawnOverrides overrides = null,
             NodeView originOverride = null, NodeView targetOverride = null,
-            bool forceBenign = false)
+            bool forceBenign = false, string selectedObjective = null,
+            LoaderStructure? loaderStructure = null, LoaderPattern? loaderPattern = null)
         {
             string id = NewId();
             if (id == null) return null;
@@ -552,7 +590,7 @@ namespace Uptime.Connections
             }
             if (selected.purposeTemplate)
                 return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
-                    overrides, forceBenign);
+                    overrides, forceBenign, selectedObjective, loaderStructure, loaderPattern);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors);
@@ -560,27 +598,31 @@ namespace Uptime.Connections
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
             string id, NodeView[] route, OperationStage[] normal, bool ambient,
-            ConnectionSpawnOverrides overrides, bool forceBenign)
+            ConnectionSpawnOverrides overrides, bool forceBenign, string selectedObjective,
+            LoaderStructure? loaderStructure, LoaderPattern? loaderPattern)
         {
             bool hostile = overrides != null || ambient && !forceBenign;
             string objective = overrides != null ? overrides.Objective.ToString().ToUpperInvariant() :
-                hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
+                hostile ? selectedObjective ?? "LOADER" : "NONE";
             var stages = new List<OperationStage>(normal);
             var anomalies = new List<string>();
             string generationDecision = ambient ? "BENIGN_NORMAL" : "MANUAL_BENIGN";
             var selectedKeywords = new List<GeneratedKeywordSelection>();
+            LoaderAttackPlan loaderAttack = null;
             if (objective == "LOADER")
             {
                 generationDecision = "LOADER";
-                ApplyAnomaly(stages, "high-load", true);
-                anomalies.Add("high-load");
-                if (random.NextDouble() < secondAnomalyChance)
-                {
-                    ApplyAnomaly(stages, "work-deviation", true);
-                    anomalies.Add("work-deviation");
-                }
-                // The keyword engine is shared with benign traffic; this does not label intent.
-                if (random.NextDouble() < 0.25) selectedKeywords.Add(AddKeyword(stages));
+                loaderAttack = ComposeLoader(stages, route[route.Length - 1],
+                    loaderStructure, loaderPattern);
+                anomalies.Add("loader-capacity-demand");
+                if (loaderAttack.pattern != LoaderPattern.Immediate)
+                    selectedKeywords.Add(new GeneratedKeywordSelection
+                    {
+                        operationIndex = loaderAttack.attackOperationIndex,
+                        behaviorId = loaderAttack.pattern == LoaderPattern.Overload ?
+                            "LOADER_OVERLOAD" : "LOADER_SPIKING",
+                        behaviorKind = loaderAttack.pattern.ToString()
+                    });
             }
             else if (objective == "DELIVERY")
             {
@@ -628,6 +670,7 @@ namespace Uptime.Connections
                 anomalies = anomalies.ToArray(),
                 normalOperations = ConnectionGenerationTrace.Capture(normal),
                 finalOperations = ConnectionGenerationTrace.Capture(stages.ToArray()),
+                loaderAttack = loaderAttack?.Copy(),
                 forcedOptions = overrides == null ? null : new ForcedGenerationOptions
                 {
                     objective = objective,
@@ -639,7 +682,63 @@ namespace Uptime.Connections
                 }
             };
             return new ConnectionSpawnPlan(atTime, id, route, purpose.id, purpose.claimedPurpose,
-                stages.ToArray(), hostile, purpose.connectionBehaviors, trace);
+                stages.ToArray(), hostile, purpose.connectionBehaviors, trace,
+                loaderAttack: loaderAttack);
+        }
+
+        private LoaderAttackPlan ComposeLoader(List<OperationStage> stages, NodeView target,
+            LoaderStructure? forcedStructure, LoaderPattern? forcedPattern)
+        {
+            LoaderStructure structure = forcedStructure ??
+                (random.NextDouble() < loaderDelayedChance ? LoaderStructure.Delayed : LoaderStructure.Single);
+            LoaderPattern pattern = forcedPattern ?? (LoaderPattern)random.Next(3);
+            int sourceIndex = stages.Count - 1;
+            OperationStage source = stages[sourceIndex];
+            if (structure == LoaderStructure.Single)
+            {
+                // The sampled PURPOSE supplies the operation kind and plausible activity.
+                sourceIndex = random.Next(stages.Count);
+                source = stages[sourceIndex];
+                stages.Clear();
+                stages.Add(source);
+            }
+            else stages.Add(source);
+            int attackIndex = stages.Count - 1;
+            float capacity = 0f;
+            foreach (NodeResources node in host.Nodes)
+                if (node.View == target) { capacity = node.LoadCapacity; break; }
+            if (capacity <= 0f) throw new InvalidOperationException("LOADER target needs positive LOAD capacity.");
+            float attackLoad = Mathf.Max(capacity * Range(loaderMinAttackCapacityFraction,
+                loaderMaxAttackCapacityFraction), source.DesiredLoad +
+                Mathf.Max(0.5f, capacity * 0.2f));
+            float onset = pattern == LoaderPattern.Immediate ? 0f :
+                Range(loaderMinOnsetSeconds, loaderMaxOnsetSeconds);
+            float duration = Range(loaderMinDurationSeconds, loaderMaxDurationSeconds);
+            float work = Mathf.Max(source.TotalWork,
+                source.DesiredLoad * (onset + 1f) + 0.01f);
+            var behaviors = new List<TimedModifierBehaviorDefinition>();
+            if (pattern == LoaderPattern.Overload)
+                behaviors.Add(TimedModifierBehaviorDefinition.Overload("LOADER_OVERLOAD",
+                    onset, attackLoad - source.DesiredLoad));
+            if (pattern == LoaderPattern.Spiking)
+                behaviors.Add(TimedModifierBehaviorDefinition.Spiking("LOADER_SPIKING",
+                    loaderSpikeQuietSeconds, loaderSpikeElevatedSeconds,
+                    attackLoad - source.DesiredLoad, onset));
+            behaviors.Add(TimedModifierBehaviorDefinition.Rate("LOADER_ACTIVE", onset, 0f, 0f));
+            stages[attackIndex] = new OperationStage(source.Operation, work,
+                pattern == LoaderPattern.Immediate ? attackLoad : source.DesiredLoad,
+                source.ActivityDescription, CompletionEffect.None, behaviors.ToArray());
+            return new LoaderAttackPlan
+            {
+                structure = structure, pattern = pattern,
+                attackOperationIndex = attackIndex, targetCapacity = capacity,
+                normalLoad = source.DesiredLoad, attackLoad = attackLoad,
+                onsetSeconds = onset, spikeQuietSeconds = pattern == LoaderPattern.Spiking ?
+                    loaderSpikeQuietSeconds : 0f,
+                spikeElevatedSeconds = pattern == LoaderPattern.Spiking ?
+                    loaderSpikeElevatedSeconds : 0f,
+                durationSeconds = duration
+            };
         }
 
         private InfectionPayload Payload(InfectionKind kind, ConnectionSpawnOverrides overrides) =>

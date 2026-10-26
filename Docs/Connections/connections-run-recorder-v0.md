@@ -22,6 +22,8 @@ Connections records each Play Mode run automatically. The recording starts when 
 
 In the Unity Editor, find files at `<project-root>/Logs/UptimeRuns/`. The folder is created automatically and ignored by Git. Standalone builds use `Application.persistentDataPath/UptimeRuns/`. Filenames follow `uptime_YYYYMMDD_HHMMSS_seed-XXXXX_RUNID.json`, using the run's UTC start time. The output is ordinary UTF-8 JSON and can be attached directly to a ChatGPT conversation.
 
+**Phase 3 LOADER recording (review branch):** `plan_queued.definition.loaderAttack` and `generation.loaderAttack` carry the selected structure, pattern, attack operation index, target capacity, normal and elevated LOAD, onset, spike intervals, and withdrawal duration. The complete composed operations and behavior definitions remain in the queued definition; the generation trace retains the original normal operations. Run metadata copies the provisional Traffic Director LOADER settings. The `loader_activated` event records actual activation and scheduled withdrawal from that time. A completed attacker exit emits `loader_withdrawal` and a `connection_resolved` event with outcome `Withdrawn` and cause `AttackerWithdrawal`; the resolved state remains in inspection history. Snapshots include actual activation/withdrawal times. Killed or Blackout-canceled LOADERs retain their existing outcomes and emit no later withdrawal. This is internal evidence; no player-facing threat label or recorder schema change is introduced.
+
 ## Commands
 
 | Command | Result |
