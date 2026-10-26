@@ -1,188 +1,256 @@
 # Connections — THREATS
 
-> **Status:** Active working design foundation, October 25, 2026. This page captures the agreed model and the outstanding design space; it is **not** a claim that the proposed generator changes are implemented or that numerical tuning is final.
+> **Status:** Active working design foundation, updated October 26, 2026. Captures the current design agreements and unresolved questions. **Not** a claim that the proposed changes have been implemented, or that provisional tuning values are final.
 >
-> **Scope:** Uptime's **Connections** prototype. Packet remains a separate playable experiment. This is the *top-level design anchor* for what a hostile connection is trying to achieve and how that intent should be translated into spawn plans. Existing focused implementation contracts remain authoritative for current behavior.
+> **Scope:** Uptime's **Connections** prototype. Packet remains separate and playable. This page is the conceptual entry point for ambient threat generation; the linked focused contracts and current runtime/serialized scene remain authoritative for implemented behavior.
 
-## Central premise
+## The game-design premise
 
-**Every generated connection is grounded in a canonical benign PURPOSE. Hostile generation starts with a legitimate-purpose sample, then transforms that concrete connection to pursue an attacker objective.**
+Uptime's player is defending a network that is doing real, legitimate work. Hostile activity is interesting because it interferes with that work, blends into it, or exploits it—not because the simulation labels a connection as malicious.
 
-The PURPOSE tells us what normal behavior *would have been*. The threat genus tells us *why* the resulting connection is dangerous. Anomalies and timed behaviors tell us *how it departs from that baseline*, and what evidence may become visible to the player.
+**Canonical PURPOSES supply the legitimate behavioral baseline; threat genera define the attacker's goal; attack signatures, structure, and temporal tactics determine what can be observed and how the attack plays out.**
 
-These concepts should not be collapsed:
+Keep these concepts distinct:
 
-- **PURPOSE / cover identity:** Claimed business activity such as Customer Authentication, Product Detail Retrieval, or Checkout Order Submission. A purpose defines legitimate operation kind(s), destination, expected requested LOAD, and expected WORK, with normal variation.
-- **Threat genus / objective:** The class of harm the attacker is attempting. Our first two are **LOADER** (ongoing resource pressure) and **INFECTOR** (delivering a persistent node infection). They are the first two examples, **not** the exhaustive hostile taxonomy.
-- **Signature / anomaly:** A deviation from the sampled normal purpose—high LOAD, low LOAD, unusual WORK, or a different operation. An anomaly is *evidence*, not a verdict. Benign outliers can exhibit the same signatures.
-- **Tactic / temporal behavior:** When and how a deviation appears: immediate, delayed onset, sustained escalation, repeated spikes, or a normal-looking first operation followed by an unusual operation. A timed tactic can be legible while active and misleading while dormant.
-- **Payload / consequence:** What is actually delivered or changed in the network. An INFECTOR's payload (Phantom LOAD, Blackout, Spawner) is not the same thing as the LOAD/WORK signature of its carrier.
-- **Attack surface:** The means through which the attack reaches the simulated network. Currently this is primarily a logical connection; future tunnels, compromised nodes, etc. need not fit a single-connection model.
-
-A connection can claim a legitimate purpose while being conspicuous **from its first active moment**. A normal-looking opening period is important for *delayed* tactics, not a requirement for every threat. The same canonical purpose must support clearly benign, anomalous-but-benign, and hostile instances.
-
-## Generation model: PURPOSE first, hostile goal second
-
-The conceptual recipe is:
-
-1. **Select a compatible PURPOSE.** It supplies a claim, eligible target(s), operation arc, and normal LOAD/WORK distributions. Scheduling or intended attack target may constrain which purposes are eligible.
-2. **Sample a concrete normal connection.** Preserve this sample in generation evidence: kind, requested LOAD, WORK, order of operations, and implied nominal duration. Do not mutate the canonical definition.
-3. **Choose the connection's role.** It may remain benign (possibly with a benign outlier), or receive a hostile **genus and objective**.
-4. **Construct an objective-aware attack plan.** Decide the intended effect, strength, timing, target, and eligible tactics **before** finalizing abnormal numbers. This is where LOADER and INFECTOR differ.
-5. **Apply signatures and temporal behaviors to the normal sample.** Derive the final operation(s), requested LOAD, WORK, timed modifiers, and any infection payload so the concrete plan has a plausible opportunity to achieve its objective.
-6. **Validate and record.** Check that the chosen parameters are physically valid and mechanically consistent; queue a normal `ConnectionSpawnPlan` and retain baseline-vs-final and intent data **only in internal diagnostics**. The existing `SimulationHost` remains authoritative for allocation, advancement, delivery, and resolution.
-
-The final connection should still obey universal simulation rules. An internally hostile objective does not automatically color it red, alter the allocator, or get revealed by `inspect`.
-
-### Why a canonical PURPOSE matters
-
-A typical Customer Authentication is meaningful because it can be compared with other Customer Authentication operations—not with every operation in the network. It establishes a real, reusable expectation instead of making each threat's “normal” behavior arbitrary.
-
-This also gives the player a potential *company knowledge* reference for investigation without requiring hours of memorization. We have discussed comparing current LOAD with typical LOAD, and nominal operation duration with typical duration. Whether this appears in `inspect -v`, a service-reference tool, or a difficulty-assisted inspection mode is still open.
-
-## The first two threat genera
-
-| Dimension | LOADER | INFECTOR |
-|---|---|---|
-| **Primary objective** | Degrade legitimate service by taking usable capacity | Establish a persistent compromise on a target node |
-| **Mechanism** | Requested LOAD consumes a share of target-node capacity while the attack runs | A connection operation completes and delivers a typed infection |
-| **Danger window** | Primarily **during active operation** | Primarily **at delivery**, followed by the infection's own lifetime |
-| **Relationship to LOAD** | The resource pressure **is the attack** | Carrier LOAD may be ordinary or anomalous; payload impact is independent |
-| **Relationship to WORK** | Enough WORK/lifetime is needed to carry out the intended pressure pattern | Enough WORK determines the time until delivery; extra WORK can itself be a signature |
-| **Primary player challenge** | Notice degradation, attribute it to the responsible connection, stop further pressure | Evaluate incomplete evidence and interrupt the carrier **before** delivery |
-| **Success** | Actually disrupt useful service while active; the amount of harm can be partial | Intended infection **applies** successfully; merely attempting a rejected duplicate is not equivalent |
-| **Interruption** | Killing ends future resource pressure; damage already caused remains | Killing before delivery prevents that pending payload; killing the carrier afterward does not remove an installed infection |
-
-The distinction is about objective and lifecycle, **not** whether a connection has an abnormal LOAD number. An INFECTOR can create incidental contention before delivery; a LOADER can have a long, otherwise ordinary-looking preparation phase. These overlaps should not erase their different goals.
-
-### LOADER: spawn contract (working design)
-
-A LOADER plan should begin with the question: **Which node should experience how much additional requested LOAD, by what temporal pattern, and for how long?**
-
-| Plan input | What it controls |
+| Concept | Role |
 |---|---|
-| Cover PURPOSE and compatible target | Legitimate-looking operation(s), route, expected normal behavior |
-| Attack target / context | Where resource contention is likely to matter; target capacity and legitimate demand are useful planning inputs |
-| Pressure strength | Desired attack-phase requested LOAD or increment, ideally considered relative to capacity and competing traffic |
-| Onset / pattern | Immediate sustained LOAD, delayed escalation, repeated SPIKING, or a normal first operation followed by an attack operation |
-| Preparation interval | How long initial baseline behavior survives before visible escalation, when applicable |
-| Attack window | Intended duration and/or number of high-demand intervals after onset |
-| Optional additional signature | Any deviation beyond the characteristic pressure pattern; not required for the genus |
-| End behavior | Ordinary completion/kill ends the connection's resource demand; no infection-delivery requirement |
+| **PURPOSE** | The expected business activity: claim, eligible destination(s), operation sequence, normal LOAD, and normal WORK. It is primarily an **investigative expectation** and secondarily world-building. |
+| **Genus / objective** | What a hostile connection tries to achieve. Initially **LOADER** or **INFECTOR**; not an exhaustive taxonomy. |
+| **Anomaly / signature** | A measurable mismatch with the legitimate PURPOSE baseline: LOAD, WORK, or operation deviation. Anomaly is **evidence**, not a threat verdict. |
+| **Attack pattern / tactic** | How and when pressure appears: immediate high LOAD, OVERLOAD, SPIKING, etc. |
+| **Connection structure** | The number/order of operations; **DELAYED** means the original normal PURPOSE arc is retained and **an additional malicious operation is appended**. This can apply to LOADERs and INFECTORs. |
+| **Payload** | What an INFECTOR installs on delivery (e.g. Phantom LOAD, Blackout, Spawner); separate from the carrier's investigative signature. |
+| **Information presentation** | What PURPOSE, operation kind, activity description, and evidence the player can observe. Not necessarily equal to hidden intent or a future independent classification. |
 
-**Key generation constraint:** **Do not multiply LOAD without accounting for WORK and time.** In the current model, allocated LOAD advances WORK at the same numeric rate; at full allocation, four times the LOAD with unchanged WORK makes the operation approximately four times shorter.
+The canonical PURPOSE is **not** a placeholder label applied after making arbitrary hostile traffic. Normal and hostile connections share a credible legitimate baseline. A LOADER can *abuse the actual functionality* of Customer Authentication by forcing it to consume excessive processing capacity; it need not be fictionally pretending to do something entirely unrelated. An INFECTOR can use the same purpose as cover for delivering a persistent infection.
 
-For a simple constant-LOAD operation, choose a *nominal target duration*, then derive enough WORK to support it. For temporal LOAD patterns, size WORK against the **whole expected demand-versus-time sequence**, not just the peak LOAD. Example: 10 seconds requesting 1 LOAD followed by 30 seconds requesting 8 LOAD implies about **250 WORK** at full requested allocation, before considering fixed-step boundaries. This is illustrative, not a locked formula for every variant.
+We do **not** need to redesign PURPOSE, introduce UNKNOWN/UNCATEGORIZED, implement independent classification, or add node *types* to complete this generation pass. Those are interesting open lines of inquiry. Preserve the current PURPOSE system for now.
 
-Allocation may be less than requested LOAD because of contention, extending actual lifetime. Realized harm must be measured from **legitimate service effects**, not just an impressive LOAD request or the LOADER's eventual completion. A LOADER on an idle node can be mechanically loud without having caused much harm.
+## Ownership: ambient Traffic Director versus Level Director
 
-**Temporal identity matters:**
+**Ambient `ConnectionTrafficDirector` is the source of relatively random background connections.** It ensures a tunable amount of legitimate network activity and a tunable amount/mix of ambient hostility. It respects meaningful PURPOSE → eligible target mapping, but does **not** attempt coordinated campaigns, hand-pick ideal victims, or intelligently plan simultaneous attacks. The genus and variants of any particular ambient threat may still be random.
 
-- **Immediate/sustained:** The active pressure is obvious immediately; attribution and prioritization are the player's problem.
-- **OVERLOAD:** Initial baseline-looking demand, then a sustained positive LOAD modifier after a delay. Its **effective** requested LOAD becomes obvious on activation. The plan must survive long enough for that activation and for meaningful time afterward.
-- **SPIKING:** Repeated baseline and elevated LOAD intervals; it may look normal between spikes. The point is incongruent *timing*, not a covert peak effect.
-- **DELAYED (broader pattern):** May use a delayed OVERLOAD activation or a normal operation followed by an attack operation. “DELAYED” is **not** currently an independent implemented keyword/genus.
+**Level Director + events are the future orchestration layer.** They can increase or decrease ambient density and threat pressure, enable/disable ambient generation altogether, and schedule deliberately overlapping or targeted attacks, possibly with several concrete spawn plans. The Packet prototype already explored coordinated packet spawns; this does not imply its scheduling code transfers directly to Connections.
 
-Do **not** pre-inflate the base LOAD of a delayed or spiking LOADER so that the advertised quiet phase already displays the full attack. The recognizable resource effect should occur when its planned behavior activates.
+A separate `ThreatDirector` or threat-planning MonoBehaviour is **not an established requirement**. A genus-specific connection composer may be useful to both the ambient Traffic Director and eventual Level Director, but coordinated planning belongs conceptually to the **Level Director**, not the ambient producer. Do not add architecture just to satisfy a hypothetical class diagram.
 
-### INFECTOR: spawn contract (working design)
+### Ambient population / coverage objective
 
-An INFECTOR plan should begin with: **What infection is being delivered, to which node, and what opportunity does the player have to intercept it?**
+Benign ambient activity exists to keep the network **occupied enough for attacks to have somewhere to hide**, without being perpetually crowded.
 
-| Plan input | What it controls |
+The emerging tuning question is whether to replace or augment “spawn every N seconds ± jitter” with a **soft occupancy / coverage goal over time**:
+
+- Coverage means **how many legitimate active logical connections** occupy the network across a window—not “cover all targets” or “send traffic to every node.”
+- The default should be *generally busy, not constantly saturated*. Natural lulls and occasional high-roll crowding should still occur.
+- The ambient director still selects valid PURPOSES and random eligible targets; target diversity should arise mainly from the purpose catalog and meaningful destination mappings.
+- Maintain or measure **benign occupancy separately from hostile occupancy**. A persistent LOADER should not satisfy the ordinary-traffic coverage goal merely by staying alive.
+- Use simulation/recorder evidence (active population over time, zero/one-connection stretches, overlap distribution, contention, benign service outcomes) rather than assuming a shorter fixed spawn interval solves the design problem.
+- Actual coverage algorithm, desired range, smoothing window, and random process are **not yet decided**. Do not turn a soft goal into an artificial guarantee that the network never goes quiet.
+
+**Ambient threat scheduling remains open:** either (a) classify a fraction of ordinary ambient arrivals as hostile, or (b) generate benign coverage and hostile attempts through separate stochastic processes. We want control over the *amount/mix* of ambient threat pressure without creating an obviously patterned threat signal. Two threats should be able to arrive almost together, or far apart. The Level Director should eventually be able to tune these controls independently.
+
+## Two ambient generation recipes
+
+### Benign
+
+1. Randomly select a canonical PURPOSE from the current valid/weighted catalog.
+2. Choose a random eligible target for that PURPOSE; derive a valid route.
+3. Sample its defined normal operation(s), requested LOAD, WORK, and activity descriptions.
+4. Optionally apply the existing small chance of a **benign outlier**, using shared signatures/tactics.
+5. Queue the concrete connection and record its baseline/changes internally.
+
+No advanced target prioritization or attack planning is needed to generate ordinary business traffic.
+
+### Hostile
+
+1. Decide to spawn **an ambient threat** (arrival process still TBD).
+2. **Choose its genus first:** LOADER or INFECTOR.
+3. Let the chosen genus define compatible PURPOSES/targets and the parameters it needs.
+4. Select a compatible canonical PURPOSE, eligible target, and sample a **normal baseline**.
+5. Compose the genus-specific attack from that baseline, including structure, timing, signature, LOAD, WORK, behavior, and (for INFECTOR) payload.
+6. Validate mechanical viability, queue a normal `ConnectionSpawnPlan`, and record both the sampled baseline and the final plan.
+
+For hostile generation **genus comes before PURPOSE choice**; benign generation simply rolls PURPOSE. Both still share the canonical purpose catalog and normal sampling rules. The genus dictates the transformation—not an undifferentiated “make it anomalous” operation.
+
+## Genus 1 — LOADER
+
+### Objective and player challenge
+
+A LOADER attempts to **degrade legitimate services by consuming node LOAD while it is active**. The active pressure is meant to be obvious *when it happens*. Its difficulty comes from onset, timing, misdirection/attribution, congestion, prioritization, and the player's need to act—not from hiding the magnitude of a full attack.
+
+Unlike an INFECTOR, LOADER success is **not** successful WORK completion. It is the actual interference caused to legitimate service while the attack runs. Killing it stops future pressure but cannot undo past disruption. A loud LOADER on an otherwise empty node might do little damage; ambient random generation should not always “solve” that for the attacker by finding the busiest node.
+
+### Selected generation decisions
+
+- **Attack LOAD is derived relative to the selected target node's LOAD capacity** (Option B), rather than simply multiplying the PURPOSE's sampled normal LOAD. Exact fractions/ranges are playtest tuning, not agreed values.
+- Retain the sampled PURPOSE as the connection's overall claimed purpose. It can meaningfully represent functionality being abused.
+- **Structure and attack pattern are independent dimensions.**
+- A single-operation LOADER can begin in high-LOAD attack mode, or run normally before an OVERLOAD/SPIKING activation.
+- **DELAYED appends one additional malicious operation after the complete sampled normal PURPOSE arc.** Its appended operation may itself be immediate high LOAD, OVERLOAD, or SPIKING.
+- The time *before* a temporal attack's first activation is a **meaningful, variable tuning input**, not a fixed keyword delay.
+- Operation kind remains READ / WRITE / EXECUTE; a suspicious activity/WORK description in the appended operation can communicate a changed phase without mutating PURPOSE or inventing a new operation kind. Exact description honesty/visibility is open.
+
+### Composition matrix
+
+| Structure | Immediate high LOAD | OVERLOAD | SPIKING |
+|---|---|---|---|
+| **Single-operation attack** | High attack LOAD from activation | Normal-demand opening, then sustained high demand | Normal-demand opening, then recurring high-demand bursts |
+| **DELAYED appended attack** | Full normal PURPOSE arc, then obvious high-LOAD added operation | Full normal arc, then added operation that escalates after its own onset delay | Full normal arc, then added operation that starts recurring bursts |
+
+Here **DELAYED is an arc-composition choice**, not a fourth competitor to OVERLOAD/SPIKING and not a separate genus. In the current code OVERLOAD and SPIKING are timed modifiers which can be scoped to a connection or operation; for an appended attack operation, **operation-scoped timing** is a natural fit so the timer does not begin during earlier benign stages. No new named “DELAYED keyword” is required just to append a stage.
+
+**EASY / MEDIUM** from exploration described relative player difficulty, not distinct runtime types: immediate high LOAD is straightforward to identify; timed escalation and intermittent spikes complicate attribution. The word “Packet Flood” as an alternative claimed PURPOSE, and UNKNOWN/UNCATEGORIZED, remain exploratory rather than selected generation rules.
+
+### Attack state and a general-purpose WORK rate scalar
+
+**Selected direction:** An attacking LOADER needs an **attack-active versus not-attack-active state**, and a general-purpose, real-time adjustable **WORK rate multiplier**. Attack mode changes productive progress, not the amount of requested/allocated LOAD or the connection's original total WORK.
+
+Current rule:
+
+    WORK progress per second = allocated LOAD
+
+Proposed universal rule:
+
+    WORK progress per second = allocated LOAD × workRateMultiplier
+
+- Normal operation defaults to **1.0×**.
+- A LOADER's initial attack mode may set **0.0×**: it continues requesting/receiving LOAD and contending normally, but makes no WORK progress and therefore does not naturally complete via WORK while attack-active.
+- Other positive values, e.g. 0.25×, 0.5×, 2.0×, remain available for future scaling, throttling/efficiency mechanics, or finite variants. The scalar is a **general runtime dimension**, not a hardcoded LOADER-only exemption.
+- This is **different** from the current `workDelta` modifier, which changes the total WORK requirement rather than the **rate of WORK completion**. Do not silently reinterpret `workDelta`.
+- Existing proportional LOAD allocation stays authoritative. Zero productive progress does not mean zero resource consumption, nor necessarily “stalled due to allocation.”
+- The multiplier may be changed by appropriate connection- or operation-scoped behaviors in the future; the exact stacking/composition rule is not yet designed. Avoid building an overly broad general modifier framework ahead of this slice.
+
+**SPIKING nuance:** Once a LOADER is in its *attack-active phase*, its WORK rate can remain 0× **during quiet intervals between spikes**. Attack-active state is distinct from “requested LOAD happens to be elevated at this instant.” The spike timer continues to progress in simulation time even while WORK progress is zero.
+
+For temporal patterns, the **pre-attack period still needs to survive** long enough for the planned onset. It may require enough baseline WORK, or a carefully selected pre-activation progress rate, to avoid natural completion just before the attack starts. **Do not** return to calculating huge total WORK merely to fake a sustained attack after activation.
+
+At 0×, an attack will not resolve by ordinary WORK completion unless its state changes. A player kill, an explicit end-of-attack/attacker event, or other connection termination can end it; whether ambient LOADERs require an automatic timeout is **unresolved and important for population stability**. Do not silently make every ambient LOADER immortal and thereby create irreversible accumulation.
+
+### LOADER spawn parameters (conceptual; not all need serialized fields)
+
+| Parameter | Responsibility |
 |---|---|
-| Cover PURPOSE and target | Legitimate operation plan, route, and expected values |
-| Infection payload | Phantom LOAD strength, Blackout, or Spawner cadence; this is the *result*, not carrier evidence |
-| Delivery operation / phase | Which operation's successful completion applies the payload; potentially preceded by normal operations |
-| Delivery window | Intended nominal time before successful delivery, including any earlier stages |
-| Evidence signature | High LOAD, low LOAD, operation deviation, WORK-only deviation, or intentionally no added anomaly |
-| Signature magnitude / placement | Which operation changes and how detectable it might be |
-| Optional temporal behavior | How evidence appears or varies over time, without redefining the payload |
+| `purpose / target` | Cover identity, valid node and route, initial normal operations |
+| `structure` | Single attack operation or DELAYED appended operation |
+| `pattern` | Immediate sustained, OVERLOAD, SPIKING |
+| `attackLoadFraction` | Desired elevated LOAD relative to target node capacity |
+| `preAttackDelay` | Variable initial wait before the attack first becomes active, where applicable |
+| `spikeNormalInterval` / `spikeElevatedInterval` | Temporal rhythm while SPIKING |
+| `workRateMultiplier` | Effective productive WORK scaling, e.g. 1× normally and 0× attack-active |
+| `exitPolicy` | How persistent LOADERs eventually end; **open design**, separate from WORK computation |
 
-**Key generation constraint:** A high-LOAD **carrier signature** should not automatically turn a reasonable investigation window into a few seconds. After changing carrier LOAD, recalculate supporting WORK as needed to preserve the intended delivery window. That extra resulting WORK is a **consequence of preserving time**, not necessarily a separately rolled WORK-only anomaly.
+Avoid treating `attackDuration` or spike count as a required *WORK budget* when attack-active rate is zero. Those can still become constraints/tuning parameters if explicit attack termination or finite variants are later selected.
 
-A **WORK-only deviation** remains a distinct, valuable signature: preserve the normal requested LOAD, deliberately increase WORK, and create a substantially longer *nominal operation duration*. The evidence is **“Why is this still running?”** rather than “Why is this consuming so much?” It should be relatively rare at our current introductory tuning, **not removed or redefined**.
+### LOADER generation viability checks
 
-Keep nominal/at-speed duration separate from elapsed time or ETA **under contention**. A benign operation made slow by a crowded node is not thereby an INFECTOR. An operation deviation may likewise change or append a stage without automatically revealing intent.
+- A normal-looking pre-attack interval is genuinely normal, not already inflated to peak LOAD.
+- OVERLOAD and SPIKING reach their first intended activation before a baseline operation would complete.
+- Spiking timelines continue independently of WORK advancement.
+- Once attack-active at 0×, LOAD is still allocated and impacts benign service.
+- One active LOADER does not count as enough benign population for ambient coverage.
+- A LOADER can be killed; allocation releases; the recorder and any status/ETA output do not misdescribe 0× productive progress as no LOAD.
+- Natural termination and optional timeout semantics are explicit rather than accidental.
 
-A fully ordinary-looking carrier with no chosen anomaly is a possible higher-difficulty/alternative-evidence case. It should not become the main early gameplay pattern until the player has credible other investigative tools or clues.
+## Genus 2 — INFECTOR
 
-The INFECTOR's success is successful *application* of its payload. If a duplicate infection is rejected, the attempted completion happened but the intended new compromise did not take hold. Once delivered, the carrier can retire while the infection persists and must be addressed separately.
+### Objective and player challenge
 
-## Signatures and temporal behaviors are shared vocabulary
+An INFECTOR attempts to **deliver a typed infection**, generally by successfully completing a carrier operation. The infection remains after the carrier retires and presents a new problem (e.g. Phantom LOAD, Blackout, or Spawner). Killing the carrier *before* delivery can prevent the pending infection; killing it afterward does not clean the node.
 
-| Vocabulary | What it means | Relation to genus |
-|---|---|---|
-| **high-load** | An operation requests unusually high LOAD versus its PURPOSE baseline | Core active effect for many LOADERs; possible INFECTOR signature |
-| **low-load** | An operation requests unusually low LOAD versus baseline | Possible INFECTOR signature or benign outlier; not automatically malicious |
-| **work-deviation** | WORK differs from the normal sampled amount at ordinary LOAD | May make an operation unusually long/short; distinct from compensating WORK for a LOAD change |
-| **operation-deviation** | An operation kind changes or an unexpected kind is appended | Possible evidence in either role |
-| **OVERLOAD** | A sustained positive LOAD modifier begins after a configurable delay | Implemented timed keyword; suitable LOADER tactic, possible benign noise |
-| **SPIKING** | Alternating ordinary/elevated LOAD intervals | Implemented timed keyword; suitable LOADER tactic, possible benign noise |
-| **DELAYED** | A temporal structure with an inconspicuous opening then later attack behavior | Design pattern realized through available behaviors/arcs; not yet a standalone keyword |
+An INFECTOR's carrier is typically designed to resemble a compatible benign PURPOSE. Its anomaly signatures are **investigative clues** rather than the essence of the attack.
 
-A signature is **not** a threat genus, an infection type, a confirmed classification, or a guarantee that the operation is malicious. Benign outliers remain essential to making investigation a judgment rather than a threshold test.
+### INFECTOR spawn inputs
 
-For **early INFECTOR anomaly selection**, our *proposed playtest weights* are **65% high-load, 10% low-load, 15% operation-deviation, 10% work-deviation**. These are **not** implemented weights or a permanent difficulty progression. LOADERs should use an **objective-aware temporal-tactic mix**, not inherit this generic INFECTOR table. Optional secondary anomalies, subtle deliveries, and benign outlier frequencies need separate tuning.
+| Parameter | Responsibility |
+|---|---|
+| Infection type / payload parameters | What happens on successful delivery; payload is independent of carrier LOAD |
+| Compatible PURPOSE / valid target | Which legitimate operation(s) may carry this payload |
+| Structure | Existing purpose arc with delivery, or DELAYED append of one malicious delivery operation |
+| Evidence signature | High LOAD, low LOAD, operation deviation, WORK-only duration deviation, potentially rare no-anomaly |
+| Signature magnitude / placement | Where the mutation occurs and how detectable it may be |
+| Delivery window | The time the player has before delivery in nominal uncongested execution |
 
-## Scheduler and director responsibilities
+A high-LOAD carrier signature **must not accidentally shrink the investigation window** by leaving WORK unchanged. Generate LOAD and supporting WORK with intentional delivery timing. This is a *different* reason to change total WORK than LOADER persistence, now served by a 0× attack rate.
 
-Distinguish **ordinary network traffic** from **hostile opportunities**:
+**WORK-only deviation remains important and distinct:** normal-looking requested LOAD, but abnormally large WORK and hence an unusually long nominal duration. The player notices “Why is this still running?” rather than high consumption. Keep it **rare, not removed**, at current introductory tuning. Actual slowdown from allocation contention must not automatically be treated as evidence of malicious WORK.
 
-- **Ambient network schedule:** How much legitimate company activity exists, which purposes are common, and how much natural contention/counterexample traffic appears.
-- **Threat opportunity schedule:** How often the adversary attempts something, which genus and target it chooses, how many hostile plans can overlap, and how attacks scale across a run.
-- **Genus-specific plan construction:** Starting from a concrete normal PURPOSE sample, generate a LOADER pressure plan or INFECTOR delivery plan with its own parameters and viability checks.
-- **Simulation execution:** Existing `ConnectionSpawnPlan`, `SimulationHost`, allocator, operation effects, timed modifiers, and infection state continue to execute the concrete plan.
+**Working early INFECTOR anomaly weights (proposed, not yet implemented):**
 
-A separate `ThreatDirector` **might** eventually own adversary scheduling and multi-surface campaigns. **Do not assume that new class is required for the next slice.** The near-term implementation could separate plan-building and scheduling responsibilities inside the existing `ConnectionTrafficDirector`, then extract them when needed.
+- High LOAD: **65%**
+- Low LOAD: **10%**
+- Operation deviation: **15%**
+- WORK-only deviation: **10%**
 
-The important architectural seam is **attack intent → objective-aware concrete plan**, not the MonoBehaviour name.
+A subtle carrier with *no anomaly* is a future/rare case requiring other plausible detection channels; do not make the early game rely on evidence the player cannot obtain. Legitimate **benign outliers** must remain possible so deviation ≠ confirmed hostility.
 
-### Implementation reality at the time of writing
+**DELAYED applies to INFECTOR too:** generate and retain the normal PURPOSE arc, then append a malicious delivery operation. The additional operation may carry a strange activity description; ordinary READ/WRITE/EXECUTE and stable claimed PURPOSE are sufficient for now. Avoid automatically changing PURPOSE or leaking hostile identity in inspection.
 
-Current Connections code does **not yet** follow all of this intended recipe:
+Unlike a sustained LOADER, an INFECTOR must advance toward completion: the 0× attack-active rate is not its default delivery mechanic.
 
-- `ConnectionTrafficDirector` uses one ambient cadence and rolls hostile chance, then LOADER versus DELIVERY. This couples benign density and hostile frequency.
-- It samples six purpose templates with independent normal LOAD and WORK. LOADER currently applies high LOAD **without** automatically compensating WORK, optionally adds WORK deviation, and can add an OVERLOAD/SPIKING keyword; many generated examples therefore end too quickly to exert sustained pressure.
-- DELIVERY currently selects zero/one/occasionally two anomalies and attaches a typed infection-delivery effect to the **final operation**. A high-LOAD signature can unintentionally shorten the available interception period.
-- `OVERLOAD` and `SPIKING` exist as timed modifier behaviors; the earlier `delayed-threat` manual profile is an operation arc, **not** proof of a general DELAYED keyword.
-- The recorder already captures the generated **normal** and **final** operation values and decision branch. Ordinary inspection does not currently provide a comparative baseline or intent diagnosis.
-- The simulation already supports Phantom LOAD, Blackout, Spawner, interruption, and player cleaning. Their exact effects and current scene defaults remain the responsibility of their focused contracts and runtime code.
+## Investigation and fiction boundaries
 
-This design foundation is intended to guide a focused revision, **not** retroactively describe implemented behavior.
+The player should be able to compare observed LOAD and *nominal duration* with expected behavior for the claimed PURPOSE. A typical-range comparison may eventually appear in verbose inspection, in a separate service reference, or through optional difficulty assistance. **Not yet decided**; no new command or classifier is authorized by this document.
 
-## Boundaries and future taxonomy
+Separately, UNKNOWN/UNCATEGORIZED might represent genuinely unrecognized legitimate activity or incomplete classification and should not become an automatic threat marker. Independent classification, probes, logs, tracing, node scanning, and richer source evidence are future ideas rather than prerequisites for this generator.
 
-LOADER and INFECTOR are **initial genera**, not the two permanent categories of all hostile activity. A future genus earns its place by introducing a different *attacker objective and player problem*, not simply another LOAD multiplier or keyword.
+PURPOSE is useful because legitimate traffic usually behaves consistently with it; attackers exploit or imitate that consistency. Activity descriptions and operation history may communicate the malicious phase, but should not replace actual simulated evidence.
 
-Potential examples to investigate later, **not selected designs**:
+## Current code versus selected direction
 
-- **THROTTLER:** Impairs legitimate throughput by some mechanism other than simply consuming corresponding LOAD. Is causal attribution different enough to deserve a genus?
-- **TUNNELER:** Establishes a new access route. Is this itself an attack objective, or instead an *attack surface* through which LOADERs/INFECTORs arrive?
-- Other evasive, moving, or coordinated attackers may be tactics or multi-attack plans rather than new genera.
+As of this document's review baseline, current Connections code already has:
 
-Do not prematurely implement these, or insist every future attack is exactly one connection or one objective. Keep the genus question distinct from the delivery surface and the tactics.
+- A seeded `ConnectionTrafficDirector` generating six ecommerce purpose templates, with sampled normal LOAD and independent WORK, plus a single 13.5 ± 1.5 second ambient arrival schedule, hostile chance, and LOADER/DELIVERY objective roll.
+- High/low LOAD, WORK, and operation mutations; benign outliers; OVERLOAD and SPIKING behaviors; manual delayed threat profiles; typed infection-delivery effects and persistent node infections.
+- A `ConnectionSpawnPlan` → `SimulationHost` execution path, proportional target-node allocation, operation arcs, and a run recorder storing original and final values and internal generation decisions.
+- `kill`, `inspect` / `inspect -v`, and basic node cleaning; the current inspector does not show a canonical-purpose baseline or work-rate scaling.
 
-## Questions to settle during the next generation pass
+**Not yet implemented by these design decisions:**
 
-1. **LOADER pressure target:** absolute LOAD, proportion of capacity, expected legitimate slowdown, or a hybrid? How much should current network demand influence target choice?
-2. **LOADER lifetime:** what minimum preparation, attack-on, and spike counts are needed? Should a runtime duration constraint supplement WORK-derived lifetime?
-3. **INFECTOR delivery window:** preserve sampled nominal duration, choose a genus-level range, or condition by payload and difficulty? How should multi-operation arcs allocate that window?
-4. **Signature choices:** which anomalies are viable for each genus, in which stage, and with what magnitude? How do benign outliers avoid a trivial signature=hostile rule?
-5. **Scheduling:** when to decouple benign density from hostile attempts, and how should genus weights/concurrent threat budgets work?
-6. **Player reference information:** where do typical LOAD and nominal duration comparisons live, and which difficulty levels provide assistance without declaring “threat”?
-7. **Success evidence:** what measurable player-facing outcomes represent LOADER disruption versus INFECTOR installation, without conflating the two?
-8. **Future orchestration:** when does an attack plan need multiple connections or different surfaces rather than a single purposeful connection?
+- Occupancy/coverage-aware benign ambient generation; independently tunable benign/threat opportunity streams if chosen.
+- Objective-aware LOADER composition with capacity-relative attack strength, variable onset, DELAYED appended attack, and an attack-active state that changes productive WORK rate.
+- A general **WORK rate multiplier** in allocator/progress semantics.
+- INFECTOR composition with intentional delivery windows, the proposed weighted anomaly mix, and optional DELAYED appended delivery.
+- An actual Connections Level Director that tunes ambient parameters or owns coordinated attack events.
 
-The working principle for the next implementation proposal is: **sample a credible benign PURPOSE, decide what the attacker wants, then build and validate a concrete connection that can plausibly achieve it.**
+Implementations must continue to respect the *working branch's actual code and scene*. Existing legacy Threats/Traffic/Behavior documents explain implemented slices or older proposals; they are not automatically updated to this new design.
 
-## Related source documents
+## Proposed near-term Codex sequence (not yet an implementation authorization)
 
-- [Connections Current State](Current_State.md) — current integrated scene and runtime posture.
-- [Purpose & Anomaly Generation V0](connections-purpose-anomaly-generation-v0.md) — six canonical purpose profiles and *current* anomaly mutation/rate behavior.
-- [Threats V0](connections-threats-v0.md) — provenance of delivery, kill interception, operation arcs, and LOAD keywords.
-- [Behavior & Modifier Foundation](connections-behavior-foundation-v0.md) — actual OVERLOAD/SPIKING timing and effective LOAD/WORK.
-- [Infections V0](connections-infections-v0.md) — typed payloads, persistent node effects, and cleaning.
-- [Network Health V0](connections-network-health-v0.md) — consequences to legitimate service.
-- [Run Recorder V0](connections-run-recorder-v0.md) — private generation decisions, snapshots, and cause/effect evidence.
-- [Threat Signals and Investigation (ideas)](connections-threat-investigation-ideas.md) — speculative tools and evidence, not yet an approved build plan.
+**A. Population/coverage baseline.** Read the latest director/scene and recorder; instrument and tune time-weighted benign active counts, overlaps, and gaps. Explore a *soft target* approach, not guaranteed node coverage. Preserve randomness, allow lulls/high rolls, and avoid counting persistent threats as benign background. Keep adversary orchestration out of the Traffic Director.
+
+**B. WORK-rate foundation.** Add a general effective per-operation/connection WORK rate scalar (default 1×); scale productive progress after LOAD allocation while leaving demanded/allocated LOAD, total WORK, and `workDelta` meaning unchanged. Test 0×, positive values, mid-operation transitions, operation scope, zero allocation, completion, kill, and recorder/inspect correctness.
+
+**C. Objective-aware LOADERs.** Compose immediate, OVERLOAD, and SPIKING attack patterns, plus DELAYED appended variants, with capacity-relative peak LOAD, varied initial time-to-attack, explicit attack-active state, and a 0× attack productive-rate default. Test all six structural combinations and pending-onset viability. Define or consciously defer an ambient-LOADER exit policy instead of allowing unbounded accumulation accidentally.
+
+**D. INFECTOR timing and signatures.** Choose payload and compatible PURPOSE; preserve nominal delivery opportunity when mutating carrier LOAD, support rare WORK-only long-duration anomalies and the proposed signature weights, and add DELAYED appended deliveries. Preserve benign outliers and evidence ambiguity.
+
+Throughout: retain seeded determinism, stable purpose baselines, source/target validity, accurate recordered normal-vs-final plans, actual Network Health consequences, and manually invokable witnesses. **No mandatory new ThreatDirector; no coordinated campaign logic in the ambient director.** The Level Director can later tune ambient parameters, turn ambient off, and supply intentional overlapping spawn plans.
+
+## Open questions to resolve with playtests
+
+1. **Population control:** soft occupancy target, adaptive arrival rate, rolling window, or another randomized controller? What active-count distribution actually feels busy rather than crowded?
+2. **Hostile opportunity scheduling:** roll threat as part of ambient arrivals or maintain a separate tunable stochastic stream? Ensure near-simultaneous threats and long gaps remain possible.
+3. **LOADER lifetime:** Do ambient permanent 0× attacks need a finite termination/recovery mechanism, attacker-initiated exit, or just an explicit policy in the Level Director? What prevents unattended attacks accumulating without meaningful play?
+4. **Temporal variety:** weights for immediate/OVERLOAD/SPIKING and DELAYED, onset-delay ranges, peak capacity fractions, and the minimum useful number of spikes.
+5. **WORK rate semantics:** stacking priority, connection vs operation scope, and what 0× should display in inspection/ETA without leaking “malicious” as a label.
+6. **INFECTOR delivery timing:** how long should baseline and anomalous carriers take, and where should an appended delivery operation fit in that window?
+7. **PURPOSE / information evolution:** future node types, unknown/unclassified behavior, reference baselines, logs/probes/trace, and degree of trustworthy activity descriptions.
+8. **Future genera:** THROTTLER, TUNNELER, other attackers—are they distinct objectives, tactics, payloads, or attack surfaces?
+
+## Future genera are possibilities, not scope
+
+LOADER and INFECTOR are the first two *genera*, not a complete hostile taxonomy. Later objectives may impair productive work without consuming equivalent LOAD (a possible **THROTTLER**), establish a new route/access surface (possible **TUNNELER**), or behave in ways we have not named. A new genus should pose a **meaningfully different player problem**, not merely relabel an anomaly or the same attack at another magnitude.
+
+Coordinated or multi-surface campaigns belong to future Level Director design. They should be able to reuse genus-specific connection composition without making the ambient Traffic Director “smart.”
+
+## Related sources
+
+- [Connections Current State](Current_State.md) — working baseline and code authority.
+- [Purpose & Anomaly Generation V0](connections-purpose-anomaly-generation-v0.md) — current canonical PURPOSE profiles and implemented anomaly handling.
+- [Threats V0](connections-threats-v0.md) — earlier threat slices, operation delivery, and LOAD keyword provenance.
+- [Behavior Foundation](connections-behavior-foundation-v0.md) — effective WORK/LOAD and implemented timed modifier semantics.
+- [Infections V0](connections-infections-v0.md) — node payloads, application, and removal.
+- [Network Health V0](connections-network-health-v0.md) — real service degradation consequences.
+- [Run Recorder V0](connections-run-recorder-v0.md) — generation provenance, snapshots, and marks.
+- [Threat Investigation Ideas](connections-threat-investigation-ideas.md) — investigative tooling proposals, not an implementation contract.
+- [Shared Uptime Design](../Design/Uptime_Design.md) — broader game/Level Director direction.
