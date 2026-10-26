@@ -48,6 +48,11 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float initialGraceSeconds = 3f;
         [SerializeField, Min(0.01f)] private float spawnIntervalSeconds = 13.5f;
         [SerializeField, Min(0f)] private float spawnJitterSeconds = 1.5f;
+        [Header("Benign population (soft coverage)")]
+        [SerializeField, Min(0f)] private float benignPopulationGoal = 3f;
+        [SerializeField, Min(0.01f)] private float coverageMeanIntervalSeconds = 10f;
+        [SerializeField, Min(0f)] private float coverageResponse = 0.6f;
+        [SerializeField, Min(0f)] private float coverageCancellationMemorySeconds = 60f;
         [SerializeField] private string ambientOriginId = "EXT1";
         [SerializeField] private ConnectionTrafficProfile[] profiles;
         [Tooltip("Optional ambient weights by profile ID. Built-in profile operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
@@ -71,14 +76,18 @@ namespace Uptime.Connections
         }
         private readonly List<Queued> queue = new List<Queued>();
         private readonly HashSet<string> reservedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<float> recentBenignCancellations = new List<float>();
         private const string IdLetters = "abcdefghijklmnopqrstuvwxyz";
         private const string IdDigits = "0123456789";
+        private const int CanceledAttemptWeight = 2;
         private string[] shuffledIds;
         private int nextIdIndex;
         private bool idsExhausted;
         private System.Random random;
         private System.Random spawnerRandom;
+        private System.Random coverageRandom;
         private float nextAmbientAt;
+        private float nextCoverageAt;
         private long nextOrder;
         private readonly Dictionary<string, float> effectiveWeights =
             new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
@@ -90,6 +99,11 @@ namespace Uptime.Connections
         public float InitialGraceSeconds => initialGraceSeconds;
         public float SpawnIntervalSeconds => spawnIntervalSeconds;
         public float SpawnJitterSeconds => spawnJitterSeconds;
+        public float BenignPopulationGoal => benignPopulationGoal;
+        public float CoverageMeanIntervalSeconds => coverageMeanIntervalSeconds;
+        public float CoverageResponse => coverageResponse;
+        public float CoverageCancellationMemorySeconds => coverageCancellationMemorySeconds;
+        public int CoverageCanceledAttemptWeight => CanceledAttemptWeight;
         public string AmbientOriginId => ambientOriginId;
         public float HostileChance => hostileChance;
         public float DeliveryChance => deliveryChance;
@@ -112,11 +126,30 @@ namespace Uptime.Connections
             seed = chosen == seed ? (chosen == int.MaxValue ? 0 : chosen + 1) : chosen;
         }
 
+        private void OnDisable()
+        {
+            if (host != null) host.ConnectionResolved -= OnConnectionResolved;
+        }
+
+        private void OnConnectionResolved(LogicalConnectionState state, ConnectionResolution reason)
+        {
+            if (reason == ConnectionResolution.Canceled && !state.IsHostile)
+                recentBenignCancellations.Add(state.ResolvedAtSeconds);
+        }
+
         public void ResetDirector()
         {
+            // Edit Mode witnesses reset the director without MonoBehaviour enable callbacks.
+            if (host != null)
+            {
+                host.ConnectionResolved -= OnConnectionResolved;
+                host.ConnectionResolved += OnConnectionResolved;
+            }
             random = new System.Random(seed);
             spawnerRandom = new System.Random(unchecked(seed ^ (int)0x53A7B10));
+            coverageRandom = new System.Random(unchecked(seed ^ (int)0xC0B3A63));
             queue.Clear();
+            recentBenignCancellations.Clear();
             reservedIds.Clear();
             shuffledIds = new string[IdLetters.Length * IdDigits.Length];
             for (int i = 0; i < shuffledIds.Length; i++)
@@ -133,6 +166,7 @@ namespace Uptime.Connections
             idsExhausted = false;
             nextOrder = 0;
             nextAmbientAt = initialGraceSeconds;
+            nextCoverageAt = initialGraceSeconds + CoverageDelay(0);
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
@@ -186,6 +220,28 @@ namespace Uptime.Connections
                     if (idsExhausted) break;
                     nextAmbientAt += Mathf.Max(0.01f, spawnIntervalSeconds +
                         Range(-spawnJitterSeconds, spawnJitterSeconds));
+                }
+                // One stochastic opportunity per step prevents catch-up bursts after long steps.
+                if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
+                {
+                    int established, anticipated;
+                    CountBenignPopulation(out established, out anticipated);
+                    int cancellations = RecentBenignCancellations(simulationTime);
+                    ConnectionSpawnPlan plan = GenerateCoveragePlan(simulationTime);
+                    if (plan != null) QueueSpawnPlan(plan, "ambient_coverage");
+                    int afterEstablished, afterAnticipated;
+                    CountBenignPopulation(out afterEstablished, out afterAnticipated);
+                    // Failed attempts remain recent evidence that another immediate
+                    // attempt is unlikely to establish while an outage persists.
+                    int nextPressure = afterEstablished + afterAnticipated +
+                        CanceledAttemptWeight * cancellations;
+                    float mean = CoverageMean(nextPressure);
+                    float interval = CoverageDelay(nextPressure);
+                    nextCoverageAt = simulationTime + interval;
+                    host.Recorder?.RecordCoverageOpportunity(simulationTime, established,
+                        anticipated, cancellations, nextPressure, mean, interval,
+                        nextCoverageAt, plan?.ConnectionId,
+                        plan == null ? (idsExhausted ? "ids_exhausted" : "no_weighted_purpose") : null);
                 }
             }
             queue.Sort((a, b) =>
@@ -290,6 +346,69 @@ namespace Uptime.Connections
             return BuildPlan(selected, atTime, true);
         }
 
+        private void CountBenignPopulation(out int established, out int anticipated)
+        {
+            established = 0;
+            anticipated = 0;
+            if (host.RuntimeConnections != null)
+                foreach (LogicalConnectionState state in host.RuntimeConnections)
+                {
+                    if (state.IsHostile) continue;
+                    if (state.IsActive) established++;
+                    else if (state.IsConnecting || state.IsPending) anticipated++;
+                }
+            foreach (Queued queued in queue)
+                if (!queued.Plan.IsHostile) anticipated++;
+        }
+
+        private int RecentBenignCancellations(float now)
+        {
+            recentBenignCancellations.RemoveAll(at =>
+                now - at >= coverageCancellationMemorySeconds);
+            return recentBenignCancellations.Count;
+        }
+
+        private float CoverageMean(int coveragePressure)
+        {
+            return Mathf.Max(0.01f, coverageMeanIntervalSeconds) *
+                Mathf.Exp(Mathf.Clamp(coverageResponse *
+                    (coveragePressure - benignPopulationGoal), -1.4f, 1.8f));
+        }
+
+        private float CoverageDelay(int coveragePressure)
+        {
+            // Exponential waiting times allow both lulls and close arrivals. The occupancy
+            // response changes their mean, without a hard floor or population cap.
+            return Mathf.Max(0.1f, (float)(-Math.Log(1d - coverageRandom.NextDouble()) *
+                CoverageMean(coveragePressure)));
+        }
+
+        private ConnectionSpawnPlan GenerateCoveragePlan(float atTime)
+        {
+            System.Random ambientRandom = random;
+            random = coverageRandom;
+            try
+            {
+                float total = 0f;
+                foreach (ConnectionTrafficProfile profile in profiles)
+                    if (profile != null && profile.purposeTemplate)
+                        total += Mathf.Max(0f, EffectiveAmbientWeight(profile.id));
+                if (total <= 0f) return null;
+                float choice = (float)random.NextDouble() * total;
+                ConnectionTrafficProfile selected = null;
+                foreach (ConnectionTrafficProfile profile in profiles)
+                {
+                    if (profile == null || !profile.purposeTemplate ||
+                        EffectiveAmbientWeight(profile.id) <= 0f) continue;
+                    selected = profile;
+                    choice -= EffectiveAmbientWeight(profile.id);
+                    if (choice < 0f) break;
+                }
+                return BuildPlan(selected, atTime, true, forceBenign: true);
+            }
+            finally { random = ambientRandom; }
+        }
+
         // Uses the purpose recipe with a separate random stream. The child is queued now and
         // dispatched by Tick on the following simulation step.
         public ConnectionSpawnPlan QueueSpawnerChild(NodeInfection parent, float atTime,
@@ -344,7 +463,8 @@ namespace Uptime.Connections
 
         private ConnectionSpawnPlan BuildPlan(ConnectionTrafficProfile selected, float atTime,
             bool ambient = false, ConnectionSpawnOverrides overrides = null,
-            NodeView originOverride = null, NodeView targetOverride = null)
+            NodeView originOverride = null, NodeView targetOverride = null,
+            bool forceBenign = false)
         {
             string id = NewId();
             if (id == null) return null;
@@ -368,7 +488,7 @@ namespace Uptime.Connections
             }
             if (selected.purposeTemplate)
                 return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
-                    overrides);
+                    overrides, forceBenign);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors);
@@ -376,9 +496,10 @@ namespace Uptime.Connections
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
             string id, NodeView[] route, OperationStage[] normal, bool ambient,
-            ConnectionSpawnOverrides overrides)
+            ConnectionSpawnOverrides overrides, bool forceBenign)
         {
-            bool hostile = overrides != null || ambient && random.NextDouble() < hostileChance;
+            bool hostile = overrides != null || ambient && !forceBenign &&
+                random.NextDouble() < hostileChance;
             string objective = overrides != null ? overrides.Objective.ToString().ToUpperInvariant() :
                 hostile ? (random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER") : "NONE";
             var stages = new List<OperationStage>(normal);

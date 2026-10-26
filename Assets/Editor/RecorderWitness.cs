@@ -46,7 +46,12 @@ namespace Uptime.Connections.EditorTools
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
                     initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
                     initial.run.traffic.hostileChance == 0.25f &&
-                    initial.run.traffic.normalWorkSpread == 0.25f,
+                    initial.run.traffic.normalWorkSpread == 0.25f &&
+                    initial.run.traffic.benignPopulationGoal == 3f &&
+                    initial.run.traffic.coverageMeanIntervalSeconds == 10f &&
+                    initial.run.traffic.coverageResponse == 0.6f &&
+                    initial.run.traffic.coverageCancellationMemorySeconds == 60f &&
+                    initial.run.traffic.coverageCanceledAttemptWeight == 2,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "product-lookup");
@@ -313,8 +318,9 @@ namespace Uptime.Connections.EditorTools
                     "authored mode records its own configuration and connections");
                 recorder.EndRun();
                 CheckHealthRecording(host, director, recorder, route);
+                CheckCoverageRecording(host, director, recorder);
                 Debug.Log("RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, " +
-                    "JSON saves, autosave, kill, distinct runs, authored mode, and " +
+                    "JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and " +
                     "enabled/disabled parity. " + firstPath);
             }
             finally
@@ -324,6 +330,51 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = oldAuto;
                 travelField.SetValue(host, originalTravel);
                 host.SetRunMode(ConnectionRunMode.Generated);
+            }
+        }
+
+        private static void CheckCoverageRecording(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            bool oldAuto = director.AutoGenerationEnabled;
+            FieldInfo nextAmbient = typeof(ConnectionTrafficDirector).GetField("nextAmbientAt",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            try
+            {
+                director.AutoGenerationEnabled = true;
+                host.ResetSimulation(); recorder.BeginRun();
+                nextAmbient.SetValue(director, 1000f);
+                nextCoverage.SetValue(director, 0f);
+                director.QueueProfile("product-lookup");
+                host.StepSimulation(0.1f);
+                recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+                Check(recorder.Save(true), "coverage run saved");
+                ConnectionsRunLog saved = Read(recorder.OutputPath);
+                RunEvent coverage = saved.events.Single(e => e.type == "coverage_opportunity");
+                RunEvent plan = saved.events.Single(e =>
+                    e.type == "plan_queued" && e.source == "ambient_coverage");
+                Check(coverage.anticipatedBenign == 1 &&
+                    coverage.nextCoveragePressure >= 2 &&
+                    coverage.nextCoverageMeanSeconds > 0f &&
+                    coverage.nextCoverageIntervalSeconds > 0f &&
+                    coverage.nextCoverageAtSeconds > coverage.timeSeconds &&
+                    coverage.connectionId == plan.connectionId &&
+                    !plan.definition.isHostile && plan.generation.objective == "NONE",
+                    "saved opportunity explains occupancy and links to complete benign coverage plan");
+                NetworkSnapshot snapshot = saved.snapshots.Last();
+                Check(snapshot.establishedBenign == host.RuntimeConnections.Count(c =>
+                    c.IsActive && !c.IsHostile) && snapshot.establishedHostile == 0 &&
+                    snapshot.activeConnections == snapshot.establishedBenign,
+                    "saved snapshot counts established benign occupancy separately");
+                recorder.EndRun();
+            }
+            finally
+            {
+                recorder.EndRun();
+                director.AutoGenerationEnabled = oldAuto;
+                host.ResetSimulation();
             }
         }
 

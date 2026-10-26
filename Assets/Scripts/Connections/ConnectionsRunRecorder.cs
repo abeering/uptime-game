@@ -51,6 +51,11 @@ namespace Uptime.Connections
         public float openingGraceSeconds;
         public float spawnIntervalSeconds;
         public float spawnJitterSeconds;
+        public float benignPopulationGoal;
+        public float coverageMeanIntervalSeconds;
+        public float coverageResponse;
+        public float coverageCancellationMemorySeconds;
+        public int coverageCanceledAttemptWeight;
         public float hostileChance;
         public float deliveryChance;
         public float benignOutlierChance;
@@ -150,6 +155,13 @@ namespace Uptime.Connections
         public float healthAfter;
         public string note;
         public int snapshotIndex = -1;
+        public int establishedBenign;
+        public int anticipatedBenign;
+        public int recentCanceledBenign;
+        public int nextCoveragePressure;
+        public float nextCoverageMeanSeconds;
+        public float nextCoverageIntervalSeconds;
+        public float nextCoverageAtSeconds;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
@@ -182,6 +194,9 @@ namespace Uptime.Connections
     {
         public float timeSeconds;
         public int activeConnections;
+        public int establishedBenign;
+        public int establishedHostile;
+        public int anticipatedBenign;
         public HealthSnapshotRecord health;
         public NodeSnapshot[] nodes;
         public InfectionSnapshot[] infections;
@@ -423,6 +438,24 @@ namespace Uptime.Connections
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
         }
 
+        public void RecordCoverageOpportunity(float time, int establishedBenign,
+            int anticipatedBenign, int recentCanceledBenign, int nextCoveragePressure,
+            float nextMean, float nextInterval,
+            float nextAt, string connectionId, string reason)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("coverage_opportunity", time);
+            entry.connectionId = connectionId;
+            entry.establishedBenign = establishedBenign;
+            entry.anticipatedBenign = anticipatedBenign;
+            entry.recentCanceledBenign = recentCanceledBenign;
+            entry.nextCoveragePressure = nextCoveragePressure;
+            entry.nextCoverageMeanSeconds = nextMean;
+            entry.nextCoverageIntervalSeconds = nextInterval;
+            entry.nextCoverageAtSeconds = nextAt;
+            entry.reason = reason;
+        }
+
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -639,7 +672,13 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState state in host.RuntimeConnections)
             {
                 if (!state.IsPending && !state.IsConnecting && !state.IsActive) continue;
-                if (state.IsActive) snapshot.activeConnections++;
+                if (state.IsActive)
+                {
+                    snapshot.activeConnections++;
+                    if (state.IsHostile) snapshot.establishedHostile++;
+                    else snapshot.establishedBenign++;
+                }
+                else if (!state.IsHostile) snapshot.anticipatedBenign++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
@@ -686,6 +725,13 @@ namespace Uptime.Connections
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
                 spawnIntervalSeconds = trafficDirector.SpawnIntervalSeconds,
                 spawnJitterSeconds = trafficDirector.SpawnJitterSeconds,
+                benignPopulationGoal = trafficDirector.BenignPopulationGoal,
+                coverageMeanIntervalSeconds = trafficDirector.CoverageMeanIntervalSeconds,
+                coverageResponse = trafficDirector.CoverageResponse,
+                coverageCancellationMemorySeconds =
+                    trafficDirector.CoverageCancellationMemorySeconds,
+                coverageCanceledAttemptWeight =
+                    trafficDirector.CoverageCanceledAttemptWeight,
                 hostileChance = trafficDirector.HostileChance,
                 deliveryChance = trafficDirector.DeliveryChance,
                 benignOutlierChance = trafficDirector.BenignOutlierChance,

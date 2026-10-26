@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:77960478934f29ee4985bf196b7a5a440968c8f7b6d885bd87bedc501321c336`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:0d9f6bf46f526842a22cd988e3722da6842cba0acadbad5045e0bde033a50522`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Population / Coverage V1 (October 26, 2026):** Connections Generated mode adds a seeded, benign-only soft-coverage opportunity stream alongside the unchanged 13.5 ± 1.5-second ordinary ambient stream. The authored goal is 3 established benign connections; queued, pending, and Connecting benign plans temper new opportunities, and recently canceled benign attempts briefly ease retries during an outage. The opportunity stream uses a separate random generator, keeps canonical PURPOSE weights, routes, operation sampling, and benign outliers, and records its timing decisions and `ambient_coverage` plan source internally. It does not guarantee occupancy during Blackout or change hostile generation, WORK/LOAD, Health, or topology. See the [traffic contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-arcade-traffic-v0.md) for the provisional tuning and caveats. The older single-scheduler descriptions below preserve their phase provenance.
 
 **Play seed option:** The Connections scene's `ConnectionTrafficDirector` now has **Randomize Seed** checked by default. Starting Play chooses a new seed before director reset and recorder startup; the selected value is visible in the Inspector and stored in run metadata. Simulation resets during that Play session reuse it. Uncheck the option to replay the authored Seed value, currently 1701.
 
