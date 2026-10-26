@@ -224,7 +224,7 @@ Implementations must continue to respect the *working branch's actual code and s
 
 **D. INFECTOR timing and signatures.** Choose payload and compatible PURPOSE; preserve nominal delivery opportunity when mutating carrier LOAD, support rare WORK-only long-duration anomalies and the proposed signature weights, and add DELAYED appended deliveries. Preserve benign outliers and evidence ambiguity.
 
-Throughout: retain seeded determinism, stable purpose baselines, source/target validity, accurate recordered normal-vs-final plans, actual Network Health consequences, and manually invokable witnesses. **No mandatory new ThreatDirector; no coordinated campaign logic in the ambient director.** The Level Director can later tune ambient parameters, turn ambient off, and supply intentional overlapping spawn plans.
+Throughout: retain seeded determinism, stable purpose baselines, source/target validity, accurate recorded normal-vs-final plans, actual Network Health consequences, and manually invokable witnesses. **No mandatory new ThreatDirector; no coordinated campaign logic in the ambient director.** The Level Director can later tune ambient parameters, turn ambient off, and supply intentional overlapping spawn plans.
 
 ## Open questions to resolve with playtests
 
