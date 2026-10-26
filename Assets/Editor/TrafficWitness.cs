@@ -20,6 +20,7 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && director != null, "scene traffic bindings");
             bool originalAuto = director.AutoGenerationEnabled;
             int originalSeed = director.Seed;
+            bool originalRandomize = director.RandomizeSeed;
             FieldInfo travelField = typeof(SimulationHost).GetField(
                 "connectionTravelSecondsPerLink", BindingFlags.Instance | BindingFlags.NonPublic);
             float originalTravel = (float)travelField.GetValue(host);
@@ -32,6 +33,10 @@ namespace Uptime.Connections.EditorTools
             try
             {
                 director.AutoGenerationEnabled = false;
+                Check(director.RandomizeSeed && director.Seed == 1701,
+                    "authored scene enables Play seed randomization with a fixed reference seed");
+                CheckPlaySeedOption(host, director);
+                director.RandomizeSeed = false;
                 director.Seed = 456;
                 host.SetRunMode(ConnectionRunMode.Generated);
                 Check(host.RuntimeConnections.Count == 0, "generated mode excludes authored witness");
@@ -213,11 +218,41 @@ namespace Uptime.Connections.EditorTools
             finally
             {
                 director.Seed = originalSeed;
+                director.RandomizeSeed = originalRandomize;
                 director.AutoGenerationEnabled = originalAuto;
                 travelField.SetValue(host, originalTravel);
                 overridesField.SetValue(director, originalOverrides);
                 host.SetRunMode(ConnectionRunMode.Generated);
             }
+        }
+
+        private static void CheckPlaySeedOption(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            director.RandomizeSeed = false;
+            director.BeginPlaySession();
+            Check(director.Seed == 1701, "unchecked option retains authored seed");
+
+            director.RandomizeSeed = true;
+            director.BeginPlaySession();
+            int firstSeed = director.Seed;
+            Check(firstSeed != 1701, "checked option chooses a new seed");
+            host.ResetSimulation();
+            var recorder = host.Recorder;
+            Check(recorder != null && recorder.RecordingEnabled,
+                "recorder available for Play seed evidence");
+            recorder.BeginRun();
+            Check(recorder.CurrentLog.run.seed == firstSeed,
+                "recorder metadata captures selected Play seed");
+            recorder.EndRun();
+            ConnectionSpawnPlan first = director.GeneratePlan(0f);
+            host.ResetSimulation();
+            Check(director.Seed == firstSeed &&
+                Signature(first) == Signature(director.GeneratePlan(0f)),
+                "simulation reset replays the selected Play seed");
+
+            director.BeginPlaySession();
+            Check(director.Seed != firstSeed, "next Play session chooses another seed");
         }
 
         private static void CheckManualProfilesAndThreats(SimulationHost host,

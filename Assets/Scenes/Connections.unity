@@ -6571,6 +6571,7 @@ MonoBehaviour:
   host: {fileID: 1996901015}
   autoGenerationEnabled: 1
   seed: 1701
+  randomizeSeed: 1
   initialGraceSeconds: 3
   spawnIntervalSeconds: 13.5
   spawnJitterSeconds: 1.5

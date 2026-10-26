@@ -79,7 +79,10 @@ namespace Uptime.Connections
         private void Start()
         {
             if (Application.isPlaying)
+            {
+                trafficDirector?.BeginPlaySession();
                 ResetSimulation();
+            }
         }
 
         private void FixedUpdate()

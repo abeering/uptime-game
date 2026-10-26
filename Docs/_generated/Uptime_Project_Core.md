@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:89d696b04855e1201d60521f101199fcae74f9693f9920d26dcd1a5e42bbcac4`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:77960478934f29ee4985bf196b7a5a440968c8f7b6d885bd87bedc501321c336`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,10 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Play seed option:** The Connections scene's `ConnectionTrafficDirector` now has **Randomize Seed** checked by default. Starting Play chooses a new seed before director reset and recorder startup; the selected value is visible in the Inspector and stored in run metadata. Simulation resets during that Play session reuse it. Uncheck the option to replay the authored Seed value, currently 1701.
+
+Unity 6000.3.11f1 compiled an isolated project copy. The Traffic and Recorder Witnesses passed; an automated batch Editor check entered Play twice, confirmed distinct seeds, and matched each seed to its recorder metadata. Interactive 16:9 visual review was not run.
 
 **Clean V0 review-branch update (October 25, 2026):** This Connections-only branch starts from `main` after PR #34 merged. The player-facing `clean <nodeId>` immediately removes all active infections on one node, refreshes authoritative LOAD allocation, restores Blackout availability, and stops that Spawner's future attempts. It leaves queued and existing children, prior cancellations, and Health penalties intact. It has no direct Health cost, time advance, prerequisite, or minigame. The recorder links one player-action receipt to separate infection-removal receipts with source provenance; ordinary feedback does not identify the infection kinds. Duplicate payload delivery now reports an unsuccessful installation to the terminal. See [Infections V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-infections-v0.md). Interactive Play Mode review remains outstanding.
 

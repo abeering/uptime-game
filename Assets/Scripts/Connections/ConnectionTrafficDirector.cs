@@ -44,6 +44,7 @@ namespace Uptime.Connections
         [SerializeField] private SimulationHost host;
         [SerializeField] private bool autoGenerationEnabled = true;
         [SerializeField] private int seed = 1701;
+        [SerializeField] private bool randomizeSeed = true;
         [SerializeField, Min(0f)] private float initialGraceSeconds = 3f;
         [SerializeField, Min(0.01f)] private float spawnIntervalSeconds = 13.5f;
         [SerializeField, Min(0f)] private float spawnJitterSeconds = 1.5f;
@@ -84,6 +85,7 @@ namespace Uptime.Connections
 
         public bool AutoGenerationEnabled { get => autoGenerationEnabled; set => autoGenerationEnabled = value; }
         public int Seed { get => seed; set => seed = value; }
+        public bool RandomizeSeed { get => randomizeSeed; set => randomizeSeed = value; }
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
         public float InitialGraceSeconds => initialGraceSeconds;
         public float SpawnIntervalSeconds => spawnIntervalSeconds;
@@ -100,6 +102,15 @@ namespace Uptime.Connections
         public float SpawnerWeight => spawnerWeight;
         public float EffectiveAmbientWeight(string profileId) =>
             profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
+
+        // Called once by the host at Play start, before director reset and recorder startup.
+        // A new seed changes the run; later simulation resets replay this same seed.
+        public void BeginPlaySession()
+        {
+            if (!randomizeSeed) return;
+            int chosen = BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0) & int.MaxValue;
+            seed = chosen == seed ? (chosen == int.MaxValue ? 0 : chosen + 1) : chosen;
+        }
 
         public void ResetDirector()
         {
