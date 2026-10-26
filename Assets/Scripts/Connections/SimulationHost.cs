@@ -239,6 +239,7 @@ namespace Uptime.Connections
         {
             var ordered = new List<LogicalConnectionState>(runtimeConnections);
             ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
+            bool establishedAny = false;
             foreach (LogicalConnectionState state in ordered)
             {
                 if (!state.IsConnecting) continue;
@@ -256,6 +257,7 @@ namespace Uptime.Connections
                 }
                 if (state.ReachedRouteNodeIndex != state.RouteLinks.Length) continue;
                 state.Lifecycle = Lifecycle.Active;
+                establishedAny = true;
                 state.HasEstablished = true;
                 state.EstablishedAtSeconds = simulationTimeSeconds;
                 health.Activate(state, simulationTimeSeconds);
@@ -264,6 +266,10 @@ namespace Uptime.Connections
                 recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
                 recorder?.RecordOperationStarted(state, simulationTimeSeconds);
             }
+            // Arrival can end the outer step. Publish the first real allocation now so
+            // presentation never interprets an unallocated Active state as stalled.
+            if (establishedAny)
+                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
         }
 
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
