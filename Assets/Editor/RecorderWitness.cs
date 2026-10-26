@@ -45,13 +45,24 @@ namespace Uptime.Connections.EditorTools
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
                     initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
-                    initial.run.traffic.hostileChance == 0.25f &&
-                    initial.run.traffic.normalWorkSpread == 0.25f,
+                    initial.run.traffic.hostileGenerationEnabled &&
+                    initial.run.traffic.hostileMeanIntervalSeconds == 54f &&
+                    initial.run.traffic.normalWorkSpread == 0.25f &&
+                    initial.run.traffic.benignPopulationGoal == 3f &&
+                    initial.run.traffic.coverageStartupGoal == 1f &&
+                    initial.run.traffic.coverageRampSeconds == 75f &&
+                    initial.run.traffic.coverageMeanIntervalSeconds == 8f &&
+                    initial.run.traffic.coverageResponse == 0.6f &&
+                    initial.run.traffic.coverageCancellationMemorySeconds == 60f &&
+                    initial.run.traffic.coverageAtGoalChance == 0.12f &&
+                    initial.run.traffic.coverageOutageRetryMaxSeconds == 20f &&
+                    initial.run.traffic.coverageImminentPlanSeconds == 5f &&
+                    initial.run.traffic.coverageCanceledAttemptWeight == 2,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "product-lookup");
                 Check(purposeProfile.purposeTemplate && purposeProfile.ambientWeight == 1.5f &&
-                    purposeProfile.operations[0].meanWork == 24f,
+                    purposeProfile.operations[0].meanWork == 48f,
                     "purpose template and independent WORK mean recorded");
                 ProfileConfiguration threatProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "basic-threat");
@@ -84,8 +95,8 @@ namespace Uptime.Connections.EditorTools
                     "recorded mixed keyword catalog keeps demand behavior separate from hostility");
                 Near(initial.snapshots.Last().health.value, host.Health.Value,
                     "initial authoritative Health snapshot");
-                ConnectionSpawnPlan generated = director.GeneratePlan(1000f);
-                director.QueueSpawnPlan(generated, "ambient");
+                ConnectionSpawnPlan generated = director.GenerateHostilePlan(1000f);
+                director.QueueSpawnPlan(generated, "ambient_hostile");
                 RunEvent generation = recorder.CurrentLog.events.Last(e => e.type == "plan_queued");
                 Check(generation.generation != null && generation.generation.purposeId ==
                     generated.ProfileId && generation.generation.normalOperations.Length > 0 &&
@@ -313,8 +324,9 @@ namespace Uptime.Connections.EditorTools
                     "authored mode records its own configuration and connections");
                 recorder.EndRun();
                 CheckHealthRecording(host, director, recorder, route);
+                CheckCoverageRecording(host, director, recorder);
                 Debug.Log("RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, " +
-                    "JSON saves, autosave, kill, distinct runs, authored mode, and " +
+                    "JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and " +
                     "enabled/disabled parity. " + firstPath);
             }
             finally
@@ -324,6 +336,59 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = oldAuto;
                 travelField.SetValue(host, originalTravel);
                 host.SetRunMode(ConnectionRunMode.Generated);
+            }
+        }
+
+        private static void CheckCoverageRecording(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            bool oldAuto = director.AutoGenerationEnabled;
+            FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            float oldStartupGoal = (float)startupGoal.GetValue(director);
+            FieldInfo nextHostile = typeof(ConnectionTrafficDirector).GetField("nextHostileAt",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            try
+            {
+                director.AutoGenerationEnabled = true;
+                startupGoal.SetValue(director, 3f);
+                host.ResetSimulation(); recorder.BeginRun();
+                nextHostile.SetValue(director, 1000f);
+                nextCoverage.SetValue(director, 0f);
+                director.QueueProfile("product-lookup");
+                host.StepSimulation(0.1f);
+                recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+                Check(recorder.Save(true), "coverage run saved");
+                ConnectionsRunLog saved = Read(recorder.OutputPath);
+                RunEvent coverage = saved.events.Single(e => e.type == "coverage_opportunity");
+                RunEvent plan = saved.events.Single(e =>
+                    e.type == "plan_queued" && e.source == "ambient_benign");
+                Check(coverage.anticipatedBenign == 1 &&
+                    coverage.effectiveCoverageGoal == 3f &&
+                    coverage.coverageSpawnChance == 1f &&
+                    coverage.coverageRoll < coverage.coverageSpawnChance &&
+                    coverage.nextCoveragePressure >= 2 &&
+                    coverage.nextCoverageMeanSeconds > 0f &&
+                    coverage.nextCoverageIntervalSeconds > 0f &&
+                    coverage.nextCoverageAtSeconds > coverage.timeSeconds &&
+                    coverage.connectionId == plan.connectionId &&
+                    !plan.definition.isHostile && plan.generation.objective == "NONE",
+                    "saved opportunity explains occupancy and links to complete benign coverage plan");
+                NetworkSnapshot snapshot = saved.snapshots.Last();
+                Check(snapshot.establishedBenign == host.RuntimeConnections.Count(c =>
+                    c.IsActive && !c.IsHostile) && snapshot.establishedHostile == 0 &&
+                    snapshot.activeConnections == snapshot.establishedBenign,
+                    "saved snapshot counts established benign occupancy separately");
+                recorder.EndRun();
+            }
+            finally
+            {
+                startupGoal.SetValue(director, oldStartupGoal);
+                recorder.EndRun();
+                director.AutoGenerationEnabled = oldAuto;
+                host.ResetSimulation();
             }
         }
 

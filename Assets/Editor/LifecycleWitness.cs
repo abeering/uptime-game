@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -165,6 +166,9 @@ namespace Uptime.Connections.EditorTools
                 director.AutoGenerationEnabled = true;
                 Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _),
                     "ambient offline-route setup");
+                typeof(ConnectionTrafficDirector).GetField("nextHostileAt",
+                    BindingFlags.Instance | BindingFlags.NonPublic).SetValue(director,
+                    director.InitialGraceSeconds);
                 host.StepSimulation(director.InitialGraceSeconds + 0.01f);
                 host.StepSimulation(0.01f);
                 RunEvent ambient = recorder.CurrentLog.events.First(e =>

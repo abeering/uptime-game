@@ -6511,8 +6511,8 @@ MonoBehaviour:
   autoGenerationEnabled: 1
   seed: 1701
   initialGraceSeconds: 3
-  spawnIntervalSeconds: 13.5
-  spawnJitterSeconds: 1.5
+  hostileGenerationEnabled: 1
+  hostileMeanIntervalSeconds: 54
   ambientOriginId: EXT1
   profiles: []
 --- !u!114 &1996901018
