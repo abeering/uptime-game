@@ -146,6 +146,10 @@ namespace Uptime.Connections.EditorTools
                 Near(dbSnapshot.allocatedLoad, host.Nodes.First(n => n.View == db).AllocatedLoad,
                     "authoritative allocated LOAD snapshot");
                 Near(connectionSnapshot.completedWork, live.CompletedWork, "authoritative WORK snapshot");
+                Near(connectionSnapshot.effectiveWorkRateMultiplier, 1f,
+                    "legacy connection snapshot has neutral WORK rate factor");
+                Near(connectionSnapshot.actualWorkRate, live.AllocatedLoad,
+                    "legacy connection productive rate equals allocated LOAD");
                 Near(liveSnapshot.health.value, host.Health.Value, "live Health value snapshot");
                 Near(liveSnapshot.health.netRate, host.Health.NetRate, "live signed Health rate");
                 Check(recorder.Save(true) && Read(firstPath).snapshots.Any(s =>

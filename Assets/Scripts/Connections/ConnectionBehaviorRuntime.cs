@@ -8,7 +8,7 @@ namespace Uptime.Connections
     public enum ModifierChangeKind { Added, Removed }
     public enum ConnectionBehaviorKind { TimedAdjustment, Overload, Spiking }
 
-    // One serialized definition shape for the narrow timed witness and two LOAD keywords.
+    // One serialized definition shape for timed adjustments and two LOAD keywords.
     // The original constructor retains the Slice 3A timed adjustment behavior.
     [Serializable]
     public sealed class TimedModifierBehaviorDefinition
@@ -21,6 +21,10 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float elevatedIntervalSeconds;
         [SerializeField] private float workDelta;
         [SerializeField] private float loadDelta;
+        // The presence flag keeps definitions serialized before rate factors at neutral 1x.
+        // A serialized zero is meaningful only when explicitly enabled.
+        [SerializeField] private bool hasWorkRateMultiplier;
+        [SerializeField] private float workRateMultiplier = 1f;
 
         public string Id => id;
         public ConnectionBehaviorKind Kind => kind;
@@ -30,6 +34,7 @@ namespace Uptime.Connections
         public float ElevatedIntervalSeconds => elevatedIntervalSeconds;
         public float WorkDelta => workDelta;
         public float LoadDelta => loadDelta;
+        public float WorkRateMultiplier => hasWorkRateMultiplier ? workRateMultiplier : 1f;
         public TimedModifierBehaviorDefinition(string id, float startAfterSeconds,
             float stopAfterSeconds, float workDelta, float loadDelta)
         {
@@ -39,6 +44,10 @@ namespace Uptime.Connections
             this.workDelta = workDelta;
             this.loadDelta = loadDelta;
         }
+        public static TimedModifierBehaviorDefinition Rate(string id, float startAfterSeconds,
+            float stopAfterSeconds, float multiplier) =>
+            new TimedModifierBehaviorDefinition(id, startAfterSeconds, stopAfterSeconds, 0f, 0f)
+            { hasWorkRateMultiplier = true, workRateMultiplier = multiplier };
         public static TimedModifierBehaviorDefinition Overload(string id, float delaySeconds,
             float loadDelta) => new TimedModifierBehaviorDefinition(id, delaySeconds, 0f, 0f,
                 loadDelta) { kind = ConnectionBehaviorKind.Overload };
@@ -50,21 +59,25 @@ namespace Uptime.Connections
         public TimedModifierBehaviorDefinition Copy() => new TimedModifierBehaviorDefinition(
             id, startAfterSeconds, stopAfterSeconds, workDelta, loadDelta)
             { kind = kind, normalIntervalSeconds = normalIntervalSeconds,
-                elevatedIntervalSeconds = elevatedIntervalSeconds };
+                elevatedIntervalSeconds = elevatedIntervalSeconds,
+                hasWorkRateMultiplier = hasWorkRateMultiplier,
+                workRateMultiplier = workRateMultiplier };
     }
 
     public sealed class ActiveRequirementModifier
     {
         internal ActiveRequirementModifier(string id, string sourceId, BehaviorScope scope,
-            int operationIndex, float workDelta, float loadDelta)
+            int operationIndex, float workDelta, float loadDelta, float workRateMultiplier)
         { Id = id; SourceId = sourceId; Scope = scope; OperationIndex = operationIndex;
-            WorkDelta = workDelta; LoadDelta = loadDelta; }
+            WorkDelta = workDelta; LoadDelta = loadDelta;
+            WorkRateMultiplier = workRateMultiplier; }
         public string Id { get; }
         public string SourceId { get; }
         public BehaviorScope Scope { get; }
         public int OperationIndex { get; }
         public float WorkDelta { get; }
         public float LoadDelta { get; }
+        public float WorkRateMultiplier { get; }
         public bool AppliesTo(int index) => Scope == BehaviorScope.Connection || OperationIndex == index;
     }
 
@@ -75,7 +88,7 @@ namespace Uptime.Connections
         { TimeSeconds = time; Action = action; ModifierId = modifier.Id;
             SourceId = modifier.SourceId; Scope = modifier.Scope;
             OperationIndex = modifier.OperationIndex; WorkDelta = modifier.WorkDelta;
-            LoadDelta = modifier.LoadDelta; }
+            LoadDelta = modifier.LoadDelta; WorkRateMultiplier = modifier.WorkRateMultiplier; }
         public float TimeSeconds { get; }
         public ModifierChangeKind Action { get; }
         public string ModifierId { get; }
@@ -84,6 +97,7 @@ namespace Uptime.Connections
         public int OperationIndex { get; }
         public float WorkDelta { get; }
         public float LoadDelta { get; }
+        public float WorkRateMultiplier { get; }
     }
 
     // One instance per connection. Both scopes and all three behavior kinds use the
@@ -214,6 +228,26 @@ namespace Uptime.Connections
 
         internal float EffectiveWork(int index) => Effective(index, true);
         internal float EffectiveLoad(int index) => Effective(index, false);
+        internal float EffectiveWorkRateMultiplier(int index)
+        {
+            double value = 1d;
+            bool zero = false;
+            foreach (ActiveRequirementModifier modifier in active)
+                if (modifier.AppliesTo(index))
+                {
+                    float factor = modifier.WorkRateMultiplier;
+                    if (float.IsNaN(factor) || float.IsInfinity(factor) || factor < 0f)
+                        throw new InvalidOperationException(
+                            "WORK rate factors must be finite and nonnegative.");
+                    if (factor == 0f) zero = true;
+                    else if (!zero) value *= factor;
+                }
+            if (zero) return 0f;
+            if (double.IsInfinity(value) || value > float.MaxValue)
+                throw new InvalidOperationException(
+                    "Effective WORK rate multiplier must be finite and nonnegative.");
+            return (float)value;
+        }
         private float Effective(int index, bool work)
         {
             float value = work ? plan.WorkAt(index) : plan.LoadAt(index);
@@ -231,13 +265,15 @@ namespace Uptime.Connections
             BehaviorScope scope, int index, float time)
         {
             var modifier = new ActiveRequirementModifier("m" + (++nextModifierId), definition.Id,
-                scope, index, definition.WorkDelta, definition.LoadDelta);
+                scope, index, definition.WorkDelta, definition.LoadDelta,
+                definition.WorkRateMultiplier);
             active.Add(modifier);
             // Validate the combined effective requirements before allocation.
             try
             {
                 EffectiveWork(CurrentOperationIndex);
                 EffectiveLoad(CurrentOperationIndex);
+                EffectiveWorkRateMultiplier(CurrentOperationIndex);
             }
             catch
             {
@@ -260,6 +296,7 @@ namespace Uptime.Connections
             {
                 EffectiveWork(CurrentOperationIndex);
                 EffectiveLoad(CurrentOperationIndex);
+                EffectiveWorkRateMultiplier(CurrentOperationIndex);
             }
             catch
             {

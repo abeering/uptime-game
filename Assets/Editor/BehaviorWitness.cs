@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -258,6 +259,7 @@ namespace Uptime.Connections.EditorTools
                     host.FindConnection("bw5").Behaviors.History[0].ModifierId == "m1",
                     "reset/replay starts with fresh behavior state");
                 RunKeywords(host, director, recorder, db, route, baseline, oldBaseline);
+                RunWorkRate(host, director, recorder, db, route, baseline, oldBaseline);
                 Debug.Log("BehaviorWitness PASS: expected 2+3+5=10 LOAD; 10 then 5 then 2 " +
                     "requested LOAD, zero-allocation timer changes at 1s/2s, 8 accomplished " +
                     "WORK retained when requirement drops to 5; observed matching allocation, " +
@@ -528,6 +530,216 @@ namespace Uptime.Connections.EditorTools
                 host.Occurrences[0].OperationIndex == 0 &&
                 host.FindConnection(benign.ConnectionId).Behaviors.History.Count > 2,
                 "benign SPIKING has no delivery; hostile SPIKING delivers once on normal completion");
+        }
+
+        private static void RunWorkRate(SimulationHost host, ConnectionTrafficDirector director,
+            ConnectionsRunRecorder recorder, NodeResources db, NodeView[] route,
+            FieldInfo baseline, float oldBaseline)
+        {
+            var half = TimedModifierBehaviorDefinition.Rate("half", 1f, 2f, 0.5f);
+            var pause = TimedModifierBehaviorDefinition.Rate("pause", 2f, 4f, 0f);
+            var doubleRate = TimedModifierBehaviorDefinition.Rate("double", 5f, 0f, 2f);
+            Check(JsonUtility.FromJson<TimedModifierBehaviorDefinition>(
+                "{\"id\":\"legacy\",\"loadDelta\":2}").WorkRateMultiplier == 1f &&
+                JsonUtility.FromJson<TimedModifierBehaviorDefinition>(
+                    "{\"id\":\"explicit-pause\",\"hasWorkRateMultiplier\":true," +
+                    "\"workRateMultiplier\":0}").WorkRateMultiplier == 0f &&
+                half.Copy().WorkRateMultiplier == 0.5f && pause.Copy().WorkRateMultiplier == 0f,
+                "legacy serialized behavior is neutral; explicit zero and copies retain their factor");
+            foreach (float invalid in new[] { -0.1f, float.NaN, float.PositiveInfinity })
+            {
+                bool rejected = false;
+                try
+                {
+                    director.QueueSpawnPlan(Plan("invalid-rate", route,
+                        new[] { Stage(OperationKind.Read, 10f, 4f,
+                            TimedModifierBehaviorDefinition.Rate("invalid", 0f, 0f, invalid)) }));
+                }
+                catch (InvalidOperationException) { rejected = true; }
+                Check(rejected, "nonfinite or negative WORK rate factor rejected before queue");
+            }
+            host.ResetSimulation(); recorder.BeginRun();
+            director.QueueSpawnPlan(Plan("rate", route,
+                new[] { Stage(OperationKind.Read, 18f, 4f, half, pause, doubleRate) }));
+            host.StepSimulation(1f);
+            LogicalConnectionState state = host.FindConnection("rate");
+            Near(state.DesiredLoad, 4f, "1x requested LOAD");
+            Near(state.AllocatedLoad, 4f, "1x allocated LOAD");
+            Near(state.ActualWorkRate, 4f, "1x productive rate");
+            Near(state.CompletedWork, 4f, "1x WORK");
+            host.StepSimulation(1f);
+            Near(state.AllocatedLoad, 4f, "0.5x allocated LOAD unchanged");
+            Near(state.EffectiveWorkRateMultiplier, 0.5f, "0.5x factor");
+            Near(state.ActualWorkRate, 2f, "0.5x productive rate");
+            Near(state.CompletedWork, 6f, "0.5x WORK");
+            var halfInspection = InspectRate(state);
+            Check(halfInspection.status.Contains("AT SPEED") &&
+                halfInspection.status.Contains("WORK ×0.5") &&
+                (halfInspection.eta == "ETA  00:06" ||
+                 halfInspection.eta == "ETA  00:07"),
+                "positive rate changes verbose status and ETA from authoritative progress");
+            host.StepSimulation(1f);
+            Near(state.AllocatedLoad, 4f, "0x allocated LOAD unchanged");
+            Near(state.ActualWorkRate, 0f, "0x productive rate");
+            Near(state.CompletedWork, 6f, "0x WORK stays paused");
+            Check(state.IsActive && state.Resolution == null, "paused operation does not complete");
+            recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            ConnectionSnapshot paused = recorder.CurrentLog.snapshots.Last().connections
+                .Single(c => c.id == "rate");
+            Check(paused.desiredLoad == 4f && paused.allocatedLoad == 4f &&
+                paused.effectiveWorkRateMultiplier == 0f && paused.actualWorkRate == 0f &&
+                Approx(paused.completedWork, 6f),
+                "paused snapshot separates consumed LOAD and WORK rate");
+            var pausedInspection = InspectRate(state);
+            Check(pausedInspection.status.Contains("AT SPEED") &&
+                pausedInspection.status.Contains("WORK PAUSED") &&
+                !pausedInspection.status.Contains("STALLED") &&
+                pausedInspection.eta == "ETA  PAUSED",
+                "verbose inspect distinguishes productive pause from LOAD starvation");
+            host.StepSimulation(1f);
+            Near(state.CompletedWork, 6f, "paused WORK stays fixed while timer advances");
+            host.StepSimulation(1f);
+            Near(state.EffectiveWorkRateMultiplier, 1f, "positive rate restored");
+            Near(state.CompletedWork, 10f, "WORK resumes from accomplished amount");
+            host.StepSimulation(1f);
+            Near(state.CompletedWork, 18f, "2x completes with 8 WORK from 4 LOAD");
+            Check(state.Resolution == ConnectionResolution.Completed &&
+                state.Behaviors.ActiveModifiers.Count == 0,
+                "rate change completes normally and scope cleanup removes active factor");
+            Check(recorder.CurrentLog.events.Any(e => e.connectionId == "rate" &&
+                e.type == "modifier_added" && e.behaviorId == "pause" &&
+                e.workRateMultiplier == 0f) &&
+                recorder.CurrentLog.events.Any(e => e.connectionId == "rate" &&
+                    e.type == "modifier_added" && e.behaviorId == "double" &&
+                    e.workRateMultiplier == 2f),
+                "modifier events identify rate source and factor");
+            Check(recorder.Save(true), "rate run saves as JSON");
+            ConnectionsRunLog saved = JsonUtility.FromJson<ConnectionsRunLog>(
+                File.ReadAllText(recorder.OutputPath));
+            Check(saved.snapshots.Any(s => s.connections.Any(c => c.id == "rate" &&
+                c.allocatedLoad == 4f && c.effectiveWorkRateMultiplier == 0f &&
+                c.actualWorkRate == 0f)) &&
+                saved.events.Any(e => e.connectionId == "rate" && e.behaviorId == "pause" &&
+                    e.type == "modifier_added" && e.workRateMultiplier == 0f),
+                "saved JSON preserves paused snapshot and factor provenance");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("scope-rate", route, new[]
+            {
+                Stage(OperationKind.Read, 2f, 4f,
+                    TimedModifierBehaviorDefinition.Rate("operation-pause", 0f, 2f, 0f)),
+                Stage(OperationKind.Write, 20f, 4f,
+                    TimedModifierBehaviorDefinition.Rate("operation-double", 0f, 0f, 2f))
+            }, TimedModifierBehaviorDefinition.Rate("connection-half", 0f, 0f, 0.5f)));
+            host.StepSimulation(1f);
+            var scope = host.FindConnection("scope-rate");
+            Check(scope.Behaviors.ActiveModifiers.Count == 2 &&
+                scope.EffectiveWorkRateMultiplier == 0f && scope.CompletedWork == 0f,
+                "overlapping connection and operation factors multiply; zero dominates");
+            host.StepSimulation(1f);
+            host.StepSimulation(1f);
+            Check(scope.CurrentOperationIndex == 1 && scope.IsTransitioning &&
+                scope.Behaviors.ActiveModifiers.Count == 1 &&
+                scope.EffectiveWorkRateMultiplier == 0.5f,
+                "operation pause ends at transition; connection factor persists");
+            host.StepSimulation(1f);
+            Near(scope.EffectiveWorkRateMultiplier, 1f,
+                "connection 0.5x and next operation 2x compose to 1x");
+            Near(scope.CompletedWork, 4f, "next operation progresses at composed rate");
+            Check(host.KillConnection("scope-rate") && scope.Behaviors.ActiveModifiers.Count == 0 &&
+                scope.AllocatedLoad == 0f, "kill removes scoped rate factors and releases LOAD");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("paused-demand", route,
+                new[] { Stage(OperationKind.Read, 100f, 4f) },
+                TimedModifierBehaviorDefinition.Rate("pause", 0f, 0f, 0f)));
+            director.QueueSpawnPlan(Plan("competitor", route,
+                new[] { Stage(OperationKind.Read, 100f, 8f) }));
+            host.StepSimulation(1f);
+            var demand = host.FindConnection("paused-demand");
+            var competitor = host.FindConnection("competitor");
+            Near(db.RequestedLoad, 12f, "paused connection still requests LOAD");
+            Near(demand.AllocatedLoad, 10f / 3f, "paused connection receives proportional LOAD");
+            Near(competitor.AllocatedLoad, 20f / 3f, "peer competes with paused demand");
+            Near(demand.CompletedWork, 0f, "paused contender makes no WORK");
+            Check(host.KillConnection("paused-demand"), "paused connection can be killed");
+            host.StepSimulation(1f);
+            Near(competitor.AllocatedLoad, 8f, "kill releases capacity to peer");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "effect-paused", route,
+                "behavior-witness", "Paused delivery witness",
+                new[] { new OperationStage(OperationKind.Write, 8f, 4f, "Deliver",
+                    CompletionEffect.InfectionDelivery) }, true,
+                new[] { TimedModifierBehaviorDefinition.Rate("pause", 0f, 0f, 0f) }));
+            host.StepSimulation(10f);
+            var delivery = host.FindConnection("effect-paused");
+            Check(delivery.IsActive && delivery.CompletedWork == 0f &&
+                host.Occurrences.Count == 0 && host.Infections.Count == 0,
+                "paused operation does not naturally complete or deliver its effect");
+            Check(host.KillConnection("effect-paused") && host.Occurrences.Count == 0,
+                "killing paused delivery prevents its completion effect");
+
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("spiking-paused", route,
+                new[] { Stage(OperationKind.Read, 100f, 4f,
+                    TimedModifierBehaviorDefinition.Spiking("spike", 1f, 1f, 2f)) },
+                TimedModifierBehaviorDefinition.Rate("pause", 0f, 0f, 0f)));
+            for (int i = 0; i < 4; i++)
+            {
+                host.StepSimulation(1f);
+                var spiking = host.FindConnection("spiking-paused");
+                Near(spiking.DesiredLoad, i % 2 == 0 ? 4f : 6f,
+                    "SPIKING toggles LOAD during productive pause " + i);
+                Near(spiking.CompletedWork, 0f, "SPIKING quiet and elevated phases remain paused " + i);
+            }
+            host.ResetSimulation();
+            baseline.SetValue(db, 10f);
+            director.QueueSpawnPlan(Plan("rate-no-load", route,
+                new[] { Stage(OperationKind.Read, 100f, 4f) },
+                TimedModifierBehaviorDefinition.Rate("double", 0f, 0f, 2f)));
+            host.StepSimulation(1f);
+            var noLoad = host.FindConnection("rate-no-load");
+            Near(noLoad.AllocatedLoad, 0f, "zero allocation with 2x factor");
+            Near(noLoad.ActualWorkRate, 0f, "zero allocation still has zero rate");
+            Near(noLoad.CompletedWork, 0f, "zero allocation still has zero WORK");
+            baseline.SetValue(db, oldBaseline);
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("rate", route,
+                new[] { Stage(OperationKind.Read, 18f, 4f, half, pause, doubleRate) }));
+            host.StepSimulation(1f);
+            Check(host.FindConnection("rate").Behaviors.History.Count == 0 &&
+                host.FindConnection("rate").EffectiveWorkRateMultiplier == 1f &&
+                Approx(host.FindConnection("rate").CompletedWork, 4f),
+                "reset/replay starts at neutral rate and repeats first WORK step");
+            host.ResetSimulation();
+            director.QueueSpawnPlan(Plan("overflow-rate", route,
+                new[] { Stage(OperationKind.Read, 100f, 4f,
+                    TimedModifierBehaviorDefinition.Rate("huge", 0f, 0f, float.MaxValue)) }));
+            bool overflowRejected = false;
+            try { host.StepSimulation(1f); }
+            catch (InvalidOperationException error)
+            { overflowRejected = error.Message.Contains("Actual WORK rate"); }
+            Check(overflowRejected, "finite factor cannot overflow actual productive rate");
+            Debug.Log("BehaviorWitness WORK rate: 4 LOAD gives 4, 2, 0, 4, then 8 WORK/s " +
+                "at 1x, 0.5x, 0x, restored 1x, and 2x; allocation stays 4.");
+        }
+
+        private static (string status, string eta) InspectRate(LogicalConnectionState state)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>(
+                "Assets/Prefabs/Connections/InspectOutput.prefab");
+            InspectOutput output = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                output.Bind(new[] { state }, presentationMode: InspectPresentationMode.Verbose);
+                var entry = (InspectEntry)new SerializedObject(output).FindProperty("entries")
+                    .GetArrayElementAtIndex(0).objectReferenceValue;
+                var fields = new SerializedObject(entry);
+                return (((TMP_Text)fields.FindProperty("throughput").objectReferenceValue).text,
+                    ((TMP_Text)fields.FindProperty("eta").objectReferenceValue).text);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(output.gameObject); }
         }
 
         private static TimedModifierBehaviorDefinition Behavior(string id, float start,

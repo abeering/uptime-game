@@ -184,13 +184,19 @@ namespace Uptime.Connections
                 reason = target.LoadCapacity - target.BaselineLoad <= 0.0001f ?
                     " · NO LOAD AVAILABLE" : target.RequestedLoad > target.LoadCapacity + 0.0001f ?
                     " · " + state.TargetNode.NodeId + " OVERLOADED" : " · TARGET LIMITED";
-            Set(throughput, status + reason);
+            bool workPaused = state.IsDemanding && state.AllocatedLoad > 0f &&
+                state.EffectiveWorkRateMultiplier == 0f;
+            string rateNote = workPaused ? " · WORK PAUSED" :
+                state.IsDemanding && state.EffectiveWorkRateMultiplier != 1f ?
+                    $" · WORK ×{state.EffectiveWorkRateMultiplier:G3}" : string.Empty;
+            Set(throughput, status + reason + rateNote);
             if (throughput != null) throughput.color = tint;
             float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
             Set(bottleneck, state.ActivityDescription);
             string remaining = state.IsComplete ? "00:00" : !state.IsActive ? "--:--" :
-                state.ActualWorkRate <= 0f ? "--:--" : FormatSeconds(state.RemainingWork / state.ActualWorkRate);
+                workPaused ? "PAUSED" : state.ActualWorkRate <= 0f ? "--:--" :
+                FormatSeconds(state.RemainingWork / state.ActualWorkRate);
             Set(eta, "ETA  " + remaining);
             if (throughput != null) throughput.gameObject.SetActive(verbose);
             if (work != null) work.gameObject.SetActive(verbose && !state.IsComplete);

@@ -107,6 +107,7 @@ namespace Uptime.Connections
         public float elevatedIntervalSeconds;
         public float workDelta;
         public float loadDelta;
+        public float workRateMultiplier;
     }
 
     [Serializable] public sealed class RunEvent
@@ -139,6 +140,7 @@ namespace Uptime.Connections
         public string modifierScope;
         public float workDelta;
         public float loadDelta;
+        public float workRateMultiplier;
         public float completedWork;
         public float requiredWork;
         public float actualDurationSeconds;
@@ -262,6 +264,8 @@ namespace Uptime.Connections
         public float completedWork;
         public float totalWork;
         public float baseWork;
+        public float effectiveWorkRateMultiplier;
+        public float actualWorkRate;
         public string performance;
     }
 
@@ -585,6 +589,7 @@ namespace Uptime.Connections
             entry.modifierScope = change.Scope.ToString();
             entry.workDelta = change.WorkDelta;
             entry.loadDelta = change.LoadDelta;
+            entry.workRateMultiplier = change.WorkRateMultiplier;
         }
 
         public void RecordResolution(LogicalConnectionState state, ConnectionResolution reason, float time)
@@ -713,6 +718,8 @@ namespace Uptime.Connections
                     allocatedLoad = state.AllocatedLoad,
                     completedWork = state.CompletedWork, totalWork = state.CurrentTotalWork,
                     baseWork = state.BaseWork,
+                    effectiveWorkRateMultiplier = state.EffectiveWorkRateMultiplier,
+                    actualWorkRate = state.ActualWorkRate,
                     performance = state.IsActive ? state.Performance.ToString() : null });
             }
             snapshot.connections = active.ToArray();
@@ -841,7 +848,8 @@ namespace Uptime.Connections
                     stopAfterSeconds = source[i].StopAfterSeconds,
                     normalIntervalSeconds = source[i].NormalIntervalSeconds,
                     elevatedIntervalSeconds = source[i].ElevatedIntervalSeconds,
-                    workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta };
+                    workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta,
+                    workRateMultiplier = source[i].WorkRateMultiplier };
             return result;
         }
 

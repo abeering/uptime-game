@@ -290,7 +290,18 @@ namespace Uptime.Connections
         public float CompletedWork { get; internal set; }
         public float RemainingWork => Mathf.Max(0f, CurrentTotalWork - CompletedWork);
         public float AllocatedLoad { get; internal set; }
-        public float ActualWorkRate => AllocatedLoad;
+        public float EffectiveWorkRateMultiplier =>
+            Behaviors.EffectiveWorkRateMultiplier(CurrentOperationIndex);
+        public float ActualWorkRate
+        {
+            get
+            {
+                float rate = AllocatedLoad * EffectiveWorkRateMultiplier;
+                if (float.IsNaN(rate) || float.IsInfinity(rate))
+                    throw new InvalidOperationException("Actual WORK rate must be finite.");
+                return rate;
+            }
+        }
         public float Satisfaction => IsComplete ? 1f : !IsActive || IsTransitioning ? 0f : DesiredLoad > 0f ?
             AllocatedLoad / DesiredLoad : 0f;
         public bool IsTransitioning { get; internal set; }

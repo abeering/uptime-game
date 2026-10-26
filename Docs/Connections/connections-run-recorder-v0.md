@@ -45,6 +45,8 @@ Slice 3A adds optional behavior definitions to recorded plan/profile metadata, e
 
 Slice 3B records each behavior definition's kind and SPIKING normal/elevated interval durations in profile and concrete-plan metadata. Repeated SPIKING bursts use distinct modifier IDs and ordinary modifier add/remove events; OVERLOAD produces one addition and a removal at scope end. Events are timestamped when transitions are applied at a simulation-step start, including catch-up transitions after a coarse step. No recorder schema or player-facing `logs` command is added.
 
+The Phase 2 WORK rate foundation adds each behavior's effective factor to copied definitions and modifier add/remove events, including source behavior, scope, operation index, and time. Live connection snapshots add `effectiveWorkRateMultiplier` and `actualWorkRate` alongside allocated LOAD and accomplished WORK. Older definitions resolve to neutral 1×. The recorder remains observational; these fields do not classify intent.
+
 [`connections-run-recorder-example.json`](examples/connections-run-recorder-example.json) is the complete file saved by a Recorder Witness run. It includes a two-operation connection, a bookmark, autosave, and a blocked high-demand connection.
 
 Snapshots are taken at about one-second **simulation** intervals after allocation, plus immediately for markers and blocks. Each contains authoritative requested and allocated LOAD for every node and current WORK, operation, demand, allocation, and performance for pending or active connections. A large manual simulation step yields one snapshot at the actual observed time; the recorder does not invent intermediate states. Autosaves use **real elapsed** time, including while simulation time is paused.
