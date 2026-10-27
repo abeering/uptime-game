@@ -126,6 +126,9 @@ namespace Uptime.Connections
         public float normalIntervalSeconds;
         public float elevatedIntervalSeconds;
         public float spikeInitialDelaySeconds;
+        public float minimumLoadOffset;
+        public float maximumLoadOffset;
+        public float wavePeriodSeconds;
         public float workDelta;
         public float loadDelta;
         public float workRateMultiplier;
@@ -928,6 +931,9 @@ namespace Uptime.Connections
                     normalIntervalSeconds = source[i].NormalIntervalSeconds,
                     elevatedIntervalSeconds = source[i].ElevatedIntervalSeconds,
                     spikeInitialDelaySeconds = source[i].SpikeInitialDelaySeconds,
+                    minimumLoadOffset = source[i].MinimumLoadOffset,
+                    maximumLoadOffset = source[i].MaximumLoadOffset,
+                    wavePeriodSeconds = source[i].WavePeriodSeconds,
                     workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta,
                     workRateMultiplier = source[i].WorkRateMultiplier };
             return result;

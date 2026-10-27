@@ -765,8 +765,21 @@ namespace Uptime.Connections
                     float.IsNaN(behavior.WorkRateMultiplier) ||
                     float.IsInfinity(behavior.WorkRateMultiplier) ||
                     behavior.WorkRateMultiplier < 0f ||
-                    (behavior.Kind != ConnectionBehaviorKind.TimedAdjustment &&
+                    ((behavior.Kind == ConnectionBehaviorKind.Overload ||
+                        behavior.Kind == ConnectionBehaviorKind.Spiking) &&
                         (behavior.WorkDelta != 0f || behavior.LoadDelta <= 0f)) ||
+                    (behavior.Kind == ConnectionBehaviorKind.Waving &&
+                        (behavior.WorkDelta != 0f || behavior.LoadDelta != 0f ||
+                         behavior.WorkRateMultiplier != 1f ||
+                         behavior.StopAfterSeconds != 0f ||
+                         !FinitePositive(behavior.WavePeriodSeconds) ||
+                         float.IsNaN(behavior.MinimumLoadOffset) ||
+                         float.IsInfinity(behavior.MinimumLoadOffset) ||
+                         float.IsNaN(behavior.MaximumLoadOffset) ||
+                         float.IsInfinity(behavior.MaximumLoadOffset) ||
+                         behavior.MinimumLoadOffset > 0f ||
+                         behavior.MaximumLoadOffset < 0f ||
+                         behavior.MinimumLoadOffset > behavior.MaximumLoadOffset)) ||
                     (behavior.Kind == ConnectionBehaviorKind.Overload &&
                         behavior.StopAfterSeconds != 0f) ||
                     (behavior.Kind == ConnectionBehaviorKind.Spiking &&
@@ -780,7 +793,7 @@ namespace Uptime.Connections
                          behavior.NormalIntervalSeconds <= 0f ||
                          behavior.ElevatedIntervalSeconds <= 0f)))
                     throw new InvalidOperationException("Behavior needs a unique ID, finite deltas, " +
-                        "valid timing and positive keyword LOAD, and connection-scope WORK delta zero.");
+                        "valid timing and keyword LOAD bounds, and connection-scope WORK delta zero.");
         }
 
         private static bool FinitePositive(float value) =>

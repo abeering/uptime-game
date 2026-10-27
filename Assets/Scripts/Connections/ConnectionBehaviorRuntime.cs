@@ -6,7 +6,7 @@ namespace Uptime.Connections
 {
     public enum BehaviorScope { Connection, Operation }
     public enum ModifierChangeKind { Added, Removed }
-    public enum ConnectionBehaviorKind { TimedAdjustment, Overload, Spiking }
+    public enum ConnectionBehaviorKind { TimedAdjustment, Overload, Spiking, Waving }
 
     // One serialized definition shape for timed adjustments and two LOAD keywords.
     // The original constructor retains the Slice 3A timed adjustment behavior.
@@ -20,6 +20,9 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float normalIntervalSeconds;
         [SerializeField, Min(0f)] private float elevatedIntervalSeconds;
         [SerializeField, Min(0f)] private float spikeInitialDelaySeconds;
+        [SerializeField] private float minimumLoadOffset;
+        [SerializeField] private float maximumLoadOffset;
+        [SerializeField, Min(0f)] private float wavePeriodSeconds;
         [SerializeField] private float workDelta;
         [SerializeField] private float loadDelta;
         // The presence flag keeps definitions serialized before rate factors at neutral 1x.
@@ -36,6 +39,9 @@ namespace Uptime.Connections
         public float SpikeInitialDelaySeconds => spikeInitialDelaySeconds > 0f ?
             spikeInitialDelaySeconds : normalIntervalSeconds;
         public float SpikeInitialDelayOverrideSeconds => spikeInitialDelaySeconds;
+        public float MinimumLoadOffset => minimumLoadOffset;
+        public float MaximumLoadOffset => maximumLoadOffset;
+        public float WavePeriodSeconds => wavePeriodSeconds;
         public float WorkDelta => workDelta;
         public float LoadDelta => loadDelta;
         public float WorkRateMultiplier => hasWorkRateMultiplier ? workRateMultiplier : 1f;
@@ -62,11 +68,19 @@ namespace Uptime.Connections
                 { kind = ConnectionBehaviorKind.Spiking, normalIntervalSeconds = normalSeconds,
                     elevatedIntervalSeconds = elevatedSeconds,
                     spikeInitialDelaySeconds = firstDelaySeconds };
+        public static TimedModifierBehaviorDefinition Waving(string id, float onsetSeconds,
+            float minimumOffset, float maximumOffset, float periodSeconds) =>
+            new TimedModifierBehaviorDefinition(id, onsetSeconds, 0f, 0f, 0f)
+            { kind = ConnectionBehaviorKind.Waving, minimumLoadOffset = minimumOffset,
+                maximumLoadOffset = maximumOffset, wavePeriodSeconds = periodSeconds };
         public TimedModifierBehaviorDefinition Copy() => new TimedModifierBehaviorDefinition(
             id, startAfterSeconds, stopAfterSeconds, workDelta, loadDelta)
             { kind = kind, normalIntervalSeconds = normalIntervalSeconds,
                 elevatedIntervalSeconds = elevatedIntervalSeconds,
                 spikeInitialDelaySeconds = spikeInitialDelaySeconds,
+                minimumLoadOffset = minimumLoadOffset,
+                maximumLoadOffset = maximumLoadOffset,
+                wavePeriodSeconds = wavePeriodSeconds,
                 hasWorkRateMultiplier = hasWorkRateMultiplier,
                 workRateMultiplier = workRateMultiplier };
     }
@@ -75,10 +89,11 @@ namespace Uptime.Connections
     {
         internal ActiveRequirementModifier(string id, string sourceId, BehaviorScope scope,
             int operationIndex, float workDelta, float loadDelta, float workRateMultiplier,
-            bool dynamicLoad)
+            bool dynamicLoad, bool signedLoad)
         { Id = id; SourceId = sourceId; Scope = scope; OperationIndex = operationIndex;
             WorkDelta = workDelta; LoadDelta = loadDelta;
-            WorkRateMultiplier = workRateMultiplier; DynamicLoad = dynamicLoad; }
+            WorkRateMultiplier = workRateMultiplier; DynamicLoad = dynamicLoad;
+            SignedLoad = signedLoad; }
         public string Id { get; }
         public string SourceId { get; }
         public BehaviorScope Scope { get; }
@@ -87,6 +102,7 @@ namespace Uptime.Connections
         public float LoadDelta { get; }
         public float WorkRateMultiplier { get; }
         internal bool DynamicLoad { get; }
+        internal bool SignedLoad { get; }
         public bool AppliesTo(int index) => Scope == BehaviorScope.Connection || OperationIndex == index;
     }
 
@@ -165,6 +181,15 @@ namespace Uptime.Connections
                         }
                     }
                 }
+                else if (definition.Kind == ConnectionBehaviorKind.Waving)
+                {
+                    if (modifierId == null &&
+                        elapsed + BoundaryTolerance >= definition.StartAfterSeconds)
+                        modifierId = owner.AddModifier(definition, scope, operationIndex, time);
+                    if (modifierId != null)
+                        owner.UpdateKeywordLoad(modifierId, WaveOffset(definition,
+                            Math.Max(0d, elapsed - definition.StartAfterSeconds)));
+                }
                 else
                 {
                     if (modifierId == null &&
@@ -180,6 +205,24 @@ namespace Uptime.Connections
                     }
                 }
                 elapsed += delta;
+            }
+
+            private static float WaveOffset(TimedModifierBehaviorDefinition behavior,
+                double secondsSinceOnset)
+            {
+                if (secondsSinceOnset <= BoundaryTolerance) return 0f;
+                double minimum = behavior.MinimumLoadOffset;
+                double maximum = behavior.MaximumLoadOffset;
+                double radius = (maximum - minimum) * 0.5d;
+                if (radius == 0d) return 0f;
+                double center = (minimum + maximum) * 0.5d;
+                // The ascending solution begins at zero for symmetric and positive-only
+                // bounds; negative-only bounds depart smoothly from their zero maximum.
+                double phase = Math.Asin(Math.Max(-1d, Math.Min(1d, -center / radius)));
+                double angle = 2d * Math.PI *
+                    (secondsSinceOnset / behavior.WavePeriodSeconds) + phase;
+                double offset = center + radius * Math.Sin(angle);
+                return (float)Math.Max(minimum, Math.Min(maximum, offset));
             }
 
             public void Stop(ConnectionBehaviorRuntime owner, float time)
@@ -253,6 +296,16 @@ namespace Uptime.Connections
             dynamicLoadDeltas[source] = new DynamicLoadContribution(delta, scope, keyword);
         }
 
+        private void UpdateKeywordLoad(string modifierId, float delta)
+        {
+            if (float.IsNaN(delta) || float.IsInfinity(delta) ||
+                !dynamicLoadDeltas.TryGetValue(modifierId, out DynamicLoadContribution current) ||
+                !current.Keyword)
+                throw new InvalidOperationException("Active keyword needs a finite LOAD contribution.");
+            dynamicLoadDeltas[modifierId] =
+                new DynamicLoadContribution(delta, current.Scope, true);
+        }
+
         internal void EndConnection(float time)
         {
             EndOperation(time);
@@ -294,7 +347,7 @@ namespace Uptime.Connections
                 if (modifier.AppliesTo(index))
                 {
                     if (work) value += modifier.WorkDelta;
-                    else if (modifier.DynamicLoad)
+                    else if (modifier.DynamicLoad && !modifier.SignedLoad)
                     {
                         if (!dynamicLoadDeltas.TryGetValue(modifier.Id,
                             out DynamicLoadContribution contribution))
@@ -310,6 +363,9 @@ namespace Uptime.Connections
             if (!work)
             {
                 double requested = value;
+                foreach (ActiveRequirementModifier modifier in active)
+                    if (modifier.SignedLoad && modifier.AppliesTo(index))
+                        requested += dynamicLoadDeltas[modifier.Id].Delta;
                 foreach (DynamicLoadContribution contribution in dynamicLoadDeltas.Values)
                     if (!contribution.Keyword) requested += contribution.Delta;
                 if (double.IsInfinity(requested) || requested > float.MaxValue)
@@ -325,7 +381,8 @@ namespace Uptime.Connections
             bool keyword = definition.Kind != ConnectionBehaviorKind.TimedAdjustment;
             var modifier = new ActiveRequirementModifier("m" + (++nextModifierId), definition.Id,
                 scope, index, definition.WorkDelta, definition.LoadDelta,
-                definition.WorkRateMultiplier, keyword);
+                definition.WorkRateMultiplier, keyword,
+                definition.Kind == ConnectionBehaviorKind.Waving);
             active.Add(modifier);
             if (keyword) SetDynamicLoadDelta(modifier.Id, definition.LoadDelta, scope, true);
             // Validate the combined effective requirements before allocation.

@@ -1144,8 +1144,22 @@ namespace Uptime.Connections
                     behaviors = new[] { TimedModifierBehaviorDefinition.Overload(
                         "OVERLOAD", 5f, 10f) }
                 } }
-            }
+            },
+            Profile("waving-moderate", "Database Maintenance", "DB", 0f,
+                WavingWriteStage("WAVING_MODERATE", -1f, 1f, 20f, 180f)),
+            Profile("waving-strong", "Database Maintenance", "DB", 0f,
+                WavingWriteStage("WAVING_STRONG", 0f, 8f, 30f, 360f))
         };
+        private static ConnectionOperationProfile WavingWriteStage(string behaviorId,
+            float minimumOffset, float maximumOffset, float period, float duration) =>
+            new ConnectionOperationProfile
+            {
+                operation = OperationKind.Write, activityDescription = "Writing records",
+                minimumLoad = 2f, maximumLoad = 2f,
+                minimumDuration = duration, maximumDuration = duration,
+                behaviors = new[] { TimedModifierBehaviorDefinition.Waving(
+                    behaviorId, 3f, minimumOffset, maximumOffset, period) }
+            };
         private static ConnectionOperationProfile SpikingWriteStage(CompletionEffect effect) =>
             new ConnectionOperationProfile
             {
