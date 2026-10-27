@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:d93925b24f2c15a9482d73f7b28117c5a6f96cd4a7c277df22a30f4803a33b6a`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:d59e55d2021fe7cea7982f064701de2ab1733fce8b9d86fa8d67e737077193f0`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Command recall (gameplay QoL review branch):** With the prompt focused, bare Up recalls the newest submitted command, further presses move backward, and Down moves forward to the unfinished draft captured before browsing. Recalled text is editable and runs only on Enter. The terminal retains up to 100 nonblank commands per terminal instance (Inspector configurable), including failed commands, skipping consecutive exact duplicates. Editing recalled text does not rewrite stored commands. Ctrl/Cmd + arrows keep scrolling output; Shift/Alt + arrows retain their existing editing behavior. `help` lists recall separately from scrolling. History is session-local, without disk persistence.
 
 **Health bar display and presentation (gameplay QoL review branch, October 27, 2026):** The numeric Health was updating, but the sprite-less fill Image ignored `fillAmount` and stayed full. `NetworkHealthPanel` now sizes the authored fill rectangle; the prefab uses Simple image mode. The follow-up makes the bar taller and wider, centered between `HEALTH 100` and reserved `-11.11/s` text while retaining the rate's right edge. In Play Mode, bar width eases toward authoritative Health using real time; the numeric Health stays immediate. The bar is muted orange during ongoing drain or while a visible one-off loss settles, teal otherwise, and red whenever actual Health is below the configurable threshold (default 25), including during recovery. First display, re-enable, and a backwards simulation-clock reset snap to current Health. Health rules and tuning are unchanged. See [Network Health V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-network-health-v0.md) and the [authored prefab preview](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsHealthBar/README.md).
 

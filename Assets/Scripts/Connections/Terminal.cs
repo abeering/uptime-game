@@ -20,6 +20,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField, Min(1)] private int maxEntries = 100;
+        [SerializeField, Min(1)] private int maxCommandHistory = 100;
         [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
@@ -31,6 +32,9 @@ namespace Uptime.Connections
         private Key heldScrollKey;
         private float nextScrollRepeatAt;
         private TMP_InputField.OnValidateInput previousInputValidator;
+        private readonly List<string> commandHistory = new();
+        private int commandHistoryIndex = -1;
+        private string commandDraft = string.Empty;
 
         private void Awake()
         {
@@ -91,6 +95,48 @@ namespace Uptime.Connections
             if (keyboard.backquoteKey.wasPressedThisFrame)
                 identityPresenter?.CycleCongestedEdges();
             UpdateHistoryScrolling(keyboard);
+        }
+
+        // Run after the EventSystem has processed TMP's normal arrow-key navigation.
+        private void LateUpdate()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null || commandInput == null || !commandInput.isFocused ||
+                keyboard.ctrlKey.isPressed || keyboard.leftMetaKey.isPressed ||
+                keyboard.rightMetaKey.isPressed || keyboard.altKey.isPressed ||
+                keyboard.shiftKey.isPressed)
+                return;
+            if (keyboard.upArrowKey.wasPressedThisFrame) RecallCommand(-1);
+            else if (keyboard.downArrowKey.wasPressedThisFrame) RecallCommand(1);
+        }
+
+        private void RememberCommand(string command)
+        {
+            if (commandHistory.Count == 0 || commandHistory[commandHistory.Count - 1] != command)
+                commandHistory.Add(command);
+            while (commandHistory.Count > Mathf.Max(1, maxCommandHistory))
+                commandHistory.RemoveAt(0);
+            commandHistoryIndex = -1;
+            commandDraft = string.Empty;
+        }
+
+        private void RecallCommand(int direction)
+        {
+            if (commandInput == null || commandHistory.Count == 0) return;
+            if (commandHistoryIndex < 0)
+            {
+                if (direction > 0) return;
+                commandDraft = commandInput.text;
+                commandHistoryIndex = commandHistory.Count;
+            }
+            commandHistoryIndex = Mathf.Clamp(commandHistoryIndex + direction,
+                0, commandHistory.Count);
+            bool atDraft = commandHistoryIndex == commandHistory.Count;
+            commandInput.SetTextWithoutNotify(atDraft ? commandDraft :
+                commandHistory[commandHistoryIndex]);
+            commandInput.textComponent.ForceMeshUpdate();
+            commandInput.MoveTextEnd(false);
+            if (atDraft) commandHistoryIndex = -1;
         }
 
         private void UpdateHistoryScrolling(Keyboard keyboard)
@@ -163,6 +209,7 @@ namespace Uptime.Connections
             }
 
             string command = raw.Trim();
+            RememberCommand(command);
             commandInput.SetTextWithoutNotify(string.Empty);
             AppendText($"> {command}", normalColor);
 
@@ -318,6 +365,7 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  clean <nodeId>", mutedColor);
+                    AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
