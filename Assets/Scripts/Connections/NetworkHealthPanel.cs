@@ -23,6 +23,11 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text causesText;
         [SerializeField] private TMP_Text eventsText;
         [SerializeField] private Image healthFill;
+        [SerializeField] private Color healthyBarColor = new Color(0.32f, 0.77f, 0.66f);
+        [SerializeField] private Color drainingBarColor = new Color(0.85f, 0.53f, 0.32f);
+        [SerializeField] private Color criticalBarColor = new Color(0.94f, 0.32f, 0.30f);
+        [SerializeField, Range(0f, 100f)] private float criticalHealthThreshold = 25f;
+        [SerializeField, Min(0f)] private float healthBarLerpSpeed = 10f;
         [SerializeField] private Color degradingColor = new Color(1f, 0.63f, 0.39f);
         [SerializeField] private Color recoveringColor = new Color(0.52f, 0.84f, 0.72f);
         [SerializeField] private Color stableColor = new Color(0.47f, 0.63f, 0.62f);
@@ -36,6 +41,8 @@ namespace Uptime.Connections
         private bool expanded;
         private bool restoreFocus;
         private int anchor, focus;
+        private float displayedHealth = float.NaN;
+        private float lastSimulationTime;
 
         public bool Expanded => expanded;
         public string ClockText => clockText != null ? clockText.text : null;
@@ -79,7 +86,12 @@ namespace Uptime.Connections
             commandInput.selectionFocusPosition = focus;
         }
 
-        private void OnEnable() { ApplyLayout(); Render(); }
+        private void OnEnable()
+        {
+            displayedHealth = float.NaN;
+            ApplyLayout();
+            Render();
+        }
 
         public void ApplyLayout()
         {
@@ -103,12 +115,9 @@ namespace Uptime.Connections
             NetworkHealthSnapshot health = host.Health;
             if (health == null) return;
             if (valueText != null) valueText.text = $"HEALTH {health.Value:0.#}";
-            if (healthFill != null)
-            {
-                // Sprite-less Images ignore fillAmount; size the authored rectangle instead.
-                RectTransform fill = healthFill.rectTransform;
-                fill.anchorMax = new Vector2(Mathf.Clamp01(health.Value / 100f), fill.anchorMax.y);
-            }
+            RenderHealthBar(health, Time.unscaledDeltaTime,
+                !Application.isPlaying || host.SimulationTimeSeconds < lastSimulationTime);
+            lastSimulationTime = host.SimulationTimeSeconds;
             float displayRate = Mathf.Abs(health.NetRate) < 0.005f ? 0f : health.NetRate;
             Color rateColor = displayRate < 0f ? degradingColor :
                 displayRate > 0f ? recoveringColor : stableColor;
@@ -145,6 +154,31 @@ namespace Uptime.Connections
                 (health.Failed ? "NETWORK FAILURE" : "RECENT IMPACTS  NONE") :
                 $"RECENT IMPACT  SERVICE INTERRUPTED {health.RecentEvents[0].Amount:0.#}" +
                 (health.Failed ? "   NETWORK FAILURE" : "");
+        }
+
+        private void RenderHealthBar(NetworkHealthSnapshot health, float deltaSeconds, bool snap)
+        {
+            if (healthFill == null) return;
+            float target = Mathf.Clamp(health.Value, 0f, 100f);
+            if (snap || float.IsNaN(displayedHealth) || healthBarLerpSpeed <= 0f)
+                displayedHealth = target;
+            else
+            {
+                // Exponential lerp keeps the response consistent across frame rates.
+                float blend = 1f - Mathf.Exp(-healthBarLerpSpeed * Mathf.Max(0f, deltaSeconds));
+                displayedHealth = Mathf.Lerp(displayedHealth, target, blend);
+                if (Mathf.Abs(displayedHealth - target) < 0.01f) displayedHealth = target;
+            }
+
+            // A one-off penalty stays orange while its visible drop settles, even if
+            // the simulation has already resumed recovery. Critical Health wins immediately.
+            bool draining = health.DegradationRate > 0f || health.NetRate < 0f ||
+                displayedHealth > target + 0.01f;
+            healthFill.color = target < criticalHealthThreshold ? criticalBarColor :
+                draining ? drainingBarColor : healthyBarColor;
+            // Sprite-less Images ignore fillAmount; size the authored rectangle instead.
+            RectTransform fill = healthFill.rectTransform;
+            fill.anchorMax = new Vector2(displayedHealth / 100f, fill.anchorMax.y);
         }
     }
 }
