@@ -178,6 +178,8 @@ namespace Uptime.Connections
         private OperationStage[] operations;
         [SerializeField] private TimedModifierBehaviorDefinition[] connectionBehaviors;
         [SerializeReference] private LoaderAttackPlan loaderAttack;
+        [SerializeField] private bool naturalLoadNoise;
+        [SerializeField] private int naturalLoadSeed;
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
@@ -201,6 +203,8 @@ namespace Uptime.Connections
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
             connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public LoaderAttackPlan LoaderAttack => loaderAttack;
+        public bool NaturalLoadNoise => naturalLoadNoise;
+        public int NaturalLoadSeed => naturalLoadSeed;
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
             StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
         private bool HasArc => operations != null && operations.Length > 0;
@@ -220,7 +224,9 @@ namespace Uptime.Connections
                 route = new RouteNode[plan.Route.Length],
                 operations = new OperationStage[plan.Operations.Length],
                 connectionBehaviors = OperationStage.CopyBehaviors(plan.ConnectionBehaviors),
-                loaderAttack = plan.LoaderAttack?.Copy()
+                loaderAttack = plan.LoaderAttack?.Copy(),
+                naturalLoadNoise = plan.NaturalLoadNoise,
+                naturalLoadSeed = plan.NaturalLoadSeed
             };
             for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
             for (int i = 0; i < result.operations.Length; i++)
@@ -286,6 +292,8 @@ namespace Uptime.Connections
         public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
         public float BaseWork => Definition.WorkAt(CurrentOperationIndex);
         public float BaseLoad => Definition.LoadAt(CurrentOperationIndex);
+        public float NaturalLoadDelta { get; internal set; }
+        public float OperationStartedAtSeconds { get; internal set; }
         public float CurrentTotalWork => Behaviors.EffectiveWork(CurrentOperationIndex);
         public float DesiredLoad => Behaviors.EffectiveLoad(CurrentOperationIndex);
         public string ActivityDescription => Definition.ActivityAt(CurrentOperationIndex);

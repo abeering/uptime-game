@@ -593,7 +593,9 @@ namespace Uptime.Connections
                     basePlan.ConnectionId, basePlan.Route, basePlan.ProfileId,
                     basePlan.ClaimedPurpose, basePlan.Operations, basePlan.IsHostile,
                     basePlan.ConnectionBehaviors, basePlan.GenerationTrace,
-                    origin.NodeId, parent.SourceConnectionId, parent.AppliedAtSeconds);
+                    origin.NodeId, parent.SourceConnectionId, parent.AppliedAtSeconds,
+                    naturalLoadNoise: basePlan.NaturalLoadNoise,
+                    naturalLoadSeed: basePlan.NaturalLoadSeed);
                 QueueSpawnPlan(child, "spawner");
                 reason = null;
                 return child;
@@ -723,7 +725,7 @@ namespace Uptime.Connections
             };
             return new ConnectionSpawnPlan(atTime, id, route, purpose.id, purpose.claimedPurpose,
                 stages.ToArray(), hostile, purpose.connectionBehaviors, trace,
-                loaderAttack: loaderAttack);
+                loaderAttack: loaderAttack, naturalLoadNoise: true, naturalLoadSeed: seed);
         }
 
         private LoaderAttackPlan ComposeLoader(List<OperationStage> stages, NodeView target,

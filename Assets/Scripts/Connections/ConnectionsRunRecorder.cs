@@ -33,6 +33,10 @@ namespace Uptime.Connections
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
         public float connectionTravelSecondsPerLink;
+        public bool naturalLoadNoiseEnabled;
+        public float naturalLoadNoiseAmplitude;
+        public float naturalLoadNoiseMinPeriodSeconds;
+        public float naturalLoadNoiseMaxPeriodSeconds;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
     }
@@ -206,6 +210,8 @@ namespace Uptime.Connections
         public BehaviorRecord[] connectionBehaviors;
         public OperationRecord[] operations;
         public LoaderAttackPlan loaderAttack;
+        public bool naturalLoadNoise;
+        public int naturalLoadSeed;
     }
 
     [Serializable] public sealed class OperationRecord
@@ -280,6 +286,7 @@ namespace Uptime.Connections
         public string target;
         public float desiredLoad;
         public float baseLoad;
+        public float naturalLoadDelta;
         public float allocatedLoad;
         public float completedWork;
         public float totalWork;
@@ -761,6 +768,7 @@ namespace Uptime.Connections
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
                     desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
+                    naturalLoadDelta = state.NaturalLoadDelta,
                     allocatedLoad = state.AllocatedLoad,
                     completedWork = state.CompletedWork, totalWork = state.CurrentTotalWork,
                     baseWork = state.BaseWork,
@@ -793,6 +801,10 @@ namespace Uptime.Connections
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
+                naturalLoadNoiseEnabled = host.NaturalLoadNoiseEnabled,
+                naturalLoadNoiseAmplitude = host.NaturalLoadNoiseAmplitude,
+                naturalLoadNoiseMinPeriodSeconds = host.NaturalLoadNoiseMinPeriodSeconds,
+                naturalLoadNoiseMaxPeriodSeconds = host.NaturalLoadNoiseMaxPeriodSeconds,
                 nodes = new NodeConfiguration[host.Nodes.Length] };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
@@ -881,6 +893,8 @@ namespace Uptime.Connections
                 route = new string[definition.Route.Length],
                 connectionBehaviors = Behaviors(definition.ConnectionBehaviors),
                 loaderAttack = definition.LoaderAttack?.Copy(),
+                naturalLoadNoise = definition.NaturalLoadNoise,
+                naturalLoadSeed = definition.NaturalLoadSeed,
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;

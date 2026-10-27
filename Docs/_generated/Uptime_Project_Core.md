@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:69a075e64859a15fcd3f2d98179ccffaa731ecfd88d40ef2120a31c09133f040`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:6bbf3135aab41a22972eea63b94d9cf53dc561220fb099b29c7e3670bbf64758`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Natural LOAD Noise V0 (review branch):** Canonical generated PURPOSE plans now carry a seeded per-operation LOAD variation, including benign, INFECTOR, LOADER, and Spawner-child plans. The default scene samples a smooth, independent contribution up to ±10% of each operation's sampled base LOAD over a 3–6-second interval. The simulation applies it once per allocation step after fixed keyword/modifier deltas; the resulting nonnegative request drives allocation, WORK, node totals, Health, recorder snapshots, and the existing one-decimal inspect LOAD pill. The run log records the host's enable/amplitude/period settings, each concrete plan's opt-in and seed, and each snapshot's contribution. It emits no per-sample events. Authored scene connections, legacy manual profiles, and explicit witness plans remain exact unless a plan opts in; the host toggle can disable the effect for exact-value checks. This changes neither traffic generation nor Packet. See the [deterministic review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsNaturalLoadNoiseV0/README.md).
 
 **Runtime WORK rate foundation (Phase 2, review branch):** Connections now computes productive WORK as allocated LOAD multiplied by an effective connection rate factor. The factor is 1× for existing plans; explicitly authored timed behaviors can apply finite nonnegative factors, including 0×, at connection or operation scope. Simultaneous factors multiply. A 0× connection still requests and receives LOAD, keeps its behavior timers running, and can be killed; it makes no productive progress while WORK remains. Effective factor and actual rate are recorded in snapshots, and verbose inspection distinguishes a productive pause from LOAD starvation. At the Phase 2 baseline this was generic machinery; the Phase 3 update below now uses it for generated LOADER attacks. See the [behavior foundation](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-behavior-foundation-v0.md).
 
