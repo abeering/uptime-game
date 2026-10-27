@@ -75,6 +75,13 @@ namespace Uptime.Connections
         public float loaderSpikeElevatedSeconds;
         public float loaderMinDurationSeconds;
         public float loaderMaxDurationSeconds;
+        public float infectorDelayedChance;
+        public float infectorMinDeliverySeconds;
+        public float infectorMinFinalEvidenceSeconds;
+        public float infectorHighLoadWeight;
+        public float infectorLowLoadWeight;
+        public float infectorOperationWeight;
+        public float infectorWorkLongWeight;
         public float phantomLoadWeight;
         public float blackoutWeight;
         public float spawnerWeight;
@@ -826,6 +833,13 @@ namespace Uptime.Connections
                 loaderSpikeElevatedSeconds = trafficDirector.LoaderSpikeElevatedSeconds,
                 loaderMinDurationSeconds = trafficDirector.LoaderMinDurationSeconds,
                 loaderMaxDurationSeconds = trafficDirector.LoaderMaxDurationSeconds,
+                infectorDelayedChance = trafficDirector.InfectorDelayedChance,
+                infectorMinDeliverySeconds = trafficDirector.InfectorMinDeliverySeconds,
+                infectorMinFinalEvidenceSeconds = trafficDirector.InfectorMinFinalEvidenceSeconds,
+                infectorHighLoadWeight = trafficDirector.InfectorHighLoadWeight,
+                infectorLowLoadWeight = trafficDirector.InfectorLowLoadWeight,
+                infectorOperationWeight = trafficDirector.InfectorOperationWeight,
+                infectorWorkLongWeight = trafficDirector.InfectorWorkLongWeight,
                 phantomLoadWeight = trafficDirector.PhantomLoadWeight,
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
