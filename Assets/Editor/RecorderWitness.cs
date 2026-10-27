@@ -48,6 +48,13 @@ namespace Uptime.Connections.EditorTools
                     initial.run.traffic.hostileGenerationEnabled &&
                     initial.run.traffic.hostileMeanIntervalSeconds == 54f &&
                     initial.run.traffic.normalWorkSpread == 0.25f &&
+                    initial.run.traffic.benignOutlierChance == 0.08f &&
+                    initial.run.traffic.benignWavingOutlierChance == 0.3f &&
+                    initial.run.traffic.infectorHighLoadWeight == 50f &&
+                    initial.run.traffic.infectorLowLoadWeight == 10f &&
+                    initial.run.traffic.infectorOperationWeight == 15f &&
+                    initial.run.traffic.infectorWorkLongWeight == 10f &&
+                    initial.run.traffic.infectorWavingWeight == 15f &&
                     initial.run.traffic.benignPopulationGoal == 3f &&
                     initial.run.traffic.coverageStartupGoal == 1f &&
                     initial.run.traffic.coverageRampSeconds == 75f &&

@@ -65,6 +65,7 @@ namespace Uptime.Connections
         [Header("Purpose generation (provisional playtest rates)")]
         [SerializeField, Range(0f, 1f)] private float deliveryChance = 0.5f;
         [SerializeField, Range(0f, 1f)] private float benignOutlierChance = 0.08f;
+        [SerializeField, Range(0f, 1f)] private float benignWavingOutlierChance = 0.3f;
         [SerializeField, Range(0f, 1f)] private float secondAnomalyChance = 0.15f;
         [SerializeField, Range(0f, 1f)] private float subtleDeliveryChance = 0.1f;
         [SerializeField, Range(0f, 0.5f)] private float normalWorkSpread = 0.25f;
@@ -82,10 +83,11 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 1f)] private float infectorDelayedChance = 0.33f;
         [SerializeField, Min(0f)] private float infectorMinDeliverySeconds = 25f;
         [SerializeField, Min(0f)] private float infectorMinFinalEvidenceSeconds = 18f;
-        [SerializeField, Min(0f)] private float infectorHighLoadWeight = 65f;
+        [SerializeField, Min(0f)] private float infectorHighLoadWeight = 50f;
         [SerializeField, Min(0f)] private float infectorLowLoadWeight = 10f;
         [SerializeField, Min(0f)] private float infectorOperationWeight = 15f;
         [SerializeField, Min(0f)] private float infectorWorkLongWeight = 10f;
+        [SerializeField, Min(0f)] private float infectorWavingWeight = 15f;
         [Header("Delivery infection weights")]
         [SerializeField, Min(0f)] private float phantomLoadWeight = 1f;
         [SerializeField, Min(0f)] private float blackoutWeight = 1f;
@@ -139,6 +141,7 @@ namespace Uptime.Connections
         public string AmbientOriginId => ambientOriginId;
         public float DeliveryChance => deliveryChance;
         public float BenignOutlierChance => benignOutlierChance;
+        public float BenignWavingOutlierChance => benignWavingOutlierChance;
         public float SecondAnomalyChance => secondAnomalyChance;
         public float SubtleDeliveryChance => subtleDeliveryChance;
         public float NormalWorkSpread => normalWorkSpread;
@@ -158,6 +161,7 @@ namespace Uptime.Connections
         public float InfectorLowLoadWeight => infectorLowLoadWeight;
         public float InfectorOperationWeight => infectorOperationWeight;
         public float InfectorWorkLongWeight => infectorWorkLongWeight;
+        public float InfectorWavingWeight => infectorWavingWeight;
         public float PhantomLoadWeight => phantomLoadWeight;
         public float BlackoutWeight => blackoutWeight;
         public float SpawnerWeight => spawnerWeight;
@@ -678,7 +682,7 @@ namespace Uptime.Connections
                 bool subtle = infectorPrimary == InfectorSignature.None ||
                     !infectorPrimary.HasValue && random.NextDouble() < subtleDeliveryChance;
                 generationDecision = subtle ? "DELIVERY_SUBTLE" : "DELIVERY_ANOMALOUS";
-                infector = ComposeInfector(stages, anomalies, subtle,
+                infector = ComposeInfector(stages, anomalies, selectedKeywords, subtle,
                     infectorStructure, infectorPrimary, infectorSecondary);
                 int last = stages.Count - 1;
                 OperationStage stage = stages[last];
@@ -691,7 +695,9 @@ namespace Uptime.Connections
             else if (ambient && random.NextDouble() < benignOutlierChance)
             {
                 generationDecision = "BENIGN_OUTLIER";
-                if (random.NextDouble() < 0.25) selectedKeywords.Add(AddKeyword(stages));
+                if (random.NextDouble() < benignWavingOutlierChance)
+                    selectedKeywords.Add(AddWaving(stages));
+                else if (random.NextDouble() < 0.25) selectedKeywords.Add(AddKeyword(stages));
                 else
                 {
                     string anomaly = RandomAnomaly();
@@ -784,7 +790,8 @@ namespace Uptime.Connections
         }
 
         private InfectorGenerationRecord ComposeInfector(List<OperationStage> stages,
-            List<string> anomalies, bool subtle, InfectorStructure? forcedStructure,
+            List<string> anomalies, List<GeneratedKeywordSelection> selectedKeywords,
+            bool subtle, InfectorStructure? forcedStructure,
             InfectorSignature? forcedPrimary, InfectorSignature? forcedSecondary)
         {
             float normalNominal = NominalSeconds(stages);
@@ -813,6 +820,8 @@ namespace Uptime.Connections
                 earliestChange = Mathf.Min(earliestChange,
                     ApplyInfectorSignature(stages, structure, primary));
                 anomalies.Add(SignatureId(primary));
+                if (primary == InfectorSignature.Waving)
+                    selectedKeywords.Add(WavingSelection(earliestChange));
                 if (forcedSecondary.HasValue || random.NextDouble() < secondAnomalyChance)
                 {
                     secondary = forcedSecondary ?? ChooseInfectorSignature(primary);
@@ -820,9 +829,14 @@ namespace Uptime.Connections
                     {
                         if (!CompatibleSignatures(primary, secondary))
                             throw new ArgumentException("INFECTOR signatures conflict.");
-                        earliestChange = Mathf.Min(earliestChange,
-                            ApplyInfectorSignature(stages, structure, secondary));
+                        int generatedWaveIndex = primary == InfectorSignature.Waving ?
+                            selectedKeywords[0].operationIndex : -1;
+                        int secondaryIndex = ApplyInfectorSignature(stages, structure, secondary,
+                            generatedWaveIndex);
+                        earliestChange = Mathf.Min(earliestChange, secondaryIndex);
                         anomalies.Add(SignatureId(secondary));
+                        if (secondary == InfectorSignature.Waving)
+                            selectedKeywords.Add(WavingSelection(secondaryIndex));
                     }
                 }
             }
@@ -830,22 +844,46 @@ namespace Uptime.Connections
             float composedNominal = NominalSeconds(stages);
             float finalNominal = stages[deliveryIndex].TotalWork /
                 stages[deliveryIndex].DesiredLoad;
+            bool hasWave = primary == InfectorSignature.Waving ||
+                secondary == InfectorSignature.Waving;
+            float conservativeTotal = hasWave ? ConservativeWavingSeconds(stages) : composedNominal;
+            float conservativeFinal = hasWave ? ConservativeWavingSeconds(stages[deliveryIndex]) : finalNominal;
             float workAdded = 0f;
             string reason = "none";
             if (!subtle)
             {
-                float totalShortfall = Mathf.Max(0f, infectorMinDeliverySeconds - composedNominal);
-                float finalShortfall = earliestChange == deliveryIndex ?
-                    Mathf.Max(0f, infectorMinFinalEvidenceSeconds - finalNominal) : 0f;
-                float secondsAdded = Mathf.Max(totalShortfall, finalShortfall);
-                if (secondsAdded > 0f)
+                if (hasWave)
                 {
                     OperationStage last = stages[deliveryIndex];
-                    workAdded = secondsAdded * last.DesiredLoad;
-                    stages[deliveryIndex] = Changed(last, work: last.TotalWork + workAdded);
-                    reason = totalShortfall > 0f && finalShortfall > 0f ?
-                        "minimum_total_and_final_evidence" : totalShortfall > 0f ?
-                        "minimum_total" : "minimum_final_evidence";
+                    float upperLoad = WavingUpperLoad(last);
+                    float neededForTotal = Mathf.Max(0f,
+                        infectorMinDeliverySeconds - (conservativeTotal - conservativeFinal)) * upperLoad;
+                    float onset = WavingOnset(last);
+                    float neededForFinal = earliestChange == deliveryIndex ?
+                        (infectorMinFinalEvidenceSeconds + onset) * upperLoad : 0f;
+                    workAdded = Mathf.Max(0f,
+                        Mathf.Max(neededForTotal, neededForFinal) - last.TotalWork);
+                    if (workAdded > 0f)
+                    {
+                        stages[deliveryIndex] = Changed(last, work: last.TotalWork + workAdded);
+                        reason = "waving_conservative_delivery_window";
+                    }
+                }
+                else
+                {
+                    float totalShortfall = Mathf.Max(0f, infectorMinDeliverySeconds - composedNominal);
+                    float finalShortfall = earliestChange == deliveryIndex ?
+                        Mathf.Max(0f, infectorMinFinalEvidenceSeconds - finalNominal) : 0f;
+                    float secondsAdded = Mathf.Max(totalShortfall, finalShortfall);
+                    if (secondsAdded > 0f)
+                    {
+                        OperationStage last = stages[deliveryIndex];
+                        workAdded = secondsAdded * last.DesiredLoad;
+                        stages[deliveryIndex] = Changed(last, work: last.TotalWork + workAdded);
+                        reason = totalShortfall > 0f && finalShortfall > 0f ?
+                            "minimum_total_and_final_evidence" : totalShortfall > 0f ?
+                            "minimum_total" : "minimum_final_evidence";
+                    }
                 }
             }
             else if (composedNominal < infectorMinDeliverySeconds)
@@ -861,6 +899,12 @@ namespace Uptime.Connections
                 finalNominalDeliverySeconds = NominalSeconds(stages),
                 finalOperationNominalSeconds = stages[deliveryIndex].TotalWork /
                     stages[deliveryIndex].DesiredLoad,
+                composedConservativeDeliverySeconds = conservativeTotal,
+                finalConservativeDeliverySeconds = hasWave ?
+                    ConservativeWavingSeconds(stages) : NominalSeconds(stages),
+                finalOperationConservativeSeconds = hasWave ?
+                    ConservativeWavingSeconds(stages[deliveryIndex]) :
+                    stages[deliveryIndex].TotalWork / stages[deliveryIndex].DesiredLoad,
                 deliveryWindowWorkAdded = workAdded,
                 deliveryWindowCorrectionReason = reason
             };
@@ -876,19 +920,27 @@ namespace Uptime.Connections
                 Mathf.Max(0f, infectorOperationWeight) : 0f;
             float work = CompatibleSignatures(previous, InfectorSignature.WorkLong) ?
                 Mathf.Max(0f, infectorWorkLongWeight) : 0f;
-            float total = high + low + operation + work;
+            float waving = CompatibleSignatures(previous, InfectorSignature.Waving) ?
+                Mathf.Max(0f, infectorWavingWeight) : 0f;
+            float total = high + low + operation + work + waving;
             if (total <= 0f)
                 throw new InvalidOperationException("INFECTOR signature weights need a compatible positive choice.");
             float draw = (float)random.NextDouble() * total;
             return draw < high ? InfectorSignature.HighLoad :
                 draw < high + low ? InfectorSignature.LowLoad :
                 draw < high + low + operation ? InfectorSignature.OperationDeviation :
-                InfectorSignature.WorkLong;
+                draw < high + low + operation + work ? InfectorSignature.WorkLong :
+                InfectorSignature.Waving;
         }
 
         private static bool CompatibleSignatures(InfectorSignature first, InfectorSignature next) =>
             next != InfectorSignature.None &&
-            !(first == InfectorSignature.HighLoad && next == InfectorSignature.LowLoad ||
+            !(first == InfectorSignature.Waving && next == InfectorSignature.Waving) &&
+            !(first == InfectorSignature.Waving &&
+                (next == InfectorSignature.HighLoad || next == InfectorSignature.LowLoad) ||
+              next == InfectorSignature.Waving &&
+                (first == InfectorSignature.HighLoad || first == InfectorSignature.LowLoad) ||
+              first == InfectorSignature.HighLoad && next == InfectorSignature.LowLoad ||
               first == InfectorSignature.LowLoad && next == InfectorSignature.HighLoad ||
               first == InfectorSignature.WorkLong &&
                   (next == InfectorSignature.HighLoad || next == InfectorSignature.LowLoad) ||
@@ -898,7 +950,8 @@ namespace Uptime.Connections
                   next == InfectorSignature.OperationDeviation);
 
         private int ApplyInfectorSignature(List<OperationStage> stages,
-            InfectorStructure structure, InfectorSignature signature)
+            InfectorStructure structure, InfectorSignature signature,
+            int generatedWaveOperationIndex = -1)
         {
             int index = structure == InfectorStructure.Delayed ? stages.Count - 1 :
                 random.Next(stages.Count);
@@ -917,17 +970,25 @@ namespace Uptime.Connections
                 case InfectorSignature.WorkLong:
                     stages[index] = Changed(stage, work: stage.TotalWork * Range(2f, 4f));
                     break;
+                case InfectorSignature.Waving:
+                    stages[index] = AttachWaving(stage);
+                    break;
                 case InfectorSignature.OperationDeviation:
                     OperationKind other = (OperationKind)(((int)stage.Operation +
                         1 + random.Next(2)) % 3);
-                    OperationStage changed = Changed(stage, kind: other,
-                        description: Activity(other));
                     if (structure == InfectorStructure.Standard && random.NextDouble() < 0.5)
                     {
-                        stages.Add(changed);
+                        // An appended operation copies the source's authored behaviors, but
+                        // the generated WAVING signature belongs only to its selected stage.
+                        TimedModifierBehaviorDefinition[] behaviors =
+                            index == generatedWaveOperationIndex ?
+                                WithoutAppendedGeneratedWave(stage) : stage.Behaviors;
+                        stages.Add(Changed(stage, kind: other,
+                            description: Activity(other), behaviors: behaviors));
                         index = stages.Count - 1;
                     }
-                    else stages[index] = changed;
+                    else stages[index] = Changed(stage, kind: other,
+                        description: Activity(other));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(signature));
@@ -935,11 +996,82 @@ namespace Uptime.Connections
             return index;
         }
 
+        private static TimedModifierBehaviorDefinition[] WithoutAppendedGeneratedWave(
+            OperationStage source)
+        {
+            TimedModifierBehaviorDefinition[] behaviors = source.Behaviors;
+            int generatedIndex = behaviors.Length - 1;
+            if (generatedIndex < 0 || behaviors[generatedIndex] == null ||
+                behaviors[generatedIndex].Kind != ConnectionBehaviorKind.Waving ||
+                behaviors[generatedIndex].Id != "WAVING")
+                throw new InvalidOperationException("Generated WAVING must be the last source behavior.");
+            var retained = new TimedModifierBehaviorDefinition[generatedIndex];
+            Array.Copy(behaviors, retained, generatedIndex);
+            return retained;
+        }
+
         private static string SignatureId(InfectorSignature signature) =>
             signature == InfectorSignature.HighLoad ? "high-load" :
             signature == InfectorSignature.LowLoad ? "low-load" :
             signature == InfectorSignature.OperationDeviation ? "operation-deviation" :
-            signature == InfectorSignature.WorkLong ? "work-deviation" : "none";
+            signature == InfectorSignature.WorkLong ? "work-deviation" :
+            signature == InfectorSignature.Waving ? "waving" : "none";
+
+        private OperationStage AttachWaving(OperationStage stage)
+        {
+            float baseLoad = stage.DesiredLoad;
+            float negative = Range(0.4f, 0.75f) * Mathf.Min(baseLoad, 2f);
+            float positive = Range(0.4f, Mathf.Max(0.4f,
+                Mathf.Min(1.5f, baseLoad * 0.75f)));
+            var behaviors = new List<TimedModifierBehaviorDefinition>(stage.Behaviors)
+            {
+                TimedModifierBehaviorDefinition.Waving("WAVING",
+                    Range(2f, 5f), -negative, positive, Range(15f, 30f))
+            };
+            return Changed(stage, behaviors: behaviors.ToArray());
+        }
+
+        private GeneratedKeywordSelection AddWaving(List<OperationStage> stages)
+        {
+            int index = random.Next(stages.Count);
+            stages[index] = AttachWaving(stages[index]);
+            return WavingSelection(index);
+        }
+
+        private static GeneratedKeywordSelection WavingSelection(int index) =>
+            new GeneratedKeywordSelection
+            {
+                operationIndex = index, behaviorId = "WAVING", behaviorKind = "Waving"
+            };
+
+        private float WavingUpperLoad(OperationStage stage)
+        {
+            float upper = stage.DesiredLoad * (host.NaturalLoadNoiseEnabled ?
+                1f + host.NaturalLoadNoiseAmplitude : 1f);
+            foreach (TimedModifierBehaviorDefinition behavior in stage.Behaviors)
+                if (behavior.Kind == ConnectionBehaviorKind.Waving)
+                    upper += behavior.MaximumLoadOffset;
+            return upper;
+        }
+
+        private static float WavingOnset(OperationStage stage)
+        {
+            foreach (TimedModifierBehaviorDefinition behavior in stage.Behaviors)
+                if (behavior.Kind == ConnectionBehaviorKind.Waving)
+                    return behavior.StartAfterSeconds;
+            return 0f;
+        }
+
+        private float ConservativeWavingSeconds(OperationStage stage) =>
+            stage.TotalWork / WavingUpperLoad(stage);
+
+        private float ConservativeWavingSeconds(IEnumerable<OperationStage> stages)
+        {
+            float seconds = 0f;
+            foreach (OperationStage stage in stages)
+                seconds += ConservativeWavingSeconds(stage);
+            return seconds;
+        }
 
         private static float NominalSeconds(IEnumerable<OperationStage> stages)
         {

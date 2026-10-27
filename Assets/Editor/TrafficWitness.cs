@@ -98,6 +98,7 @@ namespace Uptime.Connections.EditorTools
                     replay.Any(p => p.ProfileId == "sales-export" && !p.IsHostile),
                     "six purpose mix includes both objectives, benign outliers, subtle delivery, and sales export");
                 CheckAnomalyIndependence(replay);
+                CheckShortWorkDeviation(host, director);
                 CheckGenerationDecisions(replay);
                 CheckQueuedPlanRecording(host, director, replay);
                 float total = director.Profiles.Sum(p => director.EffectiveAmbientWeight(p.id));
@@ -546,11 +547,6 @@ namespace Uptime.Connections.EditorTools
             Check(plans.Any(p => p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation"),
                 "WORK deviation sampled");
-            Check(plans.Where(p => !p.IsHostile && p.GenerationTrace.anomalies.Length == 1 &&
-                p.GenerationTrace.anomalies[0] == "work-deviation")
-                .Any(p => p.GenerationTrace.finalOperations.Zip(
-                    p.GenerationTrace.normalOperations, (a, b) => a.totalWork / b.totalWork)
-                    .Any(r => r < 0.5f)), "short WORK deviation sampled");
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
                 p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "operation-deviation"))
@@ -560,6 +556,32 @@ namespace Uptime.Connections.EditorTools
                 Check(after.Length == before.Length || after.Length == before.Length + 1,
                     "operation deviation changes one kind or appends one stage");
             }
+        }
+
+        private static void CheckShortWorkDeviation(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            int originalSeed = director.Seed;
+            bool found = false;
+            try
+            {
+                for (int seed = 200; seed < 220 && !found; seed++)
+                {
+                    director.Seed = seed;
+                    host.ResetSimulation();
+                    for (int i = 0; i < 100 && !found; i++)
+                    {
+                        ConnectionGenerationTrace trace = director.GenerateBenignPlan(i).GenerationTrace;
+                        found = trace.generationDecision == "BENIGN_OUTLIER" &&
+                            trace.anomalies.Length == 1 &&
+                            trace.anomalies[0] == "work-deviation" &&
+                            trace.finalOperations.Zip(trace.normalOperations,
+                                (a, b) => a.totalWork / b.totalWork).Any(r => r < 0.5f);
+                    }
+                }
+            }
+            finally { director.Seed = originalSeed; host.ResetSimulation(); }
+            Check(found, "short WORK deviation remains available in the non-WAVING outlier recipe");
         }
 
         private static void CheckGenerationDecisions(ConnectionSpawnPlan[] plans)

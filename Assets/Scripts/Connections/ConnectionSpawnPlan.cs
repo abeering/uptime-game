@@ -83,7 +83,7 @@ namespace Uptime.Connections
     public enum LoaderStructure { Single, Delayed }
     public enum LoaderPattern { Immediate, Overload, Spiking }
     public enum InfectorStructure { Standard, Delayed }
-    public enum InfectorSignature { None, HighLoad, LowLoad, OperationDeviation, WorkLong }
+    public enum InfectorSignature { None, HighLoad, LowLoad, OperationDeviation, WorkLong, Waving }
 
     // Internal generation evidence; the concrete operation plan remains authoritative.
     [Serializable]
@@ -97,6 +97,9 @@ namespace Uptime.Connections
         public float composedNominalDeliverySeconds;
         public float finalNominalDeliverySeconds;
         public float finalOperationNominalSeconds;
+        public float composedConservativeDeliverySeconds;
+        public float finalConservativeDeliverySeconds;
+        public float finalOperationConservativeSeconds;
         public float deliveryWindowWorkAdded;
         public string deliveryWindowCorrectionReason;
 
