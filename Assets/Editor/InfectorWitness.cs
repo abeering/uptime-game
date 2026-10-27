@@ -57,6 +57,7 @@ namespace Uptime.Connections.EditorTools
                 CheckWavingSharedEvidence(host, director, overrides);
                 CheckWavingInterruption(host, director, recorder);
                 CheckWavingCorrection(host, director, recorder, overrides);
+                CheckWavingDeviationInheritance(host, director, recorder, overrides);
                 CheckLifecycle(host, director, recorder);
                 CheckManualAndSpawner(host, director, recorder);
                 CheckAmbiguousOutlier(host, director, overrides);
@@ -301,6 +302,8 @@ namespace Uptime.Connections.EditorTools
             Check(secondaryWave.GenerationTrace.anomalies.SequenceEqual(new[]
                 { "operation-deviation", "waving" }) &&
                 secondaryWave.GenerationTrace.infector.secondarySignature == "waving" &&
+                secondaryWave.Operations.SelectMany(o => o.Behaviors).Count(b =>
+                    b.Kind == ConnectionBehaviorKind.Waving && b.Id == "WAVING") == 1 &&
                 secondaryWave.GenerationTrace.selectedKeywords.Single(k =>
                     k.behaviorKind == "Waving").operationIndex < secondaryWave.Operations.Length,
                 "secondary WAVING records its compatible operation and ordered signature");
@@ -517,6 +520,89 @@ namespace Uptime.Connections.EditorTools
             Debug.Log($"InfectorWitness corrected WAVING: added={decision.deliveryWindowWorkAdded:F1} " +
                 $"WORK, actual delivery={resolved.resolvedAtSeconds - resolved.establishedAtSeconds:F1}s, " +
                 $"final={actualFinal:F1}s, onset={onset:F1}s");
+        }
+
+        private static void CheckWavingDeviationInheritance(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder,
+            FieldInfo overrides)
+        {
+            SelectPurpose(host, director, overrides, "product-lookup");
+            ConnectionOperationProfile source = director.Profiles.Single(p =>
+                p.id == "product-lookup").operations[0];
+            TimedModifierBehaviorDefinition[] original = source.behaviors;
+            source.behaviors = new[] {
+                TimedModifierBehaviorDefinition.Overload("AUTHORED", 1000f, 1f) };
+            try
+            {
+                int appendSeed = -1, replaceSeed = -1;
+                for (int seed = 600; seed < 640 &&
+                    (appendSeed < 0 || replaceSeed < 0); seed++)
+                {
+                    director.Seed = seed; host.ResetSimulation();
+                    ConnectionSpawnPlan candidate = director.GenerateInfectorPlanForWitness(0f,
+                        InfectorStructure.Standard, InfectorSignature.Waving,
+                        InfectorSignature.OperationDeviation, InfectionKind.PhantomLoad);
+                    if (candidate.Operations.Length == 2 && appendSeed < 0) appendSeed = seed;
+                    if (candidate.Operations.Length == 1 && replaceSeed < 0) replaceSeed = seed;
+                }
+                Check(appendSeed >= 0 && replaceSeed >= 0,
+                    "seeded STANDARD primary WAVING + secondary OperationDeviation reaches append and replace");
+
+                director.Seed = appendSeed; host.ResetSimulation(); recorder.BeginRun();
+                ConnectionSpawnPlan appended = director.GenerateInfectorPlanForWitness(0f,
+                    InfectorStructure.Standard, InfectorSignature.Waving,
+                    InfectorSignature.OperationDeviation, InfectionKind.PhantomLoad);
+                Check(appended.Operations.Length == 2 &&
+                    appended.GenerationTrace.anomalies.SequenceEqual(new[]
+                        { "waving", "operation-deviation" }) &&
+                    appended.GenerationTrace.selectedKeywords.Single().operationIndex == 0 &&
+                    appended.Operations.SelectMany(o => o.Behaviors).Count(b =>
+                        b.Kind == ConnectionBehaviorKind.Waving && b.Id == "WAVING") == 1 &&
+                    appended.Operations[0].Behaviors.Any(b => b.Id == "WAVING") &&
+                    !appended.Operations[1].Behaviors.Any(b => b.Id == "WAVING") &&
+                    appended.Operations.All(o => o.Behaviors.Any(b => b.Id == "AUTHORED")),
+                    "appended deviation keeps authored behavior but not copied generated WAVING");
+                OperationKind appendedKind = appended.Operations[1].Operation;
+                string expectedActivity = appendedKind == OperationKind.Read ? "Reading records" :
+                    appendedKind == OperationKind.Write ? "Writing records" : "Processing request";
+                Check(appendedKind != appended.Operations[0].Operation &&
+                    appended.Operations[1].ActivityDescription == expectedActivity &&
+                    appended.Operations[0].EffectOnCompletion == CompletionEffect.None &&
+                    appended.Operations[1].EffectOnCompletion == CompletionEffect.InfectionDelivery &&
+                    appended.Operations[1].InfectionPayload.Kind == InfectionKind.PhantomLoad,
+                    "appended operation retains deviated kind, activity, and final delivery");
+                director.QueueSpawnPlan(appended);
+                RunEvent queued = recorder.CurrentLog.events.Single(e =>
+                    e.type == "plan_queued" && e.connectionId == appended.ConnectionId);
+                Check(queued.generation.selectedKeywords.Single().operationIndex == 0 &&
+                    queued.definition.operations[0].behaviors.Count(b => b.kind == "Waving") == 1 &&
+                    queued.definition.operations[1].behaviors.All(b => b.kind != "Waving") &&
+                    queued.definition.operations[1].completionEffect == "InfectionDelivery",
+                    "queued plan and recorder agree on one intentionally selected WAVING operation");
+                LogicalConnectionState delivered = WaitForResolution(host, appended.ConnectionId);
+                Check(delivered.Resolution == ConnectionResolution.Completed &&
+                    recorder.CurrentLog.events.Count(e => e.type == "infection_applied" &&
+                        e.connectionId == appended.ConnectionId) == 1,
+                    "appended deviation still delivers once after normal completion");
+
+                director.Seed = replaceSeed; host.ResetSimulation();
+                ConnectionSpawnPlan replaced = director.GenerateInfectorPlanForWitness(0f,
+                    InfectorStructure.Standard, InfectorSignature.Waving,
+                    InfectorSignature.OperationDeviation, InfectionKind.PhantomLoad);
+                OperationKind replacedKind = replaced.Operations[0].Operation;
+                expectedActivity = replacedKind == OperationKind.Read ? "Reading records" :
+                    replacedKind == OperationKind.Write ? "Writing records" : "Processing request";
+                Check(replaced.Operations.Length == 1 &&
+                    replaced.GenerationTrace.selectedKeywords.Single().operationIndex == 0 &&
+                    replaced.Operations[0].Behaviors.Count(b => b.Id == "WAVING") == 1 &&
+                    replaced.Operations[0].Behaviors.Any(b => b.Id == "AUTHORED") &&
+                    replacedKind.ToString() != replaced.GenerationTrace.normalOperations[0].kind &&
+                    replaced.Operations[0].ActivityDescription == expectedActivity &&
+                    replaced.Operations[0].EffectOnCompletion == CompletionEffect.InfectionDelivery,
+                    "replacement deviation keeps the intended WAVING and authored behavior");
+                Debug.Log($"InfectorWitness WAVING append/replacement seeds: {appendSeed}/{replaceSeed}");
+            }
+            finally { source.behaviors = original; host.ResetSimulation(); }
         }
 
         private static void CheckLifecycle(SimulationHost host,

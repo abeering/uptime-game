@@ -829,7 +829,10 @@ namespace Uptime.Connections
                     {
                         if (!CompatibleSignatures(primary, secondary))
                             throw new ArgumentException("INFECTOR signatures conflict.");
-                        int secondaryIndex = ApplyInfectorSignature(stages, structure, secondary);
+                        int generatedWaveIndex = primary == InfectorSignature.Waving ?
+                            selectedKeywords[0].operationIndex : -1;
+                        int secondaryIndex = ApplyInfectorSignature(stages, structure, secondary,
+                            generatedWaveIndex);
                         earliestChange = Mathf.Min(earliestChange, secondaryIndex);
                         anomalies.Add(SignatureId(secondary));
                         if (secondary == InfectorSignature.Waving)
@@ -947,7 +950,8 @@ namespace Uptime.Connections
                   next == InfectorSignature.OperationDeviation);
 
         private int ApplyInfectorSignature(List<OperationStage> stages,
-            InfectorStructure structure, InfectorSignature signature)
+            InfectorStructure structure, InfectorSignature signature,
+            int generatedWaveOperationIndex = -1)
         {
             int index = structure == InfectorStructure.Delayed ? stages.Count - 1 :
                 random.Next(stages.Count);
@@ -972,19 +976,38 @@ namespace Uptime.Connections
                 case InfectorSignature.OperationDeviation:
                     OperationKind other = (OperationKind)(((int)stage.Operation +
                         1 + random.Next(2)) % 3);
-                    OperationStage changed = Changed(stage, kind: other,
-                        description: Activity(other));
                     if (structure == InfectorStructure.Standard && random.NextDouble() < 0.5)
                     {
-                        stages.Add(changed);
+                        // An appended operation copies the source's authored behaviors, but
+                        // the generated WAVING signature belongs only to its selected stage.
+                        TimedModifierBehaviorDefinition[] behaviors =
+                            index == generatedWaveOperationIndex ?
+                                WithoutAppendedGeneratedWave(stage) : stage.Behaviors;
+                        stages.Add(Changed(stage, kind: other,
+                            description: Activity(other), behaviors: behaviors));
                         index = stages.Count - 1;
                     }
-                    else stages[index] = changed;
+                    else stages[index] = Changed(stage, kind: other,
+                        description: Activity(other));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(signature));
             }
             return index;
+        }
+
+        private static TimedModifierBehaviorDefinition[] WithoutAppendedGeneratedWave(
+            OperationStage source)
+        {
+            TimedModifierBehaviorDefinition[] behaviors = source.Behaviors;
+            int generatedIndex = behaviors.Length - 1;
+            if (generatedIndex < 0 || behaviors[generatedIndex] == null ||
+                behaviors[generatedIndex].Kind != ConnectionBehaviorKind.Waving ||
+                behaviors[generatedIndex].Id != "WAVING")
+                throw new InvalidOperationException("Generated WAVING must be the last source behavior.");
+            var retained = new TimedModifierBehaviorDefinition[generatedIndex];
+            Array.Copy(behaviors, retained, generatedIndex);
+            return retained;
         }
 
         private static string SignatureId(InfectorSignature signature) =>
