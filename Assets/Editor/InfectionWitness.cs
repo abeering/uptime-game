@@ -442,6 +442,8 @@ namespace Uptime.Connections.EditorTools
                 e.source == "spawner");
             Check(first.parentNodeId == "DB" && first.definition.origin == "DB" &&
                 first.definition.target != "DB" &&
+                first.definition.naturalLoadNoise &&
+                first.definition.naturalLoadSeed == director.Seed &&
                 first.definition.operations.Last().infectionKind != null &&
                 first.definition.route.Length >= 2 &&
                 recorder.CurrentLog.events.Any(e => e.type == "spawner_attempt" &&

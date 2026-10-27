@@ -152,7 +152,7 @@ namespace Uptime.Connections.EditorTools
                 "attack activation pauses WORK and schedules duration from actual onset");
             if (pattern == LoaderPattern.Immediate || pattern == LoaderPattern.Overload ||
                 pattern == LoaderPattern.Spiking)
-                Check(Approx(state.DesiredLoad, attack.attackLoad) &&
+                Check(Approx(state.DesiredLoad - state.NaturalLoadDelta, attack.attackLoad) &&
                     benign.AllocatedLoad < benign.DesiredLoad &&
                     state.AllocatedLoad > 0f,
                     "attack consumes capacity and causes real peer contention");
@@ -161,7 +161,7 @@ namespace Uptime.Connections.EditorTools
                 float accomplished = state.CompletedWork;
                 host.StepSimulation(2.5f);
                 Check(state.IsActive && state.EffectiveWorkRateMultiplier == 0f &&
-                    Approx(state.DesiredLoad, attack.normalLoad) &&
+                    Approx(state.DesiredLoad - state.NaturalLoadDelta, attack.normalLoad) &&
                     Approx(state.CompletedWork, accomplished),
                     "SPIKING quiet phase keeps attack-active WORK paused");
             }

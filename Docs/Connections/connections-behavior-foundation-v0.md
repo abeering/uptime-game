@@ -1,5 +1,7 @@
 # Connections — behavior and modifier foundation (Slice 3A)
 
+**Natural LOAD Noise V0 extension:** Generated canonical plans opt into a separate smooth, seeded per-operation LOAD contribution. The behavior runtime retains its fixed, attributable modifier history and adds a small keyed time-varying LOAD contribution seam. At each simulation allocation step, effective requested LOAD is sampled base LOAD plus active fixed modifier deltas plus the cached natural contribution, clamped to nonnegative. The noise contribution is derived from run seed, connection ID, operation index, and elapsed simulation time, so it consumes no director random draws and does not add modifier events. It clears at operation end. The scene defaults to a 10% maximum contribution and 3–6-second interpolation interval, with a host enable toggle for exact-value witnesses. These are provisional playtest values; no new player-facing keyword is introduced.
+
 **Status:** Slice 3A foundation merged; Slice 3B adds reusable OVERLOAD and SPIKING LOAD keywords and manual-only examples. The Slice 3A timed adjustment remains for deterministic witnesses.
 
 **Later Generated Hostile Traffic V0 update:** The Slice 3B examples gained nonzero default ambient weights in that phase. The keyword executor and behavior definitions remain as described below; both benign and hostile SPIKING use the same visible demand behavior.

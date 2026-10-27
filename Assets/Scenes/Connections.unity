@@ -6541,6 +6541,10 @@ MonoBehaviour:
   defaultPhantomLoad: 8
   defaultSpawnerCadence: 20
   connectionTravelSecondsPerLink: 0.6
+  naturalLoadNoiseEnabled: 1
+  naturalLoadNoiseAmplitude: 0.1
+  naturalLoadNoiseMinPeriodSeconds: 3
+  naturalLoadNoiseMaxPeriodSeconds: 6
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0

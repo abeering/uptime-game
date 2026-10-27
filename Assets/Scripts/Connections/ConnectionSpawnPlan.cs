@@ -40,6 +40,8 @@ namespace Uptime.Connections
         public string ParentNodeId { get; }
         public string ParentConnectionId { get; }
         public float ParentInfectionAppliedAtSeconds { get; }
+        public bool NaturalLoadNoise { get; }
+        public int NaturalLoadSeed { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
@@ -48,7 +50,8 @@ namespace Uptime.Connections
             ConnectionGenerationTrace generationTrace = null,
             string parentNodeId = null, string parentConnectionId = null,
             float parentInfectionAppliedAtSeconds = 0f,
-            LoaderAttackPlan loaderAttack = null)
+            LoaderAttackPlan loaderAttack = null,
+            bool naturalLoadNoise = false, int naturalLoadSeed = 0)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -72,6 +75,8 @@ namespace Uptime.Connections
             ParentNodeId = parentNodeId;
             ParentConnectionId = parentConnectionId;
             ParentInfectionAppliedAtSeconds = parentInfectionAppliedAtSeconds;
+            NaturalLoadNoise = naturalLoadNoise;
+            NaturalLoadSeed = naturalLoadSeed;
         }
     }
 

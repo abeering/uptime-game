@@ -184,6 +184,10 @@ namespace Uptime.Connections
         private readonly List<TimedInstance> operationBehaviors = new List<TimedInstance>();
         private readonly List<ActiveRequirementModifier> active = new List<ActiveRequirementModifier>();
         private readonly List<ModifierHistoryEntry> history = new List<ModifierHistoryEntry>();
+        // Sampled once by the simulation before allocation. Separate keys allow later
+        // time-varying LOAD sources to compose without creating modifier log events.
+        private readonly SortedDictionary<string, float> dynamicLoadDeltas =
+            new SortedDictionary<string, float>(StringComparer.Ordinal);
         private int nextModifierId;
         private bool connectionStarted;
         private bool operationStarted;
@@ -222,7 +226,15 @@ namespace Uptime.Connections
         {
             foreach (TimedInstance behavior in operationBehaviors) behavior.Stop(this, time);
             operationBehaviors.Clear();
+            dynamicLoadDeltas.Clear();
             operationStarted = false;
+        }
+
+        internal void SetDynamicLoadDelta(string source, float delta)
+        {
+            if (string.IsNullOrEmpty(source) || float.IsNaN(delta) || float.IsInfinity(delta))
+                throw new ArgumentException("Dynamic LOAD source and delta must be valid.");
+            dynamicLoadDeltas[source] = delta;
         }
 
         internal void EndConnection(float time)
@@ -265,6 +277,14 @@ namespace Uptime.Connections
                 (work ? value <= 0f : value < 0f))
                 throw new InvalidOperationException("Effective WORK must be finite and positive; " +
                     "effective LOAD must be finite and nonnegative.");
+            if (!work)
+            {
+                double requested = value;
+                foreach (float delta in dynamicLoadDeltas.Values) requested += delta;
+                if (double.IsInfinity(requested) || requested > float.MaxValue)
+                    throw new InvalidOperationException("Effective LOAD must be finite.");
+                return (float)Math.Max(0d, requested);
+            }
             return value;
         }
 
@@ -318,6 +338,48 @@ namespace Uptime.Connections
             var entry = new ModifierHistoryEntry(time, action, modifier);
             history.Add(entry);
             ModifierChanged?.Invoke(entry);
+        }
+    }
+
+    // Hash-interpolated LOAD variation. No traffic RNG draws or frame state are consumed.
+    internal static class NaturalLoadVariation
+    {
+        internal static float Delta(int seed, string id, int operationIndex,
+            float elapsedSeconds, float baseLoad, float amplitude,
+            float minPeriodSeconds, float maxPeriodSeconds)
+        {
+            if (baseLoad <= 0f || amplitude <= 0f) return 0f;
+            float period = Mathf.Lerp(minPeriodSeconds, maxPeriodSeconds,
+                Unit(Hash(seed, id, operationIndex, -1)));
+            float position = Mathf.Max(0f, elapsedSeconds) / period;
+            int anchor = Mathf.FloorToInt(position);
+            float phase = position - anchor;
+            phase = phase * phase * (3f - 2f * phase);
+            float from = anchor == 0 ? 0f :
+                2f * Unit(Hash(seed, id, operationIndex, anchor)) - 1f;
+            float to = 2f * Unit(Hash(seed, id, operationIndex, anchor + 1)) - 1f;
+            return baseLoad * amplitude * Mathf.Lerp(from, to, phase);
+        }
+
+        private static float Unit(uint bits) => (bits >> 8) / 16777215f;
+
+        private static uint Hash(int seed, string id, int operationIndex, int anchor)
+        {
+            unchecked
+            {
+                uint hash = 2166136261u;
+                hash = (hash ^ (uint)seed) * 16777619u;
+                for (int i = 0; i < id.Length; i++)
+                    hash = (hash ^ char.ToLowerInvariant(id[i])) * 16777619u;
+                hash = (hash ^ (uint)operationIndex) * 16777619u;
+                hash = (hash ^ (uint)anchor) * 16777619u;
+                // Avalanche neighboring anchors before taking high bits as a fraction.
+                hash ^= hash >> 16;
+                hash *= 0x7feb352du;
+                hash ^= hash >> 15;
+                hash *= 0x846ca68bu;
+                return hash ^ (hash >> 16);
+            }
         }
     }
 }
