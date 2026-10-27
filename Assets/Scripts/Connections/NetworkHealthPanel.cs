@@ -103,7 +103,12 @@ namespace Uptime.Connections
             NetworkHealthSnapshot health = host.Health;
             if (health == null) return;
             if (valueText != null) valueText.text = $"HEALTH {health.Value:0.#}";
-            if (healthFill != null) healthFill.fillAmount = health.Value / 100f;
+            if (healthFill != null)
+            {
+                // Sprite-less Images ignore fillAmount; size the authored rectangle instead.
+                RectTransform fill = healthFill.rectTransform;
+                fill.anchorMax = new Vector2(Mathf.Clamp01(health.Value / 100f), fill.anchorMax.y);
+            }
             float displayRate = Mathf.Abs(health.NetRate) < 0.005f ? 0f : health.NetRate;
             Color rateColor = displayRate < 0f ? degradingColor :
                 displayRate > 0f ? recoveringColor : stableColor;

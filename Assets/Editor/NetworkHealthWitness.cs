@@ -78,6 +78,7 @@ namespace Uptime.Connections.EditorTools
                     host.Health.Impacts.Count == 3 && a.HealthWasSubstantiallySlowed,
                     "slowed facts and aggregate");
                 panel.Render();
+                CheckHealthBar(panel, 99.5f);
                 var panelFields = new SerializedObject(panel);
                 Check(((TMP_Text)panelFields.FindProperty("rateText").objectReferenceValue).text ==
                     "-0.50/s", "compact signed rate");
@@ -110,6 +111,7 @@ namespace Uptime.Connections.EditorTools
                 Near(host.Health.Value, beforeRecovery + 1.75f,
                     "recovery after final damage clears");
                 Near(host.Health.NetRate, 0.35f, "signed recovery rate");
+                CheckHealthBar(panel, host.Health.Value);
                 Debug.Log($"NetworkHealthWitness contention: expected 3.333 LOAD, -0.50/s, first overdue -1.53/s, next -1.59/s, -10 kill, +1.75 over 5s recovery; observed {observedSharedGrant:0.###} LOAD, {firstOverdue:0.###}/s first late, {host.Health.Value:0.###} after recovery");
 
                 host.ResetSimulation();
@@ -213,6 +215,7 @@ namespace Uptime.Connections.EditorTools
                         new OperationStage(OperationKind.Read, 10f, 5f, "failure"));
                     Check(host.KillConnection("failure") && host.Health.Value == 0f &&
                         host.Health.Failed, "zero latches failure");
+                    CheckHealthBar(panel, 0f);
                     host.StepSimulation(1f);
                     Check(host.Health.Failed, "recovery does not clear latched failure");
                 }
@@ -336,6 +339,7 @@ namespace Uptime.Connections.EditorTools
                 "matching panel widths");
             Check(panel.ShiftEndMinuteOfDay == 17 * 60, "configurable end marker");
             panel.Render();
+            CheckHealthBar(panel, 100f);
             Check(panel.ClockText == "09:00", "24-hour clock at simulation start");
             typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
                 BindingFlags.NonPublic).SetValue(panel, true);
@@ -348,6 +352,18 @@ namespace Uptime.Connections.EditorTools
             panel.ApplyLayout();
             Near(rect.rect.height, 52f, "compact height");
         }
+        private static void CheckHealthBar(NetworkHealthPanel panel, float expectedHealth)
+        {
+            panel.Render();
+            Canvas.ForceUpdateCanvases();
+            var fill = (Image)new SerializedObject(panel).FindProperty("healthFill")
+                .objectReferenceValue;
+            Check(fill != null, "health fill binding");
+            var track = (RectTransform)fill.rectTransform.parent;
+            Near(fill.rectTransform.rect.width / track.rect.width,
+                expectedHealth / 100f, "visible bar fraction at Health " + expectedHealth);
+        }
+
         private static void CheckHistoryResize(NetworkHealthPanel panel)
         {
             Check(panel != null, "health panel exists for resize check");

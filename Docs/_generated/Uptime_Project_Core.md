@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:78c650a6f68de9685ad05b142f4928fb115a4f1b64d1467f8ca63e9760049afe`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:5dcba221836c9aff67c0e7d1b59d19eff1d2eefdb9cf04f9c1fe2d3cfde84bf3`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Health bar display fix (gameplay QoL review branch, October 27, 2026):** The numeric Health was updating, but the sprite-less fill Image ignored `fillAmount` and stayed full. `NetworkHealthPanel` now sizes the authored fill rectangle directly from authoritative Health; the prefab uses Simple image mode. Health rules and tuning are unchanged. See [Network Health V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-network-health-v0.md).
 
 **Terminal keyboard scrolling (gameplay QoL review branch):** With the command prompt focused, Ctrl + Up/Down and Cmd + Up/Down scroll history in 48-pixel steps; Page Up/Down move by 90% of the visible history height. Holding a shortcut repeats using real time, including while simulation time is paused. Keyboard scrolling stops scroll inertia and cancels a pending jump to the latest output. Returning to the bottom resumes the existing follow behavior. `help` lists the shortcuts. macOS may reserve Ctrl + arrows for Mission Control. Interactive Play Mode review remains necessary for OS shortcut delivery, text/caret/focus behavior, and scrolling through live `inspect` output at 16:9. This changes Connections presentation only.
 
