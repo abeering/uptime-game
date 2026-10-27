@@ -175,6 +175,7 @@ namespace Uptime.Connections
             NodeResources target = state.TargetResources;
             string status = state.Resolution == ConnectionResolution.Canceled ? "CANCELED" :
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
+                state.Resolution == ConnectionResolution.Withdrawn ? "WITHDRAWN" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
                 state.IsConnecting ? "CONNECTING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?

@@ -43,7 +43,7 @@ namespace Uptime.Connections
         public event Action<LogicalConnectionState> Destroyed;
         public Image TerminalMarker => terminalMarker;
         public Color DisplayAccent => state != null && state.IsComplete &&
-            state.Resolution != ConnectionResolution.Completed &&
+            !state.IsNormalDeparture &&
             Mathf.FloorToInt(failureElapsed / failureFlashHalfCycleSeconds) % 2 == 0 ?
             failureColor : identityColor;
 
@@ -159,7 +159,7 @@ namespace Uptime.Connections
         private float CurrentReveal()
         {
             if (state.IsActive || state.IsComplete &&
-                (state.Resolution == ConnectionResolution.Completed ||
+                (state.IsNormalDeparture ||
                  state.TerminationPhase == Lifecycle.Active)) return 1f;
             float total = 0f, visible = 0f;
             for (int i = 0; i < starts.Length; i++)
@@ -226,7 +226,7 @@ namespace Uptime.Connections
             if (state.IsComplete)
             {
                 departureElapsed += deltaSeconds;
-                bool failure = state.Resolution != ConnectionResolution.Completed;
+                bool failure = !state.IsNormalDeparture;
                 if (failure) failureElapsed += deltaSeconds;
                 if (failure ? failureElapsed >= failureFlashHalfCycleSeconds * 4f :
                     departureElapsed >= departureSeconds)
@@ -238,10 +238,10 @@ namespace Uptime.Connections
                 }
             }
             float reveal = CurrentReveal();
-            float fade = state.IsComplete && state.Resolution == ConnectionResolution.Completed ?
+            float fade = state.IsComplete && state.IsNormalDeparture ?
                 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
             LoadPerformance performance = state.Performance;
-            Color tint = state.IsComplete && state.Resolution != ConnectionResolution.Completed ?
+            Color tint = state.IsComplete && !state.IsNormalDeparture ?
                 DisplayAccent : state.IsConnecting ? identityColor : BeamColorFor(performance);
             tint.a *= fade;
             if (path.color != tint)
@@ -274,7 +274,7 @@ namespace Uptime.Connections
                         towardSource, -laneOffsets[last], lineWidths[last], markerPadding);
                     terminalMarker.rectTransform.position = networkArea.TransformPoint(marker.center);
                     terminalMarker.rectTransform.sizeDelta = marker.size;
-                    Color markerColor = state.IsComplete && state.Resolution != ConnectionResolution.Completed ?
+                    Color markerColor = state.IsComplete && !state.IsNormalDeparture ?
                         DisplayAccent : hasIdentityColor ? identityColor : healthyColor;
                     markerColor.a *= fade;
                     terminalMarker.color = markerColor;

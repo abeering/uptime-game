@@ -33,6 +33,10 @@ namespace Uptime.Connections
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
         public float connectionTravelSecondsPerLink;
+        public bool naturalLoadNoiseEnabled;
+        public float naturalLoadNoiseAmplitude;
+        public float naturalLoadNoiseMinPeriodSeconds;
+        public float naturalLoadNoiseMaxPeriodSeconds;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
     }
@@ -63,9 +67,27 @@ namespace Uptime.Connections
         public int coverageCanceledAttemptWeight;
         public float deliveryChance;
         public float benignOutlierChance;
+        public float benignWavingOutlierChance;
         public float secondAnomalyChance;
         public float subtleDeliveryChance;
         public float normalWorkSpread;
+        public float loaderDelayedChance;
+        public float loaderMinAttackCapacityFraction;
+        public float loaderMaxAttackCapacityFraction;
+        public float loaderMinOnsetSeconds;
+        public float loaderMaxOnsetSeconds;
+        public float loaderSpikeQuietSeconds;
+        public float loaderSpikeElevatedSeconds;
+        public float loaderMinDurationSeconds;
+        public float loaderMaxDurationSeconds;
+        public float infectorDelayedChance;
+        public float infectorMinDeliverySeconds;
+        public float infectorMinFinalEvidenceSeconds;
+        public float infectorHighLoadWeight;
+        public float infectorLowLoadWeight;
+        public float infectorOperationWeight;
+        public float infectorWorkLongWeight;
+        public float infectorWavingWeight;
         public float phantomLoadWeight;
         public float blackoutWeight;
         public float spawnerWeight;
@@ -105,6 +127,10 @@ namespace Uptime.Connections
         public float stopAfterSeconds;
         public float normalIntervalSeconds;
         public float elevatedIntervalSeconds;
+        public float spikeInitialDelaySeconds;
+        public float minimumLoadOffset;
+        public float maximumLoadOffset;
+        public float wavePeriodSeconds;
         public float workDelta;
         public float loadDelta;
         public float workRateMultiplier;
@@ -154,6 +180,8 @@ namespace Uptime.Connections
         public float establishedAtSeconds;
         public float resolvedAtSeconds;
         public float elapsedLifetimeSeconds;
+        public float loaderActivatedAtSeconds;
+        public float loaderWithdrawAtSeconds;
         public string command;
         public bool success;
         public int actionSequence;
@@ -186,6 +214,9 @@ namespace Uptime.Connections
         public string[] route;
         public BehaviorRecord[] connectionBehaviors;
         public OperationRecord[] operations;
+        public LoaderAttackPlan loaderAttack;
+        public bool naturalLoadNoise;
+        public int naturalLoadSeed;
     }
 
     [Serializable] public sealed class OperationRecord
@@ -260,12 +291,15 @@ namespace Uptime.Connections
         public string target;
         public float desiredLoad;
         public float baseLoad;
+        public float naturalLoadDelta;
         public float allocatedLoad;
         public float completedWork;
         public float totalWork;
         public float baseWork;
         public float effectiveWorkRateMultiplier;
         public float actualWorkRate;
+        public float loaderActivatedAtSeconds;
+        public float loaderWithdrawAtSeconds;
         public string performance;
     }
 
@@ -612,6 +646,30 @@ namespace Uptime.Connections
             entry.operationKind = state.CurrentOperation.ToString();
             entry.completedWork = state.CompletedWork;
             entry.elapsedLifetimeSeconds = Mathf.Max(0f, time - state.SpawnedAtSeconds);
+            entry.loaderActivatedAtSeconds = state.LoaderActivatedAtSeconds;
+            entry.loaderWithdrawAtSeconds = state.LoaderWithdrawAtSeconds;
+        }
+
+        public void RecordLoaderActivated(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("loader_activated", time);
+            entry.connectionId = state.ConnectionId;
+            entry.operationIndex = state.CurrentOperationIndex;
+            entry.targetNodeId = state.TargetNode.NodeId;
+            entry.loaderActivatedAtSeconds = time;
+            entry.loaderWithdrawAtSeconds = state.LoaderWithdrawAtSeconds;
+        }
+
+        public void RecordLoaderWithdrawal(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("loader_withdrawal", time);
+            entry.connectionId = state.ConnectionId;
+            entry.operationIndex = state.CurrentOperationIndex;
+            entry.targetNodeId = state.TargetNode.NodeId;
+            entry.loaderActivatedAtSeconds = state.LoaderActivatedAtSeconds;
+            entry.loaderWithdrawAtSeconds = time;
         }
 
         public void RecordNodeArrival(LogicalConnectionState state, string nodeId, float time)
@@ -715,11 +773,14 @@ namespace Uptime.Connections
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
                     desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
+                    naturalLoadDelta = state.NaturalLoadDelta,
                     allocatedLoad = state.AllocatedLoad,
                     completedWork = state.CompletedWork, totalWork = state.CurrentTotalWork,
                     baseWork = state.BaseWork,
                     effectiveWorkRateMultiplier = state.EffectiveWorkRateMultiplier,
                     actualWorkRate = state.ActualWorkRate,
+                    loaderActivatedAtSeconds = state.LoaderActivatedAtSeconds,
+                    loaderWithdrawAtSeconds = state.LoaderWithdrawAtSeconds,
                     performance = state.IsActive ? state.Performance.ToString() : null });
             }
             snapshot.connections = active.ToArray();
@@ -745,6 +806,10 @@ namespace Uptime.Connections
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
+                naturalLoadNoiseEnabled = host.NaturalLoadNoiseEnabled,
+                naturalLoadNoiseAmplitude = host.NaturalLoadNoiseAmplitude,
+                naturalLoadNoiseMinPeriodSeconds = host.NaturalLoadNoiseMinPeriodSeconds,
+                naturalLoadNoiseMaxPeriodSeconds = host.NaturalLoadNoiseMaxPeriodSeconds,
                 nodes = new NodeConfiguration[host.Nodes.Length] };
             for (int i = 0; i < host.Nodes.Length; i++)
             {
@@ -773,9 +838,27 @@ namespace Uptime.Connections
                     trafficDirector.CoverageCanceledAttemptWeight,
                 deliveryChance = trafficDirector.DeliveryChance,
                 benignOutlierChance = trafficDirector.BenignOutlierChance,
+                benignWavingOutlierChance = trafficDirector.BenignWavingOutlierChance,
                 secondAnomalyChance = trafficDirector.SecondAnomalyChance,
                 subtleDeliveryChance = trafficDirector.SubtleDeliveryChance,
                 normalWorkSpread = trafficDirector.NormalWorkSpread,
+                loaderDelayedChance = trafficDirector.LoaderDelayedChance,
+                loaderMinAttackCapacityFraction = trafficDirector.LoaderMinAttackCapacityFraction,
+                loaderMaxAttackCapacityFraction = trafficDirector.LoaderMaxAttackCapacityFraction,
+                loaderMinOnsetSeconds = trafficDirector.LoaderMinOnsetSeconds,
+                loaderMaxOnsetSeconds = trafficDirector.LoaderMaxOnsetSeconds,
+                loaderSpikeQuietSeconds = trafficDirector.LoaderSpikeQuietSeconds,
+                loaderSpikeElevatedSeconds = trafficDirector.LoaderSpikeElevatedSeconds,
+                loaderMinDurationSeconds = trafficDirector.LoaderMinDurationSeconds,
+                loaderMaxDurationSeconds = trafficDirector.LoaderMaxDurationSeconds,
+                infectorDelayedChance = trafficDirector.InfectorDelayedChance,
+                infectorMinDeliverySeconds = trafficDirector.InfectorMinDeliverySeconds,
+                infectorMinFinalEvidenceSeconds = trafficDirector.InfectorMinFinalEvidenceSeconds,
+                infectorHighLoadWeight = trafficDirector.InfectorHighLoadWeight,
+                infectorLowLoadWeight = trafficDirector.InfectorLowLoadWeight,
+                infectorOperationWeight = trafficDirector.InfectorOperationWeight,
+                infectorWorkLongWeight = trafficDirector.InfectorWorkLongWeight,
+                infectorWavingWeight = trafficDirector.InfectorWavingWeight,
                 phantomLoadWeight = trafficDirector.PhantomLoadWeight,
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
@@ -816,6 +899,9 @@ namespace Uptime.Connections
                 claimedPurpose = definition.ClaimedPurpose,
                 route = new string[definition.Route.Length],
                 connectionBehaviors = Behaviors(definition.ConnectionBehaviors),
+                loaderAttack = definition.LoaderAttack?.Copy(),
+                naturalLoadNoise = definition.NaturalLoadNoise,
+                naturalLoadSeed = definition.NaturalLoadSeed,
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;
@@ -848,6 +934,10 @@ namespace Uptime.Connections
                     stopAfterSeconds = source[i].StopAfterSeconds,
                     normalIntervalSeconds = source[i].NormalIntervalSeconds,
                     elevatedIntervalSeconds = source[i].ElevatedIntervalSeconds,
+                    spikeInitialDelaySeconds = source[i].SpikeInitialDelaySeconds,
+                    minimumLoadOffset = source[i].MinimumLoadOffset,
+                    maximumLoadOffset = source[i].MaximumLoadOffset,
+                    wavePeriodSeconds = source[i].WavePeriodSeconds,
                     workDelta = source[i].WorkDelta, loadDelta = source[i].LoadDelta,
                     workRateMultiplier = source[i].WorkRateMultiplier };
             return result;

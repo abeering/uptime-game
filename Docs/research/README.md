@@ -10,4 +10,6 @@ This folder keeps useful exploration that has not become current implementation 
 
 - [connections-topology-stress-v0.md](connections-topology-stress-v0.md) — opt-in generated Connections trees with real traffic, 21 native 16:9 captures, diagnostics, and tier-by-tier presentation findings; no production topology progression or node-count limit is established.
 
+- [playstyle-run-pacing.md](playstyle-run-pacing.md) — parked exploration of active/arcade versus ATC-inspired alt-tab run pacing, and the different attention rhythms each would demand; no mode or tuning is committed.
+
 Research may be promoted through an explicit design decision. Keep its original alternatives and examples available when doing so.

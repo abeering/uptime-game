@@ -36,9 +36,12 @@ namespace Uptime.Connections
         public OperationStage[] Operations { get; }
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors { get; }
         public ConnectionGenerationTrace GenerationTrace { get; }
+        public LoaderAttackPlan LoaderAttack { get; }
         public string ParentNodeId { get; }
         public string ParentConnectionId { get; }
         public float ParentInfectionAppliedAtSeconds { get; }
+        public bool NaturalLoadNoise { get; }
+        public int NaturalLoadSeed { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
@@ -46,7 +49,9 @@ namespace Uptime.Connections
             TimedModifierBehaviorDefinition[] connectionBehaviors = null,
             ConnectionGenerationTrace generationTrace = null,
             string parentNodeId = null, string parentConnectionId = null,
-            float parentInfectionAppliedAtSeconds = 0f)
+            float parentInfectionAppliedAtSeconds = 0f,
+            LoaderAttackPlan loaderAttack = null,
+            bool naturalLoadNoise = false, int naturalLoadSeed = 0)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -66,10 +71,57 @@ namespace Uptime.Connections
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
+            LoaderAttack = loaderAttack?.Copy();
             ParentNodeId = parentNodeId;
             ParentConnectionId = parentConnectionId;
             ParentInfectionAppliedAtSeconds = parentInfectionAppliedAtSeconds;
+            NaturalLoadNoise = naturalLoadNoise;
+            NaturalLoadSeed = naturalLoadSeed;
         }
+    }
+
+    public enum LoaderStructure { Single, Delayed }
+    public enum LoaderPattern { Immediate, Overload, Spiking }
+    public enum InfectorStructure { Standard, Delayed }
+    public enum InfectorSignature { None, HighLoad, LowLoad, OperationDeviation, WorkLong, Waving }
+
+    // Internal generation evidence; the concrete operation plan remains authoritative.
+    [Serializable]
+    public sealed class InfectorGenerationRecord
+    {
+        public string structure;
+        public string primarySignature;
+        public string secondarySignature;
+        public int deliveryOperationIndex;
+        public float normalNominalDeliverySeconds;
+        public float composedNominalDeliverySeconds;
+        public float finalNominalDeliverySeconds;
+        public float finalOperationNominalSeconds;
+        public float composedConservativeDeliverySeconds;
+        public float finalConservativeDeliverySeconds;
+        public float finalOperationConservativeSeconds;
+        public float deliveryWindowWorkAdded;
+        public string deliveryWindowCorrectionReason;
+
+        public InfectorGenerationRecord Copy() => (InfectorGenerationRecord)MemberwiseClone();
+    }
+
+    // Internal, concrete attack intent; ordinary inspection never reads this plan.
+    [Serializable]
+    public sealed class LoaderAttackPlan
+    {
+        public LoaderStructure structure;
+        public LoaderPattern pattern;
+        public int attackOperationIndex;
+        public float targetCapacity;
+        public float normalLoad;
+        public float attackLoad;
+        public float onsetSeconds;
+        public float spikeQuietSeconds;
+        public float spikeElevatedSeconds;
+        public float durationSeconds;
+
+        public LoaderAttackPlan Copy() => (LoaderAttackPlan)MemberwiseClone();
     }
 
     // Internal generation evidence. This travels with the queued plan and recorder, never inspection.
@@ -88,6 +140,9 @@ namespace Uptime.Connections
         public GeneratedOperationValue[] normalOperations;
         public GeneratedOperationValue[] finalOperations;
         public ForcedGenerationOptions forcedOptions;
+        public LoaderAttackPlan loaderAttack;
+        public bool hasInfector;
+        public InfectorGenerationRecord infector;
 
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
@@ -100,7 +155,10 @@ namespace Uptime.Connections
             anomalies = anomalies != null ? (string[])anomalies.Clone() : Array.Empty<string>(),
             normalOperations = CopyValues(normalOperations),
             finalOperations = CopyValues(finalOperations),
-            forcedOptions = forcedOptions?.Copy()
+            forcedOptions = forcedOptions?.Copy(),
+            loaderAttack = loaderAttack?.Copy(),
+            hasInfector = hasInfector,
+            infector = infector?.Copy()
         };
 
         private static GeneratedOperationValue[] CopyValues(GeneratedOperationValue[] values)

@@ -95,7 +95,7 @@ namespace Uptime.Connections
         public void Retire(LogicalConnectionState state)
         {
             if (connections == null) return;
-            if (state.Resolution != ConnectionResolution.Completed && views.ContainsKey(state))
+            if (!state.IsNormalDeparture && views.ContainsKey(state))
                 return; // Keep the lane and ID visible through both failure flashes.
             var next = new List<LogicalConnectionState>(connections);
             next.Remove(state);
@@ -135,7 +135,7 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive && !connection.IsConnecting &&
-                    !(connection.IsComplete && connection.Resolution != ConnectionResolution.Completed))
+                    !(connection.IsComplete && !connection.IsNormalDeparture))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
@@ -180,7 +180,7 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive && !connection.IsConnecting &&
-                    !(connection.IsComplete && connection.Resolution != ConnectionResolution.Completed))
+                    !(connection.IsComplete && !connection.IsNormalDeparture))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 float[] offsets = new float[connection.RouteLinks.Length];

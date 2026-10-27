@@ -75,9 +75,11 @@ namespace Uptime.Connections.EditorTools
                         (plan.IsHostile == (plan.GenerationTrace.objective != "NONE")),
                         "trace matches concrete plan and internal objective");
                     if (plan.GenerationTrace.objective == "LOADER")
-                        Check(plan.GenerationTrace.anomalies.Contains("high-load") &&
+                        Check(plan.LoaderAttack != null &&
+                            plan.GenerationTrace.loaderAttack != null &&
+                            plan.LoaderAttack.attackLoad > plan.LoaderAttack.normalLoad &&
                             plan.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
-                            "loader raises demand without delivery");
+                            "loader has explicit capacity-relative demand without delivery");
                     if (plan.GenerationTrace.objective == "DELIVERY")
                         Check(plan.Operations.Last().EffectOnCompletion == CompletionEffect.InfectionDelivery &&
                             plan.Operations.Take(plan.Operations.Length - 1)
@@ -87,7 +89,7 @@ namespace Uptime.Connections.EditorTools
                         Check(plan.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
                             "benign anomalies and keywords have no delivery");
                 }
-                Check(director.Profiles.Count == 16 &&
+                Check(director.Profiles.Count == 18 &&
                     replay.Select(p => p.ProfileId).Distinct().Count() == 6 &&
                     replay.Any(p => p.GenerationTrace.objective == "LOADER") &&
                     replay.Any(p => p.GenerationTrace.objective == "DELIVERY") &&
@@ -96,6 +98,7 @@ namespace Uptime.Connections.EditorTools
                     replay.Any(p => p.ProfileId == "sales-export" && !p.IsHostile),
                     "six purpose mix includes both objectives, benign outliers, subtle delivery, and sales export");
                 CheckAnomalyIndependence(replay);
+                CheckShortWorkDeviation(host, director);
                 CheckGenerationDecisions(replay);
                 CheckQueuedPlanRecording(host, director, replay);
                 float total = director.Profiles.Sum(p => director.EffectiveAmbientWeight(p.id));
@@ -501,6 +504,7 @@ namespace Uptime.Connections.EditorTools
                 Check(plans.Any(p => p.GenerationTrace.anomalies.Contains(id)),
                     "sample includes " + id);
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
+                !p.IsHostile &&
                 p.GenerationTrace.anomalies.Length == 1 &&
                 (p.GenerationTrace.anomalies[0] == "high-load" ||
                  p.GenerationTrace.anomalies[0] == "low-load")))
@@ -524,6 +528,7 @@ namespace Uptime.Connections.EditorTools
                     p.GenerationTrace.anomalies[0] == "low-load"),
                 "both LOAD directions sampled");
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
+                !p.IsHostile &&
                 p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation"))
             {
@@ -542,11 +547,6 @@ namespace Uptime.Connections.EditorTools
             Check(plans.Any(p => p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "work-deviation"),
                 "WORK deviation sampled");
-            Check(plans.Where(p => p.GenerationTrace.anomalies.Length == 1 &&
-                p.GenerationTrace.anomalies[0] == "work-deviation")
-                .Any(p => p.GenerationTrace.finalOperations.Zip(
-                    p.GenerationTrace.normalOperations, (a, b) => a.totalWork / b.totalWork)
-                    .Any(r => r < 0.5f)), "short WORK deviation sampled");
             foreach (ConnectionSpawnPlan plan in plans.Where(p =>
                 p.GenerationTrace.anomalies.Length == 1 &&
                 p.GenerationTrace.anomalies[0] == "operation-deviation"))
@@ -556,6 +556,32 @@ namespace Uptime.Connections.EditorTools
                 Check(after.Length == before.Length || after.Length == before.Length + 1,
                     "operation deviation changes one kind or appends one stage");
             }
+        }
+
+        private static void CheckShortWorkDeviation(SimulationHost host,
+            ConnectionTrafficDirector director)
+        {
+            int originalSeed = director.Seed;
+            bool found = false;
+            try
+            {
+                for (int seed = 200; seed < 220 && !found; seed++)
+                {
+                    director.Seed = seed;
+                    host.ResetSimulation();
+                    for (int i = 0; i < 100 && !found; i++)
+                    {
+                        ConnectionGenerationTrace trace = director.GenerateBenignPlan(i).GenerationTrace;
+                        found = trace.generationDecision == "BENIGN_OUTLIER" &&
+                            trace.anomalies.Length == 1 &&
+                            trace.anomalies[0] == "work-deviation" &&
+                            trace.finalOperations.Zip(trace.normalOperations,
+                                (a, b) => a.totalWork / b.totalWork).Any(r => r < 0.5f);
+                    }
+                }
+            }
+            finally { director.Seed = originalSeed; host.ResetSimulation(); }
+            Check(found, "short WORK deviation remains available in the non-WAVING outlier recipe");
         }
 
         private static void CheckGenerationDecisions(ConnectionSpawnPlan[] plans)
@@ -578,17 +604,21 @@ namespace Uptime.Connections.EditorTools
                         break;
                     case "LOADER":
                         Check(plan.IsHostile && trace.objective == "LOADER" &&
-                            trace.anomalies[0] == "high-load",
-                            "loader decision records high-demand selection");
+                            trace.loaderAttack != null &&
+                            trace.anomalies.Contains("loader-capacity-demand"),
+                            "loader decision records capacity-based attack intent");
                         break;
                     case "DELIVERY_SUBTLE":
                         Check(plan.IsHostile && trace.objective == "DELIVERY" &&
-                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0,
+                            trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 0 &&
+                            trace.infector != null && trace.infector.structure == "STANDARD" &&
+                            trace.infector.deliveryWindowWorkAdded == 0f,
                             "intentional subtle delivery is distinguished from omitted evidence");
                         break;
                     case "DELIVERY_ANOMALOUS":
                         Check(plan.IsHostile && trace.objective == "DELIVERY" &&
-                            trace.anomalies.Length >= 1,
+                            trace.anomalies.Length >= 1 && trace.infector != null &&
+                            trace.infector.finalNominalDeliverySeconds >= 25f - 0.001f,
                             "anomalous delivery records its mutation choice");
                         break;
                     default:

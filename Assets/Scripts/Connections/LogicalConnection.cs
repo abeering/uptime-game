@@ -170,13 +170,16 @@ namespace Uptime.Connections
         [SerializeField] private RouteNode[] route;
         [SerializeField, Min(0f)] private float totalWork;
         [FormerlySerializedAs("desiredWorkRate")]
-        [SerializeField, Min(0f), Tooltip("Requested LOAD; one allocated LOAD advances one WORK unit per second.")]
+        [SerializeField, Min(0f), Tooltip("Requested LOAD; productive WORK also depends on the effective WORK rate multiplier.")]
         private float desiredLoad = 5f;
         [SerializeField, Min(0f), Tooltip("Seconds after simulation start before this connection is established.")]
         private float startDelaySeconds;
         [SerializeField, Tooltip("Ordered operation arc. Empty preserves the legacy single-operation fields above.")]
         private OperationStage[] operations;
         [SerializeField] private TimedModifierBehaviorDefinition[] connectionBehaviors;
+        [SerializeReference] private LoaderAttackPlan loaderAttack;
+        [SerializeField] private bool naturalLoadNoise;
+        [SerializeField] private int naturalLoadSeed;
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
@@ -199,6 +202,9 @@ namespace Uptime.Connections
         public InfectionPayload PayloadAt(int index) => HasArc ? StageAt(index).InfectionPayload : null;
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
             connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
+        public LoaderAttackPlan LoaderAttack => loaderAttack;
+        public bool NaturalLoadNoise => naturalLoadNoise;
+        public int NaturalLoadSeed => naturalLoadSeed;
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
             StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
         private bool HasArc => operations != null && operations.Length > 0;
@@ -217,7 +223,10 @@ namespace Uptime.Connections
                 currentOperation = plan.Operations[0].Operation,
                 route = new RouteNode[plan.Route.Length],
                 operations = new OperationStage[plan.Operations.Length],
-                connectionBehaviors = OperationStage.CopyBehaviors(plan.ConnectionBehaviors)
+                connectionBehaviors = OperationStage.CopyBehaviors(plan.ConnectionBehaviors),
+                loaderAttack = plan.LoaderAttack?.Copy(),
+                naturalLoadNoise = plan.NaturalLoadNoise,
+                naturalLoadSeed = plan.NaturalLoadSeed
             };
             for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
             for (int i = 0; i < result.operations.Length; i++)
@@ -246,8 +255,8 @@ namespace Uptime.Connections
         Complete
     }
 
-    public enum ConnectionResolution { Completed, Killed, Canceled }
-    public enum ConnectionTerminationCause { None, Player, Blackout }
+    public enum ConnectionResolution { Completed, Killed, Canceled, Withdrawn }
+    public enum ConnectionTerminationCause { None, Player, Blackout, AttackerWithdrawal }
 
     public enum LoadPerformance
     {
@@ -283,6 +292,8 @@ namespace Uptime.Connections
         public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
         public float BaseWork => Definition.WorkAt(CurrentOperationIndex);
         public float BaseLoad => Definition.LoadAt(CurrentOperationIndex);
+        public float NaturalLoadDelta { get; internal set; }
+        public float OperationStartedAtSeconds { get; internal set; }
         public float CurrentTotalWork => Behaviors.EffectiveWork(CurrentOperationIndex);
         public float DesiredLoad => Behaviors.EffectiveLoad(CurrentOperationIndex);
         public string ActivityDescription => Definition.ActivityAt(CurrentOperationIndex);
@@ -313,6 +324,8 @@ namespace Uptime.Connections
         public bool IsPending => Lifecycle == Lifecycle.Pending;
         public bool IsConnecting => Lifecycle == Lifecycle.Connecting;
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
+        public bool IsNormalDeparture => Resolution == ConnectionResolution.Completed ||
+            Resolution == ConnectionResolution.Withdrawn;
         public bool IsActive => Lifecycle == Lifecycle.Active;
         public float EstablishedAtSeconds { get; internal set; }
         public bool HasEstablished { get; internal set; }
@@ -331,6 +344,8 @@ namespace Uptime.Connections
         public Lifecycle TerminationPhase { get; internal set; }
         public string FailureNodeId { get; internal set; }
         public float HealthPenaltyAmount { get; internal set; }
+        public float LoaderActivatedAtSeconds { get; internal set; } = -1f;
+        public float LoaderWithdrawAtSeconds { get; internal set; } = -1f;
         // Service evidence is retained with the resolved connection for later evaluation systems.
         public float HealthNominalDurationSeconds { get; internal set; }
         public float HealthDeadlineSeconds { get; internal set; }

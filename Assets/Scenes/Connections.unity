@@ -6541,6 +6541,10 @@ MonoBehaviour:
   defaultPhantomLoad: 8
   defaultSpawnerCadence: 20
   connectionTravelSecondsPerLink: 0.6
+  naturalLoadNoiseEnabled: 1
+  naturalLoadNoiseAmplitude: 0.1
+  naturalLoadNoiseMinPeriodSeconds: 3
+  naturalLoadNoiseMaxPeriodSeconds: 6
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
@@ -6588,9 +6592,27 @@ MonoBehaviour:
   hostileMeanIntervalSeconds: 54
   deliveryChance: 0.5
   benignOutlierChance: 0.08
+  benignWavingOutlierChance: 0.3
   secondAnomalyChance: 0.15
   subtleDeliveryChance: 0.1
   normalWorkSpread: 0.25
+  loaderDelayedChance: 0.35
+  loaderMinAttackCapacityFraction: 0.8
+  loaderMaxAttackCapacityFraction: 1.2
+  loaderMinOnsetSeconds: 5
+  loaderMaxOnsetSeconds: 15
+  loaderSpikeQuietSeconds: 5
+  loaderSpikeElevatedSeconds: 2
+  loaderMinDurationSeconds: 30
+  loaderMaxDurationSeconds: 60
+  infectorDelayedChance: 0.33
+  infectorMinDeliverySeconds: 25
+  infectorMinFinalEvidenceSeconds: 18
+  infectorHighLoadWeight: 50
+  infectorLowLoadWeight: 10
+  infectorOperationWeight: 15
+  infectorWorkLongWeight: 10
+  infectorWavingWeight: 15
   phantomLoadWeight: 1
   blackoutWeight: 1
   spawnerWeight: 1
