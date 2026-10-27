@@ -44,7 +44,7 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 2 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 16 &&
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 18 &&
                     initial.run.traffic.hostileGenerationEnabled &&
                     initial.run.traffic.hostileMeanIntervalSeconds == 54f &&
                     initial.run.traffic.normalWorkSpread == 0.25f &&
