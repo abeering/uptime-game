@@ -67,6 +67,7 @@ namespace Uptime.Connections
         public int coverageCanceledAttemptWeight;
         public float deliveryChance;
         public float benignOutlierChance;
+        public float benignWavingOutlierChance;
         public float secondAnomalyChance;
         public float subtleDeliveryChance;
         public float normalWorkSpread;
@@ -86,6 +87,7 @@ namespace Uptime.Connections
         public float infectorLowLoadWeight;
         public float infectorOperationWeight;
         public float infectorWorkLongWeight;
+        public float infectorWavingWeight;
         public float phantomLoadWeight;
         public float blackoutWeight;
         public float spawnerWeight;
@@ -836,6 +838,7 @@ namespace Uptime.Connections
                     trafficDirector.CoverageCanceledAttemptWeight,
                 deliveryChance = trafficDirector.DeliveryChance,
                 benignOutlierChance = trafficDirector.BenignOutlierChance,
+                benignWavingOutlierChance = trafficDirector.BenignWavingOutlierChance,
                 secondAnomalyChance = trafficDirector.SecondAnomalyChance,
                 subtleDeliveryChance = trafficDirector.SubtleDeliveryChance,
                 normalWorkSpread = trafficDirector.NormalWorkSpread,
@@ -855,6 +858,7 @@ namespace Uptime.Connections
                 infectorLowLoadWeight = trafficDirector.InfectorLowLoadWeight,
                 infectorOperationWeight = trafficDirector.InfectorOperationWeight,
                 infectorWorkLongWeight = trafficDirector.InfectorWorkLongWeight,
+                infectorWavingWeight = trafficDirector.InfectorWavingWeight,
                 phantomLoadWeight = trafficDirector.PhantomLoadWeight,
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,

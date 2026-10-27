@@ -6592,6 +6592,7 @@ MonoBehaviour:
   hostileMeanIntervalSeconds: 54
   deliveryChance: 0.5
   benignOutlierChance: 0.08
+  benignWavingOutlierChance: 0.3
   secondAnomalyChance: 0.15
   subtleDeliveryChance: 0.1
   normalWorkSpread: 0.25
@@ -6607,10 +6608,11 @@ MonoBehaviour:
   infectorDelayedChance: 0.33
   infectorMinDeliverySeconds: 25
   infectorMinFinalEvidenceSeconds: 18
-  infectorHighLoadWeight: 65
+  infectorHighLoadWeight: 50
   infectorLowLoadWeight: 10
   infectorOperationWeight: 15
   infectorWorkLongWeight: 10
+  infectorWavingWeight: 15
   phantomLoadWeight: 1
   blackoutWeight: 1
   spawnerWeight: 1

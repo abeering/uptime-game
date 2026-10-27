@@ -46,13 +46,17 @@ namespace Uptime.Connections.EditorTools
                         foreach (InfectorSignature signature in new[]
                         {
                             InfectorSignature.HighLoad, InfectorSignature.LowLoad,
-                            InfectorSignature.OperationDeviation, InfectorSignature.WorkLong
+                            InfectorSignature.OperationDeviation, InfectorSignature.WorkLong,
+                            InfectorSignature.Waving
                         })
                             CheckRecipe(host, director, recorder, purpose, structure, signature);
                 }
                 SelectPurpose(host, director, overrides, "product-lookup");
                 CheckSubtleAndTiming(host, director);
                 CheckSecondaryAndWeights(host, director);
+                CheckWavingSharedEvidence(host, director, overrides);
+                CheckWavingInterruption(host, director, recorder);
+                CheckWavingCorrection(host, director, recorder, overrides);
                 CheckLifecycle(host, director, recorder);
                 CheckManualAndSpawner(host, director, recorder);
                 CheckAmbiguousOutlier(host, director, overrides);
@@ -140,6 +144,25 @@ namespace Uptime.Connections.EditorTools
                     plan.Operations.Where((o, i) => o.TotalWork >=
                         trace.normalOperations[i].totalWork * 2f - 0.001f).Any()),
                     "WORK-only long duration retains normal LOAD");
+            if (signature == InfectorSignature.Waving)
+            {
+                var selections = trace.selectedKeywords.Where(k => k.behaviorKind == "Waving").ToArray();
+                Check(selections.Length == 1 && trace.anomalies.Single() == "waving" &&
+                    selections[0].operationIndex >= 0 &&
+                    selections[0].operationIndex < plan.Operations.Length &&
+                    plan.NaturalLoadNoise &&
+                    infector.finalConservativeDeliverySeconds >= 24.999f &&
+                    infector.finalOperationConservativeSeconds >=
+                        (structure == InfectorStructure.Delayed ? 20f : 0f),
+                    "WAVING signature, natural noise, and conservative delivery evidence");
+                var wave = plan.Operations[selections[0].operationIndex].Behaviors.Single(b =>
+                    b.Kind == ConnectionBehaviorKind.Waving);
+                Check(wave.MinimumLoadOffset < 0f && wave.MaximumLoadOffset >= 0.4f &&
+                    wave.StartAfterSeconds >= 2f && wave.StartAfterSeconds <= 5f &&
+                    wave.WavePeriodSeconds >= 15f && wave.WavePeriodSeconds <= 30f &&
+                    wave.WorkRateMultiplier == 1f,
+                    "WAVING sampled bounds, period, onset, and productive WORK");
+            }
             }
             director.QueueSpawnPlan(plan, "infector-witness");
             RunEvent queued = recorder.CurrentLog.events.Single(e =>
@@ -150,10 +173,75 @@ namespace Uptime.Connections.EditorTools
                 queued.generation.infector.finalNominalDeliverySeconds ==
                     infector.finalNominalDeliverySeconds,
                 "queue records concrete plan and complete INFECTOR decision");
+            if (signature == InfectorSignature.Waving)
+            {
+                int selectedIndex = trace.selectedKeywords.Single(k =>
+                    k.behaviorKind == "Waving").operationIndex;
+                var sampled = plan.Operations[selectedIndex].Behaviors.Single(b =>
+                    b.Kind == ConnectionBehaviorKind.Waving);
+                BehaviorRecord recorded = queued.definition.operations[selectedIndex].behaviors
+                    .Single(b => b.kind == "Waving");
+                Check(queued.generation.infector.primarySignature == "waving" &&
+                    queued.generation.selectedKeywords.Single().operationIndex == selectedIndex &&
+                    recorded.minimumLoadOffset == sampled.MinimumLoadOffset &&
+                    recorded.maximumLoadOffset == sampled.MaximumLoadOffset &&
+                    recorded.wavePeriodSeconds == sampled.WavePeriodSeconds &&
+                    recorded.startAfterSeconds == sampled.StartAfterSeconds &&
+                    queued.generation.infector.finalConservativeDeliverySeconds >= 25f - 0.001f,
+                    "queued WAVING plan preserves operation, parameters, and corrected timing");
+            }
             Check(recorder.Save(false) && File.ReadAllText(recorder.OutputPath)
                 .Contains("\"hasInfector\": true") &&
                 File.ReadAllText(recorder.OutputPath).Contains("\"primarySignature\""),
                 "INFECTOR decisions persist in JSON");
+            if (signature == InfectorSignature.Waving)
+            {
+                var wave = plan.Operations.SelectMany(o => o.Behaviors)
+                    .Single(b => b.Kind == ConnectionBehaviorKind.Waving);
+                int waveIndex = trace.selectedKeywords.Single(k =>
+                    k.behaviorKind == "Waving").operationIndex;
+                LogicalConnectionState active = null;
+                for (int i = 0; i < 1200; i++)
+                {
+                    host.StepSimulation(0.2f);
+                    active = host.FindConnection(plan.ConnectionId);
+                    if (active?.IsActive == true && active.CurrentOperationIndex == waveIndex)
+                        break;
+                }
+                Check(active?.IsActive == true && active.CurrentOperationIndex == waveIndex,
+                    "uncontended INFECTOR reaches its WAVING operation");
+                float beforeWork = active.CompletedWork;
+                for (int i = 0; i < 35; i++) host.StepSimulation(0.2f);
+                Check(active.CurrentOperationIndex == waveIndex &&
+                    active.CompletedWork > beforeWork && active.AllocatedLoad > 0f &&
+                    active.DesiredLoad > active.BaseLoad + active.NaturalLoadDelta + 0.1f &&
+                    active.Behaviors.ActiveModifiers.Any(m => m.SourceId == "WAVING"),
+                    "INFECTOR WAVING composes with natural noise while productive WORK advances");
+                LogicalConnectionState completed = WaitForResolution(host, plan.ConnectionId);
+                RunEvent resolved = recorder.CurrentLog.events.Single(e =>
+                    e.type == "connection_resolved" && e.connectionId == plan.ConnectionId);
+                Check(completed.Resolution == ConnectionResolution.Completed &&
+                    resolved.resolvedAtSeconds - resolved.establishedAtSeconds >= 24.8f &&
+                    host.Infections.Count == 1 &&
+                    recorder.CurrentLog.events.Count(e => e.type == "infection_applied" &&
+                        e.connectionId == plan.ConnectionId) == 1,
+                    "uncontended WAVING INFECTOR retains actual delivery window and installs once");
+                if (structure == InfectorStructure.Delayed)
+                {
+                    float actualFinal = recorder.CurrentLog.events.Single(e =>
+                        e.type == "operation_completed" && e.connectionId == plan.ConnectionId &&
+                        e.operationIndex == plan.Operations.Length - 1).actualDurationSeconds;
+                    Check(actualFinal >= wave.StartAfterSeconds + 17.8f,
+                        "DELAYED WAVING remains observable for 18 seconds after onset");
+                    Debug.Log($"InfectorWitness WAVING {purpose}/{structure}: actual " +
+                        $"delivery={resolved.resolvedAtSeconds - resolved.establishedAtSeconds:F1}s, " +
+                        $"final={actualFinal:F1}s, onset={wave.StartAfterSeconds:F1}s, " +
+                        $"WORK added={infector.deliveryWindowWorkAdded:F1}");
+                }
+                else Debug.Log($"InfectorWitness WAVING {purpose}/{structure}: actual " +
+                    $"delivery={resolved.resolvedAtSeconds - resolved.establishedAtSeconds:F1}s, " +
+                    $"WORK added={infector.deliveryWindowWorkAdded:F1}");
+            }
             host.ResetSimulation();
             ConnectionSpawnPlan replay = director.GenerateInfectorPlanForWitness(0f, structure,
                 signature, InfectorSignature.None, InfectionKind.PhantomLoad);
@@ -207,14 +295,32 @@ namespace Uptime.Connections.EditorTools
                 doubleSignature.GenerationTrace.infector.secondarySignature == "work-deviation" &&
                 doubleSignature.GenerationTrace.infector.finalNominalDeliverySeconds >= 25f,
                 "compatible primary/secondary signatures record in order");
+            var secondaryWave = director.GenerateInfectorPlanForWitness(0f,
+                InfectorStructure.Standard, InfectorSignature.OperationDeviation,
+                InfectorSignature.Waving);
+            Check(secondaryWave.GenerationTrace.anomalies.SequenceEqual(new[]
+                { "operation-deviation", "waving" }) &&
+                secondaryWave.GenerationTrace.infector.secondarySignature == "waving" &&
+                secondaryWave.GenerationTrace.selectedKeywords.Single(k =>
+                    k.behaviorKind == "Waving").operationIndex < secondaryWave.Operations.Length,
+                "secondary WAVING records its compatible operation and ordered signature");
             bool conflictRejected = false;
             try { director.GenerateInfectorPlanForWitness(1f,
                 InfectorStructure.Standard, InfectorSignature.HighLoad,
                 InfectorSignature.LowLoad); }
             catch (ArgumentException) { conflictRejected = true; }
             Check(conflictRejected, "opposing LOAD signatures cannot cancel each other");
+            foreach (InfectorSignature conflict in new[] { InfectorSignature.HighLoad,
+                InfectorSignature.LowLoad, InfectorSignature.Waving })
+            {
+                conflictRejected = false;
+                try { director.GenerateInfectorPlanForWitness(1f,
+                    InfectorStructure.Standard, InfectorSignature.Waving, conflict); }
+                catch (ArgumentException) { conflictRejected = true; }
+                Check(conflictRejected, "WAVING excludes conflicting or duplicate LOAD signatures");
+            }
             int subtle = 0, delayed = 0, anomalous = 0, secondaryCount = 0;
-            int[] count = new int[4];
+            int[] count = new int[5];
             for (int seed = 200; seed < 220; seed++)
             {
                 director.Seed = seed; host.ResetSimulation();
@@ -232,6 +338,7 @@ namespace Uptime.Connections.EditorTools
                         case "low-load": count[1]++; break;
                         case "operation-deviation": count[2]++; break;
                         case "work-deviation": count[3]++; break;
+                        case "waving": count[4]++; break;
                         default: throw new InvalidOperationException("Unknown signature");
                     }
                 }
@@ -241,14 +348,175 @@ namespace Uptime.Connections.EditorTools
                 secondaryCount > anomalous * 0.11f &&
                 secondaryCount < anomalous * 0.19f &&
                 count.Sum() == anomalous &&
-                count[0] > anomalous * 0.61f && count[0] < anomalous * 0.69f &&
+                count[0] > anomalous * 0.46f && count[0] < anomalous * 0.54f &&
                 count[1] > anomalous * 0.07f && count[1] < anomalous * 0.13f &&
                 count[2] > anomalous * 0.12f && count[2] < anomalous * 0.18f &&
-                count[3] > anomalous * 0.07f && count[3] < anomalous * 0.13f,
-                "seeded 2400-plan sample follows 65/10/15/10 weighted primary signatures");
+                count[3] > anomalous * 0.07f && count[3] < anomalous * 0.13f &&
+                count[4] > anomalous * 0.12f && count[4] < anomalous * 0.18f,
+                "seeded 2400-plan sample follows 50/10/15/10/15 weighted primary signatures");
             Debug.Log($"InfectorWitness weighting: subtle={subtle}, delayed={delayed}/{anomalous}, " +
                 $"secondary={secondaryCount}, " +
-                $"high={count[0]}, low={count[1]}, operation={count[2]}, work={count[3]}");
+                $"high={count[0]}, low={count[1]}, operation={count[2]}, work={count[3]}, wave={count[4]}");
+        }
+
+        private static void CheckWavingSharedEvidence(SimulationHost host,
+            ConnectionTrafficDirector director, FieldInfo overrides)
+        {
+            SelectPurpose(host, director, overrides, "product-lookup");
+            int outliers = 0, waves = 0, ordinary = 0;
+            var benignMaximums = new System.Collections.Generic.List<float>();
+            var hostileMaximums = new System.Collections.Generic.List<float>();
+            for (int seed = 300; seed < 325; seed++)
+            {
+                director.Seed = seed; host.ResetSimulation();
+                for (int i = 0; i < 100; i++)
+                {
+                    ConnectionSpawnPlan plan = director.GenerateBenignPlan(i);
+                    var trace = plan.GenerationTrace;
+                    if (trace.generationDecision == "BENIGN_NORMAL")
+                    {
+                        ordinary++;
+                        Check(trace.selectedKeywords.Length == 0 &&
+                            plan.Operations.All(o => o.Behaviors.All(b =>
+                                b.Kind != ConnectionBehaviorKind.Waving)),
+                            "ordinary benign PURPOSE has only natural noise");
+                        continue;
+                    }
+                    outliers++;
+                    if (!trace.selectedKeywords.Any(k => k.behaviorKind == "Waving")) continue;
+                    waves++;
+                    Check(!plan.IsHostile && plan.NaturalLoadNoise &&
+                        trace.anomalies.Length == 0 && trace.selectedKeywords.Length == 1 &&
+                        plan.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
+                        "benign WAVING is one outlier keyword without infection");
+                    RecordWave(plan, benignMaximums);
+                }
+            }
+            for (int seed = 400; seed < 405; seed++)
+            {
+                director.Seed = seed; host.ResetSimulation();
+                for (int i = 0; i < 20; i++)
+                {
+                    ConnectionSpawnPlan plan = director.GenerateInfectorPlanForWitness(i,
+                        InfectorStructure.Standard, InfectorSignature.Waving,
+                        InfectorSignature.None, InfectionKind.PhantomLoad);
+                    Check(plan.NaturalLoadNoise && plan.GenerationTrace.selectedKeywords
+                        .Any(k => k.behaviorKind == "Waving"),
+                        "INFECTOR WAVING keeps natural noise and keyword provenance");
+                    RecordWave(plan, hostileMaximums);
+                }
+            }
+            Check(ordinary + outliers == 2500 && outliers > 160 && outliers < 240 &&
+                waves > outliers * 0.23f && waves < outliers * 0.37f &&
+                Mathf.Abs(benignMaximums.Average() - hostileMaximums.Average()) < 0.25f,
+                "8% total benign outliers; about 30% WAVING, sampled like INFECTOR WAVING");
+            Debug.Log($"InfectorWitness benign sample: outliers={outliers}/2500, " +
+                $"waves={waves}/{outliers}, benignWaveMaxMean={benignMaximums.Average():F2}, " +
+                $"infectorWaveMaxMean={hostileMaximums.Average():F2}");
+        }
+
+        private static void RecordWave(ConnectionSpawnPlan plan,
+            System.Collections.Generic.List<float> maximums)
+        {
+            GeneratedKeywordSelection selection = plan.GenerationTrace.selectedKeywords
+                .Single(k => k.behaviorKind == "Waving");
+            OperationStage stage = plan.Operations[selection.operationIndex];
+            TimedModifierBehaviorDefinition wave = stage.Behaviors.Single(b =>
+                b.Kind == ConnectionBehaviorKind.Waving);
+            float negativeBase = Mathf.Min(stage.DesiredLoad, 2f);
+            Check(wave.MinimumLoadOffset <= -negativeBase * 0.4f + 0.001f &&
+                wave.MinimumLoadOffset >= -negativeBase * 0.75f - 0.001f &&
+                wave.MaximumLoadOffset >= 0.4f - 0.001f &&
+                wave.MaximumLoadOffset <= Mathf.Max(0.4f,
+                    Mathf.Min(1.5f, stage.DesiredLoad * 0.75f)) + 0.001f &&
+                wave.WavePeriodSeconds >= 15f && wave.WavePeriodSeconds <= 30f &&
+                wave.StartAfterSeconds >= 2f && wave.StartAfterSeconds <= 5f,
+                "shared waveform sampler respects base-relative bounds, period, and onset");
+            maximums.Add(wave.MaximumLoadOffset);
+        }
+
+        private static void CheckWavingInterruption(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
+        {
+            director.Seed = 1701; host.ResetSimulation(); recorder.BeginRun();
+            ConnectionSpawnPlan killed = director.GenerateInfectorPlanForWitness(0f,
+                InfectorStructure.Standard, InfectorSignature.Waving,
+                InfectorSignature.None, InfectionKind.PhantomLoad);
+            director.QueueSpawnPlan(killed);
+            for (int i = 0; i < 35; i++) host.StepSimulation(0.2f);
+            Check(host.FindConnection(killed.ConnectionId).Behaviors.ActiveModifiers
+                .Any(m => m.SourceId == "WAVING") && host.KillConnection(killed.ConnectionId),
+                "active WAVING INFECTOR can be killed");
+            host.StepSimulation(200f);
+            Check(host.Infections.Count == 0 &&
+                !recorder.CurrentLog.events.Any(e => e.connectionId == killed.ConnectionId &&
+                    e.type == "infection_applied"),
+                "killing WAVING INFECTOR prevents infection");
+
+            host.ResetSimulation(); recorder.BeginRun();
+            ConnectionSpawnPlan canceled = director.GenerateInfectorPlanForWitness(0f,
+                InfectorStructure.Standard, InfectorSignature.Waving,
+                InfectorSignature.None, InfectionKind.PhantomLoad);
+            director.QueueSpawnPlan(canceled);
+            for (int i = 0; i < 35; i++) host.StepSimulation(0.2f);
+            Check(host.TryInjectInfection(canceled.Target.NodeId, InfectionKind.Blackout, 0f,
+                out _), "WAVING cancellation setup");
+            host.StepSimulation(0.2f);
+            Check(host.FindConnection(canceled.ConnectionId).Resolution ==
+                ConnectionResolution.Canceled &&
+                !recorder.CurrentLog.events.Any(e => e.connectionId == canceled.ConnectionId &&
+                    e.type == "infection_applied"),
+                "Blackout cancellation prevents WAVING delivery");
+        }
+
+        private static void CheckWavingCorrection(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder,
+            FieldInfo overrides)
+        {
+            SelectPurpose(host, director, overrides, "order-submit");
+            ConnectionSpawnPlan corrected = null;
+            for (int seed = 500; seed < 540 && corrected == null; seed++)
+            {
+                director.Seed = seed; host.ResetSimulation();
+                for (int i = 0; i < 100; i++)
+                {
+                    ConnectionSpawnPlan plan = director.GenerateInfectorPlanForWitness(0f,
+                        InfectorStructure.Standard, InfectorSignature.Waving,
+                        InfectorSignature.None, InfectionKind.PhantomLoad);
+                    if (plan.GenerationTrace.infector.deliveryWindowWorkAdded > 0f &&
+                        plan.GenerationTrace.selectedKeywords.Single().operationIndex ==
+                            plan.Operations.Length - 1)
+                    { corrected = plan; break; }
+                }
+            }
+            Check(corrected != null, "seeded WAVING carrier needs a final-stage WORK correction");
+            var decision = corrected.GenerationTrace.infector;
+            int last = corrected.Operations.Length - 1;
+            float onset = corrected.Operations[last].Behaviors.Single(b =>
+                b.Kind == ConnectionBehaviorKind.Waving).StartAfterSeconds;
+            Check(decision.deliveryWindowCorrectionReason ==
+                    "waving_conservative_delivery_window" &&
+                decision.finalConservativeDeliverySeconds >= 25f - 0.001f &&
+                decision.finalOperationConservativeSeconds >= onset + 18f - 0.001f &&
+                corrected.Operations[0].TotalWork ==
+                    corrected.GenerationTrace.normalOperations[0].totalWork &&
+                corrected.Operations[last].TotalWork >
+                    corrected.GenerationTrace.normalOperations[last].totalWork,
+                "minimal correction changes only final WORK and records conservative window");
+            recorder.BeginRun(); director.QueueSpawnPlan(corrected);
+            LogicalConnectionState completed = WaitForResolution(host, corrected.ConnectionId);
+            RunEvent resolved = recorder.CurrentLog.events.Single(e =>
+                e.type == "connection_resolved" && e.connectionId == corrected.ConnectionId);
+            float actualFinal = recorder.CurrentLog.events.Single(e =>
+                e.type == "operation_completed" && e.connectionId == corrected.ConnectionId &&
+                e.operationIndex == last).actualDurationSeconds;
+            Check(completed.Resolution == ConnectionResolution.Completed &&
+                resolved.resolvedAtSeconds - resolved.establishedAtSeconds >= 24.8f &&
+                actualFinal >= onset + 17.8f && host.Infections.Count == 1,
+                "corrected WAVING carrier completes with actual post-onset evidence time");
+            Debug.Log($"InfectorWitness corrected WAVING: added={decision.deliveryWindowWorkAdded:F1} " +
+                $"WORK, actual delivery={resolved.resolvedAtSeconds - resolved.establishedAtSeconds:F1}s, " +
+                $"final={actualFinal:F1}s, onset={onset:F1}s");
         }
 
         private static void CheckLifecycle(SimulationHost host,
