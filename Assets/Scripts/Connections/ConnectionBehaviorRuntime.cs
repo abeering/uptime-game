@@ -74,10 +74,11 @@ namespace Uptime.Connections
     public sealed class ActiveRequirementModifier
     {
         internal ActiveRequirementModifier(string id, string sourceId, BehaviorScope scope,
-            int operationIndex, float workDelta, float loadDelta, float workRateMultiplier)
+            int operationIndex, float workDelta, float loadDelta, float workRateMultiplier,
+            bool dynamicLoad)
         { Id = id; SourceId = sourceId; Scope = scope; OperationIndex = operationIndex;
             WorkDelta = workDelta; LoadDelta = loadDelta;
-            WorkRateMultiplier = workRateMultiplier; }
+            WorkRateMultiplier = workRateMultiplier; DynamicLoad = dynamicLoad; }
         public string Id { get; }
         public string SourceId { get; }
         public BehaviorScope Scope { get; }
@@ -85,6 +86,7 @@ namespace Uptime.Connections
         public float WorkDelta { get; }
         public float LoadDelta { get; }
         public float WorkRateMultiplier { get; }
+        internal bool DynamicLoad { get; }
         public bool AppliesTo(int index) => Scope == BehaviorScope.Connection || OperationIndex == index;
     }
 
@@ -111,6 +113,15 @@ namespace Uptime.Connections
     // same executor; only their lifetime and modifier association differ.
     public sealed class ConnectionBehaviorRuntime
     {
+        private readonly struct DynamicLoadContribution
+        {
+            public DynamicLoadContribution(float delta, BehaviorScope scope, bool keyword)
+            { Delta = delta; Scope = scope; Keyword = keyword; }
+            public float Delta { get; }
+            public BehaviorScope Scope { get; }
+            public bool Keyword { get; }
+        }
+
         private sealed class TimedInstance
         {
             // Float fixed deltas such as 0.02f accumulate slightly below authored
@@ -186,8 +197,8 @@ namespace Uptime.Connections
         private readonly List<ModifierHistoryEntry> history = new List<ModifierHistoryEntry>();
         // Sampled once by the simulation before allocation. Separate keys allow later
         // time-varying LOAD sources to compose without creating modifier log events.
-        private readonly SortedDictionary<string, float> dynamicLoadDeltas =
-            new SortedDictionary<string, float>(StringComparer.Ordinal);
+        private readonly SortedDictionary<string, DynamicLoadContribution> dynamicLoadDeltas =
+            new SortedDictionary<string, DynamicLoadContribution>(StringComparer.Ordinal);
         private int nextModifierId;
         private bool connectionStarted;
         private bool operationStarted;
@@ -226,15 +237,20 @@ namespace Uptime.Connections
         {
             foreach (TimedInstance behavior in operationBehaviors) behavior.Stop(this, time);
             operationBehaviors.Clear();
-            dynamicLoadDeltas.Clear();
+            var ended = new List<string>();
+            foreach (KeyValuePair<string, DynamicLoadContribution> contribution in dynamicLoadDeltas)
+                if (contribution.Value.Scope == BehaviorScope.Operation)
+                    ended.Add(contribution.Key);
+            foreach (string source in ended) dynamicLoadDeltas.Remove(source);
             operationStarted = false;
         }
 
-        internal void SetDynamicLoadDelta(string source, float delta)
+        internal void SetDynamicLoadDelta(string source, float delta,
+            BehaviorScope scope = BehaviorScope.Operation, bool keyword = false)
         {
             if (string.IsNullOrEmpty(source) || float.IsNaN(delta) || float.IsInfinity(delta))
                 throw new ArgumentException("Dynamic LOAD source and delta must be valid.");
-            dynamicLoadDeltas[source] = delta;
+            dynamicLoadDeltas[source] = new DynamicLoadContribution(delta, scope, keyword);
         }
 
         internal void EndConnection(float time)
@@ -242,6 +258,7 @@ namespace Uptime.Connections
             EndOperation(time);
             foreach (TimedInstance behavior in connectionBehaviors) behavior.Stop(this, time);
             connectionBehaviors.Clear();
+            dynamicLoadDeltas.Clear();
             connectionStarted = false;
         }
 
@@ -270,9 +287,22 @@ namespace Uptime.Connections
         private float Effective(int index, bool work)
         {
             float value = work ? plan.WorkAt(index) : plan.LoadAt(index);
+            // Fold active keyword entries in modifier order to preserve the existing
+            // LOAD arithmetic and event semantics; their magnitude comes only from
+            // the dynamic store. Unattributed samples such as noise are added below.
             foreach (ActiveRequirementModifier modifier in active)
                 if (modifier.AppliesTo(index))
-                    value += work ? modifier.WorkDelta : modifier.LoadDelta;
+                {
+                    if (work) value += modifier.WorkDelta;
+                    else if (modifier.DynamicLoad)
+                    {
+                        if (!dynamicLoadDeltas.TryGetValue(modifier.Id,
+                            out DynamicLoadContribution contribution))
+                            throw new InvalidOperationException("Active keyword lacks its LOAD contribution.");
+                        value += contribution.Delta;
+                    }
+                    else value += modifier.LoadDelta;
+                }
             if (float.IsNaN(value) || float.IsInfinity(value) ||
                 (work ? value <= 0f : value < 0f))
                 throw new InvalidOperationException("Effective WORK must be finite and positive; " +
@@ -280,7 +310,8 @@ namespace Uptime.Connections
             if (!work)
             {
                 double requested = value;
-                foreach (float delta in dynamicLoadDeltas.Values) requested += delta;
+                foreach (DynamicLoadContribution contribution in dynamicLoadDeltas.Values)
+                    if (!contribution.Keyword) requested += contribution.Delta;
                 if (double.IsInfinity(requested) || requested > float.MaxValue)
                     throw new InvalidOperationException("Effective LOAD must be finite.");
                 return (float)Math.Max(0d, requested);
@@ -291,10 +322,12 @@ namespace Uptime.Connections
         private string AddModifier(TimedModifierBehaviorDefinition definition,
             BehaviorScope scope, int index, float time)
         {
+            bool keyword = definition.Kind != ConnectionBehaviorKind.TimedAdjustment;
             var modifier = new ActiveRequirementModifier("m" + (++nextModifierId), definition.Id,
                 scope, index, definition.WorkDelta, definition.LoadDelta,
-                definition.WorkRateMultiplier);
+                definition.WorkRateMultiplier, keyword);
             active.Add(modifier);
+            if (keyword) SetDynamicLoadDelta(modifier.Id, definition.LoadDelta, scope, true);
             // Validate the combined effective requirements before allocation.
             try
             {
@@ -304,6 +337,7 @@ namespace Uptime.Connections
             }
             catch
             {
+                if (keyword) dynamicLoadDeltas.Remove(modifier.Id);
                 active.Remove(modifier);
                 throw;
             }
@@ -318,7 +352,11 @@ namespace Uptime.Connections
             int index = active.FindIndex(modifier => modifier.Id == id);
             if (index < 0) throw new InvalidOperationException("Unknown active modifier: " + id);
             ActiveRequirementModifier removed = active[index];
+            DynamicLoadContribution contribution = default;
+            if (removed.DynamicLoad && !dynamicLoadDeltas.TryGetValue(id, out contribution))
+                throw new InvalidOperationException("Active keyword lacks its LOAD contribution.");
             active.RemoveAt(index);
+            if (removed.DynamicLoad) dynamicLoadDeltas.Remove(id);
             try
             {
                 EffectiveWork(CurrentOperationIndex);
@@ -328,6 +366,7 @@ namespace Uptime.Connections
             catch
             {
                 active.Insert(index, removed);
+                if (removed.DynamicLoad) dynamicLoadDeltas.Add(id, contribution);
                 throw;
             }
             Record(time, ModifierChangeKind.Removed, removed);

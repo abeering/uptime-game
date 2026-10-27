@@ -45,9 +45,10 @@ namespace Uptime.Connections.EditorTools
                 Check(director.GenerateInfectorPlanForWitness(0f, InfectorStructure.Standard,
                     InfectorSignature.None).NaturalLoadNoise,
                     "canonical INFECTOR plan opts in");
+                CheckUnifiedKeywords(host, director, recorder, enabled);
                 CheckLifecycle(host, director, recorder, enabled);
                 Debug.Log("NaturalLoadNoiseWitness PASS: deterministic independent smooth LOAD, " +
-                    "additive modifiers, allocation/WORK/node/inspect/recorder agreement, " +
+                    "additive fixed/keyword/noise LOAD, allocation/WORK/node/inspect/recorder agreement, " +
                     "global disable, canonical hostile opt-in, transition, completion, kill, " +
                     "cancellation, and one-decimal low-LOAD readability.");
             }
@@ -61,6 +62,69 @@ namespace Uptime.Connections.EditorTools
                 recorder.RecordingEnabled = oldRecording;
                 host.ResetSimulation();
             }
+        }
+
+        private static void CheckUnifiedKeywords(SimulationHost host,
+            ConnectionTrafficDirector director, ConnectionsRunRecorder recorder,
+            FieldInfo enabled)
+        {
+            enabled.SetValue(host, true);
+            host.SetRunMode(ConnectionRunMode.Generated);
+            recorder.BeginRun();
+            NodeView[] route = { host.Nodes.Single(n => n.View.NodeId == "EXT1").View,
+                host.Nodes.Single(n => n.View.NodeId == "API").View,
+                host.Nodes.Single(n => n.View.NodeId == "DB").View };
+            var stage = new OperationStage(OperationKind.Read, 1000f, 8f, "Mixed LOAD",
+                behaviors: new[] {
+                    TimedModifierBehaviorDefinition.Overload("shared", 0f, 2f),
+                    new TimedModifierBehaviorDefinition("fixed", 0f, 0f, 0f, 1f) });
+            director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "noise-keywords", route,
+                "noise-witness", "Noise witness", new[] { stage },
+                connectionBehaviors: new[] {
+                    TimedModifierBehaviorDefinition.Spiking("shared", 1f, 1f, 3f) },
+                naturalLoadNoise: true, naturalLoadSeed: 1701));
+            host.StepSimulation(1.2f);
+            var state = host.FindConnection("noise-keywords");
+            host.StepSimulation(0.2f);
+            Near(state.DesiredLoad, 11f + state.NaturalLoadDelta,
+                "fixed adjustment, operation OVERLOAD, and noise compose once");
+            for (int i = 0; i < 5; i++) host.StepSimulation(0.2f);
+            Near(state.DesiredLoad, 14f + state.NaturalLoadDelta,
+                "connection SPIKING stacks with operation OVERLOAD and noise");
+            Check(DynamicContributionCount(state) == 3 &&
+                state.Behaviors.History.Count == 3 &&
+                state.Behaviors.History[0].SourceId == "shared" &&
+                state.Behaviors.History[0].Scope == BehaviorScope.Operation &&
+                state.Behaviors.History[0].LoadDelta == 2f &&
+                state.Behaviors.History[1].SourceId == "fixed" &&
+                state.Behaviors.History[2].SourceId == "shared" &&
+                state.Behaviors.History[2].Scope == BehaviorScope.Connection &&
+                state.Behaviors.History[2].LoadDelta == 3f &&
+                state.Behaviors.History[0].ModifierId !=
+                    state.Behaviors.History[2].ModifierId,
+                "same behavior ID in distinct scopes retains ordered modifier provenance");
+            for (int i = 0; i < 5; i++) host.StepSimulation(0.2f);
+            Near(state.DesiredLoad, 11f + state.NaturalLoadDelta,
+                "SPIKING quiet phase removes only its dynamic contribution");
+            Check(DynamicContributionCount(state) == 2 &&
+                state.Behaviors.History.Count == 4 &&
+                state.Behaviors.History[3].Action == ModifierChangeKind.Removed &&
+                state.Behaviors.History[3].ModifierId ==
+                    state.Behaviors.History[2].ModifierId &&
+                recorder.CurrentLog.events.Count(e => e.connectionId == state.ConnectionId &&
+                    e.type.StartsWith("modifier_")) == 4,
+                "recorder retains activation and recovery events without noise events");
+            Check(host.KillConnection(state.ConnectionId) &&
+                state.Behaviors.ActiveModifiers.Count == 0,
+                "mixed-scope keyword cleanup on kill");
+        }
+
+        private static int DynamicContributionCount(LogicalConnectionState state)
+        {
+            FieldInfo field = typeof(ConnectionBehaviorRuntime).GetField("dynamicLoadDeltas",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            object store = field.GetValue(state.Behaviors);
+            return (int)store.GetType().GetProperty("Count").GetValue(store);
         }
 
         private static void CheckLifecycle(SimulationHost host,
