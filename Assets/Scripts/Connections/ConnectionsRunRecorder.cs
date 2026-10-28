@@ -53,6 +53,7 @@ namespace Uptime.Connections
     {
         public bool autoGenerationEnabled;
         public string ambientOriginId;
+        public AmbientOriginRecord[] ambientOrigins;
         public float openingGraceSeconds;
         public bool hostileGenerationEnabled;
         public float hostileMeanIntervalSeconds;
@@ -95,6 +96,12 @@ namespace Uptime.Connections
         public ProfileConfiguration[] profiles;
     }
 
+    [Serializable] public sealed class AmbientOriginRecord
+    {
+        public string nodeId;
+        public float weight;
+    }
+
     [Serializable] public sealed class ProfileConfiguration
     {
         public string id;
@@ -102,6 +109,7 @@ namespace Uptime.Connections
         public bool purposeTemplate;
         public string claimedPurpose;
         public string[] eligibleTargetIds;
+        public string[] authoredEligibleTargetIds;
         public float ambientWeight;
         public BehaviorRecord[] connectionBehaviors;
         public OperationRange[] operations;
@@ -916,6 +924,13 @@ namespace Uptime.Connections
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
+            IReadOnlyList<AmbientOriginWeight> origins = trafficDirector.EffectiveAmbientOrigins;
+            traffic.ambientOrigins = new AmbientOriginRecord[origins.Count];
+            for (int i = 0; i < origins.Count; i++)
+                traffic.ambientOrigins[i] = new AmbientOriginRecord
+                {
+                    nodeId = origins[i].nodeId, weight = origins[i].weight
+                };
             for (int i = 0; i < traffic.profiles.Length; i++)
             {
                 ConnectionTrafficProfile source = configuredProfiles[i];
@@ -924,7 +939,8 @@ namespace Uptime.Connections
                     purposeTemplate = source.purposeTemplate,
                     claimedPurpose = source.claimedPurpose,
                     ambientWeight = trafficDirector.EffectiveAmbientWeight(source.id),
-                    eligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
+                    eligibleTargetIds = (string[])trafficDirector.EffectiveTargetIds(source).Clone(),
+                    authoredEligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
                     connectionBehaviors = Behaviors(source.connectionBehaviors),
                     operations = new OperationRange[source.operations.Length] };
                 for (int j = 0; j < profile.operations.Length; j++)
