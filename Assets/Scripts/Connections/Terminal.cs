@@ -15,10 +15,12 @@ namespace Uptime.Connections
         [SerializeField] private TextRow textRowPrefab;
         [SerializeField] private PlaceholderOutput placeholderPrefab;
         [SerializeField] private InspectOutput inspectPrefab;
+        [SerializeField] private ScanOutput scanPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
+        [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField, Min(1)] private int maxCommandHistory = 100;
         [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
@@ -50,19 +52,33 @@ namespace Uptime.Connections
         {
             AppendText("CONNECTIONS // TERMINAL READY", normalColor);
             AppendText("Type help for commands.", mutedColor);
-            StartCoroutine(FocusInputNextFrame());
+            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+                StartCoroutine(FocusInputNextFrame());
         }
 
         private void OnEnable()
         {
             if (Application.isPlaying && simulationHost != null)
+            {
                 simulationHost.EffectOccurred += OnEffectOccurred;
+                simulationHost.ScanCompleted += OnScanCompleted;
+            }
         }
 
         private void OnDisable()
         {
             if (simulationHost != null)
+            {
                 simulationHost.EffectOccurred -= OnEffectOccurred;
+                simulationHost.ScanCompleted -= OnScanCompleted;
+            }
+        }
+
+        private void OnScanCompleted(NodeScanSession session)
+        {
+            AppendText("SCAN COMPLETE  " + session.NodeId + "  /  " +
+                (session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN"),
+                session.Result == NodeScanResult.Infected ? errorColor : normalColor);
         }
 
         private void OnEffectOccurred(ConnectionEffectOccurrence occurrence)
@@ -233,6 +249,9 @@ namespace Uptime.Connections
                 case "clean":
                     Clean(tokens, command);
                     break;
+                case "scan":
+                    Scan(tokens, command);
+                    break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "spawn":
                     if (!TryParseSpawn(tokens, out string profileId,
@@ -364,7 +383,7 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  clean <nodeId>", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -380,7 +399,8 @@ namespace Uptime.Connections
                     break;
             }
 
-            StartCoroutine(FocusInputNextFrame());
+            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+                StartCoroutine(FocusInputNextFrame());
         }
 
         public static bool TryParseSpawn(string[] tokens, out string profileId,
@@ -492,17 +512,67 @@ namespace Uptime.Connections
                 AppendText("USAGE  clean <nodeId>", errorColor);
             else if (simulationHost == null)
                 AppendText("CLEAN FAILED  simulation unavailable", errorColor);
+            else if (cleanOverlay == null)
+                AppendText("CLEAN FAILED  interface unavailable", errorColor);
             else
             {
-                CleanResult result = simulationHost.CleanNode(tokens[1], command);
+                CleanStartResult result = simulationHost.StartClean(tokens[1], command,
+                    out CleanSession session);
                 string nodeId = tokens[1].ToUpperInvariant();
-                AppendText(result == CleanResult.Complete ? "CLEAN COMPLETE  " + nodeId :
-                    result == CleanResult.NoInfection ?
-                        "CLEAN  NO INFECTION DETECTED  " + nodeId :
-                        "CLEAN FAILED  UNKNOWN NODE " + nodeId,
-                    result == CleanResult.Complete ? normalColor :
-                    result == CleanResult.NoInfection ? mutedColor : errorColor);
+                if (result == CleanStartResult.Started)
+                {
+                    AppendText("CLEAN SESSION  " + nodeId, normalColor);
+                    commandInput.DeactivateInputField();
+                    cleanOverlay.Open(session, simulationHost, this);
+                }
+                else AppendText(result == CleanStartResult.AlreadyActive ?
+                    "CLEAN FAILED  SESSION ALREADY ACTIVE" :
+                    "CLEAN FAILED  UNKNOWN NODE " + nodeId, errorColor);
             }
+        }
+
+        private void Scan(string[] tokens, string command)
+        {
+            if (tokens.Length != 2)
+            {
+                AppendText("USAGE  scan <nodeId>", errorColor);
+                return;
+            }
+            if (simulationHost == null)
+            {
+                AppendText("SCAN FAILED  simulation unavailable", errorColor);
+                return;
+            }
+            if (scanPrefab == null || historyContent == null)
+            {
+                AppendText("SCAN FAILED  output unavailable", errorColor);
+                return;
+            }
+            ScanStartResult result = simulationHost.StartScan(tokens[1], command,
+                out NodeScanSession session);
+            switch (result)
+            {
+                case ScanStartResult.Started:
+                    ScanOutput block = AppendOutputBlock(scanPrefab);
+                    block.Bind(session, simulationHost);
+                    break;
+                case ScanStartResult.AlreadyScanning:
+                    AppendText("ALREADY SCANNING  " + tokens[1].ToUpperInvariant(), errorColor);
+                    break;
+                case ScanStartResult.Busy:
+                    AppendText("SCAN BUSY  " + simulationHost.ActiveScan.NodeId, errorColor);
+                    break;
+                default:
+                    AppendText("SCAN FAILED  UNKNOWN NODE " + tokens[1].ToUpperInvariant(),
+                        errorColor);
+                    break;
+            }
+        }
+
+        public void FinishClean(string message, bool success)
+        {
+            AppendText(message, success ? normalColor : errorColor);
+            StartCoroutine(FocusInputNextFrame());
         }
 
         private void Inspect(string[] tokens)
@@ -648,7 +718,7 @@ namespace Uptime.Connections
         private IEnumerator FocusInputNextFrame()
         {
             yield return null;
-            if (commandInput == null)
+            if (commandInput == null || cleanOverlay != null && cleanOverlay.IsOpen)
                 yield break;
             commandInput.ActivateInputField();
             commandInput.Select();

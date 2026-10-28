@@ -33,6 +33,7 @@ namespace Uptime.Connections
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
         public float connectionTravelSecondsPerLink;
+        public float scanDurationSeconds;
         public bool naturalLoadNoiseEnabled;
         public float naturalLoadNoiseAmplitude;
         public float naturalLoadNoiseMinPeriodSeconds;
@@ -185,6 +186,16 @@ namespace Uptime.Connections
         public string command;
         public bool success;
         public int actionSequence;
+        public int cleanSessionId;
+        public int scanSessionId;
+        public float scanStartedAtSeconds;
+        public float scanScheduledCompletionAtSeconds;
+        public float scanCompletedAtSeconds;
+        public string scanResult;
+        public int selectedPid;
+        public bool healthyAtStart;
+        public int capturedInfectionCount;
+        public int removedInfectionCount;
         public float healthPenaltyAmount;
         public float healthAfter;
         public string note;
@@ -701,11 +712,52 @@ namespace Uptime.Connections
             return entry.sequence;
         }
 
+        public void RecordScanStarted(NodeScanSession session)
+        {
+            if (!IsRecording || session == null) return;
+            RunEvent entry = NewEvent("scan_started", session.StartedAtSeconds);
+            entry.scanSessionId = session.Id;
+            entry.targetNodeId = session.NodeId;
+            entry.scanStartedAtSeconds = session.StartedAtSeconds;
+            entry.scanScheduledCompletionAtSeconds = session.ScheduledCompletionAtSeconds;
+            entry.actionSequence = session.ActionSequence;
+        }
+
+        public void RecordScanCompleted(NodeScanSession session)
+        {
+            if (!IsRecording || session == null) return;
+            RunEvent entry = NewEvent("scan_completed", session.CompletedAtSeconds);
+            entry.scanSessionId = session.Id;
+            entry.targetNodeId = session.NodeId;
+            entry.scanStartedAtSeconds = session.StartedAtSeconds;
+            entry.scanScheduledCompletionAtSeconds = session.ScheduledCompletionAtSeconds;
+            entry.scanCompletedAtSeconds = session.CompletedAtSeconds;
+            entry.scanResult = session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN";
+            entry.actionSequence = session.ActionSequence;
+        }
+
+        public void RecordClean(string type, CleanSession session, float time,
+            int selectedPid = 0, int removedCount = 0)
+        {
+            if (!IsRecording || session == null) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.cleanSessionId = session.Id;
+            entry.targetNodeId = session.NodeId;
+            entry.selectedPid = selectedPid;
+            entry.healthyAtStart = session.WasHealthy;
+            entry.capturedInfectionCount = session.StartingInfections.Length;
+            entry.removedInfectionCount = removedCount;
+            entry.actionSequence = session.ActionSequence;
+            entry.success = type == "clean_succeeded";
+        }
+
         public void RecordHealthPenalty(NetworkHealthEvent penalty, float resultingHealth)
         {
             if (!IsRecording || penalty == null) return;
             RunEvent entry = NewEvent("health_penalty", penalty.TimeSeconds);
             entry.connectionId = penalty.ConnectionId;
+            entry.targetNodeId = penalty.TargetNodeId;
+            entry.reason = penalty.Reason;
             entry.healthPenaltyAmount = penalty.Amount;
             entry.healthAfter = resultingHealth;
         }
@@ -806,6 +858,7 @@ namespace Uptime.Connections
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
+                scanDurationSeconds = host.ScanDurationSeconds,
                 naturalLoadNoiseEnabled = host.NaturalLoadNoiseEnabled,
                 naturalLoadNoiseAmplitude = host.NaturalLoadNoiseAmplitude,
                 naturalLoadNoiseMinPeriodSeconds = host.NaturalLoadNoiseMinPeriodSeconds,

@@ -268,4 +268,13 @@ They are the foundation for:
 
 - what if upgrading is like a puzzle - not hard, not game-losing/winning, but instead you just have to do a sort of "terminal / hacker puzzle" (<30s) in making your decision 
 - what if some upgrades were not just "upgrade node" - but were "create programmable" - basically allow you to tune / specify ranges / packet info etc on a node to do "automation" like tasks 
--- need more ideas on automation 
+-- need more ideas on automation
+
+## Idea parking lot — network-state-dependent run upgrades (2026-10-27)
+
+Exploratory thought: **make upgrades respond to live network conditions**, rather than only granting flat bonuses or more tool slots. This could create specialized, situational builds whose strengths emerge from what is happening on the network.
+
+- **Probe duration from edge traffic:** Instead of only upgrading the number of available Probe slots, a Probe attached to an edge could last longer as the number of connections on that edge increases.
+- **Scan speed from node LOAD:** A `scan <nodeId>` could complete faster when the target node has higher LOAD.
+
+These are deliberately rough examples, not balanced rules or implementation decisions. Probe behavior and asynchronous node scanning are themselves still exploratory. The idea worth retaining is **upgrades whose effectiveness scales with network state** (edge activity, node LOAD, etc.), potentially encouraging unusual playstyles and synergies.
