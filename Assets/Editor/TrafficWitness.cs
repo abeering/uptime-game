@@ -1152,8 +1152,11 @@ namespace Uptime.Connections.EditorTools
                     "outage backoff remains bounded while Blackout persists");
                 int queuedBeforeClean = recorder.CurrentLog.events.Count(e =>
                     e.type == "plan_queued" && e.source == "ambient_benign");
-                Check(host.CleanNode("API", "clean API") == CleanResult.Complete,
-                    "coverage recovery test cleans Blackout");
+                Check(host.StartClean("API", "clean API", out CleanSession cleanSession) ==
+                    CleanStartResult.Started && host.SelectCleanPid(
+                        cleanSession.Processes.Single(p => p.CpuPercent >= 82).Pid,
+                        out int removed) == CleanSelectionResult.Success && removed == 1,
+                    "coverage recovery test cleans Blackout through PID selection");
                 host.StepSimulation(0.1f);
                 Check((float)nextCoverage.GetValue(director) <=
                     host.SimulationTimeSeconds + 1f + 0.001f,

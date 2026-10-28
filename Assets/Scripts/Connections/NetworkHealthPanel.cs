@@ -13,6 +13,7 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform panel;
         [SerializeField] private RectTransform terminalPanel;
         [SerializeField] private TMP_InputField commandInput;
+        [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private GameObject expandedContent;
         [SerializeField] private TMP_Text clockText;
         [SerializeField] private TMP_Text valueText;
@@ -43,7 +44,8 @@ namespace Uptime.Connections
 
         private void Update()
         {
-            if (Application.isPlaying && Keyboard.current != null &&
+            if (Application.isPlaying && (cleanOverlay == null || !cleanOverlay.IsOpen) &&
+                Keyboard.current != null &&
                 Keyboard.current.tabKey.wasPressedThisFrame)
             {
                 if (commandInput != null)
@@ -62,6 +64,7 @@ namespace Uptime.Connections
         {
             if (!restoreFocus || commandInput == null) return;
             restoreFocus = false;
+            if (cleanOverlay != null && cleanOverlay.IsOpen) return;
             commandInput.ActivateInputField();
             commandInput.Select();
             commandInput.selectionAnchorPosition = anchor;
@@ -72,7 +75,8 @@ namespace Uptime.Connections
         private IEnumerator RestoreFocusNextFrame()
         {
             yield return null;
-            if (commandInput == null) yield break;
+            if (commandInput == null || cleanOverlay != null && cleanOverlay.IsOpen)
+                yield break;
             commandInput.ActivateInputField();
             commandInput.Select();
             commandInput.selectionAnchorPosition = anchor;
@@ -138,7 +142,10 @@ namespace Uptime.Connections
             }
             if (eventsText != null) eventsText.text = health.RecentEvents.Count == 0 ?
                 (health.Failed ? "NETWORK FAILURE" : "RECENT IMPACTS  NONE") :
-                $"RECENT IMPACT  SERVICE INTERRUPTED {health.RecentEvents[0].Amount:0.#}" +
+                $"RECENT IMPACT  " +
+                (health.RecentEvents[0].Reason == "innocent_process" ?
+                    "INNOCENT PROCESS TERMINATED " : "SERVICE INTERRUPTED ") +
+                $"{health.RecentEvents[0].Amount:0.#}" +
                 (health.Failed ? "   NETWORK FAILURE" : "");
         }
     }

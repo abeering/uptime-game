@@ -19,6 +19,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
+        [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
@@ -42,7 +43,8 @@ namespace Uptime.Connections
         {
             AppendText("CONNECTIONS // TERMINAL READY", normalColor);
             AppendText("Type help for commands.", mutedColor);
-            StartCoroutine(FocusInputNextFrame());
+            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+                StartCoroutine(FocusInputNextFrame());
         }
 
         private void OnEnable()
@@ -273,7 +275,8 @@ namespace Uptime.Connections
                     break;
             }
 
-            StartCoroutine(FocusInputNextFrame());
+            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+                StartCoroutine(FocusInputNextFrame());
         }
 
         public static bool TryParseSpawn(string[] tokens, out string profileId,
@@ -385,17 +388,29 @@ namespace Uptime.Connections
                 AppendText("USAGE  clean <nodeId>", errorColor);
             else if (simulationHost == null)
                 AppendText("CLEAN FAILED  simulation unavailable", errorColor);
+            else if (cleanOverlay == null)
+                AppendText("CLEAN FAILED  interface unavailable", errorColor);
             else
             {
-                CleanResult result = simulationHost.CleanNode(tokens[1], command);
+                CleanStartResult result = simulationHost.StartClean(tokens[1], command,
+                    out CleanSession session);
                 string nodeId = tokens[1].ToUpperInvariant();
-                AppendText(result == CleanResult.Complete ? "CLEAN COMPLETE  " + nodeId :
-                    result == CleanResult.NoInfection ?
-                        "CLEAN  NO INFECTION DETECTED  " + nodeId :
-                        "CLEAN FAILED  UNKNOWN NODE " + nodeId,
-                    result == CleanResult.Complete ? normalColor :
-                    result == CleanResult.NoInfection ? mutedColor : errorColor);
+                if (result == CleanStartResult.Started)
+                {
+                    AppendText("CLEAN SESSION  " + nodeId, normalColor);
+                    commandInput.DeactivateInputField();
+                    cleanOverlay.Open(session, simulationHost, this);
+                }
+                else AppendText(result == CleanStartResult.AlreadyActive ?
+                    "CLEAN FAILED  SESSION ALREADY ACTIVE" :
+                    "CLEAN FAILED  UNKNOWN NODE " + nodeId, errorColor);
             }
+        }
+
+        public void FinishClean(string message, bool success)
+        {
+            AppendText(message, success ? normalColor : errorColor);
+            StartCoroutine(FocusInputNextFrame());
         }
 
         private void Inspect(string[] tokens)
@@ -540,7 +555,7 @@ namespace Uptime.Connections
         private IEnumerator FocusInputNextFrame()
         {
             yield return null;
-            if (commandInput == null)
+            if (commandInput == null || cleanOverlay != null && cleanOverlay.IsOpen)
                 yield break;
             commandInput.ActivateInputField();
             commandInput.Select();

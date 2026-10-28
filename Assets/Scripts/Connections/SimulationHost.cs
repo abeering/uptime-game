@@ -7,7 +7,6 @@ using UnityEngine;
 namespace Uptime.Connections
 {
     public enum ConnectionRunMode { AuthoredWitness, Generated }
-    public enum CleanResult { Complete, NoInfection, UnknownNode }
 
     // The only clock and owner of resource state for the Connections game.
     [ExecuteAlways]
@@ -39,6 +38,8 @@ namespace Uptime.Connections
         private readonly List<NodeInfection> infections = new List<NodeInfection>();
         private float simulationTimeSeconds;
         private NetworkHealth health;
+        private CleanSession activeClean;
+        private int nextCleanSessionId;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -50,6 +51,7 @@ namespace Uptime.Connections
         public ConnectionsRunRecorder Recorder => recorder;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
+        public CleanSession ActiveClean => activeClean;
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
@@ -101,6 +103,7 @@ namespace Uptime.Connections
 
         private void OnDisable()
         {
+            activeClean = null;
             ClearAllocatedUsage();
             infections.Clear();
             RefreshDisplays();
@@ -429,30 +432,109 @@ namespace Uptime.Connections
         public bool TryRemovePhantomLoad(string nodeId, out string error)
             => TryRemoveInfection(nodeId, InfectionKind.PhantomLoad, out error);
 
-        // One player action removes the node's current infections as a batch.
-        public CleanResult CleanNode(string nodeId, string command)
+        public CleanStartResult StartClean(string nodeId, string command,
+            out CleanSession session)
         {
+            session = null;
             NodeResources target = FindNodeResources(nodeId);
             if (target == null)
             {
                 recorder?.RecordPlayerAction(command, null, false, nodeId, "unknown_node");
-                return CleanResult.UnknownNode;
+                return CleanStartResult.UnknownNode;
             }
             if (runtimeConnections == null) ResetSimulation();
-            var removed = infections.FindAll(infection => infection.Target == target);
-            bool success = removed.Count > 0;
+            if (activeClean != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, target.View.NodeId,
+                    "clean_already_active");
+                return CleanStartResult.AlreadyActive;
+            }
+            var captured = infections.FindAll(infection => infection.Target == target).ToArray();
             int actionSequence = recorder != null ? recorder.RecordPlayerAction(command,
-                null, success, target.View.NodeId, success ? "clean_complete" : "no_infection") : 0;
-            if (!success) return CleanResult.NoInfection;
+                null, true, target.View.NodeId, "clean_started") : 0;
+            int id = ++nextCleanSessionId;
+            CleanProcess[] processes = BuildCleanProcesses(target.View.NodeId, id,
+                captured.Length > 0, out int maliciousPid);
+            activeClean = new CleanSession(id, target, captured, processes,
+                maliciousPid, actionSequence);
+            recorder?.RecordClean("clean_started", activeClean, simulationTimeSeconds);
+            session = activeClean;
+            return CleanStartResult.Started;
+        }
 
-            infections.RemoveAll(infection => infection.Target == target);
-            foreach (NodeInfection infection in removed)
+        public CleanSelectionResult SelectCleanPid(int pid, out int removedCount)
+        {
+            removedCount = 0;
+            CleanSession session = activeClean;
+            if (session == null) return CleanSelectionResult.NoSession;
+            bool listed = false;
+            foreach (CleanProcess process in session.Processes)
+                if (process.Pid == pid) { listed = true; break; }
+            if (!listed)
+            {
+                recorder?.RecordClean("clean_invalid_pid", session, simulationTimeSeconds, pid);
+                return CleanSelectionResult.InvalidPid;
+            }
+            if (pid != session.MaliciousPid)
+            {
+                NetworkHealthEvent penalty = health.PenalizeInnocentProcess(session.NodeId,
+                    simulationTimeSeconds);
+                recorder?.RecordHealthPenalty(penalty, health.Snapshot.Value);
+                recorder?.RecordClean("clean_failed", session, simulationTimeSeconds, pid);
+                recorder?.CaptureSnapshot(simulationTimeSeconds);
+                activeClean = null;
+                return CleanSelectionResult.InnocentProcess;
+            }
+            foreach (NodeInfection infection in session.StartingInfections)
+            {
+                if (!infections.Remove(infection)) continue;
+                removedCount++;
                 recorder?.RecordInfection("infection_removed", infection, simulationTimeSeconds,
-                    "player_clean", actionSequence);
+                    "player_clean", session.ActionSequence);
+            }
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
             RefreshDisplays();
+            recorder?.RecordClean("clean_succeeded", session, simulationTimeSeconds, pid,
+                removedCount);
             recorder?.CaptureSnapshot(simulationTimeSeconds);
-            return CleanResult.Complete;
+            activeClean = null;
+            return CleanSelectionResult.Success;
+        }
+
+        public bool CancelClean()
+        {
+            if (activeClean == null) return false;
+            recorder?.RecordClean("clean_canceled", activeClean, simulationTimeSeconds);
+            activeClean = null;
+            return true;
+        }
+
+        private CleanProcess[] BuildCleanProcesses(string nodeId, int sessionId,
+            bool infected, out int maliciousPid)
+        {
+            unchecked
+            {
+                int seed = trafficDirector != null ? trafficDirector.Seed : 1701;
+                foreach (char character in nodeId.ToUpperInvariant())
+                    seed = seed * 31 + character;
+                seed = seed * 31 + sessionId;
+                var random = new System.Random(seed);
+                int suspiciousIndex = infected ? random.Next(5) : -1;
+                string[] names = { "systemd", "node-agent", "cache-sync", "log-rotate", "db-worker" };
+                var processes = new CleanProcess[5];
+                maliciousPid = 0;
+                int basePid = 1100 + random.Next(7000);
+                for (int i = 0; i < processes.Length; i++)
+                {
+                    int pid = basePid + i * 37 + random.Next(10);
+                    bool suspicious = i == suspiciousIndex;
+                    processes[i] = new CleanProcess(pid,
+                        suspicious ? random.Next(82, 95) : random.Next(8, 45),
+                        suspicious ? "sys-update-helper" : names[i]);
+                    if (suspicious) maliciousPid = pid;
+                }
+                return processes;
+            }
         }
 
         public bool TryRemoveInfection(string nodeId, InfectionKind kind, out string error)
@@ -588,6 +670,8 @@ namespace Uptime.Connections
 
         public void ResetSimulation()
         {
+            activeClean = null;
+            nextCleanSessionId = 0;
             ClearAllocatedUsage();
             simulationTimeSeconds = 0f;
             health = new NetworkHealth(healthTuning ?? new NetworkHealthTuning());
