@@ -90,11 +90,8 @@ namespace Uptime.Connections.EditorTools
                     "recorder captures effective and canonical purpose destinations");
                 recorder.EndRun();
 
-                // A Spawner at DB must not select either configured ingress as a target.
-                // Customer-login's canonical destination is AUTH; it is excluded here
-                // even though this witness gives it a different ambient target.
-                destinations[0].eligibleTargetIds = new[] { "AUTH" };
-                targetsField.SetValue(director, destinations);
+                // A Spawner at DB must route to an eligible internal target, never
+                // either configured ingress or its own infected node.
                 director.ResetDirector();
                 var parent = new NodeInfection(
                     host.Nodes.First(n => n.View.NodeId == "DB"),
