@@ -38,6 +38,20 @@ namespace Uptime.Connections
         [Min(0f)] public float weight;
     }
 
+    [Serializable]
+    public sealed class AmbientOriginWeight
+    {
+        public string nodeId;
+        [Min(0f)] public float weight = 1f;
+    }
+
+    [Serializable]
+    public sealed class PurposeTargetOverride
+    {
+        public string purposeId;
+        public string[] eligibleTargetIds;
+    }
+
     // Owns only generation and scheduling. SimulationHost owns every live connection.
     public sealed class ConnectionTrafficDirector : MonoBehaviour
     {
@@ -56,6 +70,10 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 1f)] private float coverageAtGoalChance = 0.12f;
         [SerializeField, Min(0.1f)] private float coverageOutageRetryMaxSeconds = 20f;
         [SerializeField] private string ambientOriginId = "EXT1";
+        [Tooltip("Optional weighted ambient origins. Empty preserves the legacy single ambientOriginId with no new random draws.")]
+        [SerializeField] private AmbientOriginWeight[] ambientOrigins;
+        [Tooltip("Optional PURPOSE destination overrides for this scene. Empty retains each catalog definition.")]
+        [SerializeField] private PurposeTargetOverride[] purposeTargetOverrides;
         [SerializeField] private ConnectionTrafficProfile[] profiles;
         [Tooltip("Optional canonical PURPOSE weights by profile ID. Built-in operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
         [SerializeField] private AmbientWeightOverride[] ambientWeightOverrides;
@@ -120,6 +138,8 @@ namespace Uptime.Connections
         private long nextOrder;
         private readonly Dictionary<string, float> effectiveWeights =
             new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string[]> effectivePurposeTargets =
+            new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
         public bool AutoGenerationEnabled { get => autoGenerationEnabled; set => autoGenerationEnabled = value; }
         public int Seed { get => seed; set => seed = value; }
@@ -139,6 +159,13 @@ namespace Uptime.Connections
         public float CoverageImminentPlanSeconds => ImminentPlanSeconds;
         public int CoverageCanceledAttemptWeight => CanceledAttemptWeight;
         public string AmbientOriginId => ambientOriginId;
+        public IReadOnlyList<AmbientOriginWeight> EffectiveAmbientOrigins =>
+            ambientOrigins != null && ambientOrigins.Length > 0 ? ambientOrigins :
+            new[] { new AmbientOriginWeight { nodeId = ambientOriginId, weight = 1f } };
+        public string[] EffectiveTargetIds(ConnectionTrafficProfile profile) =>
+            profile != null && profile.id != null &&
+            effectivePurposeTargets.TryGetValue(profile.id, out string[] targets) ?
+                targets : profile?.eligibleTargetIds;
         public float DeliveryChance => deliveryChance;
         public float BenignOutlierChance => benignOutlierChance;
         public float BenignWavingOutlierChance => benignWavingOutlierChance;
@@ -226,6 +253,7 @@ namespace Uptime.Connections
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
+            RebuildAdvancedRouting();
         }
 
         private void RebuildEffectiveWeights()
@@ -251,6 +279,118 @@ namespace Uptime.Connections
                     throw new InvalidOperationException("Unknown ambient weight profile: " + entry.profileId);
                 effectiveWeights[entry.profileId] = entry.weight;
             }
+        }
+
+        // Scene-only overrides do not modify the canonical PURPOSE catalog.
+        // Validate once at reset so an invalid multi-ingress combination cannot fail mid-run.
+        private void RebuildAdvancedRouting()
+        {
+            effectivePurposeTargets.Clear();
+            bool customOrigins = ambientOrigins != null && ambientOrigins.Length > 0;
+            bool customTargets = purposeTargetOverrides != null && purposeTargetOverrides.Length > 0;
+            if (!customOrigins && !customTargets) return; // Keep the four-node path untouched.
+
+            if (customOrigins)
+            {
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                float sum = 0f;
+                foreach (AmbientOriginWeight origin in ambientOrigins)
+                {
+                    if (origin == null || string.IsNullOrWhiteSpace(origin.nodeId) ||
+                        float.IsNaN(origin.weight) || float.IsInfinity(origin.weight) ||
+                        origin.weight < 0f || !seen.Add(origin.nodeId))
+                        throw new InvalidOperationException(
+                            "Ambient origins require unique node IDs and finite nonnegative weights.");
+                    FindNode(origin.nodeId);
+                    sum += origin.weight;
+                }
+                if (sum <= 0f || float.IsInfinity(sum))
+                    throw new InvalidOperationException(
+                        "Ambient origins require a finite positive total weight.");
+            }
+
+            if (customTargets)
+            {
+                foreach (PurposeTargetOverride entry in purposeTargetOverrides)
+                {
+                    if (entry == null || string.IsNullOrWhiteSpace(entry.purposeId) ||
+                        entry.eligibleTargetIds == null || entry.eligibleTargetIds.Length == 0 ||
+                        effectivePurposeTargets.ContainsKey(entry.purposeId))
+                        throw new InvalidOperationException(
+                            "Purpose target overrides require unique PURPOSE IDs and at least one destination.");
+                    ConnectionTrafficProfile profile = Array.Find(profiles, p =>
+                        p != null && p.purposeTemplate && string.Equals(p.id,
+                            entry.purposeId, StringComparison.OrdinalIgnoreCase));
+                    if (profile == null)
+                        throw new InvalidOperationException(
+                            "Unknown canonical PURPOSE target override: " + entry.purposeId);
+                    var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (string targetId in entry.eligibleTargetIds)
+                    {
+                        if (string.IsNullOrWhiteSpace(targetId) || !seen.Add(targetId))
+                            throw new InvalidOperationException(
+                                "Purpose destinations must have unique nonempty node IDs: " +
+                                entry.purposeId);
+                        FindNode(targetId);
+                        if (IsAmbientOrigin(targetId))
+                            throw new InvalidOperationException(
+                                "PURPOSE destinations cannot be external ingress nodes: " + targetId);
+                    }
+                    effectivePurposeTargets.Add(entry.purposeId,
+                        (string[])entry.eligibleTargetIds.Clone());
+                }
+            }
+
+            foreach (ConnectionTrafficProfile profile in profiles)
+            {
+                if (profile == null || !profile.purposeTemplate ||
+                    EffectiveAmbientWeight(profile.id) <= 0f) continue;
+                string[] targets = EffectiveTargetIds(profile);
+                if (targets == null || targets.Length == 0)
+                    throw new InvalidOperationException("PURPOSE has no destinations: " + profile.id);
+                foreach (string targetId in targets)
+                {
+                    NodeView target = FindNode(targetId);
+                    foreach (AmbientOriginWeight origin in EffectiveAmbientOrigins)
+                    {
+                        if (origin.weight <= 0f) continue;
+                        NodeView source = FindNode(origin.nodeId);
+                        if (source == target)
+                            throw new InvalidOperationException(
+                                "PURPOSE destination equals ambient origin: " + profile.id);
+                        FindRoute(source, target); // Validate graph reachability ahead of arrivals.
+                    }
+                }
+            }
+        }
+
+        private bool IsAmbientOrigin(string nodeId)
+        {
+            if (ambientOrigins == null || ambientOrigins.Length == 0)
+                return string.Equals(nodeId, ambientOriginId, StringComparison.OrdinalIgnoreCase);
+            foreach (AmbientOriginWeight origin in ambientOrigins)
+                if (origin != null && string.Equals(nodeId, origin.nodeId,
+                    StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        private NodeView ChooseAmbientOrigin()
+        {
+            if (ambientOrigins == null || ambientOrigins.Length == 0)
+                return FindNode(ambientOriginId); // No random draw in the original four-node mode.
+            float total = 0f;
+            foreach (AmbientOriginWeight origin in ambientOrigins)
+                total += origin.weight;
+            double choice = random.NextDouble() * total;
+            AmbientOriginWeight lastPositive = null;
+            foreach (AmbientOriginWeight origin in ambientOrigins)
+            {
+                if (origin.weight <= 0f) continue;
+                lastPositive = origin;
+                choice -= origin.weight;
+                if (choice < 0d) return FindNode(origin.nodeId);
+            }
+            return FindNode(lastPositive.nodeId); // Floating-point boundary fallback.
         }
 
         public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
@@ -407,7 +547,7 @@ namespace Uptime.Connections
         public ConnectionSpawnPlan QueueHighDemandWitness(string targetId = "DB", bool obvious = true)
         {
             if (random == null) ResetDirector();
-            NodeView origin = FindNode(ambientOriginId);
+            NodeView origin = ChooseAmbientOrigin();
             NodeView target = FindNode(targetId);
             NodeView[] route = FindRoute(origin, target);
             string id = NewId();
@@ -563,15 +703,15 @@ namespace Uptime.Connections
             var choices = new List<(ConnectionTrafficProfile profile, NodeView target)>();
             foreach (ConnectionTrafficProfile profile in profiles)
             {
-                if (profile == null || !profile.purposeTemplate || profile.eligibleTargetIds == null)
-                    continue;
-                foreach (string targetId in profile.eligibleTargetIds)
+                if (profile == null || !profile.purposeTemplate) continue;
+                string[] targets = EffectiveTargetIds(profile);
+                if (targets == null) continue;
+                foreach (string targetId in targets)
                 {
                     try
                     {
                         NodeView target = FindNode(targetId);
-                        if (target == origin || string.Equals(target.NodeId,
-                            ambientOriginId, StringComparison.OrdinalIgnoreCase)) continue;
+                        if (target == origin || IsAmbientOrigin(target.NodeId)) continue;
                         FindRoute(origin, target);
                         choices.Add((profile, target));
                     }
@@ -619,9 +759,10 @@ namespace Uptime.Connections
         {
             string id = NewId();
             if (id == null) return null;
-            NodeView origin = originOverride != null ? originOverride : FindNode(ambientOriginId);
+            NodeView origin = originOverride != null ? originOverride : ChooseAmbientOrigin();
+            string[] eligibleTargets = EffectiveTargetIds(selected);
             NodeView target = targetOverride != null ? targetOverride :
-                FindNode(selected.eligibleTargetIds[random.Next(selected.eligibleTargetIds.Length)]);
+                FindNode(eligibleTargets[random.Next(eligibleTargets.Length)]);
             NodeView[] route = FindRoute(origin, target);
             var stages = new OperationStage[selected.operations.Length];
             for (int i = 0; i < stages.Length; i++)
