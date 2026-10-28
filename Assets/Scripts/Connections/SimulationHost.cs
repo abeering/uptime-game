@@ -28,6 +28,7 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 0.2f)] private float naturalLoadNoiseAmplitude = 0.1f;
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMinPeriodSeconds = 3f;
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMaxPeriodSeconds = 6f;
+        [SerializeField, Min(0.1f)] private float scanDurationSeconds = 8f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -40,6 +41,8 @@ namespace Uptime.Connections
         private NetworkHealth health;
         private CleanSession activeClean;
         private int nextCleanSessionId;
+        private NodeScanSession activeScan;
+        private int nextScanId;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -52,6 +55,8 @@ namespace Uptime.Connections
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
         public CleanSession ActiveClean => activeClean;
+        public NodeScanSession ActiveScan => activeScan;
+        public float ScanDurationSeconds => scanDurationSeconds;
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
@@ -63,6 +68,7 @@ namespace Uptime.Connections
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
         public event Action<ConnectionEffectOccurrence> EffectOccurred;
+        public event Action<NodeScanSession> ScanCompleted;
         public bool HasEverUsedId(string id) => usedIds.Contains(id);
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
@@ -104,6 +110,8 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             activeClean = null;
+            activeScan?.Reset(simulationTimeSeconds);
+            activeScan = null;
             ClearAllocatedUsage();
             infections.Clear();
             RefreshDisplays();
@@ -129,6 +137,8 @@ namespace Uptime.Connections
                 float.IsInfinity(naturalLoadNoiseMaxPeriodSeconds) ||
                 naturalLoadNoiseMaxPeriodSeconds < naturalLoadNoiseMinPeriodSeconds)
                 naturalLoadNoiseMaxPeriodSeconds = naturalLoadNoiseMinPeriodSeconds;
+            if (float.IsNaN(scanDurationSeconds) || float.IsInfinity(scanDurationSeconds) ||
+                scanDurationSeconds <= 0f) scanDurationSeconds = 8f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -178,8 +188,12 @@ namespace Uptime.Connections
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             connection.Definition.StartDelaySeconds - simulationTimeSeconds));
                 }
+                if (activeScan != null)
+                    segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                        activeScan.ScheduledCompletionAtSeconds - simulationTimeSeconds));
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
+                CompleteDueScan();
                 remaining -= segment;
             }
             WithdrawDueLoaders();
@@ -462,6 +476,46 @@ namespace Uptime.Connections
             return CleanStartResult.Started;
         }
 
+        public ScanStartResult StartScan(string nodeId, string command,
+            out NodeScanSession session)
+        {
+            session = null;
+            NodeResources target = FindNodeResources(nodeId);
+            if (target == null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, nodeId, "unknown_node");
+                return ScanStartResult.UnknownNode;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            if (activeScan != null)
+            {
+                bool sameNode = activeScan.Target == target;
+                recorder?.RecordPlayerAction(command, null, false, target.View.NodeId,
+                    sameNode ? "already_scanning" : "scan_busy");
+                return sameNode ? ScanStartResult.AlreadyScanning : ScanStartResult.Busy;
+            }
+            int action = recorder != null ? recorder.RecordPlayerAction(command, null,
+                true, target.View.NodeId, "scan_started") : 0;
+            activeScan = new NodeScanSession(++nextScanId, target,
+                simulationTimeSeconds, scanDurationSeconds, action);
+            recorder?.RecordScanStarted(activeScan);
+            session = activeScan;
+            return ScanStartResult.Started;
+        }
+
+        private void CompleteDueScan()
+        {
+            NodeScanSession session = activeScan;
+            if (session == null || simulationTimeSeconds + 0.000001f <
+                session.ScheduledCompletionAtSeconds) return;
+            bool infected = infections.Exists(infection => infection.Target == session.Target);
+            session.Complete(infected ? NodeScanResult.Infected : NodeScanResult.Clean,
+                session.ScheduledCompletionAtSeconds);
+            activeScan = null;
+            recorder?.RecordScanCompleted(session);
+            ScanCompleted?.Invoke(session);
+        }
+
         public CleanSelectionResult SelectCleanPid(int pid, out int removedCount)
         {
             removedCount = 0;
@@ -671,6 +725,9 @@ namespace Uptime.Connections
         public void ResetSimulation()
         {
             activeClean = null;
+            activeScan?.Reset(simulationTimeSeconds);
+            activeScan = null;
+            nextScanId = 0;
             nextCleanSessionId = 0;
             ClearAllocatedUsage();
             simulationTimeSeconds = 0f;

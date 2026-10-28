@@ -15,6 +15,7 @@ namespace Uptime.Connections
         [SerializeField] private TextRow textRowPrefab;
         [SerializeField] private PlaceholderOutput placeholderPrefab;
         [SerializeField] private InspectOutput inspectPrefab;
+        [SerializeField] private ScanOutput scanPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
@@ -50,13 +51,26 @@ namespace Uptime.Connections
         private void OnEnable()
         {
             if (Application.isPlaying && simulationHost != null)
+            {
                 simulationHost.EffectOccurred += OnEffectOccurred;
+                simulationHost.ScanCompleted += OnScanCompleted;
+            }
         }
 
         private void OnDisable()
         {
             if (simulationHost != null)
+            {
                 simulationHost.EffectOccurred -= OnEffectOccurred;
+                simulationHost.ScanCompleted -= OnScanCompleted;
+            }
+        }
+
+        private void OnScanCompleted(NodeScanSession session)
+        {
+            AppendText("SCAN COMPLETE  " + session.NodeId + "  /  " +
+                (session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN"),
+                session.Result == NodeScanResult.Infected ? errorColor : normalColor);
         }
 
         private void OnEffectOccurred(ConnectionEffectOccurrence occurrence)
@@ -129,6 +143,9 @@ namespace Uptime.Connections
                     break;
                 case "clean":
                     Clean(tokens, command);
+                    break;
+                case "scan":
+                    Scan(tokens, command);
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "spawn":
@@ -261,7 +278,7 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  clean <nodeId>", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
@@ -404,6 +421,44 @@ namespace Uptime.Connections
                 else AppendText(result == CleanStartResult.AlreadyActive ?
                     "CLEAN FAILED  SESSION ALREADY ACTIVE" :
                     "CLEAN FAILED  UNKNOWN NODE " + nodeId, errorColor);
+            }
+        }
+
+        private void Scan(string[] tokens, string command)
+        {
+            if (tokens.Length != 2)
+            {
+                AppendText("USAGE  scan <nodeId>", errorColor);
+                return;
+            }
+            if (simulationHost == null)
+            {
+                AppendText("SCAN FAILED  simulation unavailable", errorColor);
+                return;
+            }
+            if (scanPrefab == null || historyContent == null)
+            {
+                AppendText("SCAN FAILED  output unavailable", errorColor);
+                return;
+            }
+            ScanStartResult result = simulationHost.StartScan(tokens[1], command,
+                out NodeScanSession session);
+            switch (result)
+            {
+                case ScanStartResult.Started:
+                    ScanOutput block = AppendOutputBlock(scanPrefab);
+                    block.Bind(session, simulationHost);
+                    break;
+                case ScanStartResult.AlreadyScanning:
+                    AppendText("ALREADY SCANNING  " + tokens[1].ToUpperInvariant(), errorColor);
+                    break;
+                case ScanStartResult.Busy:
+                    AppendText("SCAN BUSY  " + simulationHost.ActiveScan.NodeId, errorColor);
+                    break;
+                default:
+                    AppendText("SCAN FAILED  UNKNOWN NODE " + tokens[1].ToUpperInvariant(),
+                        errorColor);
+                    break;
             }
         }
 
