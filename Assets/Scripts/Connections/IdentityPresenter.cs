@@ -359,6 +359,11 @@ namespace Uptime.Connections
                         break;
                     }
                 LiveLine line = state.Lines[i];
+                // The schedule uses the physical link's A-to-B lanes. Live paths can
+                // travel B-to-A, so measure their placement from the opposite end.
+                if (Vector2.Dot(line.TargetEnd - line.TargetStart,
+                    state.Layout.Lanes[i].End - state.Layout.Lanes[i].Start) < 0f)
+                    fraction = 1f - fraction;
                 float length = Vector2.Distance(line.VisualStart, line.VisualEnd);
                 bool show = selected && length > 0.01f &&
                     line.VisibleFraction + 0.001f >= fraction + state.PillSize.x * 0.5f / length;

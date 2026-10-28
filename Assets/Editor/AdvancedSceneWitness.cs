@@ -356,6 +356,7 @@ namespace Uptime.Connections.EditorTools
                                     first.LinkId + " and " + second.LinkId +
                                     " lanes do not cross outside a shared card");
                 }
+            CheckMixedRoutePills(links, layouts, identity);
             identity.EndFrame();
             foreach (PhysicalLinkView link in links)
                 link.ClearAttachmentOffsets(0.01f);
@@ -363,6 +364,34 @@ namespace Uptime.Connections.EditorTools
                 " E2=" + ports[links.First(l => l.LinkId == "E2")].Budget.ToString("0.#") +
                 " E4=" + ports[links.First(l => l.LinkId == "E4")].Budget.ToString("0.#") +
                 " E6=" + ports[links.First(l => l.LinkId == "E6")].Budget.ToString("0.#"));
+        }
+
+        private static void CheckMixedRoutePills(PhysicalLinkView[] links,
+            Dictionary<PhysicalLinkView, IdentityPacking.Layout> layouts,
+            IdentityPresenter identity)
+        {
+            PhysicalLinkView link = links.First(l => l.LinkId == "E6");
+            IdentityPacking.Layout layout = layouts[link];
+            Check(layout.Schedule.Count == 1 && layout.Schedule[0].Count == 7,
+                "E6 plans all seven identity pills in one cycle");
+            var lines = new List<IdentityPresenter.LiveLine>();
+            for (int i = 0; i < layout.Lanes.Length; i++)
+            {
+                IdentityPacking.Lane lane = layout.Lanes[i];
+                bool reverse = i == 0 || i == 3 || i == 4;
+                Vector2 start = reverse ? lane.End : lane.Start;
+                Vector2 end = reverse ? lane.Start : lane.End;
+                lines.Add(new IdentityPresenter.LiveLine("p" + i, start, end,
+                    start, end, Color.cyan, 1f, lane.Width));
+            }
+            identity.PresentEdge(link, lines);
+            RectTransform layer = (RectTransform)new SerializedObject(identity)
+                .FindProperty("pillLayer").objectReferenceValue;
+            int shown = layer.GetComponentsInChildren<IdentityPillView>(true)
+                .Count(pill => pill.name.StartsWith("E6 identity ", StringComparison.Ordinal) &&
+                    pill.gameObject.activeSelf);
+            Check(shown == 7,
+                "mixed forward/reverse routes render all seven scheduled E6 pills");
         }
 
         private static bool TryIntersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d,
