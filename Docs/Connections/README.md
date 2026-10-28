@@ -12,6 +12,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [LOAD foundation](connections-arcade-load-v1.md) — target-node LOAD capacity, proportional allocation, and WORK.
 - [Operation arcs](connections-arcade-operation-arcs-v1.md) — READ/WRITE/EXECUTE stages and visual presentation.
 - [Traffic generation](connections-arcade-traffic-v0.md) — generated benign profiles, spawn plans, and cadence.
+- [Advanced Scenario V0](connections-advanced-scenario-v0.md) — approved eight-node, dual-ingress playground and staged implementation contract.
 - [Run recorder](connections-run-recorder-v0.md) — Play Mode JSON telemetry and terminal commands.
 - [Route-aware lanes](route-aware-lanes-v1.md) — path continuity and physical-link lane ordering.
 - [Threats V0, Slices 1–3B](connections-threats-v0.md) — manual threats, operation-completion delivery, `kill` interception, and reusable OVERLOAD/SPIKING LOAD behaviors.
