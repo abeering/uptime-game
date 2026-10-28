@@ -45,6 +45,7 @@ namespace Uptime.Connections
 
         public event Action<LogicalConnectionState> Destroyed;
         public Image TerminalMarker => terminalMarker;
+        public float RelayoutSeconds => relayoutSeconds;
         public Color DisplayAccent => state != null && state.IsComplete &&
             !state.IsNormalDeparture &&
             Mathf.FloorToInt(failureElapsed / failureFlashHalfCycleSeconds) % 2 == 0 ?

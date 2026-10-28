@@ -236,6 +236,8 @@ namespace Uptime.Connections.EditorTools
             }
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
                 NodePortPacking.Plan(counts, area);
+            foreach (PhysicalLinkView link in links)
+                link.SetAttachmentOffsets(ports[link].AtA, ports[link].AtB, 0.3f);
             Dictionary<PhysicalLinkView, NodePortPacking.Port> reordered =
                 NodePortPacking.Plan(counts.Reverse().ToDictionary(p => p.Key, p => p.Value), area);
             foreach (PhysicalLinkView link in links)
@@ -265,13 +267,35 @@ namespace Uptime.Connections.EditorTools
                     layout.Stage != IdentityPacking.ReadabilityStage.Unavailable,
                     link.LinkId + " crowded lanes and pills fit");
                 layouts.Add(link, layout);
-                Vector2 source = area.InverseTransformPoint(link.NodeA.transform.position);
-                Vector2 target = area.InverseTransformPoint(link.NodeB.transform.position);
-                Vector2 along = (target - source).normalized;
-                Vector2 midpoint = (source + target) * 0.5f;
+                link.GetTargetSpine(out Vector2 spineStart, out Vector2 spineEnd);
+                Vector2 along = (spineEnd - spineStart).normalized;
+                Vector2 midpoint = (spineStart + spineEnd) * 0.5f;
                 Vector2 labelCenter = area.InverseTransformPoint(link.ResourceLabel.position);
                 Check(Mathf.Abs(Vector2.Dot(labelCenter - midpoint, along)) < 0.1f,
-                    link.LinkId + " label remains at midpoint with adaptive ports");
+                    link.LinkId + " label remains at its physical spine midpoint");
+                Vector2 source = area.InverseTransformPoint(link.NodeA.transform.position);
+                Vector2 target = area.InverseTransformPoint(link.NodeB.transform.position);
+                bool vertical = Mathf.Abs(source.x - target.x) < 0.01f;
+                bool horizontal = Mathf.Abs(source.y - target.y) < 0.01f;
+                if (vertical || horizontal)
+                {
+                    Check(Mathf.Abs(port.AtA - port.AtB) < 0.01f &&
+                        Mathf.Abs(vertical ? spineStart.x - spineEnd.x :
+                            spineStart.y - spineEnd.y) < 0.1f,
+                        link.LinkId + " physical cardinal spine remains straight");
+                    foreach (IdentityPacking.Lane lane in layout.Lanes)
+                        Check(Mathf.Abs(vertical ? lane.Start.x - lane.End.x :
+                            lane.Start.y - lane.End.y) < 0.1f,
+                            link.LinkId + " logical cardinal lane remains straight");
+                }
+                if (counts[link] % 2 == 1)
+                {
+                    IdentityPacking.Lane middleLane = layout.Lanes[counts[link] / 2];
+                    Vector2 laneMidpoint = (middleLane.Start + middleLane.End) * 0.5f;
+                    Check(Mathf.Abs(Vector2.Dot(laneMidpoint - midpoint,
+                        new Vector2(-along.y, along.x))) < 1f,
+                        link.LinkId + " physical spine follows its center lane");
+                }
                 var labelBounds = new IdentityPacking.PillBounds(labelCenter, along,
                     link.ResourceLabel.rect.size);
                 foreach (var cycle in layout.Schedule)
@@ -333,6 +357,8 @@ namespace Uptime.Connections.EditorTools
                                     " lanes do not cross outside a shared card");
                 }
             identity.EndFrame();
+            foreach (PhysicalLinkView link in links)
+                link.ClearAttachmentOffsets(0.01f);
             Debug.Log("ADVANCED PORTS: E1=" + ports[links.First(l => l.LinkId == "E1")].Budget.ToString("0.#") +
                 " E2=" + ports[links.First(l => l.LinkId == "E2")].Budget.ToString("0.#") +
                 " E4=" + ports[links.First(l => l.LinkId == "E4")].Budget.ToString("0.#") +

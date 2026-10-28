@@ -170,16 +170,18 @@ namespace Uptime.Connections
                     sourceBias, destinationBias);
                 if (link.ResourceLabel != null)
                 {
-                    Vector2 normal = new Vector2(-direction.y, direction.x);
+                    link.GetTargetSpine(out Vector2 spineStart, out Vector2 spineEnd);
+                    Vector2 spineDirection = (spineEnd - spineStart).normalized;
+                    Vector2 normal = new Vector2(-spineDirection.y, spineDirection.x);
                     if (normal.y < 0f) normal = -normal;
-                    Vector2 midpoint = (a + b) * 0.5f;
+                    Vector2 midpoint = (spineStart + spineEnd) * 0.5f;
                     float occupiedEdge = 0f;
                     foreach (IdentityPacking.Lane lane in state.Layout.Lanes)
                     {
                         Vector2 span = lane.End - lane.Start;
-                        float along = Vector2.Dot(span, direction);
+                        float along = Vector2.Dot(span, spineDirection);
                         float t = Mathf.Abs(along) > 0.01f ?
-                            Mathf.Clamp01(Vector2.Dot(midpoint - lane.Start, direction) / along) : 0.5f;
+                            Mathf.Clamp01(Vector2.Dot(midpoint - lane.Start, spineDirection) / along) : 0.5f;
                         Vector2 center = Vector2.Lerp(lane.Start, lane.End, t);
                         occupiedEdge = Mathf.Max(occupiedEdge,
                             Vector2.Dot(center - midpoint, normal));
@@ -192,11 +194,10 @@ namespace Uptime.Connections
                     // midpoint even when its lane center clears the label.
                     for (int attempt = 0; attempt < 80; attempt++)
                     {
-                        link.SetOccupiedLabelOffset(labelDistance);
-                        Vector2 labelCenter = networkArea.InverseTransformPoint(
-                            link.ResourceLabel.position);
+                        link.GetTargetLabelPose(labelDistance, out Vector2 labelCenter,
+                            out Vector2 labelDirection);
                         var labelBounds = new IdentityPacking.PillBounds(labelCenter,
-                            direction, link.ResourceLabel.rect.size);
+                            labelDirection, link.ResourceLabel.rect.size);
                         bool blocked = false;
                         foreach (List<IdentityPacking.Placement> cycle in state.Layout.Schedule)
                             foreach (IdentityPacking.Placement placement in cycle)
@@ -205,6 +206,7 @@ namespace Uptime.Connections
                         if (!blocked) break;
                         labelDistance += 4f;
                     }
+                    link.SetOccupiedLabelOffset(labelDistance);
                 }
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);

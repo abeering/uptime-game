@@ -23,6 +23,7 @@ namespace Uptime.Connections
         private readonly Dictionary<LogicalConnectionState, LogicalPathView> views =
             new Dictionary<LogicalConnectionState, LogicalPathView>();
         private readonly HashSet<PhysicalLinkView> warnedLinks = new HashSet<PhysicalLinkView>();
+        private readonly HashSet<PhysicalLinkView> positionedLinks = new HashSet<PhysicalLinkView>();
         private readonly RouteLaneOrder laneOrder = new RouteLaneOrder();
         private bool previewMode;
 
@@ -48,6 +49,7 @@ namespace Uptime.Connections
                 identityPresenter.BeginFrame();
                 identityPresenter.EndFrame();
             }
+            if (enabled) ClearPhysicalPositions();
         }
 
         public void Bind(LogicalConnectionState[] states)
@@ -62,6 +64,7 @@ namespace Uptime.Connections
                     Destroy(oldView.gameObject);
                 }
             views.Clear();
+            ClearPhysicalPositions();
             warnedLinks.Clear();
             laneOrder.Clear();
             identityPalette.Reset();
@@ -171,6 +174,21 @@ namespace Uptime.Connections
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports = adaptiveNodePorts ?
                 NodePortPacking.Plan(portCounts, networkArea) :
                 new Dictionary<PhysicalLinkView, NodePortPacking.Port>();
+            float relayoutSeconds = pathPrefab.RelayoutSeconds;
+            var departedLinks = new List<PhysicalLinkView>();
+            foreach (PhysicalLinkView link in positionedLinks)
+                if (!portCounts.ContainsKey(link)) departedLinks.Add(link);
+            foreach (PhysicalLinkView link in departedLinks)
+            {
+                if (link != null) link.ClearAttachmentOffsets(relayoutSeconds);
+                positionedLinks.Remove(link);
+            }
+            foreach (PhysicalLinkView link in portCounts.Keys)
+            {
+                ports.TryGetValue(link, out NodePortPacking.Port port);
+                link.SetAttachmentOffsets(port.AtA, port.AtB, relayoutSeconds);
+                positionedLinks.Add(link);
+            }
 
             var layouts = new Dictionary<PhysicalLinkReference,
                 IdentityPacking.Layout>();
@@ -268,5 +286,14 @@ namespace Uptime.Connections
                 identityPresenter.EndFrame();
             }
         }
+
+        private void ClearPhysicalPositions()
+        {
+            foreach (PhysicalLinkView link in positionedLinks)
+                if (link != null) link.ClearAttachmentOffsets(0.01f);
+            positionedLinks.Clear();
+        }
+
+        private void OnDisable() => ClearPhysicalPositions();
     }
 }

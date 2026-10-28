@@ -54,12 +54,14 @@ full-size-pill fit warnings appeared in either capture.
 
 The advanced scene now opts into node-aware entry packing. When several active
 physical links approach the same card face, they divide the usable face and the
-near half of its adjoining sides according to their live lane counts. Each link
-uses the smaller allowance at its two ends. Entry positions and widths change
-with occupancy, and the path view eases those changes over its existing relayout
-time. The single-link case stays centered. This only changes Connections path
-presentation in the advanced scene; the four-node scene keeps its authored
-attachment widths, and node shapes, routing, traffic, and simulation are unchanged.
+near half of its adjoining sides according to their live lane counts. Diagonal
+links may use different offsets at their two ends. Vertical and horizontal links
+use one offset that fits both ends, keeping their physical spine and all logical
+lanes perfectly straight. The thin physical link and its midpoint label follow
+the occupied bundle through the same 0.3-second relayout; an empty link returns
+to its authored center. The single-link case stays centered. The four-node
+scene keeps its authored attachment widths, and node shapes, routing, traffic,
+and simulation are unchanged.
 
 At the deterministic 14-active-connection seed-1701 state, the E1/E2/E4/E6
 attachment allowances were 163 / 55.9 / 161.5 / 88 UI pixels. E2 gives some
@@ -69,9 +71,10 @@ had E1 staggered, E2 staggered, E4 overlaid, and E6 overlaid. These are
 presentation measures, not connection limits.
 
 The expanded Advanced Scene Witness checks the authored opt-in, on-card
-attachments, separation of different bundles at WEB and API, no path crossings
-outside shared cards, and clearance between midpoint link labels and all
-planned ID pills. Geometry and Advanced Scene Witnesses passed in Unity
+attachments, straight cardinal lanes and physical spines, center-lane alignment,
+separation of different bundles at WEB and API, no path crossings outside shared
+cards, and clearance between moving midpoint link labels and all planned ID
+pills. Geometry and Advanced Scene Witnesses passed in Unity
 6000.3.11f1. Scripted 1920x1080 Play Mode captures: compare the
 [previous crowded layout](advanced-play-crowded.png) with the
 [adaptive crowded layout](advanced-play-crowded-node-ports.png); see also
@@ -88,12 +91,25 @@ For a direct comparison, a scripted Play Mode session registered three identical
 EXT1 -> WEB -> API connections and captured the same state with adaptive ports
 off and then on. [Fixed attachment widths](web-three-before.png) put the outer
 beam edges 25.6 UI pixels into overlap at WEB's top border.
-[Adaptive entries](web-three-after.png) separate those edges by 69 UI pixels,
+[Adaptive entries](web-three-after.png) separate those edges by 70.5 UI pixels,
 while both links retain 12-pixel beams and three centered ID pills. The diagonal
-bundle uses WEB's upper-right boundary; the vertical bundle moves left. The
+bundle uses WEB's upper-right boundary; the vertical bundle moves left as one
+straight group with its thin link. The
 advanced-scene witness now reproduces this exact 3+3 lane arrangement and checks
 the clearance improvement. This toggle was only in the validation session; the
 authored advanced scene keeps adaptive ports enabled.
+
+Compare the earlier [flexible cardinal layout](web-three-flexible.png) with the
+[straight cardinal layout](web-three-after.png). The corresponding
+[flexible crowded](advanced-play-crowded-flexible.png) and
+[straight crowded](advanced-play-crowded-node-ports.png) captures show the API-DB
+bundle straightening while diagonal bundles retain flexible entries. In a
+scripted mid-relayout Play Mode check, E1's physical link and the center of its
+three-path bundle shared the same X coordinate; E2's physical link stayed on
+its center diagonal path. The Geometry, Advanced Scene, and Topology Stress
+regression witnesses passed in the isolated Unity 6000.3.11f1 project; the
+stress suite also passed Resource and Traffic witnesses. Interactive motion and
+command focus still need review.
 
 | Seed | Ambient benign | Ambient hostile | EXT1 / EXT2 plans | Peak active connections | Delivered infections |
 | --- | ---: | ---: | ---: | ---: | ---: |

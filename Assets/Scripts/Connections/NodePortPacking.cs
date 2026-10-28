@@ -36,6 +36,8 @@ namespace Uptime.Connections
             public float Nominal;
             public float Budget;
             public float Bias;
+            public float MinimumOffset;
+            public float MaximumOffset;
         }
 
         public static Dictionary<PhysicalLinkView, Port> Plan(
@@ -71,6 +73,24 @@ namespace Uptime.Connections
             foreach (KeyValuePair<PhysicalLinkView, Entry[]> pair in byLink)
             {
                 Entry a = pair.Value[0], b = pair.Value[1];
+                Vector2 start = area.InverseTransformPoint(pair.Key.NodeA.transform.position);
+                Vector2 end = area.InverseTransformPoint(pair.Key.NodeB.transform.position);
+                bool cardinal = Mathf.Abs(start.x - end.x) < 0.01f ||
+                    Mathf.Abs(start.y - end.y) < 0.01f;
+                if (cardinal)
+                {
+                    // Both ends use one lane offset so an authored vertical or
+                    // horizontal link can translate but never tilt.
+                    float low = Mathf.Max(a.MinimumOffset, -b.MaximumOffset);
+                    float high = Mathf.Min(a.MaximumOffset, -b.MinimumOffset);
+                    if (high > low)
+                    {
+                        float shared = (low + high) * 0.5f;
+                        result.Add(pair.Key, new Port(high - low, shared, shared));
+                    }
+                    else result.Add(pair.Key, new Port(0f, 0f, 0f));
+                    continue;
+                }
                 float budget = Mathf.Min(a.Budget, b.Budget);
                 // Store both biases in the physical A-to-B lane frame.
                 result.Add(pair.Key, budget > 0f ? new Port(budget, a.Bias, -b.Bias) :
@@ -123,6 +143,8 @@ namespace Uptime.Connections
                 float low = Vector2.Dot(Point(only.Card, only.Face, only.Low) - only.Card.center, normal);
                 float high = Vector2.Dot(Point(only.Card, only.Face, only.High) - only.Card.center, normal);
                 only.Budget = 2f * Mathf.Min(Mathf.Abs(low), Mathf.Abs(high));
+                only.MinimumOffset = -only.Budget * 0.5f;
+                only.MaximumOffset = only.Budget * 0.5f;
                 return;
             }
             float start = float.PositiveInfinity, end = float.NegativeInfinity;
@@ -158,6 +180,8 @@ namespace Uptime.Connections
                 float b = Vector2.Dot(Point(entry.Card, entry.Face, high) - entry.Card.center, normal);
                 entry.Bias = (a + b) * 0.5f;
                 entry.Budget = Mathf.Abs(b - a);
+                entry.MinimumOffset = Mathf.Min(a, b);
+                entry.MaximumOffset = Mathf.Max(a, b);
             }
         }
 
