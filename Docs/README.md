@@ -2,6 +2,19 @@
 
 Uptime is one game design explored through two independent gameplay prototypes: Packet and Connections. Both remain playable and neither is declared the final implementation.
 
+## ChatGPT and Codex workflow
+
+**ChatGPT is the design, documentation, exploration, and review workspace; Codex/local Unity is the production implementation workspace.** This is a division of *work*, not a blanket prohibition on writing code or editing documents in ChatGPT.
+
+- **Design and review in ChatGPT:** Research the current repository read-only as needed, brainstorm and settle small gameplay contracts, write Codex handoff prompts, and review Codex PRs, run evidence, and playtests. Agreeing on a design or saying “let's continue” is **not** authorization for ChatGPT to implement it.
+- **Small documentation-only PRs in ChatGPT:** When the user explicitly requests it, ChatGPT can create and update focused docs-only branches and PRs to capture ideas, design decisions, research, planning notes, or documentation maintenance. This is an ordinary, supported part of the workflow, not a rare exception. Keep changes to documentation and its required generated artifacts; do not attach gameplay code, Unity scenes/prefabs, or unrelated implementation changes.
+- **Independent exploration and simulation in ChatGPT:** Use reasoning, temporary scripts, Python, numerical or Monte Carlo simulations, and other standalone experiments to test design hypotheses and share results. Such exploratory code and artifacts are **not production Uptime implementation**; do not silently commit them to the game repository. If an experiment needs integration into Unity, hand that work to Codex. Do not imply a simulation or other task runs in the background unless an actual scheduled/async tool was configured.
+- **Handoff directly to Codex:** When an implementation is agreed, provide a **complete, copy-ready Codex prompt in the conversation itself**. Do not create GitHub issues/tickets as handoffs, ask Codex to work from an issue instead of a prompt, or replace the prompt with a vague summary or external link. The user takes the prompt to Codex.
+- **Production implementation in Codex/local Unity:** Codex owns gameplay/runtime code, scene/prefab authoring, implementation-specific docs, integration tests, Unity validation, implementation branches, commits, and reviewable unmerged PRs. Return branch/commit, exact changes, checks actually run, caveats, and manual Play Mode review instructions to this discussion.
+- **Explicit GitHub actions:** Read-only repository/PR inspection is fine here. ChatGPT may perform a particular requested write action, including a docs-only PR, replying to inline PR questions, or merging a specified PR. Such authorization is limited to the requested action; it does not authorize implementation or issue creation by implication.
+
+A Codex handoff prompt should identify current repository/branch implementation authority; objective; agreed mechanics and boundaries; relevant docs, code, scenes, and prefabs to inspect; non-goals; observable acceptance criteria; automated and manual Unity checks; and expectation of an unmerged, reviewable PR. Prefer small, independent PRs. ChatGPT can review and iterate on Codex's work without taking over implementation.
+
 ## Start here
 
 1. [Uptime Current State](Uptime_Current_State.md) — project posture, implementation boundaries, validation, and source authority at the documented baseline.
