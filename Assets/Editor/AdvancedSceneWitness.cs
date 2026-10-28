@@ -134,6 +134,9 @@ namespace Uptime.Connections.EditorTools
             Debug.Log($"ADVANCED GEOMETRY: area={areaSize}, card={cardSize}, " +
                 $"shortest={geometry.ShortestVisible:0.#}px, overlaps={geometry.NodeOverlaps}, " +
                 $"overflow={geometry.NodeOverflow}, crossings={geometry.LinkCrossings}");
+            Check(new SerializedObject(presenter).FindProperty("adaptiveNodePorts").boolValue,
+                "adaptive node ports enabled in advanced scene");
+            CheckCrowdedPorts(links, area, identity);
 
             foreach (int seed in new[] { 1701, 3141, 9001 })
             {
@@ -216,6 +219,138 @@ namespace Uptime.Connections.EditorTools
             recorder.EndRun();
             Debug.Log("AdvancedSceneWitness PASS: authored scene, three deterministic " +
                 "real-traffic runs, Blackout cancellation and Spawner routing.");
+        }
+
+        private static void CheckCrowdedPorts(PhysicalLinkView[] links, RectTransform area,
+            IdentityPresenter identity)
+        {
+            Canvas.ForceUpdateCanvases();
+            var counts = new Dictionary<PhysicalLinkView, int>();
+            foreach (PhysicalLinkView link in links)
+            {
+                int count = link.LinkId == "E1" || link.LinkId == "E2" ||
+                    link.LinkId == "E3" ? 4 : link.LinkId == "E4" ? 9 :
+                    link.LinkId == "E6" ? 7 : 3;
+                counts.Add(link, count);
+            }
+            Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
+                NodePortPacking.Plan(counts, area);
+            Dictionary<PhysicalLinkView, NodePortPacking.Port> reordered =
+                NodePortPacking.Plan(counts.Reverse().ToDictionary(p => p.Key, p => p.Value), area);
+            foreach (PhysicalLinkView link in links)
+            {
+                NodePortPacking.Port first = ports[link], second = reordered[link];
+                Check(Mathf.Abs(first.Budget - second.Budget) < 0.01f &&
+                    Mathf.Abs(first.AtA - second.AtA) < 0.01f &&
+                    Mathf.Abs(first.AtB - second.AtB) < 0.01f,
+                    link.LinkId + " node entry is independent of input enumeration");
+                NodePortPacking.Port single = NodePortPacking.Plan(
+                    new Dictionary<PhysicalLinkView, int> { { link, 1 } }, area)[link];
+                Check(single.Budget > 0f && Mathf.Abs(single.AtA) < 0.01f &&
+                    Mathf.Abs(single.AtB) < 0.01f,
+                    link.LinkId + " stays centered when uncontested");
+            }
+            var points = new Dictionary<NodeView, List<(PhysicalLinkView link, Vector2 point, float width)>>();
+            var layouts = new Dictionary<PhysicalLinkView, IdentityPacking.Layout>();
+            identity.BeginFrame();
+            foreach (PhysicalLinkView link in links)
+            {
+                NodePortPacking.Port port = ports[link];
+                Check(port.Budget > 0f && !float.IsNaN(port.Budget),
+                    link.LinkId + " has usable node entry space");
+                IdentityPacking.Layout layout = identity.ResolveLayout(link, counts[link],
+                    12f, 2.5f, 6f, port);
+                Check(layout != null && layout.Lanes.Length == counts[link] &&
+                    layout.Stage != IdentityPacking.ReadabilityStage.Unavailable,
+                    link.LinkId + " crowded lanes and pills fit");
+                layouts.Add(link, layout);
+                Vector2 source = area.InverseTransformPoint(link.NodeA.transform.position);
+                Vector2 target = area.InverseTransformPoint(link.NodeB.transform.position);
+                Vector2 along = (target - source).normalized;
+                Vector2 midpoint = (source + target) * 0.5f;
+                Vector2 labelCenter = area.InverseTransformPoint(link.ResourceLabel.position);
+                Check(Mathf.Abs(Vector2.Dot(labelCenter - midpoint, along)) < 0.1f,
+                    link.LinkId + " label remains at midpoint with adaptive ports");
+                var labelBounds = new IdentityPacking.PillBounds(labelCenter, along,
+                    link.ResourceLabel.rect.size);
+                foreach (var cycle in layout.Schedule)
+                    foreach (IdentityPacking.Placement placement in cycle)
+                        Check(!IdentityPacking.Intersects(labelBounds, placement.Bounds,
+                            identity.MinimumPillGap),
+                            link.LinkId + " label clears adaptive connection pills");
+                foreach (NodeView node in new[] { link.NodeA, link.NodeB })
+                {
+                    if (!points.TryGetValue(node, out List<(PhysicalLinkView link, Vector2 point, float width)> list))
+                    {
+                        list = new List<(PhysicalLinkView link, Vector2 point, float width)>();
+                        points.Add(node, list);
+                    }
+                    bool isA = node == link.NodeA;
+                    NodeView other = isA ? link.NodeB : link.NodeA;
+                    Vector2 direction = (Vector2)(area.InverseTransformPoint(other.transform.position) -
+                        area.InverseTransformPoint(node.transform.position));
+                    direction.Normalize();
+                    Rect card = EdgeGeometry.CardRect(node, area);
+                    for (int i = 0; i < counts[link]; i++)
+                    {
+                        float lane = EdgeGeometry.Offset(i, counts[link],
+                            layout.LineWidth, layout.LineGap);
+                        float offset = isA ? lane + port.AtA : -lane - port.AtB;
+                        Vector2 point = EdgeGeometry.CardEdge(card, direction, offset);
+                        Check(point.x >= card.xMin - 0.1f && point.x <= card.xMax + 0.1f &&
+                            point.y >= card.yMin - 0.1f && point.y <= card.yMax + 0.1f,
+                            link.LinkId + " enters " + node.NodeId + " at its card: " +
+                            "point=" + point + " card=" + card + " offset=" + offset +
+                            " port=" + port.Budget + "/" + port.AtA + "/" + port.AtB);
+                        list.Add((link, point, layout.LineWidth));
+                    }
+                }
+            }
+            foreach (string nodeId in new[] { "WEB", "API" })
+            {
+                var list = points.First(p => p.Key.NodeId == nodeId).Value;
+                for (int i = 0; i < list.Count; i++)
+                    for (int j = i + 1; j < list.Count; j++)
+                        if (list[i].link != list[j].link)
+                            Check(Vector2.Distance(list[i].point, list[j].point) >=
+                                (list[i].width + list[j].width) * 0.5f - 0.1f,
+                                nodeId + " different bundles clear at the card edge");
+            }
+            foreach (PhysicalLinkView first in links)
+                foreach (PhysicalLinkView second in links)
+                {
+                    if (string.CompareOrdinal(first.LinkId, second.LinkId) >= 0) continue;
+                    NodeView shared = first.NodeA == second.NodeA || first.NodeA == second.NodeB ?
+                        first.NodeA : first.NodeB == second.NodeA || first.NodeB == second.NodeB ?
+                        first.NodeB : null;
+                    Rect sharedCard = shared != null ? EdgeGeometry.CardRect(shared, area) : new Rect();
+                    foreach (IdentityPacking.Lane a in layouts[first].Lanes)
+                        foreach (IdentityPacking.Lane b in layouts[second].Lanes)
+                            if (TryIntersect(a.Start, a.End, b.Start, b.End, out Vector2 cross))
+                                Check(shared != null && sharedCard.Contains(cross),
+                                    first.LinkId + " and " + second.LinkId +
+                                    " lanes do not cross outside a shared card");
+                }
+            identity.EndFrame();
+            Debug.Log("ADVANCED PORTS: E1=" + ports[links.First(l => l.LinkId == "E1")].Budget.ToString("0.#") +
+                " E2=" + ports[links.First(l => l.LinkId == "E2")].Budget.ToString("0.#") +
+                " E4=" + ports[links.First(l => l.LinkId == "E4")].Budget.ToString("0.#") +
+                " E6=" + ports[links.First(l => l.LinkId == "E6")].Budget.ToString("0.#"));
+        }
+
+        private static bool TryIntersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d,
+            out Vector2 point)
+        {
+            Vector2 ab = b - a, cd = d - c;
+            float divisor = ab.x * cd.y - ab.y * cd.x;
+            point = Vector2.zero;
+            if (Mathf.Abs(divisor) < 0.001f) return false;
+            Vector2 ac = c - a;
+            float t = (ac.x * cd.y - ac.y * cd.x) / divisor;
+            float u = (ac.x * ab.y - ac.y * ab.x) / divisor;
+            if (t < 0f || t > 1f || u < 0f || u > 1f) return false;
+            point = a + ab * t;
+            return true;
         }
 
         private static string Edge(string a, string b) =>

@@ -78,21 +78,27 @@ namespace Uptime.Connections
             Vector2 pillSize, float pillGap,
             float staggerStep, float endInset, float lineClearance,
             IReadOnlyList<PillBounds> obstacles, Rect? sourceCard = null,
-            Rect? destinationCard = null)
+            Rect? destinationCard = null, float sourceBias = 0f,
+            float destinationBias = 0f)
         {
             if (count <= 0 || (end - start).sqrMagnitude < 0.01f)
                 return new Layout(ReadabilityStage.Unavailable, 0f, minimumLineGap,
                     new Lane[0], new List<List<Placement>>());
+            Vector2 along = (end - start).normalized;
+            Vector2 normal = new Vector2(-along.y, along.x);
+            Vector2 tilted = end - start + normal * (destinationBias - sourceBias);
+            float spacingScale = tilted.magnitude /
+                Mathf.Max(0.01f, Vector2.Dot(tilted, along));
 
             // Keep centered pills only when they do not make the paths thinner
             // than a staggered layout that can still show every identity.
             Layout centeredLayout = null;
             if (TryPillAwareLines(budget, count, maximumLineWidth, minimumLineGap,
                 pillSize.y, pillGap, lineClearance, minimumReadableLineWidth,
-                true, out float width, out float gap))
+                spacingScale, true, out float width, out float gap))
             {
                 Lane[] lanes = MakeLanes(start, end, count, width, gap,
-                    sourceCard, destinationCard);
+                    sourceCard, destinationCard, sourceBias, destinationBias);
                 List<Placement> centered = Pack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance, 3);
                 if (centered.Count == count)
@@ -101,10 +107,10 @@ namespace Uptime.Connections
 
             if (TryPillAwareLines(budget, count, maximumLineWidth, minimumLineGap,
                 pillSize.y, pillGap, lineClearance, minimumReadableLineWidth,
-                false, out width, out gap))
+                spacingScale, false, out width, out gap))
             {
                 Lane[] lanes = MakeLanes(start, end, count, width, gap,
-                    sourceCard, destinationCard);
+                    sourceCard, destinationCard, sourceBias, destinationBias);
                 List<Placement> staggered = BestPack(lanes, Sequential(count), pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance);
                 if (staggered != null && staggered.Count == count &&
@@ -117,7 +123,7 @@ namespace Uptime.Connections
             width = EdgeGeometry.LineWidth(budget, count, minimumLineGap, maximumLineWidth);
             gap = minimumLineGap;
             Lane[] compressed = MakeLanes(start, end, count, width, gap,
-                sourceCard, destinationCard);
+                sourceCard, destinationCard, sourceBias, destinationBias);
             List<Placement> overlaid = BestPack(compressed, Sequential(count), pillSize,
                 pillGap, staggerStep, endInset, obstacles, false, lineClearance);
             if (overlaid != null && overlaid.Count == count)
@@ -140,15 +146,17 @@ namespace Uptime.Connections
         // A asks for full pill separation; B only needs clearance from neighboring line strips.
         private static bool TryPillAwareLines(float budget, int count, float maximumWidth,
             float minimumGap, float pillHeight, float pillGap, float lineClearance,
-            float minimumReadableWidth, bool centered, out float width, out float gap)
+            float minimumReadableWidth, float spacingScale, bool centered,
+            out float width, out float gap)
         {
             float low = 0f;
             float high = maximumWidth;
             for (int i = 0; i < 18; i++)
             {
                 float candidate = (low + high) * 0.5f;
-                float separation = centered ? pillHeight + pillGap :
-                    pillHeight * 0.5f + candidate * 0.5f + lineClearance + 0.5f;
+                float separation = centered ? (pillHeight + pillGap) * spacingScale :
+                    (pillHeight * 0.5f + candidate * 0.5f + lineClearance + 0.5f) *
+                    spacingScale;
                 float candidateGap = Mathf.Max(minimumGap, separation - candidate);
                 if (count * candidate + (count - 1) * candidateGap <= budget + 0.001f)
                     low = candidate;
@@ -156,15 +164,17 @@ namespace Uptime.Connections
                     high = candidate;
             }
             width = low;
-            float needed = centered ? pillHeight + pillGap :
-                pillHeight * 0.5f + width * 0.5f + lineClearance + 0.5f;
+            float needed = centered ? (pillHeight + pillGap) * spacingScale :
+                (pillHeight * 0.5f + width * 0.5f + lineClearance + 0.5f) *
+                spacingScale;
             gap = Mathf.Max(minimumGap, needed - width);
             return width >= minimumReadableWidth &&
                 count * width + (count - 1) * gap <= budget + 0.01f;
         }
 
         private static Lane[] MakeLanes(Vector2 start, Vector2 end, int count, float width,
-            float gap, Rect? sourceCard, Rect? destinationCard)
+            float gap, Rect? sourceCard, Rect? destinationCard,
+            float sourceBias, float destinationBias)
         {
             var lanes = new Lane[count];
             Vector2 direction = (end - start).normalized;
@@ -174,11 +184,13 @@ namespace Uptime.Connections
                 float offset = EdgeGeometry.Offset(i, count, width, gap);
                 // Plan against the same covered endpoints drawn by LogicalPathView.
                 Vector2 laneStart = sourceCard.HasValue ?
-                    EdgeGeometry.CardUnderlap(sourceCard.Value, direction, offset, width) :
-                    start + normal * offset;
+                    EdgeGeometry.CardUnderlap(sourceCard.Value, direction,
+                        offset + sourceBias, width) :
+                    start + normal * (offset + sourceBias);
                 Vector2 laneEnd = destinationCard.HasValue ?
-                    EdgeGeometry.CardUnderlap(destinationCard.Value, -direction, -offset, width) :
-                    end + normal * offset;
+                    EdgeGeometry.CardUnderlap(destinationCard.Value, -direction,
+                        -offset - destinationBias, width) :
+                    end + normal * (offset + destinationBias);
                 lanes[i] = new Lane("c" + (i + 1), laneStart, laneEnd, width);
             }
             return lanes;

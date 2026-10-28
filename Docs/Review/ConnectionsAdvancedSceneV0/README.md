@@ -50,6 +50,37 @@ while E1 stayed at the midpoint beside them. A second capture at 335 seconds had
 pill stages while link labels remained outside the occupied bundles. No
 full-size-pill fit warnings appeared in either capture.
 
+## Adaptive node entries
+
+The advanced scene now opts into node-aware entry packing. When several active
+physical links approach the same card face, they divide the usable face and the
+near half of its adjoining sides according to their live lane counts. Each link
+uses the smaller allowance at its two ends. Entry positions and widths change
+with occupancy, and the path view eases those changes over its existing relayout
+time. The single-link case stays centered. This only changes Connections path
+presentation in the advanced scene; the four-node scene keeps its authored
+attachment widths, and node shapes, routing, traffic, and simulation are unchanged.
+
+At the deterministic 14-active-connection seed-1701 state, the E1/E2/E4/E6
+attachment allowances were 163 / 55.9 / 161.5 / 88 UI pixels. E2 gives some
+space to its busy neighbors at API. The visible pill stages were E1 centered,
+E2 staggered, E4 staggered, and E6 overlaid; before this pass the same capture
+had E1 staggered, E2 staggered, E4 overlaid, and E6 overlaid. These are
+presentation measures, not connection limits.
+
+The expanded Advanced Scene Witness checks the authored opt-in, on-card
+attachments, separation of different bundles at WEB and API, no path crossings
+outside shared cards, and clearance between midpoint link labels and all
+planned ID pills. Geometry and Advanced Scene Witnesses passed in Unity
+6000.3.11f1. Scripted 1920x1080 Play Mode captures: compare the
+[previous crowded layout](advanced-play-crowded.png) with the
+[adaptive crowded layout](advanced-play-crowded-node-ports.png); see also
+[normal traffic](advanced-play-traffic-node-ports.png) and
+[multi-ID inspect](advanced-play-inspect-node-ports.png). The captures are
+scripted Play Mode states, not an interactive check of animated relayout or
+command focus. Adjacent-face port competition and nonrectangular nodes are
+outside this first pass.
+
 | Seed | Ambient benign | Ambient hostile | EXT1 / EXT2 plans | Peak active connections | Delivered infections |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1701 | 24 | 11 | 23 / 12 | 14 | 6 |

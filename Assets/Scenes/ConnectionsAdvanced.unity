@@ -6924,6 +6924,7 @@ MonoBehaviour:
   maxLineWidth: 12
   minLineGap: 6
   minLineWidth: 2.5
+  adaptiveNodePorts: 1
 --- !u!224 &1033840603
 RectTransform:
   m_ObjectHideFlags: 0
