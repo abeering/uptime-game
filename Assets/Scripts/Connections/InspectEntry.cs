@@ -13,7 +13,6 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform operationRow;
         [SerializeField] private InspectOperationToken operationTokenPrefab;
         [SerializeField] private InspectOperationToken loadBadge;
-        [SerializeField, Min(60f)] private float loadBadgeWidth = 126f;
         [SerializeField, Min(0f)] private float loadBadgeGap = 12f;
         [SerializeField, Min(0f)] private float contentInset = 16f;
         [SerializeField, Min(0f)] private float identityPillTop = 12f;
@@ -68,8 +67,10 @@ namespace Uptime.Connections
                 stateTag.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
 
-        public void SetCardWidth(float width)
+        public void SetCardWidth(float width, float requestedLoad)
         {
+            float loadBadgeWidth = loadBadge != null ?
+                loadBadge.Measure(InspectOperationToken.LoadLabel(requestedLoad)) : 0f;
             RectTransform card = (RectTransform)transform;
             card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             float contentWidth = Mathf.Max(0f, width - contentInset * 2f);
@@ -239,15 +240,14 @@ namespace Uptime.Connections
                 state.Definition.OperationAt(current), target);
             float available = Mathf.Max(0f, operationRow.rect.width);
             float spacing = operationRow.GetComponent<HorizontalLayoutGroup>()?.spacing ?? 0f;
-            float currentWidth = operationTokenPrefab.Measure(currentLabel,
-                currentCompleted ? 32f : 24f);
+            float currentWidth = operationTokenPrefab.Measure(currentLabel, currentCompleted);
             float historyWidth = completedCount > 0 ?
-                operationTokenPrefab.Measure("+" + completedCount, 32f) : 0f;
+                operationTokenPrefab.Measure("+" + completedCount, true) : 0f;
             float futureWidth = futureCount > 0 ?
-                operationTokenPrefab.Measure("+" + futureCount, 20f) : 0f;
+                operationTokenPrefab.Measure("+" + futureCount) : 0f;
             float shortWidth = operationTokenPrefab.Measure(InspectOperationToken.OperationLabel(
                 state.Definition.OperationAt(current), target, true),
-                currentCompleted ? 32f : 24f);
+                currentCompleted);
             int fullGroups = VisibleGroups(currentWidth, historyWidth, futureWidth,
                 available, spacing);
             int shortGroups = VisibleGroups(shortWidth, historyWidth, futureWidth,
@@ -269,9 +269,9 @@ namespace Uptime.Connections
             {
                 float previousWidth = operationTokenPrefab.Measure(
                     InspectOperationToken.OperationLabel(state.Definition.OperationAt(current - 1),
-                        target), 32f);
+                        target), true);
                 float olderWidth = olderCount > 0 ?
-                    operationTokenPrefab.Measure("+" + olderCount, 32f) : 0f;
+                    operationTokenPrefab.Measure("+" + olderCount, true) : 0f;
                 float replacement = previousWidth + (olderCount > 0 ? olderWidth : 0f);
                 int replacementItems = 1 + (olderCount > 0 ? 1 : 0);
                 float candidateWidths = widths - (showHistory ? historyWidth : 0f) + replacement;
@@ -280,7 +280,7 @@ namespace Uptime.Connections
                 {
                     float shortPreviousWidth = operationTokenPrefab.Measure(
                         InspectOperationToken.OperationLabel(
-                            state.Definition.OperationAt(current - 1), target, true), 32f);
+                            state.Definition.OperationAt(current - 1), target, true), true);
                     candidateWidths = candidateWidths - previousWidth + shortPreviousWidth;
                     shortPrevious = true;
                 }

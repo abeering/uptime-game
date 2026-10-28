@@ -88,8 +88,9 @@ namespace Uptime.Connections
                 Mathf.Min(580f, parent.rect.width) : root.rect.width;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, available);
             float cardWidth = Mathf.Max(0f, available - 28f);
-            foreach (InspectEntry entry in cards)
-                entry.SetCardWidth(cardWidth);
+            for (int i = 0; i < cards.Count; i++)
+                cards[i].SetCardWidth(cardWidth,
+                    i < states.Length && states[i].IsDemanding ? states[i].DesiredLoad : 0f);
         }
 
         private void Reflow()

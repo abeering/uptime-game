@@ -11,6 +11,8 @@ namespace Uptime.Connections
         [SerializeField] private PillGraphic outline;
         [SerializeField] private GameObject checkmark;
         [SerializeField] private LayoutElement layout;
+        [SerializeField, Min(0f)] private float horizontalPadding = 12f;
+        [SerializeField, Min(0f)] private float checkmarkGap = 6f;
         [SerializeField] private Color completedColor = new Color(0.52f, 0.61f, 0.61f);
         [SerializeField] private Color futureColor = new Color(0.62f, 0.73f, 0.72f);
 
@@ -19,8 +21,15 @@ namespace Uptime.Connections
         public bool HasCheckmark => checkmark != null && checkmark.activeSelf;
         public Color OutlineColor => outline != null ? outline.color : Color.clear;
 
-        public float Measure(string text, float padding) =>
-            label != null ? Mathf.Ceil(label.GetPreferredValues(text).x + padding) : 0f;
+        private float CheckmarkSpace => checkmark != null ?
+            ((RectTransform)checkmark.transform).rect.width + checkmarkGap : 0f;
+
+        public float Measure(string text, bool completed = false) =>
+            label != null ? Mathf.Ceil(label.GetPreferredValues(text).x +
+                horizontalPadding * 2f + (completed ? CheckmarkSpace : 0f)) : 0f;
+
+        public static string LoadLabel(float requested) => "LOAD " +
+            requested.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
 
         public static string OperationLabel(OperationKind operation, string target, bool shortLabel = false) =>
             operation.ToString().ToUpperInvariant() + (shortLabel ? string.Empty : " → " + target);
@@ -29,24 +38,23 @@ namespace Uptime.Connections
             bool shortLabel = false)
         {
             string text = OperationLabel(operation, target, shortLabel);
-            Configure(text, completed ? completedColor : activeColor, true, completed,
-                completed ? 32f : 24f, completed ? 24f : 12f);
+            Configure(text, completed ? completedColor : activeColor, completed);
             if (!completed) SetActiveColor(activeColor);
         }
 
         public void ShowCompletedCount(int count)
         {
-            Configure("+" + count, completedColor, true, true, 32f, 24f);
+            Configure("+" + count, completedColor, true);
         }
 
         public void ShowFuture(int count)
         {
-            Configure("+" + count, futureColor, true, false, 20f, 10f);
+            Configure("+" + count, futureColor, false);
         }
 
         public void ShowLoad(float requested, Color color)
         {
-            Configure($"LOAD {requested:0.#}", color, true, false, 20f, 10f);
+            Configure(LoadLabel(requested), color, false);
         }
 
         public void SetActiveColor(Color color)
@@ -62,19 +70,27 @@ namespace Uptime.Connections
             if (label != null) label.overflowMode = TextOverflowModes.Ellipsis;
         }
 
-        private void Configure(string text, Color textColor, bool showOutline, bool showCheck,
-            float totalPadding, float leftInset)
+        private void Configure(string text, Color textColor, bool showCheck)
         {
             if (label == null || layout == null) return;
             label.text = text;
             label.color = textColor;
-            if (outline != null) outline.gameObject.SetActive(showOutline);
-            if (showOutline && outline != null) outline.SetOutline(textColor);
-            if (checkmark != null) checkmark.SetActive(showCheck);
+            if (outline != null)
+            {
+                outline.gameObject.SetActive(true);
+                outline.SetOutline(textColor);
+            }
+            if (checkmark != null)
+            {
+                checkmark.SetActive(showCheck);
+                var checkRect = (RectTransform)checkmark.transform;
+                checkRect.anchoredPosition = new Vector2(horizontalPadding, 0f);
+            }
             RectTransform labelRect = label.rectTransform;
-            labelRect.offsetMin = new Vector2(leftInset, labelRect.offsetMin.y);
-            labelRect.offsetMax = new Vector2(-(totalPadding - leftInset), labelRect.offsetMax.y);
-            layout.preferredWidth = Mathf.Ceil(label.GetPreferredValues(text).x + totalPadding);
+            labelRect.offsetMin = new Vector2(horizontalPadding +
+                (showCheck ? CheckmarkSpace : 0f), labelRect.offsetMin.y);
+            labelRect.offsetMax = new Vector2(-horizontalPadding, labelRect.offsetMax.y);
+            layout.preferredWidth = Measure(text, showCheck);
         }
     }
 }

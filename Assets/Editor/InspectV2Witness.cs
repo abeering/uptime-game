@@ -44,6 +44,7 @@ namespace Uptime.Connections.EditorTools
             travelField.SetValue(host, 0.000001f); // LifecycleWitness checks travel presentation.
             try
             {
+                CheckTokenStates(operationPrefab);
                 CheckCommand("inspect a1", InspectPresentationMode.Compact, "a1");
                 CheckCommand("i a1", InspectPresentationMode.Compact, "a1");
                 CheckCommand("inspect -v a1", InspectPresentationMode.Verbose, "a1");
@@ -83,8 +84,8 @@ namespace Uptime.Connections.EditorTools
                     Check(Height(compact) == 232f && Entry(compact, 0).rect.height == 98f &&
                         Entry(compact, 1).rect.height == 98f,
                         "two consecutive compact results use two-row cards");
-                    CheckCompact(compact, 0, "LOAD 2", 1);
-                    CheckCompact(compact, 1, "LOAD 2", 1);
+                    CheckCompact(compact, 0, "LOAD 2.0", 1);
+                    CheckCompact(compact, 1, "LOAD 2.0", 1);
                     verbose.Bind(new[] { first }, presentationMode: InspectPresentationMode.Verbose);
                     Check(Height(verbose) == 234f && Entry(verbose, 0).rect.height == 210f,
                         "verbose active result retains its detailed height");
@@ -97,7 +98,7 @@ namespace Uptime.Connections.EditorTools
                             EntryComponent(many, i).GetComponent<RectTransform>().rect.height == 98f),
                         "one inspect output grows to five authored entry instances");
                     for (int i = 0; i < 5; i++)
-                        CheckCompact(many, i, i < 2 ? "LOAD 2" : "LOAD 1", 1);
+                        CheckCompact(many, i, i < 2 ? "LOAD 2.0" : "LOAD 1.0", 1);
                     many.Bind(five, presentationMode: InspectPresentationMode.Verbose);
                     Check(Height(many) == 1122f && Enumerable.Range(0, 5).All(i =>
                         ((TMP_Text)new SerializedObject(EntryComponent(many, i))
@@ -169,7 +170,7 @@ namespace Uptime.Connections.EditorTools
                         .objectReferenceValue;
                     var badge = (InspectOperationToken)fields.FindProperty("loadBadge")
                         .objectReferenceValue;
-                    Check(badge != null && badge.Text == "LOAD 2" &&
+                    Check(badge != null && badge.Text == "LOAD 2.0" &&
                         Mathf.Abs(((RectTransform)badge.transform).anchoredPosition.x + 16f) < 0.1f &&
                         row.anchoredPosition.x + row.rect.width + 12f <=
                             narrowEntry.GetComponent<RectTransform>().rect.width - 16f -
@@ -208,7 +209,7 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     killed.Bind(new[] { longState });
-                    CheckCompact(killed, 0, "LOAD 0", -1);
+                    CheckCompact(killed, 0, "LOAD 0.0", -1);
                     Check(Tokens(EntryComponent(killed, 0)).Any(t => t.HasCheckmark),
                         "killed history retains completed operations");
                     var killedFields = new SerializedObject(EntryComponent(killed, 0));
@@ -232,13 +233,15 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     live.Bind(new[] { dynamic });
-                    CheckCompact(live, 0, "LOAD 2", 1);
+                    CheckCompact(live, 0, "LOAD 2.0", 1);
                     host.StepSimulation(1f);
-                    EntryComponent(live, 0).Render(dynamic);
-                    CheckCompact(live, 0, "LOAD 12", 1);
+                    typeof(InspectOutput).GetMethod("Refresh", BindingFlags.Instance |
+                        BindingFlags.NonPublic).Invoke(live, null);
+                    CheckCompact(live, 0, "LOAD 12.0", 1);
                     host.StepSimulation(1f);
-                    EntryComponent(live, 0).Render(dynamic);
-                    CheckCompact(live, 0, "LOAD 5", 1);
+                    typeof(InspectOutput).GetMethod("Refresh", BindingFlags.Instance |
+                        BindingFlags.NonPublic).Invoke(live, null);
+                    CheckCompact(live, 0, "LOAD 5.0", 1);
                     Check(Tokens(EntryComponent(live, 0))[0].Text == "WRITE → DB",
                         "effective LOAD updates without changing current operation identity");
                 }
@@ -252,7 +255,7 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     done.Bind(new[] { host.FindConnection("done") });
-                    CheckCompact(done, 0, "LOAD 0", 1);
+                    CheckCompact(done, 0, "LOAD 0.0", 1);
                     Check(Tokens(EntryComponent(done, 0))[0].HasCheckmark,
                         "completed history remains inspectable in compact mode");
                 }
@@ -301,7 +304,7 @@ namespace Uptime.Connections.EditorTools
                 }
                 finally { UnityEngine.Object.DestroyImmediate(hidden.gameObject); }
                 Debug.Log("InspectV2Witness PASS: command modes, multi-ID, compact/verbose, " +
-                    "width-aware six-stage timeline, fixed badge, live effective LOAD, " +
+                    "width-aware six-stage timeline, fitted pills, one-decimal live LOAD, " +
                     "canceled outcome, and history.");
             }
             finally
@@ -335,6 +338,7 @@ namespace Uptime.Connections.EditorTools
         }
         private static void CheckCompact(InspectOutput output, int index, string badge, int tokenCount)
         {
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)output.transform);
             InspectEntry entry = EntryComponent(output, index);
             var fields = new SerializedObject(entry);
             var load = (InspectOperationToken)fields.FindProperty("loadBadge").objectReferenceValue;
@@ -351,6 +355,67 @@ namespace Uptime.Connections.EditorTools
                 !((Image)fields.FindProperty("progressFill").objectReferenceValue)
                     .transform.parent.gameObject.activeSelf,
                 "compact content and badge " + badge);
+            Check(Mathf.Abs(((RectTransform)load.transform).rect.width - load.Measure(load.Text)) < 0.01f,
+                "LOAD border fits its current text " + badge);
+            CheckUniformPadding(load);
+            foreach (InspectOperationToken token in Tokens(entry)) CheckUniformPadding(token);
+        }
+
+        private static void CheckUniformPadding(InspectOperationToken token)
+        {
+            var fields = new SerializedObject(token);
+            var label = (TMP_Text)fields.FindProperty("label").objectReferenceValue;
+            var check = (GameObject)fields.FindProperty("checkmark").objectReferenceValue;
+            float left = 12f + (token.HasCheckmark ? ((RectTransform)check.transform).rect.width + 6f : 0f);
+            Check(label.alignment == TextAlignmentOptions.Midline &&
+                Mathf.Abs(label.rectTransform.offsetMin.x - left) < 0.01f &&
+                Mathf.Abs(label.rectTransform.offsetMax.x + 12f) < 0.01f &&
+                (!token.HasCheckmark ||
+                    ((RectTransform)check.transform).anchoredPosition == new Vector2(12f, 0f)),
+                "uniform centered pill padding for " + token.Text);
+            float preferred = token.GetComponent<LayoutElement>().preferredWidth;
+            Check(preferred <= token.Measure(token.Text, token.HasCheckmark) + 0.01f,
+                "pill has no surplus preferred width for " + token.Text);
+        }
+
+        private static void CheckTokenStates(InspectOperationToken prefab)
+        {
+            InspectOperationToken token = UnityEngine.Object.Instantiate(prefab);
+            var originalCulture = System.Globalization.CultureInfo.CurrentCulture;
+            try
+            {
+                token.ShowOperation(OperationKind.Read, "DB", false, Color.green);
+                CheckUniformPadding(token);
+                token.ShowOperation(OperationKind.Read, "DB", true, Color.green);
+                CheckUniformPadding(token);
+                token.ShowCompletedCount(1);
+                CheckUniformPadding(token);
+                token.ShowFuture(1);
+                CheckUniformPadding(token);
+                float width = -1f;
+                System.Globalization.CultureInfo.CurrentCulture =
+                    System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
+                foreach (float value in new[] { 1.9f, 2f, 2.1f })
+                {
+                    token.ShowLoad(value, Color.gray);
+                    Check(token.Text == "LOAD " + value.ToString("0.0",
+                        System.Globalization.CultureInfo.InvariantCulture),
+                        "LOAD keeps one decimal and a period for " + value);
+                    CheckUniformPadding(token);
+                    float nextWidth = token.GetComponent<LayoutElement>().preferredWidth;
+                    Check(width < 0f || Mathf.Abs(nextWidth - width) < 0.01f,
+                        "1.9 to 2.0 to 2.1 preserves pill width");
+                    width = nextWidth;
+                }
+                token.ShowLoad(0f, Color.gray);
+                Check(token.Text == "LOAD 0.0", "retired LOAD keeps its decimal");
+                CheckUniformPadding(token);
+            }
+            finally
+            {
+                System.Globalization.CultureInfo.CurrentCulture = originalCulture;
+                UnityEngine.Object.DestroyImmediate(token.gameObject);
+            }
         }
         private static void CheckCardGeometry(InspectEntry entry, bool verbose, Material material)
         {
@@ -383,9 +448,9 @@ namespace Uptime.Connections.EditorTools
                 purpose.rectTransform.anchoredPosition.x >= pillRect.anchoredPosition.x + pill.Size.x + 12f &&
                 row.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
                 row.rect.height == 40f &&
-                ((RectTransform)load.transform).rect.width == 126f &&
+                ((RectTransform)load.transform).rect.width == load.Measure(load.Text) &&
                 row.anchoredPosition.x + row.rect.width + 12f <=
-                    card.rect.width - 16f - 126f + 0.5f &&
+                    card.rect.width - 16f - ((RectTransform)load.transform).rect.width + 0.5f &&
                 status.rectTransform.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
                 status.gameObject.activeSelf == verbose &&
                 work.rectTransform.anchoredPosition.x == 16f &&

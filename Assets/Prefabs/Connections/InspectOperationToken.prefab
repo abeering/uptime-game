@@ -177,7 +177,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 5, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 16, y: 16}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!1 &4788873270946846727
@@ -279,7 +279,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -393,6 +393,8 @@ MonoBehaviour:
   outline: {fileID: 3007648076943107131}
   checkmark: {fileID: 3740618457718371690}
   layout: {fileID: 8122788230010975626}
+  horizontalPadding: 12
+  checkmarkGap: 6
   completedColor: {r: 0.52, g: 0.61, b: 0.61, a: 1}
   futureColor: {r: 0.62, g: 0.73, b: 0.72, a: 1}
 --- !u!1 &9154488466401923760

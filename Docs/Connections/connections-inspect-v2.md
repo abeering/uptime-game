@@ -15,3 +15,11 @@ The card now has a small additional content inset, with more space above and bel
 ## Later terminal cleanup
 
 The Terminal and Inspect Cleanup follow-up on PR #27 removed the old horizontal `TitleBar` strip from each authored card and removed numeric `ALLOC` text from the verbose status line. The performance status and any contention reason remain; the LOAD pill and underlying allocation model are unchanged. This note records the later presentation change without rewriting the original Inspect V2 phase contract above. See the [updated Editor previews](../Review/ConnectionsTerminalInspectCleanup/README.md).
+
+## Fitted pill follow-up — gameplay QoL branch
+
+The later gameplay QoL cleanup replaces the original fixed 126-unit LOAD badge with a text-measured pill. Its right edge stays aligned to the card inset, while its actual width is reserved before packing the operation timeline. Every LOAD label uses one decimal and an invariant period (`1.9`, `2.0`, `2.1`, and retired `0.0`). The monospace digits keep the width stable within one digit count; adding a digit resizes the badge and repacks the timeline.
+
+The shared authored token prefab gives active, completed, future-count, and LOAD pills centered labels and 12 units of outer horizontal padding on each side. A completed pill additionally reserves the authored 16-unit checkmark plus a 6-unit internal gap, keeping the combined checkmark/text group centered. Existing 40-unit heights, borders, colors, and narrow-width shortening remain. The same measurements drive preferred widths and timeline fit decisions. Compact, verbose, completed, killed, and canceled cards share these rules. This changes presentation only.
+
+The extended Inspect V2 Witness checks padding/centering, one-decimal LOAD under a comma-decimal locale, stable `1.9 → 2.0 → 2.1` widths, live one-/two-digit badge resizing, narrow cards, and completed/killed/canceled output. See the [Editor previews and manual review steps](../Review/ConnectionsInspectPillFit/README.md).

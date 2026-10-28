@@ -242,7 +242,6 @@ MonoBehaviour:
   operationRow: {fileID: 122395578689969953}
   operationTokenPrefab: {fileID: 8697775655569061275, guid: 7821e3d2fa00921448c03d387a7e6501, type: 3}
   loadBadge: {fileID: 680440541820507890}
-  loadBadgeWidth: 126
   loadBadgeGap: 12
   contentInset: 16
   identityPillTop: 12
@@ -1749,7 +1748,6 @@ MonoBehaviour:
   operationRow: {fileID: 677025782917982169}
   operationTokenPrefab: {fileID: 8697775655569061275, guid: 7821e3d2fa00921448c03d387a7e6501, type: 3}
   loadBadge: {fileID: 3412336778968757539}
-  loadBadgeWidth: 126
   loadBadgeGap: 12
   contentInset: 16
   identityPillTop: 12
