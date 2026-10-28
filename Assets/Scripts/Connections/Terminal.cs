@@ -59,19 +59,13 @@ namespace Uptime.Connections
         private void OnEnable()
         {
             if (Application.isPlaying && simulationHost != null)
-            {
-                simulationHost.EffectOccurred += OnEffectOccurred;
                 simulationHost.ScanCompleted += OnScanCompleted;
-            }
         }
 
         private void OnDisable()
         {
             if (simulationHost != null)
-            {
-                simulationHost.EffectOccurred -= OnEffectOccurred;
                 simulationHost.ScanCompleted -= OnScanCompleted;
-            }
         }
 
         private void OnScanCompleted(NodeScanSession session)
@@ -80,20 +74,6 @@ namespace Uptime.Connections
                 (session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN"),
                 session.Result == NodeScanResult.Infected ? errorColor : normalColor);
         }
-
-        private void OnEffectOccurred(ConnectionEffectOccurrence occurrence)
-        {
-            if (occurrence.Type == CompletionEffect.InfectionDelivery)
-                AppendText(DeliveryMessage(occurrence),
-                    occurrence.InfectionApplied == true ? errorColor : mutedColor);
-        }
-
-        public static string DeliveryMessage(ConnectionEffectOccurrence occurrence) =>
-            occurrence.InfectionApplied == true ?
-                "PAYLOAD INSTALLED  " + occurrence.ConnectionId.ToLowerInvariant() +
-                    "  " + occurrence.TargetNodeId :
-                "PAYLOAD NOT INSTALLED  " + occurrence.ConnectionId.ToLowerInvariant() +
-                    "  " + occurrence.TargetNodeId;
 
         private void OnDestroy()
         {
