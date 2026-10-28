@@ -431,6 +431,11 @@ MonoBehaviour:
   causesText: {fileID: 3473196687077500661}
   eventsText: {fileID: 5388723036999693294}
   healthFill: {fileID: 8239316690328876960}
+  healthyBarColor: {r: 0.32, g: 0.77, b: 0.66, a: 1}
+  drainingBarColor: {r: 0.85, g: 0.53, b: 0.32, a: 1}
+  criticalBarColor: {r: 0.94, g: 0.32, b: 0.30, a: 1}
+  criticalHealthThreshold: 25
+  healthBarLerpSpeed: 10
   degradingColor: {r: 1, g: 0.63, b: 0.39, a: 1}
   recoveringColor: {r: 0.52, g: 0.84, b: 0.72, a: 1}
   stableColor: {r: 0.47, g: 0.63, b: 0.62, a: 1}
@@ -476,8 +481,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 245, y: -25}
-  m_SizeDelta: {x: -380, y: 12}
+  m_AnchoredPosition: {x: 232, y: -25}
+  m_SizeDelta: {x: -340, y: 18}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7255550069786941847
 CanvasRenderer:
@@ -994,7 +999,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 0}
-  m_Type: 3
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0

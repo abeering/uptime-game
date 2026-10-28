@@ -22,13 +22,21 @@ namespace Uptime.Connections
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField, Min(1)] private int maxEntries = 100;
+        [SerializeField, Min(1)] private int maxCommandHistory = 100;
+        [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
         [SerializeField] private Color normalColor = new(0.73f, 0.89f, 0.84f);
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
         [SerializeField] private Color errorColor = new(1f, 0.63f, 0.39f);
 
         private int entryCount;
         private bool scrollPending;
+        private Coroutine bottomScrollRoutine;
+        private Key heldScrollKey;
+        private float nextScrollRepeatAt;
         private TMP_InputField.OnValidateInput previousInputValidator;
+        private readonly List<string> commandHistory = new();
+        private int commandHistoryIndex = -1;
+        private string commandDraft = string.Empty;
 
         private void Awake()
         {
@@ -78,9 +86,105 @@ namespace Uptime.Connections
 
         private void Update()
         {
-            if (Keyboard.current == null || !Keyboard.current.backquoteKey.wasPressedThisFrame)
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null) return;
+            if (keyboard.backquoteKey.wasPressedThisFrame)
+                identityPresenter?.CycleCongestedEdges();
+            UpdateHistoryScrolling(keyboard);
+        }
+
+        // Run after the EventSystem has processed TMP's normal arrow-key navigation.
+        private void LateUpdate()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null || commandInput == null || !commandInput.isFocused ||
+                keyboard.ctrlKey.isPressed || keyboard.leftMetaKey.isPressed ||
+                keyboard.rightMetaKey.isPressed || keyboard.altKey.isPressed ||
+                keyboard.shiftKey.isPressed)
                 return;
-            identityPresenter?.CycleCongestedEdges();
+            if (keyboard.upArrowKey.wasPressedThisFrame) RecallCommand(-1);
+            else if (keyboard.downArrowKey.wasPressedThisFrame) RecallCommand(1);
+        }
+
+        private void RememberCommand(string command)
+        {
+            if (commandHistory.Count == 0 || commandHistory[commandHistory.Count - 1] != command)
+                commandHistory.Add(command);
+            while (commandHistory.Count > Mathf.Max(1, maxCommandHistory))
+                commandHistory.RemoveAt(0);
+            commandHistoryIndex = -1;
+            commandDraft = string.Empty;
+        }
+
+        private void RecallCommand(int direction)
+        {
+            if (commandInput == null || commandHistory.Count == 0) return;
+            if (commandHistoryIndex < 0)
+            {
+                if (direction > 0) return;
+                commandDraft = commandInput.text;
+                commandHistoryIndex = commandHistory.Count;
+            }
+            commandHistoryIndex = Mathf.Clamp(commandHistoryIndex + direction,
+                0, commandHistory.Count);
+            bool atDraft = commandHistoryIndex == commandHistory.Count;
+            commandInput.SetTextWithoutNotify(atDraft ? commandDraft :
+                commandHistory[commandHistoryIndex]);
+            commandInput.textComponent.ForceMeshUpdate();
+            commandInput.MoveTextEnd(false);
+            if (atDraft) commandHistoryIndex = -1;
+        }
+
+        private void UpdateHistoryScrolling(Keyboard keyboard)
+        {
+            Key key = Key.None;
+            if (commandInput != null && commandInput.isFocused &&
+                !keyboard.altKey.isPressed && !keyboard.shiftKey.isPressed)
+            {
+                if (keyboard.pageUpKey.isPressed) key = Key.PageUp;
+                else if (keyboard.pageDownKey.isPressed) key = Key.PageDown;
+                else if (keyboard.ctrlKey.isPressed || keyboard.leftMetaKey.isPressed ||
+                    keyboard.rightMetaKey.isPressed)
+                {
+                    if (keyboard.upArrowKey.isPressed) key = Key.UpArrow;
+                    else if (keyboard.downArrowKey.isPressed) key = Key.DownArrow;
+                }
+            }
+
+            if (key == Key.None)
+            {
+                heldScrollKey = Key.None;
+                return;
+            }
+            bool firstPress = key != heldScrollKey || keyboard[key].wasPressedThisFrame;
+            if (!firstPress && Time.unscaledTime < nextScrollRepeatAt) return;
+            heldScrollKey = key;
+            nextScrollRepeatAt = Time.unscaledTime + (firstPress ? 0.35f : 0.06f);
+
+            bool page = key == Key.PageUp || key == Key.PageDown;
+            float direction = key == Key.UpArrow || key == Key.PageUp ? 1f : -1f;
+            ScrollHistory(direction, page);
+        }
+
+        private void ScrollHistory(float direction, bool page)
+        {
+            if (historyScroll == null || historyContent == null || historyScroll.viewport == null)
+                return;
+            if (bottomScrollRoutine != null)
+            {
+                StopCoroutine(bottomScrollRoutine);
+                bottomScrollRoutine = null;
+                scrollPending = false;
+            }
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContent);
+            float viewportHeight = historyScroll.viewport.rect.height;
+            float travel = Mathf.Max(0f, historyContent.rect.height - viewportHeight);
+            historyScroll.StopMovement();
+            if (travel <= 0f) return;
+            float distance = page ? viewportHeight * 0.9f : keyboardScrollStep;
+            historyScroll.verticalNormalizedPosition = Mathf.Clamp01(
+                historyScroll.verticalNormalizedPosition + direction * distance / travel);
         }
 
         private char ValidateCommandCharacter(string text, int position, char character)
@@ -101,6 +205,7 @@ namespace Uptime.Connections
             }
 
             string command = raw.Trim();
+            RememberCommand(command);
             commandInput.SetTextWithoutNotify(string.Empty);
             AppendText($"> {command}", normalColor);
 
@@ -259,6 +364,8 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
+                    AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
+                    AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
@@ -542,8 +649,65 @@ namespace Uptime.Connections
 
             if (!scrollPending && (historyScroll == null ||
                 historyScroll.verticalNormalizedPosition <= 0.01f))
-                StartCoroutine(ScrollToBottomNextFrame());
+                bottomScrollRoutine = StartCoroutine(ScrollToBottomNextFrame());
             return instance;
+        }
+
+        // Anchor the first visible card/entry while resolved inspection rows shrink.
+        internal void UpdateHistoryLayout(System.Action updateLayout)
+        {
+            if (historyScroll == null || historyContent == null || historyScroll.viewport == null)
+            {
+                updateLayout();
+                return;
+            }
+            Canvas.ForceUpdateCanvases();
+            bool atBottom = historyScroll.verticalNormalizedPosition <= 0.01f;
+            RectTransform viewport = historyScroll.viewport;
+            RectTransform anchor = null;
+            float topBefore = 0f;
+            var corners = new Vector3[4];
+            bool Visible(RectTransform rect)
+            {
+                rect.GetWorldCorners(corners);
+                float top = viewport.InverseTransformPoint(corners[1]).y;
+                float bottom = viewport.InverseTransformPoint(corners[0]).y;
+                if (top <= viewport.rect.yMin || bottom >= viewport.rect.yMax) return false;
+                anchor = rect;
+                topBefore = top;
+                return true;
+            }
+            if (!atBottom)
+                foreach (RectTransform child in historyContent)
+                {
+                    if (!child.gameObject.activeInHierarchy) continue;
+                    InspectEntry[] entries = child.GetComponentsInChildren<InspectEntry>();
+                    if (entries.Length > 0)
+                    {
+                        foreach (InspectEntry entry in entries)
+                            if (Visible((RectTransform)entry.transform)) break;
+                    }
+                    else Visible(child);
+                    if (anchor != null) break;
+                }
+            updateLayout();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContent);
+            Canvas.ForceUpdateCanvases();
+            if (atBottom)
+                historyScroll.verticalNormalizedPosition = 0f;
+            else if (anchor != null)
+            {
+                anchor.GetWorldCorners(corners);
+                float topAfter = viewport.InverseTransformPoint(corners[1]).y;
+                // If the text being read disappeared, reveal its retained summary row.
+                if (topBefore - viewport.rect.yMax >= anchor.rect.height)
+                    topBefore = viewport.rect.yMax;
+                Vector3 correction = historyContent.parent.InverseTransformVector(
+                    viewport.TransformVector(new Vector3(0f, topBefore - topAfter, 0f)));
+                historyContent.anchoredPosition += new Vector2(0f, correction.y);
+                historyScroll.verticalNormalizedPosition = Mathf.Clamp01(
+                    historyScroll.verticalNormalizedPosition);
+            }
         }
 
         // Keep the top visible history location when the workstation changes height.
@@ -585,6 +749,7 @@ namespace Uptime.Connections
             if (historyScroll != null)
                 historyScroll.verticalNormalizedPosition = 0f;
             scrollPending = false;
+            bottomScrollRoutine = null;
         }
 
         private IEnumerator FocusInputNextFrame()

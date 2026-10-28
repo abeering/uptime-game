@@ -21,6 +21,7 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && director != null, "host and traffic director");
             var panel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
             CheckPanelBindings(host);
+            CheckBarPresentation(panel);
             CheckHistoryResize(panel);
             var settings = new SerializedObject(host).FindProperty("healthTuning");
             Near(settings.FindPropertyRelative("deadlineTolerance").floatValue, 1.5f,
@@ -78,6 +79,7 @@ namespace Uptime.Connections.EditorTools
                     host.Health.Impacts.Count == 3 && a.HealthWasSubstantiallySlowed,
                     "slowed facts and aggregate");
                 panel.Render();
+                CheckHealthBar(panel, 99.5f);
                 var panelFields = new SerializedObject(panel);
                 Check(((TMP_Text)panelFields.FindProperty("rateText").objectReferenceValue).text ==
                     "-0.50/s", "compact signed rate");
@@ -110,6 +112,7 @@ namespace Uptime.Connections.EditorTools
                 Near(host.Health.Value, beforeRecovery + 1.75f,
                     "recovery after final damage clears");
                 Near(host.Health.NetRate, 0.35f, "signed recovery rate");
+                CheckHealthBar(panel, host.Health.Value);
                 Debug.Log($"NetworkHealthWitness contention: expected 3.333 LOAD, -0.50/s, first overdue -1.53/s, next -1.59/s, -10 kill, +1.75 over 5s recovery; observed {observedSharedGrant:0.###} LOAD, {firstOverdue:0.###}/s first late, {host.Health.Value:0.###} after recovery");
 
                 host.ResetSimulation();
@@ -213,6 +216,7 @@ namespace Uptime.Connections.EditorTools
                         new OperationStage(OperationKind.Read, 10f, 5f, "failure"));
                     Check(host.KillConnection("failure") && host.Health.Value == 0f &&
                         host.Health.Failed, "zero latches failure");
+                    CheckHealthBar(panel, 0f);
                     host.StepSimulation(1f);
                     Check(host.Health.Failed, "recovery does not clear latched failure");
                 }
@@ -336,6 +340,7 @@ namespace Uptime.Connections.EditorTools
                 "matching panel widths");
             Check(panel.ShiftEndMinuteOfDay == 17 * 60, "configurable end marker");
             panel.Render();
+            CheckHealthBar(panel, 100f);
             Check(panel.ClockText == "09:00", "24-hour clock at simulation start");
             typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
                 BindingFlags.NonPublic).SetValue(panel, true);
@@ -348,6 +353,117 @@ namespace Uptime.Connections.EditorTools
             panel.ApplyLayout();
             Near(rect.rect.height, 52f, "compact height");
         }
+        private static void CheckHealthBar(NetworkHealthPanel panel, float expectedHealth)
+        {
+            panel.Render();
+            Canvas.ForceUpdateCanvases();
+            var fill = (Image)new SerializedObject(panel).FindProperty("healthFill")
+                .objectReferenceValue;
+            Check(fill != null, "health fill binding");
+            var track = (RectTransform)fill.rectTransform.parent;
+            Near(fill.rectTransform.rect.width / track.rect.width,
+                expectedHealth / 100f, "visible bar fraction at Health " + expectedHealth);
+        }
+
+        private static void CheckBarPresentation(NetworkHealthPanel panel)
+        {
+            var fields = new SerializedObject(panel);
+            var fill = (Image)fields.FindProperty("healthFill").objectReferenceValue;
+            var track = (RectTransform)fill.rectTransform.parent;
+            var value = (TMP_Text)fields.FindProperty("valueText").objectReferenceValue;
+            var rate = (TMP_Text)fields.FindProperty("rateText").objectReferenceValue;
+            Color healthy = fields.FindProperty("healthyBarColor").colorValue;
+            Color orange = fields.FindProperty("drainingBarColor").colorValue;
+            Color red = fields.FindProperty("criticalBarColor").colorValue;
+            Near(track.rect.height, value.fontSize, "bar matches Health text size");
+            Near(rate.rectTransform.anchoredPosition.x, -16f, "rate right edge unchanged");
+            var corners = new Vector3[4];
+            track.GetWorldCorners(corners);
+            float left = value.rectTransform.InverseTransformPoint(corners[0]).x;
+            float right = rate.rectTransform.InverseTransformPoint(corners[2]).x;
+            Check(left > value.rectTransform.rect.xMin +
+                value.GetPreferredValues("HEALTH 99.9").x,
+                "bar clears fractional Health text");
+            Check(right < rate.rectTransform.rect.xMax - rate.GetPreferredValues("-11.11/s").x,
+                "bar clears signed two-digit rate");
+            float leftGap = left - value.rectTransform.rect.xMin -
+                value.GetPreferredValues("HEALTH 100").x;
+            float rightGap = rate.rectTransform.rect.xMax -
+                rate.GetPreferredValues("-11.11/s").x - right;
+            Check(Mathf.Abs(leftGap - rightGap) < 2f,
+                "bar centers between full Health text and reserved two-digit rate");
+            Debug.Log($"NetworkHealthWitness bar layout: {track.rect.width:0.#} x " +
+                $"{track.rect.height:0.#}, rate reserve {rate.GetPreferredValues("-11.11/s").x:0.#}");
+
+            void Draw(float health, float netRate, float dt, bool snap = false)
+            {
+                var snapshot = (NetworkHealthSnapshot)typeof(NetworkHealthSnapshot)
+                    .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic).Single()
+                    .Invoke(new object[] { health, Mathf.Max(0f, -netRate),
+                        Mathf.Max(0f, netRate), netRate, 0, 0, health <= 0f,
+                        Array.Empty<NetworkHealthImpact>(), Array.Empty<NetworkHealthEvent>() });
+                typeof(NetworkHealthPanel).GetMethod("RenderHealthBar",
+                    BindingFlags.Instance | BindingFlags.NonPublic)
+                    .Invoke(panel, new object[] { snapshot, dt, snap });
+            }
+            float Fraction() => fill.rectTransform.anchorMax.x;
+
+            try
+            {
+                Draw(100f, 0f, 0f, true);
+                Check(fill.color == healthy, "healthy stable bar is teal");
+                Draw(90f, 0.35f, 0.03f);
+                Check(Fraction() > 0.9f && Fraction() < 1f && fill.color == orange,
+                    "one-off loss eases and remains orange despite immediate recovery");
+                float firstDrop = Fraction();
+                Draw(80f, 0.35f, 0.03f);
+                Check(Fraction() > 0.8f && Fraction() < firstDrop && fill.color == orange,
+                    "repeated penalties retarget the moving bar");
+                for (int i = 0; i < 120; i++) Draw(80f, 0.35f, 1f / 60f);
+                Near(Fraction(), 0.8f, "loss settles on authoritative Health");
+                Check(fill.color == healthy, "settled recovery returns to teal");
+                Draw(80f, -0.001f, 0f, true);
+                Check(fill.color == orange, "ongoing drain is orange even below rate text precision");
+                foreach (float netRate in new[] { -1f, 0f, 0.35f })
+                {
+                    Draw(24.9f, netRate, 0f, true);
+                    Check(fill.color == red, "sub-25 Health is red at rate " + netRate);
+                }
+                Draw(80f, 0f, 0f, true);
+                Draw(20f, 0.35f, 0f);
+                Check(Fraction() == 0.8f && fill.color == red,
+                    "critical color uses real Health before animation arrives");
+                Draw(25f, -1f, 0f, true);
+                Check(fill.color == orange, "25 itself retains drain color");
+                Draw(25f, 0.35f, 0f, true);
+                Check(fill.color == healthy, "recovering at threshold returns to teal");
+                Draw(0f, 0.35f, 0f, true);
+                Check(Fraction() == 0f && fill.color == red, "empty recovering bar remains critical");
+                fields.FindProperty("criticalHealthThreshold").floatValue = 40f;
+                fields.ApplyModifiedPropertiesWithoutUndo();
+                Draw(35f, 0.35f, 0f, true);
+                Check(fill.color == red, "Inspector critical threshold is configurable");
+
+                Draw(100f, 0f, 0f, true);
+                Draw(90f, 0f, 0.3f);
+                float singleFrame = Fraction();
+                Draw(100f, 0f, 0f, true);
+                for (int i = 0; i < 18; i++) Draw(90f, 0f, 1f / 60f);
+                Near(Fraction(), singleFrame, "lerp is independent of frame subdivision");
+                Draw(100f, 0f, 0f, true);
+                Near(Fraction(), 1f, "reset snaps to current Health");
+                Debug.Log("NetworkHealthWitness bar presentation PASS: layout, eased and " +
+                    "repeated penalties, sustained drain, critical priority, recovery, " +
+                    "configurable threshold, frame subdivision, and reset.");
+            }
+            finally
+            {
+                fields.FindProperty("criticalHealthThreshold").floatValue = 25f;
+                fields.ApplyModifiedPropertiesWithoutUndo();
+                panel.Render();
+            }
+        }
+
         private static void CheckHistoryResize(NetworkHealthPanel panel)
         {
             Check(panel != null, "health panel exists for resize check");

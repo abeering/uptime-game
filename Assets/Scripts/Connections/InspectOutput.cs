@@ -15,6 +15,8 @@ namespace Uptime.Connections
         [SerializeField, Min(1f)] private float activeEntryHeight = 210f;
         [SerializeField, Min(1f)] private float completeEntryHeight = 128f;
         [SerializeField, Min(1f)] private float compactEntryHeight = 98f;
+        [SerializeField, Min(0f)] private float resolvedHoldSeconds = 4f;
+        [SerializeField, Min(1f)] private float resolvedRowHeight = 48f;
         [SerializeField, Min(0f)] private float topPadding = 12f;
         [SerializeField, Min(0f)] private float entryGap = 12f;
         [SerializeField, Min(0f)] private float bottomPadding = 12f;
@@ -24,6 +26,7 @@ namespace Uptime.Connections
         private ConnectionIdentityPalette palette;
         private InspectPresentationMode mode;
         private bool[] frozen;
+        private float[] collapseAt;
         private float nextRefresh;
 
         public void Bind(LogicalConnectionState[] selected,
@@ -45,8 +48,12 @@ namespace Uptime.Connections
             mode = presentationMode;
             enabled = true;
             frozen = new bool[selected.Length];
+            collapseAt = new float[selected.Length];
             for (int i = 0; i < cards.Count; i++)
+            {
+                cards[i].ShowFullCard();
                 cards[i].gameObject.SetActive(i < states.Length);
+            }
             Refresh();
             nextRefresh = Time.unscaledTime + refreshSeconds;
         }
@@ -59,21 +66,42 @@ namespace Uptime.Connections
             Refresh();
         }
 
+        private void OnRectTransformDimensionsChange()
+        {
+            if (states == null || enabled) return;
+            // Frozen history still needs one layout pass when the terminal width changes.
+            nextRefresh = 0f;
+            enabled = true;
+        }
+
         private void Refresh()
+        {
+            RefreshPresentation(Time.unscaledTime);
+        }
+
+        private void RefreshPresentation(float now)
         {
             FitWidth();
             bool allFrozen = true;
             for (int i = 0; i < states.Length; i++)
             {
-                if (frozen[i])
-                    continue;
-                Color? accent = palette != null && palette.TryGet(states[i], out Color color) ?
-                    color : (Color?)null;
-                cards[i].Render(states[i], accent, mode);
-                if (states[i].IsComplete)
-                    frozen[i] = true;
-                else
+                if (!frozen[i])
+                {
+                    Color? accent = palette != null && palette.TryGet(states[i], out Color color) ?
+                        color : (Color?)null;
+                    cards[i].Render(states[i], accent, mode);
+                    if (states[i].IsComplete)
+                    {
+                        frozen[i] = true;
+                        collapseAt[i] = now + resolvedHoldSeconds;
+                    }
+                }
+                if (frozen[i] && !cards[i].IsResolvedSummary && now >= collapseAt[i])
+                    cards[i].ShowResolvedSummary(states[i]);
+                if (!frozen[i] || now < collapseAt[i])
                     allFrozen = false;
+                if (frozen[i] && !cards[i].IsResolvedSummary)
+                    nextRefresh = Mathf.Min(nextRefresh, collapseAt[i]);
             }
             Reflow();
             if (allFrozen)
@@ -88,18 +116,32 @@ namespace Uptime.Connections
                 Mathf.Min(580f, parent.rect.width) : root.rect.width;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, available);
             float cardWidth = Mathf.Max(0f, available - 28f);
-            foreach (InspectEntry entry in cards)
-                entry.SetCardWidth(cardWidth);
+            for (int i = 0; i < cards.Count; i++)
+                cards[i].SetCardWidth(cardWidth,
+                    i < states.Length && states[i].IsDemanding ? states[i].DesiredLoad : 0f);
         }
 
         private void Reflow()
         {
+            bool changesHeight = false;
+            for (int i = 0; i < states.Length; i++)
+                if (Mathf.Abs(((RectTransform)cards[i].transform).rect.height - EntryHeight(i)) > 0.01f)
+                    changesHeight = true;
+            Terminal terminal = changesHeight ? GetComponentInParent<Terminal>() : null;
+            if (terminal != null) terminal.UpdateHistoryLayout(ApplyReflow);
+            else ApplyReflow();
+        }
+
+        private float EntryHeight(int i) => cards[i].IsResolvedSummary ? resolvedRowHeight :
+            (mode == InspectPresentationMode.Compact ? compactEntryHeight :
+                states[i].IsComplete ? completeEntryHeight : activeEntryHeight) + cards[i].ExtraHeight;
+
+        private void ApplyReflow()
+        {
             float y = topPadding;
             for (int i = 0; i < states.Length; i++)
             {
-                float height = mode == InspectPresentationMode.Compact ? compactEntryHeight :
-                    states[i].IsComplete ? completeEntryHeight : activeEntryHeight;
-                height += cards[i].ExtraHeight;
+                float height = EntryHeight(i);
                 RectTransform entry = (RectTransform)cards[i].transform;
                 entry.anchoredPosition = new Vector2(14f, -y);
                 cards[i].SetHeight(height);
@@ -116,6 +158,7 @@ namespace Uptime.Connections
             states = null;
             palette = null;
             frozen = null;
+            collapseAt = null;
         }
     }
 }

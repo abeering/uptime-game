@@ -15,3 +15,28 @@ The card now has a small additional content inset, with more space above and bel
 ## Later terminal cleanup
 
 The Terminal and Inspect Cleanup follow-up on PR #27 removed the old horizontal `TitleBar` strip from each authored card and removed numeric `ALLOC` text from the verbose status line. The performance status and any contention reason remain; the LOAD pill and underlying allocation model are unchanged. This note records the later presentation change without rewriting the original Inspect V2 phase contract above. See the [updated Editor previews](../Review/ConnectionsTerminalInspectCleanup/README.md).
+
+## Fitted pill follow-up — gameplay QoL branch
+
+The later gameplay QoL cleanup replaces the original fixed 126-unit LOAD badge with a text-measured pill. Its right edge stays aligned to the card inset, while its actual width is reserved before packing the operation timeline. Every LOAD label uses one decimal and an invariant period (`1.9`, `2.0`, `2.1`, and retired `0.0`). The monospace digits keep the width stable within one digit count; adding a digit resizes the badge and repacks the timeline.
+
+The shared authored token prefab gives active, completed, future-count, and LOAD pills centered labels and 12 units of outer horizontal padding on each side. A completed pill additionally reserves the authored 16-unit checkmark plus a 6-unit internal gap, keeping the combined checkmark/text group centered. Existing 40-unit heights, borders, colors, and narrow-width shortening remain. The same measurements drive preferred widths and timeline fit decisions. Compact, verbose, completed, killed, and canceled cards share these rules. This changes presentation only.
+
+The extended Inspect V2 Witness checks padding/centering, one-decimal LOAD under a comma-decimal locale, stable `1.9 → 2.0 → 2.1` widths, live one-/two-digit badge resizing, narrow cards, and completed/killed/canceled output. See the [Editor previews and manual review steps](../Review/ConnectionsInspectPillFit/README.md).
+
+## Resolved summary follow-up — gameplay QoL branch
+
+The existing active card and immediate resolution transition remain unchanged in the requested compact or verbose mode. On first rendering a resolved state, each card starts its own four-second hold using unscaled UI time. It then becomes a 48-unit horizontal summary with a 54×28 ID pill, purpose, operation badge, and explicit outcome. The smaller operation badge reuses the authored token and pill material, with 28-unit height and proportionally reduced padding/type. The existing muted color and left accent remain; LOAD, WORK, progress, activity, and ETA are hidden. Long purposes ellipsize; narrow rows can shorten the operation label to its kind before constraining it.
+
+| Resolution | Summary label | Final/current operation |
+| --- | --- | --- |
+| Natural completion | `COMPLETE` | Completion checkmark |
+| Player kill | `KILLED` | Interrupted operation, no completion checkmark |
+| Cancellation | `CANCELED` | Interrupted or planned operation, no completion checkmark |
+| Withdrawal | `WITHDRAWN` | Interrupted operation, no completion checkmark |
+
+Cancellation before establishment retains the existing planned/current operation presentation; the summary does not claim that the operation ran. Multi-operation history and resolution facts remain in the simulation unchanged. Inspecting a historical connection creates the existing full card again and starts a fresh hold; earlier summaries stay collapsed. This is a presentation choice measured from observation, not a new simulation timestamp or connection lifecycle state.
+
+Collapses preserve bottom-following or anchor the first visible history entry, including individual cards inside a multi-ID output. If the details being read disappear, the retained summary is revealed. Scroll limits still apply when the remaining history becomes shorter than the viewport. Layout updates do not select an object, focus the prompt, or change its text/caret. Resolved rows reflow when terminal width changes.
+
+`Assets/Editor/ResolvedInspectWitness.cs` checks all four outcomes, exact UI deadlines, paused simulation, independent cards, historical reinspection, narrow layout, simulation invariance, scrolling, and prompt preservation. The [review notes and preview](../Review/ConnectionsResolvedInspect/README.md) also record automated Play Mode results and the remaining interactive checks.
