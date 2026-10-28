@@ -7,6 +7,7 @@ using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
@@ -748,6 +749,39 @@ namespace Uptime.Connections.EditorTools
                 typeof(ConnectionsCleanOverlay).GetField("pidInput",
                     BindingFlags.Instance | BindingFlags.NonPublic).GetValue(prefabOverlay) == input,
                 "Connections prefab keeps Packet visual language without Packet callback");
+            var background = prefab.transform.Find("MinigameBackground").GetComponent<Image>();
+            var header = prefab.transform.Find("MinigameTitleBar").GetComponent<Image>();
+            var title = prefab.transform.Find("MinigameTitle").GetComponent<TMP_Text>();
+            var body = prefab.transform.Find("MinigameText").GetComponent<TMP_Text>();
+            var rail = prefab.transform.Find("CleanAccentRail").GetComponent<Image>();
+            var inputBackground = input.GetComponent<Image>();
+            var placeholder = (TMP_Text)input.placeholder;
+            var networkHeader = overlay.transform.parent.Find("NetworkHeader").GetComponent<Image>();
+            var terminalTitle = terminal.transform.Find("TerminalHeader/TerminalTitle")
+                .GetComponent<TMP_Text>();
+            var terminalInput = terminal.transform.Find("CommandPrompt/CommandInput")
+                .GetComponent<TMP_InputField>();
+            Check(background.color == terminal.GetComponent<Image>().color &&
+                header.color == networkHeader.color &&
+                title.font == terminalTitle.font &&
+                body.font == terminalInput.textComponent.font &&
+                title.color == new Color(0.73f, 0.89f, 0.84f) &&
+                body.color == title.color &&
+                rail.rectTransform.anchorMin == Vector2.zero &&
+                rail.rectTransform.anchorMax == new Vector2(0f, 1f) &&
+                rail.rectTransform.rect.width == 5f &&
+                ((RectTransform)header.transform).rect.height == 56f &&
+                body.rectTransform.offsetMax.y == -82f &&
+                inputBackground != null && input.targetGraphic == inputBackground &&
+                input.GetComponent<Outline>() != null &&
+                placeholder.text == "> PID" &&
+                placeholder.color == new Color(0.47f, 0.63f, 0.62f) &&
+                overlay.transform.Find("MinigameTitle").GetComponent<TMP_Text>().color ==
+                    title.color &&
+                overlay.transform.Find("MinigameText").GetComponent<TMP_Text>().color ==
+                    body.color &&
+                overlay.transform.Find("MinigameInput").GetComponent<Image>() != null,
+                "clean overlay uses Connections colors, font, spacing, and visible PID input");
         }
 
         private static void StepUntilComplete(SimulationHost host, string id)
