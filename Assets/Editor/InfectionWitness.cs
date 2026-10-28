@@ -37,6 +37,7 @@ namespace Uptime.Connections.EditorTools
                     director.PhantomLoadWeight == 1f && director.BlackoutWeight == 1f &&
                     director.SpawnerWeight == 1f && host.Infections.Count == 0,
                     "authored default and clean initial state");
+                CheckCleanOverlayBindings();
                 CheckParserAndDeterminism(director);
                 CheckKilledCarrier(host, director, recorder);
                 CheckDeliveredCarrier(host, director, recorder);
@@ -583,168 +584,165 @@ namespace Uptime.Connections.EditorTools
         private static void CheckPlayerCleaning(SimulationHost host,
             ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
         {
-            var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
-            MethodInfo clean = typeof(Terminal).GetMethod("Clean",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            Check(terminal != null && clean != null, "player clean command bound");
-
             host.ResetSimulation();
             recorder.BeginRun();
             NodeResources db = Node(host, "DB");
-            var route = new[] { Node(host, "EXT1").View, Node(host, "API").View, db.View };
-            var peer = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
-                new ConnectionSpawnPlan(0f, "clean-peer", route, "witness", "Service",
-                    new[] { new OperationStage(OperationKind.Read, 100f, 5f, "Service") })));
-            Check(host.TryInjectPhantomLoad("DB", 8f, out _), "clean LOAD setup");
-            host.StepSimulation(1.3f);
-            Near(peer.AllocatedLoad, 2f, "peer contends with Phantom LOAD");
-            float health = host.Health.Value, work = peer.CompletedWork, time = host.SimulationTimeSeconds;
-            RunClean(terminal, clean, "clean DB");
-            Check(LastTerminalText(terminal) == "CLEAN COMPLETE  DB", "clean success feedback");
-            Check(host.Infections.Count == 0 && db.InfectionRequestedLoad == 0f,
-                "Phantom LOAD removed");
-            Near(peer.AllocatedLoad, 5f, "clean immediately frees peer capacity");
-            Near(host.Health.Value, health, "clean does not directly change Health");
-            Near(peer.CompletedWork, work, "clean does not advance WORK");
-            Near(host.SimulationTimeSeconds, time, "clean does not advance time");
-            host.StepSimulation(1f);
-            Near(peer.CompletedWork, work + 5f, "peer WORK benefits after clean");
+            Check(host.StartClean("MISSING", "clean MISSING", out _) ==
+                CleanStartResult.UnknownNode, "unknown node rejected");
+            Check(host.StartClean("DB", "clean DB", out CleanSession healthy) ==
+                CleanStartResult.Started && healthy.WasHealthy &&
+                healthy.Processes.Count == 5 &&
+                healthy.Processes.Select(p => p.Pid).Distinct().Count() == 5 &&
+                healthy.Processes.All(p => p.CpuPercent < 45),
+                "healthy PID session has plausible innocent processes");
+            Check(host.StartClean("API", "clean API", out _) ==
+                CleanStartResult.AlreadyActive, "only one session at a time");
+            float health = host.Health.Value;
+            Check(host.SelectCleanPid(-1, out _) == CleanSelectionResult.InvalidPid &&
+                host.ActiveClean == healthy && host.Health.Value == health,
+                "invalid PID keeps session and Health intact");
+            Check(host.SelectCleanPid(healthy.Processes[0].Pid, out _) ==
+                CleanSelectionResult.InnocentProcess && host.ActiveClean == null,
+                "healthy attempt fails on innocent process");
+            Near(host.Health.Value, health - 5f, "innocent process costs five Health");
+            Check(recorder.CurrentLog.events.Any(e => e.type == "clean_started" &&
+                e.healthyAtStart) && recorder.CurrentLog.events.Any(e =>
+                e.type == "clean_failed" && e.healthyAtStart) &&
+                recorder.CurrentLog.events.Any(e => e.type == "health_penalty" &&
+                e.reason == "innocent_process" && e.connectionId == null &&
+                e.targetNodeId == "DB"), "healthy failure and operator penalty recorded");
 
             host.ResetSimulation();
             recorder.BeginRun();
             Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 8f, out _) &&
                 host.TryInjectInfection("DB", InfectionKind.Blackout, 0f, out _) &&
-                host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _) &&
-                host.TryInjectInfection("AUTH", InfectionKind.PhantomLoad, 2f, out _),
-                "three kinds coexist with another node infected");
-            health = host.Health.Value;
-            RunClean(terminal, clean, "clean db");
-            Check(host.Infections.Count == 1 &&
-                host.Infections[0].Target.View.NodeId == "AUTH" &&
-                !host.IsNodeOffline(db.View) && db.InfectionRequestedLoad == 0f,
-                "one clean clears all DB kinds and leaves AUTH intact");
-            Near(host.Health.Value, health, "batch cleaning has no Health cost");
-            RunEvent action = recorder.CurrentLog.events.Last(e => e.type == "player_action");
-            RunEvent[] removals = recorder.CurrentLog.events.Where(e =>
-                e.type == "infection_removed" && e.actionSequence == action.sequence).ToArray();
-            Check(action.command == "clean db" && action.targetNodeId == "DB" &&
-                action.success && removals.Length == 3 && removals.All(e =>
-                    e.source == "player_clean" && e.reason == "player_clean" &&
-                    e.timeSeconds == action.timeSeconds) &&
-                removals.Select(e => e.infectionKind).OrderBy(k => k).SequenceEqual(
-                    new[] { "Blackout", "PhantomLoad", "Spawner" }),
-                "one action links all three attributable removal receipts");
-            RunClean(terminal, clean, "clean DB");
-            Check(LastTerminalText(terminal) == "CLEAN  NO INFECTION DETECTED  DB" &&
-                !recorder.CurrentLog.events.Last().success &&
-                recorder.CurrentLog.events.Last().reason == "no_infection",
-                "uninfected node is an ordinary recorded no-op");
-            int eventCount = recorder.CurrentLog.events.Count;
-            RunClean(terminal, clean, "clean MISSING");
-            Check(LastTerminalText(terminal) == "CLEAN FAILED  UNKNOWN NODE MISSING" &&
-                host.Infections.Count == 1 &&
-                recorder.CurrentLog.events.Count == eventCount + 1 &&
-                recorder.CurrentLog.events.Last().targetNodeId == "MISSING" &&
-                recorder.CurrentLog.events.Last().reason == "unknown_node",
-                "unknown node changes no infection state and records failure");
-            host.StepSimulation(2f);
-            Check(!recorder.CurrentLog.events.Any(e => e.source == "spawner"),
-                "cleaned Spawner produces no future child");
-            Check(recorder.Save(false), "clean JSON saved");
+                host.TryInjectInfection("DB", InfectionKind.Spawner, 20f, out _),
+                "three infections coexist");
+            Check(host.StartClean("db", "clean db", out CleanSession session) ==
+                CleanStartResult.Started && session.Processes.Count == 5 &&
+                session.Processes.Count(p => p.CpuPercent >= 82) == 1 &&
+                host.Infections.Count == 3 && host.IsNodeOffline(db.View),
+                "start captures infections without removing or revealing them");
+            float time = host.SimulationTimeSeconds;
+            host.StepSimulation(0.25f);
+            Check(host.SimulationTimeSeconds > time && host.Infections.Count == 3,
+                "simulation continues during session");
+            int malicious = session.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(malicious, out int removed) ==
+                CleanSelectionResult.Success && removed == 3 &&
+                host.Infections.Count == 0 && !host.IsNodeOffline(db.View) &&
+                db.InfectionRequestedLoad == 0f, "one correct PID clears captured kinds");
+            RunEvent started = recorder.CurrentLog.events.Last(e =>
+                e.type == "clean_started");
+            Check(recorder.CurrentLog.events.Count(e => e.type == "infection_removed" &&
+                e.actionSequence == started.actionSequence) == 3 &&
+                recorder.CurrentLog.events.Any(e => e.type == "clean_succeeded" &&
+                    e.cleanSessionId == started.cleanSessionId &&
+                    e.removedInfectionCount == 3),
+                "success and removal provenance recorded");
+            Check(recorder.Save(false), "clean log saved");
             ConnectionsRunLog saved = JsonUtility.FromJson<ConnectionsRunLog>(
                 File.ReadAllText(recorder.OutputPath));
-            Check(saved.events.Count(e => e.type == "infection_removed" &&
-                e.actionSequence == action.sequence) == 3 &&
-                saved.events.Any(e => e.type == "player_action" && e.sequence == action.sequence &&
-                    e.targetNodeId == "DB" && e.success) &&
-                saved.snapshots.Last().infections.Single().targetNodeId == "AUTH" &&
-                saved.snapshots.Last().nodes.Single(n => n.id == "DB").infectionRequestedLoad == 0f,
-                "saved clean JSON retains action, provenance, and resulting state");
+            Check(saved.events.Any(e => e.type == "clean_succeeded" &&
+                e.removedInfectionCount == 3) &&
+                saved.events.Count(e => e.type == "infection_removed" &&
+                    e.actionSequence == started.actionSequence) == 3,
+                "saved JSON keeps clean outcome and infection provenance");
 
             host.ResetSimulation();
             recorder.BeginRun();
-            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _),
-                "Blackout cleaning setup");
-            var failed = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
-                new ConnectionSpawnPlan(0f, "clean-failed", route, "witness", "Service",
-                    new[] { new OperationStage(OperationKind.Read, 100f, 1f, "Service") })));
-            host.StepSimulation(0.6f);
-            Check(failed.Resolution == ConnectionResolution.Canceled &&
-                failed.HealthPenaltyAmount == -5f, "prior benign cancellation costs five");
-            var survives = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(
-                new ConnectionSpawnPlan(0f, "clean-survives", route, "witness", "Service",
-                    new[] { new OperationStage(OperationKind.Read, 100f, 1f, "Service") })));
+            Check(host.TryInjectPhantomLoad("DB", 8f, out _), "arrival setup");
+            Check(host.StartClean("DB", "clean DB", out session) ==
+                CleanStartResult.Started, "arrival session starts");
+            Check(host.TryRemovePhantomLoad("DB", out _) &&
+                host.TryInjectPhantomLoad("DB", 3f, out _),
+                "old instance removed and new infection arrives mid-session");
+            NodeInfection newArrival = host.Infections.Single();
+            malicious = session.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(malicious, out removed) ==
+                CleanSelectionResult.Success && removed == 0 &&
+                ReferenceEquals(host.Infections.Single(), newArrival) &&
+                db.InfectionRequestedLoad == 3f,
+                "newly delivered instance survives successful old session");
+
+            Check(host.StartClean("DB", "clean DB", out session) ==
+                CleanStartResult.Started && host.CancelClean() &&
+                ReferenceEquals(host.Infections.Single(), newArrival) &&
+                recorder.CurrentLog.events.Any(e => e.type == "clean_canceled"),
+                "cancel preserves infection with no penalty");
+            Check(host.StartClean("DB", "clean DB", out session) ==
+                CleanStartResult.Started, "session restarts");
+            int innocent = session.Processes.First(p => p.CpuPercent < 45).Pid;
             health = host.Health.Value;
-            RunClean(terminal, clean, "clean API");
-            Near(host.Health.Value, health, "clean does not refund prior cancellation");
-            host.StepSimulation(1.2f);
-            Check(survives.IsActive && failed.Resolution == ConnectionResolution.Canceled &&
-                !host.IsNodeOffline(Node(host, "API").View),
-                "cleaned transit node admits later attempt without resurrecting prior one");
+            Check(host.SelectCleanPid(innocent, out _) ==
+                CleanSelectionResult.InnocentProcess &&
+                ReferenceEquals(host.Infections.Single(), newArrival),
+                "wrong PID leaves infection active");
+            Near(host.Health.Value, health - 5f, "infected wrong PID costs five Health");
+            host.StepSimulation(1f);
+            Check(host.Health.Value > health - 5f,
+                "ordinary Health recovery still works after operator penalty");
 
             host.ResetSimulation();
             recorder.BeginRun();
             Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
                 "Spawner independence setup");
             host.StepSimulation(1f);
-            RunEvent firstChild = recorder.CurrentLog.events.Single(e =>
+            int children = recorder.CurrentLog.events.Count(e =>
                 e.type == "plan_queued" && e.source == "spawner");
-            host.StepSimulation(0.1f);
-            host.StepSimulation(1f);
-            RunEvent[] children = recorder.CurrentLog.events.Where(e =>
-                e.type == "plan_queued" && e.source == "spawner").ToArray();
-            Check(children.Length == 2 &&
-                host.FindConnection(firstChild.connectionId) != null,
-                "Spawner has an arrived child and a queued child");
-            RunClean(terminal, clean, "clean DB");
-            host.StepSimulation(0.1f);
-            Check(host.FindConnection(children[0].connectionId) != null &&
-                host.FindConnection(children[1].connectionId) != null,
-                "clean preserves arrived and queued children");
-            host.StepSimulation(1f);
+            Check(children == 1, "Spawner generated child before cleaning");
+            Check(host.StartClean("DB", "clean DB", out session) ==
+                CleanStartResult.Started, "Spawner clean starts");
+            malicious = session.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(malicious, out removed) ==
+                CleanSelectionResult.Success && removed == 1,
+                "Spawner infection removed");
+            host.StepSimulation(1.1f);
             Check(recorder.CurrentLog.events.Count(e => e.type == "plan_queued" &&
-                e.source == "spawner") == 2,
-                "cleaned Spawner queues no further children");
+                e.source == "spawner") == children &&
+                host.FindConnection(recorder.CurrentLog.events.Single(e =>
+                    e.type == "plan_queued" && e.source == "spawner").connectionId) != null,
+                "Spawner child remains independent; no further children queued");
 
             host.ResetSimulation();
-            recorder.BeginRun();
-            foreach (string id in new[] { "clean-delivery-1", "clean-delivery-2" })
-                director.QueueSpawnPlan(new ConnectionSpawnPlan(0f, id, route, "witness",
-                    "Service", new[] { new OperationStage(OperationKind.Write, 1f, 1f,
-                        "Delivery", CompletionEffect.InfectionDelivery, null,
-                        new InfectionPayload(InfectionKind.PhantomLoad, 3f)) }, true));
-            host.StepSimulation(3f);
-            ConnectionEffectOccurrence[] deliveries = host.Occurrences.Where(o =>
-                o.Type == CompletionEffect.InfectionDelivery).ToArray();
-            Check(deliveries.Length == 2 && deliveries.Count(o => o.InfectionApplied == true) == 1 &&
-                deliveries.Count(o => o.InfectionApplied == false) == 1 &&
-                Terminal.DeliveryMessage(deliveries.Single(o => o.InfectionApplied == false))
-                    .StartsWith("PAYLOAD NOT INSTALLED") &&
-                recorder.CurrentLog.events.Count(e => e.type == "infection_rejected" &&
-                    e.reason == "already_active") == 1,
-                "duplicate delivery reports rejection without a false installation message");
-            RunClean(terminal, clean, "clean DB");
-            action = recorder.CurrentLog.events.Last(e => e.type == "player_action");
-            RunEvent deliveredRemoval = recorder.CurrentLog.events.Single(e =>
-                e.type == "infection_removed" && e.actionSequence == action.sequence);
-            Check(deliveredRemoval.sourceConnectionId == "clean-delivery-1" &&
-                deliveredRemoval.sourceOperationIndex == 0 &&
-                deliveredRemoval.source == "player_clean" && host.Infections.Count == 0,
-                "clean removal preserves delivered infection provenance");
-            Check(recorder.Save(false), "delivered clean JSON saved");
-            saved = JsonUtility.FromJson<ConnectionsRunLog>(File.ReadAllText(recorder.OutputPath));
-            Check(saved.events.Any(e => e.type == "infection_removed" &&
-                e.actionSequence == action.sequence &&
-                e.sourceConnectionId == "clean-delivery-1") &&
-                saved.snapshots.Last().infections.Length == 0,
-                "saved JSON links delivered provenance to cleaned state");
+            director.ResetDirector();
+            string expectedHostile = PayloadSignature(director.GenerateHostilePlan(100f));
+            host.ResetSimulation();
+            Check(host.StartClean("DB", "clean DB", out _) ==
+                CleanStartResult.Started && host.CancelClean(),
+                "determinism check runs healthy puzzle");
+            Check(PayloadSignature(director.GenerateHostilePlan(100f)) == expectedHostile,
+                "clean puzzle does not consume ambient generation RNG");
         }
 
-        private static void RunClean(Terminal terminal, MethodInfo clean, string command) =>
-            clean.Invoke(terminal, new object[] { command.Split(' '), command });
-
-        private static string LastTerminalText(Terminal terminal) =>
-            terminal.GetComponentsInChildren<TextRow>(true).Last().GetComponentInChildren<TMP_Text>(true).text;
+        private static void CheckCleanOverlayBindings()
+        {
+            var overlay = UnityEngine.Object.FindFirstObjectByType<ConnectionsCleanOverlay>(
+                FindObjectsInactive.Include);
+            var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
+            var panel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Connections/CleanOverlay.prefab");
+            Check(overlay != null && terminal != null && panel != null && prefab != null &&
+                overlay.transform.parent.name == "NetworkPanel" &&
+                !overlay.gameObject.activeSelf &&
+                ((RectTransform)overlay.transform).sizeDelta == new Vector2(710f, 465f),
+                "authored inactive clean overlay in network panel");
+            Check(ReferenceEquals(typeof(Terminal).GetField("cleanOverlay",
+                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(terminal), overlay) &&
+                ReferenceEquals(typeof(NetworkHealthPanel).GetField("cleanOverlay",
+                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(panel), overlay),
+                "terminal and Health focus bindings target scene overlay");
+            var prefabOverlay = prefab.GetComponent<ConnectionsCleanOverlay>();
+            var input = prefab.GetComponentInChildren<TMP_InputField>(true);
+            Check(prefabOverlay != null && input != null &&
+                prefab.GetComponent<Canvas>() == null &&
+                prefab.GetComponent<CleanMinigameOverlayView>() == null &&
+                input.onEndEdit.GetPersistentEventCount() == 0 &&
+                typeof(ConnectionsCleanOverlay).GetField("pidInput",
+                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(prefabOverlay) == input,
+                "Connections prefab keeps Packet visual language without Packet callback");
+        }
 
         private static void StepUntilComplete(SimulationHost host, string id)
         {

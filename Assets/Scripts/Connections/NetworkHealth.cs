@@ -15,6 +15,7 @@ namespace Uptime.Connections
         [Min(0f)] public float recoveryPerSecond = 0.35f;
         [Min(0f)] public float incorrectKillPenalty = 10f;
         [Min(0f)] public float benignCancellationPenalty = 5f;
+        [Min(0f)] public float innocentProcessPenalty = 5f;
         [Range(0f, 1f)] public float substantialSlowdownThreshold = 0.98f;
     }
 
@@ -30,11 +31,15 @@ namespace Uptime.Connections
 
     public sealed class NetworkHealthEvent
     {
-        internal NetworkHealthEvent(string connectionId, float timeSeconds, float amount)
-        { ConnectionId = connectionId; TimeSeconds = timeSeconds; Amount = amount; }
+        internal NetworkHealthEvent(string connectionId, float timeSeconds, float amount,
+            string reason = null, string targetNodeId = null)
+        { ConnectionId = connectionId; TimeSeconds = timeSeconds; Amount = amount;
+            Reason = reason; TargetNodeId = targetNodeId; }
         public string ConnectionId { get; }
         public float TimeSeconds { get; }
         public float Amount { get; }
+        public string Reason { get; }
+        public string TargetNodeId { get; }
     }
 
     public sealed class NetworkHealthSnapshot
@@ -189,6 +194,30 @@ namespace Uptime.Connections
                 net, slowed, overdue, failed,
                 remaining.ToArray(), events.ToArray());
             return penalty;
+        }
+
+        public NetworkHealthEvent PenalizeInnocentProcess(string nodeId, float timeSeconds)
+        {
+            float amount = Mathf.Max(0f, tuning.innocentProcessPenalty);
+            value = Mathf.Max(0f, value - amount);
+            if (value <= 0f) failed = true;
+            var penalty = new NetworkHealthEvent(null, timeSeconds, -amount,
+                "innocent_process", nodeId);
+            events.Insert(0, penalty);
+            if (events.Count > 5) events.RemoveAt(events.Count - 1);
+            float recovery = snapshot.DegradationRate == 0f && value < 100f ?
+                Mathf.Max(0f, tuning.recoveryPerSecond) : 0f;
+            snapshot = new NetworkHealthSnapshot(value, snapshot.DegradationRate, recovery,
+                recovery - snapshot.DegradationRate, snapshot.SlowedCount,
+                snapshot.OverdueCount, failed, CopyImpacts(snapshot), events.ToArray());
+            return penalty;
+        }
+
+        private static NetworkHealthImpact[] CopyImpacts(NetworkHealthSnapshot current)
+        {
+            var copy = new NetworkHealthImpact[current.Impacts.Count];
+            for (int i = 0; i < copy.Length; i++) copy[i] = current.Impacts[i];
+            return copy;
         }
     }
 }

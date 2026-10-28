@@ -185,6 +185,11 @@ namespace Uptime.Connections
         public string command;
         public bool success;
         public int actionSequence;
+        public int cleanSessionId;
+        public int selectedPid;
+        public bool healthyAtStart;
+        public int capturedInfectionCount;
+        public int removedInfectionCount;
         public float healthPenaltyAmount;
         public float healthAfter;
         public string note;
@@ -701,11 +706,28 @@ namespace Uptime.Connections
             return entry.sequence;
         }
 
+        public void RecordClean(string type, CleanSession session, float time,
+            int selectedPid = 0, int removedCount = 0)
+        {
+            if (!IsRecording || session == null) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.cleanSessionId = session.Id;
+            entry.targetNodeId = session.NodeId;
+            entry.selectedPid = selectedPid;
+            entry.healthyAtStart = session.WasHealthy;
+            entry.capturedInfectionCount = session.StartingInfections.Length;
+            entry.removedInfectionCount = removedCount;
+            entry.actionSequence = session.ActionSequence;
+            entry.success = type == "clean_succeeded";
+        }
+
         public void RecordHealthPenalty(NetworkHealthEvent penalty, float resultingHealth)
         {
             if (!IsRecording || penalty == null) return;
             RunEvent entry = NewEvent("health_penalty", penalty.TimeSeconds);
             entry.connectionId = penalty.ConnectionId;
+            entry.targetNodeId = penalty.TargetNodeId;
+            entry.reason = penalty.Reason;
             entry.healthPenaltyAmount = penalty.Amount;
             entry.healthAfter = resultingHealth;
         }
