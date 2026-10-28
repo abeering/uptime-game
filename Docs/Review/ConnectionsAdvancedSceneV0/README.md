@@ -81,6 +81,20 @@ scripted Play Mode states, not an interactive check of animated relayout or
 command focus. Adjacent-face port competition and nonrectangular nodes are
 outside this first pass.
 
+### Three paths through WEB
+
+The crowded capture is a poor way to see the specific WEB junction improvement.
+For a direct comparison, a scripted Play Mode session registered three identical
+EXT1 -> WEB -> API connections and captured the same state with adaptive ports
+off and then on. [Fixed attachment widths](web-three-before.png) put the outer
+beam edges 25.6 UI pixels into overlap at WEB's top border.
+[Adaptive entries](web-three-after.png) separate those edges by 69 UI pixels,
+while both links retain 12-pixel beams and three centered ID pills. The diagonal
+bundle uses WEB's upper-right boundary; the vertical bundle moves left. The
+advanced-scene witness now reproduces this exact 3+3 lane arrangement and checks
+the clearance improvement. This toggle was only in the validation session; the
+authored advanced scene keeps adaptive ports enabled.
+
 | Seed | Ambient benign | Ambient hostile | EXT1 / EXT2 plans | Peak active connections | Delivered infections |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1701 | 24 | 11 | 23 / 12 | 14 | 6 |

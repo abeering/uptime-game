@@ -137,6 +137,7 @@ namespace Uptime.Connections.EditorTools
             Check(new SerializedObject(presenter).FindProperty("adaptiveNodePorts").boolValue,
                 "adaptive node ports enabled in advanced scene");
             CheckCrowdedPorts(links, area, identity);
+            CheckThreeAtWeb(links, area, identity);
 
             foreach (int seed in new[] { 1701, 3141, 9001 })
             {
@@ -352,6 +353,53 @@ namespace Uptime.Connections.EditorTools
             point = a + ab * t;
             return true;
         }
+
+        private static void CheckThreeAtWeb(PhysicalLinkView[] links, RectTransform area,
+            IdentityPresenter identity)
+        {
+            PhysicalLinkView e1 = links.First(l => l.LinkId == "E1");
+            PhysicalLinkView e2 = links.First(l => l.LinkId == "E2");
+            Rect web = EdgeGeometry.CardRect(e1.NodeB, area);
+            identity.BeginFrame();
+            IdentityPacking.Layout fixedE1 = identity.ResolveLayout(e1, 3, 12f, 2.5f, 6f);
+            IdentityPacking.Layout fixedE2 = identity.ResolveLayout(e2, 3, 12f, 2.5f, 6f);
+            float fixedGap = WebTopGap(fixedE1, fixedE2, web.yMax);
+            var counts = new Dictionary<PhysicalLinkView, int> { { e1, 3 }, { e2, 3 } };
+            Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
+                NodePortPacking.Plan(counts, area);
+            IdentityPacking.Layout adaptiveE1 = identity.ResolveLayout(e1, 3, 12f, 2.5f,
+                6f, ports[e1]);
+            IdentityPacking.Layout adaptiveE2 = identity.ResolveLayout(e2, 3, 12f, 2.5f,
+                6f, ports[e2]);
+            float adaptiveGap = WebTopGap(adaptiveE1, adaptiveE2, web.yMax);
+            Check(adaptiveGap > fixedGap + 20f && adaptiveGap >= identity.MinimumPillGap &&
+                Mathf.Abs(adaptiveE1.LineWidth - 12f) < 0.1f &&
+                Mathf.Abs(adaptiveE2.LineWidth - 12f) < 0.1f,
+                "three shared WEB paths separate without shrinking their 12px beams");
+            identity.EndFrame();
+            Debug.Log($"WEB THREE: fixed edge gap={fixedGap:0.#}px, " +
+                $"adaptive edge gap={adaptiveGap:0.#}px, both beams=12px");
+        }
+
+        private static float WebTopGap(IdentityPacking.Layout e1,
+            IdentityPacking.Layout e2, float y)
+        {
+            float right = float.NegativeInfinity, left = float.PositiveInfinity;
+            foreach (IdentityPacking.Lane lane in e1.Lanes)
+                right = Mathf.Max(right, BeamXAtY(lane, y) + BeamHalfSpanAtY(lane));
+            foreach (IdentityPacking.Lane lane in e2.Lanes)
+                left = Mathf.Min(left, BeamXAtY(lane, y) - BeamHalfSpanAtY(lane));
+            return left - right;
+        }
+
+        private static float BeamXAtY(IdentityPacking.Lane lane, float y)
+        {
+            float fraction = (y - lane.Start.y) / (lane.End.y - lane.Start.y);
+            return Mathf.LerpUnclamped(lane.Start.x, lane.End.x, fraction);
+        }
+
+        private static float BeamHalfSpanAtY(IdentityPacking.Lane lane) =>
+            lane.Width * 0.5f / Mathf.Abs((lane.End - lane.Start).normalized.y);
 
         private static string Edge(string a, string b) =>
             string.CompareOrdinal(a, b) < 0 ? a + "-" + b : b + "-" + a;
