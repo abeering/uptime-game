@@ -9,6 +9,8 @@ namespace Uptime.Connections
     {
         [SerializeField] private TMP_Text identity;
         [SerializeField] private IdentityPillView headerIdentityPill;
+        [SerializeField] private GameObject fullContent;
+        [SerializeField] private ResolvedInspectRow resolvedRow;
         [SerializeField] private TMP_Text purpose;
         [SerializeField] private RectTransform operationRow;
         [SerializeField] private InspectOperationToken operationTokenPrefab;
@@ -40,8 +42,26 @@ namespace Uptime.Connections
         private float renderedTimelineWidth = -1f;
         private InspectOperationToken activeToken;
         private bool stackedUpper;
+        private bool resolvedSummary;
 
-        public float ExtraHeight => stackedUpper ? 52f : 0f;
+        public float ExtraHeight => !resolvedSummary && stackedUpper ? 52f : 0f;
+        public bool IsResolvedSummary => resolvedSummary;
+
+        public void ShowFullCard()
+        {
+            resolvedSummary = false;
+            if (fullContent != null) fullContent.SetActive(true);
+            if (resolvedRow != null) resolvedRow.gameObject.SetActive(false);
+        }
+
+        public void ShowResolvedSummary(LogicalConnectionState state)
+        {
+            if (!state.IsComplete || fullContent == null || resolvedRow == null) return;
+            resolvedSummary = true;
+            fullContent.SetActive(false);
+            resolvedRow.gameObject.SetActive(true);
+            resolvedRow.Bind(state, quietColor);
+        }
 
         public void ClearRuntimeTokens()
         {
@@ -73,6 +93,11 @@ namespace Uptime.Connections
                 loadBadge.Measure(InspectOperationToken.LoadLabel(requestedLoad)) : 0f;
             RectTransform card = (RectTransform)transform;
             card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+            if (resolvedSummary)
+            {
+                resolvedRow.FitWidth();
+                return;
+            }
             float contentWidth = Mathf.Max(0f, width - contentInset * 2f);
             float upperLeft = contentInset;
             if (headerIdentityPill != null)

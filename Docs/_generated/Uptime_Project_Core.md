@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:5f4e6a664ba91403137322ba6d41a30b50b0f9aa9199f945b6231a559d2ca4cc`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:fd67ab0ba12a0d6d43e831dbb4ef63f05936f380677d0b9472e75fde192eb085`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -203,6 +203,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Resolved inspection lifecycle (gameplay QoL review branch):** Each inspection card preserves its existing active and immediate-resolution presentation, then collapses to a 48-unit summary after four unscaled UI seconds. The summary retains the small ID pill, purpose, last/current operation, muted accent, and exact `COMPLETE`, `KILLED`, `CANCELED`, or `WITHDRAWN` outcome; only natural completion marks the final operation complete. LOAD, WORK, progress, and ETA disappear from the summary. Cards time independently, including while simulation time is paused. Historical reinspection starts a fresh four-second hold in the requested compact/verbose mode. Height changes preserve the visible history entry or bottom-follow position without changing prompt focus, selection, or draft. Simulation, commands, and historical state are unchanged. See [Inspect V2](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-inspect-v2.md) and the [lifecycle preview and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsResolvedInspect/README.md).
 
 **Inspect pill cleanup (gameplay QoL review branch):** Active operations, completed operations/counts, future counts, and LOAD use the same 12-unit outer horizontal padding and centered labels in their authored 40-unit pills. Completed pills reserve the checkmark width plus a 6-unit gap inside that padding. The right-aligned LOAD badge fits its displayed text instead of a fixed 126-unit width; its space is measured before timeline packing. LOAD always shows one decimal with a period, including `2.0` and retired `0.0`, so `1.9 → 2.0 → 2.1` keeps a stable width. Compact and verbose presentation share the change; simulation and information access are unchanged. See [Inspect V2](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-inspect-v2.md) and the [Editor previews](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsInspectPillFit/README.md).
 

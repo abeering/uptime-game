@@ -673,6 +673,63 @@ namespace Uptime.Connections
             return instance;
         }
 
+        // Anchor the first visible card/entry while resolved inspection rows shrink.
+        internal void UpdateHistoryLayout(System.Action updateLayout)
+        {
+            if (historyScroll == null || historyContent == null || historyScroll.viewport == null)
+            {
+                updateLayout();
+                return;
+            }
+            Canvas.ForceUpdateCanvases();
+            bool atBottom = historyScroll.verticalNormalizedPosition <= 0.01f;
+            RectTransform viewport = historyScroll.viewport;
+            RectTransform anchor = null;
+            float topBefore = 0f;
+            var corners = new Vector3[4];
+            bool Visible(RectTransform rect)
+            {
+                rect.GetWorldCorners(corners);
+                float top = viewport.InverseTransformPoint(corners[1]).y;
+                float bottom = viewport.InverseTransformPoint(corners[0]).y;
+                if (top <= viewport.rect.yMin || bottom >= viewport.rect.yMax) return false;
+                anchor = rect;
+                topBefore = top;
+                return true;
+            }
+            if (!atBottom)
+                foreach (RectTransform child in historyContent)
+                {
+                    if (!child.gameObject.activeInHierarchy) continue;
+                    InspectEntry[] entries = child.GetComponentsInChildren<InspectEntry>();
+                    if (entries.Length > 0)
+                    {
+                        foreach (InspectEntry entry in entries)
+                            if (Visible((RectTransform)entry.transform)) break;
+                    }
+                    else Visible(child);
+                    if (anchor != null) break;
+                }
+            updateLayout();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(historyContent);
+            Canvas.ForceUpdateCanvases();
+            if (atBottom)
+                historyScroll.verticalNormalizedPosition = 0f;
+            else if (anchor != null)
+            {
+                anchor.GetWorldCorners(corners);
+                float topAfter = viewport.InverseTransformPoint(corners[1]).y;
+                // If the text being read disappeared, reveal its retained summary row.
+                if (topBefore - viewport.rect.yMax >= anchor.rect.height)
+                    topBefore = viewport.rect.yMax;
+                Vector3 correction = historyContent.parent.InverseTransformVector(
+                    viewport.TransformVector(new Vector3(0f, topBefore - topAfter, 0f)));
+                historyContent.anchoredPosition += new Vector2(0f, correction.y);
+                historyScroll.verticalNormalizedPosition = Mathf.Clamp01(
+                    historyScroll.verticalNormalizedPosition);
+            }
+        }
+
         // Keep the top visible history location when the workstation changes height.
         public void SetTopInset(float inset)
         {
