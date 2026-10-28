@@ -2,6 +2,17 @@
 
 Uptime is one game design explored through two independent gameplay prototypes: Packet and Connections. Both remain playable and neither is declared the final implementation.
 
+## ChatGPT and Codex workflow
+
+**ChatGPT is the design, planning, and review workspace; Codex/local Unity is the implementation workspace.** This governs collaboration on Uptime, not any gameplay mechanic.
+
+- **In ChatGPT:** Research the current repository read-only as needed, discuss alternatives, agree on a small design contract, prepare review criteria, and review Codex PRs, test results, and playtest evidence. Do not implement gameplay code, author scenes/prefabs, create branches or implementation PRs, or run a development workflow from this conversation by default, even when GitHub write tools are available.
+- **Handoff directly to Codex:** Once a design is approved, provide a **complete, copy-ready Codex implementation prompt in the chat itself**. Do not create GitHub issues/tickets as handoffs, ask Codex to work from an issue instead of a prompt, or substitute a vague task summary or external link for the prompt. The user takes that prompt to Codex.
+- **Codex/local Unity:** Own code and scene changes, implementation documentation, tests and Unity validation, feature branches, commits, and unmerged PRs. Return branch/commit, exact changes, checks actually run, caveats, and manual Play Mode review instructions to this discussion.
+- **Approval is not implementation authorization:** Replies such as “sounds good,” “agreed,” or “let's continue” authorize the next design or Codex handoff step, **not** repository writes from ChatGPT. Read/review GitHub material here freely, but take GitHub write actions (for example a specifically requested docs update, PR review reply, or merge) **only when the user explicitly requests that particular action**.
+
+A handoff prompt should state the current repository/branch as implementation authority; objective; agreed mechanics and boundaries; relevant docs, code, scenes, and prefabs to inspect; non-goals; observable acceptance criteria; automated and manual Unity checks; and expectation of an unmerged, reviewable PR. Prefer small, independent PRs. ChatGPT may discuss and review that PR afterward without assuming responsibility for its implementation.
+
 ## Start here
 
 1. [Uptime Current State](Uptime_Current_State.md) — project posture, implementation boundaries, validation, and source authority at the documented baseline.
