@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    // Presentation-only attachment space. Active links on the same side of a card
-    // divide its usable perimeter instead of each claiming a centered fixed strip.
+    // Presentation-only attachment space. Keep each link centered while its
+    // preferred full-size footprint fits; divide the perimeter when they compete.
     public static class NodePortPacking
     {
         public struct Port
@@ -41,7 +41,8 @@ namespace Uptime.Connections
         }
 
         public static Dictionary<PhysicalLinkView, Port> Plan(
-            IReadOnlyDictionary<PhysicalLinkView, int> counts, RectTransform area)
+            IReadOnlyDictionary<PhysicalLinkView, int> counts, RectTransform area,
+            float lineWidth = 12f, float lineGap = 6f)
         {
             var byNode = new Dictionary<NodeView, List<Entry>>();
             var result = new Dictionary<PhysicalLinkView, Port>();
@@ -58,7 +59,7 @@ namespace Uptime.Connections
                 {
                     var group = entries.FindAll(e => e.Face == face);
                     if (group.Count == 0) continue;
-                    Allocate(group);
+                    Allocate(group, lineWidth, lineGap);
                 }
                 foreach (Entry entry in entries)
                 {
@@ -128,7 +129,7 @@ namespace Uptime.Connections
             });
         }
 
-        private static void Allocate(List<Entry> group)
+        private static void Allocate(List<Entry> group, float lineWidth, float lineGap)
         {
             group.Sort((a, b) =>
             {
@@ -147,6 +148,8 @@ namespace Uptime.Connections
                 only.MaximumOffset = only.Budget * 0.5f;
                 return;
             }
+            if (TryKeepCentered(group, lineWidth, lineGap))
+                return;
             float start = float.PositiveInfinity, end = float.NegativeInfinity;
             float totalWeight = 0f;
             foreach (Entry entry in group)
@@ -183,6 +186,52 @@ namespace Uptime.Connections
                 entry.MinimumOffset = Mathf.Min(a, b);
                 entry.MaximumOffset = Mathf.Max(a, b);
             }
+        }
+
+        private static bool TryKeepCentered(List<Entry> group,
+            float lineWidth, float lineGap)
+        {
+            float side = group[0].Face == Face.Top || group[0].Face == Face.Bottom ?
+                group[0].Card.height : group[0].Card.width;
+            float front = group[0].Face == Face.Top || group[0].Face == Face.Bottom ?
+                group[0].Card.width : group[0].Card.height;
+            float allowedLow = side * 0.5f;
+            float allowedHigh = side * 1.5f + front;
+            var halfBudgets = new float[group.Count];
+            float previousEnd = float.NegativeInfinity;
+            for (int i = 0; i < group.Count; i++)
+            {
+                Entry entry = group[i];
+                float half = Weight(entry.Count) * 0.5f;
+                float start = entry.Nominal - half;
+                float end = entry.Nominal + half;
+                if (start < Mathf.Max(entry.Low, allowedLow) ||
+                    end > Mathf.Min(entry.High, allowedHigh) || start < previousEnd)
+                    return false;
+                previousEnd = end;
+
+                // Leave 3 px at each boundary, as in the crowded allocation.
+                Vector2 normal = Normal(entry.Direction);
+                float a = Vector2.Dot(Point(entry.Card, entry.Face, start + 3f) -
+                    entry.Card.center, normal);
+                float b = Vector2.Dot(Point(entry.Card, entry.Face, end - 3f) -
+                    entry.Card.center, normal);
+                float halfBudget = Mathf.Min(-Mathf.Min(a, b), Mathf.Max(a, b));
+                float fullWidth = entry.Count * lineWidth +
+                    (entry.Count - 1) * lineGap;
+                if (halfBudget * 2f < fullWidth - 0.01f)
+                    return false;
+                halfBudgets[i] = halfBudget;
+            }
+            for (int i = 0; i < group.Count; i++)
+            {
+                Entry entry = group[i];
+                entry.Budget = halfBudgets[i] * 2f;
+                entry.Bias = 0f;
+                entry.MinimumOffset = -halfBudgets[i];
+                entry.MaximumOffset = halfBudgets[i];
+            }
+            return true;
         }
 
         private static float Weight(int count) => 16f + 15f * count;

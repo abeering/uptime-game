@@ -137,3 +137,20 @@ human interactive Play Mode review of motion, readability, input focus, and
 terminal scrolling. Open `ConnectionsAdvanced.unity` in Unity, press Play, use
 `inspect -v <id>`, `scan <node>`, `clean <node>`, `kill <id>`, `mark <note>`, and
 `log save`; then review both ingress paths and crowded WEB/API junctions.
+
+## Center preference follow-up
+
+When neighboring links can each fit their preferred full-width footprints around
+their authored attachment centers, node-entry packing now keeps those centers.
+It uses the existing shared perimeter allocation once those footprints compete
+for the same space. A deterministic advanced-scene witness reproduces one
+EXT2 -> JOBS -> API -> DB path: the API -> DB and JOBS -> EXT2 segments remain
+straight and centered while the diagonal API -> JOBS segment keeps its natural
+entry. The new sparse-case assertion failed before the change and passed after.
+
+The [1920x1080 sparse Play Mode capture](advanced-play-sparse-centered.png) shows
+that route with no ambient traffic. This is a scripted state, not an interactive
+motion or input check. Geometry and Advanced Scene witnesses passed in Unity
+6000.3.11f1. A second scripted seed-1701 Play Mode check at 335 simulated
+seconds retained the crowded stages (E4 staggered, E6 overlaid) and all seven
+E6 identities remained visible.

@@ -172,7 +172,7 @@ namespace Uptime.Connections
             foreach (KeyValuePair<PhysicalLinkReference, List<LogicalConnectionState>> entry in usersByLink)
                 portCounts[entry.Key.View] = entry.Value.Count;
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports = adaptiveNodePorts ?
-                NodePortPacking.Plan(portCounts, networkArea) :
+                NodePortPacking.Plan(portCounts, networkArea, maxLineWidth, minLineGap) :
                 new Dictionary<PhysicalLinkView, NodePortPacking.Port>();
             float relayoutSeconds = pathPrefab.RelayoutSeconds;
             var departedLinks = new List<PhysicalLinkView>();

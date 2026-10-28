@@ -136,6 +136,7 @@ namespace Uptime.Connections.EditorTools
                 $"overflow={geometry.NodeOverflow}, crossings={geometry.LinkCrossings}");
             Check(new SerializedObject(presenter).FindProperty("adaptiveNodePorts").boolValue,
                 "adaptive node ports enabled in advanced scene");
+            CheckSparseCenteredPorts(links, area);
             CheckCrowdedPorts(links, area, identity);
             CheckThreeAtWeb(links, area, identity);
 
@@ -222,6 +223,23 @@ namespace Uptime.Connections.EditorTools
                 "real-traffic runs, Blackout cancellation and Spawner routing.");
         }
 
+        private static void CheckSparseCenteredPorts(PhysicalLinkView[] links,
+            RectTransform area)
+        {
+            var counts = links.Where(link => link.LinkId == "E4" ||
+                link.LinkId == "E6" || link.LinkId == "E7")
+                .ToDictionary(link => link, _ => 1);
+            Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
+                NodePortPacking.Plan(counts, area, 12f, 6f);
+            foreach (PhysicalLinkView link in counts.Keys)
+            {
+                NodePortPacking.Port port = ports[link];
+                Check(port.Budget >= 12f && Mathf.Abs(port.AtA) < 0.1f &&
+                    Mathf.Abs(port.AtB) < 0.1f,
+                    link.LinkId + " sparse API/JOBS path stays on its authored center");
+            }
+        }
+
         private static void CheckCrowdedPorts(PhysicalLinkView[] links, RectTransform area,
             IdentityPresenter identity)
         {
@@ -235,11 +253,12 @@ namespace Uptime.Connections.EditorTools
                 counts.Add(link, count);
             }
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
-                NodePortPacking.Plan(counts, area);
+                NodePortPacking.Plan(counts, area, 12f, 6f);
             foreach (PhysicalLinkView link in links)
                 link.SetAttachmentOffsets(ports[link].AtA, ports[link].AtB, 0.3f);
             Dictionary<PhysicalLinkView, NodePortPacking.Port> reordered =
-                NodePortPacking.Plan(counts.Reverse().ToDictionary(p => p.Key, p => p.Value), area);
+                NodePortPacking.Plan(counts.Reverse().ToDictionary(p => p.Key, p => p.Value),
+                    area, 12f, 6f);
             foreach (PhysicalLinkView link in links)
             {
                 NodePortPacking.Port first = ports[link], second = reordered[link];
@@ -248,7 +267,8 @@ namespace Uptime.Connections.EditorTools
                     Mathf.Abs(first.AtB - second.AtB) < 0.01f,
                     link.LinkId + " node entry is independent of input enumeration");
                 NodePortPacking.Port single = NodePortPacking.Plan(
-                    new Dictionary<PhysicalLinkView, int> { { link, 1 } }, area)[link];
+                    new Dictionary<PhysicalLinkView, int> { { link, 1 } }, area,
+                    12f, 6f)[link];
                 Check(single.Budget > 0f && Mathf.Abs(single.AtA) < 0.01f &&
                     Mathf.Abs(single.AtB) < 0.01f,
                     link.LinkId + " stays centered when uncontested");
@@ -421,7 +441,7 @@ namespace Uptime.Connections.EditorTools
             float fixedGap = WebTopGap(fixedE1, fixedE2, web.yMax);
             var counts = new Dictionary<PhysicalLinkView, int> { { e1, 3 }, { e2, 3 } };
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports =
-                NodePortPacking.Plan(counts, area);
+                NodePortPacking.Plan(counts, area, 12f, 6f);
             IdentityPacking.Layout adaptiveE1 = identity.ResolveLayout(e1, 3, 12f, 2.5f,
                 6f, ports[e1]);
             IdentityPacking.Layout adaptiveE2 = identity.ResolveLayout(e2, 3, 12f, 2.5f,
