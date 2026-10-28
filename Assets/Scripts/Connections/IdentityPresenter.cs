@@ -154,6 +154,15 @@ namespace Uptime.Connections
                     StaggerStep, EndInset, state.Clearance, obstacles,
                     EdgeGeometry.CardRect(link.NodeA, networkArea),
                     EdgeGeometry.CardRect(link.NodeB, networkArea));
+                if (link.ResourceLabel != null)
+                {
+                    float outerLane = (count - 1) *
+                        (state.Layout.LineWidth + state.Layout.LineGap) * 0.5f;
+                    float occupiedHalfWidth = outerLane +
+                        Mathf.Max(state.Layout.LineWidth, PillSize.y) * 0.5f;
+                    link.SetOccupiedLabelOffset(occupiedHalfWidth +
+                        link.ResourceLabel.rect.height * 0.5f + MinimumPillGap);
+                }
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);
                 if (state.Layout.Stage == IdentityPacking.ReadabilityStage.Unavailable &&
@@ -226,6 +235,7 @@ namespace Uptime.Connections
                 foreach (IdentityPillView pill in edges[link].Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
+                link.ClearOccupiedLabelOffset();
                 edges.Remove(link);
             }
         }
@@ -350,9 +360,8 @@ namespace Uptime.Connections
 
         private IdentityPacking.PillBounds[] Obstacles(PhysicalLinkView link)
         {
-            return link.ResourceLabel != null ? new[] { Bounds(link.NodeA.transform),
-                Bounds(link.NodeB.transform), Bounds(link.ResourceLabel) } :
-                new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
+            // The midpoint label moves outside the occupied bundle after pill packing.
+            return new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
         }
 
         private IdentityPacking.PillBounds Bounds(Transform target)
@@ -383,9 +392,13 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             foreach (EdgeState state in edges.Values)
+            {
+                if (state.Link != null)
+                    state.Link.ClearOccupiedLabelOffset();
                 foreach (IdentityPillView pill in state.Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
+            }
             edges.Clear();
         }
     }

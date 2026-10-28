@@ -124,6 +124,7 @@ namespace Uptime.Connections.EditorTools
                     var layout = identity.ResolveLayout(link, count, presenter.MaxLineWidth,
                         presenter.MinLineWidth, presenter.MinLineGap);
                     CheckLayout(layout, link.BundleWidth(presenter.NetworkArea), count);
+                    CheckMidpointLabel(link, layout, presenter.NetworkArea, identity.MinimumPillGap);
                     Rect sourceCard = EdgeGeometry.CardRect(link.NodeA,
                         presenter.NetworkArea);
                     Rect destinationCard = EdgeGeometry.CardRect(link.NodeB,
@@ -150,6 +151,20 @@ namespace Uptime.Connections.EditorTools
                     link.LinkId + " three paths stay at least as wide as four");
             }
             CheckRenderedPillsAtReferenceSize(presenter, identity, links);
+            foreach (PhysicalLinkView link in links)
+            {
+                if (link.ResourceLabel == null) continue;
+                link.SendMessage("LateUpdate");
+                Vector2 a = presenter.NetworkArea.InverseTransformPoint(link.NodeA.transform.position);
+                Vector2 b = presenter.NetworkArea.InverseTransformPoint(link.NodeB.transform.position);
+                Vector2 midpoint = (a + b) * 0.5f;
+                float offset = Vector2.Distance(
+                    presenter.NetworkArea.InverseTransformPoint(link.ResourceLabel.position),
+                    midpoint);
+                float authored = new SerializedObject(link).FindProperty("labelOffset").floatValue;
+                Check(Mathf.Abs(offset - authored) < 0.1f,
+                    link.LinkId + " label resets when paths leave");
+            }
             foreach (IdentityPacking.ReadabilityStage stage in new[] {
                 IdentityPacking.ReadabilityStage.Centered,
                 IdentityPacking.ReadabilityStage.Staggered,
@@ -633,6 +648,26 @@ namespace Uptime.Connections.EditorTools
             solver.Update(dense, area);
             Check(solver.SolveCount == solveCount && string.Join(",", solver.Orders[e1]) == denseOrder,
                 "dense unchanged layout remains stable");
+        }
+
+        private static void CheckMidpointLabel(PhysicalLinkView link,
+            IdentityPacking.Layout layout, RectTransform area, float pillGap)
+        {
+            RectTransform label = link.ResourceLabel;
+            if (label == null) return;
+            Vector2 a = area.InverseTransformPoint(link.NodeA.transform.position);
+            Vector2 b = area.InverseTransformPoint(link.NodeB.transform.position);
+            Vector2 along = (b - a).normalized;
+            Vector2 midpoint = (a + b) * 0.5f;
+            Vector2 labelCenter = area.InverseTransformPoint(label.position);
+            Check(Mathf.Abs(Vector2.Dot(labelCenter - midpoint, along)) < 0.1f,
+                link.LinkId + " label remains at link midpoint");
+            var labelBounds = new IdentityPacking.PillBounds(labelCenter, along,
+                label.rect.size);
+            foreach (var cycle in layout.Schedule)
+                foreach (IdentityPacking.Placement placement in cycle)
+                    Check(!IdentityPacking.Intersects(labelBounds, placement.Bounds, pillGap),
+                        link.LinkId + " midpoint label clears connection pills");
         }
 
         private static void CheckRenderedPillsAtReferenceSize(LogicalPathPresenter presenter,

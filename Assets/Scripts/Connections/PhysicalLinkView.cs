@@ -15,10 +15,29 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text resourceReadout;
         [SerializeField, Min(0f)] private float labelOffset = 26f;
 
+        private float? occupiedLabelOffset;
+
         public string LinkId => linkId;
         public NodeView NodeA => nodeA;
         public NodeView NodeB => nodeB;
         public RectTransform ResourceLabel => label;
+
+        // Keep the label at the link midpoint while active paths need more side clearance.
+        public void SetOccupiedLabelOffset(float minimumOffset)
+        {
+            float next = Mathf.Max(labelOffset, minimumOffset);
+            if (occupiedLabelOffset.HasValue && Mathf.Abs(occupiedLabelOffset.Value - next) < 0.01f)
+                return;
+            occupiedLabelOffset = next;
+            LateUpdate();
+        }
+
+        public void ClearOccupiedLabelOffset()
+        {
+            if (!occupiedLabelOffset.HasValue) return;
+            occupiedLabelOffset = null;
+            LateUpdate();
+        }
 
         // Rebind an authored link copy in the opt-in stress scene.
         public void ConfigureStressLink(string id, NodeView a, NodeView b,
@@ -71,7 +90,8 @@ namespace Uptime.Connections
                 if (normal.y < 0f)
                     normal = -normal;
 
-                label.anchoredPosition = middle + normal * labelOffset;
+                label.anchoredPosition = middle + normal *
+                    (occupiedLabelOffset ?? labelOffset);
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 if (angle > 90f)
                     angle -= 180f;

@@ -82,6 +82,7 @@ namespace Uptime.Connections.EditorTools
             }
             var links = host.PhysicalLinks.Select(p => p.View).ToArray();
             Check(links.All(l => l != null && l.ResourceLabel != null &&
+                l.ResourceLabel.gameObject.activeInHierarchy &&
                 nodes.ContainsKey(l.NodeA.NodeId) && nodes.ContainsKey(l.NodeB.NodeId)) &&
                 links.Select(l => l.LinkId).Distinct().Count() == 7,
                 "link labels, endpoints and unique IDs");

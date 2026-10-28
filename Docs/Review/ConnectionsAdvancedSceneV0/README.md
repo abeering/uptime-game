@@ -32,6 +32,24 @@ zero card overlaps, viewport overflow, link crossings, links through other cards
 or links shorter than 120 px; the shortest visible physical link is **269 px**.
 The scripted Play Mode run produced no full-size identity-pill fit warnings.
 
+## Midpoint link-label pass
+
+Connection pills now pack without treating the `E#` label as a fixed midpoint
+obstacle. The label keeps its midpoint along the link and moves only perpendicular
+to clear the occupied path lanes and full-size pills. When the link empties, it
+returns to its authored offset. The label objects and their scene bindings remain
+in place. This presentation rule applies to both Connections scenes; it does not
+change topology, traffic, resources, or simulation.
+
+The Geometry Witness passed on the four-node scene and checks that label centers
+stay at link midpoints and clear every planned pill. The Advanced Scene Witness
+passed with all seven labels still bound and visible. In a fixed-seed 1701 Play
+Mode capture at 90 simulated seconds, the EXT1-WEB pills moved to the center
+while E1 stayed at the midpoint beside them. A second capture at 335 seconds had
+14 active connections; its busiest edges used the existing staggered and overlaid
+pill stages while link labels remained outside the occupied bundles. No
+full-size-pill fit warnings appeared in either capture.
+
 | Seed | Ambient benign | Ambient hostile | EXT1 / EXT2 plans | Peak active connections | Delivered infections |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1701 | 24 | 11 | 23 / 12 | 14 | 6 |
@@ -46,8 +64,10 @@ witness recorded a legitimate EXT1 connection canceled at WEB with cause
 from DB to eligible internal destinations. The JSON logs are under
 `Temp/AdvancedSceneValidation/Logs/UptimeRuns/` in the local isolated project.
 
-The [traffic](advanced-play-traffic.png) and
-[multi-ID inspection](advanced-play-inspect.png) images are scripted batch
+Compare the [original fixed-label traffic capture](advanced-play-traffic-before-midpoint-labels.png)
+with the [midpoint-label traffic capture](advanced-play-traffic.png). The
+[crowded capture](advanced-play-crowded.png) and
+[multi-ID inspection](advanced-play-inspect.png) are also scripted batch
 **Play Mode** captures at 1920×1080. The capture script exercised `scan DB`,
 `kill m7`, `mark`, `log save`, and `inspect -v m7 g5`. It opened `clean DB`, but
 the offscreen batch capture did not advance the overlay's real-time typing
