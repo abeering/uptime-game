@@ -726,8 +726,13 @@ namespace Uptime.Connections.EditorTools
             Check(overlay != null && terminal != null && panel != null && prefab != null &&
                 overlay.transform.parent.name == "NetworkPanel" &&
                 !overlay.gameObject.activeSelf &&
-                ((RectTransform)overlay.transform).sizeDelta == new Vector2(710f, 465f),
-                "authored inactive clean overlay in network panel");
+                ((RectTransform)overlay.transform).sizeDelta == new Vector2(710f, 465f) &&
+                overlay.transform.localScale == Vector3.one &&
+                Mathf.Approximately(overlay.transform.lossyScale.x,
+                    overlay.transform.parent.lossyScale.x),
+                "authored inactive clean overlay in network panel: local=" +
+                    overlay.transform.localScale + " lossy=" + overlay.transform.lossyScale +
+                    " size=" + ((RectTransform)overlay.transform).sizeDelta);
             Check(ReferenceEquals(typeof(Terminal).GetField("cleanOverlay",
                     BindingFlags.Instance | BindingFlags.NonPublic).GetValue(terminal), overlay) &&
                 ReferenceEquals(typeof(NetworkHealthPanel).GetField("cleanOverlay",
@@ -736,6 +741,7 @@ namespace Uptime.Connections.EditorTools
             var prefabOverlay = prefab.GetComponent<ConnectionsCleanOverlay>();
             var input = prefab.GetComponentInChildren<TMP_InputField>(true);
             Check(prefabOverlay != null && input != null &&
+                prefab.transform.localScale == Vector3.one &&
                 prefab.GetComponent<Canvas>() == null &&
                 prefab.GetComponent<CleanMinigameOverlayView>() == null &&
                 input.onEndEdit.GetPersistentEventCount() == 0 &&
