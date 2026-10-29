@@ -215,6 +215,7 @@ namespace Uptime.Connections
                 float[] starts = new float[connection.RouteLinks.Length];
                 float[] ends = new float[starts.Length];
                 float[] widths = new float[starts.Length];
+                float maximumSocketDiameter = float.PositiveInfinity;
                 for (int edge = 0; edge < starts.Length; edge++)
                 {
                     PhysicalLinkReference link = connection.RouteLinks[edge];
@@ -226,6 +227,8 @@ namespace Uptime.Connections
                     float width = layout != null ? layout.LineWidth :
                         EdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
                     float gap = layout != null ? layout.LineGap : minLineGap;
+                    if (edge == starts.Length - 1 && users.Count > 1)
+                        maximumSocketDiameter = Mathf.Max(12f, width + gap - 2f);
                     float offset = EdgeGeometry.Offset(users.IndexOf(connection), users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
                     bool forward = connection.Definition.Route[edge].Node == linkView.NodeA;
@@ -271,7 +274,7 @@ namespace Uptime.Connections
                                 "Overflow presentation is not implemented yet.", linkView);
                     }
                 }
-                views[connection].SetLayout(starts, ends, widths);
+                views[connection].SetLayout(starts, ends, widths, maximumSocketDiameter);
             }
             warnedLinks.IntersectWith(currentlyOverflowed);
             if (identityPresenter != null)

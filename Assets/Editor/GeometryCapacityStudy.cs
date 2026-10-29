@@ -134,11 +134,11 @@ namespace Uptime.Connections.EditorTools
 
                 data.AppendLine("\n## Local junction: independently solved edges, 180 px visible\n\n" +
                     "Counts are intersecting strip/marker pairs across the two links (not within one link). " +
-                    "Strips cover the first 40 visible px at the shared node; markers use the production rectangle helper. " +
+                    "Strips cover the first 40 visible px at the shared node; markers use the production socket helper. " +
                     "This is a local collision diagnostic, not a complete placed topology.\n\n" +
-                    "|Card scale|Headings|Lanes per link|Stages|Cross-link strip pairs|Cross-link marker pairs (8 px padding)|\n|---|---|---:|---|---:|---:|");
+                    "|Card scale|Headings|Lanes per link|Stages|Cross-link strip pairs|Cross-link socket bounds pairs|\n|---|---|---:|---|---:|---:|");
                 var markerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/TerminalMarker.prefab");
-                Vector2 padding = markerPrefab.GetComponent<TerminalMarkerStyle>().Padding;
+                TerminalMarkerStyle socketStyle = markerPrefab.GetComponent<TerminalMarkerStyle>();
                 foreach (float scale in new[] { 1f, 0.8f, 0.65f })
                     foreach (var angles in new[] { new[] { 45f, 90f }, new[] { 0f, 15f } })
                         foreach (int count in new[] { 4, 8 })
@@ -159,8 +159,13 @@ namespace Uptime.Connections.EditorTools
                                 }).ToArray());
                                 markers.Add(Enumerable.Range(0, count).Select(i =>
                                 {
-                                    Rect rect = LogicalPathView.TerminalMarkerRect(card, d,
-                                        EdgeGeometry.Offset(i, count, layout.LineWidth, layout.LineGap), layout.LineWidth, padding);
+                                    float diameter = count > 1 ? Mathf.Max(12f,
+                                        Mathf.Min(socketStyle.PreferredDiameter,
+                                            layout.LineWidth + layout.LineGap - 2f)) :
+                                        socketStyle.PreferredDiameter;
+                                    Rect rect = LogicalPathView.TerminalSocketRect(card, d,
+                                        EdgeGeometry.Offset(i, count, layout.LineWidth, layout.LineGap),
+                                        diameter, socketStyle.BorderOutset);
                                     return new IdentityPacking.PillBounds(rect.center, Vector2.right, rect.size);
                                 }).ToArray());
                             }

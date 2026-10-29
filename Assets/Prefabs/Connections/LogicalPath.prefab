@@ -79,7 +79,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.LogicalPathView
   path: {fileID: 8284974062488692513}
-  terminalMarkerPrefab: {fileID: 1000003, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+  terminalMarkerPrefab: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
   departureSeconds: 0.45
   failureFlashHalfCycleSeconds: 0.12
   failureColor: {r: 1, g: 0.12, b: 0.12, a: 1}
