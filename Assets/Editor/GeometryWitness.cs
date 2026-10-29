@@ -349,16 +349,33 @@ namespace Uptime.Connections.EditorTools
         {
             var pathPrefab = AssetDatabase.LoadAssetAtPath<LogicalPathView>(
                 "Assets/Prefabs/Connections/LogicalPath.prefab");
-            var markerPrefab = AssetDatabase.LoadAssetAtPath<Image>(
+            var markerPrefab = AssetDatabase.LoadAssetAtPath<TerminalMarkerStyle>(
                 "Assets/Prefabs/Connections/TerminalMarker.prefab");
-            Check(markerPrefab != null && !markerPrefab.raycastTarget &&
-                markerPrefab.GetComponent<TerminalMarkerStyle>() != null &&
-                markerPrefab.GetComponent<TerminalMarkerStyle>().Padding == new Vector2(8f, 8f) &&
+            Material pillMaterial = AssetDatabase.LoadAssetAtPath<Material>(
+                "Assets/Shaders/ConnectionsPill.mat");
+            Check(markerPrefab != null && markerPrefab.Backing != null &&
+                markerPrefab.Ring != null && markerPrefab.InnerDot != null &&
+                markerPrefab.Backing.material == pillMaterial &&
+                markerPrefab.Ring.material == pillMaterial &&
+                markerPrefab.InnerDot.material == pillMaterial &&
+                !markerPrefab.Backing.raycastTarget &&
+                !markerPrefab.Ring.raycastTarget &&
+                !markerPrefab.InnerDot.raycastTarget &&
+                markerPrefab.PreferredDiameter == 26f &&
                 new SerializedObject(pathPrefab).FindProperty("terminalMarkerPrefab")
                     .objectReferenceValue == markerPrefab &&
                 presenter.MarkerLayer != null && presenter.MarkerLayer.GetSiblingIndex() >
                     nodes[0].transform.parent.GetSiblingIndex(),
-                "authored marker and overlay above node cards");
+                "authored socket and overlay above node cards");
+            var ringGraphic = new SerializedObject(markerPrefab.Ring);
+            Check(markerPrefab.Backing.color.r < 0.05f &&
+                markerPrefab.Backing.rectTransform.rect.size == Vector2.one * 26f &&
+                markerPrefab.Ring.rectTransform.rect.size == Vector2.one * 20f &&
+                markerPrefab.InnerDot.rectTransform.rect.size == Vector2.one * 4f &&
+                markerPrefab.InnerDot.color.a < markerPrefab.Ring.color.a &&
+                ringGraphic.FindProperty("cornerRadius").floatValue == 10f &&
+                ringGraphic.FindProperty("borderThickness").floatValue == 2.5f,
+                "dark circular backing, identity ring and subtle authored dot");
 
             Rect synthetic = new Rect(-120f, -40f, 240f, 80f);
             Vector2 side = LogicalPathView.TerminalBorderPoint(synthetic, Vector2.left, 0f,
@@ -369,21 +386,18 @@ namespace Uptime.Connections.EditorTools
                 new Vector2(1f, 1f).normalized, 8f, out vertical);
             Check(!vertical && Mathf.Abs(diagonal.y - synthetic.yMax) < 0.001f,
                 "diagonal approach uses the visible horizontal border");
-            Vector2 padding = markerPrefab.GetComponent<TerminalMarkerStyle>().Padding;
-            Rect straightMark = LogicalPathView.TerminalMarkerRect(synthetic, Vector2.left,
-                0f, 8f, padding);
-            Rect diagonalMark = LogicalPathView.TerminalMarkerRect(synthetic,
-                new Vector2(1f, 1f), 0f, 8f, padding);
-            Check(Mathf.Abs(straightMark.width - 8f) < 0.001f &&
-                Mathf.Abs(straightMark.height - 16f) < 0.001f,
-                "straight arrival uses beam width plus prefab padding");
-            Check(Mathf.Abs(diagonalMark.width - (8f * Mathf.Sqrt(2f) + 8f)) < 0.01f &&
-                Mathf.Abs(diagonalMark.height - 8f) < 0.001f,
-                "diagonal arrival covers its wider border footprint");
-            Rect cornerMark = LogicalPathView.TerminalMarkerRect(new Rect(-20f, -20f, 40f, 40f),
-                new Vector2(1f, 1f), 0f, 8f, Vector2.zero);
-            Check(cornerMark.xMax <= 20.001f && cornerMark.yMax <= 20.001f,
-                "border footprint clips at card corner before padding");
+            Rect straightMark = LogicalPathView.TerminalSocketRect(synthetic, Vector2.left,
+                0f, markerPrefab.PreferredDiameter, markerPrefab.BorderOutset);
+            Rect diagonalMark = LogicalPathView.TerminalSocketRect(synthetic,
+                new Vector2(1f, 1f), 8f, markerPrefab.PreferredDiameter,
+                markerPrefab.BorderOutset);
+            Check(straightMark.size == Vector2.one * 26f &&
+                Mathf.Abs(straightMark.center.x - (synthetic.xMin - 2f)) < 0.001f,
+                "straight socket is circular and sits just outside the target border");
+            Check(diagonalMark.size == Vector2.one * 26f &&
+                diagonalMark.center.y > synthetic.yMax &&
+                diagonalMark.center.x > diagonal.x,
+                "diagonal socket follows its approach beyond the visible border");
 
             var area = presenter.NetworkArea;
             NodeView ext = nodes.First(n => n.NodeId == "EXT1");
@@ -460,10 +474,10 @@ namespace Uptime.Connections.EditorTools
                     area.InverseTransformPoint(api.transform.position)).normalized;
                 Vector2 towardDb = (area.InverseTransformPoint(api.transform.position) -
                     area.InverseTransformPoint(db.transform.position)).normalized;
-                Vector2 expectedApi = LogicalPathView.TerminalBorderPoint(apiCard, towardApi, 0f,
-                    out _);
-                Vector2 expectedDb = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, 8f,
-                    out _);
+                Vector2 expectedApi = LogicalPathView.TerminalSocketCenter(apiCard,
+                    towardApi, 0f, markerPrefab.BorderOutset);
+                Vector2 expectedDb = LogicalPathView.TerminalSocketCenter(dbCard,
+                    towardDb, 8f, markerPrefab.BorderOutset);
                 Check((apiPoint - expectedApi).sqrMagnitude < 0.01f &&
                     (dbPoint - expectedDb).sqrMagnitude < 0.01f &&
                     !apiCard.Contains(dbPoint),
@@ -471,11 +485,12 @@ namespace Uptime.Connections.EditorTools
                 Check((dbPoint - secondPoint).sqrMagnitude > 1f &&
                     dbView.TerminalMarker != secondView.TerminalMarker,
                     "two DB targets retain distinct border markers");
-                Rect expectedDbMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
-                    8f, 8f, padding);
+                Rect expectedDbMarker = LogicalPathView.TerminalSocketRect(dbCard,
+                    towardDb, 8f, markerPrefab.PreferredDiameter,
+                    markerPrefab.BorderOutset);
                 Check((dbView.TerminalMarker.rectTransform.sizeDelta -
                     expectedDbMarker.size).sqrMagnitude < 0.01f,
-                    "live diagonal marker uses final segment width");
+                    "live terminal socket keeps its authored circular size");
                 Check(dbView.TerminalMarker.color == dbColor &&
                     dbView.BeamColorFor(LoadPerformance.Stalled) != dbColor,
                     "terminal marker keeps identity accent during beam warning");
@@ -483,21 +498,23 @@ namespace Uptime.Connections.EditorTools
                 Check((dbPoint - hiddenEnd).sqrMagnitude > 0.1f,
                     "marker uses visible border instead of hidden underlap");
 
-                dbView.SetLayout(new[] { 0f, 8f }, new[] { 8f, 4f });
+                dbView.SetLayout(new[] { 0f, 8f }, new[] { 0f, 8f },
+                    new[] { 8f, 4f }, 16f);
                 dbView.AdvanceVisual(0.15f);
                 dbPoint = area.InverseTransformPoint(dbView.TerminalMarker.rectTransform.position);
-                expectedDb = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, 0f, out _);
-                Vector2 finalPoint = LogicalPathView.TerminalBorderPoint(dbCard, towardDb, -8f,
-                    out _);
-                Rect reflowMarker = LogicalPathView.TerminalMarkerRect(dbCard, towardDb,
-                    0f, 6f, padding);
+                expectedDb = LogicalPathView.TerminalSocketCenter(dbCard, towardDb,
+                    0f, markerPrefab.BorderOutset);
+                Vector2 finalPoint = LogicalPathView.TerminalSocketCenter(dbCard,
+                    towardDb, -8f, markerPrefab.BorderOutset);
                 Check((dbPoint - expectedDb).sqrMagnitude < 0.01f &&
                     (dbPoint - finalPoint).sqrMagnitude > 1f,
-                    "marker follows interpolated lane instead of snapping to final offset");
-                Check((dbView.TerminalMarker.rectTransform.sizeDelta -
-                    reflowMarker.size).sqrMagnitude < 0.01f &&
-                    dbView.TerminalMarker.rectTransform.sizeDelta.x < expectedDbMarker.width,
-                    "marker width follows interpolated beam width during reflow");
+                    "socket follows interpolated lane instead of snapping to final offset");
+                Check(dbView.TerminalMarker.rectTransform.sizeDelta == Vector2.one * 16f &&
+                    dbView.TerminalMarker.Ring.rectTransform.rect.width <
+                    markerPrefab.Ring.rectTransform.rect.width &&
+                    dbView.TerminalMarker.InnerDot.rectTransform.rect.width <
+                    markerPrefab.InnerDot.rectTransform.rect.width,
+                    "crowded terminal socket shrinks without changing its circular shape");
                 dbView.SetPresentationActive(false);
                 Check(!dbView.TerminalMarker.gameObject.activeSelf,
                     "preview hides marker with its owning path");
@@ -543,7 +560,7 @@ namespace Uptime.Connections.EditorTools
                     dbView.GetComponent<PathGraphic>().color.r > 0.9f &&
                     dbView.DisplayAccent.r > 0.9f,
                     "killed marker flashes red a second time");
-                Image retired = dbView.TerminalMarker;
+                TerminalMarkerStyle retired = dbView.TerminalMarker;
                 dbView.ReleaseTerminalMarker();
                 UnityEngine.Object.DestroyImmediate(dbView.gameObject);
                 Check(retired == null || !retired.gameObject.activeSelf,
