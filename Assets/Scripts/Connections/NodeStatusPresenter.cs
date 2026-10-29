@@ -128,12 +128,28 @@ namespace Uptime.Connections
                 if (node?.View != null && node.View != card)
                     cards.Add(EdgeGeometry.CardRect(node.View, networkArea));
             var critical = new List<Rect>();
+            var busyDirections = new List<Vector2>();
             foreach (TerminalMarkerStyle socket in networkArea.GetComponentsInChildren<TerminalMarkerStyle>())
                 if (socket.isActiveAndEnabled)
-                    critical.Add(RelativeRect(socket.rectTransform));
+                {
+                    Rect socketRect = RelativeRect(socket.rectTransform);
+                    critical.Add(NodeStatusPlacement.Expanded(socketRect, 12f));
+                    if (NodeStatusPlacement.Expanded(cardRect, 20f)
+                        .Contains(socketRect.center))
+                        busyDirections.Add(socketRect.center - cardRect.center);
+                }
             foreach (IdentityPillView pill in networkArea.GetComponentsInChildren<IdentityPillView>())
                 if (pill.isActiveAndEnabled)
-                    critical.Add(RelativeRect((RectTransform)pill.transform));
+                    critical.Add(NodeStatusPlacement.Expanded(
+                        RelativeRect((RectTransform)pill.transform), 8f));
+            var beams = new List<NodeStatusPlacement.BeamSegment>();
+            foreach (LogicalPathView path in networkArea.GetComponentsInChildren<LogicalPathView>())
+                if (path.isActiveAndEnabled)
+                    for (int i = 0; i < path.VisualSegmentCount; i++)
+                        if (path.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
+                            out float visible, out _) && visible > .01f)
+                            beams.Add(new NodeStatusPlacement.BeamSegment(start,
+                                Vector2.Lerp(start, end, visible)));
             var otherStacks = new List<Rect>();
             foreach (var pair in views)
                 if (pair.Key != card && anchors.TryGetValue(pair.Key, out _) &&
@@ -143,7 +159,7 @@ namespace Uptime.Connections
             viewport.xMin += 8f; viewport.xMax -= 8f;
             viewport.yMin += 8f; viewport.yMax -= 8f;
             return NodeStatusPlacement.Choose(cardRect, size, viewport,
-                cards, critical, otherStacks);
+                cards, critical, otherStacks, busyDirections, beams);
         }
 
         private Rect RelativeRect(RectTransform rect)

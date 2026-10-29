@@ -94,6 +94,24 @@ namespace Uptime.Connections.EditorTools
                 Array.Empty<Rect>(), Array.Empty<Rect>(), Array.Empty<Rect>());
             Check(NodeStatusPlacement.At(choice, topNode, new Vector2(184, 63)).yMax <=
                 viewport.yMax, "viewport edge is respected");
+            // DB-like case: a live connection enters from above, while adjacent
+            // cards occupy both sides and the area below remains clear.
+            var adjacent = new[] { new Rect(-480, -40, 240, 80),
+                new Rect(240, -40, 240, 80) };
+            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
+                adjacent, Array.Empty<Rect>(), Array.Empty<Rect>()) == NodeStatusAnchor.N,
+                "unoccupied DB-like node retains preferred north placement");
+            var socket = new[] { NodeStatusPlacement.Expanded(
+                new Rect(-13, 40, 26, 26), 12f) };
+            var beam = new[] { new NodeStatusPlacement.BeamSegment(
+                new Vector2(0, 240), new Vector2(0, 40)) };
+            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
+                adjacent, Array.Empty<Rect>(), Array.Empty<Rect>(), null, beam) !=
+                NodeStatusAnchor.N, "live beam alone discourages a covering callout");
+            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
+                adjacent, socket, Array.Empty<Rect>(),
+                new[] { Vector2.up }, beam) == NodeStatusAnchor.S,
+                "DB-like top socket and live approach place callout below");
             for (int i = 0; i < 8; i++)
             {
                 Rect position = NodeStatusPlacement.At((NodeStatusAnchor)i, node,

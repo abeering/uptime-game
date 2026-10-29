@@ -43,6 +43,14 @@ size changes; the stack follows its node. Connection beams may pass beneath
 opaque panels. This is an intentionally small placement heuristic, not a
 global layout solver.
 
+**DB placement follow-up:** A CLEAN callout could previously sit above DB,
+barely clearing a termination socket while covering the incoming connection.
+The solver now gives sockets and pills breathing room, mildly penalizes callout
+overlap with visible beams, and prefers the side opposite a node's live terminal
+socket. This chooses the clear space below DB in the reported case while
+retaining the chosen anchor as traffic changes. Beams remain a soft constraint;
+the card, socket, and viewport protections have higher priority.
+
 ## Validation and review
 
 `NodeStatusWitness` checks both scene and prefab bindings, state transitions,

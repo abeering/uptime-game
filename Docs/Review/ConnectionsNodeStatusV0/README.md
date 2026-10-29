@@ -14,12 +14,16 @@ examples, not human validation of animation or keyboard interaction.
 | CLEAN plus Editor-only Awareness preview | [status-families.png](status-families.png) |
 | Live crowded advanced topology, seed 1701 | [status-crowded.png](status-crowded.png) |
 | Four-node Connections scene, grouped Pain | [status-four-grouped.png](status-four-grouped.png) |
+| DB CLEAN placement with a live connection entering from above | [status-db-below.png](status-db-below.png) |
 
 The advanced crowded capture shows 13 active or Connecting connections at
 simulation time 343 seconds. The target API was scanned after infection; a
 separate naturally offline node is also visible. The screenshot checks visual
 stacking near beams, identity pills, and terminal sockets. The normal and
 single-status captures use generated mode with ambient generation disabled.
+The DB follow-up capture uses seed 1701, manually spawns `product-lookup`,
+completes a DB scan while that connection is active, and shows the CLEAN
+callout below DB with its upper termination socket unobscured.
 
 ## Manual review in Unity
 
