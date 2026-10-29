@@ -65,6 +65,8 @@ namespace Uptime.Connections
             public float MaximumWidth;
             public float MinimumReadableWidth;
             public float MinimumGap;
+            public float SourceBias;
+            public float DestinationBias;
             public int Count;
             public int Cycle;
             public float NextCycleAt;
@@ -117,6 +119,12 @@ namespace Uptime.Connections
         public IdentityPacking.Layout ResolveLayout(PhysicalLinkView link,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
             float minimumLineGap)
+            => ResolveLayout(link, count, maximumLineWidth, minimumReadableLineWidth,
+                minimumLineGap, default(NodePortPacking.Port));
+
+        public IdentityPacking.Layout ResolveLayout(PhysicalLinkView link,
+            int count, float maximumLineWidth, float minimumReadableLineWidth,
+            float minimumLineGap, NodePortPacking.Port port)
         {
             if (link == null || networkArea == null || pillPrefab == null)
                 return null;
@@ -130,10 +138,13 @@ namespace Uptime.Connections
             Vector2 direction = (b - a).normalized;
             Vector2 start = EdgeGeometry.CardEdge(link.NodeA, networkArea, direction);
             Vector2 end = EdgeGeometry.CardEdge(link.NodeB, networkArea, -direction);
-            float budget = link.BundleWidth(networkArea);
+            float budget = port.Budget > 0f ? port.Budget : link.BundleWidth(networkArea);
+            float sourceBias = port.Budget > 0f ? port.AtA : 0f;
+            float destinationBias = port.Budget > 0f ? port.AtB : 0f;
             IdentityPacking.PillBounds[] obstacles = Obstacles(link);
             if (NeedsPlan(state, start, end, budget, count, maximumLineWidth,
-                minimumReadableLineWidth, minimumLineGap, obstacles))
+                minimumReadableLineWidth, minimumLineGap, obstacles,
+                sourceBias, destinationBias))
             {
                 state.Start = start;
                 state.End = end;
@@ -142,6 +153,8 @@ namespace Uptime.Connections
                 state.MaximumWidth = maximumLineWidth;
                 state.MinimumReadableWidth = minimumReadableLineWidth;
                 state.MinimumGap = minimumLineGap;
+                state.SourceBias = sourceBias;
+                state.DestinationBias = destinationBias;
                 state.Obstacles = obstacles;
                 state.PillSize = PillSize;
                 state.Gap = MinimumPillGap;
@@ -153,7 +166,48 @@ namespace Uptime.Connections
                     PillSize, MinimumPillGap,
                     StaggerStep, EndInset, state.Clearance, obstacles,
                     EdgeGeometry.CardRect(link.NodeA, networkArea),
-                    EdgeGeometry.CardRect(link.NodeB, networkArea));
+                    EdgeGeometry.CardRect(link.NodeB, networkArea),
+                    sourceBias, destinationBias);
+                if (link.ResourceLabel != null)
+                {
+                    link.GetTargetSpine(out Vector2 spineStart, out Vector2 spineEnd);
+                    Vector2 spineDirection = (spineEnd - spineStart).normalized;
+                    Vector2 normal = new Vector2(-spineDirection.y, spineDirection.x);
+                    if (normal.y < 0f) normal = -normal;
+                    Vector2 midpoint = (spineStart + spineEnd) * 0.5f;
+                    float occupiedEdge = 0f;
+                    foreach (IdentityPacking.Lane lane in state.Layout.Lanes)
+                    {
+                        Vector2 span = lane.End - lane.Start;
+                        float along = Vector2.Dot(span, spineDirection);
+                        float t = Mathf.Abs(along) > 0.01f ?
+                            Mathf.Clamp01(Vector2.Dot(midpoint - lane.Start, spineDirection) / along) : 0.5f;
+                        Vector2 center = Vector2.Lerp(lane.Start, lane.End, t);
+                        occupiedEdge = Mathf.Max(occupiedEdge,
+                            Vector2.Dot(center - midpoint, normal));
+                    }
+                    float occupiedHalfWidth = occupiedEdge +
+                        Mathf.Max(state.Layout.LineWidth, PillSize.y) * 0.5f;
+                    float labelDistance = occupiedHalfWidth +
+                        link.ResourceLabel.rect.height * 0.5f + MinimumPillGap;
+                    // Biased paths may put a staggered pill near the fixed link
+                    // midpoint even when its lane center clears the label.
+                    for (int attempt = 0; attempt < 80; attempt++)
+                    {
+                        link.GetTargetLabelPose(labelDistance, out Vector2 labelCenter,
+                            out Vector2 labelDirection);
+                        var labelBounds = new IdentityPacking.PillBounds(labelCenter,
+                            labelDirection, link.ResourceLabel.rect.size);
+                        bool blocked = false;
+                        foreach (List<IdentityPacking.Placement> cycle in state.Layout.Schedule)
+                            foreach (IdentityPacking.Placement placement in cycle)
+                                blocked |= IdentityPacking.Intersects(labelBounds,
+                                    placement.Bounds, MinimumPillGap);
+                        if (!blocked) break;
+                        labelDistance += 4f;
+                    }
+                    link.SetOccupiedLabelOffset(labelDistance);
+                }
                 state.Cycle = 0;
                 state.NextCycleAt = Clock() + Dwell(state);
                 if (state.Layout.Stage == IdentityPacking.ReadabilityStage.Unavailable &&
@@ -226,6 +280,7 @@ namespace Uptime.Connections
                 foreach (IdentityPillView pill in edges[link].Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
+                link.ClearOccupiedLabelOffset();
                 edges.Remove(link);
             }
         }
@@ -304,6 +359,11 @@ namespace Uptime.Connections
                         break;
                     }
                 LiveLine line = state.Lines[i];
+                // The schedule uses the physical link's A-to-B lanes. Live paths can
+                // travel B-to-A, so measure their placement from the opposite end.
+                if (Vector2.Dot(line.TargetEnd - line.TargetStart,
+                    state.Layout.Lanes[i].End - state.Layout.Lanes[i].Start) < 0f)
+                    fraction = 1f - fraction;
                 float length = Vector2.Distance(line.VisualStart, line.VisualEnd);
                 bool show = selected && length > 0.01f &&
                     line.VisibleFraction + 0.001f >= fraction + state.PillSize.x * 0.5f / length;
@@ -326,7 +386,8 @@ namespace Uptime.Connections
 
         private bool NeedsPlan(EdgeState state, Vector2 start, Vector2 end, float budget,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
-            float minimumLineGap, IdentityPacking.PillBounds[] obstacles)
+            float minimumLineGap, IdentityPacking.PillBounds[] obstacles,
+            float sourceBias, float destinationBias)
         {
             if (state.Layout == null || state.Count != count || state.PillSize != PillSize ||
                 (state.Start - start).sqrMagnitude > 0.25f ||
@@ -335,6 +396,8 @@ namespace Uptime.Connections
                 !Mathf.Approximately(state.MaximumWidth, maximumLineWidth) ||
                 !Mathf.Approximately(state.MinimumReadableWidth, minimumReadableLineWidth) ||
                 !Mathf.Approximately(state.MinimumGap, minimumLineGap) ||
+                !Mathf.Approximately(state.SourceBias, sourceBias) ||
+                !Mathf.Approximately(state.DestinationBias, destinationBias) ||
                 !Mathf.Approximately(state.Gap, MinimumPillGap) ||
                 !Mathf.Approximately(state.Step, StaggerStep) || !Mathf.Approximately(state.Inset, EndInset) ||
                 !Mathf.Approximately(state.Clearance, Mathf.Max(0f, pillToLineClearance)) ||
@@ -350,9 +413,8 @@ namespace Uptime.Connections
 
         private IdentityPacking.PillBounds[] Obstacles(PhysicalLinkView link)
         {
-            return link.ResourceLabel != null ? new[] { Bounds(link.NodeA.transform),
-                Bounds(link.NodeB.transform), Bounds(link.ResourceLabel) } :
-                new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
+            // The midpoint label moves outside the occupied bundle after pill packing.
+            return new[] { Bounds(link.NodeA.transform), Bounds(link.NodeB.transform) };
         }
 
         private IdentityPacking.PillBounds Bounds(Transform target)
@@ -383,9 +445,13 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             foreach (EdgeState state in edges.Values)
+            {
+                if (state.Link != null)
+                    state.Link.ClearOccupiedLabelOffset();
                 foreach (IdentityPillView pill in state.Pills)
                     if (pill != null)
                         DestroyView(pill.gameObject);
+            }
             edges.Clear();
         }
     }

@@ -22,11 +22,14 @@ namespace Uptime.Connections
 
         private LogicalConnectionState state;
         private RectTransform networkArea;
-        private float[] laneOffsets;
+        private float[] startOffsets;
+        private float[] endOffsets;
         private float[] lineWidths;
-        private float[] fromOffsets;
+        private float[] fromStartOffsets;
+        private float[] fromEndOffsets;
         private float[] fromWidths;
-        private float[] targetOffsets;
+        private float[] targetStartOffsets;
+        private float[] targetEndOffsets;
         private float[] targetWidths;
         private float relayoutElapsed;
         private Vector2[] starts;
@@ -42,6 +45,7 @@ namespace Uptime.Connections
 
         public event Action<LogicalConnectionState> Destroyed;
         public Image TerminalMarker => terminalMarker;
+        public float RelayoutSeconds => relayoutSeconds;
         public Color DisplayAccent => state != null && state.IsComplete &&
             !state.IsNormalDeparture &&
             Mathf.FloorToInt(failureElapsed / failureFlashHalfCycleSeconds) % 2 == 0 ?
@@ -175,26 +179,34 @@ namespace Uptime.Connections
         }
 
         public void SetLayout(float[] offsets, float[] widths)
+            => SetLayout(offsets, offsets, widths);
+
+        public void SetLayout(float[] nextStarts, float[] nextEnds, float[] widths)
         {
-            if (targetOffsets == null)
+            if (targetStartOffsets == null)
             {
-                laneOffsets = (float[])offsets.Clone();
+                startOffsets = (float[])nextStarts.Clone();
+                endOffsets = (float[])nextEnds.Clone();
                 lineWidths = (float[])widths.Clone();
-                fromOffsets = (float[])offsets.Clone();
+                fromStartOffsets = (float[])nextStarts.Clone();
+                fromEndOffsets = (float[])nextEnds.Clone();
                 fromWidths = (float[])widths.Clone();
             }
             else
             {
                 bool changed = false;
-                for (int i = 0; i < offsets.Length; i++)
-                    changed |= Mathf.Abs(targetOffsets[i] - offsets[i]) > 0.001f ||
+                for (int i = 0; i < nextStarts.Length; i++)
+                    changed |= Mathf.Abs(targetStartOffsets[i] - nextStarts[i]) > 0.001f ||
+                        Mathf.Abs(targetEndOffsets[i] - nextEnds[i]) > 0.001f ||
                         Mathf.Abs(targetWidths[i] - widths[i]) > 0.001f;
                 if (!changed)
                     return;
-                fromOffsets = (float[])laneOffsets.Clone();
+                fromStartOffsets = (float[])startOffsets.Clone();
+                fromEndOffsets = (float[])endOffsets.Clone();
                 fromWidths = (float[])lineWidths.Clone();
             }
-            targetOffsets = (float[])offsets.Clone();
+            targetStartOffsets = (float[])nextStarts.Clone();
+            targetEndOffsets = (float[])nextEnds.Clone();
             targetWidths = (float[])widths.Clone();
             relayoutElapsed = 0f;
         }
@@ -204,16 +216,17 @@ namespace Uptime.Connections
         // Shared by Play Mode and the deterministic geometry witness.
         public void AdvanceVisual(float deltaSeconds)
         {
-            if (state == null || networkArea == null || path == null || state.IsPending || laneOffsets == null)
+            if (state == null || networkArea == null || path == null || state.IsPending || startOffsets == null)
                 return;
 
             if (!state.IsComplete)
             {
                 relayoutElapsed += deltaSeconds;
                 float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(relayoutElapsed / relayoutSeconds));
-                for (int i = 0; i < laneOffsets.Length; i++)
+                for (int i = 0; i < startOffsets.Length; i++)
                 {
-                    laneOffsets[i] = Mathf.Lerp(fromOffsets[i], targetOffsets[i], t);
+                    startOffsets[i] = Mathf.Lerp(fromStartOffsets[i], targetStartOffsets[i], t);
+                    endOffsets[i] = Mathf.Lerp(fromEndOffsets[i], targetEndOffsets[i], t);
                     lineWidths[i] = Mathf.Lerp(fromWidths[i], targetWidths[i], t);
                 }
             }
@@ -253,9 +266,9 @@ namespace Uptime.Connections
                 Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
                 starts[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i].Node,
-                    networkArea, direction, laneOffsets[i], lineWidths[i]);
+                    networkArea, direction, startOffsets[i], lineWidths[i]);
                 ends[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i + 1].Node,
-                    networkArea, -direction, -laneOffsets[i], lineWidths[i]);
+                    networkArea, -direction, -endOffsets[i], lineWidths[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
             if (terminalMarker != null)
@@ -271,7 +284,7 @@ namespace Uptime.Connections
                     Vector2 to = networkArea.InverseTransformPoint(target.transform.position);
                     Vector2 towardSource = (from - to).normalized;
                     Rect marker = TerminalMarkerRect(EdgeGeometry.CardRect(target, networkArea),
-                        towardSource, -laneOffsets[last], lineWidths[last], markerPadding);
+                        towardSource, -endOffsets[last], lineWidths[last], markerPadding);
                     terminalMarker.rectTransform.position = networkArea.TransformPoint(marker.center);
                     terminalMarker.rectTransform.sizeDelta = marker.size;
                     Color markerColor = state.IsComplete && !state.IsNormalDeparture ?

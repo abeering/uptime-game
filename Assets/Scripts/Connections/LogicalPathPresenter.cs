@@ -17,11 +17,13 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float minLineGap = 3f;
         [SerializeField, Min(0.1f), Tooltip("Diagnostic threshold only; narrower lines are reported in the Console.")]
         private float minLineWidth = 2.5f;
+        [SerializeField] private bool adaptiveNodePorts;
 
         private LogicalConnectionState[] connections;
         private readonly Dictionary<LogicalConnectionState, LogicalPathView> views =
             new Dictionary<LogicalConnectionState, LogicalPathView>();
         private readonly HashSet<PhysicalLinkView> warnedLinks = new HashSet<PhysicalLinkView>();
+        private readonly HashSet<PhysicalLinkView> positionedLinks = new HashSet<PhysicalLinkView>();
         private readonly RouteLaneOrder laneOrder = new RouteLaneOrder();
         private bool previewMode;
 
@@ -47,6 +49,7 @@ namespace Uptime.Connections
                 identityPresenter.BeginFrame();
                 identityPresenter.EndFrame();
             }
+            if (enabled) ClearPhysicalPositions();
         }
 
         public void Bind(LogicalConnectionState[] states)
@@ -61,6 +64,7 @@ namespace Uptime.Connections
                     Destroy(oldView.gameObject);
                 }
             views.Clear();
+            ClearPhysicalPositions();
             warnedLinks.Clear();
             laneOrder.Clear();
             identityPalette.Reset();
@@ -164,13 +168,38 @@ namespace Uptime.Connections
                     order.IndexOf(b.ConnectionId)));
             }
 
+            var portCounts = new Dictionary<PhysicalLinkView, int>();
+            foreach (KeyValuePair<PhysicalLinkReference, List<LogicalConnectionState>> entry in usersByLink)
+                portCounts[entry.Key.View] = entry.Value.Count;
+            Dictionary<PhysicalLinkView, NodePortPacking.Port> ports = adaptiveNodePorts ?
+                NodePortPacking.Plan(portCounts, networkArea, maxLineWidth, minLineGap) :
+                new Dictionary<PhysicalLinkView, NodePortPacking.Port>();
+            float relayoutSeconds = pathPrefab.RelayoutSeconds;
+            var departedLinks = new List<PhysicalLinkView>();
+            foreach (PhysicalLinkView link in positionedLinks)
+                if (!portCounts.ContainsKey(link)) departedLinks.Add(link);
+            foreach (PhysicalLinkView link in departedLinks)
+            {
+                if (link != null) link.ClearAttachmentOffsets(relayoutSeconds);
+                positionedLinks.Remove(link);
+            }
+            foreach (PhysicalLinkView link in portCounts.Keys)
+            {
+                ports.TryGetValue(link, out NodePortPacking.Port port);
+                link.SetAttachmentOffsets(port.AtA, port.AtB, relayoutSeconds);
+                positionedLinks.Add(link);
+            }
+
             var layouts = new Dictionary<PhysicalLinkReference,
                 IdentityPacking.Layout>();
             if (identityPresenter != null)
                 foreach (KeyValuePair<PhysicalLinkReference,
                     List<LogicalConnectionState>> entry in usersByLink)
+                {
+                    ports.TryGetValue(entry.Key.View, out NodePortPacking.Port port);
                     layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key.View,
-                        entry.Value.Count, maxLineWidth, minLineWidth, minLineGap));
+                        entry.Value.Count, maxLineWidth, minLineWidth, minLineGap, port));
+                }
 
             var currentlyOverflowed = new HashSet<PhysicalLinkView>();
             var identitiesByLink = new Dictionary<PhysicalLinkView,
@@ -183,21 +212,26 @@ namespace Uptime.Connections
                     !(connection.IsComplete && !connection.IsNormalDeparture))
                     continue;
                 Color accent = identityPalette.Assign(connection);
-                float[] offsets = new float[connection.RouteLinks.Length];
-                float[] widths = new float[offsets.Length];
-                for (int edge = 0; edge < offsets.Length; edge++)
+                float[] starts = new float[connection.RouteLinks.Length];
+                float[] ends = new float[starts.Length];
+                float[] widths = new float[starts.Length];
+                for (int edge = 0; edge < starts.Length; edge++)
                 {
                     PhysicalLinkReference link = connection.RouteLinks[edge];
                     PhysicalLinkView linkView = link.View;
                     List<LogicalConnectionState> users = usersByLink[link];
-                    float budget = linkView.BundleWidth(networkArea);
+                    ports.TryGetValue(linkView, out NodePortPacking.Port port);
+                    float budget = port.Budget > 0f ? port.Budget : linkView.BundleWidth(networkArea);
                     layouts.TryGetValue(link, out IdentityPacking.Layout layout);
                     float width = layout != null ? layout.LineWidth :
                         EdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
                     float gap = layout != null ? layout.LineGap : minLineGap;
                     float offset = EdgeGeometry.Offset(users.IndexOf(connection), users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
-                    offsets[edge] = connection.Definition.Route[edge].Node == linkView.NodeA ? offset : -offset;
+                    bool forward = connection.Definition.Route[edge].Node == linkView.NodeA;
+                    float sign = forward ? 1f : -1f;
+                    starts[edge] = sign * (offset + (forward ? port.AtA : port.AtB));
+                    ends[edge] = sign * (offset + (forward ? port.AtB : port.AtA));
                     widths[edge] = width;
                     if (identityPresenter != null)
                     {
@@ -207,9 +241,9 @@ namespace Uptime.Connections
                         Vector2 b = networkArea.InverseTransformPoint(routeB.transform.position);
                         Vector2 direction = (b - a).normalized;
                         Vector2 targetStart = EdgeGeometry.CardEdge(routeA,
-                            networkArea, direction, offsets[edge]);
+                            networkArea, direction, starts[edge]);
                         Vector2 targetEnd = EdgeGeometry.CardEdge(routeB,
-                            networkArea, -direction, -offsets[edge]);
+                            networkArea, -direction, -ends[edge]);
                         bool hasVisual = views[connection].TryGetVisualSegment(edge, out Vector2 visualStart,
                             out Vector2 visualEnd, out float visibleFraction, out _);
                         if (!hasVisual)
@@ -237,7 +271,7 @@ namespace Uptime.Connections
                                 "Overflow presentation is not implemented yet.", linkView);
                     }
                 }
-                views[connection].SetLayout(offsets, widths);
+                views[connection].SetLayout(starts, ends, widths);
             }
             warnedLinks.IntersectWith(currentlyOverflowed);
             if (identityPresenter != null)
@@ -252,5 +286,14 @@ namespace Uptime.Connections
                 identityPresenter.EndFrame();
             }
         }
+
+        private void ClearPhysicalPositions()
+        {
+            foreach (PhysicalLinkView link in positionedLinks)
+                if (link != null) link.ClearAttachmentOffsets(0.01f);
+            positionedLinks.Clear();
+        }
+
+        private void OnDisable() => ClearPhysicalPositions();
     }
 }
