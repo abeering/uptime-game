@@ -20,6 +20,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionRunMode runMode;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
+        [SerializeField] private PayloadDirector payloadDirector;
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
         [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
@@ -53,6 +54,7 @@ namespace Uptime.Connections
         public NetworkHealthSnapshot Health => health?.Snapshot;
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
+        public PayloadDirector Payloads => payloadDirector;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
         public IReadOnlyList<NodeCondition> Conditions => conditions.AsReadOnly();
@@ -79,7 +81,10 @@ namespace Uptime.Connections
         public event Action<NodeScanSession> ScanCompleted;
         public event Action<CleanSession, int> CleanSucceeded;
         public event Action SimulationReset;
-        public bool HasEverUsedId(string id) => usedIds.Contains(id);
+        public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
+            payloadDirector != null && payloadDirector.HasEverUsedId(id);
+        public bool IsTrafficIdReserved(string id) => trafficDirector != null &&
+            trafficDirector.IsIdReserved(id);
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
 
@@ -124,6 +129,7 @@ namespace Uptime.Connections
             activeScan = null;
             ClearAllocatedUsage();
             infections.Clear();
+            payloadDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
             RefreshDisplays();
             runtimeConnections = null;
         }
@@ -204,8 +210,12 @@ namespace Uptime.Connections
                 foreach (NodeCondition condition in conditions)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         condition.ExpiresAtSeconds - simulationTimeSeconds));
+                if (payloadDirector != null)
+                    segment = Mathf.Min(segment,
+                        payloadDirector.TimeToNextBoundary(simulationTimeSeconds));
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
+                payloadDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
                 ExpireConditions();
                 remaining -= segment;
@@ -248,7 +258,8 @@ namespace Uptime.Connections
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
-                    connection => !completedThisStep.Contains(connection));
+                    connection => !completedThisStep.Contains(connection),
+                    payloadDirector != null ? payloadDirector.DemandAt : null);
             simulationTimeSeconds += deltaSeconds;
             var newlyBlackout = new List<NodeResources>();
             foreach (ResourceAllocator.OperationCompletion completion in completed)
@@ -340,7 +351,7 @@ namespace Uptime.Connections
             // Arrival can end the outer step. Publish the first real allocation now so
             // presentation never interprets an unallocated Active state as stalled.
             if (establishedAny)
-                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+                RefreshPayloadAllocations();
         }
 
         private void StartOperation(LogicalConnectionState state)
@@ -366,7 +377,7 @@ namespace Uptime.Connections
         {
             if (runtimeConnections == null) ResetSimulation();
             LogicalConnectionState state = BuildState(definition);
-            if (!usedIds.Add(state.ConnectionId))
+            if (HasEverUsedId(state.ConnectionId) || !usedIds.Add(state.ConnectionId))
                 throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
             state.SpawnedAtSeconds = simulationTimeSeconds;
             state.TravelSecondsPerLink = connectionTravelSecondsPerLink;
@@ -598,7 +609,7 @@ namespace Uptime.Connections
                 recorder?.RecordInfection("infection_removed", infection, simulationTimeSeconds,
                     "player_clean", session.ActionSequence);
             }
-            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            RefreshPayloadAllocations();
             RefreshDisplays();
             recorder?.RecordClean("clean_succeeded", session, simulationTimeSeconds, pid,
                 removedCount);
@@ -662,8 +673,7 @@ namespace Uptime.Connections
             infections.Remove(existing);
             recorder?.RecordInfection("infection_removed", existing, simulationTimeSeconds,
                 "debug_removal");
-            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections,
-                infections);
+            RefreshPayloadAllocations();
             RefreshDisplays();
             error = null;
             return true;
@@ -686,9 +696,25 @@ namespace Uptime.Connections
             infections.Add(infection);
             recorder?.RecordInfection("infection_applied", infection,
                 simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
-            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            RefreshPayloadAllocations();
             RefreshDisplays();
             return true;
+        }
+
+        internal bool ApplyPayloadEffect(NodeView targetNode, string payloadId)
+        {
+            NodeResources target = FindNodeResources(targetNode.NodeId);
+            return ApplyInfection(target,
+                new InfectionPayload(InfectionKind.PhantomLoad, defaultPhantomLoad),
+                payloadId, -1);
+        }
+
+        public void RefreshPayloadAllocations()
+        {
+            if (runtimeConnections == null || nodes == null) return;
+            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections,
+                payloadDirector != null ? payloadDirector.DemandAt : null);
+            RefreshDisplays();
         }
 
         public bool IsNodeOffline(NodeView view) => view != null &&
@@ -734,7 +760,7 @@ namespace Uptime.Connections
             next.Remove(state);
             runtimeConnections = next.ToArray();
             pathPresenter?.Retire(state);
-            ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+            RefreshPayloadAllocations();
         }
 
         private void StepSpawners()
@@ -766,7 +792,7 @@ namespace Uptime.Connections
             }
         }
 
-        private NodeResources FindNodeResources(string id)
+        public NodeResources FindNodeResources(string id)
         {
             if (id == null || nodes == null) return null;
             foreach (NodeResources node in nodes)
@@ -790,6 +816,8 @@ namespace Uptime.Connections
             occurrences.Clear();
             infections.Clear();
             conditions.Clear();
+            if (payloadDirector == null) payloadDirector = GetComponent<PayloadDirector>();
+            payloadDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
             SimulationReset?.Invoke();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
@@ -939,7 +967,7 @@ namespace Uptime.Connections
                 pathPresenter?.Retire(state);
             }
             if (due.Count > 0)
-                ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections);
+                RefreshPayloadAllocations();
         }
 
         private static void ValidateBehaviors(TimedModifierBehaviorDefinition[] definitions,
@@ -1007,6 +1035,7 @@ namespace Uptime.Connections
                 {
                     node?.ClearConnectionUsage();
                     node?.SetInfectionUsage(0f, 0f);
+                    node?.SetDefensiveUsage(0f, 0f);
                 }
         }
 

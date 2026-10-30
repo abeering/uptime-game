@@ -1397,6 +1397,7 @@ namespace Uptime.Connections
             idsExhausted = true;
             return null;
         }
+        public bool IsIdReserved(string id) => id != null && reservedIds.Contains(id);
         private float Range(float min, float max) => min + (float)random.NextDouble() * (max - min);
         private NodeView FindNode(string id)
         {

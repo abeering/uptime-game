@@ -85,6 +85,8 @@ namespace Uptime.Connections
                 state.SetOffline(host.IsNodeOffline(card));
                 state.SetPortScanned(host.ConditionFor(card, ConditionKind.PortScanned),
                     host.SimulationTimeSeconds);
+                state.SetInterceptor(host.Payloads?.InterceptorAt(card),
+                    host.SimulationTimeSeconds);
                 Rect cardRect = EdgeGeometry.CardRect(card, networkArea);
                 view.SetNodeRect(cardRect);
                 view.Render(state, realTime, deltaSeconds);

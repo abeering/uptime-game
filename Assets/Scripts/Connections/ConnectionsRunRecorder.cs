@@ -34,6 +34,9 @@ namespace Uptime.Connections
         public float defaultSpawnerCadence;
         public float connectionTravelSecondsPerLink;
         public float scanDurationSeconds;
+        public float payloadInterceptWindowSeconds;
+        public float payloadInterceptCooldownSeconds;
+        public float payloadInterceptRequestedLoad;
         public bool naturalLoadNoiseEnabled;
         public float naturalLoadNoiseAmplitude;
         public float naturalLoadNoiseMinPeriodSeconds;
@@ -241,6 +244,18 @@ namespace Uptime.Connections
         public float hostileMeanIntervalSeconds;
         public float nextHostileIntervalSeconds;
         public float nextHostileAtSeconds;
+        public string payloadId;
+        public string payloadProfile;
+        public string payloadPhase;
+        public int payloadHop;
+        public string[] payloadRoute;
+        public float[] payloadHopTravelSeconds;
+        public float payloadEstablishSeconds;
+        public float interceptActivatedAtSeconds;
+        public float interceptExpiresAtSeconds;
+        public float interceptCooldownUntilSeconds;
+        public float defensiveRequestedLoad;
+        public float defensiveAllocatedLoad;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
@@ -286,6 +301,28 @@ namespace Uptime.Connections
         public InfectionSnapshot[] infections;
         public ConditionSnapshot[] conditions;
         public ConnectionSnapshot[] connections;
+        public PayloadSnapshot[] payloads;
+        public InterceptionSnapshot[] interceptors;
+    }
+
+    [Serializable] public sealed class PayloadSnapshot
+    {
+        public string id;
+        public string phase;
+        public string currentNode;
+        public string nextNode;
+        public int hop;
+        public float progress;
+    }
+
+    [Serializable] public sealed class InterceptionSnapshot
+    {
+        public string payloadId;
+        public string nodeId;
+        public float activatedAtSeconds;
+        public float expiresAtSeconds;
+        public float cooldownUntilSeconds;
+        public bool succeeded;
     }
 
     [Serializable] public sealed class InfectionSnapshot
@@ -328,6 +365,8 @@ namespace Uptime.Connections
         public float baselineLoad;
         public float infectionRequestedLoad;
         public float infectionAllocatedLoad;
+        public float defensiveRequestedLoad;
+        public float defensiveAllocatedLoad;
         public float connectionRequestedLoad;
         public float connectionAllocatedLoad;
         public float requestedLoad;
@@ -618,6 +657,44 @@ namespace Uptime.Connections
             entry.sourceOperationIndex = condition.SourceOperationIndex;
         }
 
+        public void RecordPayload(string type, PayloadState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.payloadId = state.Id;
+            entry.payloadProfile = state.Profile.ToString();
+            entry.payloadPhase = state.Phase.ToString();
+            entry.payloadHop = state.Hop;
+            entry.targetNodeId = state.Phase == PayloadPhase.Resolved ?
+                state.FinalNode.NodeId : state.NextNode.NodeId;
+            entry.success = state.Intercepted || state.EffectApplied;
+            if (type == "payload_created")
+            {
+                entry.payloadRoute = new string[state.Route.Length];
+                for (int i = 0; i < state.Route.Length; i++)
+                    entry.payloadRoute[i] = state.Route[i].NodeId;
+                entry.payloadHopTravelSeconds = (float[])state.TravelSeconds.Clone();
+                entry.payloadEstablishSeconds = state.EstablishSeconds;
+                entry.infectionKind = InfectionKind.PhantomLoad.ToString();
+            }
+        }
+
+        public void RecordIntercept(string type, InterceptionState state, float time,
+            float requested, float allocated)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.payloadId = state.PayloadId;
+            entry.targetNodeId = state.Node.View.NodeId;
+            entry.interceptActivatedAtSeconds = state.ActivatedAt;
+            entry.interceptExpiresAtSeconds = state.ExpiresAt;
+            entry.interceptCooldownUntilSeconds = state.CooldownUntil;
+            entry.defensiveRequestedLoad = requested;
+            entry.defensiveAllocatedLoad = allocated;
+            entry.success = state.Succeeded;
+            entry.actionSequence = state.ActionSequence;
+        }
+
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -878,6 +955,8 @@ namespace Uptime.Connections
                     loadCapacity = node.LoadCapacity, baselineLoad = node.BaselineLoad,
                     infectionRequestedLoad = node.InfectionRequestedLoad,
                     infectionAllocatedLoad = node.InfectionAllocatedLoad,
+                    defensiveRequestedLoad = node.DefensiveRequestedLoad,
+                    defensiveAllocatedLoad = node.DefensiveAllocatedLoad,
                     connectionRequestedLoad = node.ConnectionRequestedLoad,
                     connectionAllocatedLoad = node.ConnectionAllocatedLoad,
                     requestedLoad = node.RequestedLoad, allocatedLoad = node.AllocatedLoad };
@@ -911,6 +990,26 @@ namespace Uptime.Connections
                     sourceConnectionId = condition.SourceConnectionId,
                     sourceOperationIndex = condition.SourceOperationIndex
                 };
+            }
+            if (host.Payloads != null)
+            {
+                var moving = new List<PayloadSnapshot>();
+                foreach (PayloadState payload in host.Payloads.Payloads)
+                    if (payload.Phase != PayloadPhase.Resolved)
+                        moving.Add(new PayloadSnapshot { id = payload.Id,
+                            phase = payload.Phase.ToString(), hop = payload.Hop,
+                            currentNode = payload.CurrentNode.NodeId,
+                            nextNode = payload.NextNode.NodeId, progress = payload.Progress });
+                snapshot.payloads = moving.ToArray();
+                var armed = new List<InterceptionSnapshot>();
+                foreach (InterceptionState interceptor in host.Payloads.Interceptors)
+                    armed.Add(new InterceptionSnapshot { payloadId = interceptor.PayloadId,
+                        nodeId = interceptor.Node.View.NodeId,
+                        activatedAtSeconds = interceptor.ActivatedAt,
+                        expiresAtSeconds = interceptor.ExpiresAt,
+                        cooldownUntilSeconds = interceptor.CooldownUntil,
+                        succeeded = interceptor.Succeeded });
+                snapshot.interceptors = armed.ToArray();
             }
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
@@ -961,6 +1060,12 @@ namespace Uptime.Connections
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
                 scanDurationSeconds = host.ScanDurationSeconds,
+                payloadInterceptWindowSeconds = host.Payloads != null ?
+                    host.Payloads.InterceptWindowSeconds : 0f,
+                payloadInterceptCooldownSeconds = host.Payloads != null ?
+                    host.Payloads.InterceptCooldownSeconds : 0f,
+                payloadInterceptRequestedLoad = host.Payloads != null ?
+                    host.Payloads.InterceptRequestedLoad : 0f,
                 naturalLoadNoiseEnabled = host.NaturalLoadNoiseEnabled,
                 naturalLoadNoiseAmplitude = host.NaturalLoadNoiseAmplitude,
                 naturalLoadNoiseMinPeriodSeconds = host.NaturalLoadNoiseMinPeriodSeconds,

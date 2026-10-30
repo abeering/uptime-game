@@ -6944,6 +6944,7 @@ GameObject:
   - component: {fileID: 1033840603}
   - component: {fileID: 1033840602}
   - component: {fileID: 1033840604}
+  - component: {fileID: 1033840605}
   m_Layer: 0
   m_Name: LogicalPaths
   m_TagString: Untagged
@@ -6998,6 +6999,27 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1033840605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033840601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98bdb79e64354f0c954629c65cad364e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PayloadPresenter
+  host: {fileID: 1996901015}
+  networkArea: {fileID: 772389560}
+  pathLayer: {fileID: 1033840603}
+  markerLayer: {fileID: 901162629}
+  socketPrefab: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+  idPrefab: {fileID: 8025527490866664778, guid: 3b613de177b2977418658a5f6a9bb7fc, type: 3}
+  lineStyle: {fileID: 8284974062488692513, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  lineWidth: 3
+  laneOffset: 9
 --- !u!114 &1033840604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11530,6 +11552,7 @@ GameObject:
   - component: {fileID: 1996901017}
   - component: {fileID: 1996901018}
   - component: {fileID: 1996901019}
+  - component: {fileID: 1996901020}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -11588,6 +11611,7 @@ MonoBehaviour:
   runMode: 1
   trafficDirector: {fileID: 1996901017}
   recorder: {fileID: 1996901018}
+  payloadDirector: {fileID: 1996901020}
   healthTuning:
     deadlineTolerance: 1.5
     slowdownDrainPerSecond: 0.25
@@ -11609,6 +11633,24 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
+--- !u!114 &1996901020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a80e53fc33240d8b84463e947c242a1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PayloadDirector
+  host: {fileID: 1996901015}
+  establishmentSeconds: 1.2
+  interceptWindowSeconds: 5
+  interceptCooldownSeconds: 15
+  interceptRequestedLoad: 4
+  payloadColor: {r: 1, g: 0.72, b: 0.35, a: 1}
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0

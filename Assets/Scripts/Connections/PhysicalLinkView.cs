@@ -49,6 +49,9 @@ namespace Uptime.Connections
         public void GetTargetSpine(out Vector2 start, out Vector2 end) =>
             Spine(targetAtA, targetAtB, out start, out end);
 
+        public void GetRenderedSpine(out Vector2 start, out Vector2 end) =>
+            Spine(renderedAtA, renderedAtB, out start, out end);
+
         public void GetTargetLabelPose(float requestedOffset, out Vector2 center,
             out Vector2 along)
         {
