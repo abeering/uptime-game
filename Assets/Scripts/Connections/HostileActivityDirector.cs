@@ -25,11 +25,15 @@ namespace Uptime.Connections
             public bool FollowupSelected;
             public float FollowupAt = -1f;
             public string FollowupId;
+            public ConnectionResolution? ScanResolution;
+            public ConnectionResolution? FollowupResolution;
+            public bool Retired;
         }
 
         private readonly List<ReconEvent> events = new();
         private System.Random random;
         private int nextEventId;
+        private bool visitingEvents;
 
         public float OrdinaryWeight { get => ordinaryWeight; set => ordinaryWeight = Mathf.Max(0f, value); }
         public float ReconnaissanceWeight { get => reconnaissanceWeight; set => reconnaissanceWeight = Mathf.Max(0f, value); }
@@ -38,6 +42,7 @@ namespace Uptime.Connections
         public float PortScanLoad => portScanLoad;
         public float PortScanWork => portScanWork;
         public float PortScannedSeconds => portScannedSeconds;
+        public int ActiveReconnaissanceCount => events.Count;
 
         private void OnDisable()
         {
@@ -55,6 +60,7 @@ namespace Uptime.Connections
             }
             random = new System.Random(unchecked(seed ^ (int)0x7265636f));
             events.Clear();
+            visitingEvents = false;
             nextEventId = 0;
         }
 
@@ -111,26 +117,44 @@ namespace Uptime.Connections
 
         public void Tick(float now)
         {
-            foreach (ReconEvent item in events)
+            visitingEvents = true;
+            try
             {
-                if (item.FollowupAt < 0f || item.FollowupId != null ||
-                    now + .00001f < item.FollowupAt) continue;
-                ConnectionSpawnPlan plan = traffic.GenerateTargetedInfectorPlan(now, item.Target);
-                if (plan == null)
+                foreach (ReconEvent item in events)
                 {
-                    item.FollowupId = "unavailable";
-                    host.Recorder?.RecordReconnaissance("recon_followup_unavailable", now,
-                        item.Id, item.Target, item.ScanId, true,
-                        followupDelaySeconds, null, "no_plan");
-                    continue;
+                    if (item.Retired || item.FollowupAt < 0f || item.FollowupId != null ||
+                        now + .00001f < item.FollowupAt) continue;
+                    try
+                    {
+                        ConnectionSpawnPlan plan = traffic.GenerateTargetedInfectorPlan(now,
+                            item.Target);
+                        if (plan == null)
+                        {
+                            RecordUnavailable(item, now, "no_plan");
+                            continue;
+                        }
+                        plan = plan.ForEvent(item.Id);
+                        traffic.QueueSpawnPlan(plan, "recon_followup");
+                        item.FollowupId = plan.ConnectionId;
+                        host.Recorder?.RecordReconnaissance("recon_followup_queued", now,
+                            item.Id, item.Target, item.ScanId, true,
+                            followupDelaySeconds, item.FollowupId, null);
+                    }
+                    catch (InvalidOperationException error)
+                    {
+                        RecordUnavailable(item, now, error.Message);
+                    }
                 }
-                plan = plan.ForEvent(item.Id);
-                traffic.QueueSpawnPlan(plan, "recon_followup");
-                item.FollowupId = plan.ConnectionId;
-                host.Recorder?.RecordReconnaissance("recon_followup_queued", now,
-                    item.Id, item.Target, item.ScanId, true,
-                    followupDelaySeconds, item.FollowupId, null);
             }
+            finally { visitingEvents = false; RetireFinished(); }
+        }
+
+        private void RecordUnavailable(ReconEvent item, float now, string reason)
+        {
+            host.Recorder?.RecordReconnaissance("recon_followup_unavailable", now,
+                item.Id, item.Target, item.ScanId, true,
+                followupDelaySeconds, null, reason);
+            item.Retired = true;
         }
 
         private void OnConnectionResolved(LogicalConnectionState state,
@@ -138,8 +162,10 @@ namespace Uptime.Connections
         {
             foreach (ReconEvent item in events)
             {
-                if (item.ScanId == state.ConnectionId)
+                if (item.Retired) continue;
+                if (item.ScanId == state.ConnectionId && !item.ScanResolution.HasValue)
                 {
+                    item.ScanResolution = reason;
                     host.Recorder?.RecordReconnaissance("recon_scan_resolved",
                         host.SimulationTimeSeconds, item.Id, item.Target,
                         item.ScanId, item.FollowupSelected, followupDelaySeconds,
@@ -152,13 +178,26 @@ namespace Uptime.Connections
                             item.ScanId, true, followupDelaySeconds, null,
                             reason.ToString(), item.FollowupAt);
                     }
+                    else item.Retired = true;
                 }
-                else if (item.FollowupId == state.ConnectionId)
+                else if (item.FollowupId == state.ConnectionId &&
+                    !item.FollowupResolution.HasValue)
+                {
+                    item.FollowupResolution = reason;
                     host.Recorder?.RecordReconnaissance("recon_followup_resolved",
                         host.SimulationTimeSeconds, item.Id, item.Target,
                         item.ScanId, true, followupDelaySeconds,
                         item.FollowupId, reason.ToString());
+                    item.Retired = true;
+                }
             }
+            if (!visitingEvents) RetireFinished();
+        }
+
+        private void RetireFinished()
+        {
+            for (int i = events.Count - 1; i >= 0; i--)
+                if (events[i].Retired) events.RemoveAt(i);
         }
     }
 }

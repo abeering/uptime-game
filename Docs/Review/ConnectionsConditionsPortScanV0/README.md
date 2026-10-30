@@ -10,6 +10,8 @@ Advanced starts with a 38-second hostile opportunity mean, ordinary/reconnaissan
 
 The run log records the complete condition payload in `plan_queued`, event ID on queued plans, activity weights/selection, reconnaissance target and follow-up decision, scan outcome, follow-up timing and outcome, condition apply/refresh/expire with source, and active conditions in snapshots. Ordinary inspect does not reveal hostile intent.
 
+Reconnaissance keeps the scan's typed resolution while a selected follow-up is pending, allowing future event behavior to distinguish completion, player kill, and Blackout cancellation. No-follow-up events retire when the scan resolves. Selected events retire when the follow-up resolves or cannot be generated; reset clears pending events. This changes event ownership only: a killed scan still launches any preselected follow-up on the existing delay.
+
 ## Manual review
 
 1. In each Connections scene at 16:9 Play Mode, enter `portscan db`. Inspect the connection while connecting/active, watch READ progress and the terminal socket, then watch DB's purple `PORT SCANNED` panel and radial timer for about 20 simulated seconds.
@@ -43,3 +45,5 @@ The Advanced Scene witness ran three deterministic 600-second simulations:
 | 9001 | 20 | 18 | 6 | 6 |
 
 These are seeded examples of the provisional settings, not a balance claim. Interactive Play Mode review remains open.
+
+The PR #62 lifecycle follow-up added `ReconEventLifecycleWitness`. In Unity 6000.3.11f1 it passed scan and follow-up `Completed`, `Killed`, and Blackout `Canceled` outcomes, failed follow-up generation, retained typed scan resolution, recorder linkage, and reset. The full relevant Connections witness batch also passed after this cleanup.
