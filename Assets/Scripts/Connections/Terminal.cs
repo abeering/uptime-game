@@ -60,12 +60,21 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+            if (Application.isPlaying && simulationHost?.Payloads != null)
+                simulationHost.Payloads.InterceptSucceeded += OnInterceptSucceeded;
         }
 
         private void OnDisable()
         {
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
+            if (simulationHost?.Payloads != null)
+                simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+        }
+
+        private void OnInterceptSucceeded(PayloadState payload)
+        {
+            AppendText("INTERCEPTED  " + payload.Id.ToLowerInvariant(), normalColor);
         }
 
         private void OnScanCompleted(NodeScanSession session)
@@ -232,7 +241,48 @@ namespace Uptime.Connections
                 case "scan":
                     Scan(tokens, command);
                     break;
+                case "intercept":
+                    if (tokens.Length != 4 || tokens[2] != "@")
+                        AppendText("USAGE  intercept <payloadId> @ <nodeId>", errorColor);
+                    else if (simulationHost?.Payloads == null)
+                        AppendText("INTERCEPT  simulation unavailable", errorColor);
+                    else
+                    {
+                        bool armed = simulationHost.Payloads.TryIntercept(tokens[1], tokens[3],
+                            out string interceptError, command);
+                        if (!armed) recorder?.RecordPlayerAction(command, tokens[1], false,
+                            tokens[3], interceptError);
+                        AppendText(armed ? "INTERCEPT ACTIVE  " + tokens[1].ToLowerInvariant() +
+                            " @ " + tokens[3].ToUpperInvariant() : "INTERCEPT  " + interceptError,
+                            armed ? normalColor : errorColor);
+                    }
+                    break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "payload":
+                    if (tokens.Length < 2 || tokens.Length > 3 || tokens.Length == 3 &&
+                        (!System.Enum.TryParse(tokens[2], true, out PayloadMotionProfile parsedProfile) ||
+                         !System.Enum.IsDefined(typeof(PayloadMotionProfile), parsedProfile)))
+                        AppendText("USAGE  payload <targetNodeId> [steady|variable]", errorColor);
+                    else if (simulationHost?.Payloads == null)
+                        AppendText("PAYLOAD  simulation unavailable", errorColor);
+                    else try
+                    {
+                        PayloadMotionProfile profile = tokens.Length == 3 ?
+                            (PayloadMotionProfile)System.Enum.Parse(typeof(PayloadMotionProfile),
+                                tokens[2], true) : PayloadMotionProfile.Steady;
+                        PayloadState payload = simulationHost.Payloads.Spawn(tokens[1], profile);
+                        recorder?.RecordPlayerAction(command, payload.Id, true,
+                            tokens[1], "payload_spawned");
+                        AppendText("PAYLOAD  " + payload.Id.ToLowerInvariant() +
+                            " moving (" + profile.ToString().ToLowerInvariant() + ")", normalColor);
+                    }
+                    catch (System.InvalidOperationException error)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false,
+                            tokens[1], error.Message);
+                        AppendText("PAYLOAD  " + error.Message, errorColor);
+                    }
+                    break;
                 case "portscan":
                 case "recon":
                     if (tokens.Length != 2)
@@ -394,11 +444,13 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
+                    AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  // 5s window, 4 LOAD, 15s node cooldown", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
+                    AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else

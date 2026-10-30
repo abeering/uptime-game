@@ -79,7 +79,7 @@ namespace Uptime.Connections
             float staggerStep, float endInset, float lineClearance,
             IReadOnlyList<PillBounds> obstacles, Rect? sourceCard = null,
             Rect? destinationCard = null, float sourceBias = 0f,
-            float destinationBias = 0f)
+            float destinationBias = 0f, IReadOnlyList<bool> pillEligible = null)
         {
             if (count <= 0 || (end - start).sqrMagnitude < 0.01f)
                 return new Layout(ReadabilityStage.Unavailable, 0f, minimumLineGap,
@@ -89,6 +89,19 @@ namespace Uptime.Connections
             Vector2 tilted = end - start + normal * (destinationBias - sourceBias);
             float spacingScale = tilted.magnitude /
                 Mathf.Max(0.01f, Vector2.Dot(tilted, along));
+            var eligible = new List<int>();
+            for (int i = 0; i < count; i++)
+                if (pillEligible == null || i >= pillEligible.Count || pillEligible[i])
+                    eligible.Add(i);
+            if (eligible.Count == 0)
+            {
+                float thinWidth = EdgeGeometry.LineWidth(budget, count,
+                    minimumLineGap, maximumLineWidth);
+                return new Layout(ReadabilityStage.Centered, thinWidth, minimumLineGap,
+                    MakeLanes(start, end, count, thinWidth, minimumLineGap,
+                        sourceCard, destinationCard, sourceBias, destinationBias),
+                    new List<List<Placement>> { new List<Placement>() });
+            }
 
             // Keep centered pills only when they do not make the paths thinner
             // than a staggered layout that can still show every identity.
@@ -99,9 +112,9 @@ namespace Uptime.Connections
             {
                 Lane[] lanes = MakeLanes(start, end, count, width, gap,
                     sourceCard, destinationCard, sourceBias, destinationBias);
-                List<Placement> centered = Pack(lanes, Sequential(count), pillSize,
+                List<Placement> centered = Pack(lanes, eligible, pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance, 3);
-                if (centered.Count == count)
+                if (centered.Count == eligible.Count)
                     centeredLayout = Single(ReadabilityStage.Centered, width, gap, lanes, centered);
             }
 
@@ -111,9 +124,9 @@ namespace Uptime.Connections
             {
                 Lane[] lanes = MakeLanes(start, end, count, width, gap,
                     sourceCard, destinationCard, sourceBias, destinationBias);
-                List<Placement> staggered = BestPack(lanes, Sequential(count), pillSize,
+                List<Placement> staggered = BestPack(lanes, eligible, pillSize,
                     pillGap, staggerStep, endInset, obstacles, true, lineClearance);
-                if (staggered != null && staggered.Count == count &&
+                if (staggered != null && staggered.Count == eligible.Count &&
                     (centeredLayout == null || width > centeredLayout.LineWidth + 0.01f))
                     return Single(ReadabilityStage.Staggered, width, gap, lanes, staggered);
             }
@@ -124,13 +137,13 @@ namespace Uptime.Connections
             gap = minimumLineGap;
             Lane[] compressed = MakeLanes(start, end, count, width, gap,
                 sourceCard, destinationCard, sourceBias, destinationBias);
-            List<Placement> overlaid = BestPack(compressed, Sequential(count), pillSize,
+            List<Placement> overlaid = BestPack(compressed, eligible, pillSize,
                 pillGap, staggerStep, endInset, obstacles, false, lineClearance);
-            if (overlaid != null && overlaid.Count == count)
+            if (overlaid != null && overlaid.Count == eligible.Count)
                 return Single(ReadabilityStage.Overlaid, width, gap, compressed, overlaid);
 
-            List<List<Placement>> rotation = BuildRotation(compressed, pillSize, pillGap,
-                staggerStep, endInset, obstacles);
+            List<List<Placement>> rotation = BuildRotation(compressed, eligible,
+                pillSize, pillGap, staggerStep, endInset, obstacles);
             return new Layout(rotation.Count > 0 ? ReadabilityStage.Rotating : ReadabilityStage.Unavailable,
                 width, gap, compressed, rotation);
         }
@@ -196,23 +209,24 @@ namespace Uptime.Connections
             return lanes;
         }
 
-        private static List<List<Placement>> BuildRotation(Lane[] lanes, Vector2 size,
+        private static List<List<Placement>> BuildRotation(Lane[] lanes, List<int> eligible,
+            Vector2 size,
             float pillGap, float step, float inset, IReadOnlyList<PillBounds> obstacles)
         {
             var schedule = new List<List<Placement>>();
-            var remaining = Sequential(lanes.Length);
+            var remaining = new List<int>(eligible);
             List<Placement> fullest = BestPack(lanes, remaining, size, pillGap, step,
                 inset, obstacles, false, 0f);
             if (fullest == null || fullest.Count == 0)
                 return schedule;
-            int phases = Mathf.CeilToInt((float)lanes.Length / fullest.Count);
+            int phases = Mathf.CeilToInt((float)eligible.Count / fullest.Count);
             for (int phase = 0; phase < phases; phase++)
             {
                 var priority = new List<int>();
-                for (int i = phase; i < lanes.Length; i += phases)
-                    priority.Add(i);
+                for (int i = phase; i < eligible.Count; i += phases)
+                    priority.Add(eligible[i]);
                 List<Placement> cycle = BestPackWithPriority(lanes, priority, size,
-                    pillGap, step, inset, obstacles);
+                    pillGap, step, inset, obstacles, eligible);
                 if (cycle == null || cycle.Count == 0)
                     continue;
                 schedule.Add(cycle);
@@ -222,7 +236,7 @@ namespace Uptime.Connections
             while (remaining.Count > 0)
             {
                 List<Placement> cycle = BestPackWithPriority(lanes, remaining, size,
-                    pillGap, step, inset, obstacles);
+                    pillGap, step, inset, obstacles, eligible);
                 if (cycle == null || cycle.Count == 0)
                     return new List<List<Placement>>();
                 int before = remaining.Count;
@@ -241,9 +255,10 @@ namespace Uptime.Connections
         }
 
         private static List<Placement> BestPackWithPriority(Lane[] lanes, List<int> priority,
-            Vector2 size, float gap, float step, float inset, IReadOnlyList<PillBounds> obstacles)
+            Vector2 size, float gap, float step, float inset, IReadOnlyList<PillBounds> obstacles,
+            List<int> eligible)
         {
-            var others = Sequential(lanes.Length);
+            var others = new List<int>(eligible);
             foreach (int index in priority)
                 others.Remove(index);
             List<Placement> best = null;

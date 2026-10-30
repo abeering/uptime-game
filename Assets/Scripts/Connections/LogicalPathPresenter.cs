@@ -11,6 +11,8 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform markerLayer;
         [SerializeField] private LogicalPathView pathPrefab;
         [SerializeField] private IdentityPresenter identityPresenter;
+        [SerializeField] private PayloadDirector payloadDirector;
+        [SerializeField] private PayloadPresenter payloadPresenter;
         [SerializeField] private ConnectionIdentityPalette identityPalette = new ConnectionIdentityPalette();
         [Header("Logical line geometry (UI pixels)")]
         [SerializeField, Min(0.1f)] private float maxLineWidth = 12f;
@@ -35,6 +37,7 @@ namespace Uptime.Connections
         public float MinLineGap => Mathf.Max(0f, minLineGap);
         public float MinLineWidth => Mathf.Max(0.1f, minLineWidth);
         public ConnectionIdentityPalette IdentityPalette => identityPalette;
+        public void RefreshLayouts() => UpdateLayouts();
 
         public void SetPreviewMode(bool enabled)
         {
@@ -133,8 +136,6 @@ namespace Uptime.Connections
         {
             if (previewMode)
                 return;
-            var usersByLink = new Dictionary<PhysicalLinkReference,
-                List<LogicalConnectionState>>();
             var routes = new List<RouteLaneOrder.Route>();
             foreach (LogicalConnectionState connection in connections)
             {
@@ -150,27 +151,32 @@ namespace Uptime.Connections
                 for (int i = 0; i < links.Length; i++)
                     links[i] = connection.RouteLinks[i].View;
                 routes.Add(new RouteLaneOrder.Route(connection.ConnectionId, nodes, links));
-                foreach (PhysicalLinkReference link in connection.RouteLinks)
+            }
+            var payloadLinks = new Dictionary<PayloadState, PhysicalLinkView>();
+            var payloadIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (payloadDirector != null)
+                foreach (PayloadState payload in payloadDirector.Payloads)
                 {
-                    if (!usersByLink.TryGetValue(link, out List<LogicalConnectionState> users))
-                    {
-                        users = new List<LogicalConnectionState>();
-                        usersByLink.Add(link, users);
-                    }
-                    users.Add(connection);
+                    if (payload.Phase == PayloadPhase.Resolved) continue;
+                    PhysicalLinkView link = null;
+                    foreach (PhysicalLinkReference reference in payloadDirector.Host.PhysicalLinks)
+                        if (reference?.View != null &&
+                            (reference.View.NodeA == payload.CurrentNode &&
+                             reference.View.NodeB == payload.NextNode ||
+                             reference.View.NodeB == payload.CurrentNode &&
+                             reference.View.NodeA == payload.NextNode))
+                        { link = reference.View; break; }
+                    if (link == null) continue;
+                    payloadLinks.Add(payload, link);
+                    payloadIds.Add(payload.Id);
+                    routes.Add(new RouteLaneOrder.Route(payload.Id,
+                        new[] { payload.CurrentNode, payload.NextNode }, new[] { link }));
                 }
-            }
             laneOrder.Update(routes, networkArea);
-            foreach (KeyValuePair<PhysicalLinkReference, List<LogicalConnectionState>> entry in usersByLink)
-            {
-                List<string> order = laneOrder.Orders[entry.Key.View];
-                entry.Value.Sort((a, b) => order.IndexOf(a.ConnectionId).CompareTo(
-                    order.IndexOf(b.ConnectionId)));
-            }
 
             var portCounts = new Dictionary<PhysicalLinkView, int>();
-            foreach (KeyValuePair<PhysicalLinkReference, List<LogicalConnectionState>> entry in usersByLink)
-                portCounts[entry.Key.View] = entry.Value.Count;
+            foreach (KeyValuePair<PhysicalLinkView, List<string>> entry in laneOrder.Orders)
+                portCounts[entry.Key] = entry.Value.Count;
             Dictionary<PhysicalLinkView, NodePortPacking.Port> ports = adaptiveNodePorts ?
                 NodePortPacking.Plan(portCounts, networkArea, maxLineWidth, minLineGap) :
                 new Dictionary<PhysicalLinkView, NodePortPacking.Port>();
@@ -190,15 +196,18 @@ namespace Uptime.Connections
                 positionedLinks.Add(link);
             }
 
-            var layouts = new Dictionary<PhysicalLinkReference,
+            var layouts = new Dictionary<PhysicalLinkView,
                 IdentityPacking.Layout>();
             if (identityPresenter != null)
-                foreach (KeyValuePair<PhysicalLinkReference,
-                    List<LogicalConnectionState>> entry in usersByLink)
+                foreach (KeyValuePair<PhysicalLinkView, List<string>> entry in laneOrder.Orders)
                 {
-                    ports.TryGetValue(entry.Key.View, out NodePortPacking.Port port);
-                    layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key.View,
-                        entry.Value.Count, maxLineWidth, minLineWidth, minLineGap, port));
+                    ports.TryGetValue(entry.Key, out NodePortPacking.Port port);
+                    var pillEligible = new bool[entry.Value.Count];
+                    for (int i = 0; i < pillEligible.Length; i++)
+                        pillEligible[i] = !payloadIds.Contains(entry.Value[i]);
+                    layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key,
+                        entry.Value.Count, maxLineWidth, minLineWidth, minLineGap, port,
+                        pillEligible));
                 }
 
             var currentlyOverflowed = new HashSet<PhysicalLinkView>();
@@ -220,16 +229,17 @@ namespace Uptime.Connections
                 {
                     PhysicalLinkReference link = connection.RouteLinks[edge];
                     PhysicalLinkView linkView = link.View;
-                    List<LogicalConnectionState> users = usersByLink[link];
+                    List<string> users = laneOrder.Orders[linkView];
                     ports.TryGetValue(linkView, out NodePortPacking.Port port);
                     float budget = port.Budget > 0f ? port.Budget : linkView.BundleWidth(networkArea);
-                    layouts.TryGetValue(link, out IdentityPacking.Layout layout);
+                    layouts.TryGetValue(linkView, out IdentityPacking.Layout layout);
                     float width = layout != null ? layout.LineWidth :
                         EdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
                     float gap = layout != null ? layout.LineGap : minLineGap;
                     if (edge == starts.Length - 1 && users.Count > 1)
                         maximumSocketDiameter = Mathf.Max(12f, width + gap - 2f);
-                    float offset = EdgeGeometry.Offset(users.IndexOf(connection), users.Count, width, gap);
+                    float offset = EdgeGeometry.Offset(users.IndexOf(connection.ConnectionId),
+                        users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
                     bool forward = connection.Definition.Route[edge].Node == linkView.NodeA;
                     float sign = forward ? 1f : -1f;
@@ -275,6 +285,45 @@ namespace Uptime.Connections
                     }
                 }
                 views[connection].SetLayout(starts, ends, widths, maximumSocketDiameter);
+            }
+            foreach (KeyValuePair<PayloadState, PhysicalLinkView> entry in payloadLinks)
+            {
+                PayloadState payload = entry.Key;
+                PhysicalLinkView link = entry.Value;
+                List<string> users = laneOrder.Orders[link];
+                ports.TryGetValue(link, out NodePortPacking.Port port);
+                layouts.TryGetValue(link, out IdentityPacking.Layout layout);
+                float budget = port.Budget > 0f ? port.Budget : link.BundleWidth(networkArea);
+                float width = layout != null ? layout.LineWidth :
+                    EdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
+                float gap = layout != null ? layout.LineGap : minLineGap;
+                float offset = EdgeGeometry.Offset(users.IndexOf(payload.Id), users.Count,
+                    width, gap);
+                bool forward = payload.CurrentNode == link.NodeA;
+                float sign = forward ? 1f : -1f;
+                float startOffset = sign * (offset + (forward ? port.AtA : port.AtB));
+                float endOffset = sign * (offset + (forward ? port.AtB : port.AtA));
+                payloadPresenter?.SetLayout(payload, startOffset, endOffset, width);
+                if (identityPresenter != null)
+                {
+                    Vector2 a = networkArea.InverseTransformPoint(payload.CurrentNode.transform.position);
+                    Vector2 b = networkArea.InverseTransformPoint(payload.NextNode.transform.position);
+                    Vector2 direction = (b - a).normalized;
+                    Vector2 targetStart = EdgeGeometry.CardEdge(payload.CurrentNode,
+                        networkArea, direction, startOffset);
+                    Vector2 targetEnd = EdgeGeometry.CardEdge(payload.NextNode,
+                        networkArea, -direction, -endOffset);
+                    if (!identitiesByLink.TryGetValue(link, out List<IdentityPresenter.LiveLine> lines))
+                    {
+                        lines = new List<IdentityPresenter.LiveLine>();
+                        identitiesByLink.Add(link, lines);
+                    }
+                    lines.Add(new IdentityPresenter.LiveLine(payload.Id,
+                        targetStart, targetEnd, targetStart, targetEnd,
+                        payloadDirector.PayloadColor,
+                        payload.Phase == PayloadPhase.Establishing ? payload.Progress : 1f,
+                        width, false));
+                }
             }
             warnedLinks.IntersectWith(currentlyOverflowed);
             if (identityPresenter != null)

@@ -26,7 +26,8 @@ namespace Uptime.Connections
             LogicalConnectionState[] connections, IReadOnlyList<NodeInfection> infections,
             float deltaSeconds,
             Action<IReadOnlyList<LogicalConnectionState>> afterAllocation = null,
-            Func<LogicalConnectionState, bool> mayStartTransition = null)
+            Func<LogicalConnectionState, bool> mayStartTransition = null,
+            Func<NodeView, float> defensiveDemand = null)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
@@ -41,7 +42,7 @@ namespace Uptime.Connections
                 if (mayStartTransition == null || mayStartTransition(connection))
                     connection.IsTransitioning = false;
             }
-            Allocate(nodes, ordered, infections);
+            Allocate(nodes, ordered, infections, defensiveDemand);
             afterAllocation?.Invoke(ordered);
             foreach (LogicalConnectionState connection in ordered)
             {
@@ -65,16 +66,17 @@ namespace Uptime.Connections
         // Recompute authoritative allocation after a delivery or developer intervention,
         // without advancing WORK or Health until the next fixed step.
         internal static void RefreshAllocations(NodeResources[] nodes,
-            LogicalConnectionState[] connections, IReadOnlyList<NodeInfection> infections)
+            LogicalConnectionState[] connections, IReadOnlyList<NodeInfection> infections,
+            Func<NodeView, float> defensiveDemand = null)
         {
             var ordered = new List<LogicalConnectionState>(connections);
             ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
-            Allocate(nodes, ordered, infections);
+            Allocate(nodes, ordered, infections, defensiveDemand);
             Publish(nodes, ordered);
         }
 
         private static void Allocate(NodeResources[] nodes, List<LogicalConnectionState> ordered,
-            IReadOnlyList<NodeInfection> infections)
+            IReadOnlyList<NodeInfection> infections, Func<NodeView, float> defensiveDemand)
         {
             var nodeByView = new Dictionary<NodeView, NodeResources>();
             var connectionDemand = new Dictionary<NodeResources, float>();
@@ -99,6 +101,11 @@ namespace Uptime.Connections
                 float available = Mathf.Max(0f, node.LoadCapacity - node.BaselineLoad);
                 float infectionAllocated = Mathf.Min(available, infectionDemand[node]);
                 node.SetInfectionUsage(infectionDemand[node], infectionAllocated);
+                // Baseline and infection retain their previous priority. Defense takes
+                // the next share, before proportional allocation to productive WORK.
+                float requestedDefense = Mathf.Max(0f, defensiveDemand?.Invoke(node.View) ?? 0f);
+                node.SetDefensiveUsage(requestedDefense,
+                    Mathf.Min(requestedDefense, available - infectionAllocated));
             }
             foreach (LogicalConnectionState connection in ordered)
             {
@@ -106,7 +113,7 @@ namespace Uptime.Connections
                 NodeResources target = nodeByView[connection.TargetNode];
                 float demand = connectionDemand[target];
                 float available = Mathf.Max(0f, target.LoadCapacity - target.BaselineLoad -
-                    target.InfectionAllocatedLoad);
+                    target.InfectionAllocatedLoad - target.DefensiveAllocatedLoad);
                 float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
                 connection.AllocatedLoad = connection.DesiredLoad * fraction;
             }

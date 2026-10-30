@@ -47,7 +47,9 @@ namespace Uptime.Connections
         {
             bool pain = state.Offline || state.KnownInfected;
             bool awareness = state.AwarenessPreview || state.PortScanned;
-            bool benefit = state.CleanVisible(realTime);
+            bool clean = state.CleanVisible(realTime);
+            bool intercept = state.InterceptPayloadId != null;
+            bool benefit = clean || intercept;
             bool[] desired = { pain, awareness, benefit };
             NodeStatusBandGraphic[] bands = { painBand, awarenessBand, benefitBand };
             NodeStatusPanel[] panels = { painPanel, awarenessPanel, benefitPanel };
@@ -85,7 +87,17 @@ namespace Uptime.Connections
                     null, awarenessColor,
                     state.PortScanned ? state.PortScanRemainingFraction : (float?)null);
             if (benefit)
-                benefitPanel.SetContent("CLEAN", null, benefitColor);
+            {
+                string interceptText = state.InterceptSucceeded ? "CAUGHT " :
+                    "INTERCEPT ";
+                if (clean && intercept)
+                    benefitPanel.SetContent("CLEAN", interceptText + state.InterceptPayloadId,
+                        benefitColor, null, state.InterceptRemainingFraction);
+                else if (intercept)
+                    benefitPanel.SetContent(interceptText + state.InterceptPayloadId,
+                        null, benefitColor, state.InterceptRemainingFraction);
+                else benefitPanel.SetContent("CLEAN", null, benefitColor);
+            }
 
             for (int i = 0; i < 3; i++)
                 if (panels[i].gameObject.activeSelf)

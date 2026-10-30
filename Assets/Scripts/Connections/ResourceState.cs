@@ -14,6 +14,8 @@ namespace Uptime.Connections
         [NonSerialized] private float allocatedToConnections;
         [NonSerialized] private float requestedByInfections;
         [NonSerialized] private float allocatedToInfections;
+        [NonSerialized] private float requestedByDefense;
+        [NonSerialized] private float allocatedToDefense;
 
         public NodeView View => view;
         public float LoadCapacity => Mathf.Max(0f, loadCapacity);
@@ -22,8 +24,10 @@ namespace Uptime.Connections
         public float ConnectionAllocatedLoad => allocatedToConnections;
         public float InfectionRequestedLoad => requestedByInfections;
         public float InfectionAllocatedLoad => allocatedToInfections;
-        public float RequestedLoad => BaselineLoad + requestedByInfections + requestedByConnections;
-        public float AllocatedLoad => BaselineLoad + allocatedToInfections + allocatedToConnections;
+        public float DefensiveRequestedLoad => requestedByDefense;
+        public float DefensiveAllocatedLoad => allocatedToDefense;
+        public float RequestedLoad => BaselineLoad + requestedByInfections + requestedByDefense + requestedByConnections;
+        public float AllocatedLoad => BaselineLoad + allocatedToInfections + allocatedToDefense + allocatedToConnections;
 
         public NodeResources(NodeView node, float capacity, float baseline = 0f)
         {
@@ -43,6 +47,12 @@ namespace Uptime.Connections
         {
             requestedByInfections = requested;
             allocatedToInfections = allocated;
+        }
+
+        internal void SetDefensiveUsage(float requested, float allocated)
+        {
+            requestedByDefense = requested;
+            allocatedToDefense = allocated;
         }
 
         internal void AddUsage(float requested, float allocated)
