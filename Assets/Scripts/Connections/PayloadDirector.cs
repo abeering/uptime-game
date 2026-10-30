@@ -64,6 +64,7 @@ namespace Uptime.Connections
         public float InterceptWindowSeconds => interceptWindowSeconds;
         public float InterceptCooldownSeconds => interceptCooldownSeconds;
         public Color PayloadColor => payloadColor;
+        public SimulationHost Host => host;
 
         private void Awake() { if (host == null) host = GetComponent<SimulationHost>(); }
         private void OnValidate()

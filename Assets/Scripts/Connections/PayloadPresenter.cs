@@ -11,30 +11,57 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private RectTransform markerLayer;
         [SerializeField] private TerminalMarkerStyle socketPrefab;
-        [SerializeField] private IdentityPillView idPrefab;
+        [SerializeField] private PayloadBodyView bodyPrefab;
         [SerializeField] private PathGraphic lineStyle;
         [SerializeField, Min(1f)] private float lineWidth = 3f;
-        [SerializeField] private float laneOffset = 9f;
+
+        private struct LaneLayout
+        {
+            public float StartOffset;
+            public float EndOffset;
+            public float Width;
+        }
 
         private sealed class Visual
         {
             public PathGraphic Line;
             public TerminalMarkerStyle Socket;
-            public TerminalMarkerStyle Traveler;
-            public IdentityPillView Id;
+            public PayloadBodyView Traveler;
             public int Hop;
             public bool HasPose;
             public Vector2 Start;
             public Vector2 End;
+            public Vector2 SocketPoint;
         }
         private readonly Dictionary<PayloadState, Visual> visuals = new();
+        private readonly Dictionary<PayloadState, LaneLayout> layouts = new();
+
+        public void SetLayout(PayloadState state, float startOffset, float endOffset,
+            float width)
+        {
+            layouts[state] = new LaneLayout { StartOffset = startOffset,
+                EndOffset = endOffset, Width = width };
+        }
+
+        public bool TryGetVisualSegment(PayloadState state, out Vector2 start,
+            out Vector2 end)
+        {
+            if (visuals.TryGetValue(state, out Visual visual) && visual.HasPose)
+            {
+                start = visual.Start;
+                end = visual.End;
+                return true;
+            }
+            start = end = Vector2.zero;
+            return false;
+        }
 
         private void LateUpdate() { if (Application.isPlaying) RenderNow(); }
 
         public void RenderNow()
         {
             if (host?.Payloads == null || networkArea == null || pathLayer == null ||
-                markerLayer == null || socketPrefab == null || idPrefab == null ||
+                markerLayer == null || socketPrefab == null || bodyPrefab == null ||
                 lineStyle == null) return;
             var active = new HashSet<PayloadState>();
             foreach (PayloadState state in host.Payloads.Payloads)
@@ -46,11 +73,23 @@ namespace Uptime.Connections
                     visual = CreateVisual(state);
                     visuals.Add(state, visual);
                 }
-                if (!TrySegment(state, out Vector2 start, out Vector2 end)) continue;
+                if (!layouts.TryGetValue(state, out LaneLayout layout)) continue;
+                Vector2 a = networkArea.InverseTransformPoint(state.CurrentNode.transform.position);
+                Vector2 b = networkArea.InverseTransformPoint(state.NextNode.transform.position);
+                Vector2 direction = (b - a).normalized;
+                float thinWidth = Mathf.Min(Mathf.Max(1f, lineWidth), layout.Width);
+                Vector2 start = EdgeGeometry.CardUnderlap(state.CurrentNode, networkArea,
+                    direction, layout.StartOffset, thinWidth);
+                Vector2 end = EdgeGeometry.CardUnderlap(state.NextNode, networkArea,
+                    -direction, -layout.EndOffset, thinWidth);
+                Vector2 socket = LogicalPathView.TerminalSocketCenter(
+                    EdgeGeometry.CardRect(state.NextNode, networkArea), -direction,
+                    -layout.EndOffset, visual.Socket.BorderOutset);
                 if (!visual.HasPose || visual.Hop != state.Hop)
                 {
                     visual.Start = start;
                     visual.End = end;
+                    visual.SocketPoint = socket;
                     visual.Hop = state.Hop;
                     visual.HasPose = true;
                 }
@@ -59,25 +98,21 @@ namespace Uptime.Connections
                     float blend = 1f - Mathf.Exp(-Mathf.Max(0f, Time.unscaledDeltaTime) / .22f);
                     visual.Start = Vector2.Lerp(visual.Start, start, blend);
                     visual.End = Vector2.Lerp(visual.End, end, blend);
+                    visual.SocketPoint = Vector2.Lerp(visual.SocketPoint, socket, blend);
                 }
                 start = visual.Start;
                 end = visual.End;
                 float reveal = state.Phase == PayloadPhase.Establishing ? state.Progress : 1f;
                 visual.Line.color = host.Payloads.PayloadColor;
                 visual.Line.SetPath(new[] { start }, new[] { end },
-                    new[] { Mathf.Max(1f, lineWidth) }, reveal);
+                    new[] { thinWidth }, reveal);
                 visual.Socket.gameObject.SetActive(true);
-                visual.Socket.rectTransform.anchoredPosition = end;
+                visual.Socket.rectTransform.anchoredPosition = visual.SocketPoint;
                 bool traversing = state.Phase == PayloadPhase.Traversing;
                 visual.Traveler.gameObject.SetActive(traversing);
-                Vector2 position = traversing ? Vector2.Lerp(start, end, state.Progress) :
-                    Vector2.Lerp(start, end, reveal);
+                Vector2 position = traversing ? Vector2.Lerp(start, visual.SocketPoint,
+                    state.Progress) : Vector2.Lerp(start, visual.SocketPoint, reveal);
                 visual.Traveler.rectTransform.anchoredPosition = position;
-                Vector2 direction = (end - start).normalized;
-                Vector2 side = new Vector2(-direction.y, direction.x);
-                visual.Id.SetPose(Vector2.Lerp(start, end,
-                    state.Phase == PayloadPhase.Establishing ?
-                        Mathf.Max(.08f, reveal * .5f) : .5f) + side * 22f, direction);
             }
             var removed = new List<PayloadState>();
             foreach (var pair in visuals)
@@ -86,7 +121,11 @@ namespace Uptime.Connections
                     DestroyVisual(pair.Value);
                     removed.Add(pair.Key);
                 }
-            foreach (PayloadState state in removed) visuals.Remove(state);
+            foreach (PayloadState state in removed)
+            {
+                visuals.Remove(state);
+                layouts.Remove(state);
+            }
         }
 
         private Visual CreateVisual(PayloadState state)
@@ -107,50 +146,10 @@ namespace Uptime.Connections
             socket.name = "Payload " + state.Id + " next-hop socket";
             socket.SetMaximumDiameter(17f, .01f);
             socket.SetAccent(accent);
-            TerminalMarkerStyle traveler = Instantiate(socketPrefab, markerLayer, false);
+            PayloadBodyView traveler = Instantiate(bodyPrefab, markerLayer, false);
             traveler.name = "Payload " + state.Id + " traveler";
-            traveler.SetMaximumDiameter(21f, .01f);
-            traveler.SetAccent(accent);
-            IdentityPillView id = Instantiate(idPrefab, markerLayer, false);
-            id.name = "Payload " + state.Id + " identity";
-            id.Bind(state.Id, accent);
-            return new Visual { Line = line, Socket = socket, Traveler = traveler, Id = id };
-        }
-
-        private bool TrySegment(PayloadState state, out Vector2 start, out Vector2 end)
-        {
-            foreach (PhysicalLinkReference reference in host.PhysicalLinks)
-            {
-                PhysicalLinkView link = reference?.View;
-                if (link == null) continue;
-                bool forward = link.NodeA == state.CurrentNode && link.NodeB == state.NextNode;
-                if (!forward && !(link.NodeB == state.CurrentNode &&
-                    link.NodeA == state.NextNode)) continue;
-                link.GetRenderedSpine(out start, out end);
-                if (!forward) (start, end) = (end, start);
-                Vector2 direction = (end - start).normalized;
-                Vector2 normal = new Vector2(-direction.y, direction.x);
-                // Payloads sharing a physical hop need distinct, stable visible lanes.
-                // This does not change logical-connection port ownership or simulation.
-                int count = 0;
-                int rank = 0;
-                foreach (PayloadState other in host.Payloads.Payloads)
-                {
-                    if (other.Phase == PayloadPhase.Resolved ||
-                        !((other.CurrentNode == link.NodeA && other.NextNode == link.NodeB) ||
-                          (other.CurrentNode == link.NodeB && other.NextNode == link.NodeA)))
-                        continue;
-                    if (string.CompareOrdinal(other.Id, state.Id) < 0) rank++;
-                    count++;
-                }
-                float offset = (laneOffset + (rank - (count - 1) * .5f) * 24f) *
-                    (forward ? 1f : -1f);
-                start += normal * offset;
-                end += normal * offset;
-                return true;
-            }
-            start = end = Vector2.zero;
-            return false;
+            traveler.Bind(state.Id, accent);
+            return new Visual { Line = line, Socket = socket, Traveler = traveler };
         }
 
         private static void DestroyVisual(Visual visual)
@@ -158,7 +157,6 @@ namespace Uptime.Connections
             Remove(visual.Line);
             Remove(visual.Socket);
             Remove(visual.Traveler);
-            Remove(visual.Id);
         }
 
         private static void Remove(Component component)
@@ -172,6 +170,7 @@ namespace Uptime.Connections
         {
             foreach (Visual visual in visuals.Values) DestroyVisual(visual);
             visuals.Clear();
+            layouts.Clear();
         }
     }
 }

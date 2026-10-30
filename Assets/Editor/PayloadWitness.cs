@@ -25,6 +25,8 @@ namespace Uptime.Connections.EditorTools
             recorder.BeginRun();
             PayloadDirector director = host.Payloads;
             var payloadPresenter = UnityEngine.Object.FindFirstObjectByType<PayloadPresenter>();
+            var pathPresenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
+            pathPresenter.Bind(host.RuntimeConnections.ToArray());
             PayloadState first = director.Spawn("DB", PayloadMotionProfile.Variable,
                 "EXT1", new[] { 7f, 8f, 9f });
             Check(first.Id == "x1" && first.Route.Select(n => n.NodeId)
@@ -34,13 +36,19 @@ namespace Uptime.Connections.EditorTools
                 "stable ID, seeded physical route and witness timing");
             Check(host.Nodes.All(n => n.DefensiveRequestedLoad == 0f) &&
                 host.Infections.Count == 0, "Payload motion has no LOAD or immediate effect");
+            pathPresenter.RefreshLayouts();
             payloadPresenter.RenderNow();
             Check(UnityEngine.Object.FindObjectsByType<PathGraphic>(FindObjectsSortMode.None)
                 .Count(g => g.name == "Payload x1 hop") == 1 &&
-                UnityEngine.Object.FindObjectsByType<TerminalMarkerStyle>(
+                UnityEngine.Object.FindObjectsByType<PayloadBodyView>(
                     FindObjectsInactive.Include, FindObjectsSortMode.None)
-                .Any(m => m.name == "Payload x1 traveler" && !m.gameObject.activeSelf),
-                "one visible hop and no traveler during establishment");
+                .Any(m => m.name == "Payload x1 traveler" && !m.gameObject.activeSelf &&
+                    m.IdText.text == "x1" && m.Marker.InnerDot != null &&
+                    !m.Marker.InnerDot.gameObject.activeSelf) &&
+                !UnityEngine.Object.FindObjectsByType<IdentityPillView>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .Any(p => p.name.Contains("Payload x1")),
+                "one visible hop, circle contains ID, and no separate Payload pill");
             host.StepSimulation(.6f);
             Check(first.Phase == PayloadPhase.Establishing &&
                 Mathf.Abs(first.Progress - .5f) < .001f,
@@ -145,14 +153,15 @@ namespace Uptime.Connections.EditorTools
             PayloadState other = director.Spawn("DB", PayloadMotionProfile.Variable,
                 "EXT1", new[] { 1f, 1f, 1f });
             Check(threat.Id == "x1" && other.Id == "x2", "simultaneous IDs do not collide");
+            pathPresenter.RefreshLayouts();
             payloadPresenter.RenderNow();
             var sockets = UnityEngine.Object.FindObjectsByType<TerminalMarkerStyle>(
                 FindObjectsSortMode.None);
             var firstSocket = sockets.Single(s => s.name == "Payload x1 next-hop socket");
             var secondSocket = sockets.Single(s => s.name == "Payload x2 next-hop socket");
             Check(Vector2.Distance(firstSocket.rectTransform.anchoredPosition,
-                secondSocket.rectTransform.anchoredPosition) >= 20f,
-                "same-link Payload sockets occupy distinct transient lanes");
+                secondSocket.rectTransform.anchoredPosition) >= 10f,
+                "same-link Payload sockets occupy distinct shared lanes");
             Check(director.TryIntercept(threat.Id, "DB", out _) &&
                 !director.TryIntercept(other.Id, "DB", out _),
                 "one target selected from simultaneous Payloads");
@@ -250,8 +259,37 @@ namespace Uptime.Connections.EditorTools
                 recorder.CurrentLog.snapshots.Any(s => s.nodes.Any(n => n.id == "DB" &&
                     n.defensiveRequestedLoad == 4f && n.defensiveAllocatedLoad == 4f)),
                 "defense takes capacity from WORK; ordinary Health slowdown and snapshots follow");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            NodeView ext = host.Nodes.Single(n => n.View.NodeId == "EXT1").View;
+            NodeView web = host.Nodes.Single(n => n.View.NodeId == "WEB").View;
+            var sharedPlan = new ConnectionSpawnPlan(0f, "shared1", new[] { ext, web },
+                "test", "Shared lane", new[] {
+                    new OperationStage(OperationKind.Read, 500f, 1f, "Read") });
+            host.RegisterConnection(LogicalConnectionDefinition.FromPlan(sharedPlan));
+            PayloadState shared = director.Spawn("WEB", PayloadMotionProfile.Steady,
+                "EXT1", new[] { 20f });
+            pathPresenter.Bind(host.RuntimeConnections.ToArray());
+            pathPresenter.RefreshLayouts();
+            payloadPresenter.RenderNow();
+            LogicalPathView normalView = UnityEngine.Object.FindObjectsByType<LogicalPathView>(
+                FindObjectsSortMode.None).Single(v => v.name == "Logical path shared1");
+            normalView.AdvanceVisual(1f);
+            Check(normalView.TryGetVisualSegment(0, out Vector2 normalStart,
+                    out Vector2 normalEnd, out _, out _) &&
+                payloadPresenter.TryGetVisualSegment(shared, out Vector2 payloadStart,
+                    out Vector2 payloadEnd) &&
+                Vector2.Distance((normalStart + normalEnd) * .5f,
+                    (payloadStart + payloadEnd) * .5f) >= 6f,
+                "Payload and ordinary connection occupy separate shared-solver lanes");
+            Check(Resources.FindObjectsOfTypeAll<IdentityPillView>()
+                    .Count(p => p.name.Contains("identity shared1")) == 1 &&
+                !Resources.FindObjectsOfTypeAll<IdentityPillView>()
+                    .Any(p => p.name.Contains("identity x1")),
+                "ordinary lane retains its pill while Payload lane has none");
             Debug.Log("PayloadWitness PASS: both scenes, identity, hop lifecycle, defense, " +
-                "expiry, cooldown, delivery, wrong matches, congestion, WORK/Health, recorder and reset.");
+                "shared lanes, expiry, cooldown, delivery, wrong matches, congestion, WORK/Health, recorder and reset.");
         }
 
         private static void CheckScene(string scene, int nodeCount)
@@ -263,9 +301,14 @@ namespace Uptime.Connections.EditorTools
                 presenter != null, scene + " Payload services");
             var serialized = new SerializedObject(presenter);
             foreach (string field in new[] { "host", "networkArea", "pathLayer", "markerLayer",
-                "socketPrefab", "idPrefab", "lineStyle" })
+                "socketPrefab", "bodyPrefab", "lineStyle" })
                 Check(serialized.FindProperty(field).objectReferenceValue != null,
                     scene + " presenter binding " + field);
+            var path = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
+            var pathBindings = new SerializedObject(path);
+            foreach (string field in new[] { "payloadDirector", "payloadPresenter" })
+                Check(pathBindings.FindProperty(field).objectReferenceValue != null,
+                    scene + " shared lane binding " + field);
         }
 
         private static void Check(bool condition, string message)

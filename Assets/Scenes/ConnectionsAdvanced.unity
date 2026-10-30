@@ -6969,6 +6969,8 @@ MonoBehaviour:
   markerLayer: {fileID: 901162629}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
   identityPresenter: {fileID: 901162628}
+  payloadDirector: {fileID: 1996901020}
+  payloadPresenter: {fileID: 1033840605}
   identityPalette:
     cyan: {r: 0.36, g: 0.87, b: 0.91, a: 1}
     teal: {r: 0.35, g: 0.91, b: 0.76, a: 1}
@@ -7016,10 +7018,9 @@ MonoBehaviour:
   pathLayer: {fileID: 1033840603}
   markerLayer: {fileID: 901162629}
   socketPrefab: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
-  idPrefab: {fileID: 8025527490866664778, guid: 3b613de177b2977418658a5f6a9bb7fc, type: 3}
+  bodyPrefab: {fileID: 1000005, guid: 2699e8b590624982aa690b532dba129c, type: 3}
   lineStyle: {fileID: 8284974062488692513, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
   lineWidth: 3
-  laneOffset: 9
 --- !u!114 &1033840604
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -17,10 +17,11 @@ namespace Uptime.Connections
             public Color Accent;
             public float VisibleFraction;
             public float Width;
+            public bool HasPill;
 
             public LiveLine(string id, Vector2 targetStart, Vector2 targetEnd,
                 Vector2 visualStart, Vector2 visualEnd, Color accent, float visibleFraction,
-                float width)
+                float width, bool hasPill = true)
             {
                 Id = id;
                 TargetStart = targetStart;
@@ -30,6 +31,7 @@ namespace Uptime.Connections
                 Accent = accent;
                 VisibleFraction = visibleFraction;
                 Width = width;
+                HasPill = hasPill;
             }
         }
 
@@ -68,6 +70,8 @@ namespace Uptime.Connections
             public float SourceBias;
             public float DestinationBias;
             public int Count;
+            public int PillCount;
+            public bool[] PillEligible;
             public int Cycle;
             public float NextCycleAt;
             public bool Seen;
@@ -124,7 +128,8 @@ namespace Uptime.Connections
 
         public IdentityPacking.Layout ResolveLayout(PhysicalLinkView link,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
-            float minimumLineGap, NodePortPacking.Port port)
+            float minimumLineGap, NodePortPacking.Port port,
+            IReadOnlyList<bool> pillEligible = null)
         {
             if (link == null || networkArea == null || pillPrefab == null)
                 return null;
@@ -144,12 +149,20 @@ namespace Uptime.Connections
             IdentityPacking.PillBounds[] obstacles = Obstacles(link);
             if (NeedsPlan(state, start, end, budget, count, maximumLineWidth,
                 minimumReadableLineWidth, minimumLineGap, obstacles,
-                sourceBias, destinationBias))
+                sourceBias, destinationBias, pillEligible))
             {
                 state.Start = start;
                 state.End = end;
                 state.Budget = budget;
                 state.Count = count;
+                state.PillEligible = new bool[count];
+                state.PillCount = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    state.PillEligible[i] = pillEligible == null ||
+                        i >= pillEligible.Count || pillEligible[i];
+                    if (state.PillEligible[i]) state.PillCount++;
+                }
                 state.MaximumWidth = maximumLineWidth;
                 state.MinimumReadableWidth = minimumReadableLineWidth;
                 state.MinimumGap = minimumLineGap;
@@ -167,7 +180,7 @@ namespace Uptime.Connections
                     StaggerStep, EndInset, state.Clearance, obstacles,
                     EdgeGeometry.CardRect(link.NodeA, networkArea),
                     EdgeGeometry.CardRect(link.NodeB, networkArea),
-                    sourceBias, destinationBias);
+                    sourceBias, destinationBias, state.PillEligible);
                 if (link.ResourceLabel != null)
                 {
                     link.GetTargetSpine(out Vector2 spineStart, out Vector2 spineEnd);
@@ -235,7 +248,8 @@ namespace Uptime.Connections
             bool idsChanged = state.PillIds.Count != state.Lines.Count;
             if (!idsChanged)
                 for (int i = 0; i < state.Lines.Count; i++)
-                    if (state.PillIds[i] != state.Lines[i].Id)
+                    if (state.PillIds[i] != state.Lines[i].Id ||
+                        (state.Pills[i] != null) != state.Lines[i].HasPill)
                     {
                         idsChanged = true;
                         break;
@@ -250,16 +264,20 @@ namespace Uptime.Connections
                 state.PillIds.Clear();
                 foreach (LiveLine line in state.Lines)
                 {
-                    if (!old.TryGetValue(line.Id, out IdentityPillView pill))
+                    IdentityPillView pill = null;
+                    if (line.HasPill && !old.TryGetValue(line.Id, out pill))
                     {
                         pill = Instantiate(pillPrefab, pillLayer, false);
                         if (!Application.isPlaying)
                             pill.gameObject.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
                     }
-                    else
+                    else if (line.HasPill)
                         old.Remove(line.Id);
-                    pill.name = $"{link.LinkId} identity {line.Id}";
-                    pill.Bind(line.Id, line.Accent);
+                    if (pill != null)
+                    {
+                        pill.name = $"{link.LinkId} identity {line.Id}";
+                        pill.Bind(line.Id, line.Accent);
+                    }
                     state.Pills.Add(pill);
                     state.PillIds.Add(line.Id);
                 }
@@ -322,7 +340,7 @@ namespace Uptime.Connections
         private float Dwell(EdgeState state)
         {
             int visible = Mathf.Max(1, VisibleCount(state));
-            float density = Mathf.Max(1f, (float)state.Count / visible);
+            float density = Mathf.Max(1f, (float)state.PillCount / visible);
             return Mathf.Max(minimumDwellSeconds, automaticCycleSeconds / Mathf.Sqrt(density));
         }
 
@@ -349,6 +367,7 @@ namespace Uptime.Connections
                 state.Layout.Stage == IdentityPacking.ReadabilityStage.Staggered;
             for (int i = 0; i < state.Pills.Count; i++)
             {
+                if (state.Pills[i] == null) continue;
                 bool selected = false;
                 float fraction = 0f;
                 foreach (IdentityPacking.Placement placement in visible)
@@ -387,7 +406,8 @@ namespace Uptime.Connections
         private bool NeedsPlan(EdgeState state, Vector2 start, Vector2 end, float budget,
             int count, float maximumLineWidth, float minimumReadableLineWidth,
             float minimumLineGap, IdentityPacking.PillBounds[] obstacles,
-            float sourceBias, float destinationBias)
+            float sourceBias, float destinationBias,
+            IReadOnlyList<bool> pillEligible)
         {
             if (state.Layout == null || state.Count != count || state.PillSize != PillSize ||
                 (state.Start - start).sqrMagnitude > 0.25f ||
@@ -403,6 +423,11 @@ namespace Uptime.Connections
                 !Mathf.Approximately(state.Clearance, Mathf.Max(0f, pillToLineClearance)) ||
                 state.Obstacles == null || state.Obstacles.Length != obstacles.Length)
                 return true;
+            if (state.PillEligible == null || state.PillEligible.Length != count)
+                return true;
+            for (int i = 0; i < count; i++)
+                if (state.PillEligible[i] != (pillEligible == null ||
+                    i >= pillEligible.Count || pillEligible[i])) return true;
             for (int i = 0; i < obstacles.Length; i++)
                 if ((state.Obstacles[i].Center - obstacles[i].Center).sqrMagnitude > 0.25f ||
                     (state.Obstacles[i].HalfSize - obstacles[i].HalfSize).sqrMagnitude > 0.25f ||
