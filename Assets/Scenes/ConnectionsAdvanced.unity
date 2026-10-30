@@ -11529,6 +11529,7 @@ GameObject:
   - component: {fileID: 1996901015}
   - component: {fileID: 1996901017}
   - component: {fileID: 1996901018}
+  - component: {fileID: 1996901019}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -11636,6 +11637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionTrafficDirector
   host: {fileID: 1996901015}
+  hostileActivities: {fileID: 1996901019}
   autoGenerationEnabled: 1
   seed: 1701
   randomizeSeed: 1
@@ -12103,7 +12105,7 @@ MonoBehaviour:
         workRateMultiplier: 1
   ambientWeightOverrides: []
   hostileGenerationEnabled: 1
-  hostileMeanIntervalSeconds: 54
+  hostileMeanIntervalSeconds: 38
   deliveryChance: 0.5
   benignOutlierChance: 0.08
   benignWavingOutlierChance: 0.3
@@ -12893,6 +12895,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2115873844}
   m_CullTransparentMesh: 1
+--- !u!114 &1996901019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 217b33ff162141fab0fe0f265ed84ce7, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.HostileActivityDirector
+  host: {fileID: 1996901015}
+  traffic: {fileID: 1996901017}
+  ordinaryWeight: 2
+  reconnaissanceWeight: 1
+  followupChance: 0.4
+  followupDelaySeconds: 8
+  portScanLoad: 8
+  portScanWork: 56
+  portScannedSeconds: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

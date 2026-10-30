@@ -42,6 +42,7 @@ namespace Uptime.Connections
         public float ParentInfectionAppliedAtSeconds { get; }
         public bool NaturalLoadNoise { get; }
         public int NaturalLoadSeed { get; }
+        public string HostileEventId { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
@@ -51,7 +52,8 @@ namespace Uptime.Connections
             string parentNodeId = null, string parentConnectionId = null,
             float parentInfectionAppliedAtSeconds = 0f,
             LoaderAttackPlan loaderAttack = null,
-            bool naturalLoadNoise = false, int naturalLoadSeed = 0)
+            bool naturalLoadNoise = false, int naturalLoadSeed = 0,
+            string hostileEventId = null)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -67,7 +69,8 @@ namespace Uptime.Connections
                 OperationStage stage = operations[i];
                 Operations[i] = stage == null ? null : new OperationStage(stage.Operation,
                     stage.TotalWork, stage.DesiredLoad, stage.ActivityDescription,
-                    stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload);
+                    stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload,
+                    stage.ConditionPayload);
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
@@ -77,7 +80,14 @@ namespace Uptime.Connections
             ParentInfectionAppliedAtSeconds = parentInfectionAppliedAtSeconds;
             NaturalLoadNoise = naturalLoadNoise;
             NaturalLoadSeed = naturalLoadSeed;
+            HostileEventId = hostileEventId;
         }
+
+        public ConnectionSpawnPlan ForEvent(string eventId) => new ConnectionSpawnPlan(
+            ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose,
+            Operations, IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId,
+            ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack,
+            NaturalLoadNoise, NaturalLoadSeed, eventId);
     }
 
     public enum LoaderStructure { Single, Delayed }

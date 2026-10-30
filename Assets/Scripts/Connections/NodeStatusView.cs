@@ -46,7 +46,7 @@ namespace Uptime.Connections
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
         {
             bool pain = state.Offline || state.KnownInfected;
-            bool awareness = state.AwarenessPreview;
+            bool awareness = state.AwarenessPreview || state.PortScanned;
             bool benefit = state.CleanVisible(realTime);
             bool[] desired = { pain, awareness, benefit };
             NodeStatusBandGraphic[] bands = { painBand, awarenessBand, benefitBand };
@@ -81,7 +81,9 @@ namespace Uptime.Connections
                 painPanel.SetContent(state.Offline ? "OFFLINE" : "INFECTED",
                     state.Offline && state.KnownInfected ? "INFECTED" : null, painColor);
             if (awareness)
-                awarenessPanel.SetContent("PORT SCAN", null, awarenessColor);
+                awarenessPanel.SetContent(state.PortScanned ? "PORT SCANNED" : "PORT SCAN",
+                    null, awarenessColor,
+                    state.PortScanned ? state.PortScanRemainingFraction : (float?)null);
             if (benefit)
                 benefitPanel.SetContent("CLEAN", null, benefitColor);
 

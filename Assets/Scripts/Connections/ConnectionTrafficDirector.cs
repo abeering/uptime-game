@@ -56,6 +56,7 @@ namespace Uptime.Connections
     public sealed class ConnectionTrafficDirector : MonoBehaviour
     {
         [SerializeField] private SimulationHost host;
+        [SerializeField] private HostileActivityDirector hostileActivities;
         [SerializeField] private bool autoGenerationEnabled = true;
         [SerializeField] private int seed = 1701;
         [SerializeField] private bool randomizeSeed = true;
@@ -147,7 +148,11 @@ namespace Uptime.Connections
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
-        public float HostileMeanIntervalSeconds => hostileMeanIntervalSeconds;
+        public float HostileMeanIntervalSeconds
+        {
+            get => hostileMeanIntervalSeconds;
+            set => hostileMeanIntervalSeconds = Mathf.Max(.01f, value);
+        }
         public float BenignPopulationGoal => benignPopulationGoal;
         public float CoverageStartupGoal => coverageStartupGoal;
         public float CoverageRampSeconds => coverageRampSeconds;
@@ -254,6 +259,8 @@ namespace Uptime.Connections
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
             RebuildAdvancedRouting();
+            if (hostileActivities == null) hostileActivities = GetComponent<HostileActivityDirector>();
+            hostileActivities?.ResetActivity(seed);
         }
 
         private void RebuildEffectiveWeights()
@@ -434,8 +441,11 @@ namespace Uptime.Connections
                     while (nextHostileAt <= simulationTime + 0.00001f)
                     {
                         float dueAt = nextHostileAt;
-                        ConnectionSpawnPlan plan = GenerateHostilePlan(dueAt);
-                        if (plan != null) QueueSpawnPlan(plan, "ambient_hostile");
+                        ConnectionSpawnPlan plan = hostileActivities != null ?
+                            hostileActivities.QueueAmbientActivity(dueAt) :
+                            GenerateHostilePlan(dueAt);
+                        if (plan != null && hostileActivities == null)
+                            QueueSpawnPlan(plan, "ambient_hostile");
                         float interval = HostileDelay();
                         nextHostileAt = dueAt + interval;
                         host.Recorder?.RecordHostileOpportunity(simulationTime, dueAt,
@@ -478,6 +488,7 @@ namespace Uptime.Connections
                             idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
                 }
             }
+            hostileActivities?.Tick(simulationTime);
             queue.Sort((a, b) =>
             {
                 int time = a.Plan.ScheduledSpawnTime.CompareTo(b.Plan.ScheduledSpawnTime);
@@ -568,6 +579,75 @@ namespace Uptime.Connections
             InfectionKind? infection = objective == "DELIVERY" ? ChooseInfection() : null;
             return GenerateWeightedPurposePlan(atTime, false, objective,
                 selectedInfectionKind: infection);
+        }
+
+        public ConnectionSpawnPlan GeneratePortScanPlan(float atTime,
+            float requestedLoad, float totalWork, float conditionSeconds,
+            string targetNodeId = null)
+        {
+            if (random == null) ResetDirector();
+            NodeView origin = ChooseAmbientOrigin();
+            var eligible = new List<(NodeView target, NodeView[] route)>();
+            foreach (NodeResources node in host.Nodes)
+            {
+                NodeView target = node?.View;
+                if (target == null || target == origin || IsAmbientOrigin(target.NodeId) ||
+                    targetNodeId != null && !string.Equals(target.NodeId, targetNodeId,
+                        StringComparison.OrdinalIgnoreCase)) continue;
+                try { eligible.Add((target, FindRoute(origin, target))); }
+                catch (InvalidOperationException) { }
+            }
+            if (eligible.Count == 0)
+                throw new InvalidOperationException(targetNodeId == null ?
+                    "No reachable internal Port Scan target." :
+                    "Unknown or unreachable internal Port Scan target: " + targetNodeId);
+            var selected = eligible[random.Next(eligible.Count)];
+            string id = NewId();
+            if (id == null) return null;
+            var stage = new OperationStage(OperationKind.Read, totalWork, requestedLoad,
+                "Retrieving service metadata", CompletionEffect.ConditionApplication,
+                condition: new ConditionPayload(ConditionKind.PortScanned, conditionSeconds));
+            return new ConnectionSpawnPlan(atTime, id, selected.route, "port-scan",
+                "Service Metadata Retrieval", new[] { stage }, true);
+        }
+
+        public ConnectionSpawnPlan GenerateTargetedInfectorPlan(float atTime,
+            string targetNodeId)
+        {
+            if (random == null) ResetDirector();
+            NodeView target = FindNode(targetNodeId);
+            if (IsAmbientOrigin(target.NodeId))
+                throw new InvalidOperationException("INFECTOR target must be internal.");
+            // Prefer a canonical PURPOSE that already serves this node. Some reachable
+            // transit nodes (WEB in Advanced) have no canonical destination yet.
+            bool hasMatchingPurpose = false;
+            foreach (ConnectionTrafficProfile profile in profiles)
+                if (profile != null && profile.purposeTemplate &&
+                    EffectiveAmbientWeight(profile.id) > 0f &&
+                    Array.Exists(EffectiveTargetIds(profile), id =>
+                        string.Equals(id, targetNodeId, StringComparison.OrdinalIgnoreCase)))
+                    hasMatchingPurpose = true;
+            float total = 0f;
+            foreach (ConnectionTrafficProfile profile in profiles)
+                if (profile != null && profile.purposeTemplate &&
+                    (!hasMatchingPurpose || Array.Exists(EffectiveTargetIds(profile), id =>
+                        string.Equals(id, targetNodeId, StringComparison.OrdinalIgnoreCase))))
+                    total += Mathf.Max(0f, EffectiveAmbientWeight(profile.id));
+            if (total <= 0f) return null;
+            float choice = (float)random.NextDouble() * total;
+            ConnectionTrafficProfile selected = null;
+            foreach (ConnectionTrafficProfile profile in profiles)
+            {
+                if (profile == null || !profile.purposeTemplate ||
+                    hasMatchingPurpose && !Array.Exists(EffectiveTargetIds(profile), id =>
+                        string.Equals(id, targetNodeId, StringComparison.OrdinalIgnoreCase)) ||
+                    EffectiveAmbientWeight(profile.id) <= 0f) continue;
+                selected = profile;
+                choice -= EffectiveAmbientWeight(profile.id);
+                if (choice < 0f) break;
+            }
+            return BuildPlan(selected, atTime, true, targetOverride: target,
+                selectedObjective: "DELIVERY", selectedInfectionKind: ChooseInfection());
         }
 
         // Witness seam: objective and optional dimensions are explicit; null dimensions use
