@@ -256,6 +256,30 @@ namespace Uptime.Connections
         public float interceptCooldownUntilSeconds;
         public float defensiveRequestedLoad;
         public float defensiveAllocatedLoad;
+        public string wormOutbreakId;
+        public string wormBranchId;
+        public string wormParentBranchId;
+        public string wormEffect;
+        public string wormPhase;
+        public string wormOriginNodeId;
+        public string wormNextNodeId;
+        public string wormLinkId;
+        public int wormSeed;
+        public int wormClaimedNodes;
+        public int wormMaximumNodes;
+        public float wormPropagationProbability;
+        public float wormPropagationRoll;
+        public bool wormPropagationSelected;
+        public float wormEstablishSeconds;
+        public float wormTravelSeconds;
+        public float wormActionSeconds;
+        public float wormConditionSeconds;
+        public string sourceWormBranchId;
+        public float isolationActivatedAtSeconds;
+        public float isolationExpiresAtSeconds;
+        public float isolationCooldownUntilSeconds;
+        public int wormsKilled;
+        public int connectionsCanceled;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
@@ -303,6 +327,8 @@ namespace Uptime.Connections
         public ConnectionSnapshot[] connections;
         public PayloadSnapshot[] payloads;
         public InterceptionSnapshot[] interceptors;
+        public WormSnapshot[] worms;
+        public IsolationSnapshot[] isolations;
     }
 
     [Serializable] public sealed class PayloadSnapshot
@@ -325,6 +351,26 @@ namespace Uptime.Connections
         public bool succeeded;
     }
 
+    [Serializable] public sealed class WormSnapshot
+    {
+        public string outbreakId;
+        public string branchId;
+        public string parentBranchId;
+        public string effect;
+        public string phase;
+        public string currentNode;
+        public string nextNode;
+        public float progress;
+    }
+
+    [Serializable] public sealed class IsolationSnapshot
+    {
+        public string nodeId;
+        public float activatedAtSeconds;
+        public float expiresAtSeconds;
+        public float cooldownUntilSeconds;
+    }
+
     [Serializable] public sealed class InfectionSnapshot
     {
         public string targetNodeId;
@@ -344,6 +390,7 @@ namespace Uptime.Connections
         public float appliedAtSeconds;
         public float expiresAtSeconds;
         public string sourceConnectionId;
+        public string sourceWormBranchId;
         public int sourceOperationIndex;
     }
 
@@ -655,6 +702,72 @@ namespace Uptime.Connections
                 condition.AppliedAtSeconds;
             entry.sourceConnectionId = condition.SourceConnectionId;
             entry.sourceOperationIndex = condition.SourceOperationIndex;
+            entry.sourceWormBranchId = condition.SourceWormBranchId;
+        }
+
+        public void RecordWormOutbreak(string type, WormOutbreak outbreak, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.wormOutbreakId = outbreak.Id;
+            entry.wormOriginNodeId = outbreak.Origin.NodeId;
+            entry.wormEffect = outbreak.Effect.ToString();
+            entry.wormSeed = outbreak.Seed;
+            entry.wormClaimedNodes = outbreak.ClaimedNodes.Count;
+            entry.wormMaximumNodes = outbreak.Tuning.maximumNodes;
+            entry.wormPropagationProbability = outbreak.Tuning.propagationProbability;
+            entry.wormEstablishSeconds = outbreak.Tuning.establishSeconds;
+            entry.wormTravelSeconds = outbreak.Tuning.travelSeconds;
+            entry.wormActionSeconds = outbreak.Tuning.actionSeconds;
+            entry.wormConditionSeconds = outbreak.Tuning.conditionSeconds;
+        }
+
+        public void RecordWormBranch(string type, WormBranch branch, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.wormOutbreakId = branch.Outbreak.Id;
+            entry.wormBranchId = branch.Id;
+            entry.wormParentBranchId = branch.ParentId;
+            entry.wormEffect = branch.Outbreak.Effect.ToString();
+            entry.wormPhase = branch.Phase.ToString();
+            entry.wormOriginNodeId = branch.CurrentNode?.NodeId;
+            entry.wormNextNodeId = branch.NextNode?.NodeId;
+            entry.wormLinkId = branch.Link?.LinkId;
+            entry.wormTravelSeconds = branch.Outbreak.Tuning.travelSeconds;
+            entry.wormActionSeconds = branch.Outbreak.Tuning.actionSeconds;
+            entry.reason = branch.TerminationReason;
+        }
+
+        public void RecordWormDecision(WormOutbreak outbreak, WormBranch branch,
+            PhysicalLinkView link, NodeView target, bool selected, float roll,
+            string reason, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("worm_propagation_decision", time);
+            entry.wormOutbreakId = outbreak.Id;
+            entry.wormBranchId = branch.Id;
+            entry.wormOriginNodeId = branch.CurrentNode.NodeId;
+            entry.wormNextNodeId = target.NodeId;
+            entry.wormLinkId = link.LinkId;
+            entry.wormPropagationProbability = outbreak.Tuning.propagationProbability;
+            entry.wormPropagationRoll = roll;
+            entry.wormPropagationSelected = selected;
+            entry.wormClaimedNodes = outbreak.ClaimedNodes.Count;
+            entry.reason = reason;
+        }
+
+        public void RecordIsolation(string type, IsolationState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.targetNodeId = state.Node.View.NodeId;
+            entry.isolationActivatedAtSeconds = state.ActivatedAt;
+            entry.isolationExpiresAtSeconds = state.ExpiresAt;
+            entry.isolationCooldownUntilSeconds = state.CooldownUntil;
+            entry.wormsKilled = state.WormsKilled;
+            entry.connectionsCanceled = state.ConnectionsCanceled;
+            entry.actionSequence = state.ActionSequence;
         }
 
         public void RecordPayload(string type, PayloadState state, float time)
@@ -988,6 +1101,7 @@ namespace Uptime.Connections
                     appliedAtSeconds = condition.AppliedAtSeconds,
                     expiresAtSeconds = condition.ExpiresAtSeconds,
                     sourceConnectionId = condition.SourceConnectionId,
+                    sourceWormBranchId = condition.SourceWormBranchId,
                     sourceOperationIndex = condition.SourceOperationIndex
                 };
             }
@@ -1010,6 +1124,26 @@ namespace Uptime.Connections
                         cooldownUntilSeconds = interceptor.CooldownUntil,
                         succeeded = interceptor.Succeeded });
                 snapshot.interceptors = armed.ToArray();
+            }
+            if (host.Worms != null)
+            {
+                var moving = new List<WormSnapshot>();
+                foreach (WormOutbreak outbreak in host.Worms.Outbreaks)
+                    foreach (WormBranch branch in outbreak.Branches)
+                        if (branch.Phase != WormPhase.Resolved)
+                            moving.Add(new WormSnapshot { outbreakId = outbreak.Id,
+                                branchId = branch.Id, parentBranchId = branch.ParentId,
+                                effect = outbreak.Effect.ToString(), phase = branch.Phase.ToString(),
+                                currentNode = branch.CurrentNode?.NodeId,
+                                nextNode = branch.NextNode?.NodeId, progress = branch.Progress });
+                snapshot.worms = moving.ToArray();
+                var isolated = new List<IsolationSnapshot>();
+                foreach (IsolationState state in host.Worms.Isolations)
+                    isolated.Add(new IsolationSnapshot { nodeId = state.Node.View.NodeId,
+                        activatedAtSeconds = state.ActivatedAt,
+                        expiresAtSeconds = state.ExpiresAt,
+                        cooldownUntilSeconds = state.CooldownUntil });
+                snapshot.isolations = isolated.ToArray();
             }
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)

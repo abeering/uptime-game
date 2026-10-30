@@ -85,6 +85,9 @@ namespace Uptime.Connections
                 state.SetOffline(host.IsNodeOffline(card));
                 state.SetPortScanned(host.ConditionFor(card, ConditionKind.PortScanned),
                     host.SimulationTimeSeconds);
+                state.SetScanJammed(host.ConditionFor(card, ConditionKind.ScanJammed),
+                    host.SimulationTimeSeconds);
+                state.SetIsolation(host.Worms?.IsolationAt(card), host.SimulationTimeSeconds);
                 state.SetInterceptor(host.Payloads?.InterceptorAt(card),
                     host.SimulationTimeSeconds);
                 Rect cardRect = EdgeGeometry.CardRect(card, networkArea);
@@ -152,6 +155,14 @@ namespace Uptime.Connections
                     for (int i = 0; i < path.VisualSegmentCount; i++)
                         if (path.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
                             out float visible, out _) && visible > .01f)
+                            beams.Add(new NodeStatusPlacement.BeamSegment(start,
+                                Vector2.Lerp(start, end, visible)));
+            WormPresenter wormPresenter = networkArea.GetComponentInChildren<WormPresenter>();
+            if (wormPresenter != null && host.Worms != null)
+                foreach (WormOutbreak outbreak in host.Worms.Outbreaks)
+                    foreach (WormBranch branch in outbreak.Branches)
+                        if (wormPresenter.TryGetVisualSegment(branch, out Vector2 start,
+                            out Vector2 end, out float visible) && visible > .01f)
                             beams.Add(new NodeStatusPlacement.BeamSegment(start,
                                 Vector2.Lerp(start, end, visible)));
             var otherStacks = new List<Rect>();

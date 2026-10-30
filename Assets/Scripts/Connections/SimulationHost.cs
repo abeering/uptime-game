@@ -21,6 +21,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private PayloadDirector payloadDirector;
+        [SerializeField] private WormDirector wormDirector;
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
         [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
@@ -55,6 +56,7 @@ namespace Uptime.Connections
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
         public PayloadDirector Payloads => payloadDirector;
+        public WormDirector Worms => wormDirector;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
         public IReadOnlyList<NodeCondition> Conditions => conditions.AsReadOnly();
@@ -130,6 +132,7 @@ namespace Uptime.Connections
             ClearAllocatedUsage();
             infections.Clear();
             payloadDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
+            wormDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
             RefreshDisplays();
             runtimeConnections = null;
         }
@@ -213,9 +216,13 @@ namespace Uptime.Connections
                 if (payloadDirector != null)
                     segment = Mathf.Min(segment,
                         payloadDirector.TimeToNextBoundary(simulationTimeSeconds));
+                if (wormDirector != null)
+                    segment = Mathf.Min(segment,
+                        wormDirector.TimeToNextBoundary(simulationTimeSeconds));
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
                 payloadDirector?.Advance(segment, simulationTimeSeconds);
+                wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
                 ExpireConditions();
                 remaining -= segment;
@@ -235,7 +242,8 @@ namespace Uptime.Connections
                 {
                     connection.Lifecycle = Lifecycle.Connecting;
                     if (IsNodeOffline(connection.Definition.Route[0].Node))
-                        CancelConnection(connection, connection.Definition.Route[0].Node.NodeId);
+                        CancelConnection(connection, connection.Definition.Route[0].Node.NodeId,
+                            UnavailabilityCause(connection.Definition.Route[0].Node));
                 }
         }
 
@@ -334,7 +342,7 @@ namespace Uptime.Connections
                 recorder?.RecordNodeArrival(state, arrived.NodeId, simulationTimeSeconds);
                 if (IsNodeOffline(arrived))
                 {
-                    CancelConnection(state, arrived.NodeId);
+                    CancelConnection(state, arrived.NodeId, UnavailabilityCause(arrived));
                     continue;
                 }
                 if (state.ReachedRouteNodeIndex != state.RouteLinks.Length) continue;
@@ -387,7 +395,8 @@ namespace Uptime.Connections
             recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
             if (Application.isPlaying) pathPresenter?.Add(state);
             if (state.IsConnecting && IsNodeOffline(state.Definition.Route[0].Node))
-                CancelConnection(state, state.Definition.Route[0].Node.NodeId);
+                CancelConnection(state, state.Definition.Route[0].Node.NodeId,
+                    UnavailabilityCause(state.Definition.Route[0].Node));
             return state;
         }
 
@@ -400,7 +409,8 @@ namespace Uptime.Connections
         }
 
         public NodeCondition ApplyCondition(NodeResources target, ConditionPayload payload,
-            string sourceConnectionId = null, int sourceOperationIndex = -1)
+            string sourceConnectionId = null, int sourceOperationIndex = -1,
+            string sourceWormBranchId = null)
         {
             if (target == null || payload == null || !payload.IsValid ||
                 Array.IndexOf(nodes, target) < 0)
@@ -409,13 +419,13 @@ namespace Uptime.Connections
                 if (existing.Target == target && existing.Kind == payload.Kind)
                 {
                     existing.Refresh(payload, simulationTimeSeconds, sourceConnectionId,
-                        sourceOperationIndex);
+                        sourceOperationIndex, sourceWormBranchId);
                     recorder?.RecordCondition("condition_refreshed", existing,
                         simulationTimeSeconds);
                     return existing;
                 }
             var condition = new NodeCondition(target, payload, simulationTimeSeconds,
-                sourceConnectionId, sourceOperationIndex);
+                sourceConnectionId, sourceOperationIndex, sourceWormBranchId);
             conditions.Add(condition);
             recorder?.RecordCondition("condition_applied", condition,
                 simulationTimeSeconds);
@@ -550,6 +560,12 @@ namespace Uptime.Connections
                 return ScanStartResult.UnknownNode;
             }
             if (runtimeConnections == null) ResetSimulation();
+            if (ConditionFor(target.View, ConditionKind.ScanJammed) != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, target.View.NodeId,
+                    "scan_jammed");
+                return ScanStartResult.Jammed;
+            }
             if (activeScan != null)
             {
                 bool sameNode = activeScan.Target == target;
@@ -718,10 +734,19 @@ namespace Uptime.Connections
         }
 
         public bool IsNodeOffline(NodeView view) => view != null &&
-            infections.Exists(infection => infection.Target.View == view &&
-                infection.Payload.Kind == InfectionKind.Blackout);
+            (infections.Exists(infection => infection.Target.View == view &&
+                infection.Payload.Kind == InfectionKind.Blackout) ||
+             wormDirector != null && wormDirector.IsNodeIsolated(view));
 
-        private void InterruptRoutesThrough(NodeResources offline)
+        private ConnectionTerminationCause UnavailabilityCause(NodeView view) =>
+            wormDirector != null && wormDirector.IsNodeIsolated(view) ?
+                ConnectionTerminationCause.Isolation : ConnectionTerminationCause.Blackout;
+
+        public int InterruptForIsolation(NodeResources node) =>
+            InterruptRoutesThrough(node, ConnectionTerminationCause.Isolation);
+
+        private int InterruptRoutesThrough(NodeResources offline,
+            ConnectionTerminationCause cause = ConnectionTerminationCause.Blackout)
         {
             var interrupted = new List<LogicalConnectionState>();
             foreach (LogicalConnectionState state in runtimeConnections)
@@ -739,17 +764,19 @@ namespace Uptime.Connections
             interrupted.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             foreach (LogicalConnectionState state in interrupted)
             {
-                CancelConnection(state, offline.View.NodeId);
+                CancelConnection(state, offline.View.NodeId, cause);
             }
             RefreshDisplays();
+            return interrupted.Count;
         }
 
-        private void CancelConnection(LogicalConnectionState state, string failureNodeId)
+        private void CancelConnection(LogicalConnectionState state, string failureNodeId,
+            ConnectionTerminationCause cause)
         {
             if (state.Resolution.HasValue) return;
             bool wasActive = state.IsActive;
             state.TerminationPhase = state.Lifecycle;
-            state.TerminationCause = ConnectionTerminationCause.Blackout;
+            state.TerminationCause = cause;
             state.FailureNodeId = failureNodeId;
             state.Lifecycle = Lifecycle.Complete;
             state.AllocatedLoad = 0f;
@@ -818,6 +845,8 @@ namespace Uptime.Connections
             conditions.Clear();
             if (payloadDirector == null) payloadDirector = GetComponent<PayloadDirector>();
             payloadDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
+            if (wormDirector == null) wormDirector = GetComponent<WormDirector>();
+            wormDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
             SimulationReset?.Invoke();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)

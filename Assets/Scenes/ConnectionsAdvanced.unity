@@ -6945,6 +6945,7 @@ GameObject:
   - component: {fileID: 1033840602}
   - component: {fileID: 1033840604}
   - component: {fileID: 1033840605}
+  - component: {fileID: 1033840610}
   m_Layer: 0
   m_Name: LogicalPaths
   m_TagString: Untagged
@@ -6971,6 +6972,8 @@ MonoBehaviour:
   identityPresenter: {fileID: 901162628}
   payloadDirector: {fileID: 1996901020}
   payloadPresenter: {fileID: 1033840605}
+  wormDirector: {fileID: 1996901030}
+  wormPresenter: {fileID: 1033840610}
   identityPalette:
     cyan: {r: 0.36, g: 0.87, b: 0.91, a: 1}
     teal: {r: 0.35, g: 0.91, b: 0.76, a: 1}
@@ -7021,6 +7024,25 @@ MonoBehaviour:
   bodyPrefab: {fileID: 1000005, guid: 2699e8b590624982aa690b532dba129c, type: 3}
   lineStyle: {fileID: 8284974062488692513, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
   lineWidth: 3
+--- !u!114 &1033840610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033840601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5203fe4d4f4d4f1d86c5727d2ccfb26b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.WormPresenter
+  host: {fileID: 1996901015}
+  networkArea: {fileID: 772389560}
+  pathLayer: {fileID: 1033840603}
+  lineStyle: {fileID: 8284974062488692513, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  threadWidth: 2
+  bodyWidth: 8
+  waveAmplitude: 2.5
 --- !u!114 &1033840604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11554,6 +11576,7 @@ GameObject:
   - component: {fileID: 1996901018}
   - component: {fileID: 1996901019}
   - component: {fileID: 1996901020}
+  - component: {fileID: 1996901030}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -11613,6 +11636,7 @@ MonoBehaviour:
   trafficDirector: {fileID: 1996901017}
   recorder: {fileID: 1996901018}
   payloadDirector: {fileID: 1996901020}
+  wormDirector: {fileID: 1996901030}
   healthTuning:
     deadlineTolerance: 1.5
     slowdownDrainPerSecond: 0.25
@@ -11652,6 +11676,29 @@ MonoBehaviour:
   interceptCooldownSeconds: 15
   interceptRequestedLoad: 4
   payloadColor: {r: 1, g: 0.72, b: 0.35, a: 1}
+--- !u!114 &1996901030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ae179139ed474e9a9ec3b7f5796844, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.WormDirector
+  host: {fileID: 1996901015}
+  tuning:
+    propagationProbability: 0.65
+    maximumNodes: 8
+    establishSeconds: 1.2
+    travelSeconds: 12
+    actionSeconds: 8
+    conditionSeconds: 8
+  isolationSeconds: 8
+  isolationCooldownSeconds: 30
+  wormColor: {r: 0.85, g: 0.92, b: 0.37, a: 1}
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0

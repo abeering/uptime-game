@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Uptime.Connections
@@ -45,11 +46,11 @@ namespace Uptime.Connections
 
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
         {
-            bool pain = state.Offline || state.KnownInfected;
+            bool pain = state.Offline || state.KnownInfected || state.ScanJammed;
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
             bool intercept = state.InterceptPayloadId != null;
-            bool benefit = clean || intercept;
+            bool benefit = clean || intercept || state.Isolated;
             bool[] desired = { pain, awareness, benefit };
             NodeStatusBandGraphic[] bands = { painBand, awarenessBand, benefitBand };
             NodeStatusPanel[] panels = { painPanel, awarenessPanel, benefitPanel };
@@ -80,23 +81,32 @@ namespace Uptime.Connections
             }
 
             if (pain)
-                painPanel.SetContent(state.Offline ? "OFFLINE" : "INFECTED",
-                    state.Offline && state.KnownInfected ? "INFECTED" : null, painColor);
+            {
+                var rows = new List<string>();
+                var timers = new List<float?>();
+                if (state.Offline) { rows.Add("OFFLINE"); timers.Add(null); }
+                if (state.KnownInfected) { rows.Add("INFECTED"); timers.Add(null); }
+                if (state.ScanJammed)
+                { rows.Add("SCAN JAMMED"); timers.Add(state.ScanJamRemainingFraction); }
+                SetRows(painPanel, rows, timers, painColor);
+            }
             if (awareness)
                 awarenessPanel.SetContent(state.PortScanned ? "PORT SCANNED" : "PORT SCAN",
                     null, awarenessColor,
                     state.PortScanned ? state.PortScanRemainingFraction : (float?)null);
             if (benefit)
             {
+                var rows = new List<string>();
+                var timers = new List<float?>();
+                if (clean) { rows.Add("CLEAN"); timers.Add(null); }
+                if (state.Isolated)
+                { rows.Add("ISOLATED"); timers.Add(state.IsolationRemainingFraction); }
                 string interceptText = state.InterceptSucceeded ? "CAUGHT " :
                     "INTERCEPT ";
-                if (clean && intercept)
-                    benefitPanel.SetContent("CLEAN", interceptText + state.InterceptPayloadId,
-                        benefitColor, null, state.InterceptRemainingFraction);
-                else if (intercept)
-                    benefitPanel.SetContent(interceptText + state.InterceptPayloadId,
-                        null, benefitColor, state.InterceptRemainingFraction);
-                else benefitPanel.SetContent("CLEAN", null, benefitColor);
+                if (intercept)
+                { rows.Add(interceptText + state.InterceptPayloadId);
+                    timers.Add(state.InterceptRemainingFraction); }
+                SetRows(benefitPanel, rows, timers, benefitColor);
             }
 
             for (int i = 0; i < 3; i++)
@@ -110,6 +120,15 @@ namespace Uptime.Connections
                 panels[i].Rect.anchoredPosition = new Vector2(0f, top - panels[i].Height * .5f);
                 top -= panels[i].Height + 7f;
             }
+        }
+
+        private static void SetRows(NodeStatusPanel panel, List<string> rows,
+            List<float?> timers, Color color)
+        {
+            panel.SetRows(rows[0], rows.Count > 1 ? rows[1] : null,
+                rows.Count > 2 ? rows[2] : null, color,
+                timers[0], rows.Count > 1 ? timers[1] : null,
+                rows.Count > 2 ? timers[2] : null);
         }
 
         public void ClearVisuals()

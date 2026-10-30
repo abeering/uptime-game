@@ -13,6 +13,8 @@ namespace Uptime.Connections
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private PayloadDirector payloadDirector;
         [SerializeField] private PayloadPresenter payloadPresenter;
+        [SerializeField] private WormDirector wormDirector;
+        [SerializeField] private WormPresenter wormPresenter;
         [SerializeField] private ConnectionIdentityPalette identityPalette = new ConnectionIdentityPalette();
         [Header("Logical line geometry (UI pixels)")]
         [SerializeField, Min(0.1f)] private float maxLineWidth = 12f;
@@ -153,7 +155,7 @@ namespace Uptime.Connections
                 routes.Add(new RouteLaneOrder.Route(connection.ConnectionId, nodes, links));
             }
             var payloadLinks = new Dictionary<PayloadState, PhysicalLinkView>();
-            var payloadIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var pilllessIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (payloadDirector != null)
                 foreach (PayloadState payload in payloadDirector.Payloads)
                 {
@@ -168,10 +170,22 @@ namespace Uptime.Connections
                         { link = reference.View; break; }
                     if (link == null) continue;
                     payloadLinks.Add(payload, link);
-                    payloadIds.Add(payload.Id);
+                    pilllessIds.Add(payload.Id);
                     routes.Add(new RouteLaneOrder.Route(payload.Id,
                         new[] { payload.CurrentNode, payload.NextNode }, new[] { link }));
                 }
+            var wormLinks = new Dictionary<WormBranch, PhysicalLinkView>();
+            if (wormDirector != null)
+                foreach (WormOutbreak outbreak in wormDirector.Outbreaks)
+                    foreach (WormBranch branch in outbreak.Branches)
+                    {
+                        if (!branch.HasHop || branch.Link == null) continue;
+                        wormLinks.Add(branch, branch.Link);
+                        pilllessIds.Add(branch.Id);
+                        routes.Add(new RouteLaneOrder.Route(branch.Id,
+                            new[] { branch.CurrentNode, branch.NextNode },
+                            new[] { branch.Link }));
+                    }
             laneOrder.Update(routes, networkArea);
 
             var portCounts = new Dictionary<PhysicalLinkView, int>();
@@ -204,7 +218,7 @@ namespace Uptime.Connections
                     ports.TryGetValue(entry.Key, out NodePortPacking.Port port);
                     var pillEligible = new bool[entry.Value.Count];
                     for (int i = 0; i < pillEligible.Length; i++)
-                        pillEligible[i] = !payloadIds.Contains(entry.Value[i]);
+                        pillEligible[i] = !pilllessIds.Contains(entry.Value[i]);
                     layouts.Add(entry.Key, identityPresenter.ResolveLayout(entry.Key,
                         entry.Value.Count, maxLineWidth, minLineWidth, minLineGap, port,
                         pillEligible));
@@ -323,6 +337,44 @@ namespace Uptime.Connections
                         payloadDirector.PayloadColor,
                         payload.Phase == PayloadPhase.Establishing ? payload.Progress : 1f,
                         width, false));
+                }
+            }
+            foreach (KeyValuePair<WormBranch, PhysicalLinkView> entry in wormLinks)
+            {
+                WormBranch branch = entry.Key;
+                PhysicalLinkView link = entry.Value;
+                List<string> users = laneOrder.Orders[link];
+                ports.TryGetValue(link, out NodePortPacking.Port port);
+                layouts.TryGetValue(link, out IdentityPacking.Layout layout);
+                float budget = port.Budget > 0f ? port.Budget : link.BundleWidth(networkArea);
+                float width = layout != null ? layout.LineWidth :
+                    EdgeGeometry.LineWidth(budget, users.Count, minLineGap, maxLineWidth);
+                float gap = layout != null ? layout.LineGap : minLineGap;
+                float offset = EdgeGeometry.Offset(users.IndexOf(branch.Id), users.Count,
+                    width, gap);
+                bool forward = branch.CurrentNode == link.NodeA;
+                float sign = forward ? 1f : -1f;
+                float startOffset = sign * (offset + (forward ? port.AtA : port.AtB));
+                float endOffset = sign * (offset + (forward ? port.AtB : port.AtA));
+                wormPresenter?.SetLayout(branch, startOffset, endOffset, width, gap);
+                if (identityPresenter != null)
+                {
+                    Vector2 a = networkArea.InverseTransformPoint(branch.CurrentNode.transform.position);
+                    Vector2 b = networkArea.InverseTransformPoint(branch.NextNode.transform.position);
+                    Vector2 direction = (b - a).normalized;
+                    Vector2 targetStart = EdgeGeometry.CardEdge(branch.CurrentNode,
+                        networkArea, direction, startOffset);
+                    Vector2 targetEnd = EdgeGeometry.CardEdge(branch.NextNode,
+                        networkArea, -direction, -endOffset);
+                    if (!identitiesByLink.TryGetValue(link, out List<IdentityPresenter.LiveLine> lines))
+                    {
+                        lines = new List<IdentityPresenter.LiveLine>();
+                        identitiesByLink.Add(link, lines);
+                    }
+                    float visible = branch.Phase == WormPhase.Establishing ? branch.Progress : 1f;
+                    lines.Add(new IdentityPresenter.LiveLine(branch.Id,
+                        targetStart, targetEnd, targetStart, targetEnd,
+                        wormDirector.WormColor, visible, width, false));
                 }
             }
             warnedLinks.IntersectWith(currentlyOverflowed);
