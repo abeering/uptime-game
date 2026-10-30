@@ -262,7 +262,7 @@ namespace Uptime.Connections
     }
 
     public enum ConnectionResolution { Completed, Killed, Canceled, Withdrawn }
-    public enum ConnectionTerminationCause { None, Player, Blackout, AttackerWithdrawal }
+    public enum ConnectionTerminationCause { None, Player, Blackout, Isolation, AttackerWithdrawal }
 
     public enum LoadPerformance
     {

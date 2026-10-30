@@ -257,7 +257,42 @@ namespace Uptime.Connections
                             armed ? normalColor : errorColor);
                     }
                     break;
+                case "isolate":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  isolate <nodeId>", errorColor);
+                    else if (simulationHost?.Worms == null)
+                        AppendText("ISOLATE  simulation unavailable", errorColor);
+                    else
+                    {
+                        bool isolated = simulationHost.Worms.TryIsolate(tokens[1], command,
+                            out string isolateError);
+                        if (!isolated) recorder?.RecordPlayerAction(command, null, false,
+                            tokens[1], isolateError);
+                        AppendText(isolated ? "ISOLATED  " + tokens[1].ToUpperInvariant() :
+                            "ISOLATE  " + isolateError, isolated ? normalColor : errorColor);
+                    }
+                    break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "worm":
+                    if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
+                        AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", errorColor);
+                    else if (simulationHost?.Worms == null)
+                        AppendText("WORM  simulation unavailable", errorColor);
+                    else try
+                    {
+                        WormOutbreak outbreak = simulationHost.Worms.Spawn(tokens[1], effect);
+                        recorder?.RecordPlayerAction(command, outbreak.Id, true,
+                            tokens[1], "worm_spawned");
+                        AppendText("WORM  " + outbreak.Id + " from " +
+                            tokens[1].ToUpperInvariant(), normalColor);
+                    }
+                    catch (System.InvalidOperationException error)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false,
+                            tokens[1], error.Message);
+                        AppendText("WORM  " + error.Message, errorColor);
+                    }
+                    break;
                 case "payload":
                     if (tokens.Length < 2 || tokens.Length > 3 || tokens.Length == 3 &&
                         (!System.Enum.TryParse(tokens[2], true, out PayloadMotionProfile parsedProfile) ||
@@ -444,13 +479,14 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  // 5s window, 4 LOAD, 15s node cooldown", mutedColor);
+                    AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
+                    AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
@@ -530,6 +566,16 @@ namespace Uptime.Connections
                 overrides = new ConnectionSpawnOverrides(objective.Value, kind, load, cadence);
             error = null;
             return true;
+        }
+
+        public static bool TryParseWormEffect(string text, out WormEffect effect)
+        {
+            if (string.Equals(text, "scan-jammed", System.StringComparison.OrdinalIgnoreCase))
+            { effect = WormEffect.ScanJammed; return true; }
+            if (string.Equals(text, "port-scanned", System.StringComparison.OrdinalIgnoreCase))
+            { effect = WormEffect.PortScanned; return true; }
+            effect = default;
+            return false;
         }
 
         public static bool TryParseInfectionKind(string text, out InfectionKind kind)
@@ -624,6 +670,9 @@ namespace Uptime.Connections
                     break;
                 case ScanStartResult.Busy:
                     AppendText("SCAN BUSY  " + simulationHost.ActiveScan.NodeId, errorColor);
+                    break;
+                case ScanStartResult.Jammed:
+                    AppendText("SCAN JAMMED  " + tokens[1].ToUpperInvariant(), errorColor);
                     break;
                 default:
                     AppendText("SCAN FAILED  UNKNOWN NODE " + tokens[1].ToUpperInvariant(),

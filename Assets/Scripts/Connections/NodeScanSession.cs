@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public enum ScanStartResult { Started, UnknownNode, AlreadyScanning, Busy }
+    public enum ScanStartResult { Started, UnknownNode, AlreadyScanning, Busy, Jammed }
     public enum NodeScanResult { Clean, Infected }
 
     // Host-owned timing and result. A history card can retain this session after the slot is free.

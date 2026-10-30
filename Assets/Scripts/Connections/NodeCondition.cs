@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public enum ConditionKind { PortScanned }
+    public enum ConditionKind { PortScanned, ScanJammed }
 
     [Serializable]
     public sealed class ConditionPayload
@@ -31,11 +31,12 @@ namespace Uptime.Connections
     public sealed class NodeCondition
     {
         public NodeCondition(NodeResources target, ConditionPayload payload, float appliedAtSeconds,
-            string sourceConnectionId, int sourceOperationIndex)
+            string sourceConnectionId, int sourceOperationIndex, string sourceWormBranchId = null)
         {
             Target = target;
             Kind = payload.Kind;
-            Refresh(payload, appliedAtSeconds, sourceConnectionId, sourceOperationIndex);
+            Refresh(payload, appliedAtSeconds, sourceConnectionId, sourceOperationIndex,
+                sourceWormBranchId);
         }
 
         public NodeResources Target { get; }
@@ -44,14 +45,16 @@ namespace Uptime.Connections
         public float ExpiresAtSeconds { get; private set; }
         public string SourceConnectionId { get; private set; }
         public int SourceOperationIndex { get; private set; }
+        public string SourceWormBranchId { get; private set; }
 
         internal void Refresh(ConditionPayload payload, float now, string sourceConnectionId,
-            int sourceOperationIndex)
+            int sourceOperationIndex, string sourceWormBranchId = null)
         {
             AppliedAtSeconds = now;
             ExpiresAtSeconds = now + payload.DurationSeconds;
             SourceConnectionId = sourceConnectionId;
             SourceOperationIndex = sourceOperationIndex;
+            SourceWormBranchId = sourceWormBranchId;
         }
     }
 }

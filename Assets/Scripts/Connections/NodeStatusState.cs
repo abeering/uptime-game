@@ -12,12 +12,17 @@ namespace Uptime.Connections
         public bool AwarenessPreview { get; private set; }
         public bool PortScanned { get; private set; }
         public float PortScanRemainingFraction { get; private set; }
+        public bool ScanJammed { get; private set; }
+        public float ScanJamRemainingFraction { get; private set; }
+        public bool Isolated { get; private set; }
+        public float IsolationRemainingFraction { get; private set; }
         public string InterceptPayloadId { get; private set; }
         public bool InterceptSucceeded { get; private set; }
         public float InterceptRemainingFraction { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || KnownInfected ||
-            AwarenessPreview || PortScanned || CleanVisible(realTime) || InterceptPayloadId != null;
+            AwarenessPreview || PortScanned || ScanJammed || Isolated ||
+            CleanVisible(realTime) || InterceptPayloadId != null;
 
         public void SetOffline(bool offline) => Offline = offline;
 
@@ -52,6 +57,22 @@ namespace Uptime.Connections
                 (condition.ExpiresAtSeconds - condition.AppliedAtSeconds));
         }
 
+        public void SetScanJammed(NodeCondition condition, float simulationTime)
+        {
+            ScanJammed = condition != null;
+            ScanJamRemainingFraction = condition == null ? 0f : Mathf.Clamp01(
+                (condition.ExpiresAtSeconds - simulationTime) /
+                (condition.ExpiresAtSeconds - condition.AppliedAtSeconds));
+        }
+
+        public void SetIsolation(IsolationState isolation, float simulationTime)
+        {
+            Isolated = isolation != null;
+            IsolationRemainingFraction = isolation == null ? 0f : Mathf.Clamp01(
+                (isolation.ExpiresAt - simulationTime) /
+                (isolation.ExpiresAt - isolation.ActivatedAt));
+        }
+
         public void SetInterceptor(InterceptionState interceptor, float simulationTime)
         {
             InterceptPayloadId = interceptor?.PayloadId;
@@ -68,6 +89,10 @@ namespace Uptime.Connections
             AwarenessPreview = false;
             PortScanned = false;
             PortScanRemainingFraction = 0f;
+            ScanJammed = false;
+            ScanJamRemainingFraction = 0f;
+            Isolated = false;
+            IsolationRemainingFraction = 0f;
             InterceptPayloadId = null;
             InterceptSucceeded = false;
             InterceptRemainingFraction = 0f;
