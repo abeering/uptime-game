@@ -15,7 +15,7 @@ namespace Uptime.Connections.EditorTools
         public static void Run()
         {
             CheckScene("Assets/Scenes/Connections.unity", 4, 54f, 0f);
-            CheckScene("Assets/Scenes/ConnectionsAdvanced.unity", 8, 38f, 1f);
+            CheckScene("Assets/Scenes/ConnectionsAdvanced.unity", 8, 30f, 2f);
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
@@ -131,13 +131,15 @@ namespace Uptime.Connections.EditorTools
                 "preselected followup launches real target-matched INFECTOR after scan kill");
             activities.OrdinaryWeight = 2f;
             activities.ReconnaissanceWeight = 1f;
+            activities.PayloadWeight = 0f;
+            activities.WormWeight = 0f;
             activities.FollowupChance = .4f;
             host.ResetSimulation();
             ConnectionSpawnPlan baselineBenign = traffic.GenerateBenignPlan(0f);
             string benignSignature = PlanSignature(baselineBenign);
             host.ResetSimulation();
             string[] sequence = Enumerable.Range(0, 24)
-                .Select(i => PlanSignature(activities.QueueAmbientActivity(i))).ToArray();
+                .Select(i => PlanSignature(activities.QueueAmbientActivity(i).ConnectionPlan)).ToArray();
             Check(sequence.Any(s => s.Contains("port-scan")) &&
                 sequence.Any(s => !s.Contains("port-scan")),
                 "ambient opportunity selects both activity types");
@@ -145,11 +147,11 @@ namespace Uptime.Connections.EditorTools
                 "activity decisions leave seeded benign generation independent");
             host.ResetSimulation();
             string[] replay = Enumerable.Range(0, 24)
-                .Select(i => PlanSignature(activities.QueueAmbientActivity(i))).ToArray();
+                .Select(i => PlanSignature(activities.QueueAmbientActivity(i).ConnectionPlan)).ToArray();
             Check(sequence.SequenceEqual(replay), "seeded activity and concrete plans replay");
             activities.OrdinaryWeight = 0f;
             activities.ReconnaissanceWeight = 0f;
-            Check(activities.QueueAmbientActivity(25f) == null,
+            Check(!activities.QueueAmbientActivity(25f).Succeeded,
                 "zero activity weights disable ambient hostile plans");
             string firstFollowups = ReplayFollowups(host, traffic, activities, recorder);
             string secondFollowups = ReplayFollowups(host, traffic, activities, recorder);

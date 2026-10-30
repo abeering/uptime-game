@@ -7551,6 +7551,10 @@ MonoBehaviour:
   traffic: {fileID: 1996901017}
   ordinaryWeight: 1
   reconnaissanceWeight: 0
+  payloadWeight: 0
+  wormWeight: 0
+  variablePayloadChance: 0.5
+  scanJammedWormChance: 0.7
   followupChance: 0.4
   followupDelaySeconds: 8
   portScanLoad: 8
