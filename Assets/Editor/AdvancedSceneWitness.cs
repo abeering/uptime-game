@@ -97,7 +97,7 @@ namespace Uptime.Connections.EditorTools
                 "weighted dual ingress");
             Check(director.BenignPopulationGoal == 4f && director.CoverageStartupGoal == 1f &&
                 director.CoverageRampSeconds == 75f &&
-                director.HostileMeanIntervalSeconds == 54f,
+                director.HostileMeanIntervalSeconds == 38f,
                 "population and hostile scheduling");
             director.ResetDirector();
             foreach (var target in Targets)
@@ -152,11 +152,13 @@ namespace Uptime.Connections.EditorTools
                 for (int second = 0; second < 600; second++) host.StepSimulation(1f);
                 var events = recorder.CurrentLog.events;
                 var ambient = events.Where(e => e.type == "plan_queued" &&
-                    (e.source == "ambient_benign" || e.source == "ambient_hostile")).ToArray();
+                    (e.source == "ambient_benign" || e.source == "ambient_hostile" ||
+                     e.source == "ambient_reconnaissance")).ToArray();
                 Check(ambient.Length > 0 && ambient.Any(e => e.source == "ambient_benign") &&
                     ambient.Any(e => e.source == "ambient_hostile"), "benign and hostile arrivals");
                 Check(ambient.All(e => e.definition != null &&
-                    Targets[e.profileId] == e.definition.target &&
+                    (e.profileId == "port-scan" ||
+                     Targets[e.profileId] == e.definition.target) &&
                     (e.definition.origin == "EXT1" || e.definition.origin == "EXT2") &&
                     e.definition.route.First() == e.definition.origin &&
                     e.definition.route.Last() == e.definition.target &&
@@ -172,6 +174,7 @@ namespace Uptime.Connections.EditorTools
                 Check(recorder.Save(false), "run log saved");
                 Debug.Log($"ADVANCED SEED {seed}: benign={ambient.Count(e => e.source == "ambient_benign")}, " +
                     $"hostile={ambient.Count(e => e.source == "ambient_hostile")}, " +
+                    $"recon={ambient.Count(e => e.source == "ambient_reconnaissance")}, " +
                     $"EXT1={ambient.Count(e => e.definition.origin == "EXT1")}, " +
                     $"EXT2={ambient.Count(e => e.definition.origin == "EXT2")}, " +
                     $"infections={events.Count(e => e.type == "infection_applied")}, " +

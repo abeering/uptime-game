@@ -57,6 +57,13 @@ namespace Uptime.Connections
         public float openingGraceSeconds;
         public bool hostileGenerationEnabled;
         public float hostileMeanIntervalSeconds;
+        public float ordinaryActivityWeight;
+        public float reconnaissanceActivityWeight;
+        public float reconnaissanceFollowupChance;
+        public float reconnaissanceFollowupDelaySeconds;
+        public float portScanLoad;
+        public float portScanWork;
+        public float portScannedSeconds;
         public float benignPopulationGoal;
         public float coverageStartupGoal;
         public float coverageRampSeconds;
@@ -159,6 +166,19 @@ namespace Uptime.Connections
         public int operationIndex;
         public string operationKind;
         public string effectType;
+        public string conditionKind;
+        public float conditionAppliedAtSeconds;
+        public float conditionExpiresAtSeconds;
+        public float conditionDurationSeconds;
+        public string hostileActivity;
+        public string hostileEventId;
+        public bool followupSelected;
+        public float followupDelaySeconds;
+        public float followupAtSeconds;
+        public string scanConnectionId;
+        public string followupConnectionId;
+        public float ordinaryActivityWeight;
+        public float reconnaissanceActivityWeight;
         public string targetNodeId;
         public string infectionKind;
         public float infectionLoad;
@@ -242,6 +262,8 @@ namespace Uptime.Connections
     {
         public string kind;
         public string completionEffect;
+        public string conditionKind;
+        public float conditionDurationSeconds;
         public string infectionKind;
         public float infectionLoad;
         public float infectionCadence;
@@ -262,6 +284,7 @@ namespace Uptime.Connections
         public HealthSnapshotRecord health;
         public NodeSnapshot[] nodes;
         public InfectionSnapshot[] infections;
+        public ConditionSnapshot[] conditions;
         public ConnectionSnapshot[] connections;
     }
 
@@ -273,6 +296,16 @@ namespace Uptime.Connections
         public float cadenceSeconds;
         public float nextSpawnAtSeconds;
         public float appliedAtSeconds;
+        public string sourceConnectionId;
+        public int sourceOperationIndex;
+    }
+
+    [Serializable] public sealed class ConditionSnapshot
+    {
+        public string targetNodeId;
+        public string kind;
+        public float appliedAtSeconds;
+        public float expiresAtSeconds;
         public string sourceConnectionId;
         public int sourceOperationIndex;
     }
@@ -497,6 +530,7 @@ namespace Uptime.Connections
             entry.source = source;
             entry.scheduledSpawnTime = plan.ScheduledSpawnTime;
             entry.profileId = plan.ProfileId;
+            entry.hostileEventId = plan.HostileEventId;
             entry.generation = plan.GenerationTrace?.Copy();
             entry.parentNodeId = plan.ParentNodeId;
             entry.parentConnectionId = plan.ParentConnectionId;
@@ -538,6 +572,50 @@ namespace Uptime.Connections
             entry.nextHostileIntervalSeconds = nextInterval;
             entry.nextHostileAtSeconds = nextAt;
             entry.reason = reason;
+        }
+
+        public void RecordHostileActivity(float time, string activity, float ordinaryWeight,
+            float reconnaissanceWeight, string connectionId, string eventId, string source)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("hostile_activity_selected", time);
+            entry.hostileActivity = activity;
+            entry.ordinaryActivityWeight = ordinaryWeight;
+            entry.reconnaissanceActivityWeight = reconnaissanceWeight;
+            entry.connectionId = connectionId;
+            entry.hostileEventId = eventId;
+            entry.source = source;
+        }
+
+        public void RecordReconnaissance(string type, float time, string eventId,
+            string targetNodeId, string scanId, bool followupSelected,
+            float followupDelay, string followupId, string reason,
+            float followupAt = 0f)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.hostileEventId = eventId;
+            entry.targetNodeId = targetNodeId;
+            entry.scanConnectionId = scanId;
+            entry.followupConnectionId = followupId;
+            entry.followupSelected = followupSelected;
+            entry.followupDelaySeconds = followupDelay;
+            entry.followupAtSeconds = followupAt;
+            entry.reason = reason;
+        }
+
+        public void RecordCondition(string type, NodeCondition condition, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.targetNodeId = condition.Target.View.NodeId;
+            entry.conditionKind = condition.Kind.ToString();
+            entry.conditionAppliedAtSeconds = condition.AppliedAtSeconds;
+            entry.conditionExpiresAtSeconds = condition.ExpiresAtSeconds;
+            entry.conditionDurationSeconds = condition.ExpiresAtSeconds -
+                condition.AppliedAtSeconds;
+            entry.sourceConnectionId = condition.SourceConnectionId;
+            entry.sourceOperationIndex = condition.SourceOperationIndex;
         }
 
         public void RecordConnectionSpawned(LogicalConnectionState state, float time)
@@ -588,6 +666,8 @@ namespace Uptime.Connections
             entry.infectionKind = occurrence.Payload?.Kind.ToString();
             entry.infectionLoad = occurrence.Payload?.RequestedLoad ?? 0f;
             entry.infectionCadence = occurrence.Payload?.CadenceSeconds ?? 0f;
+            entry.conditionKind = occurrence.ConditionPayload?.Kind.ToString();
+            entry.conditionDurationSeconds = occurrence.ConditionPayload?.DurationSeconds ?? 0f;
         }
 
         public void RecordInfection(string type, NodeInfection infection, float time,
@@ -818,6 +898,20 @@ namespace Uptime.Connections
                     sourceOperationIndex = infection.SourceOperationIndex
                 };
             }
+            snapshot.conditions = new ConditionSnapshot[host.Conditions.Count];
+            for (int i = 0; i < snapshot.conditions.Length; i++)
+            {
+                NodeCondition condition = host.Conditions[i];
+                snapshot.conditions[i] = new ConditionSnapshot
+                {
+                    targetNodeId = condition.Target.View.NodeId,
+                    kind = condition.Kind.ToString(),
+                    appliedAtSeconds = condition.AppliedAtSeconds,
+                    expiresAtSeconds = condition.ExpiresAtSeconds,
+                    sourceConnectionId = condition.SourceConnectionId,
+                    sourceOperationIndex = condition.SourceOperationIndex
+                };
+            }
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
             {
@@ -924,6 +1018,17 @@ namespace Uptime.Connections
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
+            HostileActivityDirector activities = trafficDirector.GetComponent<HostileActivityDirector>();
+            if (activities != null)
+            {
+                traffic.ordinaryActivityWeight = activities.OrdinaryWeight;
+                traffic.reconnaissanceActivityWeight = activities.ReconnaissanceWeight;
+                traffic.reconnaissanceFollowupChance = activities.FollowupChance;
+                traffic.reconnaissanceFollowupDelaySeconds = activities.FollowupDelaySeconds;
+                traffic.portScanLoad = activities.PortScanLoad;
+                traffic.portScanWork = activities.PortScanWork;
+                traffic.portScannedSeconds = activities.PortScannedSeconds;
+            }
             IReadOnlyList<AmbientOriginWeight> origins = trafficDirector.EffectiveAmbientOrigins;
             traffic.ambientOrigins = new AmbientOriginRecord[origins.Count];
             for (int i = 0; i < origins.Count; i++)
@@ -984,6 +1089,8 @@ namespace Uptime.Connections
                     infectionKind = definition.PayloadAt(i)?.Kind.ToString(),
                     infectionLoad = definition.PayloadAt(i)?.RequestedLoad ?? 0f,
                     infectionCadence = definition.PayloadAt(i)?.CadenceSeconds ?? 0f,
+                    conditionKind = definition.ConditionAt(i)?.Kind.ToString(),
+                    conditionDurationSeconds = definition.ConditionAt(i)?.DurationSeconds ?? 0f,
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
                     behaviors = Behaviors(definition.BehaviorsAt(i)),
                     totalWork = definition.WorkAt(i),

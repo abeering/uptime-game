@@ -19,7 +19,7 @@ namespace Uptime.Connections
         Execute
     }
 
-    public enum CompletionEffect { None, InfectionDelivery }
+    public enum CompletionEffect { None, InfectionDelivery, ConditionApplication }
 
     public enum InfectionKind { PhantomLoad, Blackout, Spawner }
 
@@ -100,7 +100,7 @@ namespace Uptime.Connections
     {
         public ConnectionEffectOccurrence(CompletionEffect type, string connectionId,
             int operationIndex, string targetNodeId, float timeSeconds,
-            InfectionPayload payload = null)
+            InfectionPayload payload = null, ConditionPayload conditionPayload = null)
         {
             Type = type;
             ConnectionId = connectionId;
@@ -108,6 +108,7 @@ namespace Uptime.Connections
             TargetNodeId = targetNodeId;
             TimeSeconds = timeSeconds;
             Payload = payload?.Copy();
+            ConditionPayload = conditionPayload?.Copy();
         }
 
         public CompletionEffect Type { get; }
@@ -116,6 +117,7 @@ namespace Uptime.Connections
         public string TargetNodeId { get; }
         public float TimeSeconds { get; }
         public InfectionPayload Payload { get; }
+        public ConditionPayload ConditionPayload { get; }
         // Filled by the host before publishing the existing completion occurrence.
         public bool? InfectionApplied { get; internal set; }
     }
@@ -129,6 +131,7 @@ namespace Uptime.Connections
         [SerializeField] private string activityDescription;
         [SerializeField] private CompletionEffect completionEffect;
         [SerializeField] private InfectionPayload infectionPayload;
+        [SerializeField] private ConditionPayload conditionPayload;
         [SerializeField] private TimedModifierBehaviorDefinition[] behaviors;
 
         public OperationKind Operation => operation;
@@ -137,16 +140,18 @@ namespace Uptime.Connections
         public string ActivityDescription => activityDescription;
         public CompletionEffect EffectOnCompletion => completionEffect;
         public InfectionPayload InfectionPayload => infectionPayload;
+        public ConditionPayload ConditionPayload => conditionPayload;
         public TimedModifierBehaviorDefinition[] Behaviors => behaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public OperationStage() { }
         public OperationStage(OperationKind kind, float work, float load, string description,
             CompletionEffect effect = CompletionEffect.None,
             TimedModifierBehaviorDefinition[] behaviors = null,
-            InfectionPayload payload = null)
+            InfectionPayload payload = null, ConditionPayload condition = null)
         { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
             completionEffect = effect; this.behaviors = CopyBehaviors(behaviors);
             infectionPayload = effect == CompletionEffect.InfectionDelivery ?
-                (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null; }
+                (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null;
+            conditionPayload = effect == CompletionEffect.ConditionApplication ? condition?.Copy() : null; }
 
         internal static TimedModifierBehaviorDefinition[] CopyBehaviors(
             TimedModifierBehaviorDefinition[] source)
@@ -200,6 +205,7 @@ namespace Uptime.Connections
         public CompletionEffect EffectAt(int index) => HasArc ? StageAt(index).EffectOnCompletion :
             CompletionEffect.None;
         public InfectionPayload PayloadAt(int index) => HasArc ? StageAt(index).InfectionPayload : null;
+        public ConditionPayload ConditionAt(int index) => HasArc ? StageAt(index).ConditionPayload : null;
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
             connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public LoaderAttackPlan LoaderAttack => loaderAttack;
@@ -234,7 +240,7 @@ namespace Uptime.Connections
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
                     stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
-                    stage.Behaviors, stage.InfectionPayload);
+                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload);
             }
             return result;
         }
@@ -358,7 +364,8 @@ namespace Uptime.Connections
             if (effect == CompletionEffect.None || deliveredEffects[operationIndex]) return null;
             deliveredEffects[operationIndex] = true;
             return new ConnectionEffectOccurrence(effect, ConnectionId, operationIndex,
-                TargetNode.NodeId, timeSeconds, Definition.PayloadAt(operationIndex));
+                TargetNode.NodeId, timeSeconds, Definition.PayloadAt(operationIndex),
+                Definition.ConditionAt(operationIndex));
         }
 
         internal void FinishOperation()

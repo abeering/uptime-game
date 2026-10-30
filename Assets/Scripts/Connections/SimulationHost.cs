@@ -37,6 +37,7 @@ namespace Uptime.Connections
         private readonly List<ConnectionEffectOccurrence> occurrences =
             new List<ConnectionEffectOccurrence>();
         private readonly List<NodeInfection> infections = new List<NodeInfection>();
+        private readonly List<NodeCondition> conditions = new List<NodeCondition>();
         private float simulationTimeSeconds;
         private NetworkHealth health;
         private CleanSession activeClean;
@@ -54,6 +55,13 @@ namespace Uptime.Connections
         public ConnectionsRunRecorder Recorder => recorder;
         public IReadOnlyList<ConnectionEffectOccurrence> Occurrences => occurrences;
         public IReadOnlyList<NodeInfection> Infections => infections;
+        public IReadOnlyList<NodeCondition> Conditions => conditions.AsReadOnly();
+        public NodeCondition ConditionFor(NodeView view, ConditionKind kind)
+        {
+            foreach (NodeCondition condition in conditions)
+                if (condition.Target.View == view && condition.Kind == kind) return condition;
+            return null;
+        }
         public CleanSession ActiveClean => activeClean;
         public NodeScanSession ActiveScan => activeScan;
         public float ScanDurationSeconds => scanDurationSeconds;
@@ -193,9 +201,13 @@ namespace Uptime.Connections
                 if (activeScan != null)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         activeScan.ScheduledCompletionAtSeconds - simulationTimeSeconds));
+                foreach (NodeCondition condition in conditions)
+                    segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                        condition.ExpiresAtSeconds - simulationTimeSeconds));
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
                 CompleteDueScan();
+                ExpireConditions();
                 remaining -= segment;
             }
             WithdrawDueLoaders();
@@ -260,6 +272,10 @@ namespace Uptime.Connections
                         if (applied && occurrence.Payload.Kind == InfectionKind.Blackout)
                             newlyBlackout.Add(target);
                     }
+                    else if (occurrence.Type == CompletionEffect.ConditionApplication)
+                        ApplyCondition(FindNodeResources(occurrence.TargetNodeId),
+                            occurrence.ConditionPayload, occurrence.ConnectionId,
+                            occurrence.OperationIndex);
                     EffectOccurred?.Invoke(occurrence);
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
@@ -370,6 +386,40 @@ namespace Uptime.Connections
                 string.IsNullOrWhiteSpace(plan.ProfileId) || HasEverUsedId(plan.ConnectionId))
                 throw new InvalidOperationException("Spawn plan needs operations, profile ID, and an unused ID.");
             BuildState(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public NodeCondition ApplyCondition(NodeResources target, ConditionPayload payload,
+            string sourceConnectionId = null, int sourceOperationIndex = -1)
+        {
+            if (target == null || payload == null || !payload.IsValid ||
+                Array.IndexOf(nodes, target) < 0)
+                throw new InvalidOperationException("Condition needs a configured target and valid payload.");
+            foreach (NodeCondition existing in conditions)
+                if (existing.Target == target && existing.Kind == payload.Kind)
+                {
+                    existing.Refresh(payload, simulationTimeSeconds, sourceConnectionId,
+                        sourceOperationIndex);
+                    recorder?.RecordCondition("condition_refreshed", existing,
+                        simulationTimeSeconds);
+                    return existing;
+                }
+            var condition = new NodeCondition(target, payload, simulationTimeSeconds,
+                sourceConnectionId, sourceOperationIndex);
+            conditions.Add(condition);
+            recorder?.RecordCondition("condition_applied", condition,
+                simulationTimeSeconds);
+            return condition;
+        }
+
+        private void ExpireConditions()
+        {
+            for (int i = conditions.Count - 1; i >= 0; i--)
+                if (conditions[i].ExpiresAtSeconds <= simulationTimeSeconds + 0.00001f)
+                {
+                    recorder?.RecordCondition("condition_expired", conditions[i],
+                        conditions[i].ExpiresAtSeconds);
+                    conditions.RemoveAt(i);
+                }
         }
 
         public bool KillConnection(string id)
@@ -739,6 +789,7 @@ namespace Uptime.Connections
             usedIds.Clear();
             occurrences.Clear();
             infections.Clear();
+            conditions.Clear();
             SimulationReset?.Invoke();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
@@ -802,6 +853,9 @@ namespace Uptime.Connections
                 if (definition.EffectAt(i) == CompletionEffect.InfectionDelivery &&
                     (payload == null || !payload.IsValid))
                     throw new InvalidOperationException("Delivery needs a valid typed infection payload.");
+                if (definition.EffectAt(i) == CompletionEffect.ConditionApplication &&
+                    (definition.ConditionAt(i) == null || !definition.ConditionAt(i).IsValid))
+                    throw new InvalidOperationException("Condition application needs a valid typed payload.");
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);

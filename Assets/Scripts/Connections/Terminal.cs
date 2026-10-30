@@ -233,6 +233,36 @@ namespace Uptime.Connections
                     Scan(tokens, command);
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "portscan":
+                case "recon":
+                    if (tokens.Length != 2)
+                        AppendText("USAGE  " + tokens[0].ToLowerInvariant() + " <nodeId>", errorColor);
+                    else
+                    {
+                        HostileActivityDirector activities = simulationHost != null ?
+                            simulationHost.GetComponent<HostileActivityDirector>() : null;
+                        if (activities == null)
+                            AppendText("RECON  activity director unavailable", errorColor);
+                        else
+                            try
+                            {
+                                ConnectionSpawnPlan plan = tokens[0].Equals("recon",
+                                    System.StringComparison.OrdinalIgnoreCase) ?
+                                    activities.QueueReconnaissance(tokens[1]) :
+                                    activities.QueuePortScan(tokens[1]);
+                                bool success = plan != null;
+                                recorder?.RecordPlayerAction(command, plan?.ConnectionId, success);
+                                AppendText(success ? "QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
+                                    " to " + plan.Target.NodeId : "RECON  connection IDs exhausted",
+                                    success ? normalColor : errorColor);
+                            }
+                            catch (System.InvalidOperationException error)
+                            {
+                                recorder?.RecordPlayerAction(command, null, false);
+                                AppendText("RECON  " + error.Message, errorColor);
+                            }
+                    }
+                    break;
                 case "spawn":
                     if (!TryParseSpawn(tokens, out string profileId,
                         out ConnectionSpawnOverrides spawnOverrides, out string spawnError))
@@ -368,6 +398,7 @@ namespace Uptime.Connections
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
