@@ -69,6 +69,8 @@ namespace Uptime.Connections
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
         public event Action<ConnectionEffectOccurrence> EffectOccurred;
         public event Action<NodeScanSession> ScanCompleted;
+        public event Action<CleanSession, int> CleanSucceeded;
+        public event Action SimulationReset;
         public bool HasEverUsedId(string id) => usedIds.Contains(id);
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
@@ -552,6 +554,7 @@ namespace Uptime.Connections
                 removedCount);
             recorder?.CaptureSnapshot(simulationTimeSeconds);
             activeClean = null;
+            CleanSucceeded?.Invoke(session, removedCount);
             return CleanSelectionResult.Success;
         }
 
@@ -736,6 +739,7 @@ namespace Uptime.Connections
             usedIds.Clear();
             occurrences.Clear();
             infections.Clear();
+            SimulationReset?.Invoke();
             var states = new List<LogicalConnectionState>();
             if (runMode == ConnectionRunMode.AuthoredWitness && connections != null)
             {
@@ -961,7 +965,6 @@ namespace Uptime.Connections
                     if (node?.View != null)
                     {
                         node.View.RenderResources(node);
-                        node.View.RenderAvailability(IsNodeOffline(node.View));
                     }
                 }
             }

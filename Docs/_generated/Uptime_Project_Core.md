@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:27bc22c6df801ee7ad344d3ed8dd4bad4dd6905664b8d19f848867c91dd17a5e`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:17c3484156eb6a31468dd72e1c60ae348d98fced89e5dbff9684ef5280afa49f`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Node Status Presentation V0 (review branch, October 29, 2026):** Both Connections scenes now show authored, animated exterior node bands and one activity-aware status stack per node. Blackout activates OFFLINE immediately; a completed INFECTED scan adds player-acquired knowledge in the same Pain panel; a completed CLEAN scan gives a 2.5-real-second teal acknowledgment. Successful PID-Select cleaning clears known-infected without asserting CLEAN or exposing a newer hidden infection. The old OFFLINE role subtitle swap is replaced; terminal scan feedback remains. Three visual families can coexist, but Awareness / PORT SCAN is Editor-preview only. Eight placement anchors protect cards, sockets, pills, and the viewport at activation while remaining stable during traffic. See [Node Status V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-node-status-v0.md) and the [16:9 scripted captures](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsNodeStatusV0/README.md). Interactive animation and keyboard review is still needed.
 
 **Resolved inspection lifecycle (gameplay QoL review branch):** Each inspection card preserves its existing active and immediate-resolution presentation, then collapses to a 48-unit summary after four unscaled UI seconds. The summary retains the small ID pill, purpose, last/current operation, muted accent, and exact `COMPLETE`, `KILLED`, `CANCELED`, or `WITHDRAWN` outcome; only natural completion marks the final operation complete. LOAD, WORK, progress, and ETA disappear from the summary. Cards time independently, including while simulation time is paused. Historical reinspection starts a fresh four-second hold in the requested compact/verbose mode. Height changes preserve the visible history entry or bottom-follow position without changing prompt focus, selection, or draft. Simulation, commands, and historical state are unchanged. See [Inspect V2](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-inspect-v2.md) and the [lifecycle preview and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsResolvedInspect/README.md).
 

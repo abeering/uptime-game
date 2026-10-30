@@ -19,24 +19,6 @@ namespace Uptime.Connections
 
         public string NodeId => nodeId;
         public NodeLoadBar LoadBar => loadBar;
-        private TMP_Text roleLabel;
-        private string normalRole;
-        private Color normalRoleColor;
-
-        public void RenderAvailability(bool offline)
-        {
-            if (roleLabel == null)
-            {
-                roleLabel = transform.Find("NodeHeading/NodeRole")?.GetComponent<TMP_Text>();
-                if (roleLabel == null) return;
-                normalRole = roleLabel.text;
-                normalRoleColor = roleLabel.color;
-            }
-            string desired = offline ? "OFFLINE" : normalRole;
-            if (roleLabel.text != desired) roleLabel.text = desired;
-            roleLabel.color = offline ? new Color(1f, 0.42f, 0.34f, 1f) : normalRoleColor;
-        }
-
         // Used by the opt-in topology stress scene on copies of its authored node.
         public void ConfigureStressNode(string id, string role)
         {

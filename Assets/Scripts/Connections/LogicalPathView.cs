@@ -43,6 +43,7 @@ namespace Uptime.Connections
 
         public event Action<LogicalConnectionState> Destroyed;
         public TerminalMarkerStyle TerminalMarker => terminalMarker;
+        public int VisualSegmentCount => starts?.Length ?? 0;
         public float RelayoutSeconds => relayoutSeconds;
         public Color DisplayAccent => state != null && state.IsComplete &&
             !state.IsNormalDeparture &&

@@ -1,5 +1,7 @@
 # Connections Infections V0 — Phantom LOAD, Blackout, and Spawner
 
+**Presentation follow-up (October 29, 2026):** [Node Status Presentation V0](connections-node-status-v0.md) replaces the old `OFFLINE` role-subtitle swap with a distinct Pain band and callout. The Blackout availability and infection mechanics below are unchanged.
+
 **Lifecycle V1 update (October 25, 2026):** The Blackout and Spawner extension below records the merged PR #33 behavior. Its route rejection, pending-route interruption, offline-origin child filtering, and direct outage Health drain are superseded by [Lifecycle V1](connections-lifecycle-v1.md). A physically valid plan always becomes a Connecting attempt with a receipt. Blackout is checked at reached nodes and never directly changes Health; Spawner children from an offline origin are attempted and canceled at ingress. The `OFFLINE` symptom remains.
 
 **Status:** Phantom LOAD merged through PR #32; Blackout and Spawner merged through PR #33; Lifecycle V1 merged through PR #34. Clean V0 is merged; Clean Minigame V0 merged through PR #51. Packet remains independent.
