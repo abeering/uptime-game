@@ -6,6 +6,8 @@ Bar length compares visible requests using `max(3, largest request × 1.15)` rou
 
 ## Scripted 16:9 Play Mode captures
 
+**Gutter follow-up:** The LOAD panel now uses the same history-content width as inspect and scan. Its former viewport-minus-12 calculation made the right gutter wider when the terminal was narrower than the panel's 580-unit width cap. The focused witness checks alignment in a 320-unit scroll viewport. The 1920-by-1080 captures below are at the width cap, so they do not show this narrow-width correction.
+
 These 1920×1080 frames came from Unity 6000.3.11f1 Play Mode in `ConnectionsAdvanced.unity`. A temporary, ignored capture driver disabled automatic traffic, established explicit test connections, stepped the simulation, submitted normal terminal commands, refreshed panels, and snapped bar animations to their current targets for each still. It advanced the panel's UI clock for the recovery image. The images establish layout and values, **not interactive animation, scrolling, or keyboard-focus behavior**.
 
 | Image | Evidence |

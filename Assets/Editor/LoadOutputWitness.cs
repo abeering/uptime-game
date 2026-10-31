@@ -57,6 +57,9 @@ namespace Uptime.Connections.EditorTools
 
                 var parent = new GameObject("LOAD witness width", typeof(RectTransform));
                 ((RectTransform)parent.transform).sizeDelta = new Vector2(320f, 800f);
+                var scroll = parent.AddComponent<ScrollRect>();
+                scroll.enabled = false;
+                scroll.viewport = (RectTransform)parent.transform;
                 LoadOutput panel = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 LoadOutput second = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 try
@@ -269,9 +272,13 @@ namespace Uptime.Connections.EditorTools
             int before = content.childCount;
             typeof(Terminal).GetMethod("Load", BindingFlags.Instance |
                 BindingFlags.NonPublic).Invoke(terminal, new object[] { new[] { "load", id } });
-            Check(content.childCount == before + 1 &&
-                content.GetChild(before).GetComponent<LoadOutput>() != null,
-                "valid command appends live panel");
+            var panel = content.GetChild(before).GetComponent<LoadOutput>();
+            Check(content.childCount == before + 1 && panel != null &&
+                Mathf.Abs(((RectTransform)panel.transform).rect.width -
+                    Mathf.Min(580f, content.rect.width)) < 0.01f &&
+                Mathf.Abs(((RectTransform)panel.transform.Find("LoadCard")).rect.width -
+                    (Mathf.Min(580f, content.rect.width) - 28f)) < 0.01f,
+                "valid command appends a live panel with the inspect/scan gutter");
         }
 
         private static void CheckError(Terminal terminal, string[] tokens, string expected)

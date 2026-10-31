@@ -187,12 +187,8 @@ namespace Uptime.Connections
         {
             RectTransform root = (RectTransform)transform;
             RectTransform parent = transform.parent as RectTransform;
-            ScrollRect scroll = GetComponentInParent<ScrollRect>();
-            float viewportWidth = scroll != null && scroll.viewport != null ?
-                scroll.viewport.rect.width - 12f : 0f;
-            float available = viewportWidth > 0f ? viewportWidth :
-                parent != null && parent.rect.width > 0f ? parent.rect.width : root.rect.width;
-            float width = Mathf.Min(580f, available);
+            float width = parent != null && parent.rect.width > 0f ?
+                Mathf.Min(580f, parent.rect.width) : root.rect.width;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             if (layout != null) layout.preferredWidth = width;
             float cardWidth = Mathf.Max(0f, width - 28f);
