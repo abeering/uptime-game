@@ -62,6 +62,10 @@ namespace Uptime.Connections
         public float hostileMeanIntervalSeconds;
         public float ordinaryActivityWeight;
         public float reconnaissanceActivityWeight;
+        public float payloadActivityWeight;
+        public float wormActivityWeight;
+        public float variablePayloadChance;
+        public float scanJammedWormChance;
         public float reconnaissanceFollowupChance;
         public float reconnaissanceFollowupDelaySeconds;
         public float portScanLoad;
@@ -182,6 +186,10 @@ namespace Uptime.Connections
         public string followupConnectionId;
         public float ordinaryActivityWeight;
         public float reconnaissanceActivityWeight;
+        public float payloadActivityWeight;
+        public float wormActivityWeight;
+        public float hostileActivityRoll;
+        public string activityOriginNodeId;
         public string targetNodeId;
         public string infectionKind;
         public float infectionLoad;
@@ -648,29 +656,47 @@ namespace Uptime.Connections
         }
 
         public void RecordHostileOpportunity(float time, float dueAt, float mean,
-            float nextInterval, float nextAt, string connectionId, string reason)
+            float nextInterval, float nextAt, AmbientHostileActivityResult result)
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent("hostile_opportunity", time);
             entry.scheduledSpawnTime = dueAt;
-            entry.connectionId = connectionId;
             entry.hostileMeanIntervalSeconds = mean;
             entry.nextHostileIntervalSeconds = nextInterval;
             entry.nextHostileAtSeconds = nextAt;
-            entry.reason = reason;
+            CopyHostileResult(entry, result);
         }
 
-        public void RecordHostileActivity(float time, string activity, float ordinaryWeight,
-            float reconnaissanceWeight, string connectionId, string eventId, string source)
+        public void RecordHostileActivity(float time, float dueAt,
+            AmbientHostileActivityResult result, HostileActivityDirector director)
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent("hostile_activity_selected", time);
-            entry.hostileActivity = activity;
-            entry.ordinaryActivityWeight = ordinaryWeight;
-            entry.reconnaissanceActivityWeight = reconnaissanceWeight;
-            entry.connectionId = connectionId;
-            entry.hostileEventId = eventId;
-            entry.source = source;
+            entry.scheduledSpawnTime = dueAt;
+            entry.ordinaryActivityWeight = director.OrdinaryWeight;
+            entry.reconnaissanceActivityWeight = director.ReconnaissanceWeight;
+            entry.payloadActivityWeight = director.PayloadWeight;
+            entry.wormActivityWeight = director.WormWeight;
+            entry.hostileActivityRoll = result.SelectionRoll;
+            entry.source = "ambient";
+            CopyHostileResult(entry, result);
+        }
+
+        private static void CopyHostileResult(RunEvent entry,
+            AmbientHostileActivityResult result)
+        {
+            if (result == null) return;
+            entry.hostileActivity = result.Activity;
+            entry.success = result.Succeeded;
+            entry.connectionId = result.ConnectionId;
+            entry.hostileEventId = result.EventId;
+            entry.payloadId = result.PayloadId;
+            entry.wormOutbreakId = result.WormOutbreakId;
+            entry.activityOriginNodeId = result.OriginNodeId;
+            entry.targetNodeId = result.TargetNodeId;
+            entry.payloadProfile = result.PayloadProfile;
+            entry.wormEffect = result.WormEffect;
+            entry.reason = result.Reason;
         }
 
         public void RecordReconnaissance(string type, float time, string eventId,
@@ -1262,6 +1288,10 @@ namespace Uptime.Connections
             {
                 traffic.ordinaryActivityWeight = activities.OrdinaryWeight;
                 traffic.reconnaissanceActivityWeight = activities.ReconnaissanceWeight;
+                traffic.payloadActivityWeight = activities.PayloadWeight;
+                traffic.wormActivityWeight = activities.WormWeight;
+                traffic.variablePayloadChance = activities.VariablePayloadChance;
+                traffic.scanJammedWormChance = activities.ScanJammedWormChance;
                 traffic.reconnaissanceFollowupChance = activities.FollowupChance;
                 traffic.reconnaissanceFollowupDelaySeconds = activities.FollowupDelaySeconds;
                 traffic.portScanLoad = activities.PortScanLoad;

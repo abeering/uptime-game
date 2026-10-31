@@ -101,6 +101,8 @@ namespace Uptime.Connections
 
         public IReadOnlyList<WormOutbreak> Outbreaks => outbreaks;
         public IReadOnlyCollection<IsolationState> Isolations => isolations.Values;
+        public bool HasEverUsedId(string id) => id != null && outbreaks.Exists(outbreak =>
+            string.Equals(outbreak.Id, id, StringComparison.OrdinalIgnoreCase));
         public Color WormColor => wormColor;
         public float IsolationSeconds => isolationSeconds;
         public float IsolationCooldownSeconds => isolationCooldownSeconds;
@@ -139,11 +141,18 @@ namespace Uptime.Connections
             WormTuning settings = (witnessTuning ?? tuning)?.Copy();
             if (settings == null || !settings.IsValid)
                 throw new InvalidOperationException("Worm tuning is invalid.");
-            if (nextOutbreak == int.MaxValue)
-                throw new InvalidOperationException("Worm outbreak IDs exhausted.");
-            int ordinal = nextOutbreak++;
+            int ordinal;
+            string id;
+            do
+            {
+                if (nextOutbreak == int.MaxValue)
+                    throw new InvalidOperationException("Worm outbreak IDs exhausted.");
+                ordinal = nextOutbreak++;
+                id = "w" + ordinal;
+            }
+            while (host.HasEverUsedId(id) || host.IsTrafficIdReserved(id));
             int seed = unchecked(rootSeed ^ (int)0x8D71BA53 ^ ordinal * 104729);
-            var outbreak = new WormOutbreak { Id = "w" + ordinal, Origin = origin.View,
+            var outbreak = new WormOutbreak { Id = id, Origin = origin.View,
                 Effect = effect, Seed = seed, Tuning = settings, random = new System.Random(seed) };
             outbreak.claimed.Add(origin.View);
             outbreaks.Add(outbreak);

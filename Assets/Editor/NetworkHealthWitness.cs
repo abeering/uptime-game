@@ -188,6 +188,16 @@ namespace Uptime.Connections.EditorTools
                 Check(host.Health.RecentEvents.Count == 0, "reset clears events");
 
                 host.ResetSimulation();
+                Add(host, "hostile-only-a", "DB", true,
+                    new OperationStage(OperationKind.Write, 100f, 10f, "hostile-only-a"));
+                Add(host, "hostile-only-b", "DB", true,
+                    new OperationStage(OperationKind.Write, 100f, 10f, "hostile-only-b"));
+                host.StepSimulation(1f);
+                Check(host.Health.SlowedCount == 2 && host.Health.Impacts.Count == 0 &&
+                    host.Health.DegradationRate == 0f && host.Health.Value == 100f,
+                    "hostile-only slowdown appears in aggregate but has no benign Health impact");
+
+                host.ResetSimulation();
                 var arc = Add(host, "arc", "DB", false,
                     new OperationStage(OperationKind.Read, 10f, 5f, "read"),
                     new OperationStage(OperationKind.Write, 20f, 10f, "write"));

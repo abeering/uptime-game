@@ -84,7 +84,8 @@ namespace Uptime.Connections
         public event Action<CleanSession, int> CleanSucceeded;
         public event Action SimulationReset;
         public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
-            payloadDirector != null && payloadDirector.HasEverUsedId(id);
+            payloadDirector != null && payloadDirector.HasEverUsedId(id) ||
+            wormDirector != null && wormDirector.HasEverUsedId(id);
         public bool IsTrafficIdReserved(string id) => trafficDirector != null &&
             trafficDirector.IsIdReserved(id);
         public LogicalConnectionState FindConnection(string id) =>
@@ -178,6 +179,22 @@ namespace Uptime.Connections
         {
             if (deltaSeconds <= 0f || float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds))
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
+            // Ambient opportunities are scheduled on the simulation clock. A coarse
+            // witness step must visit that clock, so new Payloads and Worms move from
+            // their actual opportunity time rather than all appearing at the end.
+            if (deltaSeconds > 1f && runMode == ConnectionRunMode.Generated &&
+                trafficDirector != null && trafficDirector.AutoGenerationEnabled &&
+                trafficDirector.HostileGenerationEnabled)
+            {
+                float remainingCoarse = deltaSeconds;
+                while (remainingCoarse > 0.000001f)
+                {
+                    float piece = Mathf.Min(1f, remainingCoarse);
+                    StepSimulation(piece);
+                    remainingCoarse -= piece;
+                }
+                return;
+            }
             if (runtimeConnections == null)
                 ResetSimulation();
 

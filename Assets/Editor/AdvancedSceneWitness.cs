@@ -97,7 +97,7 @@ namespace Uptime.Connections.EditorTools
                 "weighted dual ingress");
             Check(director.BenignPopulationGoal == 4f && director.CoverageStartupGoal == 1f &&
                 director.CoverageRampSeconds == 75f &&
-                director.HostileMeanIntervalSeconds == 38f,
+                director.HostileMeanIntervalSeconds == 30f,
                 "population and hostile scheduling");
             director.ResetDirector();
             foreach (var target in Targets)

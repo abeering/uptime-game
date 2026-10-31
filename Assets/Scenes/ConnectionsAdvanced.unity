@@ -12195,7 +12195,7 @@ MonoBehaviour:
         workRateMultiplier: 1
   ambientWeightOverrides: []
   hostileGenerationEnabled: 1
-  hostileMeanIntervalSeconds: 38
+  hostileMeanIntervalSeconds: 30
   deliveryChance: 0.5
   benignOutlierChance: 0.08
   benignWavingOutlierChance: 0.3
@@ -12999,8 +12999,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.HostileActivityDirector
   host: {fileID: 1996901015}
   traffic: {fileID: 1996901017}
-  ordinaryWeight: 2
-  reconnaissanceWeight: 1
+  ordinaryWeight: 4
+  reconnaissanceWeight: 2
+  payloadWeight: 2
+  wormWeight: 1
+  variablePayloadChance: 0.5
+  scanJammedWormChance: 0.7
   followupChance: 0.4
   followupDelaySeconds: 8
   portScanLoad: 8
