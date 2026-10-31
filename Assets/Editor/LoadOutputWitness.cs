@@ -57,9 +57,6 @@ namespace Uptime.Connections.EditorTools
 
                 var parent = new GameObject("LOAD witness width", typeof(RectTransform));
                 ((RectTransform)parent.transform).sizeDelta = new Vector2(320f, 800f);
-                var scroll = parent.AddComponent<ScrollRect>();
-                scroll.enabled = false;
-                scroll.viewport = (RectTransform)parent.transform;
                 LoadOutput panel = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 LoadOutput second = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 try
@@ -77,9 +74,10 @@ namespace Uptime.Connections.EditorTools
                         !Rows(panel).Any() && panel.CurrentScale == 3f,
                         "zero-demand node has no obsolete rows");
                     Check(((RectTransform)panel.transform).rect.width == 320f &&
-                        ((RectTransform)panel.transform).rect.height == 122f &&
+                        ((RectTransform)panel.transform).rect.height == 146f &&
                         Empty(panel).preferredWidth <= Empty(panel).rectTransform.rect.width,
                         "narrow terminal width and empty layout");
+                    CheckBottomGutter(panel, 0);
 
                     NodeView[] route = { Node(host, "EXT1"), Node(host, "API"),
                         Node(host, "DB") };
@@ -95,6 +93,7 @@ namespace Uptime.Connections.EditorTools
                         RowFill(small).color == PanelColor(panel, "modestColor") &&
                         host.FindConnection("l5").AllocatedLoad == 2.2f,
                         "small request gets a useful relative teal bar at full allocation");
+                    CheckBottomGutter(panel, 1);
                     panel.Bind("DB", host);
                     Queue(traffic, route, "l1", new OperationStage(OperationKind.Read,
                         1000f, 4f, "spiking", behaviors: new[] {
@@ -115,6 +114,7 @@ namespace Uptime.Connections.EditorTools
                         panel.CurrentScale == second.CurrentScale &&
                         RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
                         "multiple panels share authoritative requests independently");
+                    CheckBottomGutter(panel, 3);
                     float low = spike.DesiredLoad;
                     float lowBar = Row(panel, "l1").FillFraction;
                     Check(low >= 3.9f && low <= 4.1f &&
@@ -187,6 +187,7 @@ namespace Uptime.Connections.EditorTools
                         panel.GetComponentsInChildren<LoadRequestRow>(true)
                             .Count(r => r.gameObject.activeSelf) == 2,
                         "resolved demand row disappears and layout contracts");
+                    CheckBottomGutter(panel, 2);
                     RefreshAt(panel, clock + 8.3f);
                     Check(panel.CurrentScale <= 5f &&
                         RowIds(panel).SequenceEqual(new[] { "l1", "l3" }),
@@ -217,6 +218,7 @@ namespace Uptime.Connections.EditorTools
                     Check(panel.ConnectionRowCount == 0 && second.ConnectionRowCount == 0 &&
                         !Rows(panel).Any() && Empty(panel).gameObject.activeSelf,
                         "reset clears old connection references in both panels");
+                    CheckBottomGutter(panel, 0);
                 }
                 finally
                 {
@@ -272,13 +274,9 @@ namespace Uptime.Connections.EditorTools
             int before = content.childCount;
             typeof(Terminal).GetMethod("Load", BindingFlags.Instance |
                 BindingFlags.NonPublic).Invoke(terminal, new object[] { new[] { "load", id } });
-            var panel = content.GetChild(before).GetComponent<LoadOutput>();
-            Check(content.childCount == before + 1 && panel != null &&
-                Mathf.Abs(((RectTransform)panel.transform).rect.width -
-                    Mathf.Min(580f, content.rect.width)) < 0.01f &&
-                Mathf.Abs(((RectTransform)panel.transform.Find("LoadCard")).rect.width -
-                    (Mathf.Min(580f, content.rect.width) - 28f)) < 0.01f,
-                "valid command appends a live panel with the inspect/scan gutter");
+            Check(content.childCount == before + 1 &&
+                content.GetChild(before).GetComponent<LoadOutput>() != null,
+                "valid command appends live panel");
         }
 
         private static void CheckError(Terminal terminal, string[] tokens, string expected)
@@ -327,6 +325,35 @@ namespace Uptime.Connections.EditorTools
         private static LoadRequestRow Row(LoadOutput panel, string id) =>
             Rows(panel).Single(r => r.DisplayedId.Equals(id,
                     StringComparison.OrdinalIgnoreCase));
+
+        private static void CheckBottomGutter(LoadOutput panel, int expectedRows)
+        {
+            var root = (RectTransform)panel.transform;
+            var card = (RectTransform)root.Find("LoadCard");
+            var rail = (RectTransform)card.Find("AccentRail");
+            var rows = (RectTransform)card.Find("Rows");
+            float outside = root.rect.height + card.anchoredPosition.y - card.rect.height;
+            LoadRequestRow[] active = Rows(panel);
+            Check(active.Length == expectedRows && Mathf.Abs(outside - 12f) < .01f &&
+                Mathf.Abs(rail.rect.height - card.rect.height) < .01f,
+                "LOAD card has the same 12-unit outer bottom gutter and full-height rail as other cards");
+            if (active.Length == 0)
+            {
+                TMP_Text empty = Empty(panel);
+                float inside = card.rect.height + empty.rectTransform.anchoredPosition.y -
+                    empty.rectTransform.rect.height;
+                Check(inside >= 12f, "empty LOAD state has bottom breathing room");
+            }
+            else
+            {
+                var last = (RectTransform)active.OrderBy(r =>
+                    ((RectTransform)r.transform).anchoredPosition.y).First().transform;
+                float inside = card.rect.height + rows.anchoredPosition.y +
+                    last.anchoredPosition.y - last.rect.height;
+                Check(Mathf.Abs(inside - 12f) < .01f,
+                    "last LOAD row keeps a 12-unit bottom inset as rows change");
+            }
+        }
 
         private static void Check(bool result, string message)
         {

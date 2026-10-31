@@ -135,7 +135,7 @@ namespace Uptime.Connections
             FitWidth();
             int count = order.Count;
             if (emptyText != null) emptyText.gameObject.SetActive(count == 0);
-            float height = 90f + Mathf.Max(1, count) * rowHeight +
+            float height = 114f + Mathf.Max(1, count) * rowHeight +
                 Mathf.Max(0, count - 1) * rowGap;
             RectTransform root = (RectTransform)transform;
             if (Mathf.Abs(root.rect.height - height) > 0.01f)
@@ -187,8 +187,12 @@ namespace Uptime.Connections
         {
             RectTransform root = (RectTransform)transform;
             RectTransform parent = transform.parent as RectTransform;
-            float width = parent != null && parent.rect.width > 0f ?
-                Mathf.Min(580f, parent.rect.width) : root.rect.width;
+            ScrollRect scroll = GetComponentInParent<ScrollRect>();
+            float viewportWidth = scroll != null && scroll.viewport != null ?
+                scroll.viewport.rect.width - 12f : 0f;
+            float available = viewportWidth > 0f ? viewportWidth :
+                parent != null && parent.rect.width > 0f ? parent.rect.width : root.rect.width;
+            float width = Mathf.Min(580f, available);
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             if (layout != null) layout.preferredWidth = width;
             float cardWidth = Mathf.Max(0f, width - 28f);
@@ -214,7 +218,7 @@ namespace Uptime.Connections
             RectTransform root = (RectTransform)transform;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
             if (card != null)
-                card.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height - 12f);
+                card.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height - 24f);
             if (layout != null) layout.preferredHeight = height;
         }
 
