@@ -112,8 +112,8 @@ namespace Uptime.Connections
                 details.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
                     Mathf.Max(0f, height - compactHeight));
             var terminal = terminalPanel.GetComponent<Terminal>();
-            if (terminal != null) terminal.SetTopInset(height + 6f);
-            else terminalPanel.offsetMax = new Vector2(terminalPanel.offsetMax.x, -height - 6f);
+            if (terminal != null) terminal.SetTopInset(height + 8f);
+            else terminalPanel.offsetMax = new Vector2(terminalPanel.offsetMax.x, -height - 8f);
             if (expandedContent != null) expandedContent.SetActive(expanded);
         }
 

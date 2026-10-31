@@ -350,6 +350,8 @@ namespace Uptime.Connections.EditorTools
                 rect.rect.width > terminal.rect.width &&
                 Mathf.Approximately(details.anchorMax.x, terminal.anchorMax.x),
                 "full-width strip and terminal-width detail tray");
+            Near(rect.sizeDelta.x, 0f, "status strip fills display width");
+            Near(rect.anchoredPosition.y, 0f, "status strip flush with display top");
             Check(panel.ShiftEndMinuteOfDay == 17 * 60, "configurable end marker");
             panel.Render();
             CheckHealthBar(panel, 100f);
@@ -366,6 +368,7 @@ namespace Uptime.Connections.EditorTools
                 BindingFlags.NonPublic).SetValue(panel, false);
             panel.ApplyLayout();
             Near(rect.rect.height, 52f, "compact height");
+            Near(terminal.offsetMax.y, -60f, "desktop gutter below status strip");
         }
         private static void CheckHealthBar(NetworkHealthPanel panel, float expectedHealth)
         {
