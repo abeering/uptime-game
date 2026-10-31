@@ -1,29 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
-    // One independent, live terminal history panel. The allocator remains the source
-    // of the node total and every connection's effective requested LOAD.
+    // One independent, live terminal history panel for connection requests only.
     public sealed class LoadOutput : MonoBehaviour
     {
         [SerializeField] private RectTransform card;
         [SerializeField] private LayoutElement layout;
         [SerializeField] private PillGraphic nodePill;
         [SerializeField] private TMP_Text nodeIdText;
-        [SerializeField] private TMP_Text requestedText;
         [SerializeField] private RectTransform rowsRoot;
         [SerializeField] private LoadRequestRow rowPrefab;
         [SerializeField] private TMP_Text emptyText;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.12f;
         [SerializeField, Min(1f)] private float rowHeight = 32f;
         [SerializeField, Min(0f)] private float rowGap = 4f;
-        [SerializeField, Min(0.1f)] private float initialScaleCapacityMultiplier = 1.5f;
-        [SerializeField, Min(1f)] private float scaleGrowthHeadroom = 1.15f;
+        [SerializeField, Min(0.1f)] private float minimumScale = 3f;
+        [SerializeField, Min(1f)] private float scaleHeadroom = 1.15f;
+        [SerializeField, Min(0.1f)] private float scaleStep = 0.5f;
+        [SerializeField, Min(0f)] private float contractionDelaySeconds = 0.5f;
+        [SerializeField, Min(0.1f)] private float contractionSeconds = 3f;
         [SerializeField, Min(0f)] private float elevatedAtCapacityFraction = 0.5f;
         [SerializeField, Min(0f)] private float extremeAtCapacityFraction = 1f;
         [SerializeField] private Color nodeColor = new(0.35f, 0.92f, 0.72f);
@@ -34,14 +34,15 @@ namespace Uptime.Connections
 
         private readonly List<LogicalConnectionState> order = new();
         private readonly Dictionary<LogicalConnectionState, LoadRequestRow> rows = new();
-        private LoadRequestRow otherRow;
         private SimulationHost host;
         private string nodeId;
         private float scale;
         private float nextRefresh;
+        private float lastScaleRefresh;
+        private float lowerSince = -1f;
+        private float contractionSpeed;
 
         public int ConnectionRowCount => order.Count;
-        public bool HasOtherRow => otherRow != null;
         public float CurrentScale => scale;
 
         public void Bind(string selectedNodeId, SimulationHost owner)
@@ -59,21 +60,25 @@ namespace Uptime.Connections
             if (nodeIdText != null) nodeIdText.text = nodeId;
             nodePill?.SetOutline(nodeColor);
             scale = 0f;
-            Refresh();
-            nextRefresh = Time.unscaledTime + refreshSeconds;
+            lowerSince = -1f;
+            lastScaleRefresh = Time.unscaledTime;
+            RefreshAt(lastScaleRefresh);
+            nextRefresh = lastScaleRefresh + refreshSeconds;
         }
 
         private void Update()
         {
             if (host == null || Time.unscaledTime < nextRefresh) return;
             nextRefresh = Time.unscaledTime + refreshSeconds;
-            Refresh();
+            RefreshAt(Time.unscaledTime);
         }
 
         private void OnSimulationReset()
         {
             ClearRows();
             scale = 0f;
+            lowerSince = -1f;
+            lastScaleRefresh = Time.unscaledTime;
             // ResetSimulation raises this before replacing RuntimeConnections.
             // Wait until the next UI refresh to read the new run's states.
             nextRefresh = 0f;
@@ -84,23 +89,17 @@ namespace Uptime.Connections
             if (host != null) host.SimulationReset -= OnSimulationReset;
         }
 
-        private void Refresh()
+        private void Refresh() => RefreshAt(Time.unscaledTime);
+
+        private void RefreshAt(float now)
         {
             NodeResources node = host?.FindNodeResources(nodeId);
             if (node == null) return;
             var demanding = new List<LogicalConnectionState>();
-            float visibleRequested = 0f;
             if (host.RuntimeConnections != null)
                 foreach (LogicalConnectionState state in host.RuntimeConnections)
                     if (state.IsDemanding && state.TargetNode == node.View)
-                    {
                         demanding.Add(state);
-                        visibleRequested += state.DesiredLoad;
-                    }
-            // Remaining published node demand includes baseline, defense, and infections.
-            // Its source is deliberately not disclosed by the diagnostic.
-            float otherRequested = Mathf.Max(0f, node.RequestedLoad - visibleRequested);
-            bool showOther = otherRequested >= 0.05f;
 
             for (int i = order.Count - 1; i >= 0; i--)
                 if (!demanding.Contains(order[i]))
@@ -125,38 +124,18 @@ namespace Uptime.Connections
                 order.Add(state);
                 rows.Add(state, row);
             }
-            if (showOther && otherRow == null)
-            {
-                otherRow = Instantiate(rowPrefab, rowsRoot);
-                otherRow.Bind("OTHER", mutedIdentityColor);
-            }
-            else if (!showOther && otherRow != null)
-            {
-                RemoveRow(otherRow);
-                otherRow = null;
-            }
-
             float capacity = node.LoadCapacity;
-            if (scale <= 0f) scale = Mathf.Max(1f, capacity * initialScaleCapacityMultiplier);
+            float highest = 0f;
             foreach (LogicalConnectionState state in order)
-                GrowScale(state.DesiredLoad);
-            if (showOther) GrowScale(otherRequested);
+                highest = Mathf.Max(highest, state.DesiredLoad);
+            UpdateScale(highest, now);
             foreach (LogicalConnectionState state in order)
                 rows[state].Render(state.DesiredLoad, scale, BarColor(state.DesiredLoad, capacity));
-            if (otherRow != null)
-                otherRow.Render(otherRequested, scale, BarColor(otherRequested, capacity));
 
             FitWidth();
-            if (requestedText != null)
-            {
-                bool narrow = rowsRoot != null && rowsRoot.rect.width < 330f;
-                requestedText.text = (narrow ? "REQ " : "REQUESTED ") +
-                    Format(node.RequestedLoad) + (narrow ? " / CAP " : " / CAPACITY ") +
-                    Format(capacity);
-            }
-            int count = order.Count + (otherRow != null ? 1 : 0);
+            int count = order.Count;
             if (emptyText != null) emptyText.gameObject.SetActive(count == 0);
-            float height = 102f + Mathf.Max(1, count) * rowHeight +
+            float height = 90f + Mathf.Max(1, count) * rowHeight +
                 Mathf.Max(0, count - 1) * rowGap;
             RectTransform root = (RectTransform)transform;
             if (Mathf.Abs(root.rect.height - height) > 0.01f)
@@ -167,10 +146,33 @@ namespace Uptime.Connections
             }
         }
 
-        private void GrowScale(float requested)
+        private void UpdateScale(float highestRequest, float now)
         {
-            if (requested > scale)
-                scale = requested * Mathf.Max(1f, scaleGrowthHeadroom);
+            float step = Mathf.Max(0.1f, scaleStep);
+            float target = Mathf.Ceil(Mathf.Max(minimumScale,
+                highestRequest * scaleHeadroom) / step) * step;
+            float elapsed = Mathf.Max(0f, now - lastScaleRefresh);
+            lastScaleRefresh = now;
+            if (scale <= 0f || target > scale)
+            {
+                scale = target;
+                lowerSince = -1f;
+                contractionSpeed = 0f;
+                return;
+            }
+            if (target >= scale - step * 0.5f)
+            {
+                lowerSince = -1f;
+                contractionSpeed = 0f;
+                return;
+            }
+            if (lowerSince < 0f)
+            {
+                lowerSince = now;
+                contractionSpeed = (scale - target) / Mathf.Max(0.1f, contractionSeconds);
+            }
+            if (now - lowerSince >= contractionDelaySeconds)
+                scale = Mathf.Max(target, scale - contractionSpeed * elapsed);
         }
 
         private Color BarColor(float requested, float capacity)
@@ -199,15 +201,8 @@ namespace Uptime.Connections
             float contentWidth = Mathf.Max(0f, cardWidth - 32f);
             if (rowsRoot != null)
                 rowsRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentWidth);
-            if (requestedText != null)
-            {
-                requestedText.rectTransform.SetSizeWithCurrentAnchors(
-                    RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 84f));
-                requestedText.fontSize = contentWidth < 330f ? 12f : 15f;
-            }
             for (int i = 0; i < order.Count; i++)
                 PlaceRow(rows[order[i]], i, contentWidth);
-            if (otherRow != null) PlaceRow(otherRow, order.Count, contentWidth);
         }
 
         private void PlaceRow(LoadRequestRow row, int index, float width)
@@ -230,10 +225,8 @@ namespace Uptime.Connections
         private void ClearRows()
         {
             foreach (LoadRequestRow row in rows.Values) RemoveRow(row);
-            if (otherRow != null) RemoveRow(otherRow);
             rows.Clear();
             order.Clear();
-            otherRow = null;
         }
 
         private static void RemoveRow(LoadRequestRow row)
@@ -244,7 +237,5 @@ namespace Uptime.Connections
             else DestroyImmediate(row.gameObject);
         }
 
-        private static string Format(float value) =>
-            value.ToString("0.0", CultureInfo.InvariantCulture);
     }
 }

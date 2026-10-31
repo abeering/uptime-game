@@ -19,7 +19,6 @@ namespace Uptime.Connections
 
         private float targetFraction;
         private bool hasRendered;
-        private bool isOther;
 
         public string DisplayedId => identityPill != null ? identityPill.DisplayedId : string.Empty;
         public string DisplayedValue => valueText != null ? valueText.text : string.Empty;
@@ -27,27 +26,18 @@ namespace Uptime.Connections
 
         public void Bind(string visibleId, Color identityColor)
         {
-            isOther = visibleId == "OTHER";
             identityPill?.Bind(visibleId, identityColor);
-            if (isOther && identityPill != null)
-            {
-                ((RectTransform)identityPill.transform).SetSizeWithCurrentAnchors(
-                    RectTransform.Axis.Horizontal, 66f);
-                TMP_Text label = identityPill.GetComponentInChildren<TMP_Text>();
-                if (label != null) label.fontSize = 14f;
-            }
         }
 
         public void FitWidth(float width)
         {
             RectTransform root = (RectTransform)transform;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
-            float inset = leftInset + (isOther ? 12f : 0f);
             if (track != null)
             {
-                track.anchoredPosition = new Vector2(inset, track.anchoredPosition.y);
+                track.anchoredPosition = new Vector2(leftInset, track.anchoredPosition.y);
                 track.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                    Mathf.Max(0f, width - inset - valueWidth - gap));
+                    Mathf.Max(0f, width - leftInset - valueWidth - gap));
             }
             if (valueText != null)
                 valueText.rectTransform.SetSizeWithCurrentAnchors(

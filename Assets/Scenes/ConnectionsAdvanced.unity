@@ -11603,22 +11603,22 @@ MonoBehaviour:
     baselineLoad: 0
   - view: {fileID: 161748797}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 1603479477}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 252751404}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 358228025}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 714283443}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 1117267056}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 690753301}
     loadCapacity: 10
     baselineLoad: 0

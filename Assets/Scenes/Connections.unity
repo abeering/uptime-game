@@ -6688,7 +6688,7 @@ MonoBehaviour:
     baselineLoad: 0
   - view: {fileID: 252751404}
     loadCapacity: 10
-    baselineLoad: 1
+    baselineLoad: 0
   - view: {fileID: 358228025}
     loadCapacity: 10
     baselineLoad: 0

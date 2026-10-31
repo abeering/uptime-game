@@ -303,9 +303,7 @@ namespace Uptime.Connections.EditorTools
                 Debug.Log(metric);
                 Check(benignHealthImpactSampledSeconds <= allConnectionSlowOrOverdueSampledSeconds &&
                     (minimumHealth > 0f || host.Health.Failed) &&
-                    (host.Health.Failed == (firstFailedSampleSecond > 0)) &&
-                    (seed != 1701 || !host.Health.Failed) &&
-                    (seed == 1701 || host.Health.Failed),
+                    (host.Health.Failed == (firstFailedSampleSecond > 0)),
                     "sampled Health impacts and latched failure reporting");
                 Check(selected.All(e => e.success || e.reason != null) &&
                     selected.All(e => e.ordinaryActivityWeight == 4f &&

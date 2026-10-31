@@ -14,6 +14,8 @@ namespace Uptime.Connections.EditorTools
     {
         private static readonly MethodInfo RefreshMethod = typeof(LoadOutput).GetMethod(
             "Refresh", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo RefreshAtMethod = typeof(LoadOutput).GetMethod(
+            "RefreshAt", BindingFlags.Instance | BindingFlags.NonPublic);
 
         [MenuItem("Tools/Connections/Run LOAD Output Witness")]
         public static void Run()
@@ -60,27 +62,37 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     panel.Bind("api", host);
-                    Check(panel.ConnectionRowCount == 0 && panel.HasOtherRow &&
-                        Other(panel) == 1f,
-                        "baseline LOAD is visible as OTHER without connection rows");
-                    TMP_Text narrowHeader = (TMP_Text)new SerializedObject(panel)
-                        .FindProperty("requestedText").objectReferenceValue;
-                    Check(narrowHeader.text == "REQ 1.0 / CAP 10.0" &&
-                        narrowHeader.preferredWidth <= narrowHeader.rectTransform.rect.width &&
-                        Row(panel, "OTHER").GetComponentInChildren<IdentityPillView>()
-                            .GetComponent<RectTransform>().rect.width == 66f,
-                        "narrow header and OTHER identity fit their authored geometry");
+                    Check(panel.ConnectionRowCount == 0 && !Rows(panel).Any() &&
+                        Empty(panel).gameObject.activeSelf &&
+                        Empty(panel).text == "NO ACTIVE CONNECTION REQUESTS" &&
+                        !panel.GetComponentsInChildren<TMP_Text>(true)
+                            .Any(t => t.text.Contains("REQUESTED") || t.text.Contains("CAPACITY")),
+                        "empty node states only the absence of connection requests");
                     panel.Bind("db", host);
                     second.Bind("DB", host);
                     Check(panel.ConnectionRowCount == 0 && second.ConnectionRowCount == 0 &&
-                        !panel.HasOtherRow && panel.CurrentScale >= 15f,
+                        !Rows(panel).Any() && panel.CurrentScale == 3f,
                         "zero-demand node has no obsolete rows");
                     Check(((RectTransform)panel.transform).rect.width == 320f &&
-                        ((RectTransform)panel.transform).rect.height >= 134f,
+                        ((RectTransform)panel.transform).rect.height == 122f &&
+                        Empty(panel).preferredWidth <= Empty(panel).rectTransform.rect.width,
                         "narrow terminal width and empty layout");
 
                     NodeView[] route = { Node(host, "EXT1"), Node(host, "API"),
                         Node(host, "DB") };
+                    NodeView[] authRoute = { Node(host, "EXT1"), Node(host, "API"),
+                        Node(host, "AUTH") };
+                    Queue(traffic, authRoute, "l5", new OperationStage(OperationKind.Read,
+                        1000f, 2.2f, "small service request"));
+                    host.StepSimulation(.1f);
+                    panel.Bind("AUTH", host);
+                    LoadRequestRow small = Row(panel, "l5");
+                    Check(panel.CurrentScale == 3f && small.DisplayedValue == "2.2" &&
+                        small.FillFraction > .7f && small.FillFraction < .8f &&
+                        RowFill(small).color == PanelColor(panel, "modestColor") &&
+                        host.FindConnection("l5").AllocatedLoad == 2.2f,
+                        "small request gets a useful relative teal bar at full allocation");
+                    panel.Bind("DB", host);
                     Queue(traffic, route, "l1", new OperationStage(OperationKind.Read,
                         1000f, 4f, "spiking", behaviors: new[] {
                             TimedModifierBehaviorDefinition.Spiking("SPIKING", 1f, 1f,
@@ -97,17 +109,20 @@ namespace Uptime.Connections.EditorTools
                     var wave = host.FindConnection("l3");
                     Check(panel.ConnectionRowCount == 3 && second.ConnectionRowCount == 3 &&
                         spike.IsDemanding && wave.IsDemanding &&
-                        !panel.HasOtherRow && panel.CurrentScale == second.CurrentScale,
+                        panel.CurrentScale == second.CurrentScale &&
+                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
                         "multiple panels share authoritative requests independently");
                     float low = spike.DesiredLoad;
                     float lowBar = Row(panel, "l1").FillFraction;
                     Check(low >= 3.9f && low <= 4.1f &&
                         Row(panel, "l1").DisplayedValue == "4.0" &&
                         Row(panel, "l2").DisplayedValue == "8.0" &&
+                        panel.CurrentScale == 9.5f &&
+                        RowFill(Row(panel, "l2")).color == PanelColor(panel, "elevatedColor") &&
                         Mathf.Abs(NodeResources(host, "DB").RequestedLoad -
                             (spike.DesiredLoad + host.FindConnection("l2").DesiredLoad +
                              wave.DesiredLoad)) < 0.01f,
-                        "initial rows display effective requests and reconcile node total");
+                        "initial rows use effective requests and capacity-relative colors");
 
                     for (int step = 0; step < 8 && spike.DesiredLoad < 17.9f; step++)
                         host.StepSimulation(.25f);
@@ -116,7 +131,9 @@ namespace Uptime.Connections.EditorTools
                         spike.AllocatedLoad < spike.DesiredLoad &&
                         Row(panel, "l1").DisplayedValue == "18.0" &&
                         Row(panel, "l1").FillFraction > lowBar &&
-                        panel.CurrentScale >= 18f &&
+                        panel.CurrentScale == 21f &&
+                        RowFill(Row(panel, "l1")).color == PanelColor(panel, "extremeColor") &&
+                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }) &&
                         Row(second, "l1").DisplayedValue == "18.0",
                         "SPIKING row follows changing DesiredLoad despite constrained allocation");
                     Check(wave.DesiredLoad != wave.BaseLoad &&
@@ -127,35 +144,57 @@ namespace Uptime.Connections.EditorTools
                     float highScale = panel.CurrentScale;
                     for (int step = 0; step < 8 && spike.DesiredLoad > 4.1f; step++)
                         host.StepSimulation(.25f);
-                    Refresh(panel);
+                    float clock = Time.unscaledTime;
+                    RefreshAt(panel, clock + .1f);
                     Check(spike.DesiredLoad < 4.1f &&
                         Row(panel, "l1").DisplayedValue == "4.0" &&
                         panel.CurrentScale == highScale &&
                         Row(panel, "l1").FillFraction <
-                            Row(panel, "l2").FillFraction,
-                        "SPIKING falls without rescaling or reordering the panel");
+                            Row(panel, "l2").FillFraction &&
+                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
+                        "SPIKING bar falls promptly while scale holds its short grace period");
+                    RefreshAt(panel, clock + 1.6f);
+                    Check(panel.CurrentScale < highScale && panel.CurrentScale > 9.5f,
+                        "scale contracts gradually rather than jumping to the low target");
+                    RefreshAt(panel, clock + 4.1f);
+                    Check(panel.CurrentScale <= 9.75f &&
+                        panel.CurrentScale >= 9.5f &&
+                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
+                        "scale contracts smoothly toward live demand after the spike");
 
                     Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 3f,
                         out _), "inject non-connection demand");
-                    Refresh(panel);
-                    Check(Other(panel) >= 2.9f &&
+                    RefreshAt(panel, clock + 4.2f);
+                    NodeResources db = NodeResources(host, "DB");
+                    db.View.LoadBar.Render(db);
+                    Check(Mathf.Abs(db.RequestedLoad -
+                            (spike.DesiredLoad + host.FindConnection("l2").DesiredLoad +
+                             wave.DesiredLoad + 3f)) < .01f &&
+                        db.View.LoadBar.LabelText ==
+                            $"LOAD - {db.RequestedLoad:0.#} / {db.LoadCapacity:0.#}" &&
+                        panel.ConnectionRowCount == 3 &&
+                        !Rows(panel).Any(r => r.DisplayedId == "other") &&
                         !panel.GetComponentsInChildren<TMP_Text>(true)
-                            .Any(t => t.text.Contains("INFECTED")) &&
-                        Row(panel, "OTHER").DisplayedValue == "3.0",
-                        "OTHER reconciles covert demand without disclosure");
+                            .Any(t => t.text.Contains("INFECTED") ||
+                                t.text.Contains("REQUESTED") || t.text.Contains("CAPACITY")),
+                        "Phantom LOAD stays in node accounting but outside connection panel");
                     Check(host.KillConnection("l2"), "resolve a connection");
-                    Refresh(panel);
+                    RefreshAt(panel, clock + 4.3f);
                     Check(panel.ConnectionRowCount == 2 &&
                         panel.GetComponentsInChildren<LoadRequestRow>(true)
-                            .Count(r => r.gameObject.activeSelf) == 3,
+                            .Count(r => r.gameObject.activeSelf) == 2,
                         "resolved demand row disappears and layout contracts");
+                    RefreshAt(panel, clock + 8.3f);
+                    Check(panel.CurrentScale <= 5f &&
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l3" }),
+                        "scale also contracts after the largest requester disappears");
                     traffic.QueueSpawnPlan(new ConnectionSpawnPlan(0f, "l4", route,
                         "load-witness", "Service", new[] {
                             new OperationStage(OperationKind.Read, 1f, 3f, "first operation"),
                             new OperationStage(OperationKind.Write, 1000f, 9f,
                                 "second operation") }, false));
                     host.StepSimulation(.1f);
-                    Refresh(panel);
+                    RefreshAt(panel, clock + 8.4f);
                     var transition = host.FindConnection("l4");
                     Check(transition != null && transition.IsDemanding &&
                         transition.CurrentOperationIndex == 0 &&
@@ -165,7 +204,7 @@ namespace Uptime.Connections.EditorTools
                     for (int step = 0; step < 40 && transition.CurrentOperationIndex == 0; step++)
                         host.StepSimulation(.25f);
                     host.StepSimulation(.1f); // Publish the next operation's new request.
-                    Refresh(panel);
+                    RefreshAt(panel, clock + 8.5f);
                     Check(transition.CurrentOperationIndex == 1 && transition.IsDemanding &&
                         Row(panel, "l4").DisplayedValue == "9.0" &&
                         panel.ConnectionRowCount == 3,
@@ -173,7 +212,7 @@ namespace Uptime.Connections.EditorTools
                     host.ResetSimulation();
                     Refresh(panel); Refresh(second);
                     Check(panel.ConnectionRowCount == 0 && second.ConnectionRowCount == 0 &&
-                        !panel.HasOtherRow,
+                        !Rows(panel).Any() && Empty(panel).gameObject.activeSelf,
                         "reset clears old connection references in both panels");
                 }
                 finally
@@ -184,7 +223,8 @@ namespace Uptime.Connections.EditorTools
                 }
                 host.ResetSimulation(); // Destroyed panels must no longer receive updates.
                 Debug.Log("LoadOutputWitness PASS: commands, both scenes, dynamic requests, " +
-                    "contention, OTHER, multi-panel, responsive layout, resolution, reset.");
+                    "contention, relative scale and contraction, infection boundary, " +
+                    "multi-panel, responsive layout, resolution, reset.");
             }
             finally
             {
@@ -208,14 +248,18 @@ namespace Uptime.Connections.EditorTools
                 "Assets/Prefabs/Connections/LoadRequestRow.prefab");
             var material = AssetDatabase.LoadAssetAtPath<Material>(
                 "Assets/Shaders/ConnectionsPill.mat");
-            Check(host.FindNodeResources(nodeId) != null && prefab == source && row != null &&
+            Check(host.FindNodeResources(nodeId) != null &&
+                host.Nodes.All(n => n.BaselineLoad == 0f) &&
+                prefab == source && row != null &&
                 new SerializedObject(prefab).FindProperty("rowPrefab")
                     .objectReferenceValue == row &&
+                prefab.transform.Find("LoadCard/RequestedTotal") == null &&
+                new SerializedObject(prefab).FindProperty("requestedText") == null &&
                 new SerializedObject(prefab).FindProperty("nodePill")
                     .objectReferenceValue is PillGraphic nodePill &&
                 nodePill.material == material &&
                 row.GetComponentInChildren<PillGraphic>(true).material == material,
-                "authored LOAD panel, row, pill material, and scene binding in " + scene);
+                "zero scene baseline, minimal authored panel, pill material, and binding in " + scene);
         }
 
         private static void CheckCommand(Terminal terminal, string id)
@@ -254,14 +298,28 @@ namespace Uptime.Connections.EditorTools
 
         private static void Refresh(LoadOutput panel) => RefreshMethod.Invoke(panel, null);
 
-        private static LoadRequestRow Row(LoadOutput panel, string id) =>
-            panel.GetComponentsInChildren<LoadRequestRow>(true).Single(r =>
-                r.gameObject.activeSelf && r.DisplayedId.Equals(id,
-                    StringComparison.OrdinalIgnoreCase));
+        private static void RefreshAt(LoadOutput panel, float now) =>
+            RefreshAtMethod.Invoke(panel, new object[] { now });
 
-        private static float Other(LoadOutput panel) =>
-            float.Parse(Row(panel, "OTHER").DisplayedValue,
-                System.Globalization.CultureInfo.InvariantCulture);
+        private static LoadRequestRow[] Rows(LoadOutput panel) =>
+            panel.GetComponentsInChildren<LoadRequestRow>(true)
+                .Where(r => r.gameObject.activeSelf).ToArray();
+
+        private static string[] RowIds(LoadOutput panel) =>
+            Rows(panel).Select(r => r.DisplayedId).ToArray();
+
+        private static TMP_Text Empty(LoadOutput panel) =>
+            (TMP_Text)new SerializedObject(panel).FindProperty("emptyText").objectReferenceValue;
+
+        private static Image RowFill(LoadRequestRow row) =>
+            (Image)new SerializedObject(row).FindProperty("fill").objectReferenceValue;
+
+        private static Color PanelColor(LoadOutput panel, string field) =>
+            new SerializedObject(panel).FindProperty(field).colorValue;
+
+        private static LoadRequestRow Row(LoadOutput panel, string id) =>
+            Rows(panel).Single(r => r.DisplayedId.Equals(id,
+                    StringComparison.OrdinalIgnoreCase));
 
         private static void Check(bool result, string message)
         {
