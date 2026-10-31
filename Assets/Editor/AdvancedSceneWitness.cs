@@ -68,8 +68,7 @@ namespace Uptime.Connections.EditorTools
                 "exact node IDs");
             foreach (NodeResources node in host.Nodes)
             {
-                bool external = node.View.NodeId.StartsWith("EXT", StringComparison.Ordinal);
-                Check(node.LoadCapacity == 10f && node.BaselineLoad == (external ? 0f : 1f),
+                Check(node.LoadCapacity == 10f && node.BaselineLoad == 0f,
                     "node LOAD defaults " + node.View.NodeId);
                 Check(node.View.GetComponent<RectTransform>() != null,
                     "authored card " + node.View.NodeId);

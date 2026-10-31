@@ -16,6 +16,7 @@ namespace Uptime.Connections
         [SerializeField] private PlaceholderOutput placeholderPrefab;
         [SerializeField] private InspectOutput inspectPrefab;
         [SerializeField] private ScanOutput scanPrefab;
+        [SerializeField] private LoadOutput loadPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
@@ -240,6 +241,9 @@ namespace Uptime.Connections
                     break;
                 case "scan":
                     Scan(tokens, command);
+                    break;
+                case "load":
+                    Load(tokens);
                     break;
                 case "intercept":
                     if (tokens.Length != 4 || tokens[2] != "@")
@@ -478,7 +482,8 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  kill|k <id> [id ...]", mutedColor);
+                    AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
                     AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
@@ -679,6 +684,43 @@ namespace Uptime.Connections
                         errorColor);
                     break;
             }
+        }
+
+        private void Load(string[] tokens)
+        {
+            if (!TryParseLoad(tokens, out string nodeId, out string error))
+            {
+                AppendText(error, errorColor);
+                return;
+            }
+            if (simulationHost == null)
+            {
+                AppendText("LOAD  simulation unavailable", errorColor);
+                return;
+            }
+            NodeResources node = simulationHost.FindNodeResources(nodeId);
+            if (node == null)
+            {
+                AppendText("LOAD  unknown node " + nodeId.ToUpperInvariant(), errorColor);
+                return;
+            }
+            LoadOutput block = AppendOutputBlock(loadPrefab);
+            if (block == null)
+                AppendText("LOAD  output unavailable", errorColor);
+            else
+                block.Bind(node.View.NodeId, simulationHost);
+        }
+
+        public static bool TryParseLoad(string[] tokens, out string nodeId, out string error)
+        {
+            nodeId = null;
+            error = "USAGE  load <nodeId>";
+            if (tokens == null || tokens.Length != 2 ||
+                !tokens[0].Equals("load", System.StringComparison.OrdinalIgnoreCase))
+                return false;
+            nodeId = tokens[1];
+            error = null;
+            return true;
         }
 
         public void FinishClean(string message, bool success)
