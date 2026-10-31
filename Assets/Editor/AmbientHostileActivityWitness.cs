@@ -249,13 +249,20 @@ namespace Uptime.Connections.EditorTools
             {
                 Reset(host, traffic, recorder, seed);
                 float minimumHealth = 100f;
-                int slowedSeconds = 0, peakConnections = 0;
+                int allConnectionSlowOrOverdueSampledSeconds = 0;
+                int benignHealthImpactSampledSeconds = 0;
+                int firstFailedSampleSecond = -1, peakConnections = 0;
                 for (int second = 0; second < 600; second++)
                 {
                     host.StepSimulation(1f);
-                    minimumHealth = Mathf.Min(minimumHealth, host.Health.Value);
-                    if (host.Health.SlowedCount > 0 || host.Health.OverdueCount > 0)
-                        slowedSeconds++;
+                    NetworkHealthSnapshot health = host.Health;
+                    minimumHealth = Mathf.Min(minimumHealth, health.Value);
+                    if (health.SlowedCount > 0 || health.OverdueCount > 0)
+                        allConnectionSlowOrOverdueSampledSeconds++;
+                    if (health.Impacts.Count > 0)
+                        benignHealthImpactSampledSeconds++;
+                    if (health.Failed && firstFailedSampleSecond < 0)
+                        firstFailedSampleSecond = second + 1;
                     peakConnections = Mathf.Max(peakConnections,
                         host.RuntimeConnections.Count(c => c.IsActive || c.IsConnecting));
                 }
@@ -287,10 +294,19 @@ namespace Uptime.Connections.EditorTools
                     $"wormCompleted={Count("worm_outbreak_completed")} " +
                     $"infectionApplied={Count("infection_applied")} " +
                     $"conditionsApplied={Count("condition_applied")} " +
-                    $"benignCanceled={canceledBenign} slowedSeconds={slowedSeconds} " +
+                    $"benignCanceled={canceledBenign} " +
+                    $"allConnectionSlowOrOverdueSampledSeconds={allConnectionSlowOrOverdueSampledSeconds} " +
+                    $"benignHealthImpactSampledSeconds={benignHealthImpactSampledSeconds} " +
                     $"peakConnections={peakConnections} healthFinal={host.Health.Value:0.##} " +
-                    $"healthMinimum={minimumHealth:0.##}";
+                    $"healthMinimum={minimumHealth:0.##} healthFailed={host.Health.Failed} " +
+                    $"firstFailedSampleSecond={firstFailedSampleSecond}";
                 Debug.Log(metric);
+                Check(benignHealthImpactSampledSeconds <= allConnectionSlowOrOverdueSampledSeconds &&
+                    (minimumHealth > 0f || host.Health.Failed) &&
+                    (host.Health.Failed == (firstFailedSampleSecond > 0)) &&
+                    (seed != 1701 || !host.Health.Failed) &&
+                    (seed == 1701 || host.Health.Failed),
+                    "sampled Health impacts and latched failure reporting");
                 Check(selected.All(e => e.success || e.reason != null) &&
                     selected.All(e => e.ordinaryActivityWeight == 4f &&
                         e.reconnaissanceActivityWeight == 2f &&
