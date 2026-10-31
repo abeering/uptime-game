@@ -101,8 +101,16 @@ namespace Uptime.Connections
         {
             if (panel == null || terminalPanel == null) return;
             float parentHeight = ((RectTransform)panel.parent).rect.height;
-            float height = expanded ? parentHeight * expandedHeightFraction : compactHeight;
-            panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+            float height = expanded ?
+                Mathf.Max(parentHeight * expandedHeightFraction, compactHeight + 148f) :
+                compactHeight;
+            // The full-width status strip stays compact. Its authored detail tray
+            // drops over the terminal only, so expanding Health leaves the
+            // topology in place and the right side of the strip available.
+            panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, compactHeight);
+            if (expandedContent != null && expandedContent.transform is RectTransform details)
+                details.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
+                    Mathf.Max(0f, height - compactHeight));
             var terminal = terminalPanel.GetComponent<Terminal>();
             if (terminal != null) terminal.SetTopInset(height + 6f);
             else terminalPanel.offsetMax = new Vector2(terminalPanel.offsetMax.x, -height - 6f);

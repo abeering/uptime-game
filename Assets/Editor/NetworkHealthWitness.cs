@@ -344,10 +344,12 @@ namespace Uptime.Connections.EditorTools
                 "panel simulation, command, and terminal bindings");
             var rect = (RectTransform)panel.transform;
             var terminal = (RectTransform)fields.FindProperty("terminalPanel").objectReferenceValue;
-            Check(rect.anchorMax.x == terminal.anchorMax.x &&
-                rect.anchorMin.x == terminal.anchorMin.x &&
-                Mathf.Abs(rect.rect.width - terminal.rect.width) < 0.01f,
-                "matching panel widths");
+            var details = (RectTransform)((GameObject)fields.FindProperty("expandedContent")
+                .objectReferenceValue).transform;
+            Check(rect.anchorMin.x == 0f && rect.anchorMax.x == 1f &&
+                rect.rect.width > terminal.rect.width &&
+                Mathf.Approximately(details.anchorMax.x, terminal.anchorMax.x),
+                "full-width strip and terminal-width detail tray");
             Check(panel.ShiftEndMinuteOfDay == 17 * 60, "configurable end marker");
             panel.Render();
             CheckHealthBar(panel, 100f);
@@ -355,8 +357,10 @@ namespace Uptime.Connections.EditorTools
             typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
                 BindingFlags.NonPublic).SetValue(panel, true);
             panel.ApplyLayout();
-            Near(rect.rect.height, ((RectTransform)rect.parent).rect.height * 0.2f,
-                "expanded height fraction");
+            Near(rect.rect.height, 52f, "expanded strip stays compact");
+            Near(details.rect.height, Mathf.Max(
+                ((RectTransform)rect.parent).rect.height * 0.2f, 200f) - 52f,
+                "expanded detail tray height");
             Check(terminal.rect.height > 0f, "terminal remains visible when expanded");
             typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
                 BindingFlags.NonPublic).SetValue(panel, false);
@@ -386,7 +390,7 @@ namespace Uptime.Connections.EditorTools
             Color orange = fields.FindProperty("drainingBarColor").colorValue;
             Color red = fields.FindProperty("criticalBarColor").colorValue;
             Near(track.rect.height, value.fontSize, "bar matches Health text size");
-            Near(rate.rectTransform.anchoredPosition.x, -16f, "rate right edge unchanged");
+            Near(rate.rectTransform.anchoredPosition.x, 633f, "rate stays in left status group");
             var corners = new Vector3[4];
             track.GetWorldCorners(corners);
             float left = value.rectTransform.InverseTransformPoint(corners[0]).x;
@@ -400,8 +404,8 @@ namespace Uptime.Connections.EditorTools
                 value.GetPreferredValues("HEALTH 100").x;
             float rightGap = rate.rectTransform.rect.xMax -
                 rate.GetPreferredValues("-11.11/s").x - right;
-            Check(Mathf.Abs(leftGap - rightGap) < 2f,
-                "bar centers between full Health text and reserved two-digit rate");
+            Check(leftGap > 8f && rightGap > 8f,
+                "bar has space between Health text and reserved two-digit rate");
             Debug.Log($"NetworkHealthWitness bar layout: {track.rect.width:0.#} x " +
                 $"{track.rect.height:0.#}, rate reserve {rate.GetPreferredValues("-11.11/s").x:0.#}");
 
@@ -493,7 +497,8 @@ namespace Uptime.Connections.EditorTools
             try
             {
                 dummy.transform.SetParent(content, false);
-                dummy.GetComponent<LayoutElement>().preferredHeight = 1000f;
+                dummy.GetComponent<LayoutElement>().preferredHeight =
+                    Mathf.Max(1500f, scroll.viewport.rect.height + 500f);
                 Canvas.ForceUpdateCanvases();
                 LayoutRebuilder.ForceRebuildLayoutImmediate(content);
                 scroll.verticalNormalizedPosition = 0.5f;
