@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:3d2b5e86863da05240a1eb4451e5fce8c6fc58ec28b3b89f20a6b0e0d5b41843`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:ff19dd93603456aaad09c21b1b89eac5bbcf970e4b5b1daf3523a6f3cc45d0cd`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Live node LOAD diagnostic V0 (review branch, October 31, 2026):** `load <nodeId>` now appends a continuously updating terminal-history panel in both Connections scenes. It shows a node's published requested LOAD against capacity, active demanding connections' effective requested LOAD, and an aggregated `OTHER` remainder for non-connection demand without exposing covert sources. Small identity pills, numeric values, and quickly responding bars use a stable capacity-based scale and serialized magnitude colors. Multiple panels coexist, rows arrive and retire with demand, and resets clear old row references. This is instant player information with no scan slot or resource cost. See [LOAD diagnostic V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-load-diagnostic-v0.md) and its [review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsLoadDiagnosticV0/README.md).
 
 **Ambient Hostile Activity V2 (review branch, October 30, 2026):** The Advanced Scenario now uses its existing single hostile opportunity clock to choose among ordinary LOADER/INFECTOR connections, Reconnaissance, Payloads, and Worm outbreaks at provisional weights 4:2:2:1 and a 30-second mean interval. Payloads choose a reachable internal target from a configured ingress and select Steady or Variable movement at 50%; Worms start from an available ingress with 70% SCAN JAMMED / 30% PORT SCANNED. Both reuse their V0 mechanics and separate seeded entity state. The four-node scene keeps new ambient weights at zero, retaining its prior ordinary hostile baseline. The recorder distinguishes each selected activity's real identity, parameters, and failure reason; connection-ID exhaustion no longer suppresses otherwise valid Payload or Worm opportunities. This is an exploratory mix, not a balancing rule or LevelDirector. See [Ambient Hostile Activity V2](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-ambient-hostile-activity-v2.md) and the [deterministic review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsAmbientHostileActivityV2/README.md).
 

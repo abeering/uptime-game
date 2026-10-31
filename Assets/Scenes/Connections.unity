@@ -6600,6 +6600,7 @@ MonoBehaviour:
   placeholderPrefab: {fileID: 4703692024107262633, guid: 96a14f158484292429ffeb2907e1f6ea, type: 3}
   inspectPrefab: {fileID: 5640653935189085936, guid: 26d54e60cbf2ed44997ac0f737d12ca4, type: 3}
   scanPrefab: {fileID: 4954846012338825431, guid: 82388e005f909294f8075c3afc4fa676, type: 3}
+  loadPrefab: {fileID: 2305129265954828056, guid: 6af792156d4292441a4507dea22bfe58, type: 3}
   simulationHost: {fileID: 1996901015}
   trafficDirector: {fileID: 1996901017}
   recorder: {fileID: 1996901018}
