@@ -5122,18 +5122,6 @@ PrefabInstance:
       propertyPath: host
       value:
       objectReference: {fileID: 1996901015}
-    - target: {fileID: 4932214761221723482, guid: 32b61b31280e7524789d280679e51428, type: 3}
-      propertyPath: cleanOverlay
-      value:
-      objectReference: {fileID: 897310627}
-    - target: {fileID: 4932214761221723482, guid: 32b61b31280e7524789d280679e51428, type: 3}
-      propertyPath: commandInput
-      value:
-      objectReference: {fileID: 1946291436}
-    - target: {fileID: 4932214761221723482, guid: 32b61b31280e7524789d280679e51428, type: 3}
-      propertyPath: terminalPanel
-      value:
-      objectReference: {fileID: 1950420485}
     - target: {fileID: 5402016635619941690, guid: 32b61b31280e7524789d280679e51428, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
