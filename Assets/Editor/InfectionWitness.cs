@@ -743,6 +743,8 @@ namespace Uptime.Connections.EditorTools
                     overlay.transform.parent.lossyScale.x),
                 "authored inactive centered CLEAN window in network panel");
             var fields = new SerializedObject(overlay);
+            Check(fields.FindProperty("escapeCoordinator").objectReferenceValue != null,
+                "CLEAN scene Escape coordinator binding");
             var input = (TMP_InputField)fields.FindProperty("pidInput").objectReferenceValue;
             var title = (TMP_Text)fields.FindProperty("title").objectReferenceValue;
             var body = (TMP_Text)fields.FindProperty("body").objectReferenceValue;
