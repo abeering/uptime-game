@@ -11,6 +11,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private TMP_Text title;
         [SerializeField] private TMP_Text body;
+        [SerializeField] private GameObject cancelHint;
         [SerializeField] private TMP_InputField pidInput;
         [SerializeField, Min(0f)] private float characterSeconds = 0.012f;
         [SerializeField, Min(0f)] private float resultSeconds = 1.3f;
@@ -44,6 +45,7 @@ namespace Uptime.Connections
             showingResult = false;
             gameObject.SetActive(true);
             title.text = "PROCESS KILLER  /  " + session.NodeId;
+            cancelHint.SetActive(true);
             pidInput.gameObject.SetActive(false);
             sequence = StartCoroutine(Splash());
         }
@@ -79,7 +81,7 @@ namespace Uptime.Connections
             foreach (CleanProcess process in session.Processes)
                 listing.AppendFormat("{0,-9} {1,2}%       {2}\n", process.Pid,
                     process.CpuPercent, process.Name);
-            listing.Append("\nENTER PID TO TERMINATE   /   ESC TO CANCEL");
+            listing.Append("\nENTER PID TO TERMINATE");
             body.text = listing.ToString();
             pidInput.SetTextWithoutNotify(string.Empty);
             pidInput.gameObject.SetActive(true);
@@ -113,6 +115,7 @@ namespace Uptime.Connections
             }
             acceptingPid = false;
             showingResult = true;
+            cancelHint.SetActive(false);
             pidInput.gameObject.SetActive(false);
             bool success = result == CleanSelectionResult.Success;
             string feedback = success ? "PROCESS TERMINATED  /  CLEAN COMPLETE" :
