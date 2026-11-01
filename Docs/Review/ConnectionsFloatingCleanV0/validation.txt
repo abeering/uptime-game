@@ -1,0 +1,92 @@
+Unity 6000.3.11f1 — Floating CLEAN Window validation excerpts
+Base: main 1c90aa1 (PR #70 merged)
+See README.md for scenario, capture method, indexing caveat, and remaining manual checks.
+
+Editor witnesses
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+ADVANCED SEED 1701: benign=23, hostile=13, recon=5, EXT1=29, EXT2=12, infections=5, log=/private/tmp/uptime-floating-clean-validation/Logs/UptimeRuns/uptime_20261101_032516_seed-01701_da810279.json
+ADVANCED SEED 3141: benign=27, hostile=4, recon=1, EXT1=18, EXT2=14, infections=3, log=/private/tmp/uptime-floating-clean-validation/Logs/UptimeRuns/uptime_20261101_032517_seed-03141_4bb6a6a7.json
+ADVANCED SEED 9001: benign=15, hostile=12, recon=7, EXT1=26, EXT2=8, infections=9, log=/private/tmp/uptime-floating-clean-validation/Logs/UptimeRuns/uptime_20261101_032517_seed-09001_b05aef76.json
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+FLOATING CLEAN BATCH PASS: CLEAN window, Infection, Network Health, Advanced Scene witnesses
+
+Scripted Play: Connections
+CLEAN PLAY CHECK: developer infection command uses real host infection
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: SSH splash offers cancel without infection disclosure
+CLEAN CAPTURE: Connections splash 1920x1080
+CLEAN CAPTURE: Connections splash 1280x720
+CLEAN CAPTURE: Connections splash 1577x887
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: Escape during splash cancels freely and retains infection
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: five-process selection receives typing focus
+CLEAN PLAY CHECK: titlebar is the sole Escape instruction during selection
+CLEAN PLAY CHECK: simulation continues during CLEAN
+CLEAN PLAY CHECK: CLEAN does not move/resize topology or node anchors
+CLEAN CAPTURE: Connections selection 1920x1080
+CLEAN CAPTURE: Connections selection 1280x720
+CLEAN CAPTURE: Connections selection 1577x887
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: Escape during selection is penalty-free
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: invalid PID keeps input usable with no penalty
+CLEAN PLAY CHECK: correct PID removes captured infection and hides Escape during result
+CLEAN CAPTURE: Connections success 1920x1080
+CLEAN CAPTURE: Connections success 1280x720
+CLEAN CAPTURE: Connections success 1577x887
+CLEAN PLAY CHECK: Escape does not cancel noncancelable success result
+CLEAN PLAY CHECK: success retains result-display hold
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: innocent PID retains infection and applies existing five-Health penalty
+CLEAN CAPTURE: Connections failure 1920x1080
+CLEAN CAPTURE: Connections failure 1280x720
+CLEAN CAPTURE: Connections failure 1577x887
+CLEAN PLAY CHECK: failure result also hides and ignores Escape
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: CLEAN does not move/resize topology or node anchors
+CLEAN PLAY CHECK: success, failure and cancellation retain terminal feedback
+FLOATING CLEAN SCRIPTED PLAY PASS: Connections
+
+Scripted Play: ConnectionsAdvanced
+CLEAN PLAY CHECK: developer infection command uses real host infection
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: SSH splash offers cancel without infection disclosure
+CLEAN CAPTURE: ConnectionsAdvanced splash 1920x1080
+CLEAN CAPTURE: ConnectionsAdvanced splash 1280x720
+CLEAN CAPTURE: ConnectionsAdvanced splash 1577x887
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: Escape during splash cancels freely and retains infection
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: five-process selection receives typing focus
+CLEAN PLAY CHECK: titlebar is the sole Escape instruction during selection
+CLEAN PLAY CHECK: simulation continues during CLEAN
+CLEAN PLAY CHECK: CLEAN does not move/resize topology or node anchors
+CLEAN CAPTURE: ConnectionsAdvanced selection 1920x1080
+CLEAN CAPTURE: ConnectionsAdvanced selection 1280x720
+CLEAN CAPTURE: ConnectionsAdvanced selection 1577x887
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: Escape during selection is penalty-free
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: invalid PID keeps input usable with no penalty
+CLEAN PLAY CHECK: correct PID removes captured infection and hides Escape during result
+CLEAN CAPTURE: ConnectionsAdvanced success 1920x1080
+CLEAN CAPTURE: ConnectionsAdvanced success 1280x720
+CLEAN CAPTURE: ConnectionsAdvanced success 1577x887
+CLEAN PLAY CHECK: Escape does not cancel noncancelable success result
+CLEAN PLAY CHECK: success retains result-display hold
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: clean command opens titled shared window with Escape during splash
+CLEAN PLAY CHECK: innocent PID retains infection and applies existing five-Health penalty
+CLEAN CAPTURE: ConnectionsAdvanced failure 1920x1080
+CLEAN CAPTURE: ConnectionsAdvanced failure 1280x720
+CLEAN CAPTURE: ConnectionsAdvanced failure 1577x887
+CLEAN PLAY CHECK: failure result also hides and ignores Escape
+CLEAN PLAY CHECK: terminal typing focus restored after close
+CLEAN PLAY CHECK: CLEAN does not move/resize topology or node anchors
+CLEAN PLAY CHECK: success, failure and cancellation retain terminal feedback
+FLOATING CLEAN SCRIPTED PLAY PASS: ConnectionsAdvanced

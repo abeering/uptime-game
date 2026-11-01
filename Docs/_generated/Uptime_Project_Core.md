@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:3712fc7e26fa62599363a4f091f8769862d01e176d21e341fe6fc4a02e40ce42`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:c1f5004f051274402998e46ba1696f77e5e30043542ef8ef230232e97c0ee4bf`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Floating CLEAN Window V0 (based on merged PR #70):** PID-Select now nests the same authored `DockedTitlebar` and `DockedWindowFrame` prefabs as the permanent panes. It retains its centered 710×465 placement inside NetworkPanel, with a 40-unit titlebar, dynamic `PROCESS KILLER / <node>` title, and noninteractive `[ESC] CANCEL` label during the SSH splash and PID selection. The label hides during the noncancelable result display; duplicate body Escape instructions and bespoke outer chrome are removed. The shared source prefabs, permanent pinned indicators, topology geometry, local Escape handling, CLEAN mechanics/timings, and typing-focus lifecycle are unchanged. This implements only the existing minigame presentation slice; no window manager or Escape stack is added. See [Infections V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-infections-v0.md) and the [floating CLEAN review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsFloatingCleanV0/README.md).
 
 **Permanent compact Health strip (October 31, 2026, based on merged PR #69):** Both Connections scenes retain the full-width clock, Health value, animated fill, and signed rate in the authored 52-unit strip. The expanded tray and Tab-to-expand behavior are removed. Terminal and network panes remain at their authored positions below the strip; Health has no command-input or terminal-layout references. Existing drain, recovery, critical colors, simulation snapshots, and recorder evidence remain unchanged. See [Network Health V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-network-health-v0.md) and the [compact layout review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsCompactHealth/README.md).
 
