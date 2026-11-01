@@ -58,6 +58,7 @@ namespace Uptime.Connections.EditorTools
             foreach (string field in new[] { "title", "body", "pidInput", "cancelHint" })
                 Check(Bound(clean, field), "clean overlay binding " + field);
             InfectionWitness.CheckCleanOverlayBindings();
+            EscapeVideoCallWitness.CheckBindings();
             Check(host.RunMode == ConnectionRunMode.Generated && host.Definitions.Length == 0 &&
                 director.AutoGenerationEnabled && director.HostileGenerationEnabled &&
                 director.RandomizeSeed && recorder.RecordingEnabled,

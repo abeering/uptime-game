@@ -22,6 +22,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
+        [SerializeField] private ConnectionsVideoCall videoCall;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField, Min(1)] private int maxCommandHistory = 100;
         [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
@@ -277,6 +278,11 @@ namespace Uptime.Connections
                     }
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "calltest":
+                    if (tokens.Length != 1) AppendText("USAGE  calltest", errorColor);
+                    else AppendText(videoCall != null && videoCall.TryStartSampleCall() ?
+                        "DEVELOPER TEST CALL OPENED" : "TEST CALL UNAVAILABLE OR ALREADY ACTIVE", mutedColor);
+                    break;
                 case "worm":
                     if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
                         AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", errorColor);
@@ -489,6 +495,7 @@ namespace Uptime.Connections
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  calltest  // sample video call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);

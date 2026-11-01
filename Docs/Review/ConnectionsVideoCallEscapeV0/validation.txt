@@ -1,0 +1,157 @@
+Unity 6000.3.11f1 — Video Calls and Escape Coordination V0
+Baseline: main 3dd3813 (PR #71 merged)
+See README.md for capture method, limitations, indexing caveat, and manual checks.
+
+Editor witnesses
+ESC/CALL CHECK: one coordinator and both authored windows
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: terminal developer-call binding
+ESC/CALL CHECK: both typing fields reserve native Escape
+ESC/CALL CHECK: inactive compact call has an authored network position
+ESC/CALL CHECK: call uses shared authored chrome CallTitlebar
+ESC/CALL CHECK: call uses shared authored chrome CallWindowFrame
+ESC/CALL CHECK: call has no clickable controls or raycast surface
+EscapeVideoCallWitness bindings PASS: Connections
+ESC/CALL CHECK: one coordinator and both authored windows
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: terminal developer-call binding
+ESC/CALL CHECK: both typing fields reserve native Escape
+ESC/CALL CHECK: inactive compact call has an authored network position
+ESC/CALL CHECK: call uses shared authored chrome CallTitlebar
+ESC/CALL CHECK: call uses shared authored chrome CallWindowFrame
+ESC/CALL CHECK: call has no clickable controls or raycast surface
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+ESC/CALL CHECK: one coordinator and both authored windows
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: window scene coordinator binding
+ESC/CALL CHECK: terminal developer-call binding
+ESC/CALL CHECK: both typing fields reserve native Escape
+ESC/CALL CHECK: inactive compact call has an authored network position
+ESC/CALL CHECK: call uses shared authored chrome CallTitlebar
+ESC/CALL CHECK: call uses shared authored chrome CallWindowFrame
+ESC/CALL CHECK: call has no clickable controls or raycast surface
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+VIDEO CALL BATCH PASS
+
+Focused Play: Connections
+ESC/CALL CHECK: startup terminal focus
+ESC/CALL CHECK: sample starts through public developer entry point
+ESC/CALL CHECK: duplicate/null requests leave active call untouched
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: unscaled typewriter advances while network simulation continues
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: Escape hangs up during typing rather than skipping subtitles
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: native character input replaces selection after Escape
+ESC/CALL CHECK: native arrow and Backspace editing
+ESC/CALL CHECK: native editing, Enter and terminal focus restoration remain usable
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: call can start programmatically while CLEAN owns typing
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=527, selection=1/2
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: first Escape hangs up and holding does not cascade into CLEAN
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=527, selection=1/2
+ESC/CALL CHECK: next fresh Escape cancels CLEAN and restores terminal typing
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: reverse order cancels CLEAN first without hanging up the older call
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: next fresh press hangs up the older call
+ESC/CALL CHECK: arrival protection consumes a fresh press without fallthrough or delayed replay
+ESC/CALL CHECK: automatic removal protects the newly exposed CLEAN target even after held grace expiry
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: fresh press after protection dismisses normally
+ESC/CALL CHECK: CLEAN result leaves the stack and retains successful removal
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: Escape can hang up the call while CLEAN results remain noncancelable
+ESC/CALL CHECK: CLEAN result closes and restores typing after its existing hold
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: disabling a call component also hides its window
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: external CLEAN disable releases session, ownership and focus
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: simulation reset deregisters CLEAN without orphaning input
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: temporary call instance starts for destruction check
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: caller content accepts a sprite and optional animation controller
+ESC/CALL CHECK: dynamic identity, portrait and talking hook bind without typing focus changes
+ESC/CALL CHECK: complete subtitle and talking-stop transition
+ESC/CALL CHECK: long dialogue follows its current subtitle page and long caller names keep the hint clear
+ESC/CALL CHECK: disabled coordinator hides its affordance
+ESC/CALL CHECK: re-enabling during a held Escape does not manufacture a press
+ESC/CALL CHECK: unscaled protection expires and fresh Escape still works at timeScale zero
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=unchanged, selection=1/2
+ESC/CALL CHECK: all call exit paths stop subtitle playback
+ESC/CALL CHECK: call/CLEAN lifecycles preserve network geometry and node positions
+EscapeVideoCallWitness PLAY PASS: Connections
+
+Focused Play: ConnectionsAdvanced
+ESC/CALL CHECK: startup terminal focus
+ESC/CALL CHECK: sample starts through public developer entry point
+ESC/CALL CHECK: duplicate/null requests leave active call untouched
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: unscaled typewriter advances while network simulation continues
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: Escape hangs up during typing rather than skipping subtitles
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=draft, selection=1/2
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: native character input replaces selection after Escape
+ESC/CALL CHECK: native arrow and Backspace editing
+ESC/CALL CHECK: native editing, Enter and terminal focus restoration remain usable
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: call can start programmatically while CLEAN owns typing
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=527, selection=1/2
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: first Escape hangs up and holding does not cascade into CLEAN
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=527, selection=1/2
+ESC/CALL CHECK: next fresh Escape cancels CLEAN and restores terminal typing
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: reverse order cancels CLEAN first without hanging up the older call
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: next fresh press hangs up the older call
+ESC/CALL CHECK: arrival protection consumes a fresh press without fallthrough or delayed replay
+ESC/CALL CHECK: automatic removal protects the newly exposed CLEAN target even after held grace expiry
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: fresh press after protection dismisses normally
+ESC/CALL CHECK: CLEAN result leaves the stack and retains successful removal
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: Escape can hang up the call while CLEAN results remain noncancelable
+ESC/CALL CHECK: CLEAN result closes and restores typing after its existing hold
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: disabling a call component also hides its window
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: external CLEAN disable releases session, ownership and focus
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: simulation reset deregisters CLEAN without orphaning input
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: temporary call instance starts for destruction check
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: caller content accepts a sprite and optional animation controller
+ESC/CALL CHECK: dynamic identity, portrait and talking hook bind without typing focus changes
+ESC/CALL CHECK: complete subtitle and talking-stop transition
+ESC/CALL CHECK: long dialogue follows its current subtitle page and long caller names keep the hint clear
+ESC/CALL CHECK: disabled coordinator hides its affordance
+ESC/CALL CHECK: re-enabling during a held Escape does not manufacture a press
+ESC/CALL CHECK: unscaled protection expires and fresh Escape still works at timeScale zero
+ESC/CALL CHECK: LIFO target has the only active Escape affordance
+ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape ownership: EscapeSafeInputField, focused=True, selected=True, text=unchanged, selection=1/2
+ESC/CALL CHECK: all call exit paths stop subtitle playback
+ESC/CALL CHECK: call/CLEAN lifecycles preserve network geometry and node positions
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
