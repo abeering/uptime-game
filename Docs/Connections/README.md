@@ -18,6 +18,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Threats V0, Slices 1–3B](connections-threats-v0.md) — manual threats, operation-completion delivery, `kill` interception, and reusable OVERLOAD/SPIKING LOAD behaviors.
 - [Behavior and modifier foundation](connections-behavior-foundation-v0.md) — connection and operation behavior scopes, effective WORK/LOAD, modifier history, and Slice 3B fixed-step keyword timing.
 - [Inspect V2](connections-inspect-v2.md) — compact default, verbose command mode, width-aware operation pills, and current effective LOAD badge.
+- [Video Call Presentation & Soft Placement V1](connections-video-call-presentation-v1.md) — large feed, translucent subtitles, red/gray supplied handset control, node-aware open-time positioning, and delayed developer samples.
 - [Video Calls & Escape Coordination V0](connections-video-calls-escape-v0.md) — reusable non-modal caller window, shared LIFO Escape targeting, native input preservation, and CLEAN integration.
 - [Network Health V0](connections-network-health-v0.md) — live service Health, deadlines, recovery, failure latch, and permanent compact status strip.
 - [Lifecycle V1](connections-lifecycle-v1.md) — Connecting route traversal, cancellation receipts, and connection-only Health.

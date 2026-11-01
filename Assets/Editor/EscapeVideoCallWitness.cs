@@ -32,6 +32,14 @@ namespace Uptime.Connections.EditorTools
             EditorApplication.isPlaying = true;
         }
 
+        internal static Vector2Int RequestedSize()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            int w = Array.IndexOf(args, "-witnessWidth"), h = Array.IndexOf(args, "-witnessHeight");
+            return new Vector2Int(w >= 0 ? int.Parse(args[w + 1]) : 1920,
+                h >= 0 ? int.Parse(args[h + 1]) : 1080);
+        }
+
         private static void Tick()
         {
             if (!SessionState.GetBool("EscapeVideoCallWitness.pending", false) || !Application.isPlaying || ++frames < 30) return;
@@ -67,6 +75,24 @@ namespace Uptime.Connections.EditorTools
                 call.GetComponentsInChildren<Selectable>(true).Length == 0 &&
                 call.GetComponentsInChildren<Graphic>(true).All(g => !g.raycastTarget),
                 "call has no clickable controls or raycast surface");
+            var placement = UnityEngine.Object.FindFirstObjectByType<ConnectionsWindowPlacement>();
+            Check(placement != null && placement.transform == clean.transform.parent &&
+                EscapeVideoCallChecks.Field<ConnectionsWindowPlacement>(call, "placement") == placement &&
+                EscapeVideoCallChecks.Field<ConnectionsWindowPlacement>(clean, "placement") == placement,
+                "both windows use the authored Connections placement helper");
+            var body = EscapeVideoCallChecks.Field<TMP_Text>(call, "bodyText");
+            var panel = body.transform.parent.GetComponent<Image>();
+            var handset = EscapeVideoCallChecks.Field<Image>(call, "hangUpHandset");
+            Check(body.transform.parent.parent.name == "VideoFeed" && panel.color.a > .5f && panel.color.a < 1f &&
+                body.overflowMode == TextOverflowModes.Page && body.rectTransform.rect.height >= 60 &&
+                ((RectTransform)call.transform.Find("VideoFeed")).rect.width > 500 &&
+                ((RectTransform)call.transform.Find("VideoFeed")).rect.height >= 240,
+                "large video region contains translucent, paginated subtitle overlay");
+            Check(AssetDatabase.GetAssetPath(handset.sprite) == "Assets/Images/phone.png" && handset.preserveAspect &&
+                EscapeVideoCallChecks.Field<Image>(call, "hangUpCircle").sprite != handset.sprite &&
+                EscapeVideoCallChecks.Field<TMP_Text>(call, "hangUpKeycap").text == "[ESC]" &&
+                call.transform.Find("CallTitlebar/HangUpHint") == null,
+                "one supplied handset sprite, separate circular UI background and single bottom ESC keycap");
             Debug.Log("EscapeVideoCallWitness bindings PASS: " + terminal.gameObject.scene.name);
         }
 
@@ -89,12 +115,16 @@ namespace Uptime.Connections.EditorTools
         private Keyboard keyboard;
         private string capturePath;
         private float originalScale;
+        private Canvas witnessCanvas;
+        private Camera captureCamera, originalCamera;
+        private RenderTexture captureTarget;
+        private RenderMode originalRenderMode;
         private double deadline;
         public static T Field<T>(object obj, string name) => (T)obj.GetType().GetField(name, Private).GetValue(obj);
         private static void Check(bool ok, string text) => EscapeVideoCallWitness.Check(ok, text);
         private static WaitForSecondsRealtime Wait(float seconds = .2f) => new(seconds);
         private GameObject CleanHint => Field<GameObject>(clean, "cancelHint");
-        private GameObject CallHint => Field<GameObject>(call, "hangUpHint");
+        private Image CallCircle => Field<Image>(call, "hangUpCircle");
         private void Command(string text) => command.onSubmit.Invoke(text);
         private void Native(TMP_InputField input, KeyCode key, char character = '\0')
         {
@@ -114,8 +144,11 @@ namespace Uptime.Connections.EditorTools
         {
             Check(ReferenceEquals(coordinator.CurrentTarget, target) &&
                 CleanHint.activeInHierarchy == ReferenceEquals(target, clean) &&
-                CallHint.activeInHierarchy == ReferenceEquals(target, call),
-                "LIFO target has the only active Escape affordance");
+                CallCircle.gameObject.activeInHierarchy == call.IsActive &&
+                CallCircle.color == Field<Color>(call, ReferenceEquals(target, call) ? "activeCircle" : "inactiveCircle") &&
+                Field<Image>(call, "hangUpHandset").color == Field<Color>(call, ReferenceEquals(target, call) ? "activeHandset" : "inactiveHandset") &&
+                Field<TMP_Text>(call, "hangUpKeycap").color == Field<Color>(call, ReferenceEquals(target, call) ? "activeKeycap" : "inactiveKeycap"),
+                "LIFO target alone is highlighted; live call retains its red/gray handset group");
         }
         private void Draft(TMP_InputField input, string value)
         {
@@ -130,7 +163,7 @@ namespace Uptime.Connections.EditorTools
         }
         public void Begin()
         {
-            deadline = EditorApplication.timeSinceStartup + 90;
+            deadline = EditorApplication.timeSinceStartup + 180;
             originalScale = Time.timeScale;
             StartCoroutine(Guard(Cases()));
         }
@@ -152,6 +185,12 @@ namespace Uptime.Connections.EditorTools
         private void Finish(Exception error)
         {
             enabled = false; Time.timeScale = originalScale;
+            if (witnessCanvas != null)
+            {
+                witnessCanvas.renderMode = originalRenderMode; witnessCanvas.worldCamera = originalCamera;
+            }
+            if (captureCamera != null) Destroy(captureCamera.gameObject);
+            if (captureTarget != null) Destroy(captureTarget);
             if (keyboard != null) InputSystem.RemoveDevice(keyboard);
             if (error != null) Debug.LogException(error);
             else Debug.Log("EscapeVideoCallWitness PLAY PASS: " + gameObject.scene.name);
@@ -169,6 +208,18 @@ namespace Uptime.Connections.EditorTools
             host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
             command = Field<TMP_InputField>(terminal, "commandInput"); pid = Field<TMP_InputField>(clean, "pidInput");
+            // Keep the Canvas at the reviewed size before any window placement, not just at capture time.
+            Vector2Int requested = EscapeVideoCallWitness.RequestedSize();
+            witnessCanvas = coordinator.GetComponent<Canvas>(); originalRenderMode = witnessCanvas.renderMode;
+            originalCamera = witnessCanvas.worldCamera;
+            captureCamera = new GameObject("Witness camera", typeof(Camera)).GetComponent<Camera>();
+            captureCamera.orthographic = true; captureCamera.clearFlags = CameraClearFlags.SolidColor;
+            captureCamera.backgroundColor = new Color(.025f,.065f,.08f);
+            captureCamera.transform.position = new Vector3(0,0,-100);
+            captureCamera.nearClipPlane = .1f; captureCamera.farClipPlane = 1000;
+            captureTarget = new RenderTexture(requested.x, requested.y, 24); captureCamera.targetTexture = captureTarget;
+            witnessCanvas.renderMode = RenderMode.ScreenSpaceCamera; witnessCanvas.worldCamera = captureCamera;
+            witnessCanvas.planeDistance = 10; Canvas.ForceUpdateCanvases(); yield return null;
             keyboard = InputSystem.AddDevice<Keyboard>(); keyboard.MakeCurrent();
             string[] args = Environment.GetCommandLineArgs(); int at = Array.IndexOf(args, "-capturePath");
             capturePath = at >= 0 ? args[at + 1] : null;
@@ -178,6 +229,8 @@ namespace Uptime.Connections.EditorTools
             Rect networkRect = network.rect;
             Vector2 networkMin = network.offsetMin, networkMax = network.offsetMax;
             Vector3[] nodePositions = host.Nodes.Select(n => n.View.transform.localPosition).ToArray();
+            Check(witnessCanvas.pixelRect.width == requested.x && witnessCanvas.pixelRect.height == requested.y,
+                "placement and capture share fixed Canvas viewport " + requested.x + "x" + requested.y);
             Check(command.isFocused, "startup terminal focus");
             Draft(command, "draft");
             Check(call.TryStartSampleCall(), "sample starts through public developer entry point");
@@ -205,7 +258,9 @@ namespace Uptime.Connections.EditorTools
             Command("infect DB phantom-load"); Command("clean DB");
             yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
             Owners(clean); Capture("clean-alone"); Draft(pid, "527");
+            Vector3 fixedClean = clean.transform.localPosition;
             Check(call.TryStartSampleCall(), "call can start programmatically while CLEAN owns typing");
+            Check(clean.transform.localPosition == fixedClean, "call appearance keeps existing CLEAN position fixed");
             Owners(call); Preserved(pid, "527"); yield return Wait(.5f); Capture("call-over-clean");
             yield return Wait(); Press(pid); yield return Wait(.25f);
             Owners(clean); Check(clean.IsOpen && !call.IsActive, "first Escape hangs up and holding does not cascade into CLEAN");
@@ -214,9 +269,13 @@ namespace Uptime.Connections.EditorTools
             Check(!clean.IsOpen && host.ActiveClean == null && command.isFocused, "next fresh Escape cancels CLEAN and restores terminal typing");
             Release(); yield return Wait(.05f);
 
-            call.TryStartSampleCall(); Command("clean DB");
+            call.TryStartSampleCall();
+            Vector3 fixedCall = call.transform.localPosition;
+            Command("clean DB");
             yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
             Owners(clean); Capture("clean-over-call");
+            Check(Vector3.Distance(call.transform.localPosition, fixedCall) < .01f && call.IsActive && body.maxVisibleCharacters > 0,
+                "CLEAN opening keeps the older call fixed and its dialogue advancing or complete");
             Press(pid); yield return Wait(.25f);
             Check(call.IsActive && !clean.IsOpen && command.isFocused, "reverse order cancels CLEAN first without hanging up the older call");
             Owners(call); Release(); yield return Wait(.05f); Press(command); yield return Wait(.1f);
@@ -263,9 +322,12 @@ namespace Uptime.Connections.EditorTools
             var animation = new UnityEditor.Animations.AnimatorController();
             animation.AddParameter("IsTalking", AnimatorControllerParameterType.Bool);
             animation.AddLayer("Portrait");
-            animation.layers[0].stateMachine.AddState("Idle");
+            var clip = new AnimationClip();
+            AnimationUtility.SetEditorCurve(clip, EditorCurveBinding.FloatCurve("", typeof(Image), "m_Color.r"),
+                AnimationCurve.Linear(0, .3f, 1, 1));
+            animation.layers[0].stateMachine.AddState("Idle").motion = clip;
             Check(call.TryStartCall(new ConnectionsVideoCallData { CallerName = "PORTRAIT TEST",
-                Body = "Short subtitle test.", Portrait = portrait, PortraitAnimation = animation }),
+                Body = string.Join(" ", Enumerable.Repeat("Portrait talking test.", 12)), Portrait = portrait, PortraitAnimation = animation }),
                 "caller content accepts a sprite and optional animation controller");
             yield return Wait(.1f);
             var animator = Field<Animator>(call, "portraitAnimator");
@@ -273,16 +335,29 @@ namespace Uptime.Connections.EditorTools
                 !Field<GameObject>(call, "portraitFallback").activeSelf &&
                 Field<TMP_Text>(call, "callerText").text == "CALL / PORTRAIT TEST" && animator.GetBool("IsTalking"),
                 "dynamic identity, portrait and talking hook bind without typing focus changes");
+            float animatedRed = Field<Image>(call, "portraitImage").color.r;
+            int disclosed = body.maxVisibleCharacters;
+            Command("clean DB"); yield return Wait(.3f); Owners(clean);
+            Check(animator.GetBool("IsTalking") && body.maxVisibleCharacters > disclosed &&
+                Mathf.Abs(Field<Image>(call, "portraitImage").color.r - animatedRed) > .02f,
+                "portrait animation and subtitle typewriter continue while the handset is gray");
+            Capture("animated-portrait-inactive");
+            clean.DismissFromEscape(); yield return Wait(.1f); Owners(call);
             yield return new WaitUntil(() => !call.IsTyping);
             Check(body.maxVisibleCharacters == body.textInfo.characterCount && !animator.GetBool("IsTalking"),
                 "complete subtitle and talking-stop transition");
-            call.EndCall(); Destroy(animation);
+            call.EndCall(); Destroy(animation); Destroy(clip);
             var tuning = new SerializedObject(call);
             tuning.FindProperty("charactersPerSecond").floatValue = 10000;
             tuning.ApplyModifiedPropertiesWithoutUndo();
             call.TryStartCall(new ConnectionsVideoCallData { CallerName = new string('L', 100),
                 Body = string.Join(" ", Enumerable.Repeat("Long subtitle test sentence.", 80)) });
             yield return new WaitUntil(() => !call.IsTyping);
+            var page = body.textInfo.pageInfo[body.pageToDisplay - 1];
+            int pageLines = body.textInfo.characterInfo[page.lastCharacterIndex].lineNumber -
+                body.textInfo.characterInfo[page.firstCharacterIndex].lineNumber + 1;
+            Check(pageLines <= 3, "long dialogue stays within three subtitle lines on the current page");
+            Capture("long-dialogue");
             Check(body.textInfo.pageCount > 1 && body.pageToDisplay == body.textInfo.pageCount &&
                 Field<TMP_Text>(call, "callerText").overflowMode == TextOverflowModes.Ellipsis,
                 "long dialogue follows its current subtitle page and long caller names keep the hint clear");
@@ -290,10 +365,109 @@ namespace Uptime.Connections.EditorTools
             tuning.FindProperty("charactersPerSecond").floatValue = 45;
             tuning.ApplyModifiedPropertiesWithoutUndo();
 
+            // Reopening recomputes placement from actual view bindings, with no topology motion.
+            Vector3 previousPosition = Vector3.zero;
+            bool differentHomes = false, avoidedObstruction = false;
+            Rect lastCleanBounds = default;
+            var placement = Field<ConnectionsWindowPlacement>(call, "placement");
+            var cleanParts = Field<RectTransform[]>(placement, "cleanContent");
+            var callParts = Field<RectTransform[]>(placement, "callContent");
+            foreach (NodeResources node in host.Nodes)
+            {
+                Command("clean " + node.View.NodeId);
+                yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+                Rect bounds = LocalRect(network, (RectTransform)clean.transform);
+                Check(bounds.xMin >= network.rect.xMin + 11.9f && bounds.xMax <= network.rect.xMax - 11.9f &&
+                    bounds.yMin >= network.rect.yMin + 11.9f && bounds.yMax <= network.rect.yMax - 51.9f,
+                    "node-bound CLEAN is within network content viewport: " + node.View.NodeId);
+                if (previousPosition != Vector3.zero && Vector3.Distance(previousPosition, clean.transform.localPosition) > 10)
+                    differentHomes = true;
+                previousPosition = clean.transform.localPosition;
+                Capture("clean-node-" + node.View.NodeId); lastCleanBounds = bounds;
+                Vector3 cleanHome = clean.transform.localPosition;
+                Rect preferredCall = new(network.rect.xMax - 24 - 560, network.rect.yMax - 64 - 360, 560, 360);
+                float preferredObstruction = ContentOverlap(network, preferredCall, cleanParts);
+                call.TryStartSampleCall();
+                float chosenObstruction = ContentOverlap(network, LocalRect(network, (RectTransform)call.transform), cleanParts);
+                Check(Vector3.Distance(cleanHome, clean.transform.localPosition) < .01f,
+                    "call candidates preserve existing node-bound CLEAN position");
+                if (preferredObstruction > chosenObstruction + 1)
+                {
+                    if (!avoidedObstruction) Capture("avoided-content-obstruction");
+                    avoidedObstruction = true;
+                    Check(chosenObstruction < preferredObstruction,
+                        "call alternative reduces protected-content obstruction: " + preferredObstruction + " to " + chosenObstruction);
+                }
+                call.EndCall(); clean.DismissFromEscape(); yield return Wait(.05f);
+            }
+            Check(differentHomes, "different target nodes produce different CLEAN homes");
+            Check(avoidedObstruction, "a better call candidate avoids important CLEAN content");
+
+            // Controlled fixture: stage an older call with four units of bottom-frame overlap.
+            // Node positions and the candidate solver are untouched; only the existing call pose is staged.
+            call.TryStartSampleCall();
+            Rect callBounds = LocalRect(network, (RectTransform)call.transform);
+            call.transform.position += network.TransformVector(new Vector2(0, lastCleanBounds.yMax - 4 - callBounds.yMin));
+            fixedCall = call.transform.localPosition;
+            Command("clean " + host.Nodes.Last().View.NodeId);
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            Rect minorClean = LocalRect(network, (RectTransform)clean.transform);
+            float minorArea = Overlap(minorClean, LocalRect(network, (RectTransform)call.transform));
+            Check(minorArea > 0 && ContentOverlap(network, minorClean, callParts) < .1f &&
+                Vector3.Distance(call.transform.localPosition, fixedCall) < .01f &&
+                Vector2.Distance(minorClean.center, lastCleanBounds.center) < .1f,
+                "four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=" + minorArea);
+            Owners(clean); Capture("minor-frame-overlap");
+            float beforePenalty = host.Health.Value;
+            int innocent = host.ActiveClean.Processes.First(p => p.CpuPercent < 82).Pid;
+            pid.onSubmit.Invoke(innocent.ToString());
+            Check(!clean.CanDismissWithEscape && Mathf.Abs(host.Health.Value - (beforePenalty - 5)) < .001f &&
+                Field<TMP_Text>(clean, "body").text.Contains("CLEAN FAILED"),
+                "innocent PID retains exact five-Health penalty and noncancelable failure result");
+            Owners(call); Capture("innocent-pid-result");
+            yield return new WaitUntil(() => !clean.IsOpen); yield return Wait(.1f); call.EndCall();
+
+            // A real delayed developer command arrives while the PID field owns typing.
+            Command("calltest delay=5");
+            Check(Field<Coroutine>(terminal, "delayedCall") != null, "bounded delayed call is scheduled");
+            var pending = Field<Coroutine>(terminal, "delayedCall");
+            Command("calltest delay=1"); Command("calltest");
+            Check(Field<Coroutine>(terminal, "delayedCall") == pending && !call.IsActive,
+                "duplicate delayed or immediate tests cannot replace a pending call");
+            Command("clean DB");
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            Draft(pid, "527"); fixedClean = clean.transform.localPosition;
+            yield return new WaitUntil(() => call.IsActive);
+            Owners(call); Preserved(pid, "527");
+            Check(clean.transform.localPosition == fixedClean && Field<Coroutine>(terminal, "delayedCall") == null,
+                "delayed call places once without moving CLEAN or changing its typing owner");
+            yield return Wait(.7f); Capture("delayed-call-over-clean");
+            call.EndCall(); yield return Wait(); Owners(clean); clean.DismissFromEscape(); yield return Wait(.1f);
+            Command("calltest delay=1"); terminal.enabled = false;
+            Check(Field<Coroutine>(terminal, "delayedCall") == null, "terminal disable cancels pending debug call");
+            terminal.enabled = true; yield return Wait(1.1f);
+            Check(!call.IsActive, "canceled delayed call does not appear later");
+            foreach (string invalid in new[] { "calltest delay=0", "calltest delay=-1", "calltest delay=31",
+                "calltest delay=NaN", "calltest delay=Infinity", "calltest delay=1 extra" }) Command(invalid);
+            Check(!call.IsActive && Field<Coroutine>(terminal, "delayedCall") == null, "invalid delays leave no call or schedule");
+
+            // Generated traffic continues behind the presentation using ordinary scene settings.
+            var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
+            traffic.AutoGenerationEnabled = true; host.ResetSimulation();
+            yield return new WaitUntil(() => host.RuntimeConnections.Any(c => c.IsActive));
+            Command("calltest delay=5"); Command("clean " + host.Nodes.Last().View.NodeId);
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused && call.IsActive);
+            Draft(pid, "527"); yield return Wait(.7f);
+            Owners(call); Preserved(pid, "527"); Capture("generated-traffic-overlap");
+            Check(host.SimulationTimeSeconds > 0 && host.RuntimeConnections.Any(c => c.IsActive),
+                "ordinary generated traffic remains live behind both windows");
+            call.EndCall(); clean.DismissFromEscape(); traffic.AutoGenerationEnabled = false;
+            yield return Wait(.1f);
+
             // Protection runs in real time even if simulation time is stopped by a test.
             Time.timeScale = 0f; call.TryStartSampleCall();
             yield return Wait(.2f); coordinator.enabled = false;
-            Check(!CallHint.activeSelf, "disabled coordinator hides its affordance");
+            Owners(null);
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Escape)); yield return Wait(.05f);
             coordinator.enabled = true; yield return Wait(.25f);
             Check(call.IsActive, "re-enabling during a held Escape does not manufacture a press");
@@ -308,26 +482,32 @@ namespace Uptime.Connections.EditorTools
                 "call/CLEAN lifecycles preserve network geometry and node positions");
         }
 
+        private static Rect LocalRect(RectTransform parent, RectTransform item)
+        {
+            var corners = new Vector3[4]; item.GetWorldCorners(corners);
+            Vector2 min = parent.InverseTransformPoint(corners[0]);
+            Vector2 max = parent.InverseTransformPoint(corners[2]);
+            return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        }
+
+        private static float Overlap(Rect a, Rect b) =>
+            Mathf.Max(0, Mathf.Min(a.xMax, b.xMax) - Mathf.Max(a.xMin, b.xMin)) *
+            Mathf.Max(0, Mathf.Min(a.yMax, b.yMax) - Mathf.Max(a.yMin, b.yMin));
+
+        private static float ContentOverlap(RectTransform parent, Rect window, RectTransform[] parts) =>
+            parts.Sum(part => Overlap(window, LocalRect(parent, part)));
+
         private void Capture(string phase)
         {
             if (string.IsNullOrEmpty(capturePath)) return;
             Directory.CreateDirectory(capturePath);
-            foreach (Vector2Int size in new[] { new Vector2Int(1920,1080), new Vector2Int(1280,720), new Vector2Int(1577,887) })
-            {
-                Canvas canvas = coordinator.GetComponent<Canvas>(); var oldMode = canvas.renderMode; var oldCamera = canvas.worldCamera;
-                var camera = new GameObject("Witness camera", typeof(Camera)).GetComponent<Camera>();
-                camera.orthographic = true; camera.clearFlags = CameraClearFlags.SolidColor;
-                camera.backgroundColor = new Color(.025f,.065f,.08f); camera.transform.position = new Vector3(0,0,-100);
-                camera.nearClipPlane = .1f; camera.farClipPlane = 1000;
-                var target = new RenderTexture(size.x,size.y,24); camera.targetTexture = target;
-                canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = camera; canvas.planeDistance = 10;
-                Canvas.ForceUpdateCanvases(); camera.Render(); var previous = RenderTexture.active; RenderTexture.active = target;
-                var png = new Texture2D(size.x,size.y,TextureFormat.RGB24,false);
-                png.ReadPixels(new Rect(0,0,size.x,size.y),0,0); png.Apply();
-                File.WriteAllBytes(Path.Combine(capturePath, gameObject.scene.name+"-"+phase+"-"+size.x+"x"+size.y+".png"), png.EncodeToPNG());
-                RenderTexture.active = previous; canvas.renderMode = oldMode; canvas.worldCamera = oldCamera;
-                Destroy(camera.gameObject); Destroy(target); Destroy(png); Canvas.ForceUpdateCanvases();
-            }
+            Canvas.ForceUpdateCanvases(); captureCamera.Render();
+            var previous = RenderTexture.active; RenderTexture.active = captureTarget;
+            var png = new Texture2D(captureTarget.width, captureTarget.height, TextureFormat.RGB24, false);
+            png.ReadPixels(new Rect(0, 0, png.width, png.height), 0, 0); png.Apply();
+            File.WriteAllBytes(Path.Combine(capturePath, gameObject.scene.name + "-" + phase + "-" +
+                png.width + "x" + png.height + ".png"), png.EncodeToPNG());
+            RenderTexture.active = previous; Destroy(png);
         }
     }
 }

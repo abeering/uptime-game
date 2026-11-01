@@ -1,5 +1,7 @@
 # Connections — Video Calls & Escape Coordination V0
 
+**Presentation follow-up:** [Presentation & Soft Placement V1](connections-video-call-presentation-v1.md) supersedes this PR #72 baseline's interior, fixed window homes and titlebar hang-up label. Call lifecycle, typewriter, animation and Escape/input rules below remain in effect. V1 adds bounded delayed developer samples. Historical review captures retain the V0 presentation.
+
 **Implemented slice:** Connections only, based on `main` at `3dd3813` after PR #71. The [workspace design in PR #67](https://github.com/abeering/uptime-game/pull/67) remains the broader design reference; this slice implements only one reusable call surface and shared Escape coordination with CLEAN. Packet remains independent.
 
 ## Calls and content entry points
@@ -51,6 +53,6 @@ Both terminal and PID fields use `EscapeSafeInputField`, a narrow TMP subclass. 
 
 ## Validation and limits
 
-`Tools/Connections/Run Escape and Video Call Witness (Play Mode)` runs the focused checks in the four-node scene and stops Play Mode when done. Batch mode accepts `-witnessScene ConnectionsAdvanced`; optional `-capturePath <directory>` records the authored Canvas at 1920×1080, 1280×720, and 1577×887. The witness covers native TMP/UI cancellation, both ordering cases, focus/draft/selection preservation, one dismissal per press, held keys, automatic appearance/removal protection, result ineligibility, reset/disable/destroy cleanup, simulation continuation, subtitle interruption/completion, sprite/talking hooks, long content, and unscaled protection. Existing CLEAN, Infection, Health, Inspect V2, Resolved Inspect, and Advanced Scene witnesses cover adjacent mechanics and layout.
+`Tools/Connections/Run Escape and Video Call Witness (Play Mode)` runs the focused checks in the four-node scene and stops Play Mode when done. Batch mode accepts `-witnessScene ConnectionsAdvanced`; optional `-capturePath <directory>` records the authored Canvas. The V1 witness selects one persistent render size per run with `-witnessWidth` / `-witnessHeight`; run each requested size separately. The witness covers native TMP/UI cancellation, both ordering cases, focus/draft/selection preservation, one dismissal per press, held keys, automatic appearance/removal protection, result ineligibility, reset/disable/destroy cleanup, simulation continuation, subtitle interruption/completion, sprite/talking hooks, long content, and unscaled protection. Existing CLEAN, Infection, Health, Inspect V2, Resolved Inspect, and Advanced Scene witnesses cover adjacent mechanics and layout.
 
 See the [review evidence and manual checklist](../Review/ConnectionsVideoCallEscapeV0/README.md) for actual runs and caveats. No notifications, storyteller, Level Director, traffic/threat changes, pause/menu, source blocking, player progression, or Packet changes are part of this slice.

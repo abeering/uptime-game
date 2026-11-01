@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,6 +31,9 @@ namespace Uptime.Connections
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
         [SerializeField] private Color errorColor = new(1f, 0.63f, 0.39f);
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private Coroutine delayedCall;
+#endif
         private int entryCount;
         private bool scrollPending;
         private Coroutine bottomScrollRoutine;
@@ -68,11 +72,52 @@ namespace Uptime.Connections
 
         private void OnDisable()
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (delayedCall != null) StopCoroutine(delayedCall);
+            delayedCall = null;
+#endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
             if (simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void DeveloperCallTest(string[] tokens)
+        {
+            float delay = 0f;
+            if (tokens.Length != 1 && (tokens.Length != 2 || !tokens[1].StartsWith("delay=") ||
+                !float.TryParse(tokens[1].Substring(6), NumberStyles.AllowDecimalPoint,
+                    CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
+                float.IsInfinity(delay) || delay < 1f || delay > 30f))
+            {
+                AppendText("USAGE  calltest [delay=1..30]", errorColor);
+                return;
+            }
+            if (delayedCall != null || videoCall == null || videoCall.IsActive)
+            {
+                AppendText("TEST CALL UNAVAILABLE, ACTIVE OR ALREADY SCHEDULED", mutedColor);
+                return;
+            }
+            if (delay == 0f)
+                AppendText(videoCall.TryStartSampleCall() ? "DEVELOPER TEST CALL OPENED" :
+                    "TEST CALL UNAVAILABLE OR ALREADY ACTIVE", mutedColor);
+            else
+            {
+                delayedCall = StartCoroutine(OpenDelayedCall(delay));
+                AppendText("DEVELOPER TEST CALL SCHEDULED  /  " +
+                    delay.ToString("0.##", CultureInfo.InvariantCulture) + "s", mutedColor);
+            }
+        }
+
+        private IEnumerator OpenDelayedCall(float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            delayedCall = null;
+            // No history write or input/focus transfer when an unsolicited test arrives.
+            if (videoCall != null) videoCall.TryStartSampleCall();
+        }
+#endif
 
         private void OnInterceptSucceeded(PayloadState payload)
         {
@@ -279,9 +324,7 @@ namespace Uptime.Connections
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "calltest":
-                    if (tokens.Length != 1) AppendText("USAGE  calltest", errorColor);
-                    else AppendText(videoCall != null && videoCall.TryStartSampleCall() ?
-                        "DEVELOPER TEST CALL OPENED" : "TEST CALL UNAVAILABLE OR ALREADY ACTIVE", mutedColor);
+                    DeveloperCallTest(tokens);
                     break;
                 case "worm":
                     if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
@@ -495,7 +538,7 @@ namespace Uptime.Connections
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
-                    AppendText("DEV  calltest  // sample video call; not a network event", mutedColor);
+                    AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);

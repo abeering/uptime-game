@@ -14,7 +14,16 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text bodyText;
         [SerializeField] private Image portraitImage;
         [SerializeField] private GameObject portraitFallback;
-        [SerializeField] private GameObject hangUpHint;
+        [SerializeField] private ConnectionsWindowPlacement placement;
+        [SerializeField] private Image hangUpCircle;
+        [SerializeField] private Image hangUpHandset;
+        [SerializeField] private TMP_Text hangUpKeycap;
+        [SerializeField] private Color activeCircle = new(.65f, .23f, .27f);
+        [SerializeField] private Color activeHandset = new(.98f, .97f, .94f);
+        [SerializeField] private Color activeKeycap = new(1f, .78f, .77f);
+        [SerializeField] private Color inactiveCircle = new(.25f, .30f, .32f);
+        [SerializeField] private Color inactiveHandset = new(.55f, .61f, .62f);
+        [SerializeField] private Color inactiveKeycap = new(.46f, .54f, .55f);
         [SerializeField] private Animator portraitAnimator;
         [SerializeField] private string talkingBoolName = "IsTalking";
         [SerializeField, Min(1f)] private float charactersPerSecond = 45f;
@@ -27,11 +36,11 @@ namespace Uptime.Connections
         public bool CanDismissWithEscape => IsActive;
 
         // Duplicate or unavailable requests leave the current call untouched.
-        // Future directors supply content; placement and typing remain scene-owned.
+        // Future directors supply content; typing remains independent of presentation and placement.
         public bool TryStartCall(ConnectionsVideoCallData data)
         {
             if (data == null || active || !enabled || (transform.parent != null && !transform.parent.gameObject.activeInHierarchy) ||
-                escapeCoordinator == null || !escapeCoordinator.isActiveAndEnabled)
+                escapeCoordinator == null || !escapeCoordinator.isActiveAndEnabled || placement == null)
                 return false;
             active = true;
             callerText.text = "CALL / " + (string.IsNullOrWhiteSpace(data.CallerName) ?
@@ -44,6 +53,7 @@ namespace Uptime.Connections
             bodyText.maxVisibleCharacters = 0;
             bodyText.pageToDisplay = 1;
             gameObject.SetActive(true);
+            placement.PlaceCall();
             transform.SetAsLastSibling();
             escapeCoordinator.Register(this);
             bodyText.ForceMeshUpdate();
@@ -58,7 +68,13 @@ namespace Uptime.Connections
             gameObject.SetActive(false);
         }
 
-        public void SetEscapeTarget(bool targeted) => hangUpHint.SetActive(targeted && CanDismissWithEscape);
+        public void SetEscapeTarget(bool targeted)
+        {
+            bool highlight = targeted && CanDismissWithEscape;
+            hangUpCircle.color = highlight ? activeCircle : inactiveCircle;
+            hangUpHandset.color = highlight ? activeHandset : inactiveHandset;
+            hangUpKeycap.color = highlight ? activeKeycap : inactiveKeycap;
+        }
         public void DismissFromEscape() => EndCall(); // Never skip subtitles before hanging up.
 
         private void OnEnable()
@@ -81,7 +97,7 @@ namespace Uptime.Connections
             typeRoutine = null;
             IsTyping = false;
             SetTalking(false);
-            if (hangUpHint != null) hangUpHint.SetActive(false);
+            if (hangUpCircle != null) SetEscapeTarget(false);
         }
 
         private IEnumerator TypeBody()
