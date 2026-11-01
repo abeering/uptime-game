@@ -1,0 +1,72 @@
+Unity 6000.3.11f1 — compact Health validation excerpts
+Base: main 1a52c8b (PR #69 merged)
+Temporary review runners lived only in /private/tmp/uptime-compact-health-validation.
+See README.md for setup, capture limits, indexing caveat, and remaining interactive checks.
+
+Editor witnesses
+NetworkHealthWitness bar layout: 309 x 18, rate reserve 76.8
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar layout: 309 x 18, rate reserve 76.8
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness ordinary: expected 100, observed 100
+NetworkHealthWitness contention: expected 3.333 LOAD, -0.50/s, first overdue -1.53/s, next -1.59/s, -10 kill, +1.75 over 5s recovery; observed 3.333 LOAD, 1.53/s first late, 61.13 after recovery
+NetworkHealthWitness multi-kill: expected -20 Health, 3 kills, 7 recorded attempts; observed 80 Health, 7 attempts.
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+LoadOutputWitness PASS: commands, both scenes, dynamic requests, contention, relative scale and contraction, infection boundary, multi-panel, responsive layout, resolution, reset.
+ADVANCED SEED 1701: benign=23, hostile=13, recon=5, EXT1=29, EXT2=12, infections=5, log=/private/tmp/uptime-compact-health-validation/Logs/UptimeRuns/uptime_20261101_030208_seed-01701_30d4b73f.json
+ADVANCED SEED 3141: benign=27, hostile=4, recon=1, EXT1=18, EXT2=14, infections=3, log=/private/tmp/uptime-compact-health-validation/Logs/UptimeRuns/uptime_20261101_030208_seed-03141_cef2c21c.json
+ADVANCED SEED 9001: benign=15, hostile=12, recon=7, EXT1=26, EXT2=8, infections=9, log=/private/tmp/uptime-compact-health-validation/Logs/UptimeRuns/uptime_20261101_030209_seed-09001_b3c9fb19.json
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+COMPACT CAPTURE Connections 1920x1080
+COMPACT CAPTURE Connections 1280x720
+COMPACT CAPTURE ConnectionsAdvanced 1920x1080
+COMPACT CAPTURE ConnectionsAdvanced 1280x720
+COMPACT HEALTH REVIEW PASS: five witnesses and four scene captures
+
+Scripted Play: Connections
+PLAY CHECK: authoritative contention drains Health
+PLAY CHECK: command submission restores prompt focus
+PLAY CHECK: Tab preserves actual TMP focus and EventSystem selection
+PLAY CHECK: Tab preserves draft and selection
+PLAY CHECK: Tab preserves history position
+PLAY CHECK: Tab leaves compact strip and both pane geometries fixed
+PLAY CHECK: Tab preserves actual TMP focus and EventSystem selection
+PLAY CHECK: Tab preserves draft and selection
+PLAY CHECK: Tab preserves history position
+PLAY CHECK: Tab leaves compact strip and both pane geometries fixed
+PLAY CHECK: sustained drain is orange
+PLAY CHECK: numeric Health and signed rate match live host
+PLAY CHECK: real help/inspect history overflows
+PLAY CHECK: Page Up scrolls while prompt stays focused
+PLAY CHECK: new output follows bottom and restores focus
+PLAY CHECK: appending output preserves browsed history position
+PLAY CHECK: authoritative critical Health recovers after release
+PLAY CHECK: critical recovery stays red
+PLAY CHECK: settled noncritical recovery is teal
+COMPACT HEALTH SCRIPTED PLAY PASS: Connections
+
+Scripted Play: ConnectionsAdvanced
+PLAY CHECK: authoritative contention drains Health
+PLAY CHECK: command submission restores prompt focus
+PLAY CHECK: Tab preserves actual TMP focus and EventSystem selection
+PLAY CHECK: Tab preserves draft and selection
+PLAY CHECK: Tab preserves history position
+PLAY CHECK: Tab leaves compact strip and both pane geometries fixed
+PLAY CHECK: Tab preserves actual TMP focus and EventSystem selection
+PLAY CHECK: Tab preserves draft and selection
+PLAY CHECK: Tab preserves history position
+PLAY CHECK: Tab leaves compact strip and both pane geometries fixed
+PLAY CHECK: sustained drain is orange
+PLAY CHECK: numeric Health and signed rate match live host
+PLAY CHECK: real help/inspect history overflows
+PLAY CHECK: Page Up scrolls while prompt stays focused
+PLAY CHECK: new output follows bottom and restores focus
+PLAY CHECK: appending output preserves browsed history position
+PLAY CHECK: authoritative critical Health recovers after release
+PLAY CHECK: critical recovery stays red
+PLAY CHECK: settled noncritical recovery is teal
+COMPACT HEALTH SCRIPTED PLAY PASS: ConnectionsAdvanced

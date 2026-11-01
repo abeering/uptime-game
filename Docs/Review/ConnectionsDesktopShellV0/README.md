@@ -1,5 +1,7 @@
 # Connections Desktop Shell V0 review
 
+**Historical presentation evidence:** The expanded Health tray and Tab behavior shown below were subsequently removed. See the [permanent compact Health review](../ConnectionsCompactHealth/README.md) for current behavior and validation. These captures and original checks are retained as PR #69 provenance.
+
 These are static Unity 6000.3.11f1 Editor renders of the two playable Connections scenes. The before images use `main` at `b861a25` (PR #68 merged); the previous-shell images use `6c33314`; the after images include the independent window frames. The temporary capture setup rendered the authored Canvas through a camera at the named resolution. They are presentation previews, not interactive Play Mode evidence; live traffic, logical paths, terminal history, and keyboard focus need the checks below.
 
 | Scene | Before, 1920×1080 | After, 1920×1080 | After, 1280×720 | Expanded Health | PID-Select overlay |
