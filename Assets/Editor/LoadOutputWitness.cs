@@ -112,7 +112,7 @@ namespace Uptime.Connections.EditorTools
                     Check(panel.ConnectionRowCount == 3 && second.ConnectionRowCount == 3 &&
                         spike.IsDemanding && wave.IsDemanding &&
                         panel.CurrentScale == second.CurrentScale &&
-                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l2", "l3" }),
                         "multiple panels share authoritative requests independently");
                     CheckBottomGutter(panel, 3);
                     float low = spike.DesiredLoad;
@@ -136,7 +136,7 @@ namespace Uptime.Connections.EditorTools
                         Row(panel, "l1").FillFraction > lowBar &&
                         panel.CurrentScale == 21f &&
                         RowFill(Row(panel, "l1")).color == PanelColor(panel, "extremeColor") &&
-                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }) &&
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l2", "l3" }) &&
                         Row(second, "l1").DisplayedValue == "18.0",
                         "SPIKING row follows changing DesiredLoad despite constrained allocation");
                     Check(wave.DesiredLoad != wave.BaseLoad &&
@@ -154,7 +154,7 @@ namespace Uptime.Connections.EditorTools
                         panel.CurrentScale == highScale &&
                         Row(panel, "l1").FillFraction <
                             Row(panel, "l2").FillFraction &&
-                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l2", "l3" }),
                         "SPIKING bar falls promptly while scale holds its short grace period");
                     RefreshAt(panel, clock + 1.6f);
                     Check(panel.CurrentScale < highScale && panel.CurrentScale > 9.5f,
@@ -162,7 +162,7 @@ namespace Uptime.Connections.EditorTools
                     RefreshAt(panel, clock + 4.1f);
                     Check(panel.CurrentScale <= 9.75f &&
                         panel.CurrentScale >= 9.5f &&
-                        RowIds(panel).SequenceEqual(new[] { "l2", "l1", "l3" }),
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l2", "l3" }),
                         "scale contracts smoothly toward live demand after the spike");
 
                     Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 3f,
@@ -205,14 +205,23 @@ namespace Uptime.Connections.EditorTools
                         panel.ConnectionRowCount == 3 &&
                         Row(panel, "l4").DisplayedValue == "3.0",
                         "new requesting connection appears without a new command");
+                    Queue(traffic, route, "a0", new OperationStage(OperationKind.Read,
+                        1000f, 1f, "later low request"));
+                    host.StepSimulation(.1f);
+                    RefreshAt(panel, clock + 8.45f);
+                    Check(RowIds(panel).SequenceEqual(new[] { "l1", "l3", "l4", "a0" }) &&
+                        host.FindConnection("a0").EstablishedAtSeconds >
+                            transition.EstablishedAtSeconds,
+                        "later establishment stays last despite an earlier ID");
                     for (int step = 0; step < 40 && transition.CurrentOperationIndex == 0; step++)
                         host.StepSimulation(.25f);
                     host.StepSimulation(.1f); // Publish the next operation's new request.
                     RefreshAt(panel, clock + 8.5f);
                     Check(transition.CurrentOperationIndex == 1 && transition.IsDemanding &&
                         Row(panel, "l4").DisplayedValue == "9.0" &&
-                        panel.ConnectionRowCount == 3,
-                        "operation transition updates the same identity row");
+                        panel.ConnectionRowCount == 4 &&
+                        RowIds(panel).SequenceEqual(new[] { "l1", "l3", "l4", "a0" }),
+                        "transitioning demand returns to its establishment-time position");
                     host.ResetSimulation();
                     Refresh(panel); Refresh(second);
                     Check(panel.ConnectionRowCount == 0 && second.ConnectionRowCount == 0 &&
