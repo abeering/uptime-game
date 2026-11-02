@@ -24,6 +24,7 @@ namespace Uptime.Connections
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private ConnectionsVideoCall videoCall;
+        [SerializeField] private TextCommunicationDirector textCommunications;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField, Min(1)] private int maxCommandHistory = 100;
         [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
@@ -33,6 +34,7 @@ namespace Uptime.Connections
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         private Coroutine delayedCall;
+        private Coroutine delayedNotification;
 #endif
         private int entryCount;
         private bool scrollPending;
@@ -66,6 +68,10 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.SimulationReset += CancelNotificationTest;
+#endif
             if (Application.isPlaying && simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded += OnInterceptSucceeded;
         }
@@ -75,6 +81,8 @@ namespace Uptime.Connections
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (delayedCall != null) StopCoroutine(delayedCall);
             delayedCall = null;
+            CancelNotificationTest();
+            if (simulationHost != null) simulationHost.SimulationReset -= CancelNotificationTest;
 #endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
@@ -83,6 +91,43 @@ namespace Uptime.Connections
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void CancelNotificationTest()
+        {
+            if (delayedNotification != null) StopCoroutine(delayedNotification);
+            delayedNotification = null;
+        }
+
+        private void DeveloperNotificationTest(string[] tokens)
+        {
+            float delay = 0;
+            if (tokens.Length < 2 || tokens.Length > 3 ||
+                (tokens[1] != "im" && tokens[1] != "system" && tokens[1] != "burst") ||
+                (tokens.Length == 3 && (!tokens[2].StartsWith("delay=") ||
+                    !float.TryParse(tokens[2].Substring(6), NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
+                    float.IsInfinity(delay) || delay < 1 || delay > 30)))
+            {
+                AppendText("USAGE  notifytest im|system|burst [delay=1..30]", errorColor);
+                return;
+            }
+            if (textCommunications == null || !textCommunications.isActiveAndEnabled || delayedNotification != null)
+            {
+                AppendText("DEVELOPER MESSAGE TEST UNAVAILABLE OR ALREADY SCHEDULED", mutedColor);
+                return;
+            }
+            if (delay == 0) textCommunications.PushSample(tokens[1]);
+            else delayedNotification = StartCoroutine(OpenDelayedNotification(tokens[1], delay));
+            AppendText(delay == 0 ? "DEVELOPER MESSAGE SAMPLE DELIVERED" : "DEVELOPER MESSAGE SAMPLE SCHEDULED", mutedColor);
+        }
+
+        private IEnumerator OpenDelayedNotification(string kind, float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            delayedNotification = null;
+            // Delivery performs no terminal history write or input/focus operation.
+            if (textCommunications != null) textCommunications.PushSample(kind);
+        }
+
         private void DeveloperCallTest(string[] tokens)
         {
             float delay = 0f;
@@ -323,6 +368,9 @@ namespace Uptime.Connections
                     }
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "notifytest":
+                    DeveloperNotificationTest(tokens);
+                    break;
                 case "calltest":
                     DeveloperCallTest(tokens);
                     break;
@@ -538,6 +586,7 @@ namespace Uptime.Connections
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
