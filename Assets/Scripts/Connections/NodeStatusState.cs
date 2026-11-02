@@ -28,6 +28,14 @@ namespace Uptime.Connections
 
         public void SetOffline(bool offline) => Offline = offline;
 
+        // Presentation lab only: permit synthetic knowledge/acknowledgment overlap.
+        // Gameplay continues to acquire these through ScanResult/CleanSucceeded.
+        internal void SetPreviewDiagnosis(bool infected, float cleanExpiresAt)
+        {
+            KnownInfected = infected;
+            cleanUntil = cleanExpiresAt;
+        }
+
         public void ScanResult(NodeScanResult result, float realTime, float cleanSeconds)
         {
             if (result == NodeScanResult.Infected)
