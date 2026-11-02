@@ -341,18 +341,18 @@ namespace Uptime.Connections
                     Work(tokens);
                     break;
                 case "intercept":
-                    if (tokens.Length != 4 || tokens[2] != "@")
-                        AppendText("USAGE  intercept <payloadId> @ <nodeId>", errorColor);
+                    if (!TryParseIntercept(tokens, out string interceptPayloadId, out string interceptNodeId))
+                        AppendText("USAGE  intercept [payloadId] @ <nodeId>", errorColor);
                     else if (simulationHost?.Payloads == null)
                         AppendText("INTERCEPT  simulation unavailable", errorColor);
                     else
                     {
-                        bool armed = simulationHost.Payloads.TryIntercept(tokens[1], tokens[3],
+                        bool armed = simulationHost.Payloads.TryIntercept(interceptPayloadId, interceptNodeId,
                             out string interceptError, command);
-                        if (!armed) recorder?.RecordPlayerAction(command, tokens[1], false,
-                            tokens[3], interceptError);
-                        AppendText(armed ? "INTERCEPT ACTIVE  " + tokens[1].ToLowerInvariant() +
-                            " @ " + tokens[3].ToUpperInvariant() : "INTERCEPT  " + interceptError,
+                        if (!armed) recorder?.RecordPlayerAction(command, interceptPayloadId, false,
+                            interceptNodeId, interceptError);
+                        AppendText(armed ? "INTERCEPT ACTIVE  " + (interceptPayloadId?.ToLowerInvariant() ?? "ALL") +
+                            " @ " + interceptNodeId.ToUpperInvariant() : "INTERCEPT  " + interceptError,
                             armed ? normalColor : errorColor);
                     }
                     break;
@@ -586,7 +586,7 @@ namespace Uptime.Connections
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  isolate <nodeId>", mutedColor);
+                    AppendText("DEFENSE  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -905,6 +905,22 @@ namespace Uptime.Connections
                 AppendText("INSPECT  output unavailable", errorColor);
             else
                 block.Bind(selected.ToArray(), simulationHost.PresentationPalette, mode);
+        }
+
+        public static bool TryParseIntercept(string[] tokens, out string payloadId, out string nodeId)
+        {
+            payloadId = null;
+            nodeId = null;
+            if (tokens == null) return false;
+            if (tokens.Length == 3 && tokens[1] == "@")
+                nodeId = tokens[2];
+            else if (tokens.Length == 4 && tokens[2] == "@" &&
+                !string.IsNullOrWhiteSpace(tokens[1]) && tokens[1] != "@")
+            {
+                payloadId = tokens[1];
+                nodeId = tokens[3];
+            }
+            return !string.IsNullOrWhiteSpace(nodeId) && nodeId != "@";
         }
 
         public static bool TryParseInspect(string[] tokens,

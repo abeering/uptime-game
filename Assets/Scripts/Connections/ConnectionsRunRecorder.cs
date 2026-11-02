@@ -262,6 +262,8 @@ namespace Uptime.Connections
         public float interceptActivatedAtSeconds;
         public float interceptExpiresAtSeconds;
         public float interceptCooldownUntilSeconds;
+        public bool interceptAllPayloads;
+        public int interceptCaughtCount;
         public float defensiveRequestedLoad;
         public float defensiveAllocatedLoad;
         public string wormOutbreakId;
@@ -352,6 +354,8 @@ namespace Uptime.Connections
     [Serializable] public sealed class InterceptionSnapshot
     {
         public string payloadId;
+        public bool allPayloads;
+        public int caughtCount;
         public string nodeId;
         public float activatedAtSeconds;
         public float expiresAtSeconds;
@@ -819,11 +823,13 @@ namespace Uptime.Connections
         }
 
         public void RecordIntercept(string type, InterceptionState state, float time,
-            float requested, float allocated)
+            float requested, float allocated, string interceptedPayloadId = null)
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent(type, time);
-            entry.payloadId = state.PayloadId;
+            entry.payloadId = interceptedPayloadId ?? state.PayloadId;
+            entry.interceptAllPayloads = state.AllPayloads;
+            entry.interceptCaughtCount = state.CaughtCount;
             entry.targetNodeId = state.Node.View.NodeId;
             entry.interceptActivatedAtSeconds = state.ActivatedAt;
             entry.interceptExpiresAtSeconds = state.ExpiresAt;
@@ -1144,6 +1150,7 @@ namespace Uptime.Connections
                 var armed = new List<InterceptionSnapshot>();
                 foreach (InterceptionState interceptor in host.Payloads.Interceptors)
                     armed.Add(new InterceptionSnapshot { payloadId = interceptor.PayloadId,
+                        allPayloads = interceptor.AllPayloads, caughtCount = interceptor.CaughtCount,
                         nodeId = interceptor.Node.View.NodeId,
                         activatedAtSeconds = interceptor.ActivatedAt,
                         expiresAtSeconds = interceptor.ExpiresAt,

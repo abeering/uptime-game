@@ -49,7 +49,7 @@ namespace Uptime.Connections
             bool pain = state.Offline || state.KnownInfected || state.ScanJammed;
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
-            bool intercept = state.InterceptPayloadId != null;
+            bool intercept = state.InterceptActive;
             bool benefit = clean || intercept || state.Isolated;
             bool[] desired = { pain, awareness, benefit };
             NodeStatusBandGraphic[] bands = { painBand, awarenessBand, benefitBand };
@@ -104,7 +104,8 @@ namespace Uptime.Connections
                 string interceptText = state.InterceptSucceeded ? "CAUGHT " :
                     "INTERCEPT ";
                 if (intercept)
-                { rows.Add(interceptText + state.InterceptPayloadId);
+                { rows.Add(state.InterceptAllPayloads ? "INTERCEPT ALL" :
+                        interceptText + state.InterceptPayloadId);
                     timers.Add(state.InterceptRemainingFraction); }
                 SetRows(benefitPanel, rows, timers, benefitColor);
             }
