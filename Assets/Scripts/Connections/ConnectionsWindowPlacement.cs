@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    // Two Connections surfaces, placed only on open. No input or Escape ownership.
+    // Connections windows are placed only on open. No input or Escape ownership.
     public sealed class ConnectionsWindowPlacement : MonoBehaviour
     {
         [SerializeField] private RectTransform viewport;
@@ -10,6 +10,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private RectTransform[] callContent;
         [SerializeField] private RectTransform[] cleanContent;
+        [SerializeField] private TextCommunicationDirector textCommunications;
 
         public void PlaceCall() => Place((RectTransform)videoCall.transform,
             cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform : null, cleanContent, null);
@@ -70,6 +71,9 @@ namespace Uptime.Connections
                     foreach (RectTransform existingPart in otherContent)
                         score += Overlap(rect, InViewport(existingPart)) * 10f;
                 }
+                if (textCommunications != null && textCommunications.isActiveAndEnabled)
+                    foreach (RectTransform content in textCommunications.ReadableContent())
+                        score += Overlap(rect, InViewport(content)) * 10f;
                 if (score >= bestScore) continue; // Stable deterministic tie order.
                 bestScore = score;
                 best = center;
