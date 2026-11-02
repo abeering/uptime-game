@@ -7,3 +7,7 @@ When introducing WAVING to generated connections, evaluate it alongside existing
 If necessary, experiment with faster, irregular noise cadence (~1 second) and a small absolute jitter floor (~±0.1 LOAD), preserving the recognizable underlying waveform.
 
 Goal: make individual LOAD changes feel organic without sacrificing the larger behavioral pattern.
+
+# TODO - make tne inspection "closes" more smooth - animate them to closed 
+
+# TODO - check tool card gutters - minimize 

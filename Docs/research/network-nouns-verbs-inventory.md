@@ -53,6 +53,7 @@ These are names to consider, not a formal node taxonomy. Some may prove better a
 - `failover`
 - `repair`
 - `policy`
+- `overclock` 
 
 Some verbs already exist in Connections, some were implemented differently in Packet, and others are just names for possible future actions. They are not all approved command names.
 
