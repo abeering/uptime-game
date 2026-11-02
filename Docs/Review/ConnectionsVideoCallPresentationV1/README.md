@@ -1,5 +1,7 @@
 # Connections — Video Call Presentation & Soft Placement V1 review
 
+**Initial `ae35159` evidence:** The captures and validation below retain the first PR #73 presentation. See the [focused review refinement](Refinement/README.md) for the current 520×400 window, 16:9 feed, softer scrim, synchronized titlebar/bottom Escape indicators and CLEAN label-protection case.
+
 Baseline: merged PR #72, `main` at `ddb955ba3bd9b37aea3c311c9c192c4a50e4dc49`. Connections only. See the [implementation contract](../../Connections/connections-video-call-presentation-v1.md).
 
 ## Before and after

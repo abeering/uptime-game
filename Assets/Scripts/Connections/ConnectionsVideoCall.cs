@@ -18,6 +18,7 @@ namespace Uptime.Connections
         [SerializeField] private Image hangUpCircle;
         [SerializeField] private Image hangUpHandset;
         [SerializeField] private TMP_Text hangUpKeycap;
+        [SerializeField] private TMP_Text hangUpTitleHint;
         [SerializeField] private Color activeCircle = new(.65f, .23f, .27f);
         [SerializeField] private Color activeHandset = new(.98f, .97f, .94f);
         [SerializeField] private Color activeKeycap = new(1f, .78f, .77f);
@@ -74,6 +75,7 @@ namespace Uptime.Connections
             hangUpCircle.color = highlight ? activeCircle : inactiveCircle;
             hangUpHandset.color = highlight ? activeHandset : inactiveHandset;
             hangUpKeycap.color = highlight ? activeKeycap : inactiveKeycap;
+            if (hangUpTitleHint != null) hangUpTitleHint.color = hangUpKeycap.color;
         }
         public void DismissFromEscape() => EndCall(); // Never skip subtitles before hanging up.
 

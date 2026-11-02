@@ -65,7 +65,7 @@ namespace Uptime.Connections.EditorTools
                 EscapeVideoCallChecks.Field<TMP_InputField>(clean, "pidInput") is EscapeSafeInputField,
                 "both typing fields reserve native Escape");
             Check(!call.gameObject.activeSelf && call.transform.parent == clean.transform.parent &&
-                ((RectTransform)call.transform).sizeDelta == new Vector2(560, 360),
+                ((RectTransform)call.transform).sizeDelta == new Vector2(520, 400),
                 "inactive compact call has an authored network position");
             foreach (string part in new[] { "CallTitlebar", "CallWindowFrame" })
                 Check(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(call.transform.Find(part).gameObject) ==
@@ -83,16 +83,21 @@ namespace Uptime.Connections.EditorTools
             var body = EscapeVideoCallChecks.Field<TMP_Text>(call, "bodyText");
             var panel = body.transform.parent.GetComponent<Image>();
             var handset = EscapeVideoCallChecks.Field<Image>(call, "hangUpHandset");
-            Check(body.transform.parent.parent.name == "VideoFeed" && panel.color.a > .5f && panel.color.a < 1f &&
+            var feed = (RectTransform)call.transform.Find("VideoFeed");
+            Check(body.transform.parent.parent.name == "VideoFeed" && Mathf.Approximately(panel.color.a, .6f) &&
                 body.overflowMode == TextOverflowModes.Page && body.rectTransform.rect.height >= 60 &&
-                ((RectTransform)call.transform.Find("VideoFeed")).rect.width > 500 &&
-                ((RectTransform)call.transform.Find("VideoFeed")).rect.height >= 240,
-                "large video region contains translucent, paginated subtitle overlay");
+                Mathf.Abs(feed.rect.width / feed.rect.height - 16f / 9f) < .001f && feed.rect.width >= 480 &&
+                body.rectTransform.offsetMin == new Vector2(16, 10) &&
+                body.rectTransform.offsetMax == new Vector2(-16, -10),
+                "dominant 16:9 feed contains a softer inset, padded and paginated subtitle overlay");
+            var titleHint = EscapeVideoCallChecks.Field<TMP_Text>(call, "hangUpTitleHint");
             Check(AssetDatabase.GetAssetPath(handset.sprite) == "Assets/Images/phone.png" && handset.preserveAspect &&
                 EscapeVideoCallChecks.Field<Image>(call, "hangUpCircle").sprite != handset.sprite &&
                 EscapeVideoCallChecks.Field<TMP_Text>(call, "hangUpKeycap").text == "[ESC]" &&
-                call.transform.Find("CallTitlebar/HangUpHint") == null,
-                "one supplied handset sprite, separate circular UI background and single bottom ESC keycap");
+                titleHint != null && titleHint.text == "[ESC] HANG UP" && titleHint.transform.parent.name == "CallTitlebar",
+                "same supplied handset and both authored Escape indicators without clickable controls");
+            Check(EscapeVideoCallChecks.Field<RectTransform[]>(placement, "cleanContent")
+                .Contains(clean.transform.Find("CleanTitlebar/Title")), "CLEAN title is protected alongside process body and PID input");
             Debug.Log("EscapeVideoCallWitness bindings PASS: " + terminal.gameObject.scene.name);
         }
 
@@ -147,8 +152,10 @@ namespace Uptime.Connections.EditorTools
                 CallCircle.gameObject.activeInHierarchy == call.IsActive &&
                 CallCircle.color == Field<Color>(call, ReferenceEquals(target, call) ? "activeCircle" : "inactiveCircle") &&
                 Field<Image>(call, "hangUpHandset").color == Field<Color>(call, ReferenceEquals(target, call) ? "activeHandset" : "inactiveHandset") &&
-                Field<TMP_Text>(call, "hangUpKeycap").color == Field<Color>(call, ReferenceEquals(target, call) ? "activeKeycap" : "inactiveKeycap"),
-                "LIFO target alone is highlighted; live call retains its red/gray handset group");
+                Field<TMP_Text>(call, "hangUpKeycap").color == Field<Color>(call, ReferenceEquals(target, call) ? "activeKeycap" : "inactiveKeycap") &&
+                Field<TMP_Text>(call, "hangUpTitleHint").color == Field<TMP_Text>(call, "hangUpKeycap").color &&
+                Field<TMP_Text>(call, "hangUpTitleHint").gameObject.activeInHierarchy == call.IsActive,
+                "one Escape owner drives both titlebar and bottom indicators; the inactive call stays visible");
         }
         private void Draft(TMP_InputField input, string value)
         {
@@ -385,10 +392,19 @@ namespace Uptime.Connections.EditorTools
                 previousPosition = clean.transform.localPosition;
                 Capture("clean-node-" + node.View.NodeId); lastCleanBounds = bounds;
                 Vector3 cleanHome = clean.transform.localPosition;
-                Rect preferredCall = new(network.rect.xMax - 24 - 560, network.rect.yMax - 64 - 360, 560, 360);
+                Vector2 callSize = ((RectTransform)call.transform).rect.size;
+                Rect preferredCall = new(new Vector2(network.rect.xMax - 24 - callSize.x, network.rect.yMax - 64 - callSize.y), callSize);
                 float preferredObstruction = ContentOverlap(network, preferredCall, cleanParts);
                 call.TryStartSampleCall();
                 float chosenObstruction = ContentOverlap(network, LocalRect(network, (RectTransform)call.transform), cleanParts);
+                yield return Wait(.35f);
+                Rect arrivingCall = LocalRect(network, (RectTransform)call.transform);
+                Rect cleanTitle = LocalRect(network, Field<TMP_Text>(clean, "title").rectTransform);
+                Rect headings = LocalRect(network, Field<TMP_Text>(clean, "body").rectTransform);
+                headings.yMin = headings.yMax - 32;
+                Debug.Log("CALL LABEL OVERLAP " + node.View.NodeId + ": title=" + Overlap(arrivingCall, cleanTitle) +
+                    ", headings=" + Overlap(arrivingCall, headings) + ", content=" + chosenObstruction);
+                Capture("call-over-clean-node-" + node.View.NodeId);
                 Check(Vector3.Distance(cleanHome, clean.transform.localPosition) < .01f,
                     "call candidates preserve existing node-bound CLEAN position");
                 if (preferredObstruction > chosenObstruction + 1)
@@ -402,6 +418,33 @@ namespace Uptime.Connections.EditorTools
             }
             Check(differentHomes, "different target nodes produce different CLEAN homes");
             Check(avoidedObstruction, "a better call candidate avoids important CLEAN content");
+
+            // Targeted review fixture: the preferred call home clips CLEAN's title and PID/CPU row.
+            // Stage the older window once, then let the unchanged open-time policy place the call.
+            Command("clean " + host.Nodes.First().View.NodeId);
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            Draft(pid, "527");
+            Vector2 reviewCallSize = ((RectTransform)call.transform).rect.size;
+            Rect reviewHome = new(new Vector2(network.rect.xMax - 24 - reviewCallSize.x,
+                network.rect.yMax - 64 - reviewCallSize.y), reviewCallSize);
+            Rect cleanBefore = LocalRect(network, (RectTransform)clean.transform);
+            Rect stagedClean = new(new Vector2(network.rect.xMax - 12 - cleanBefore.width,
+                reviewHome.yMin + 100 - cleanBefore.height), cleanBefore.size);
+            clean.transform.position += network.TransformVector(stagedClean.center - cleanBefore.center);
+            Vector3 stagedPosition = clean.transform.localPosition;
+            Rect reviewTitle = LocalRect(network, Field<TMP_Text>(clean, "title").rectTransform);
+            Rect reviewHeadings = LocalRect(network, Field<TMP_Text>(clean, "body").rectTransform);
+            reviewHeadings.yMin = reviewHeadings.yMax - 32;
+            Check(Overlap(reviewHome, reviewTitle) > 0 && Overlap(reviewHome, reviewHeadings) > 0,
+                "review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings");
+            call.TryStartSampleCall(); yield return Wait(.5f);
+            Rect adjustedCall = LocalRect(network, (RectTransform)call.transform);
+            Check(Overlap(adjustedCall, reviewTitle) < .1f && Overlap(adjustedCall, reviewHeadings) < .1f &&
+                ContentOverlap(network, adjustedCall, cleanParts) < .1f &&
+                Vector3.Distance(clean.transform.localPosition, stagedPosition) < .01f,
+                "adjacent call candidate clears title, headings, listing and PID input without moving CLEAN");
+            Owners(call); Preserved(pid, "527"); Capture("title-heading-collision");
+            call.EndCall(); clean.DismissFromEscape(); yield return Wait(.1f);
 
             // Controlled fixture: stage an older call with four units of bottom-frame overlap.
             // Node positions and the candidate solver are untouched; only the existing call pose is staged.

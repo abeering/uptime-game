@@ -44,10 +44,13 @@ namespace Uptime.Connections
             }
             else
             {
-                // Home, then nearby vertical/horizontal alternatives, then viewport fallbacks.
+                // Two adjacent candidates avoid clipping CLEAN's title and process headings.
+                Rect older = other != null ? InViewport(other) : current;
                 candidates = new[] { home, home + new Vector2(0, -size.y / 2),
                     home + new Vector2(-size.x / 2, 0), home + new Vector2(0, -size.y),
-                    home + new Vector2(-size.x, 0), bounds.max - size / 2,
+                    home + new Vector2(-size.x, 0),
+                    new Vector2(home.x, older.yMin - 8 - size.y / 2),
+                    new Vector2(older.xMin + 8 - size.x / 2, home.y), bounds.max - size / 2,
                     new Vector2(bounds.xMax - size.x / 2, bounds.yMin + size.y / 2),
                     new Vector2(bounds.xMin + size.x / 2, bounds.yMax - size.y / 2) };
             }

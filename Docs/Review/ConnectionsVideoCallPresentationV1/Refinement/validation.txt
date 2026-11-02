@@ -1,0 +1,104 @@
+Unity 6000.3.11f1 — focused PR #73 refinement
+Parent commit: ae3515942f89d84ba52bece158702bafafc7ab0e
+Final full Play Mode matrix: six runs, all process exit codes 0.
+
+uptime-call-refinement-connections-1920.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1920x1080
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=21651.34
+CALL LABEL OVERLAP DB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-refinement-connections-1280.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1280x720
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=21651.35
+CALL LABEL OVERLAP DB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-refinement-connections-1577.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1577x887
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=21653.73
+CALL LABEL OVERLAP DB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-refinement-connectionsadvanced-1920.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1920x1080
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP WEB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=0
+CALL LABEL OVERLAP DB: title=0, headings=0, content=23826.5
+CALL LABEL OVERLAP RPT: title=0, headings=0, content=0
+CALL LABEL OVERLAP JOBS: title=0, headings=0, content=0
+CALL LABEL OVERLAP EXT2: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+uptime-call-refinement-connectionsadvanced-1280.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1280x720
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP WEB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=0
+CALL LABEL OVERLAP DB: title=0, headings=0, content=23826.51
+CALL LABEL OVERLAP RPT: title=0, headings=0, content=0
+CALL LABEL OVERLAP JOBS: title=0, headings=0, content=0
+CALL LABEL OVERLAP EXT2: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+uptime-call-refinement-connectionsadvanced-1577.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1577x887
+CALL LABEL OVERLAP EXT1: title=0, headings=0, content=0
+CALL LABEL OVERLAP WEB: title=0, headings=0, content=0
+CALL LABEL OVERLAP AUTH: title=0, headings=0, content=0
+CALL LABEL OVERLAP API: title=0, headings=0, content=0
+CALL LABEL OVERLAP DB: title=0, headings=0, content=23828.59
+CALL LABEL OVERLAP RPT: title=0, headings=0, content=0
+CALL LABEL OVERLAP JOBS: title=0, headings=0, content=0
+CALL LABEL OVERLAP EXT2: title=0, headings=0, content=0
+ESC/CALL CHECK: review fixture reproduces preferred-home obstruction of CLEAN title and PID/CPU headings
+ESC/CALL CHECK: adjacent call candidate clears title, headings, listing and PID input without moving CLEAN
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+Final adjacent Editor witness batch: process exit code 0.
+EscapeVideoCallWitness bindings PASS: Connections
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+VIDEO CALL BATCH PASS
+
+PASS: 36 natural node cases retain zero title/heading rectangle intersection.
+PASS: targeted preferred-home collision has nonzero title and PID/CPU-heading overlap before selection; chosen adjacent candidate has zero intersection with all protected CLEAN content, retains CLEAN position and PID draft/selection/focus.
+PASS: both Escape labels are visible and share the same active/inactive tint in every owner assertion.
+PASS: unscaled typewriter, long content/pages, live portrait animation, delayed call cleanup, both opening orders, guards/held keys, correct and innocent PID results, generated traffic and topology invariance.
+PASS: 170 raw before/after PNGs have valid chunks/CRCs and matching dimensions; 16 selected images retained.
+PASS: existing scene RectTransform blocks, CLEAN prefab/runtime, Terminal/delayed calltest, Escape authority/input adapter, simulation/node positioning, phone PNG/meta, shared source chrome and Packet scenes unchanged from parent.
+PASS: authored/tested Assets match repository files; Project Core regenerated and freshness checked; review links and diff whitespace checked.
+
+Baseline capture: first attempt timed out after a temporary authoring-script import interrupted Play Mode. Retry with files fixed passed (uptime-call-refinement-before-retry.log). Baseline images use initial PR presentation/runtime.
+Known Editor caveat: existing UnityEditor.Search.SearchDatabase.EnumerateAll startup ArgumentOutOfRangeException appears on isolated Play launches; final gameplay assertions passed.
+Not run: physical keyboard/IME, native Game view interaction or Packet gameplay. Each whole witness run uses a persistent fixed-size Canvas camera viewport; captures are not OS screenshots.
