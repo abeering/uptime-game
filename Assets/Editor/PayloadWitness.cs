@@ -24,6 +24,9 @@ namespace Uptime.Connections.EditorTools
             host.SetRunMode(ConnectionRunMode.Generated);
             recorder.BeginRun();
             PayloadDirector director = host.Payloads;
+            CheckAllPayloadInterception(host, director, recorder, status);
+            host.ResetSimulation();
+            recorder.BeginRun();
             var payloadPresenter = UnityEngine.Object.FindFirstObjectByType<PayloadPresenter>();
             var pathPresenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
             pathPresenter.Bind(host.RuntimeConnections.ToArray());
@@ -289,7 +292,115 @@ namespace Uptime.Connections.EditorTools
                     .Any(p => p.name.Contains("identity x1")),
                 "ordinary lane retains its pill while Payload lane has none");
             Debug.Log("PayloadWitness PASS: both scenes, identity, hop lifecycle, defense, " +
-                "shared lanes, expiry, cooldown, delivery, wrong matches, congestion, WORK/Health, recorder and reset.");
+                "all-Payload and targeted commands, repeated catches, shared lanes, expiry, cooldown, " +
+                "delivery, wrong matches, congestion, WORK/Health, recorder and reset.");
+        }
+
+        private static void CheckAllPayloadInterception(SimulationHost host, PayloadDirector director,
+            ConnectionsRunRecorder recorder, NodeStatusPresenter status)
+        {
+            Check(Terminal.TryParseIntercept(new[] { "intercept", "@", "api" }, out string filter,
+                out string nodeId) && filter == null && nodeId == "api", "node-only command");
+            Check(Terminal.TryParseIntercept(new[] { "intercept", "X1", "@", "API" }, out filter,
+                out nodeId) && filter == "X1" && nodeId == "API", "optional targeted command");
+            foreach (string[] invalid in new[] {
+                new[] { "intercept" }, new[] { "intercept", "@" },
+                new[] { "intercept", "api" }, new[] { "intercept", "x1", "api" },
+                new[] { "intercept", "@", "@" }, new[] { "intercept", "@", "@", "api" },
+                new[] { "intercept", "@", "api", "extra" },
+                new[] { "intercept", "x1", "@", "api", "extra" } })
+                Check(!Terminal.TryParseIntercept(invalid, out _, out _), "malformed intercept command");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            NodeResources db = host.FindNodeResources("DB");
+            Check(!director.TryIntercept(null, "missing", out _) &&
+                !director.TryIntercept("missing", "DB", out _) &&
+                director.Interceptors.Count == 0, "invalid nodes and explicit IDs cannot arm defense");
+            Check(director.TryIntercept(null, "db", out _, "intercept @ db"),
+                "node-only defense can arm before any Payload exists");
+            InterceptionState armed = director.InterceptorAt(db.View);
+            float expiry = armed.ExpiresAt;
+            Check(armed.AllPayloads && armed.PayloadId == null && armed.CaughtCount == 0 &&
+                db.DefensiveRequestedLoad == 4f && db.DefensiveAllocatedLoad == 4f,
+                "one broad interceptor has one four-LOAD cost");
+            PayloadState first = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { .8f });
+            PayloadState simultaneous = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { .8f });
+            PayloadState later = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 2.8f });
+            PayloadState boundary = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 3.8f });
+            PayloadState late = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 4f });
+            Check(!director.TryIntercept(first.Id, "DB", out _) &&
+                !director.TryIntercept(null, "DB", out _), "both modes share one occupied node slot");
+            host.StepSimulation(2f);
+            Check(first.Intercepted && simultaneous.Intercepted && armed.CaughtCount == 2 &&
+                director.InterceptorAt(db.View) == armed && armed.ExpiresAt == expiry &&
+                db.DefensiveRequestedLoad == 4f && host.Infections.Count == 0,
+                "simultaneous catches retain the original window and single LOAD cost");
+            status.RenderNow(1f, 1f);
+            Check(status.StateFor(db.View).InterceptActive && status.StateFor(db.View).InterceptAllPayloads &&
+                status.StateFor(db.View).HasAny(1f) && status.ViewFor(db.View).BenefitVisible &&
+                status.ViewFor(db.View).GetComponentsInChildren<TMPro.TMP_Text>()
+                    .Any(t => t.text == "INTERCEPT ALL"),
+                "broad defense remains visibly active after catches with its timer");
+            int snapshotIndex = recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            InterceptionSnapshot snapshot = recorder.CurrentLog.snapshots[snapshotIndex].interceptors.Single();
+            Check(snapshot.allPayloads && snapshot.payloadId == null && snapshot.caughtCount == 2 &&
+                snapshot.expiresAtSeconds == expiry, "snapshot preserves broad scope and repeated success");
+            host.StepSimulation(2f);
+            Check(later.Intercepted && armed.CaughtCount == 3 && db.DefensiveRequestedLoad == 4f,
+                "later arrival is caught after the earlier successes");
+            host.StepSimulation(1f);
+            Check(boundary.Intercepted && armed.CaughtCount == 4 && director.InterceptorAt(db.View) == null &&
+                db.DefensiveRequestedLoad == 0f && !director.TryIntercept(null, "DB", out _),
+                "arrival wins at expiry; LOAD releases and cooldown persists");
+            host.StepSimulation(.2f);
+            Check(!late.Intercepted && late.EffectApplied, "arrival after broad expiry delivers its effect");
+            var catches = recorder.CurrentLog.events.Where(e => e.type == "intercept_succeeded").ToArray();
+            Check(catches.Length == 4 && catches.All(e => e.interceptAllPayloads &&
+                e.actionSequence == armed.ActionSequence && e.actionSequence > 0 && e.targetNodeId == "DB") &&
+                catches.Select(e => e.payloadId).SequenceEqual(new[] {
+                    first.Id, simultaneous.Id, later.Id, boundary.Id }) &&
+                catches.Select(e => e.interceptCaughtCount).SequenceEqual(new[] { 1, 2, 3, 4 }) &&
+                recorder.CurrentLog.events.Any(e => e.type == "intercept_activated" &&
+                    e.interceptAllPayloads && e.payloadId == null) &&
+                recorder.CurrentLog.events.Any(e => e.type == "intercept_expired" &&
+                    e.interceptAllPayloads && e.interceptCaughtCount == 4),
+                "recorder links each actual catch to the broad activation and cumulative count");
+            ConnectionsRunLog roundTrip = JsonUtility.FromJson<ConnectionsRunLog>(JsonUtility.ToJson(recorder.CurrentLog));
+            Check(roundTrip.events.Count(e => e.type == "intercept_succeeded" && e.interceptAllPayloads) == 4 &&
+                roundTrip.snapshots[snapshotIndex].interceptors.Single().caughtCount == 2,
+                "broad scope and catch history survive recorder JSON");
+            host.StepSimulation(9.8f);
+            Check(director.TryIntercept(null, "DB", out _), "broad cooldown ends fifteen seconds from activation");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            status.RenderNow(2f, 1f);
+            Check(director.Interceptors.Count == 0 && !status.StateFor(db.View).InterceptActive,
+                "reset clears broad defense and status");
+            PayloadState through = director.Spawn("DB", PayloadMotionProfile.Steady,
+                "EXT1", new[] { 1f, 1f, 1f });
+            Check(director.TryIntercept(null, "API", out _) && director.TryIntercept(null, "WEB", out _),
+                "nodes can arm independently without target or route prediction validation");
+            host.StepSimulation(4.4f);
+            Check(!through.Intercepted && through.Phase != PayloadPhase.Resolved &&
+                director.InterceptorAt(host.FindNodeResources("API").View).CaughtCount == 0,
+                "broad defense does not catch a Payload passing through an intermediate node");
+            host.StepSimulation(2.2f);
+            Check(through.EffectApplied, "broad defense preserves final-destination interception rule");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 10f, out _) &&
+                director.TryIntercept(null, "DB", out _), "broad defense under full infection demand");
+            PayloadState congested = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { .8f });
+            Check(db.DefensiveRequestedLoad == 4f && db.DefensiveAllocatedLoad == 0f,
+                "broad defense records its cost with no spare allocation");
+            host.StepSimulation(2f);
+            Check(congested.Intercepted && !congested.EffectApplied &&
+                recorder.CurrentLog.events.Any(e => e.type == "intercept_succeeded" &&
+                    e.interceptAllPayloads && e.defensiveAllocatedLoad == 0f),
+                "broad interception remains reliable at zero defensive allocation");
         }
 
         private static void CheckScene(string scene, int nodeCount)

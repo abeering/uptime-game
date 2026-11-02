@@ -17,12 +17,14 @@ namespace Uptime.Connections
         public bool Isolated { get; private set; }
         public float IsolationRemainingFraction { get; private set; }
         public string InterceptPayloadId { get; private set; }
+        public bool InterceptActive { get; private set; }
+        public bool InterceptAllPayloads { get; private set; }
         public bool InterceptSucceeded { get; private set; }
         public float InterceptRemainingFraction { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || KnownInfected ||
             AwarenessPreview || PortScanned || ScanJammed || Isolated ||
-            CleanVisible(realTime) || InterceptPayloadId != null;
+            CleanVisible(realTime) || InterceptActive;
 
         public void SetOffline(bool offline) => Offline = offline;
 
@@ -76,6 +78,8 @@ namespace Uptime.Connections
         public void SetInterceptor(InterceptionState interceptor, float simulationTime)
         {
             InterceptPayloadId = interceptor?.PayloadId;
+            InterceptActive = interceptor != null;
+            InterceptAllPayloads = interceptor != null && interceptor.AllPayloads;
             InterceptSucceeded = interceptor != null && interceptor.Succeeded;
             InterceptRemainingFraction = interceptor == null ? 0f : Mathf.Clamp01(
                 (interceptor.ExpiresAt - simulationTime) /
@@ -94,6 +98,8 @@ namespace Uptime.Connections
             Isolated = false;
             IsolationRemainingFraction = 0f;
             InterceptPayloadId = null;
+            InterceptActive = false;
+            InterceptAllPayloads = false;
             InterceptSucceeded = false;
             InterceptRemainingFraction = 0f;
             cleanUntil = -1f;

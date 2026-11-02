@@ -31,12 +31,15 @@ namespace Uptime.Connections
 
     public sealed class InterceptionState
     {
+        // A null filter arms the node against every Payload's final-action attempt.
         public string PayloadId { get; internal set; }
+        public bool AllPayloads => PayloadId == null;
         public NodeResources Node { get; internal set; }
         public float ActivatedAt { get; internal set; }
         public float ExpiresAt { get; internal set; }
         public float CooldownUntil { get; internal set; }
         public bool Succeeded { get; internal set; }
+        public int CaughtCount { get; internal set; }
         public int ActionSequence { get; internal set; }
     }
 
@@ -178,8 +181,9 @@ namespace Uptime.Connections
         public bool TryIntercept(string payloadId, string nodeId, out string error,
             string command = null)
         {
-            PayloadState payload = FindActive(payloadId);
-            if (payload == null) { error = "Unknown or resolved Payload ID."; return false; }
+            PayloadState payload = payloadId == null ? null : FindActive(payloadId);
+            if (payloadId != null && payload == null)
+            { error = "Unknown or resolved Payload ID."; return false; }
             NodeResources node = host.FindNodeResources(nodeId);
             if (node == null) { error = "Unknown node: " + nodeId; return false; }
             float now = host.SimulationTimeSeconds;
@@ -187,12 +191,12 @@ namespace Uptime.Connections
             { error = "Interceptor already active at " + node.View.NodeId; return false; }
             if (cooldowns.TryGetValue(node.View, out float until) && now < until - .00001f)
             { error = "Interceptor cooling down at " + node.View.NodeId; return false; }
-            var state = new InterceptionState { PayloadId = payload.Id, Node = node,
+            var state = new InterceptionState { PayloadId = payload?.Id, Node = node,
                 ActivatedAt = now, ExpiresAt = now + interceptWindowSeconds,
                 CooldownUntil = now + interceptCooldownSeconds };
             if (command != null)
                 state.ActionSequence = host.Recorder?.RecordPlayerAction(command,
-                    payload.Id, true, node.View.NodeId, "intercept_activated") ?? 0;
+                    payload?.Id, true, node.View.NodeId, "intercept_activated") ?? 0;
             interceptors.Add(node.View, state);
             cooldowns[node.View] = state.CooldownUntil;
             host.RefreshPayloadAllocations();
@@ -233,13 +237,15 @@ namespace Uptime.Connections
                 {
                     host.Recorder?.RecordPayload("payload_final_action_attempt", payload, now);
                     InterceptionState interceptor = InterceptorAt(payload.FinalNode);
-                    if (interceptor != null && interceptor.PayloadId == payload.Id &&
+                    if (interceptor != null &&
+                        (interceptor.AllPayloads || interceptor.PayloadId == payload.Id) &&
                         now <= interceptor.ExpiresAt + .00001f)
                     {
                         interceptor.Succeeded = true;
+                        interceptor.CaughtCount++;
                         payload.Intercepted = true;
                         host.Recorder?.RecordIntercept("intercept_succeeded", interceptor, now,
-                            interceptRequestedLoad, interceptor.Node.DefensiveAllocatedLoad);
+                            interceptRequestedLoad, interceptor.Node.DefensiveAllocatedLoad, payload.Id);
                         InterceptSucceeded?.Invoke(payload);
                     }
                     else payload.EffectApplied = host.ApplyPayloadEffect(payload.FinalNode, payload.Id);
