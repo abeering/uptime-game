@@ -8,6 +8,4 @@ If necessary, experiment with faster, irregular noise cadence (~1 second) and a 
 
 Goal: make individual LOAD changes feel organic without sacrificing the larger behavioral pattern.
 
-# TODO - make tne inspection "closes" more smooth - animate them to closed 
-
 # TODO - check tool card gutters - minimize 
