@@ -317,6 +317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d5fc7c2d12c46a2af4af825bf209c2b, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsCleanOverlay
+  escapeCoordinator: {fileID: 0}
+  placement: {fileID: 0}
   title: {fileID: 8074575406420625258}
   body: {fileID: 832925185399806275}
   cancelHint: {fileID: 5806194354289469654}

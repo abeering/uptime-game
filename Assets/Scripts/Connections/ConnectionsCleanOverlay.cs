@@ -9,6 +9,7 @@ namespace Uptime.Connections
     public sealed class ConnectionsCleanOverlay : MonoBehaviour, IEscapeTarget
     {
         [SerializeField] private EscapeCoordinator escapeCoordinator;
+        [SerializeField] private ConnectionsWindowPlacement placement;
         [SerializeField] private TMP_Text title;
         [SerializeField] private TMP_Text body;
         [SerializeField] private GameObject cancelHint;
@@ -69,6 +70,7 @@ namespace Uptime.Connections
             showingResult = false;
             gameObject.SetActive(true);
             title.text = "PROCESS KILLER  /  " + session.NodeId;
+            placement.PlaceClean(session.Target.View);
             transform.SetAsLastSibling();
             escapeCoordinator.Register(this);
             pidInput.gameObject.SetActive(false);

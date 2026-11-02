@@ -5728,6 +5728,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 955173304}
     m_Modifications:
     - target: {fileID: 1117168669337119339, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
+      propertyPath: placement
+      value:
+      objectReference: {fileID: 955173307}
+    - target: {fileID: 1117168669337119339, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
       propertyPath: escapeCoordinator
       value:
       objectReference: {fileID: 2073764758}
@@ -6228,6 +6232,7 @@ GameObject:
   - component: {fileID: 955173304}
   - component: {fileID: 955173306}
   - component: {fileID: 955173305}
+  - component: {fileID: 955173307}
   m_Layer: 0
   m_Name: NetworkPanel
   m_TagString: Untagged
@@ -7864,6 +7869,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 955173304}
     m_Modifications:
     - target: {fileID: 69995008922718803, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
+      propertyPath: placement
+      value:
+      objectReference: {fileID: 955173307}
+    - target: {fileID: 69995008922718803, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
       propertyPath: escapeCoordinator
       value:
       objectReference: {fileID: 2073764758}
@@ -7893,11 +7902,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1872705079006999342, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 560
+      value: 520
       objectReference: {fileID: 0}
     - target: {fileID: 1872705079006999342, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 360
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 1872705079006999342, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12616,3 +12625,56 @@ SceneRoots:
   - {fileID: 165539784}
   - {fileID: 2073764754}
   - {fileID: 1996901016}
+--- !u!224 &897310629 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2832205637329309679, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
+  m_PrefabInstance: {fileID: 897310626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &897310630 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4778008369542548743, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
+  m_PrefabInstance: {fileID: 897310626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &897310631 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5214501334323057395, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
+  m_PrefabInstance: {fileID: 897310626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &955173307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955173303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b557f2169617843ba864619e23a23119, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsWindowPlacement
+  viewport: {fileID: 955173304}
+  videoCall: {fileID: 1316202531}
+  cleanOverlay: {fileID: 897310627}
+  callContent:
+  - {fileID: 1316202533}
+  - {fileID: 1316202534}
+  cleanContent:
+  - {fileID: 897310631}
+  - {fileID: 897310630}
+  - {fileID: 897310629}
+  - {fileID: 669113503}
+--- !u!224 &1316202533 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4824443242752576350, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
+  m_PrefabInstance: {fileID: 1316202530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &1316202534 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3893331765473095870, guid: 1096c9622cac441fd98b0c443b2d2909, type: 3}
+  m_PrefabInstance: {fileID: 1316202530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &669113503 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4381759343395270636, guid: 0303a3f558affa046b17ab0884107b29, type: 3}
+  m_PrefabInstance: {fileID: 897310626}
+  m_PrefabAsset: {fileID: 0}

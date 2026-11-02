@@ -741,10 +741,11 @@ namespace Uptime.Connections.EditorTools
                 overlay.transform.localScale == Vector3.one &&
                 Mathf.Approximately(overlay.transform.lossyScale.x,
                     overlay.transform.parent.lossyScale.x),
-                "authored inactive centered CLEAN window in network panel");
+                "authored inactive CLEAN window in network panel");
             var fields = new SerializedObject(overlay);
-            Check(fields.FindProperty("escapeCoordinator").objectReferenceValue != null,
-                "CLEAN scene Escape coordinator binding");
+            Check(fields.FindProperty("escapeCoordinator").objectReferenceValue != null &&
+                fields.FindProperty("placement").objectReferenceValue != null,
+                "CLEAN scene Escape coordinator and placement bindings");
             var input = (TMP_InputField)fields.FindProperty("pidInput").objectReferenceValue;
             var title = (TMP_Text)fields.FindProperty("title").objectReferenceValue;
             var body = (TMP_Text)fields.FindProperty("body").objectReferenceValue;

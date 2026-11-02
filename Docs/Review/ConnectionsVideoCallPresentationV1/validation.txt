@@ -1,0 +1,89 @@
+Unity 6000.3.11f1 — isolated project /private/tmp/uptime-call-v1-validation
+Base: origin/main ddb955ba3bd9b37aea3c311c9c192c4a50e4dc49
+Final Play Mode matrix (all processes exited 0):
+
+uptime-call-v1-play-connections-1920.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1920x1080
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88593.79 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 29530.46 to 14763.6
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2239.996
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-v1-play-connections-1280.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1280x720
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88593.81 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 29530.46 to 14763.61
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2239.996
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-v1-play-connections-1577.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1577x887
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88587.14 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 29533.89 to 14762.39
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2240.013
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: Connections
+
+uptime-call-v1-play-connectionsadvanced-1920.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1920x1080
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 7151.976 to 1231.196
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 2899.991 to 1444.396
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88593.79 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 26866.49 to 16177.69
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 45615 to 532.3935
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2239.996
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+uptime-call-v1-play-connectionsadvanced-1280.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1280x720
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 7152.015 to 1231.201
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 2900.004 to 1444.406
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88593.8 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 26866.5 to 16177.7
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 45615 to 532.4028
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2239.996
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+uptime-call-v1-play-connectionsadvanced-1577.log
+ESC/CALL CHECK: placement and capture share fixed Canvas viewport 1577x887
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 7137.497 to 1228.798
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 2895.373 to 1440.08
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 88587.14 to 0
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 26870.25 to 16181.43
+ESC/CALL CHECK: call alternative reduces protected-content obstruction: 45625.28 to 529.8663
+ESC/CALL CHECK: four-unit harmless frame overlap keeps CLEAN near its node and the older call fixed: area=2240.013
+ESC/CALL CHECK: ordinary generated traffic remains live behind both windows
+EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
+
+Final adjacent Editor witness batch (process exited 0):
+EscapeVideoCallWitness bindings PASS: Connections
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+VIDEO CALL BATCH PASS
+
+Artifact and source checks:
+PASS: 108 PNG captures have complete chunks, valid CRCs and filename-matching dimensions.
+PASS: 40 selected captures committed, with before links to existing PR #72 evidence.
+PASS: all existing RectTransform blocks in both scenes byte-identical to origin/main.
+PASS: only NetworkPanel component list and both placement overrides change existing scene blocks.
+PASS: shared source chrome, Escape coordinator, input adapter, call-data API, SimulationHost, NodeView, Health and Packet scenes unchanged.
+PASS: supplied phone.png pixels unchanged; SHA-256 e19dc99fb8d460e2ee1240a6c1ec05417ef236729dd209505729a7b6e1d98656.
+PASS: Project Core regeneration/check; git diff whitespace check; review and implementation links.
+
+Known Editor caveat: Play launches log the existing UnityEditor.Search.SearchDatabase.EnumerateAll startup ArgumentOutOfRangeException. All gameplay assertions and exit codes above passed.
+Not run: human physical-keyboard/IME or native Game view interaction, human gameplay/traffic-rhythm playtest, Packet gameplay. Captures use a persistent fixed-size Canvas camera target for each whole run.
