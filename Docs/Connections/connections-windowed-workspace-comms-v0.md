@@ -1,6 +1,19 @@
 # Connections — Windowed Workspace, Escape & Communications V0
 
-**Status:** Agreed starting design direction from the October 30, 2026 discussion; **not implemented**. Some interaction details are explicitly provisional and require playtesting. This is a **Connections-specific** workspace and communications proposal, not a retroactive Packet contract, a new shared Uptime mechanic, or authorization to change Unity code.
+**Status (November 1, 2026):** Original Connections-specific design direction from the October 30 discussion, **partially implemented through merged PRs #69–#74**. This remains a design record, not a substitute for current code or [Connections Current State](Current_State.md). Some original hypotheses were superseded during implementation and playtesting; those are reconciled below. Packet remains independent.
+
+## Implementation reconciliation — November 1, 2026
+
+| Area | Implemented in Connections | Still open / deferred |
+| --- | --- | --- |
+| Desktop | [#69](https://github.com/abeering/uptime-game/pull/69) adds independently framed/pinned docked windows and full-width Health strip. [#70](https://github.com/abeering/uptime-game/pull/70) removes expanded Health and Tab expansion. | Final Fluxbox/pixel-indie art treatment, further status strip features. |
+| CLEAN | [#71](https://github.com/abeering/uptime-game/pull/71) gives PID-Select the shared frame/titlebar and an Escape hint only during cancelable phases. | Other minigames/utilities. |
+| Calls and Escape | [#72](https://github.com/abeering/uptime-game/pull/72) adds an auto-opening call API, one active call, and independent LIFO Escape/typing ownership with fresh-key and target-change protection. [#73](https://github.com/abeering/uptime-game/pull/73) adds a 16:9 video-first call, translucent subtitles, tintable handset, and content-aware positioning. | Actual caller art, authored call events, special ringing/paused calls, hold-to-dismiss. |
+| Spatial arrangement | [#73](https://github.com/abeering/uptime-game/pull/73) prefers calls upper-right and CLEAN near its target node, allows minor frame overlap, and does not move existing windows. | Further tuning for more window types and larger levels. |
+| Text communications | [#74](https://github.com/abeering/uptime-game/pull/74) delivers instant messages/system alerts in an upper-left network stack, with avatars/icons, sender, time, teal/amber rails, immediate full text, and automatic unscaled expiration. **Ordinary messages do not own Escape.** | Actual content/event director, length/lifetime/density tuning, possible upper-terminal placement. |
+| Menu, pacing, consequences | Reusable presentation/delivery systems and labeled developer demonstrations exist. | Pause/menu, end-of-shift UI, event-to-meaning narrative orchestration, reactions to ignored/hung-up communications. |
+
+The original principles remain useful; **current implementations take precedence over any superseded proposal below**. Developer test content is not an authored story or evidence that the narrative system exists.
 
 ## Intent
 
@@ -11,22 +24,22 @@ Two useful shorthand principles:
 - **The player never needs the mouse.** The game manages its windows and keyboard ownership rather than asking the player to drag, select, or manually arrange them.
 - **Communications are meaningful, missable, and never mandatory to consume.** A missed message may cost the player a hint, context, surprise, or a human reaction, but must not make the network game mechanically unplayable.
 
-These principles describe the intended experience, not an assertion that all of the controls or storyteller systems exist today.
+These principles describe the intended experience. The keyboard-first workspace and delivery surfaces now exist, but storyteller systems, pause/menu behavior, and several interaction proposals remain future work.
 
 ## 1. Desktop and visual system
 
 ### Docked workspace
 
-- Preserve the **everything-is-a-terminal-window** visual grammar. The network view and gameplay command terminal are permanent, tightly **docked** parts of one workspace.
+- Preserve the **terminal-window** visual grammar for the network, gameplay terminal, CLEAN, video calls, and future interactive utilities. The network and command terminal are permanent, tightly **docked** parts of one workspace. Textual notifications deliberately use lighter cards instead of full window chrome.
 - Reclaim wasted room: narrow, intentional gutters; compact titlebars; remove explanatory subtitles beneath window titles; avoid generous decorative margins and faux application chrome.
 - Draw on efficient X11/Fluxbox-style window managers for density and grouping, **not** for freeform window dragging or desktop simulation.
-- Permanent windows do not need minimize, maximize, or close icons that suggest clickable controls. A small, noninteractive pinned/locked indicator is a possible replacement, not a finalized icon.
+- Permanent windows do not need minimize, maximize, or close icons that suggest clickable controls. Both permanent windows now use small, noninteractive filled-square pinned indicators.
 - Keep a **global top status bar** as a stable home for the clock and Network Health; reserve its right side for later information. Avoid clickable-looking chat, webcall, or notification entry points.
 - The underlying terminal and topology should not resize/reflow every time a floating communication appears. Temporary windows primarily overlay the **network view**.
 
 ### A coherent family of windows
 
-Cleaning interfaces, future minigames, webcalls, email, settings, system menu, and inter-shift presentations should all look like members of the same window system. They can contain text, animated portraits, graphical interaction, or other content; "terminal window" is the visual and interaction language, **not** a requirement that everything be plain terminal text.
+Cleaning interfaces, future minigames, webcalls, email, settings, system menu, and inter-shift presentations should look like members of the same window system. Lightweight textual communications are deliberately a related but distinct visual surface. They can contain text, animated portraits, graphical interaction, or other content; "terminal window" is the visual and interaction language, **not** a requirement that everything be plain terminal text.
 
 Prefer shared window-chrome/titlebar prefab patterns where useful, but do not prescribe a single universal prefab or a large UI framework before testing the interactions. Permanent docked panes and temporary overlays share a visual language without requiring identical behavior.
 
@@ -36,23 +49,25 @@ The current interface is comparatively sleek, smooth, and neon-polished. The eve
 
 ## 2. Notification and webcall surfaces
 
-### Notifications
+### Notifications / text communications
 
-- Small, transient communications stack in a consistent **corner of the network view**, broadly like the Packet-era OS-style notifications.
-- They may expire on their own or be dismissed early. Exact lifetime, count, animation, and clock domain remain tuning decisions; Packet's current values are examples, not a Connections specification.
-- Notifications are **not buttons** and should not require a click, focus transfer, archive, or separate inbox to understand the game.
-- The active Escape target can be a notification, with the same visible Escape-key treatment used for larger windows.
+- **Workplace instant messaging is the primary fiction.** System notifications use the same Connections-owned delivery model and card view, differentiated by a **left accent rail** rather than by repeated printed type names.
+- Each card shows an avatar or service icon, sender/source, small timestamp, and message body. V0 uses a teal/cyan rail for instant messages and amber/gold for system alerts; missing human avatars use a neutral silhouette.
+- The complete text appears **immediately**; there is no typewriter effect. The container alone slides/fades and expires. This distinguishes IM delivery from video-call speech.
+- The V0 stack is upper-left in the network view, newest first, with a configurable cap of four live messages. Default unscaled reading durations are length-aware, roughly 6–16 seconds; these are **tuning values, not final authored-message rules**.
+- Ordinary messages are **passive**. They do not receive typing focus, become Escape targets, require clicks, provide a reply box, or have a default archive/inbox. They can be missed entirely.
+- Bursts revealed a real concern about obscuring an already constrained network view. Message length, linger time, density, and even a possible upper-terminal home should be evaluated against actual authored content and gameplay, not fixed based solely on developer burst samples.
+- Text arrivals never move an already-open CLEAN or video-call window. Subsequent window placement can consider currently readable notification content, without reserving the corner permanently.
 
 ### Webcalls / webcam calls
 
-- Calls appear as **terminal-style floating windows** over the network, containing an animated character/portrait or video area, subtitled speech, and an explicit hang-up affordance such as a red hang-up glyph next to **`[ESC]`**. The glyph teaches the keyboard action; it is not an invitation to click.
-- A rough early visualization is **about one-sixth of the network view**; this is not a fixed size requirement.
-- **Live calls:** the network continues and the player can continue typing network commands or working in a minigame. The call may obstruct part of the network; hanging up is a valid response to that pressure.
-- **Paused story/briefing calls:** may be presented with the simulation paused, and may use a deliberately slower hold-to-skip/dismiss affordance (see Escape below).
-- Placement can start with a small number of sensible candidate positions. Intelligent placement is an experiment, not a prerequisite. Once placed, a call should not constantly chase available space as network conditions change.
-- We do **not** need to guarantee that a call never overlaps an important node. Fast, reliable dismissal is part of how the player regains visibility.
-
-No complete policy is yet set for overlapping calls, arrival scheduling, how calls end naturally, or whether a second caller queues/replaces an existing one.
+- Calls are **terminal-style floating windows**, currently opening **automatically** when requested. Ordinary calls do not require ringing or an answer action. Special ringing calls remain a possible future storytelling device rather than the V0 default.
+- V0 uses a camera-first **520×400** window with a **16:9** primary video region, optional portrait/talking animation, and unscaled typewriter **subtitles** over a translucent lower-feed scrim (not a separate side text column).
+- The supplied monochrome handset sprite is tinted red/gray through Unity in a circular bottom-strip control beside **[ESC]**. The shared titlebar also retains **[ESC] HANG UP**. Both controls display active/red when the call owns Escape and subdued/gray when another window owns it; the call itself keeps playing. Neither affordance is clickable.
+- Live calls leave simulation and current terminal/PID typing focus running. Immediate hang-up, including during subtitle typing, is an intended response to an imposed interruption.
+- A paused, narratively important story/briefing call with possible hold-to-skip remains a **future proposal**, not an implemented mode.
+- Calls prefer the upper-right, using a few deterministic candidate positions and protecting important content more than outer frames. CLEAN prefers placement near the serviced node. Windows remain stable once opened; a little corner/frame overlap is acceptable when content stays legible.
+- One video call is currently supported at a time. Duplicate starts are rejected rather than queued or replacing the active call. How authored calls begin, end naturally, or affect later character reactions remains open.
 
 ## 3. Typing focus and Escape are distinct systems
 
@@ -60,35 +75,31 @@ This is a central decision, not just an implementation detail.
 
 - **Typing focus** answers: *where do ordinary typed characters and commands go?* The currently relevant owners are the gameplay terminal and PID-Select cleaning interface. Other purpose-built input workflows may be added later.
 - **Escape target** answers: *which visible surface will Escape dismiss or back out of?*
-- **Selecting or changing an Escape target must not itself steal or redirect typing focus.** A non-modal webcall or notification can own Escape while the player's typing continues in PID-Select or the gameplay terminal.
+- **Selecting or changing an Escape target must not itself steal or redirect typing focus.** A non-modal webcall can own Escape while the player's typing continues in PID-Select or the gameplay terminal. **Ordinary text notifications never own Escape in V0.**
 - Opening/closing an actual input workflow (such as a menu) may naturally give that workflow keyboard ownership and restore the previous owner on exit. That is a focus-lifecycle action, **not** a side effect of Escape-target selection.
 
 Example: the player is entering a PID in CLEAN/DB when a CEO webcall arrives. The minigame still receives the typed PID; the webcall receives the visible Escape targeting. The player can finish cleaning while the CEO is speaking.
 
 ## 4. Escape V0: a visible, generic LIFO dismissal stack
 
-**Starting rule:** use simple **last-in, first-out (LIFO)** targeting for eligible, currently presented dismissible interruptions, rather than building an intelligent priority scheduler or a second window-selection mode.
+**Implemented rule:** use simple **last-in, first-out (LIFO)** targeting for *eligible dismissible surfaces*, not for every incoming communication.
 
-- Newly presented dismissible surfaces enter the Escape stack. The top eligible entry is what Escape will affect.
-- The current target prominently displays a **`[ESC]` keycap/tag** in or around its window chrome (including notification chrome); other surfaces should not compete visually for that designation. A short label can explain the action: **HANG UP**, **CANCEL**, **CLOSE**, etc.
-- A tap dismisses/backtracks **one target per fresh keypress**, then the indicator moves to the next eligible target. This is independent of ordinary keyboard focus.
-- Notifications that expire on their own leave the stack; the marker moves accordingly.
-- The default is **no Tab cycling or manual choice of dismissal order**. If the player is cleaning and a webcall arrives afterward, they must hang up before Escape can cancel cleaning. That extra friction may be intentional attention pressure.
-- If there is **no presented interruption** to dismiss, Escape opens the game menu. The menu itself can then be escaped from normally.
+- CLEAN registers during its SSH splash and PID selection; it deregisters during its noncancelable result display. A live video call is eligible while active. Ordinary IMs and system notifications **do not register**.
+- The most recent eligible target gets the **active** Escape treatment. An older call can still show its handset/titlebar controls in **subdued gray** while CLEAN owns Escape, rather than removing every visual hint.
+- A fresh Escape press affects **one** target; holding the key cannot dismiss successive windows. The UI ownership of Escape does not imply ownership of ordinary typing.
+- No Tab cycling or manual Escape-target choice is implemented. If CLEAN opens first and a call opens afterward, the first valid Escape hangs up, and the next fresh press can cancel CLEAN. In the reverse order, CLEAN dismisses first.
+- **With no eligible surface, Escape currently does nothing.** A paused command-style system menu remains a design proposal, not current behavior.
 
-The generic LIFO rule deliberately wins over special "webcalls always before notifications" ordering. For example, a notification arriving *after* a webcall becomes the next Escape target. Revisit only if playtesting exposes a compelling problem.
+**Superseded original hypothesis:** A newly arrived ordinary notification used to be imagined as another Escape-stack entry that might preempt a call. After reviewing real notification behavior, V0 keeps such messages passive so a stack of IMs cannot prevent hanging up. A special persistent dismissible message could be reconsidered later, but none exists now.
 
 ### Press, hold, and accidental cascades
 
-- **Live/transient surfaces:** one tap dismisses.
-- **Paused, deliberately protected story moments:** propose **hold Escape to skip/close** rather than blocking Escape entirely. The same keycap can show a circular/rotational hold-progress fill. Exact thresholds and which events qualify are not yet specified.
-- Holding a key must **not repeat through multiple stack entries**. One press/hold is bound to one target until release; ignore key-repeat as repeated dismissals.
-- Add a small **target-change protection/grace period**, especially after automatic expiry or a new arrival, to prevent a rapid Escape intended for one notification from accidentally closing a newly targeted webcall or opening the menu. The timing is a playtest parameter, not an approved millisecond value.
-- The Escape marker is a promise about what the **next valid Escape input** does; protect that promise more carefully than any arbitrary animation timing.
+- **Live eligible surfaces:** one fresh press dismisses; key repeat/holding never cascades.
+- **Target changes:** current implementation applies a provisional **0.15-second unscaled protection interval** on automatic changes. Protected keypresses are consumed, not passed through or replayed afterward.
+- **Paused protected story moments:** the original proposal was **hold Escape to skip/close**, perhaps with circular progress. This has **not** been implemented or tuned.
+- The visible Escape affordance promises what the next valid press will do. Its state must stay synchronized with coordinator ownership, even if the call continues visually when not targeted.
 
-Existing minigame Escape/cancel behavior must be reconciled with this routing when implemented; this document does **not** claim the current Connections input stack already behaves this way.
-
-## 5. Pausing and system-level interactions
+## 5. Pausing and system-level interactions — future proposals, not implemented
 
 - Add a gameplay-terminal **`pause`** command that freezes the network simulation **without opening a menu or changing the desktop layout**. This is separate from dismissing interruptions. Its unpause counterpart, allowed read-only actions, and interactions while a minigame owns typing remain to be designed.
 - With the Escape stack clear, Escape opens a **paused, full-workspace system-menu terminal**. It should be styled like the rest of the environment, with a prompt and discoverable commands rather than conventional clickable menu buttons.
@@ -109,44 +120,42 @@ Useful purposes include:
 - **Interpretation and consequences:** a customer complaint explains why degraded service matters; a character reacting after a kill can reveal the significance of the defense; a message can explain a Health/score change or a failed hostile plan. (Connections scoring is not yet implied to exist.)
 - **Human reaction:** hanging up on a boss might produce later annoyance or appreciation, depending on context. This is a storyteller opportunity, not a required relationship engine.
 
-This is compatible with the broader shared [communications design](../Design/notifications.md): events should request **meaning** instead of always emitting fixed lines. It does **not** authorize implementing the entire shared storyteller/event architecture.
+This remains compatible with the broader shared [communications design](../Design/notifications.md): events should request **meaning** instead of always emitting fixed lines. It does **not** authorize implementing the full shared storyteller/event architecture. **#74 provides a message-delivery API, not automatic event interpretation; current notifytest/calltest examples are explicitly developer demo content.**
 
 ### Meaningful, missable, never mandatory to consume
 
 - Communications may contain **actionable hints**, foreshadowing, humor rooted in events, stakes, and narrative consequences. They are *not* required to be inconsequential.
 - They must **not** be the exclusive source of a password, command, critical objective, or mechanic the player cannot otherwise discover through the network/operating environment.
-- A player who closes every notification and hangs up on every call should still have a **complete, understandable network game**, though they may miss important context, be surprised by events, or lose opportunities to interpret what happened.
+- A player who ignores every message and hangs up on every call should still have a **complete, understandable network game**, though they may miss important context, be surprised by events, or lose opportunities to interpret what happened.
 - By default, **do not build an inbox, notification history, clickable status-bar notifications button, or required replay/recovery workflow**. Ephemerality is an intended design quality. Persistent run rules and mandatory objectives need homes outside fleeting communications.
 - Call dismissal can eventually be a storyteller event ("hung up early"), and missed content can alter what the player understands, but no persistent consequence system is mandated by this V0.
 
 Notifications are generally cheap, brief interpretation; webcalls are more expensive visual interruptions reserved for larger dramatic or contextual moments. Neither category is strictly "just flavor"; both must earn their attention cost.
 
-## 7. Initial playtest questions, not settled rules
+## 7. Remaining playtest questions, not settled rules
 
-1. **Collision:** CLEAN is active, a webcall arrives, then notifications appear. Does literal LIFO remain tolerable, or does another policy become necessary?
-2. **Timing:** How long should communications linger? What happens when a notification expires at the instant Escape is pressed? How do protection windows and hold actions feel?
-3. **Placement:** Which corners and candidate slots preserve the topology best across the four-node and advanced Connections layouts? How much occlusion feels like pressure versus unfairness?
-4. **Keyboard ownership:** How does the pause menu get typing focus and restore it? How can the player pause while a minigame currently owns input? How does existing **Tab-to-expand Health** coexist with later shortcuts?
-5. **Call lifecycle:** When is a call finished, interrupted, timed out, or deferred? What happens if another call arrives? Can paused briefings always be skipped with a hold?
-6. **Visual skin:** How much retro/pixel character should be introduced after the docking/chrome/interaction structure is in place?
+1. **Density and location:** How long and frequent should authored IMs be? How many should coexist, and for how long? Is the upper-left network stack best, or should messages appear over the terminal when actual traffic and inspection load are present?
+2. **Collision:** How much soft overlap and network occlusion feels atmospheric versus unfair? More utilities or the proposed hacker tug-of-war duel might require more spatial options.
+3. **Keyboard ownership:** How does a future pause/menu window gain focus and restore it? How can the player pause while CLEAN currently owns typing? **Expanded Health and its old Tab shortcut are gone;** no replacement key assignment is implied.
+4. **Call lifecycle:** Should rare authored calls ring instead of opening automatically? How do callers end naturally, and what happens when an existing call blocks another? Would a paused briefing merit hold-to-dismiss?
+5. **Narrative meaning:** Which events deserve brief IMs versus expensive calls? How can characters react to network state or early hang-ups without leaking hidden hostile intent or creating filler?
+6. **Visual skin:** How much retro/pixel character or far-future desktop customization belongs in the experience?
 
-Avoid solving these through a large abstract window-management framework before an actual scene playtest.
+Avoid answering these through a large generalized window-management or storyteller framework before playtesting authored events.
 
 ## 8. Implementation boundary and future validation
 
-This document is **documentation-only**. No notification system, video-call overlay, window prefab, new command, Escape dispatcher, menu, storyteller, or pause behavior is asserted as implemented in Connections.
+This is a **design-history and reconciliation document**, not an instruction to reimplement or extend already completed phases. Current executable contracts are documented in:
 
-The Packet implementation contains relevant reference pieces, including [NotificationDirector](../../Assets/Scripts/NotificationDirector.cs), [VideoCallDirector](../../Assets/Scripts/VideoCallDirector.cs), and [VideoCallView](../../Assets/Scripts/VideoCallView.cs). Their close buttons, typewriter-skip behavior, lifetimes, and scene assumptions are **not** adopted automatically.
+- [Connections Current State](Current_State.md) — runtime/scene authority.
+- [Network Health V0](connections-network-health-v0.md) — permanently compact strip.
+- [Infections V0](connections-infections-v0.md) — CLEAN mechanics and its input lifecycle.
+- [Video Calls & Escape Coordination V0](connections-video-calls-escape-v0.md) — call API, LIFO Escape, input preservation.
+- [Video Call Presentation & Soft Placement V1](connections-video-call-presentation-v1.md) — camera-first window, subtitles, icon and placement.
+- [Text Communications V0](connections-text-communications-v0.md) — typed delivery model, avatar/rail styling, stack, expiry and passive Escape behavior.
 
-For the first future Codex implementation handoff, consider separately testable slices: tighten the docked shell/shared chrome, then a visible Escape-routing prototype, then notifications and webcalls, then narrative orchestration. Exact sequencing requires discussion.
+Packet's [NotificationDirector](../../Assets/Scripts/NotificationDirector.cs), [VideoCallDirector](../../Assets/Scripts/VideoCallDirector.cs), and [VideoCallView](../../Assets/Scripts/VideoCallView.cs) remain reference material, not implicitly shared code or behavior.
 
-Useful interactive 16:9 scenarios to validate when implementation begins:
-
-- Ordinary commands still type correctly under live notifications and a webcall; no mouse is needed.
-- PID-Select retains typing while a newly arrived webcall takes the visible Escape marker; first Escape hangs up, next can cancel cleaning.
-- A later notification correctly takes LIFO precedence, while expiry/repeat/rapid presses cannot accidentally cascade through targets.
-- A held Escape shows progress for a protected paused story surface and never dismisses more than that surface.
-- `pause` stops the simulation without opening the menu; the menu is a separate paused command-window experience.
-- The network, docked terminal, status row, and overlays remain readable without pretending that titlebar decorations are clickable.
+Interactive review priorities now include: physical keyboard/IME focus, a real CLEAN/call/notification sequence under generated traffic, message-density and readability tuning, subtitle contrast with actual portrait art, and whether long-term notification placement should use otherwise empty terminal space. Paused-story hold, the command-style system menu, and `pause` are only relevant for tests **after** they are implemented.
 
 **Source authority:** The current Connections runtime, scene, and prefab state still determine what is actually implemented; [Connections Current State](Current_State.md) remains the starting implementation map. Packet stays independent.
