@@ -28,6 +28,8 @@ The extended Inspect V2 Witness checks padding/centering, one-decimal LOAD under
 
 The existing active card and immediate resolution transition remain unchanged in the requested compact or verbose mode. On first rendering a resolved state, each card starts its own four-second hold using unscaled UI time. It then becomes a 48-unit horizontal summary with a 54×28 ID pill, purpose, operation badge, and explicit outcome. The smaller operation badge reuses the authored token and pill material, with 28-unit height and proportionally reduced padding/type. The existing muted color and left accent remain; LOAD, WORK, progress, activity, and ETA are hidden. Long purposes ellipsize; narrow rows can shorten the operation label to its kind before constraining it.
 
+After the hold, the card eases to its summary height over 0.22 unscaled seconds. Full details fade out as the summary fades in, and the card clips its contents during the shrink so they do not cover later history entries. Each card animates independently; the final summary and four-second hold are unchanged.
+
 | Resolution | Summary label | Final/current operation |
 | --- | --- | --- |
 | Natural completion | `COMPLETE` | Completion checkmark |
@@ -39,4 +41,4 @@ Cancellation before establishment retains the existing planned/current operation
 
 Collapses preserve bottom-following or anchor the first visible history entry, including individual cards inside a multi-ID output. If the details being read disappear, the retained summary is revealed. Scroll limits still apply when the remaining history becomes shorter than the viewport. Layout updates do not select an object, focus the prompt, or change its text/caret. Resolved rows reflow when terminal width changes.
 
-`Assets/Editor/ResolvedInspectWitness.cs` checks all four outcomes, exact UI deadlines, paused simulation, independent cards, historical reinspection, narrow layout, simulation invariance, scrolling, and prompt preservation. The [review notes and preview](../Review/ConnectionsResolvedInspect/README.md) also record automated Play Mode results and the remaining interactive checks.
+`Assets/Editor/ResolvedInspectWitness.cs` checks all four outcomes, exact hold deadlines, animation midpoint and final cleanup, paused simulation, independent cards, historical reinspection, narrow layout, simulation invariance, scrolling during the shrink, and prompt preservation. The [review notes and preview](../Review/ConnectionsResolvedInspect/README.md) also record earlier automated Play Mode results and the remaining interactive checks.

@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 2936112211787420463}
   - component: {fileID: 8379175346934403179}
   - component: {fileID: 73917788027203378}
+  - component: {fileID: 910000000000000001}
   m_Layer: 0
   m_Name: Connection1
   m_TagString: Untagged
@@ -1373,6 +1374,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2046223185594941909}
+  - component: {fileID: 910000000000000003}
   m_Layer: 0
   m_Name: FullContent
   m_TagString: Untagged
@@ -1606,6 +1608,7 @@ MonoBehaviour:
   compactEntryHeight: 98
   resolvedHoldSeconds: 4
   resolvedRowHeight: 48
+  collapseSeconds: 0.22
   topPadding: 12
   entryGap: 12
   bottomPadding: 12
@@ -1618,6 +1621,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1236956924994948208}
+  - component: {fileID: 910000000000000004}
   m_Layer: 0
   m_Name: FullContent
   m_TagString: Untagged
@@ -1741,6 +1745,7 @@ GameObject:
   - component: {fileID: 7530956498632305077}
   - component: {fileID: 8860399010717122926}
   - component: {fileID: 4674007658338814172}
+  - component: {fileID: 910000000000000002}
   m_Layer: 0
   m_Name: Connection2
   m_TagString: Untagged
@@ -3321,6 +3326,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4138de8691134e4786ae9d65ea7d4be0, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.IdentityPillView
+--- !u!114 &910000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520328203580418393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
+--- !u!114 &910000000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4750180315566891109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
+--- !u!225 &910000000000000003
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3881059323499269993}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!225 &910000000000000004
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4701216426641313649}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!224 &1360063304660099660 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8411397154662696354, guid: 3b613de177b2977418658a5f6a9bb7fc, type: 3}

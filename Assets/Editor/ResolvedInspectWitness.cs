@@ -78,6 +78,25 @@ namespace Uptime.Connections.EditorTools
                     }
                     Time.timeScale = 0f;
                     Advance(output, deadline);
+                    foreach (InspectEntry entry in Entries(output).Take(states.Length))
+                        Check(entry.IsSummaryTransitioning && Rect(entry).rect.height == 128f &&
+                            Field<GameObject>(entry, "fullContent").activeSelf &&
+                            Field<ResolvedInspectRow>(entry, "resolvedRow").gameObject.activeSelf,
+                            "collapse starts with both presentations and the full height");
+                    Advance(output, deadline + CollapseSeconds(output) * 0.5f);
+                    foreach (InspectEntry entry in Entries(output).Take(states.Length))
+                    {
+                        var fullGroup = Field<GameObject>(entry, "fullContent").GetComponent<CanvasGroup>();
+                        var summaryGroup = Field<ResolvedInspectRow>(entry, "resolvedRow")
+                            .GetComponent<CanvasGroup>();
+                        Check(entry.IsSummaryTransitioning && Rect(entry).rect.height > 48f &&
+                            Rect(entry).rect.height < 128f && fullGroup != null &&
+                            summaryGroup != null && fullGroup.alpha > 0f &&
+                            fullGroup.alpha < 1f && summaryGroup.alpha > 0f &&
+                            summaryGroup.alpha < 1f && entry.GetComponent<RectMask2D>() != null,
+                            "collapse interpolates height and crossfades clipped details");
+                    }
+                    Advance(output, CollapseEnd(output, deadline));
                     for (int i = 0; i < states.Length; i++) CheckSummary(Entries(output)[i], states[i], expected[i]);
                     Check(!output.enabled && host.SimulationTimeSeconds == simulationTime &&
                         states.Select(Facts).SequenceEqual(facts), "UI collapse freezes without changing simulation facts");
@@ -90,7 +109,7 @@ namespace Uptime.Connections.EditorTools
                     output.Bind(new[] { done });
                     Check(!Entries(output)[0].IsResolvedSummary && Rect(Entries(output)[0]).rect.height == 98f,
                         "historical reinspection restores the existing chosen mode and a fresh hold");
-                    Advance(output, Deadlines(output)[0]);
+                    Advance(output, CollapseEnd(output, Deadlines(output)[0]));
                     CheckSummary(Entries(output)[0], done, "COMPLETE");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(output.gameObject); }
@@ -103,7 +122,7 @@ namespace Uptime.Connections.EditorTools
                 {
                     mixed.Bind(new[] { done, active }, presentationMode: InspectPresentationMode.Verbose);
                     float firstDeadline = Deadlines(mixed)[0];
-                    Advance(mixed, firstDeadline);
+                    Advance(mixed, CollapseEnd(mixed, firstDeadline));
                     Check(Entries(mixed)[0].IsResolvedSummary && !Entries(mixed)[1].IsResolvedSummary &&
                         Rect(Entries(mixed)[1]).rect.height == 210f, "resolved and active cards are independent");
                     host.KillConnection(active.ConnectionId);
@@ -113,6 +132,9 @@ namespace Uptime.Connections.EditorTools
                     Advance(mixed, firstDeadline + 4.999f);
                     Check(!Entries(mixed)[1].IsResolvedSummary, "later card remains full until its boundary");
                     Advance(mixed, firstDeadline + 5f);
+                    Check(Entries(mixed)[1].IsSummaryTransitioning,
+                        "later card begins its own collapse at its boundary");
+                    Advance(mixed, CollapseEnd(mixed, firstDeadline + 5f));
                     CheckSummary(Entries(mixed)[1], active, "KILLED");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(mixed.gameObject); }
@@ -121,7 +143,7 @@ namespace Uptime.Connections.EditorTools
                 host.StepSimulation(0.1f);
                 CheckScroll(prefab, done, reading);
                 Debug.Log("ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, " +
-                    "paused time, independent cards, fresh historical inspection, narrow layout, " +
+                    "animated height and crossfade, paused time, independent cards, fresh historical inspection, narrow layout, " +
                     "simulation invariance, scroll anchoring, bottom following, and input preservation.");
             }
             finally
@@ -144,7 +166,11 @@ namespace Uptime.Connections.EditorTools
                 operation.HasCheckmark == (state.Resolution == ConnectionResolution.Completed) &&
                 id.DisplayedId == state.ConnectionId.ToLowerInvariant() && id.Size == new Vector2(54f, 28f) &&
                 row.GetComponentsInChildren<TMP_Text>().All(t => !t.text.StartsWith("LOAD ") && !t.text.StartsWith("WORK ")),
-                "compact row retains exact outcome and appropriate completion mark: " + expected);
+                "compact row retains exact outcome and appropriate completion mark: " + expected +
+                $"; height={Rect(entry).rect.height:R}, transitioning={entry.IsSummaryTransitioning}, " +
+                $"full={Field<GameObject>(entry, "fullContent").activeSelf}, row={row.gameObject.activeSelf}, " +
+                $"outcome={Field<TMP_Text>(row, "resolution").text}, check={operation.HasCheckmark}, " +
+                $"id={id.DisplayedId}, size={id.Size}");
             CheckRowFits(row);
         }
 
@@ -196,7 +222,9 @@ namespace Uptime.Connections.EditorTools
                 bool focused = input.isFocused;
                 var events = UnityEngine.Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
                 var selected = events.currentSelectedGameObject;
-                Advance(output, Deadlines(output)[0]);
+                Advance(output, Deadlines(output)[0] + CollapseSeconds(output) * 0.5f);
+                Check(Mathf.Abs(Top() - top) < 0.5f, "later visible card stays anchored during shrink");
+                Advance(output, CollapseEnd(output, Deadlines(output)[0]));
                 Check(Mathf.Abs(Top() - top) < 0.5f, "later visible card stays anchored when earlier card shrinks");
                 Check(input.text == "inspect unfinished" && input.selectionStringAnchorPosition == 2 &&
                     input.selectionStringFocusPosition == 5 && input.isFocused == focused &&
@@ -205,7 +233,10 @@ namespace Uptime.Connections.EditorTools
                 output.Bind(new[] { done, active }, presentationMode: InspectPresentationMode.Verbose);
                 LayoutRebuilder.ForceRebuildLayoutImmediate(content); Canvas.ForceUpdateCanvases();
                 scroll.verticalNormalizedPosition = 0f;
-                Advance(output, Deadlines(output)[0]);
+                Advance(output, Deadlines(output)[0] + CollapseSeconds(output) * 0.5f);
+                Check(Mathf.Abs(scroll.verticalNormalizedPosition) < 0.001f,
+                    "bottom stays followed during shrink");
+                Advance(output, CollapseEnd(output, Deadlines(output)[0]));
                 Check(Mathf.Abs(scroll.verticalNormalizedPosition) < 0.001f, "bottom stays followed during collapse");
             }
             finally
@@ -224,6 +255,11 @@ namespace Uptime.Connections.EditorTools
         private static T Field<T>(UnityEngine.Object obj, string name) where T : UnityEngine.Object =>
             (T)new SerializedObject(obj).FindProperty(name).objectReferenceValue;
         private static float[] Deadlines(InspectOutput output) => (float[])typeof(InspectOutput).GetField("collapseAt", Private).GetValue(output);
+        private static float CollapseSeconds(InspectOutput output) =>
+            new SerializedObject(output).FindProperty("collapseSeconds").floatValue;
+        // Allow float timestamp rounding at the animation endpoint.
+        private static float CollapseEnd(InspectOutput output, float deadline) =>
+            deadline + CollapseSeconds(output) + 0.001f;
         private static void Advance(InspectOutput output, float now) =>
             typeof(InspectOutput).GetMethod("RefreshPresentation", Private).Invoke(output, new object[] { now });
         private static void Check(bool valid, string message)

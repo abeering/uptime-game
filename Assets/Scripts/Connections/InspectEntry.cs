@@ -43,24 +43,55 @@ namespace Uptime.Connections
         private InspectOperationToken activeToken;
         private bool stackedUpper;
         private bool resolvedSummary;
+        private bool summaryTransition;
 
         public float ExtraHeight => !resolvedSummary && stackedUpper ? 52f : 0f;
         public bool IsResolvedSummary => resolvedSummary;
+        public bool IsSummaryTransitioning => summaryTransition;
 
         public void ShowFullCard()
         {
             resolvedSummary = false;
+            summaryTransition = false;
             if (fullContent != null) fullContent.SetActive(true);
             if (resolvedRow != null) resolvedRow.gameObject.SetActive(false);
+            SetContentAlpha(1f, 1f);
         }
 
         public void ShowResolvedSummary(LogicalConnectionState state)
         {
+            BeginResolvedSummary(state);
+            SetSummaryTransition(1f);
+        }
+
+        public void BeginResolvedSummary(LogicalConnectionState state)
+        {
             if (!state.IsComplete || fullContent == null || resolvedRow == null) return;
             resolvedSummary = true;
-            fullContent.SetActive(false);
+            summaryTransition = true;
             resolvedRow.gameObject.SetActive(true);
             resolvedRow.Bind(state, quietColor);
+            resolvedRow.FitWidth();
+            SetContentAlpha(1f, 0f);
+        }
+
+        public void SetSummaryTransition(float progress)
+        {
+            if (!summaryTransition) return;
+            float t = Mathf.Clamp01(progress);
+            SetContentAlpha(1f - t, t);
+            if (t < 1f) return;
+            fullContent.SetActive(false);
+            SetContentAlpha(1f, 1f);
+            summaryTransition = false;
+        }
+
+        private void SetContentAlpha(float full, float summary)
+        {
+            if (fullContent != null && fullContent.TryGetComponent(out CanvasGroup fullGroup))
+                fullGroup.alpha = full;
+            if (resolvedRow != null && resolvedRow.TryGetComponent(out CanvasGroup summaryGroup))
+                summaryGroup.alpha = summary;
         }
 
         public void ClearRuntimeTokens()

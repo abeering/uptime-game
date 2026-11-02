@@ -284,6 +284,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6693006299413699728}
   - component: {fileID: 1719428833852010749}
+  - component: {fileID: 910000000000000005}
   m_Layer: 0
   m_Name: ResolvedInspectRow
   m_TagString: Untagged
@@ -332,6 +333,18 @@ MonoBehaviour:
   resolution: {fileID: 3715991858363757525}
   inset: 12
   gap: 10
+--- !u!225 &910000000000000005
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3639257001588093052}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1001 &444027740712687275
 PrefabInstance:
   m_ObjectHideFlags: 0
