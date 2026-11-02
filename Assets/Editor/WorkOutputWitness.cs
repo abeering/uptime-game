@@ -13,6 +13,8 @@ namespace Uptime.Connections.EditorTools
     {
         private static readonly MethodInfo RefreshMethod = typeof(WorkOutput).GetMethod(
             "Refresh", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo LoadRefreshMethod = typeof(LoadOutput).GetMethod(
+            "Refresh", BindingFlags.Instance | BindingFlags.NonPublic);
 
         [MenuItem("Tools/Connections/Run WORK Output Witness")]
         public static void Run()
@@ -35,6 +37,8 @@ namespace Uptime.Connections.EditorTools
             Terminal terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
             WorkOutput prefab = AssetDatabase.LoadAssetAtPath<WorkOutput>(
                 "Assets/Prefabs/Connections/WorkOutput.prefab");
+            LoadOutput loadPrefab = AssetDatabase.LoadAssetAtPath<LoadOutput>(
+                "Assets/Prefabs/Connections/LoadOutput.prefab");
             bool auto = traffic.AutoGenerationEnabled;
             bool hostile = traffic.HostileGenerationEnabled;
             FieldInfo travelField = typeof(SimulationHost).GetField(
@@ -45,6 +49,7 @@ namespace Uptime.Connections.EditorTools
             WorkOutput db = null;
             WorkOutput secondDb = null;
             WorkOutput auth = null;
+            LoadOutput load = null;
             try
             {
                 traffic.AutoGenerationEnabled = false;
@@ -58,9 +63,11 @@ namespace Uptime.Connections.EditorTools
                 db = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 secondDb = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 auth = UnityEngine.Object.Instantiate(prefab, parent.transform);
+                load = UnityEngine.Object.Instantiate(loadPrefab, parent.transform);
                 db.Bind("db", host);
                 secondDb.Bind("DB", host);
                 auth.Bind("auth", host);
+                load.Bind("db", host);
                 Check(db.ConnectionRowCount == 0 && Empty(db).gameObject.activeSelf &&
                     ((RectTransform)db.transform).rect.width == 320f &&
                     ((RectTransform)db.transform).rect.height == 146f,
@@ -81,11 +88,13 @@ namespace Uptime.Connections.EditorTools
                             TimedModifierBehaviorDefinition.Rate("pause", 0f, 0f, 0f) }));
                 host.StepSimulation(.1f);
                 Refresh(db); Refresh(secondDb); Refresh(auth);
+                Refresh(load);
                 Check(db.ConnectionRowCount == 2 && secondDb.ConnectionRowCount == 2 &&
                     auth.ConnectionRowCount == 1 &&
                     Ids(db).SequenceEqual(new[] { "w1", "w2" }) &&
+                    LoadIds(load).SequenceEqual(Ids(db)) &&
                     Ids(auth).SequenceEqual(new[] { "w3" }),
-                    "new arrivals, independent panels, and target membership");
+                    "new arrivals, independent panels, shared ordering, and target membership");
                 LogicalConnectionState first = host.FindConnection("w1");
                 WorkRequestRow row = Row(db, "w1");
                 int expectedSeconds = Mathf.CeilToInt(first.RemainingWork / first.ActualWorkRate);
@@ -155,9 +164,10 @@ namespace Uptime.Connections.EditorTools
                     "resolved row retires and recovered allocation changes ETA");
 
                 host.ResetSimulation();
-                Refresh(db); Refresh(secondDb); Refresh(auth);
+                Refresh(db); Refresh(secondDb); Refresh(auth); Refresh(load);
                 Check(db.ConnectionRowCount == 0 && secondDb.ConnectionRowCount == 0 &&
-                    auth.ConnectionRowCount == 0 && Empty(db).gameObject.activeSelf,
+                    auth.ConnectionRowCount == 0 && load.ConnectionRowCount == 0 &&
+                    Empty(db).gameObject.activeSelf,
                     "reset clears each panel's old row references");
                 Debug.Log("WorkOutputWitness PASS: commands, scene bindings, membership, " +
                     "contention, inspect ETA parity, operation transition, release, reset, widths.");
@@ -167,6 +177,7 @@ namespace Uptime.Connections.EditorTools
                 if (db != null) UnityEngine.Object.DestroyImmediate(db.gameObject);
                 if (secondDb != null) UnityEngine.Object.DestroyImmediate(secondDb.gameObject);
                 if (auth != null) UnityEngine.Object.DestroyImmediate(auth.gameObject);
+                if (load != null) UnityEngine.Object.DestroyImmediate(load.gameObject);
                 UnityEngine.Object.DestroyImmediate(parent);
                 travelField.SetValue(host, travel);
                 traffic.AutoGenerationEnabled = auto;
@@ -203,12 +214,18 @@ namespace Uptime.Connections.EditorTools
 
         private static void Refresh(WorkOutput panel) => RefreshMethod.Invoke(panel, null);
 
+        private static void Refresh(LoadOutput panel) => LoadRefreshMethod.Invoke(panel, null);
+
         private static WorkRequestRow[] Rows(WorkOutput panel) =>
             panel.GetComponentsInChildren<WorkRequestRow>(true)
                 .Where(r => r.gameObject.activeSelf).ToArray();
 
         private static string[] Ids(WorkOutput panel) =>
             Rows(panel).Select(r => r.DisplayedId).ToArray();
+
+        private static string[] LoadIds(LoadOutput panel) =>
+            panel.GetComponentsInChildren<LoadRequestRow>(true)
+                .Where(r => r.gameObject.activeSelf).Select(r => r.DisplayedId).ToArray();
 
         private static WorkRequestRow Row(WorkOutput panel, string id) =>
             Rows(panel).Single(r => r.DisplayedId == id);

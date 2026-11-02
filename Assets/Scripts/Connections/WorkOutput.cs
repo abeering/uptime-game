@@ -97,6 +97,7 @@ namespace Uptime.Connections
                 order.Add(state);
                 rows.Add(state, row);
             }
+            order.Sort(NodePanelRowOrder.Compare);
             FitWidth();
             foreach (LogicalConnectionState state in order)
                 rows[state].Render(state);
@@ -136,6 +137,7 @@ namespace Uptime.Connections
             {
                 WorkRequestRow row = rows[order[i]];
                 RectTransform rect = (RectTransform)row.transform;
+                if (rect.GetSiblingIndex() != i) rect.SetSiblingIndex(i);
                 rect.anchoredPosition = new Vector2(0f, -i * (rowHeight + rowGap));
                 rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowHeight);
                 row.FitWidth(contentWidth);
