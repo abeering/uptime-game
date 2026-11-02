@@ -30,6 +30,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 
 ## Working designs, not implemented contracts
 
+- [Hacker challenges, command races & skill rewards](connections-hacker-command-races.md) — working two-pane hacker-initiated TypeRacer design, optional live network, authentic-feeling commands, rolled success benefits, reusable terminal Event Cards, and upgrade ideas. **Design exploration; not an implementation contract.**
 - [Windowed workspace, Escape & communications V0](connections-windowed-workspace-comms-v0.md) — original October 30 direction, reconciled with implemented desktop/CLEAN/calls/Escape/text messaging (#69–#74) and still-open menu, pause, narrative and density questions. **Partially implemented; use current contracts for executable behavior.**
 - [Entities, Conditions, statuses, and reactive events](connections-entities-conditions-events-ideas.md) — exploratory separation of network motion, effects, timed Conditions, persistent infections, player-visible knowledge, and ambient/directed event lifecycles; candidate indirect-pressure Conditions and on-resolution villain behavior. **Not an implementation plan.**
 - [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
