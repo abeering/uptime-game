@@ -18,6 +18,7 @@ namespace Uptime.Connections
         [SerializeField] private Color benefitColor = new Color(.40f, .91f, .76f);
         [SerializeField, Min(.05f)] private float appearanceSeconds = .32f;
         [SerializeField, Min(.05f)] private float disappearanceSeconds = .5f;
+        [SerializeField] private bool showBands = true;
 
         private readonly float[] strength = new float[3];
         private Rect nodeRect;
@@ -25,7 +26,8 @@ namespace Uptime.Connections
 
         public RectTransform Rect => (RectTransform)transform;
         public RectTransform StackRoot => stackRoot;
-        public Vector2 StackSize => new Vector2(184f, stackHeight);
+        public Vector2 StackSize => new Vector2(220f, stackHeight);
+        public void SetBandsVisible(bool visible) => showBands = visible;
         public bool HasVisibleFamily => strength[0] > 0f || strength[1] > 0f || strength[2] > 0f;
         public bool PainVisible => painPanel.gameObject.activeSelf;
         public bool AwarenessVisible => awarenessPanel.gameObject.activeSelf;
@@ -63,7 +65,7 @@ namespace Uptime.Connections
                 strength[i] = Mathf.MoveTowards(strength[i], desired[i] ? 1f : 0f,
                     Mathf.Max(0f, deltaSeconds) / seconds);
                 bool visible = strength[i] > 0f;
-                bands[i].gameObject.SetActive(visible);
+                bands[i].gameObject.SetActive(visible && showBands);
                 panels[i].gameObject.SetActive(visible);
                 if (!visible) continue;
 
@@ -87,33 +89,33 @@ namespace Uptime.Connections
                 if (state.Offline) { rows.Add("OFFLINE"); timers.Add(null); }
                 if (state.KnownInfected) { rows.Add("INFECTED"); timers.Add(null); }
                 if (state.ScanJammed)
-                { rows.Add("SCAN JAMMED"); timers.Add(state.ScanJamRemainingFraction); }
+                { rows.Add("SCAN JAMMED"); timers.Add(state.ScanJamRemainingSeconds); }
                 SetRows(painPanel, rows, timers, painColor);
             }
             if (awareness)
                 awarenessPanel.SetContent(state.PortScanned ? "PORT SCANNED" : "PORT SCAN",
                     null, awarenessColor,
-                    state.PortScanned ? state.PortScanRemainingFraction : (float?)null);
+                    state.PortScanned ? state.PortScanRemainingSeconds : (float?)null);
             if (benefit)
             {
                 var rows = new List<string>();
                 var timers = new List<float?>();
                 if (clean) { rows.Add("CLEAN"); timers.Add(null); }
                 if (state.Isolated)
-                { rows.Add("ISOLATED"); timers.Add(state.IsolationRemainingFraction); }
+                { rows.Add("ISOLATED"); timers.Add(state.IsolationRemainingSeconds); }
                 string interceptText = state.InterceptSucceeded ? "CAUGHT " :
                     "INTERCEPT ";
                 if (intercept)
                 { rows.Add(state.InterceptAllPayloads ? "INTERCEPT ALL" :
                         interceptText + state.InterceptPayloadId);
-                    timers.Add(state.InterceptRemainingFraction); }
+                    timers.Add(state.InterceptRemainingSeconds); }
                 SetRows(benefitPanel, rows, timers, benefitColor);
             }
 
             for (int i = 0; i < 3; i++)
                 if (panels[i].gameObject.activeSelf)
                     stackHeight += panels[i].Height + (stackHeight > 0f ? 7f : 0f);
-            stackRoot.sizeDelta = new Vector2(184f, stackHeight);
+            stackRoot.sizeDelta = new Vector2(220f, stackHeight);
             float top = stackHeight * .5f;
             for (int i = 0; i < 3; i++)
             {

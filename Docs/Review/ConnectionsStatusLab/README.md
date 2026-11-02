@@ -1,5 +1,9 @@
 # Connections status lab
 
+The Node Status Presentation V1 follow-up changes this lab's visual treatment;
+see [its review notes](../ConnectionsNodeStatusV1/README.md). The material below
+records the original Status Lab baseline and captures.
+
 Open `Assets/Scenes/ConnectionsStatusLab.unity`, set the Game view to **16:9**, and
 enter Play Mode. The scene starts completely clean. Click the grouped buttons to
 record the existing AUTH node status presentation; no simulation needs to run.

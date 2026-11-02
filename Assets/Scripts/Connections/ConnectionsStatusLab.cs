@@ -8,6 +8,7 @@ namespace Uptime.Connections
         [SerializeField] private NodeView node;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private NodeStatusView statusView;
+        [SerializeField] private NodeEventStamp stamp;
 
         private readonly NodeStatusState state = new();
         private bool offline;
@@ -20,25 +21,32 @@ namespace Uptime.Connections
 
         public NodeStatusState State => state;
         public NodeStatusView StatusView => statusView;
+        public NodeEventStamp Stamp => stamp;
         public NodeView Node => node;
         public RectTransform NetworkArea => networkArea;
 
-        private void OnEnable() => ClearAll();
+        private void OnEnable()
+        {
+            if (statusView != null) statusView.SetBandsVisible(false);
+            ClearAll();
+        }
         private void Update() => RenderNow(Time.unscaledTime, Time.unscaledDeltaTime);
 
-        public void ToggleOffline() { offline = !offline; Refresh(); }
-        public void ToggleInfected() { infected = !infected; Refresh(); }
+        public void ToggleOffline() { offline = !offline; Refresh(); if (offline) Announce(NodeEventStamp.EventKind.Offline); }
+        public void ToggleInfected() { infected = !infected; Refresh(); if (infected) Announce(NodeEventStamp.EventKind.Infected); }
         public void ScanJammed()
         {
             jam = Condition(ConditionKind.ScanJammed, 8f);
             Refresh();
+            Announce(NodeEventStamp.EventKind.ScanJammed);
         }
         public void PortScanned()
         {
             portScan = Condition(ConditionKind.PortScanned, 20f);
             Refresh();
+            Announce(NodeEventStamp.EventKind.PortScanned);
         }
-        public void Clean() { cleanUntil = Time.unscaledTime + 2.5f; Refresh(); }
+        public void Clean() { cleanUntil = Time.unscaledTime + 2.5f; Refresh(); Announce(NodeEventStamp.EventKind.Clean); }
         public void Isolate()
         {
             isolation = new IsolationState
@@ -47,6 +55,7 @@ namespace Uptime.Connections
                 ExpiresAt = Time.unscaledTime + 8f
             };
             Refresh();
+            Announce(NodeEventStamp.EventKind.Isolated);
         }
         public void Intercept() => ApplyInterceptor(false);
         public void Caught() => ApplyInterceptor(true);
@@ -62,6 +71,12 @@ namespace Uptime.Connections
                 Succeeded = caught
             };
             Refresh();
+            Announce(caught ? NodeEventStamp.EventKind.Caught : NodeEventStamp.EventKind.Intercept);
+        }
+
+        private void Announce(NodeEventStamp.EventKind kind)
+        {
+            if (stamp != null) stamp.Play(kind);
         }
 
         private static NodeCondition Condition(ConditionKind kind, float seconds) =>
@@ -77,6 +92,7 @@ namespace Uptime.Connections
             interception = null;
             state.Reset();
             if (statusView != null) statusView.ClearVisuals();
+            if (stamp != null) stamp.Cancel();
         }
 
         private void Refresh() => RenderNow(Time.unscaledTime, 0f);
@@ -101,6 +117,7 @@ namespace Uptime.Connections
             if (node == null || networkArea == null || statusView == null) return;
             Rect card = EdgeGeometry.CardRect(node, networkArea);
             statusView.SetNodeRect(card);
+            statusView.SetBandsVisible(false);
             statusView.Render(state, realTime, deltaSeconds);
             // One unobstructed node: retain production stack geometry at its N anchor.
             statusView.PlaceStack(NodeStatusPlacement.At(NodeStatusAnchor.N,

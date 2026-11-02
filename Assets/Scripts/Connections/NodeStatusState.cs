@@ -12,15 +12,19 @@ namespace Uptime.Connections
         public bool AwarenessPreview { get; private set; }
         public bool PortScanned { get; private set; }
         public float PortScanRemainingFraction { get; private set; }
+        public float PortScanRemainingSeconds { get; private set; }
         public bool ScanJammed { get; private set; }
         public float ScanJamRemainingFraction { get; private set; }
+        public float ScanJamRemainingSeconds { get; private set; }
         public bool Isolated { get; private set; }
         public float IsolationRemainingFraction { get; private set; }
+        public float IsolationRemainingSeconds { get; private set; }
         public string InterceptPayloadId { get; private set; }
         public bool InterceptActive { get; private set; }
         public bool InterceptAllPayloads { get; private set; }
         public bool InterceptSucceeded { get; private set; }
         public float InterceptRemainingFraction { get; private set; }
+        public float InterceptRemainingSeconds { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || KnownInfected ||
             AwarenessPreview || PortScanned || ScanJammed || Isolated ||
@@ -62,6 +66,8 @@ namespace Uptime.Connections
         public void SetPortScanned(NodeCondition condition, float simulationTime)
         {
             PortScanned = condition != null;
+            PortScanRemainingSeconds = condition == null ? 0f : Mathf.Max(0f,
+                condition.ExpiresAtSeconds - simulationTime);
             PortScanRemainingFraction = condition == null ? 0f : Mathf.Clamp01(
                 (condition.ExpiresAtSeconds - simulationTime) /
                 (condition.ExpiresAtSeconds - condition.AppliedAtSeconds));
@@ -70,6 +76,8 @@ namespace Uptime.Connections
         public void SetScanJammed(NodeCondition condition, float simulationTime)
         {
             ScanJammed = condition != null;
+            ScanJamRemainingSeconds = condition == null ? 0f : Mathf.Max(0f,
+                condition.ExpiresAtSeconds - simulationTime);
             ScanJamRemainingFraction = condition == null ? 0f : Mathf.Clamp01(
                 (condition.ExpiresAtSeconds - simulationTime) /
                 (condition.ExpiresAtSeconds - condition.AppliedAtSeconds));
@@ -78,6 +86,8 @@ namespace Uptime.Connections
         public void SetIsolation(IsolationState isolation, float simulationTime)
         {
             Isolated = isolation != null;
+            IsolationRemainingSeconds = isolation == null ? 0f : Mathf.Max(0f,
+                isolation.ExpiresAt - simulationTime);
             IsolationRemainingFraction = isolation == null ? 0f : Mathf.Clamp01(
                 (isolation.ExpiresAt - simulationTime) /
                 (isolation.ExpiresAt - isolation.ActivatedAt));
@@ -89,6 +99,8 @@ namespace Uptime.Connections
             InterceptActive = interceptor != null;
             InterceptAllPayloads = interceptor != null && interceptor.AllPayloads;
             InterceptSucceeded = interceptor != null && interceptor.Succeeded;
+            InterceptRemainingSeconds = interceptor == null ? 0f : Mathf.Max(0f,
+                interceptor.ExpiresAt - simulationTime);
             InterceptRemainingFraction = interceptor == null ? 0f : Mathf.Clamp01(
                 (interceptor.ExpiresAt - simulationTime) /
                 (interceptor.ExpiresAt - interceptor.ActivatedAt));
@@ -101,15 +113,19 @@ namespace Uptime.Connections
             AwarenessPreview = false;
             PortScanned = false;
             PortScanRemainingFraction = 0f;
+            PortScanRemainingSeconds = 0f;
             ScanJammed = false;
             ScanJamRemainingFraction = 0f;
+            ScanJamRemainingSeconds = 0f;
             Isolated = false;
             IsolationRemainingFraction = 0f;
+            IsolationRemainingSeconds = 0f;
             InterceptPayloadId = null;
             InterceptActive = false;
             InterceptAllPayloads = false;
             InterceptSucceeded = false;
             InterceptRemainingFraction = 0f;
+            InterceptRemainingSeconds = 0f;
             cleanUntil = -1f;
         }
     }
