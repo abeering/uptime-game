@@ -716,72 +716,99 @@ namespace Uptime.Connections.EditorTools
                 "clean puzzle does not consume ambient generation RNG");
         }
 
-        private static void CheckCleanOverlayBindings()
+        [MenuItem("Tools/Connections/Run CLEAN Window Witness")]
+        public static void RunCleanWindowWitness()
+        {
+            foreach (string scene in new[] { "Connections", "ConnectionsAdvanced" })
+            {
+                EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
+                CheckCleanOverlayBindings();
+                Debug.Log("CLEAN Window Witness PASS: " + scene);
+            }
+        }
+
+        public static void CheckCleanOverlayBindings()
         {
             var overlay = UnityEngine.Object.FindFirstObjectByType<ConnectionsCleanOverlay>(
                 FindObjectsInactive.Include);
             var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
-            var panel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Prefabs/Connections/CleanOverlay.prefab");
-            Check(overlay != null && terminal != null && panel != null && prefab != null &&
+            Check(overlay != null && terminal != null && prefab != null &&
                 overlay.transform.parent.name == "NetworkPanel" &&
                 !overlay.gameObject.activeSelf &&
                 ((RectTransform)overlay.transform).sizeDelta == new Vector2(710f, 465f) &&
                 overlay.transform.localScale == Vector3.one &&
                 Mathf.Approximately(overlay.transform.lossyScale.x,
                     overlay.transform.parent.lossyScale.x),
-                "authored inactive clean overlay in network panel: local=" +
-                    overlay.transform.localScale + " lossy=" + overlay.transform.lossyScale +
-                    " size=" + ((RectTransform)overlay.transform).sizeDelta);
-            Check(ReferenceEquals(typeof(Terminal).GetField("cleanOverlay",
-                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(terminal), overlay) &&
-                ReferenceEquals(typeof(NetworkHealthPanel).GetField("cleanOverlay",
-                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(panel), overlay),
-                "terminal and Health focus bindings target scene overlay");
-            var prefabOverlay = prefab.GetComponent<ConnectionsCleanOverlay>();
-            var input = prefab.GetComponentInChildren<TMP_InputField>(true);
-            Check(prefabOverlay != null && input != null &&
-                prefab.transform.localScale == Vector3.one &&
+                "authored inactive CLEAN window in network panel");
+            var fields = new SerializedObject(overlay);
+            Check(fields.FindProperty("escapeCoordinator").objectReferenceValue != null &&
+                fields.FindProperty("placement").objectReferenceValue != null,
+                "CLEAN scene Escape coordinator and placement bindings");
+            var input = (TMP_InputField)fields.FindProperty("pidInput").objectReferenceValue;
+            var title = (TMP_Text)fields.FindProperty("title").objectReferenceValue;
+            var body = (TMP_Text)fields.FindProperty("body").objectReferenceValue;
+            var hint = (GameObject)fields.FindProperty("cancelHint").objectReferenceValue;
+            Check(new SerializedObject(terminal).FindProperty("cleanOverlay").objectReferenceValue == overlay &&
+                input != null && title != null && body != null && hint != null &&
                 prefab.GetComponent<Canvas>() == null &&
                 prefab.GetComponent<CleanMinigameOverlayView>() == null &&
-                input.onEndEdit.GetPersistentEventCount() == 0 &&
-                typeof(ConnectionsCleanOverlay).GetField("pidInput",
-                    BindingFlags.Instance | BindingFlags.NonPublic).GetValue(prefabOverlay) == input,
-                "Connections prefab keeps Packet visual language without Packet callback");
-            var background = prefab.transform.Find("MinigameBackground").GetComponent<Image>();
-            var header = prefab.transform.Find("MinigameTitleBar").GetComponent<Image>();
-            var title = prefab.transform.Find("MinigameTitle").GetComponent<TMP_Text>();
-            var body = prefab.transform.Find("MinigameText").GetComponent<TMP_Text>();
-            var rail = prefab.transform.Find("CleanAccentRail").GetComponent<Image>();
-            var inputBackground = input.GetComponent<Image>();
-            var placeholder = (TMP_Text)input.placeholder;
-            var networkHeader = overlay.transform.parent.Find("NetworkHeader").GetComponent<Image>();
-            var terminalTitle = terminal.transform.Find("TerminalHeader/TerminalTitle")
-                .GetComponent<TMP_Text>();
-            var terminalInput = terminal.transform.Find("CommandPrompt/CommandInput")
-                .GetComponent<TMP_InputField>();
+                input.onEndEdit.GetPersistentEventCount() == 0,
+                "Connections session, focus and authored content bindings without Packet callbacks");
+            Transform bar = overlay.transform.Find("CleanTitlebar");
+            Transform frame = overlay.transform.Find("CleanWindowFrame");
+            Check(bar != null && frame != null &&
+                PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(bar.gameObject) ==
+                    "Assets/Prefabs/Connections/DockedTitlebar.prefab" &&
+                PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(frame.gameObject) ==
+                    "Assets/Prefabs/Connections/DockedWindowFrame.prefab" &&
+                ((RectTransform)bar).rect.height == 40f &&
+                bar.Find("TitlebarRule") != null && !bar.Find("Pinned").gameObject.activeSelf &&
+                title.transform == bar.Find("Title") && hint.transform.parent == bar &&
+                hint.GetComponent<TMP_Text>().text == "[ESC] CANCEL" &&
+                hint.GetComponent<TMP_Text>().alignment == TextAlignmentOptions.MidlineRight &&
+                hint.GetComponent<TMP_Text>().raycastTarget == false &&
+                hint.GetComponent<UnityEngine.UI.Selectable>() == null &&
+                overlay.GetComponentsInChildren<UnityEngine.UI.Selectable>(true).Length == 1,
+                "CLEAN nests actual shared chrome with a bound, noninteractive Escape label");
+            Check(overlay.transform.Find("MinigameTitle") == null &&
+                overlay.transform.Find("MinigameTitleBar") == null &&
+                overlay.transform.Find("CleanAccentRail") == null &&
+                overlay.transform.Find("MinigameBackground").GetComponent<Outline>() == null,
+                "obsolete bespoke CLEAN chrome is removed");
+            foreach (Transform window in new[] { terminal.transform, overlay.transform.parent })
+            {
+                Transform header = window.Find(window == terminal.transform ? "TerminalHeader" : "NetworkHeader");
+                Check(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(header.gameObject) ==
+                    "Assets/Prefabs/Connections/DockedTitlebar.prefab" &&
+                    ((RectTransform)header).rect.height == 40f &&
+                    header.Find("Pinned").gameObject.activeSelf &&
+                    header.Find("Pinned/Fill").gameObject.activeSelf &&
+                    header.Find("CancelHint") == null,
+                    "permanent window keeps shared titlebar and filled pinned indicator");
+            }
+            foreach (string edge in new[] { "Top", "Bottom", "Left", "Right" })
+            {
+                RectTransform rect = (RectTransform)frame.Find(edge);
+                Check((edge == "Top" || edge == "Bottom" ? rect.rect.height : rect.rect.width) == 2f &&
+                    !rect.GetComponent<Image>().raycastTarget,
+                    "shared CLEAN frame keeps 2-unit noninteractive edge " + edge);
+            }
+            var background = overlay.transform.Find("MinigameBackground").GetComponent<Image>();
+            var terminalInput = (TMP_InputField)new SerializedObject(terminal)
+                .FindProperty("commandInput").objectReferenceValue;
             Check(background.color == terminal.GetComponent<Image>().color &&
-                header.color == networkHeader.color &&
-                title.font == terminalTitle.font &&
-                body.font == terminalInput.textComponent.font &&
-                title.color == new Color(0.73f, 0.89f, 0.84f) &&
-                body.color == title.color &&
-                rail.rectTransform.anchorMin == Vector2.zero &&
-                rail.rectTransform.anchorMax == new Vector2(0f, 1f) &&
-                rail.rectTransform.rect.width == 5f &&
-                ((RectTransform)header.transform).rect.height == 56f &&
-                body.rectTransform.offsetMax.y == -82f &&
-                inputBackground != null && input.targetGraphic == inputBackground &&
-                input.GetComponent<Outline>() != null &&
-                placeholder.text == "> PID" &&
-                placeholder.color == new Color(0.47f, 0.63f, 0.62f) &&
-                overlay.transform.Find("MinigameTitle").GetComponent<TMP_Text>().color ==
-                    title.color &&
-                overlay.transform.Find("MinigameText").GetComponent<TMP_Text>().color ==
-                    body.color &&
-                overlay.transform.Find("MinigameInput").GetComponent<Image>() != null,
-                "clean overlay uses Connections colors, font, spacing, and visible PID input");
+                body.font == terminalInput.textComponent.font && body.fontSize == 22f &&
+                body.color == new Color(0.73f, 0.89f, 0.84f) &&
+                body.rectTransform.offsetMax.y == -66f &&
+                body.rectTransform.offsetMin.y == 102f &&
+                body.rectTransform.offsetMax.x == -30f &&
+                input.GetComponent<Image>() != null && input.GetComponent<Outline>() != null &&
+                ((TMP_Text)input.placeholder).text == "> PID" &&
+                new SerializedObject(overlay).FindProperty("characterSeconds").floatValue == 0.012f &&
+                new SerializedObject(overlay).FindProperty("resultSeconds").floatValue == 1.3f,
+                "CLEAN retains body/input styling and timing beneath compact chrome");
         }
 
         private static void StepUntilComplete(SimulationHost host, string id)

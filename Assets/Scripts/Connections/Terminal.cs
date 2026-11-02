@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,11 +17,14 @@ namespace Uptime.Connections
         [SerializeField] private PlaceholderOutput placeholderPrefab;
         [SerializeField] private InspectOutput inspectPrefab;
         [SerializeField] private ScanOutput scanPrefab;
+        [SerializeField] private LoadOutput loadPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
+        [SerializeField] private ConnectionsVideoCall videoCall;
+        [SerializeField] private TextCommunicationDirector textCommunications;
         [SerializeField, Min(1)] private int maxEntries = 100;
         [SerializeField, Min(1)] private int maxCommandHistory = 100;
         [SerializeField, Min(1f)] private float keyboardScrollStep = 48f;
@@ -28,6 +32,10 @@ namespace Uptime.Connections
         [SerializeField] private Color mutedColor = new(0.47f, 0.63f, 0.62f);
         [SerializeField] private Color errorColor = new(1f, 0.63f, 0.39f);
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private Coroutine delayedCall;
+        private Coroutine delayedNotification;
+#endif
         private int entryCount;
         private bool scrollPending;
         private Coroutine bottomScrollRoutine;
@@ -60,17 +68,101 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.SimulationReset += CancelNotificationTest;
+#endif
             if (Application.isPlaying && simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded += OnInterceptSucceeded;
         }
 
         private void OnDisable()
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (delayedCall != null) StopCoroutine(delayedCall);
+            delayedCall = null;
+            CancelNotificationTest();
+            if (simulationHost != null) simulationHost.SimulationReset -= CancelNotificationTest;
+#endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
             if (simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void CancelNotificationTest()
+        {
+            if (delayedNotification != null) StopCoroutine(delayedNotification);
+            delayedNotification = null;
+        }
+
+        private void DeveloperNotificationTest(string[] tokens)
+        {
+            float delay = 0;
+            if (tokens.Length < 2 || tokens.Length > 3 ||
+                (tokens[1] != "im" && tokens[1] != "system" && tokens[1] != "burst") ||
+                (tokens.Length == 3 && (!tokens[2].StartsWith("delay=") ||
+                    !float.TryParse(tokens[2].Substring(6), NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
+                    float.IsInfinity(delay) || delay < 1 || delay > 30)))
+            {
+                AppendText("USAGE  notifytest im|system|burst [delay=1..30]", errorColor);
+                return;
+            }
+            if (textCommunications == null || !textCommunications.isActiveAndEnabled || delayedNotification != null)
+            {
+                AppendText("DEVELOPER MESSAGE TEST UNAVAILABLE OR ALREADY SCHEDULED", mutedColor);
+                return;
+            }
+            if (delay == 0) textCommunications.PushSample(tokens[1]);
+            else delayedNotification = StartCoroutine(OpenDelayedNotification(tokens[1], delay));
+            AppendText(delay == 0 ? "DEVELOPER MESSAGE SAMPLE DELIVERED" : "DEVELOPER MESSAGE SAMPLE SCHEDULED", mutedColor);
+        }
+
+        private IEnumerator OpenDelayedNotification(string kind, float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            delayedNotification = null;
+            // Delivery performs no terminal history write or input/focus operation.
+            if (textCommunications != null) textCommunications.PushSample(kind);
+        }
+
+        private void DeveloperCallTest(string[] tokens)
+        {
+            float delay = 0f;
+            if (tokens.Length != 1 && (tokens.Length != 2 || !tokens[1].StartsWith("delay=") ||
+                !float.TryParse(tokens[1].Substring(6), NumberStyles.AllowDecimalPoint,
+                    CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
+                float.IsInfinity(delay) || delay < 1f || delay > 30f))
+            {
+                AppendText("USAGE  calltest [delay=1..30]", errorColor);
+                return;
+            }
+            if (delayedCall != null || videoCall == null || videoCall.IsActive)
+            {
+                AppendText("TEST CALL UNAVAILABLE, ACTIVE OR ALREADY SCHEDULED", mutedColor);
+                return;
+            }
+            if (delay == 0f)
+                AppendText(videoCall.TryStartSampleCall() ? "DEVELOPER TEST CALL OPENED" :
+                    "TEST CALL UNAVAILABLE OR ALREADY ACTIVE", mutedColor);
+            else
+            {
+                delayedCall = StartCoroutine(OpenDelayedCall(delay));
+                AppendText("DEVELOPER TEST CALL SCHEDULED  /  " +
+                    delay.ToString("0.##", CultureInfo.InvariantCulture) + "s", mutedColor);
+            }
+        }
+
+        private IEnumerator OpenDelayedCall(float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            delayedCall = null;
+            // No history write or input/focus transfer when an unsolicited test arrives.
+            if (videoCall != null) videoCall.TryStartSampleCall();
+        }
+#endif
 
         private void OnInterceptSucceeded(PayloadState payload)
         {
@@ -241,6 +333,9 @@ namespace Uptime.Connections
                 case "scan":
                     Scan(tokens, command);
                     break;
+                case "load":
+                    Load(tokens);
+                    break;
                 case "intercept":
                     if (tokens.Length != 4 || tokens[2] != "@")
                         AppendText("USAGE  intercept <payloadId> @ <nodeId>", errorColor);
@@ -273,6 +368,12 @@ namespace Uptime.Connections
                     }
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "notifytest":
+                    DeveloperNotificationTest(tokens);
+                    break;
+                case "calltest":
+                    DeveloperCallTest(tokens);
+                    break;
                 case "worm":
                     if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
                         AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", errorColor);
@@ -478,12 +579,15 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  kill|k <id> [id ...]  scan <nodeId>  clean <nodeId>", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  kill|k <id> [id ...]", mutedColor);
+                    AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
                     AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
+                    AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);
@@ -681,6 +785,43 @@ namespace Uptime.Connections
             }
         }
 
+        private void Load(string[] tokens)
+        {
+            if (!TryParseLoad(tokens, out string nodeId, out string error))
+            {
+                AppendText(error, errorColor);
+                return;
+            }
+            if (simulationHost == null)
+            {
+                AppendText("LOAD  simulation unavailable", errorColor);
+                return;
+            }
+            NodeResources node = simulationHost.FindNodeResources(nodeId);
+            if (node == null)
+            {
+                AppendText("LOAD  unknown node " + nodeId.ToUpperInvariant(), errorColor);
+                return;
+            }
+            LoadOutput block = AppendOutputBlock(loadPrefab);
+            if (block == null)
+                AppendText("LOAD  output unavailable", errorColor);
+            else
+                block.Bind(node.View.NodeId, simulationHost);
+        }
+
+        public static bool TryParseLoad(string[] tokens, out string nodeId, out string error)
+        {
+            nodeId = null;
+            error = "USAGE  load <nodeId>";
+            if (tokens == null || tokens.Length != 2 ||
+                !tokens[0].Equals("load", System.StringComparison.OrdinalIgnoreCase))
+                return false;
+            nodeId = tokens[1];
+            error = null;
+            return true;
+        }
+
         public void FinishClean(string message, bool success)
         {
             AppendText(message, success ? normalColor : errorColor);
@@ -839,35 +980,6 @@ namespace Uptime.Connections
                 historyContent.anchoredPosition += new Vector2(0f, correction.y);
                 historyScroll.verticalNormalizedPosition = Mathf.Clamp01(
                     historyScroll.verticalNormalizedPosition);
-            }
-        }
-
-        // Keep the top visible history location when the workstation changes height.
-        public void SetTopInset(float inset)
-        {
-            var terminalRect = (RectTransform)transform;
-            bool atBottom = historyScroll == null ||
-                historyScroll.verticalNormalizedPosition <= 0.01f;
-            float offsetFromTop = 0f;
-            if (historyScroll != null && !atBottom)
-            {
-                Canvas.ForceUpdateCanvases();
-                var corners = new Vector3[4];
-                historyContent.GetWorldCorners(corners);
-                offsetFromTop = historyScroll.viewport.InverseTransformPoint(corners[1]).y -
-                    historyScroll.viewport.rect.yMax;
-            }
-            terminalRect.offsetMax = new Vector2(terminalRect.offsetMax.x, -inset);
-            if (historyScroll == null) return;
-            Canvas.ForceUpdateCanvases();
-            if (atBottom)
-                historyScroll.verticalNormalizedPosition = 0f;
-            else
-            {
-                float travel = Mathf.Max(0f,
-                    historyContent.rect.height - historyScroll.viewport.rect.height);
-                historyScroll.verticalNormalizedPosition = travel > 0f ?
-                    1f - Mathf.Clamp01(offsetFromTop / travel) : 0f;
             }
         }
 

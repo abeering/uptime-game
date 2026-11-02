@@ -50,14 +50,14 @@ namespace Uptime.Connections.EditorTools
                 Near(c1.AllocatedLoad, 5f, "uncontended c1 LOAD");
                 Near(db.RequestedLoad, 5f, "uncontended DB request");
                 Near(db.AllocatedLoad, 5f, "uncontended DB allocation");
-                Near(api.RequestedLoad, 1f, "transit API retains only baseline LOAD");
+                Near(api.RequestedLoad, 0f, "transit API has no LOAD request");
                 Color elevated = new SerializedObject(db.View.LoadBar).FindProperty("elevatedColor").colorValue;
                 Check(db.View.LoadBar.FillColor == elevated, "5/10 LOAD uses elevated color");
                 Check(c2.IsPending && c3.IsPending, "delayed connections pending");
                 Check(c1.OperationCount == 1 && c2.OperationCount == 1 && c3.OperationCount == 2,
                     "legacy single operations and authored arc");
                 CheckCapacityAndAccounting(host);
-                Debug.Log($"ResourceWitness uncontended: expected c1 5, DB 5/10, API baseline 1; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.LoadCapacity:0.###}, {api.RequestedLoad:0.###}");
+                Debug.Log($"ResourceWitness uncontended: expected c1 5, DB 5/10, API baseline 0; observed {c1.AllocatedLoad:0.###}, {db.RequestedLoad:0.###}/{db.LoadCapacity:0.###}, {api.RequestedLoad:0.###}");
 
                 int steps = 0;
                 while (!c3.IsActive && steps++ < 50)
@@ -72,7 +72,7 @@ namespace Uptime.Connections.EditorTools
                 Near(c1.AllocatedLoad, 50f / 13f, "authored c1 proportional LOAD");
                 Near(c3.AllocatedLoad, 80f / 13f, "authored c3 proportional LOAD");
                 Near(c2.AllocatedLoad, 5f, "AUTH target does not compete with DB");
-                Near(api.RequestedLoad, 1f, "transit API remains at baseline");
+                Near(api.RequestedLoad, 0f, "transit API remains at zero baseline");
                 CheckCapacityAndAccounting(host);
                 CheckPresentation(host, c1, db);
                 CheckArcPresentation(c3, true);

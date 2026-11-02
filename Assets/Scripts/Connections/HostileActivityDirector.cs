@@ -4,6 +4,26 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
+    // One hostile opportunity produces exactly one of these outcomes. Non-connection
+    // identities stay distinct from connection plans in both scheduling and recording.
+    public sealed class AmbientHostileActivityResult
+    {
+        public string Activity { get; internal set; }
+        public float SelectionRoll { get; internal set; }
+        public ConnectionSpawnPlan ConnectionPlan { get; internal set; }
+        public string ConnectionId => ConnectionPlan?.ConnectionId;
+        public string EventId => ConnectionPlan?.HostileEventId;
+        public string PayloadId { get; internal set; }
+        public string WormOutbreakId { get; internal set; }
+        public string OriginNodeId { get; internal set; }
+        public string TargetNodeId { get; internal set; }
+        public string PayloadProfile { get; internal set; }
+        public string WormEffect { get; internal set; }
+        public string Reason { get; internal set; }
+        public bool Succeeded => ConnectionId != null || PayloadId != null ||
+            WormOutbreakId != null;
+    }
+
     // Chooses activity at the existing hostile opportunity; owns one short event lifecycle.
     public sealed class HostileActivityDirector : MonoBehaviour
     {
@@ -11,6 +31,10 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionTrafficDirector traffic;
         [SerializeField, Min(0f)] private float ordinaryWeight = 1f;
         [SerializeField, Min(0f)] private float reconnaissanceWeight;
+        [SerializeField, Min(0f)] private float payloadWeight;
+        [SerializeField, Min(0f)] private float wormWeight;
+        [SerializeField, Range(0f, 1f)] private float variablePayloadChance = .5f;
+        [SerializeField, Range(0f, 1f)] private float scanJammedWormChance = .7f;
         [SerializeField, Range(0f, 1f)] private float followupChance = .4f;
         [SerializeField, Min(0f)] private float followupDelaySeconds = 8f;
         [SerializeField, Min(.01f)] private float portScanLoad = 8f;
@@ -37,6 +61,10 @@ namespace Uptime.Connections
 
         public float OrdinaryWeight { get => ordinaryWeight; set => ordinaryWeight = Mathf.Max(0f, value); }
         public float ReconnaissanceWeight { get => reconnaissanceWeight; set => reconnaissanceWeight = Mathf.Max(0f, value); }
+        public float PayloadWeight { get => payloadWeight; set => payloadWeight = Mathf.Max(0f, value); }
+        public float WormWeight { get => wormWeight; set => wormWeight = Mathf.Max(0f, value); }
+        public float VariablePayloadChance { get => variablePayloadChance; set => variablePayloadChance = Mathf.Clamp01(value); }
+        public float ScanJammedWormChance { get => scanJammedWormChance; set => scanJammedWormChance = Mathf.Clamp01(value); }
         public float FollowupChance { get => followupChance; set => followupChance = Mathf.Clamp01(value); }
         public float FollowupDelaySeconds { get => followupDelaySeconds; set => followupDelaySeconds = Mathf.Max(0f, value); }
         public float PortScanLoad => portScanLoad;
@@ -64,24 +92,153 @@ namespace Uptime.Connections
             nextEventId = 0;
         }
 
-        public ConnectionSpawnPlan QueueAmbientActivity(float atTime)
+        public AmbientHostileActivityResult QueueAmbientActivity(float atTime)
         {
             if (random == null) ResetActivity(traffic.Seed);
-            float total = Mathf.Max(0f, ordinaryWeight) + Mathf.Max(0f, reconnaissanceWeight);
+            float total = Mathf.Max(0f, ordinaryWeight) + Mathf.Max(0f, reconnaissanceWeight) +
+                Mathf.Max(0f, payloadWeight) + Mathf.Max(0f, wormWeight);
+            var result = new AmbientHostileActivityResult();
             if (total <= 0f)
             {
-                host.Recorder?.RecordHostileActivity(atTime, "none", ordinaryWeight,
-                    reconnaissanceWeight, null, null, "ambient");
-                return null;
+                result.Activity = "none";
+                result.Reason = "no_weighted_activity";
             }
-            bool recon = random.NextDouble() * total >= ordinaryWeight;
-            ConnectionSpawnPlan plan = recon ? QueueReconnaissance(null, atTime) :
-                traffic.GenerateHostilePlan(atTime);
-            if (!recon && plan != null) traffic.QueueSpawnPlan(plan, "ambient_hostile");
-            host.Recorder?.RecordHostileActivity(atTime, recon ? "reconnaissance" : "ordinary",
-                ordinaryWeight, reconnaissanceWeight, plan?.ConnectionId,
-                plan?.HostileEventId, "ambient");
-            return plan;
+            else
+            {
+                result.SelectionRoll = (float)random.NextDouble();
+                float choice = result.SelectionRoll * total;
+                result.Activity = choice < ordinaryWeight ? "ordinary" :
+                    choice < ordinaryWeight + reconnaissanceWeight ? "reconnaissance" :
+                    choice < ordinaryWeight + reconnaissanceWeight + payloadWeight ?
+                        "payload" : "worm";
+                try
+                {
+                    switch (result.Activity)
+                    {
+                        case "ordinary":
+                            result.ConnectionPlan = traffic.GenerateHostilePlan(atTime);
+                            if (result.ConnectionPlan != null)
+                                traffic.QueueSpawnPlan(result.ConnectionPlan, "ambient_hostile");
+                            else result.Reason = traffic.ConnectionIdsExhausted ?
+                                "ids_exhausted" : "no_weighted_purpose";
+                            break;
+                        case "reconnaissance":
+                            result.ConnectionPlan = QueueReconnaissance(null, atTime);
+                            if (result.ConnectionPlan == null)
+                                result.Reason = traffic.ConnectionIdsExhausted ?
+                                    "ids_exhausted" : "no_scan_plan";
+                            break;
+                        case "payload":
+                            SpawnAmbientPayload(result);
+                            break;
+                        case "worm":
+                            SpawnAmbientWorm(result);
+                            break;
+                    }
+                }
+                catch (InvalidOperationException error)
+                {
+                    result.Reason = "spawn_unavailable: " + error.Message;
+                }
+                if (result.ConnectionPlan != null)
+                {
+                    result.OriginNodeId = result.ConnectionPlan.Route[0].NodeId;
+                    result.TargetNodeId = result.ConnectionPlan.Target.NodeId;
+                }
+            }
+            host.Recorder?.RecordHostileActivity(host.SimulationTimeSeconds, atTime,
+                result, this);
+            return result;
+        }
+
+        private void SpawnAmbientPayload(AmbientHostileActivityResult result)
+        {
+            if (host.Payloads == null)
+            { result.Reason = "payload_director_unavailable"; return; }
+            var origins = EligibleOrigins(requireWormAvailability: false);
+            if (origins.Count == 0)
+            { result.Reason = "no_reachable_internal_target"; return; }
+            NodeView origin = ChooseOrigin(origins);
+            var targets = ReachableInternalTargets(origin);
+            NodeView target = targets[random.Next(targets.Count)];
+            PayloadMotionProfile profile = random.NextDouble() < variablePayloadChance ?
+                PayloadMotionProfile.Variable : PayloadMotionProfile.Steady;
+            result.OriginNodeId = origin.NodeId;
+            result.TargetNodeId = target.NodeId;
+            result.PayloadProfile = profile.ToString();
+            result.PayloadId = host.Payloads.Spawn(target.NodeId, profile, origin.NodeId).Id;
+        }
+
+        private void SpawnAmbientWorm(AmbientHostileActivityResult result)
+        {
+            if (host.Worms == null)
+            { result.Reason = "worm_director_unavailable"; return; }
+            var origins = EligibleOrigins(requireWormAvailability: true);
+            if (origins.Count == 0)
+            { result.Reason = "no_available_ingress"; return; }
+            NodeView origin = ChooseOrigin(origins);
+            WormEffect effect = random.NextDouble() < scanJammedWormChance ?
+                WormEffect.ScanJammed : WormEffect.PortScanned;
+            result.OriginNodeId = origin.NodeId;
+            result.WormEffect = effect.ToString();
+            result.WormOutbreakId = host.Worms.Spawn(origin.NodeId, effect).Id;
+        }
+
+        private List<(NodeView node, float weight)> EligibleOrigins(bool requireWormAvailability)
+        {
+            var result = new List<(NodeView, float)>();
+            foreach (AmbientOriginWeight entry in traffic.EffectiveAmbientOrigins)
+            {
+                if (entry == null || entry.weight <= 0f) continue;
+                NodeView node = host.FindNodeResources(entry.nodeId)?.View;
+                if (node == null || requireWormAvailability &&
+                    host.Worms.IsNodeIsolated(node)) continue;
+                if (!requireWormAvailability && ReachableInternalTargets(node).Count == 0)
+                    continue;
+                result.Add((node, entry.weight));
+            }
+            return result;
+        }
+
+        private NodeView ChooseOrigin(List<(NodeView node, float weight)> choices)
+        {
+            float total = 0f;
+            foreach (var choice in choices) total += choice.weight;
+            float roll = (float)random.NextDouble() * total;
+            foreach (var choice in choices)
+            {
+                roll -= choice.weight;
+                if (roll < 0f) return choice.node;
+            }
+            return choices[choices.Count - 1].node;
+        }
+
+        private List<NodeView> ReachableInternalTargets(NodeView origin)
+        {
+            var visited = new HashSet<NodeView> { origin };
+            var pending = new Queue<NodeView>();
+            pending.Enqueue(origin);
+            while (pending.Count > 0)
+            {
+                NodeView current = pending.Dequeue();
+                foreach (PhysicalLinkReference edge in host.PhysicalLinks)
+                {
+                    NodeView next = edge?.View?.NodeA == current ? edge.View.NodeB :
+                        edge?.View?.NodeB == current ? edge.View.NodeA : null;
+                    if (next != null && visited.Add(next)) pending.Enqueue(next);
+                }
+            }
+            var targets = new List<NodeView>();
+            foreach (NodeView node in visited)
+            {
+                bool ingress = false;
+                foreach (AmbientOriginWeight entry in traffic.EffectiveAmbientOrigins)
+                    if (entry != null && string.Equals(entry.nodeId, node.NodeId,
+                        StringComparison.OrdinalIgnoreCase)) { ingress = true; break; }
+                if (!ingress) targets.Add(node);
+            }
+            targets.Sort((a, b) => StringComparer.Ordinal.Compare(a.NodeId, b.NodeId));
+            return targets;
         }
 
         public ConnectionSpawnPlan QueuePortScan(string targetNodeId)

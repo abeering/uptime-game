@@ -55,8 +55,10 @@ namespace Uptime.Connections.EditorTools
             foreach (string field in new[] { "networkArea", "pathLayer", "markerLayer",
                 "pathPrefab", "identityPresenter" })
                 Check(Bound(presenter, field), "path presenter binding " + field);
-            foreach (string field in new[] { "title", "body", "pidInput" })
+            foreach (string field in new[] { "title", "body", "pidInput", "cancelHint" })
                 Check(Bound(clean, field), "clean overlay binding " + field);
+            InfectionWitness.CheckCleanOverlayBindings();
+            EscapeVideoCallWitness.CheckBindings();
             Check(host.RunMode == ConnectionRunMode.Generated && host.Definitions.Length == 0 &&
                 director.AutoGenerationEnabled && director.HostileGenerationEnabled &&
                 director.RandomizeSeed && recorder.RecordingEnabled,
@@ -68,8 +70,7 @@ namespace Uptime.Connections.EditorTools
                 "exact node IDs");
             foreach (NodeResources node in host.Nodes)
             {
-                bool external = node.View.NodeId.StartsWith("EXT", StringComparison.Ordinal);
-                Check(node.LoadCapacity == 10f && node.BaselineLoad == (external ? 0f : 1f),
+                Check(node.LoadCapacity == 10f && node.BaselineLoad == 0f,
                     "node LOAD defaults " + node.View.NodeId);
                 Check(node.View.GetComponent<RectTransform>() != null,
                     "authored card " + node.View.NodeId);
@@ -97,7 +98,7 @@ namespace Uptime.Connections.EditorTools
                 "weighted dual ingress");
             Check(director.BenignPopulationGoal == 4f && director.CoverageStartupGoal == 1f &&
                 director.CoverageRampSeconds == 75f &&
-                director.HostileMeanIntervalSeconds == 38f,
+                director.HostileMeanIntervalSeconds == 30f,
                 "population and hostile scheduling");
             director.ResetDirector();
             foreach (var target in Targets)

@@ -2,15 +2,17 @@ using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Uptime.Connections
 {
     // Authored overlay for the Connections PID-Select session. Simulation stays live.
-    public sealed class ConnectionsCleanOverlay : MonoBehaviour
+    public sealed class ConnectionsCleanOverlay : MonoBehaviour, IEscapeTarget
     {
+        [SerializeField] private EscapeCoordinator escapeCoordinator;
+        [SerializeField] private ConnectionsWindowPlacement placement;
         [SerializeField] private TMP_Text title;
         [SerializeField] private TMP_Text body;
+        [SerializeField] private GameObject cancelHint;
         [SerializeField] private TMP_InputField pidInput;
         [SerializeField, Min(0f)] private float characterSeconds = 0.012f;
         [SerializeField, Min(0f)] private float resultSeconds = 1.3f;
@@ -24,6 +26,29 @@ namespace Uptime.Connections
 
         public bool IsOpen => gameObject.activeInHierarchy && session != null;
 
+        public bool CanDismissWithEscape => IsOpen && !showingResult;
+
+        public void SetEscapeTarget(bool targeted) => cancelHint.SetActive(targeted && CanDismissWithEscape);
+
+        public void DismissFromEscape()
+        {
+            if (!CanDismissWithEscape) return;
+            host.CancelClean();
+            Close("CLEAN CANCELED  " + session.NodeId, true);
+        }
+
+        private void OnDisable()
+        {
+            if (escapeCoordinator != null) escapeCoordinator.Unregister(this);
+            if (session == null) return;
+            if (!showingResult && host != null && host.ActiveClean == session) host.CancelClean();
+            string message = "CLEAN SESSION ENDED  " + session.NodeId;
+            session = null;
+            if (sequence != null) StopCoroutine(sequence);
+            sequence = null;
+            if (terminal != null && terminal.isActiveAndEnabled) terminal.FinishClean(message, false);
+        }
+
         private void Awake()
         {
             if (pidInput != null) pidInput.onSubmit.AddListener(Submit);
@@ -31,6 +56,7 @@ namespace Uptime.Connections
 
         private void OnDestroy()
         {
+            if (escapeCoordinator != null) escapeCoordinator.Unregister(this);
             if (pidInput != null) pidInput.onSubmit.RemoveListener(Submit);
         }
 
@@ -44,6 +70,9 @@ namespace Uptime.Connections
             showingResult = false;
             gameObject.SetActive(true);
             title.text = "PROCESS KILLER  /  " + session.NodeId;
+            placement.PlaceClean(session.Target.View);
+            transform.SetAsLastSibling();
+            escapeCoordinator.Register(this);
             pidInput.gameObject.SetActive(false);
             sequence = StartCoroutine(Splash());
         }
@@ -55,12 +84,6 @@ namespace Uptime.Connections
             {
                 Close("CLEAN SESSION ENDED  " + session.NodeId, false);
                 return;
-            }
-            if (!showingResult && Keyboard.current != null &&
-                Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                host.CancelClean();
-                Close("CLEAN CANCELED  " + session.NodeId, true);
             }
         }
 
@@ -79,7 +102,7 @@ namespace Uptime.Connections
             foreach (CleanProcess process in session.Processes)
                 listing.AppendFormat("{0,-9} {1,2}%       {2}\n", process.Pid,
                     process.CpuPercent, process.Name);
-            listing.Append("\nENTER PID TO TERMINATE   /   ESC TO CANCEL");
+            listing.Append("\nENTER PID TO TERMINATE");
             body.text = listing.ToString();
             pidInput.SetTextWithoutNotify(string.Empty);
             pidInput.gameObject.SetActive(true);
@@ -113,6 +136,8 @@ namespace Uptime.Connections
             }
             acceptingPid = false;
             showingResult = true;
+            escapeCoordinator.Unregister(this);
+            cancelHint.SetActive(false);
             pidInput.gameObject.SetActive(false);
             bool success = result == CleanSelectionResult.Success;
             string feedback = success ? "PROCESS TERMINATED  /  CLEAN COMPLETE" :
@@ -144,11 +169,12 @@ namespace Uptime.Connections
 
         private void Close(string message, bool success)
         {
+            escapeCoordinator.Unregister(this);
             if (sequence != null) StopCoroutine(sequence);
             sequence = null;
             session = null;
             gameObject.SetActive(false);
-            terminal?.FinishClean(message, success);
+            if (terminal != null && terminal.isActiveAndEnabled) terminal.FinishClean(message, success);
         }
     }
 }

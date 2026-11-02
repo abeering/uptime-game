@@ -1,0 +1,126 @@
+Unity 6000.3.11f1 — Text Communications V0 validation
+Baseline: c7a857330a49386207c73a4d9e52a5934ad07b51 after PR #73.
+Isolated project: /private/tmp/uptime-text-v0-validation
+
+Focused Play Mode matrix (final corrected witness):
+  Connections 1920x1080: PASS, 45 logged assertions; uptime-text-connections-1920.log
+  Connections 1280x720: PASS, 45 logged assertions; uptime-text-connections-1280.log
+  Connections 1577x887: PASS, 45 logged assertions; uptime-text-connections-1577.log
+  ConnectionsAdvanced 1920x1080: PASS, 45 logged assertions; uptime-text-connectionsadvanced-1920.log
+  ConnectionsAdvanced 1280x720: PASS, 45 logged assertions; uptime-text-connectionsadvanced-1280.log
+  ConnectionsAdvanced 1577x887: PASS, 45 logged assertions; uptime-text-connectionsadvanced-1577.log
+
+Representative observed checks (1920x1080 four-node):
+TEXT CHECK: null delivery rejected
+TEXT CHECK: bounded reading-time default and finite positive lifetime override
+TEXT CHECK: entire body is assigned immediately; no typewriter
+TEXT CHECK: supplied avatar and authored teal rail
+TEXT CHECK: explicit display timestamp
+TEXT CHECK: brief arrival fade in progress
+TEXT CHECK: arrival preserves typing owner, draft and selection: inspect c1
+TEXT CHECK: system monitor icon, authored amber rail and workstation-clock snapshot
+TEXT CHECK: missing avatar has readable neutral person fallback
+TEXT CHECK: short, multiline and long text dynamically size with complete readable content
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: fifth arrival gracefully retires oldest
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: arrival/reflow does not strand fades while older entries exit
+TEXT CHECK: expiry starts departure while scaled time is stopped
+TEXT CHECK: unscaled departure cleans up without advancing simulation
+TEXT CHECK: rapid bursts bound live and departing entries
+TEXT CHECK: rapid-burst deferred destruction leaves four entries
+TEXT CHECK: one pending developer delivery
+TEXT CHECK: arrival preserves typing owner, draft and selection: 5279
+TEXT CHECK: notifications preserve CLEAN position and Escape eligibility
+TEXT CHECK: arrival preserves typing owner, draft and selection: 5279
+TEXT CHECK: call and CLEAN stay fixed when text arrives; Escape owner unchanged
+TEXT CHECK: fresh Escape hangs up call without dismissing text
+TEXT CHECK: held Escape does not cascade
+TEXT CHECK: next fresh Escape cancels CLEAN without dismissing text
+TEXT CHECK: new call prefers no greater actual readable-message overlap than its empty-stack home
+TEXT CHECK: simulation reset clears entries and cancels pending sample
+TEXT CHECK: malformed developer commands create neither messages nor pending jobs
+TEXT CHECK: terminal disable cancels scheduled test
+TEXT CHECK: component disable destroys entries and rejects delivery
+TEXT CHECK: scene/container disable leaves no old entries
+TEXT CHECK: ordinary generated traffic and simulation continue with messages visible
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: settled newest-first entries fit network viewport without overlap
+TEXT CHECK: network viewport, node positions and physical topology unchanged
+TEXT CHECK: final teardown has no orphaned entries or notification coroutines
+
+Adjacent Editor batch (initial run; final regression summary below):
+EscapeVideoCallWitness bindings PASS: Connections
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+TextCommunicationWitness BINDINGS PASS
+ResourceWitness PASS
+GeometryWitness PASS: scene references, edge budgets and stages, rendered pill visibility at reference size and 6 px gap, rotated pill clearance and cycle coverage, short edges, terminal markers, establishment and completion.
+TrafficWitness PASS
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+TEXT ADJACENT BATCH PASS
+
+Presentation captures: 24 raw PNGs generated by six focused runs; 16 selected PNGs retained.
+All 16 retained PNGs passed dimensions/chunk/CRC checks.
+Existing serialized scene blocks preserved, except the new stack child and terminal/placement bindings.
+Each scene adds four container/component blocks and one reference to the existing clock prefab component.
+
+Caveats:
+- Initial focused test assumed traffic had spawned after a fixed wait. That assertion failed; changed to wait for real active traffic. All six final runs passed.
+- Isolated Unity startup logs an existing SearchDatabase/EnumerateAll ArgumentOutOfRangeException; gameplay checks and captures continued.
+- Licensing logs a nonfatal unavailable access-token refresh; the installed Editor license permitted compilation and all runs.
+- Captures use a fixed Canvas camera viewport for the entire run, not capture-only resizing.
+- Synthetic supplied-avatar fixture is a built-in circular Sprite. Real character art is not included.
+- Physical keyboard/IME, native Game view and subjective reading comfort require manual review.
+- Extremely large text is viewport-capped with ellipsis; message authors should supply readable ephemeral paragraphs.
+- Packet gameplay was not exercised; Packet files are unchanged.
+
+Final regression summary:
+  Existing full EscapeVideoCallWitness: Connections, 1280x720: PASS (exit 0).
+  Existing full EscapeVideoCallWitness: ConnectionsAdvanced, 1280x720: PASS (exit 0).
+  Final adjacent Editor batch: PASS (exit 0).
+  Final runtime and witness C# sources matched the isolated tested project.
+  Project Core regenerated and freshness check passed.
+  Scoped staged whitespace check passed; unrelated user research edit left unchanged.
+  Scene block preservation and 16 retained PNG integrity/dimension checks passed.
+  New documentation/review relative links resolve.
+  Unrelated Docs/research/network-nouns-verbs-inventory.md and scratch excluded from commit.
+
+Final adjacent batch observed output:
+EscapeVideoCallWitness bindings PASS: Connections
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+TextCommunicationWitness BINDINGS PASS
+ResourceWitness PASS
+GeometryWitness PASS: scene references, edge budgets and stages, rendered pill visibility at reference size and 6 px gap, rotated pill clearance and cycle coverage, short edges, terminal markers, establishment and completion.
+TrafficWitness PASS
+CLEAN Window Witness PASS: Connections
+CLEAN Window Witness PASS: ConnectionsAdvanced
+InfectionWitness PASS: queued payload, interruption, completion, persistence, duplicate rejection, Blackout routing/Health, Spawner propagation/replay, clean commands, recorder JSON, and legacy profile.
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+InspectV2Witness PASS: command modes, multi-ID, compact/verbose, width-aware six-stage timeline, fitted pills, one-decimal live LOAD, canceled outcome, and history.
+ResolvedInspectWitness PASS: four outcomes, exact four-second UI hold, paused time, independent cards, fresh historical inspection, narrow layout, simulation invariance, scroll anchoring, bottom following, and input preservation.
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+TEXT ADJACENT BATCH PASS

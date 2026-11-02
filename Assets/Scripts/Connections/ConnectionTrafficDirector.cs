@@ -148,6 +148,7 @@ namespace Uptime.Connections
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
+        public bool ConnectionIdsExhausted => idsExhausted;
         public float HostileMeanIntervalSeconds
         {
             get => hostileMeanIntervalSeconds;
@@ -434,25 +435,33 @@ namespace Uptime.Connections
                 nextHostileAt = simulationTime + HostileDelay();
                 hostileClockPaused = false;
             }
-            if (allowAmbient && autoGenerationEnabled && !idsExhausted)
+            if (allowAmbient && autoGenerationEnabled)
             {
                 if (hostileGenerationEnabled)
                 {
                     while (nextHostileAt <= simulationTime + 0.00001f)
                     {
                         float dueAt = nextHostileAt;
-                        ConnectionSpawnPlan plan = hostileActivities != null ?
-                            hostileActivities.QueueAmbientActivity(dueAt) :
-                            GenerateHostilePlan(dueAt);
-                        if (plan != null && hostileActivities == null)
-                            QueueSpawnPlan(plan, "ambient_hostile");
+                        AmbientHostileActivityResult result;
+                        if (hostileActivities != null)
+                            result = hostileActivities.QueueAmbientActivity(dueAt);
+                        else
+                        {
+                            ConnectionSpawnPlan plan = GenerateHostilePlan(dueAt);
+                            if (plan != null) QueueSpawnPlan(plan, "ambient_hostile");
+                            result = new AmbientHostileActivityResult
+                            {
+                                Activity = "ordinary", ConnectionPlan = plan,
+                                OriginNodeId = plan?.Route[0].NodeId,
+                                TargetNodeId = plan?.Target.NodeId,
+                                Reason = plan == null ? idsExhausted ? "ids_exhausted" :
+                                    "no_weighted_purpose" : null
+                            };
+                        }
                         float interval = HostileDelay();
                         nextHostileAt = dueAt + interval;
                         host.Recorder?.RecordHostileOpportunity(simulationTime, dueAt,
-                            hostileMeanIntervalSeconds, interval, nextHostileAt,
-                            plan?.ConnectionId, plan != null ? null :
-                                idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
-                        if (idsExhausted) break;
+                            hostileMeanIntervalSeconds, interval, nextHostileAt, result);
                     }
                 }
                 // One stochastic opportunity per step prevents catch-up bursts after long steps.
@@ -1393,7 +1402,7 @@ namespace Uptime.Connections
                     return id;
             }
             if (!idsExhausted)
-                Debug.LogWarning("All 260 generated connection IDs are reserved; ambient spawning has stopped.", this);
+                Debug.LogWarning("All 260 generated connection IDs are reserved; connection-plan spawning has stopped.", this);
             idsExhausted = true;
             return null;
         }

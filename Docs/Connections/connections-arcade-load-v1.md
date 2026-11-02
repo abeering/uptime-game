@@ -17,7 +17,7 @@ Slice 3A adds optional additive modifiers to an operation's authored WORK and re
 
 ## Authored witness
 
-The four-node, three-link scene remains. `c1` targets DB and requests 5 LOAD; `c2` targets AUTH and requests 5 LOAD; `c3` targets DB and requests 8 LOAD after a 3-second delay. With DB capacity 10, its 13 requested LOAD grants approximately 3.846 to `c1` and 6.154 to `c3`. `c2` keeps its full 5 LOAD at AUTH. When `c3` completes, `c1` returns to 5 LOAD on the next step. API has 1 baseline LOAD and no transit cost.
+The four-node, three-link scene remains. `c1` targets DB and requests 5 LOAD; `c2` targets AUTH and requests 5 LOAD; `c3` targets DB and requests 8 LOAD after a 3-second delay. With DB capacity 10, its 13 requested LOAD grants approximately 3.846 to `c1` and 6.154 to `c3`. `c2` keeps its full 5 LOAD at AUTH. When `c3` completes, `c1` returns to 5 LOAD on the next step. At the original PR #4 checkpoint, API had 1 baseline LOAD. The PR #68 refinement sets every gameplay-scene node's baseline to 0; transit itself has no LOAD cost. The optional baseline mechanic remains supported and is checked by `ResourceWitness` with explicit nonzero values.
 
 ## Review
 

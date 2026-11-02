@@ -15,14 +15,21 @@ namespace Uptime.Connections.EditorTools
         [MenuItem("Tools/Connections/Run Network Health Witness")]
         public static void Run()
         {
-            EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
+            foreach (string scene in new[] { "ConnectionsAdvanced", "Connections" })
+            {
+                EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
+                var sceneHost = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+                sceneHost.ResetSimulation();
+                CheckPanelBindings(sceneHost);
+                var scenePanel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
+                CheckBarPresentation(scenePanel);
+                CheckPermanentLayout(scenePanel);
+                Debug.Log("NetworkHealthWitness compact layout PASS: " + scene);
+            }
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             Check(host != null && director != null, "host and traffic director");
             var panel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
-            CheckPanelBindings(host);
-            CheckBarPresentation(panel);
-            CheckHistoryResize(panel);
             var settings = new SerializedObject(host).FindProperty("healthTuning");
             Near(settings.FindPropertyRelative("deadlineTolerance").floatValue, 1.5f,
                 "scene deadline tolerance");
@@ -188,6 +195,16 @@ namespace Uptime.Connections.EditorTools
                 Check(host.Health.RecentEvents.Count == 0, "reset clears events");
 
                 host.ResetSimulation();
+                Add(host, "hostile-only-a", "DB", true,
+                    new OperationStage(OperationKind.Write, 100f, 10f, "hostile-only-a"));
+                Add(host, "hostile-only-b", "DB", true,
+                    new OperationStage(OperationKind.Write, 100f, 10f, "hostile-only-b"));
+                host.StepSimulation(1f);
+                Check(host.Health.SlowedCount == 2 && host.Health.Impacts.Count == 0 &&
+                    host.Health.DegradationRate == 0f && host.Health.Value == 100f,
+                    "hostile-only slowdown appears in aggregate but has no benign Health impact");
+
+                host.ResetSimulation();
                 var arc = Add(host, "arc", "DB", false,
                     new OperationStage(OperationKind.Read, 10f, 5f, "read"),
                     new OperationStage(OperationKind.Write, 20f, 10f, "write"));
@@ -327,35 +344,44 @@ namespace Uptime.Connections.EditorTools
                 "authored panel prefab instance");
             var fields = new SerializedObject(panel);
             Check(fields.FindProperty("host").objectReferenceValue == host &&
-                fields.FindProperty("commandInput").objectReferenceValue != null &&
-                fields.FindProperty("terminalPanel").objectReferenceValue != null &&
+                fields.FindProperty("clockText").objectReferenceValue != null &&
+                fields.FindProperty("valueText").objectReferenceValue != null &&
                 fields.FindProperty("rateText").objectReferenceValue != null &&
-                fields.FindProperty("headingText").objectReferenceValue != null,
-                "panel simulation, command, and terminal bindings");
+                fields.FindProperty("healthFill").objectReferenceValue != null,
+                "compact panel simulation and presentation bindings");
+            Check(panel.transform.Find("ExpandedDetails") == null &&
+                panel.GetComponentsInChildren<TMP_Text>(true).Length == 3,
+                "prefab contains only clock, Health and signed rate text");
             var rect = (RectTransform)panel.transform;
-            var terminal = (RectTransform)fields.FindProperty("terminalPanel").objectReferenceValue;
-            Check(rect.anchorMax.x == terminal.anchorMax.x &&
-                rect.anchorMin.x == terminal.anchorMin.x &&
-                Mathf.Abs(rect.rect.width - terminal.rect.width) < 0.01f,
-                "matching panel widths");
+            var terminal = (RectTransform)UnityEngine.Object.FindFirstObjectByType<Terminal>().transform;
+            var network = (RectTransform)terminal.parent.Find("NetworkPanel");
+            Canvas.ForceUpdateCanvases();
+            Check(rect.anchorMin == new Vector2(0f, 1f) && rect.anchorMax == Vector2.one &&
+                rect.rect.width > terminal.rect.width,
+                "permanent full-width top strip");
+            Near(rect.sizeDelta.x, 0f, "status strip fills display width");
+            Near(rect.anchoredPosition.y, 0f, "status strip flush with display top");
+            Near(rect.rect.height, 52f, "authored compact height");
+            Near(terminal.offsetMax.y, -60f, "terminal gutter below status strip");
+            Near(network.offsetMax.y, -60f, "network gutter below status strip");
             Check(panel.ShiftEndMinuteOfDay == 17 * 60, "configurable end marker");
             panel.Render();
             CheckHealthBar(panel, 100f);
             Check(panel.ClockText == "09:00", "24-hour clock at simulation start");
-            typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
-                BindingFlags.NonPublic).SetValue(panel, true);
-            panel.ApplyLayout();
-            Near(rect.rect.height, ((RectTransform)rect.parent).rect.height * 0.2f,
-                "expanded height fraction");
-            Check(terminal.rect.height > 0f, "terminal remains visible when expanded");
-            typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
-                BindingFlags.NonPublic).SetValue(panel, false);
-            panel.ApplyLayout();
-            Near(rect.rect.height, 52f, "compact height");
         }
         private static void CheckHealthBar(NetworkHealthPanel panel, float expectedHealth)
         {
             panel.Render();
+            var fields = new SerializedObject(panel);
+            var host = (SimulationHost)fields.FindProperty("host").objectReferenceValue;
+            Check(((TMP_Text)fields.FindProperty("valueText").objectReferenceValue).text ==
+                $"HEALTH {host.Health.Value:0.#}", "immediate authoritative Health value");
+            float rate = Mathf.Abs(host.Health.NetRate) < 0.005f ? 0f : host.Health.NetRate;
+            var rateText = (TMP_Text)fields.FindProperty("rateText").objectReferenceValue;
+            Check(rateText.text == $"{rate:+0.00;-0.00;0.00}/s", "authoritative signed rate");
+            Color expectedColor = fields.FindProperty(rate < 0f ? "degradingColor" :
+                rate > 0f ? "recoveringColor" : "stableColor").colorValue;
+            Check(rateText.color == expectedColor, "authoritative signed rate color");
             Canvas.ForceUpdateCanvases();
             var fill = (Image)new SerializedObject(panel).FindProperty("healthFill")
                 .objectReferenceValue;
@@ -376,7 +402,7 @@ namespace Uptime.Connections.EditorTools
             Color orange = fields.FindProperty("drainingBarColor").colorValue;
             Color red = fields.FindProperty("criticalBarColor").colorValue;
             Near(track.rect.height, value.fontSize, "bar matches Health text size");
-            Near(rate.rectTransform.anchoredPosition.x, -16f, "rate right edge unchanged");
+            Near(rate.rectTransform.anchoredPosition.x, 633f, "rate stays in left status group");
             var corners = new Vector3[4];
             track.GetWorldCorners(corners);
             float left = value.rectTransform.InverseTransformPoint(corners[0]).x;
@@ -390,8 +416,8 @@ namespace Uptime.Connections.EditorTools
                 value.GetPreferredValues("HEALTH 100").x;
             float rightGap = rate.rectTransform.rect.xMax -
                 rate.GetPreferredValues("-11.11/s").x - right;
-            Check(Mathf.Abs(leftGap - rightGap) < 2f,
-                "bar centers between full Health text and reserved two-digit rate");
+            Check(leftGap > 8f && rightGap > 8f,
+                "bar has space between Health text and reserved two-digit rate");
             Debug.Log($"NetworkHealthWitness bar layout: {track.rect.width:0.#} x " +
                 $"{track.rect.height:0.#}, rate reserve {rate.GetPreferredValues("-11.11/s").x:0.#}");
 
@@ -464,9 +490,8 @@ namespace Uptime.Connections.EditorTools
             }
         }
 
-        private static void CheckHistoryResize(NetworkHealthPanel panel)
+        private static void CheckPermanentLayout(NetworkHealthPanel panel)
         {
-            Check(panel != null, "health panel exists for resize check");
             var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
             var fields = new SerializedObject(terminal);
             var scroll = (ScrollRect)fields.FindProperty("historyScroll").objectReferenceValue;
@@ -475,39 +500,62 @@ namespace Uptime.Connections.EditorTools
             Check(scroll != null && content != null && input != null &&
                 content.anchorMin.y == 0f && content.anchorMax.y == 0f && content.pivot.y == 0f,
                 "authored history bottom anchor and prompt binding");
+            var terminalRect = (RectTransform)terminal.transform;
+            var network = (RectTransform)terminalRect.parent.Find("NetworkPanel");
+            var strip = (RectTransform)panel.transform;
             var prompt = (RectTransform)input.transform;
-            Canvas.ForceUpdateCanvases();
-            float promptBottom = prompt.position.y;
-            var dummy = new GameObject("Health history resize witness", typeof(RectTransform),
+            var dummy = new GameObject("Compact Health history witness", typeof(RectTransform),
                 typeof(LayoutElement));
+            string draft = input.text;
+            int anchor = input.selectionStringAnchorPosition, focus = input.selectionStringFocusPosition;
             try
             {
                 dummy.transform.SetParent(content, false);
-                dummy.GetComponent<LayoutElement>().preferredHeight = 1000f;
+                dummy.GetComponent<LayoutElement>().preferredHeight =
+                    Mathf.Max(1500f, scroll.viewport.rect.height + 500f);
                 Canvas.ForceUpdateCanvases();
                 LayoutRebuilder.ForceRebuildLayoutImmediate(content);
-                scroll.verticalNormalizedPosition = 0.5f;
-                Canvas.ForceUpdateCanvases();
-                var corners = new Vector3[4];
-                content.GetWorldCorners(corners);
-                float before = scroll.viewport.InverseTransformPoint(corners[1]).y -
-                    scroll.viewport.rect.yMax;
-                typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
-                    BindingFlags.NonPublic).SetValue(panel, true);
-                panel.ApplyLayout();
-                Canvas.ForceUpdateCanvases();
-                content.GetWorldCorners(corners);
-                float after = scroll.viewport.InverseTransformPoint(corners[1]).y -
-                    scroll.viewport.rect.yMax;
-                Near(after, before, "browsed history top offset preserved on expand");
-                Near(prompt.position.y, promptBottom, "prompt stays at bottom on expand");
+                input.SetTextWithoutNotify("inspect unfinished");
+                input.selectionStringAnchorPosition = 3;
+                input.selectionStringFocusPosition = 7;
+                bool focused = input.isFocused;
+                var events = UnityEngine.Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
+                GameObject selected = events.currentSelectedGameObject;
+                foreach (float position in new[] { 0.5f, 0f })
+                {
+                    scroll.verticalNormalizedPosition = position;
+                    Canvas.ForceUpdateCanvases();
+                    Vector2 historyBefore = content.anchoredPosition;
+                    Vector3 promptBefore = prompt.position;
+                    Rect terminalBefore = terminalRect.rect, networkBefore = network.rect;
+                    Vector2 terminalTop = terminalRect.offsetMax, networkTop = network.offsetMax;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        panel.enabled = false;
+                        panel.enabled = true;
+                        panel.Render();
+                    }
+                    Canvas.ForceUpdateCanvases();
+                    Check(terminalRect.rect == terminalBefore && network.rect == networkBefore &&
+                        terminalRect.offsetMax == terminalTop && network.offsetMax == networkTop,
+                        "Health render/re-enable leaves both pane geometries fixed");
+                    Near(strip.rect.height, 52f, "Health render/re-enable keeps compact height");
+                    Near(Vector2.Distance(content.anchoredPosition, historyBefore), 0f,
+                        "Health leaves browsed history or bottom position unchanged");
+                    Near(Vector3.Distance(prompt.position, promptBefore), 0f,
+                        "prompt stays at authored bottom");
+                    Check(input.text == "inspect unfinished" && input.selectionStringAnchorPosition == 3 &&
+                        input.selectionStringFocusPosition == 7 && input.isFocused == focused &&
+                        events.currentSelectedGameObject == selected,
+                        "Health leaves prompt draft and selection unchanged");
+                }
             }
             finally
             {
                 UnityEngine.Object.DestroyImmediate(dummy);
-                typeof(NetworkHealthPanel).GetField("expanded", BindingFlags.Instance |
-                    BindingFlags.NonPublic).SetValue(panel, false);
-                panel.ApplyLayout();
+                input.SetTextWithoutNotify(draft);
+                input.selectionStringAnchorPosition = anchor;
+                input.selectionStringFocusPosition = focus;
             }
         }
         private static void Near(float actual, float expected, string label) =>
