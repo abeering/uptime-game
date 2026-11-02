@@ -18,6 +18,7 @@ namespace Uptime.Connections
         [SerializeField] private InspectOutput inspectPrefab;
         [SerializeField] private ScanOutput scanPrefab;
         [SerializeField] private LoadOutput loadPrefab;
+        [SerializeField] private WorkOutput workPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
@@ -336,6 +337,9 @@ namespace Uptime.Connections
                 case "load":
                     Load(tokens);
                     break;
+                case "work":
+                    Work(tokens);
+                    break;
                 case "intercept":
                     if (tokens.Length != 4 || tokens[2] != "@")
                         AppendText("USAGE  intercept <payloadId> @ <nodeId>", errorColor);
@@ -579,7 +583,8 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", errorColor);
                     break;
                 case "help":
-                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  kill|k <id> [id ...]", mutedColor);
+                    AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
+                    AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
                     AppendText("DEFENSE  intercept <payloadId> @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
@@ -808,6 +813,43 @@ namespace Uptime.Connections
                 AppendText("LOAD  output unavailable", errorColor);
             else
                 block.Bind(node.View.NodeId, simulationHost);
+        }
+
+        private void Work(string[] tokens)
+        {
+            if (!TryParseWork(tokens, out string nodeId, out string error))
+            {
+                AppendText(error, errorColor);
+                return;
+            }
+            if (simulationHost == null)
+            {
+                AppendText("WORK  simulation unavailable", errorColor);
+                return;
+            }
+            NodeResources node = simulationHost.FindNodeResources(nodeId);
+            if (node == null)
+            {
+                AppendText("WORK  unknown node " + nodeId.ToUpperInvariant(), errorColor);
+                return;
+            }
+            WorkOutput block = AppendOutputBlock(workPrefab);
+            if (block == null)
+                AppendText("WORK  output unavailable", errorColor);
+            else
+                block.Bind(node.View.NodeId, simulationHost);
+        }
+
+        public static bool TryParseWork(string[] tokens, out string nodeId, out string error)
+        {
+            nodeId = null;
+            error = "USAGE  work <nodeId>";
+            if (tokens == null || tokens.Length != 2 ||
+                !tokens[0].Equals("work", System.StringComparison.OrdinalIgnoreCase))
+                return false;
+            nodeId = tokens[1];
+            error = null;
+            return true;
         }
 
         public static bool TryParseLoad(string[] tokens, out string nodeId, out string error)

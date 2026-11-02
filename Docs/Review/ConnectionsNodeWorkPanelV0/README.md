@@ -1,0 +1,7 @@
+# Node WORK panel V0 — Editor review
+
+[`work-db-1920x1080.png`](work-db-1920x1080.png) is a graphics-enabled Unity 6000.3.11f1 Editor preview at 1920×1080. It renders the authored `WorkOutput` and `WorkRequestRow` prefabs in a 650-unit terminal column, using deterministic DB traffic from the Connections simulation. The remaining canvas is deliberately blank. The image shows one multi-operation connection and one independent connection under shared target-node LOAD contention; ETA and bar lengths come from their current simulation states. It is a prefab composition preview, not a Connections scene Play Mode screenshot.
+
+The focused `WorkOutputWitness` passed in an isolated Unity project copy. It checks parsing and errors, both scene bindings, empty and multi-panel states, target membership, threat-label absence, current-operation WORK and inspect ETA parity, `PAUSED` and zero-allocation ETA, stage transition, resource release, reset, narrow-purpose ellipsis, and operation-pill bounds. The existing Inspect V2, LOAD Output, Resource, Traffic, and Behavior witnesses also passed. Unity compiled the project during these runs.
+
+Interactive Play Mode review remains: open `Connections.unity` and `ConnectionsAdvanced.unity` at 16:9, run `work db` beside `load db` and `inspect -v <id>`, check long purposes and crowded rows, watch pills and bars across a stage transition, then confirm prompt focus and history scrolling while rows arrive and retire. The Editor preview does not establish those interactions.
