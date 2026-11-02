@@ -54,9 +54,11 @@ namespace Uptime.Connections.EditorTools
                     "Assets/Prefabs/Connections/NodeEventStamp.prefab"),
                 "genuine linked stamp prefab");
             Check(lab.Stamp.transform.parent == lab.StatusView.transform &&
+                lab.Stamp.transform.GetSiblingIndex() >
+                    lab.StatusView.StackRoot.GetSiblingIndex() &&
                 lab.Stamp.Rect.sizeDelta.y > lab.StatusView.Rect.sizeDelta.y &&
                 lab.Stamp.GetComponentsInChildren<Image>(true).All(i => !i.raycastTarget),
-                "large centered stamp and no raycast interception");
+                "large centered stamp above panels with no raycast interception");
             var stampData = new SerializedObject(lab.Stamp);
             var frames = stampData.FindProperty("frames");
             var symbols = stampData.FindProperty("symbols");

@@ -12,7 +12,7 @@ Sprite. All imports retain their original PNGs and GUIDs, alpha, no mipmaps, and
 uncompressed texture data. The authored `NodeEventStamp.prefab` exposes its
 overall size, 24 FPS playback, one-second lifetime, fade onset, tint, opacity,
 icon delay and icon scale in the Inspector. It is centered on AUTH inside the
-linked status view, above the card and below the panel stack, and has no raycast
+linked status view, above the card and the panel stack, and has no raycast
 targets. A new event replaces the current one; CLEAR ALL cancels it.
 
 The shared `NodeStatus.prefab` now has three separate label rows and three
@@ -51,6 +51,8 @@ physical mouse feel and normal Game view focus need a human Play Mode pass.
 - Unity 6000.3.11f1 compiled and imported the isolated project copy.
 - `NodeStatusLabWitness.Run` and `NodeStatusWitness.Run` passed. The lab witness
   was rerun after the final band-suppression change.
+- The stamp now draws over panels. The lab witness checks sibling order, and
+  the eight captures below were refreshed for that placement.
 - Scripted Editor captures were rendered and inspected at both resolutions.
   These are single-frame scene renders, not Play Mode screenshots or an animation.
 - Two batch Play Mode capture attempts stalled after Unity's startup Search
