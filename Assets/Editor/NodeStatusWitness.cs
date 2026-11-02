@@ -45,11 +45,12 @@ namespace Uptime.Connections.EditorTools
             {
                 var serialized = new SerializedObject(panel);
                 Check(serialized.FindProperty("plate").objectReferenceValue != null &&
-                    serialized.FindProperty("firstRow").objectReferenceValue != null &&
-                    serialized.FindProperty("secondRow").objectReferenceValue != null &&
-                    serialized.FindProperty("firstRadialTimer").objectReferenceValue != null &&
-                    serialized.FindProperty("secondRadialTimer").objectReferenceValue != null,
-                    path + " authored panel bindings and optional per-row timers");
+                    serialized.FindProperty("labels").arraySize == 3 &&
+                    serialized.FindProperty("timers").arraySize == 3 &&
+                    Enumerable.Range(0, 3).All(i =>
+                        serialized.FindProperty("labels").GetArrayElementAtIndex(i).objectReferenceValue != null &&
+                        serialized.FindProperty("timers").GetArrayElementAtIndex(i).objectReferenceValue != null),
+                    path + " authored three-row panel and seconds timers");
                 var plate = (PillGraphic)serialized.FindProperty("plate").objectReferenceValue;
                 Check(plate.material != null && plate.material.shader.name ==
                     "Uptime/Connections/AntialiasedPill" && !plate.raycastTarget,
@@ -59,17 +60,18 @@ namespace Uptime.Connections.EditorTools
             try
             {
                 var panel = preview.GetComponentsInChildren<NodeStatusPanel>(true)[0];
-                panel.SetContent("OFFLINE", "INFECTED", Color.red, .75f, .25f);
+                panel.SetRows("OFFLINE", "INFECTED", "SCAN JAMMED", Color.red,
+                    null, null, 7.01f);
                 var serialized = new SerializedObject(panel);
-                var first = (Image)serialized.FindProperty("firstRadialTimer").objectReferenceValue;
-                var second = (Image)serialized.FindProperty("secondRadialTimer").objectReferenceValue;
-                Check(first.gameObject.activeSelf && second.gameObject.activeSelf &&
-                    Mathf.Approximately(first.fillAmount, .75f) &&
-                    Mathf.Approximately(second.fillAmount, .25f),
-                    path + " independent optional row timers");
+                var timers = serialized.FindProperty("timers");
+                var first = (TMP_Text)timers.GetArrayElementAtIndex(0).objectReferenceValue;
+                var third = (TMP_Text)timers.GetArrayElementAtIndex(2).objectReferenceValue;
+                Check(!first.gameObject.activeSelf && third.gameObject.activeSelf &&
+                    third.text == "8s" && panel.Height == 78f,
+                    path + " third-row ceiling seconds timer");
                 panel.SetContent("CLEAN", null, Color.green);
-                Check(!first.gameObject.activeSelf && !second.gameObject.activeSelf,
-                    path + " untimed statuses hide both radial timers");
+                Check(!first.gameObject.activeSelf && !third.gameObject.activeSelf,
+                    path + " untimed statuses hide seconds timers");
             }
             finally { UnityEngine.Object.DestroyImmediate(preview.gameObject); }
         }

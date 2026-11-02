@@ -40,7 +40,8 @@ namespace Uptime.Connections.EditorTools
             EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsStatusLab.unity");
             var lab = UnityEngine.Object.FindFirstObjectByType<ConnectionsStatusLab>();
             Check(lab != null && lab.Node != null && lab.Node.NodeId == "AUTH" &&
-                lab.NetworkArea != null && lab.StatusView != null, "authored driver bindings");
+                lab.NetworkArea != null && lab.StatusView != null && lab.Stamp != null,
+                "authored driver and stamp bindings");
             Check(UnityEngine.Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None).Length == 1 &&
                 UnityEngine.Object.FindFirstObjectByType<SimulationHost>() == null &&
                 UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>() == null,
@@ -48,6 +49,31 @@ namespace Uptime.Connections.EditorTools
             Check(PrefabUtility.GetCorrespondingObjectFromSource(lab.StatusView) ==
                 AssetDatabase.LoadAssetAtPath<NodeStatusView>(
                     "Assets/Prefabs/Connections/NodeStatus.prefab"), "genuine linked status prefab");
+            Check(PrefabUtility.GetCorrespondingObjectFromSource(lab.Stamp) ==
+                AssetDatabase.LoadAssetAtPath<NodeEventStamp>(
+                    "Assets/Prefabs/Connections/NodeEventStamp.prefab"),
+                "genuine linked stamp prefab");
+            Check(lab.Stamp.transform.parent == lab.StatusView.transform &&
+                lab.Stamp.Rect.sizeDelta.y > lab.StatusView.Rect.sizeDelta.y &&
+                lab.Stamp.GetComponentsInChildren<Image>(true).All(i => !i.raycastTarget),
+                "large centered stamp and no raycast interception");
+            var stampData = new SerializedObject(lab.Stamp);
+            var frames = stampData.FindProperty("frames");
+            var symbols = stampData.FindProperty("symbols");
+            Check(frames.arraySize == 24 && symbols.arraySize == 8,
+                "24 background frames and eight separate symbols");
+            for (int i = 0; i < 24; i++)
+            {
+                var frame = (Sprite)frames.GetArrayElementAtIndex(i).objectReferenceValue;
+                Check(frame != null && frame.name == "background_sheet_6x4_" + i &&
+                    frame.rect.size == new Vector2(320f, 384f),
+                    "ordered full-cell background frame " + i);
+            }
+            string[] symbolNames = { "offline", "infected", "scan_jammed",
+                "port_scanned", "clean", "isolated", "intercept", "caught" };
+            for (int i = 0; i < symbolNames.Length; i++)
+                Check(symbols.GetArrayElementAtIndex(i).objectReferenceValue is Sprite sprite &&
+                    sprite.name == symbolNames[i], "symbol binding " + symbolNames[i]);
             Check(UnityEngine.Object.FindFirstObjectByType<EventSystem>()?.GetComponent<BaseInputModule>() != null,
                 "authored input module");
             string[] methods = { "ToggleOffline", "ToggleInfected", "ScanJammed", "PortScanned",
@@ -69,7 +95,11 @@ namespace Uptime.Connections.EditorTools
             Check(!lab.State.HasAny(now) && !lab.StatusView.HasVisibleFamily,
                 "initial state and visuals completely clean");
             lab.ToggleOffline(); lab.RenderNow(now, 1f);
-            Check(lab.State.Offline && lab.StatusView.PainVisible, "OFFLINE persistent toggle on");
+            Check(lab.State.Offline && lab.StatusView.PainVisible && lab.Stamp.IsPlaying &&
+                lab.Stamp.CurrentKind == NodeEventStamp.EventKind.Offline &&
+                lab.StatusView.GetComponentsInChildren<NodeStatusBandGraphic>(true)
+                    .All(b => !b.gameObject.activeSelf),
+                "OFFLINE persistent toggle, stamp and lab-only band suppression");
             lab.ToggleOffline(); lab.RenderNow(now, 1f);
             Check(!lab.State.HasAny(now) && !lab.StatusView.HasVisibleFamily, "OFFLINE toggle off");
             lab.ToggleInfected(); lab.RenderNow(now + 100f, 1f);
@@ -120,7 +150,9 @@ namespace Uptime.Connections.EditorTools
                 lab.StatusView.GetComponentsInChildren<TMP_Text>()
                 .Any(t => t.text.Contains("INTERCEPT x1")), "three-row family stacks");
             lab.Caught(); lab.RenderNow(now, 1f);
-            Check(lab.State.InterceptSucceeded, "CAUGHT replaces existing interceptor outcome");
+            Check(lab.State.InterceptSucceeded && lab.Stamp.IsPlaying &&
+                lab.Stamp.CurrentKind == NodeEventStamp.EventKind.Caught,
+                "CAUGHT replaces existing interceptor outcome and stamp");
             lab.RenderNow(now + 8.01f, 1f);
             Check(!lab.State.Isolated && lab.State.Offline && lab.State.KnownInfected &&
                 lab.State.PortScanned && !lab.State.ScanJammed,
@@ -130,7 +162,8 @@ namespace Uptime.Connections.EditorTools
             lab.ToggleOffline(); lab.ToggleInfected(); lab.ScanJammed(); lab.PortScanned();
             lab.Clean(); lab.Isolate(); lab.Caught(); lab.RenderNow(Time.unscaledTime, 1f);
             lab.ClearAll();
-            Check(!lab.State.HasAny(Time.unscaledTime) && !lab.StatusView.HasVisibleFamily,
+            Check(!lab.State.HasAny(Time.unscaledTime) && !lab.StatusView.HasVisibleFamily &&
+                !lab.Stamp.IsPlaying,
                 "CLEAR ALL clears state and visuals synchronously");
             lab.RenderNow(Time.unscaledTime + 100f, 1f);
             Check(!lab.State.HasAny(Time.unscaledTime + 100f) && !lab.StatusView.HasVisibleFamily,
@@ -225,25 +258,31 @@ namespace Uptime.Connections.EditorTools
             for (int i = 0; i < buttons.Length; i++)
             {
                 Click(buttons[i]);
-                yield return new WaitForSecondsRealtime(.2f);
+                yield return new WaitForSecondsRealtime(.12f);
                 Check(lab.StatusView.GetComponentsInChildren<TMP_Text>()
                     .Any(t => t.text.Contains(labels[i])), "pointer click displays " + labels[i]);
+                Check(lab.Stamp.IsPlaying && (int)lab.Stamp.CurrentKind == i,
+                    "pointer click plays matching stamp " + labels[i]);
+                if (i == 2) Capture("stamp-scan-jammed");
+                if (i == 4) Capture("stamp-clean");
                 Click("ClearAll");
-                Check(!lab.State.HasAny(Time.unscaledTime) && !lab.StatusView.HasVisibleFamily,
+                Check(!lab.State.HasAny(Time.unscaledTime) && !lab.StatusView.HasVisibleFamily &&
+                    !lab.Stamp.IsPlaying,
                     "CLEAR ALL immediate after " + labels[i]);
             }
             Click("Offline"); Click("Infected"); Click("ScanJammed"); Click("PortScanned");
             Click("Clean"); Click("Isolate"); Click("Intercept");
             yield return new WaitForSecondsRealtime(.16f);
+            Capture("stamp-rapid-intercept");
             var painPanel = lab.StatusView.GetComponentsInChildren<NodeStatusPanel>(true)
                 .Single(p => p.name == "PainPanel");
             Check(painPanel.transform.localScale.x > 1f, "entry pop in real frames at timeScale zero");
             yield return new WaitForSecondsRealtime(.4f);
             Check(lab.StatusView.PainVisible && lab.StatusView.AwarenessVisible &&
                 lab.StatusView.BenefitVisible, "all three families coexist");
-            Check(lab.StatusView.GetComponentsInChildren<Image>()
-                .Any(i => i.type == Image.Type.Filled && i.fillAmount > .7f && i.fillAmount < 1f),
-                "genuine radial timers count down");
+            Check(lab.StatusView.GetComponentsInChildren<TMP_Text>()
+                .Any(t => t.text.EndsWith("s") && t.gameObject.activeInHierarchy),
+                "remaining seconds timers count down");
             Capture("all-families");
             Click("Caught");
             yield return new WaitForSecondsRealtime(.2f);
@@ -257,7 +296,7 @@ namespace Uptime.Connections.EditorTools
             Check(before < .8f && lab.State.ScanJamRemainingFraction > .99f &&
                 lab.State.PortScanRemainingFraction > .99f &&
                 lab.State.IsolationRemainingFraction > .99f &&
-                lab.State.InterceptRemainingFraction > .99f, "repeat application restarts all radial timers");
+                lab.State.InterceptRemainingFraction > .99f, "repeat application restarts all timers");
             float refreshedAt = Time.unscaledTime;
             yield return new WaitForSecondsRealtime(4f);
             Check(Mathf.Abs(lab.State.ScanJamRemainingFraction - .5f) < .03f &&

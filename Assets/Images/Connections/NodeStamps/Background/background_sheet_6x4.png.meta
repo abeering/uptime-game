@@ -1,0 +1,1662 @@
+fileFormatVersion: 2
+guid: 956acc4126c4a3d4aadb2da1e5c988b6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4553383371392828052
+    second: background_sheet_6x4_0
+  - first:
+      213: 7215872650114782476
+    second: background_sheet_6x4_1
+  - first:
+      213: -9152372889425992500
+    second: background_sheet_6x4_2
+  - first:
+      213: 7364676437250041325
+    second: background_sheet_6x4_3
+  - first:
+      213: -6793701303289366733
+    second: background_sheet_6x4_4
+  - first:
+      213: 867670370528718432
+    second: background_sheet_6x4_5
+  - first:
+      213: 8940759978887006279
+    second: background_sheet_6x4_6
+  - first:
+      213: -5135188033247112901
+    second: background_sheet_6x4_7
+  - first:
+      213: 7456107513106549040
+    second: background_sheet_6x4_8
+  - first:
+      213: 100303326579423802
+    second: background_sheet_6x4_9
+  - first:
+      213: 7631238601392949641
+    second: background_sheet_6x4_10
+  - first:
+      213: 6339560440012437515
+    second: background_sheet_6x4_11
+  - first:
+      213: -1775638874602883768
+    second: background_sheet_6x4_12
+  - first:
+      213: 5797253341250007692
+    second: background_sheet_6x4_13
+  - first:
+      213: -8222865058836463759
+    second: background_sheet_6x4_14
+  - first:
+      213: 7449074257894751007
+    second: background_sheet_6x4_15
+  - first:
+      213: -9047223219321960106
+    second: background_sheet_6x4_16
+  - first:
+      213: -904185235977113745
+    second: background_sheet_6x4_17
+  - first:
+      213: 6144763021351613634
+    second: background_sheet_6x4_18
+  - first:
+      213: -6986450995994535227
+    second: background_sheet_6x4_19
+  - first:
+      213: 3632991858568660116
+    second: background_sheet_6x4_20
+  - first:
+      213: 8129335074467983737
+    second: background_sheet_6x4_21
+  - first:
+      213: -9105994501517947950
+    second: background_sheet_6x4_22
+  - first:
+      213: 3488759007995172268
+    second: background_sheet_6x4_23
+  - first:
+      213: -5379465394532294051
+    second: background_sheet_6x4_24
+  - first:
+      213: -8717462542851054327
+    second: background_sheet_6x4_25
+  - first:
+      213: 3528475672197091863
+    second: background_sheet_6x4_26
+  - first:
+      213: -4614798108569825129
+    second: background_sheet_6x4_27
+  - first:
+      213: -8365108039955690362
+    second: background_sheet_6x4_28
+  - first:
+      213: 6676000692589331207
+    second: background_sheet_6x4_29
+  - first:
+      213: 6778973441886956671
+    second: background_sheet_6x4_30
+  - first:
+      213: 7768840708971370468
+    second: background_sheet_6x4_31
+  - first:
+      213: 4441765498021257111
+    second: background_sheet_6x4_32
+  - first:
+      213: -5280142367987593077
+    second: background_sheet_6x4_33
+  - first:
+      213: -304013673525442580
+    second: background_sheet_6x4_34
+  - first:
+      213: -5007561034274509722
+    second: background_sheet_6x4_35
+  - first:
+      213: -7741522272349629069
+    second: background_sheet_6x4_36
+  - first:
+      213: 1940144745097307886
+    second: background_sheet_6x4_37
+  - first:
+      213: 2343348594044123385
+    second: background_sheet_6x4_38
+  - first:
+      213: 4429603352917431499
+    second: background_sheet_6x4_39
+  - first:
+      213: -2828824823004620735
+    second: background_sheet_6x4_40
+  - first:
+      213: -3642499259461744190
+    second: background_sheet_6x4_41
+  - first:
+      213: 8241118298418773678
+    second: background_sheet_6x4_42
+  - first:
+      213: -1462155260299712269
+    second: background_sheet_6x4_43
+  - first:
+      213: 4394081526783159728
+    second: background_sheet_6x4_44
+  - first:
+      213: -2505386026556499807
+    second: background_sheet_6x4_45
+  - first:
+      213: 975988333656283281
+    second: background_sheet_6x4_46
+  - first:
+      213: 4911038452666068100
+    second: background_sheet_6x4_47
+  - first:
+      213: -5010336559799979237
+    second: background_sheet_6x4_48
+  - first:
+      213: -8608198119271987335
+    second: background_sheet_6x4_49
+  - first:
+      213: -3636938264253210308
+    second: background_sheet_6x4_50
+  - first:
+      213: -8931104094622920812
+    second: background_sheet_6x4_51
+  - first:
+      213: -2432130293717599484
+    second: background_sheet_6x4_52
+  - first:
+      213: -2119450045238304230
+    second: background_sheet_6x4_53
+  - first:
+      213: -8383650351007995127
+    second: background_sheet_6x4_54
+  - first:
+      213: 7859999697334307862
+    second: background_sheet_6x4_55
+  - first:
+      213: -5889488257490823538
+    second: background_sheet_6x4_56
+  - first:
+      213: 3700961350166449190
+    second: background_sheet_6x4_57
+  - first:
+      213: -3440099596808894796
+    second: background_sheet_6x4_58
+  - first:
+      213: 8564469984019295831
+    second: background_sheet_6x4_59
+  - first:
+      213: -8634275287679419415
+    second: background_sheet_6x4_60
+  - first:
+      213: 2119250292612528663
+    second: background_sheet_6x4_61
+  - first:
+      213: 2859691186009323391
+    second: background_sheet_6x4_62
+  - first:
+      213: 6162533659170695192
+    second: background_sheet_6x4_63
+  - first:
+      213: -309262542514905198
+    second: background_sheet_6x4_64
+  - first:
+      213: -545124108510986018
+    second: background_sheet_6x4_65
+  - first:
+      213: -5136454875326578731
+    second: background_sheet_6x4_66
+  - first:
+      213: 3692504406330351768
+    second: background_sheet_6x4_67
+  - first:
+      213: 3242813075995478927
+    second: background_sheet_6x4_68
+  - first:
+      213: -3900796560311086703
+    second: background_sheet_6x4_69
+  - first:
+      213: 2782802348707467440
+    second: background_sheet_6x4_70
+  - first:
+      213: -7273935384601906567
+    second: background_sheet_6x4_71
+  - first:
+      213: 7637235497572011255
+    second: background_sheet_6x4_72
+  - first:
+      213: -5333936236143863199
+    second: background_sheet_6x4_73
+  - first:
+      213: 8333116843642512779
+    second: background_sheet_6x4_74
+  - first:
+      213: 2888803524239712014
+    second: background_sheet_6x4_75
+  - first:
+      213: 4662910490938287464
+    second: background_sheet_6x4_76
+  - first:
+      213: -1709034801216476105
+    second: background_sheet_6x4_77
+  - first:
+      213: -2958632495019571279
+    second: background_sheet_6x4_78
+  - first:
+      213: 7219602271871283115
+    second: background_sheet_6x4_79
+  - first:
+      213: 2730742606119088197
+    second: background_sheet_6x4_80
+  - first:
+      213: -5084084728508851128
+    second: background_sheet_6x4_81
+  - first:
+      213: 6851028555268343116
+    second: background_sheet_6x4_82
+  - first:
+      213: -3919705258254994498
+    second: background_sheet_6x4_83
+  - first:
+      213: -3431867739513563151
+    second: background_sheet_6x4_84
+  - first:
+      213: 6025578563967062239
+    second: background_sheet_6x4_85
+  - first:
+      213: 3530822062195421636
+    second: background_sheet_6x4_86
+  - first:
+      213: 586170142009665039
+    second: background_sheet_6x4_87
+  - first:
+      213: 5798248525951869049
+    second: background_sheet_6x4_88
+  - first:
+      213: -992126013614804589
+    second: background_sheet_6x4_89
+  - first:
+      213: 7699170551009179442
+    second: background_sheet_6x4_90
+  - first:
+      213: 8400803440042985285
+    second: background_sheet_6x4_91
+  - first:
+      213: 435827861045506274
+    second: background_sheet_6x4_92
+  - first:
+      213: 6479561446502624367
+    second: background_sheet_6x4_93
+  - first:
+      213: -4048996983935495555
+    second: background_sheet_6x4_94
+  - first:
+      213: 1186055219212997405
+    second: background_sheet_6x4_95
+  - first:
+      213: -4733128745867747343
+    second: background_sheet_6x4_96
+  - first:
+      213: -3017029848294768890
+    second: background_sheet_6x4_97
+  - first:
+      213: 182210773960539070
+    second: background_sheet_6x4_98
+  - first:
+      213: 6736917556321100479
+    second: background_sheet_6x4_99
+  - first:
+      213: -7044074196236460859
+    second: background_sheet_6x4_100
+  - first:
+      213: 7388399987125678829
+    second: background_sheet_6x4_101
+  - first:
+      213: 5005139582588708622
+    second: background_sheet_6x4_102
+  - first:
+      213: 5888606779803777018
+    second: background_sheet_6x4_103
+  - first:
+      213: -431186859237182060
+    second: background_sheet_6x4_104
+  - first:
+      213: 491626942171736790
+    second: background_sheet_6x4_105
+  - first:
+      213: 1296369514699802564
+    second: background_sheet_6x4_106
+  - first:
+      213: -775526936139967978
+    second: background_sheet_6x4_107
+  - first:
+      213: -8131358746133602862
+    second: background_sheet_6x4_108
+  - first:
+      213: 1839369707276809843
+    second: background_sheet_6x4_109
+  - first:
+      213: -7921901656393192016
+    second: background_sheet_6x4_110
+  - first:
+      213: 9163301202809058317
+    second: background_sheet_6x4_111
+  - first:
+      213: 7105218508222310796
+    second: background_sheet_6x4_112
+  - first:
+      213: -2358826112683649576
+    second: background_sheet_6x4_113
+  - first:
+      213: 2882845966262848390
+    second: background_sheet_6x4_114
+  - first:
+      213: 6723952051111055625
+    second: background_sheet_6x4_115
+  - first:
+      213: -6879155286712865090
+    second: background_sheet_6x4_116
+  - first:
+      213: -6399997017468807135
+    second: background_sheet_6x4_117
+  - first:
+      213: 2651252047709997979
+    second: background_sheet_6x4_118
+  - first:
+      213: 4601919822986723391
+    second: background_sheet_6x4_119
+  - first:
+      213: 6351576087176269825
+    second: background_sheet_6x4_120
+  - first:
+      213: -4540875820835902158
+    second: background_sheet_6x4_121
+  - first:
+      213: 3750973337980528603
+    second: background_sheet_6x4_122
+  - first:
+      213: 2878342627629557123
+    second: background_sheet_6x4_123
+  - first:
+      213: -6382121062409760227
+    second: background_sheet_6x4_124
+  - first:
+      213: 7714461946416963062
+    second: background_sheet_6x4_125
+  - first:
+      213: -6899057082203163613
+    second: background_sheet_6x4_126
+  - first:
+      213: 6099988436318470191
+    second: background_sheet_6x4_127
+  - first:
+      213: 2858368966166587542
+    second: background_sheet_6x4_128
+  - first:
+      213: -6544314049034916227
+    second: background_sheet_6x4_129
+  - first:
+      213: 1461906978781569211
+    second: background_sheet_6x4_130
+  - first:
+      213: -2699252260299139844
+    second: background_sheet_6x4_131
+  - first:
+      213: 2209010802889940170
+    second: background_sheet_6x4_132
+  - first:
+      213: -2306161735412313521
+    second: background_sheet_6x4_133
+  - first:
+      213: 4083442771476555497
+    second: background_sheet_6x4_134
+  - first:
+      213: -2446664478527632403
+    second: background_sheet_6x4_135
+  - first:
+      213: 495784209471551317
+    second: background_sheet_6x4_136
+  - first:
+      213: -8516811869947153299
+    second: background_sheet_6x4_137
+  - first:
+      213: 4414399644091336884
+    second: background_sheet_6x4_138
+  - first:
+      213: -4128145589673430520
+    second: background_sheet_6x4_139
+  - first:
+      213: 8052648140772354004
+    second: background_sheet_6x4_140
+  - first:
+      213: -8325388376069962596
+    second: background_sheet_6x4_141
+  - first:
+      213: -337880347158510475
+    second: background_sheet_6x4_142
+  - first:
+      213: -2610458988815577390
+    second: background_sheet_6x4_143
+  - first:
+      213: -8835635360432525036
+    second: background_sheet_6x4_144
+  - first:
+      213: 4074208510312785551
+    second: background_sheet_6x4_145
+  - first:
+      213: 7825706020651790875
+    second: background_sheet_6x4_146
+  - first:
+      213: 1912145210381985796
+    second: background_sheet_6x4_147
+  - first:
+      213: -4648157017420819166
+    second: background_sheet_6x4_148
+  - first:
+      213: 3212784672893330066
+    second: background_sheet_6x4_149
+  - first:
+      213: 8998831291054545666
+    second: background_sheet_6x4_150
+  - first:
+      213: 5648897169809043408
+    second: background_sheet_6x4_151
+  - first:
+      213: 5297976416841143186
+    second: background_sheet_6x4_152
+  - first:
+      213: -8972979302662893714
+    second: background_sheet_6x4_153
+  - first:
+      213: -2274320510486414077
+    second: background_sheet_6x4_154
+  - first:
+      213: -7133854115353472906
+    second: background_sheet_6x4_155
+  - first:
+      213: -3387201590185697378
+    second: background_sheet_6x4_156
+  - first:
+      213: 2776801789787381275
+    second: background_sheet_6x4_157
+  - first:
+      213: 672681020530440656
+    second: background_sheet_6x4_158
+  - first:
+      213: 6824319842203464834
+    second: background_sheet_6x4_159
+  - first:
+      213: -8350234551900513692
+    second: background_sheet_6x4_160
+  - first:
+      213: -8354284931760551978
+    second: background_sheet_6x4_161
+  - first:
+      213: -7979264997944957608
+    second: background_sheet_6x4_162
+  - first:
+      213: -3214970100231387489
+    second: background_sheet_6x4_163
+  - first:
+      213: -8266040501898121003
+    second: background_sheet_6x4_164
+  - first:
+      213: 7750305409288534176
+    second: background_sheet_6x4_165
+  - first:
+      213: -4023128369408452117
+    second: background_sheet_6x4_166
+  - first:
+      213: 6924531973403022383
+    second: background_sheet_6x4_167
+  - first:
+      213: -1108938398906961817
+    second: background_sheet_6x4_168
+  - first:
+      213: 3922511858384763330
+    second: background_sheet_6x4_169
+  - first:
+      213: 8689932875247087152
+    second: background_sheet_6x4_170
+  - first:
+      213: -496264428533457777
+    second: background_sheet_6x4_171
+  - first:
+      213: -1007403576927522381
+    second: background_sheet_6x4_172
+  - first:
+      213: 6789179065159047333
+    second: background_sheet_6x4_173
+  - first:
+      213: 6984664097465772625
+    second: background_sheet_6x4_174
+  - first:
+      213: 4453396868647420363
+    second: background_sheet_6x4_175
+  - first:
+      213: -8169683876386243526
+    second: background_sheet_6x4_176
+  - first:
+      213: -4158902422070613397
+    second: background_sheet_6x4_177
+  - first:
+      213: -7996019755471836859
+    second: background_sheet_6x4_178
+  - first:
+      213: -6675676765723680922
+    second: background_sheet_6x4_179
+  - first:
+      213: 2139297308926608694
+    second: background_sheet_6x4_180
+  - first:
+      213: -7410931405779524530
+    second: background_sheet_6x4_181
+  - first:
+      213: -2367186960925786091
+    second: background_sheet_6x4_182
+  - first:
+      213: -3971897944527716340
+    second: background_sheet_6x4_183
+  - first:
+      213: -7234617620541032515
+    second: background_sheet_6x4_184
+  - first:
+      213: -6265906082556368934
+    second: background_sheet_6x4_185
+  - first:
+      213: 8012039291861020677
+    second: background_sheet_6x4_186
+  - first:
+      213: 7766778408405669317
+    second: background_sheet_6x4_187
+  - first:
+      213: 5069002841572932098
+    second: background_sheet_6x4_188
+  - first:
+      213: 947848071002826300
+    second: background_sheet_6x4_189
+  - first:
+      213: -3462254772097437090
+    second: background_sheet_6x4_190
+  - first:
+      213: 4061665595130139416
+    second: background_sheet_6x4_191
+  - first:
+      213: 1864474439010508268
+    second: background_sheet_6x4_192
+  - first:
+      213: -7387701475075860492
+    second: background_sheet_6x4_193
+  - first:
+      213: -2885811430139229588
+    second: background_sheet_6x4_194
+  - first:
+      213: 8735612156093669002
+    second: background_sheet_6x4_195
+  - first:
+      213: 3484751546837610208
+    second: background_sheet_6x4_196
+  - first:
+      213: -266271140219746563
+    second: background_sheet_6x4_197
+  - first:
+      213: -421287771152841927
+    second: background_sheet_6x4_198
+  - first:
+      213: 8112313240218648303
+    second: background_sheet_6x4_199
+  - first:
+      213: 4835115101648169749
+    second: background_sheet_6x4_200
+  - first:
+      213: -64183274978780822
+    second: background_sheet_6x4_201
+  - first:
+      213: 7478652786365395622
+    second: background_sheet_6x4_202
+  - first:
+      213: 99957364007665842
+    second: background_sheet_6x4_203
+  - first:
+      213: -7413347388513943534
+    second: background_sheet_6x4_204
+  - first:
+      213: -1550830228158138716
+    second: background_sheet_6x4_205
+  - first:
+      213: 4176225179049148218
+    second: background_sheet_6x4_206
+  - first:
+      213: 5466112663799525128
+    second: background_sheet_6x4_207
+  - first:
+      213: -8104837666064115021
+    second: background_sheet_6x4_208
+  - first:
+      213: 486530778169761852
+    second: background_sheet_6x4_209
+  - first:
+      213: 6664982817901718539
+    second: background_sheet_6x4_210
+  - first:
+      213: 7717175300557930200
+    second: background_sheet_6x4_211
+  - first:
+      213: -7571173169970304807
+    second: background_sheet_6x4_212
+  - first:
+      213: 4816210805586827469
+    second: background_sheet_6x4_213
+  - first:
+      213: 7725349235498337153
+    second: background_sheet_6x4_214
+  - first:
+      213: -1618912397977652460
+    second: background_sheet_6x4_215
+  - first:
+      213: -7681819075014971283
+    second: background_sheet_6x4_216
+  - first:
+      213: 4460076038584493574
+    second: background_sheet_6x4_217
+  - first:
+      213: -3897054826145413049
+    second: background_sheet_6x4_218
+  - first:
+      213: -4343731049915719599
+    second: background_sheet_6x4_219
+  - first:
+      213: -1417679108045041955
+    second: background_sheet_6x4_220
+  - first:
+      213: -6349368400002388397
+    second: background_sheet_6x4_221
+  - first:
+      213: 5298511654546316171
+    second: background_sheet_6x4_222
+  - first:
+      213: -2923829165974100835
+    second: background_sheet_6x4_223
+  - first:
+      213: 1631206376094694616
+    second: background_sheet_6x4_224
+  - first:
+      213: -2778673770080921618
+    second: background_sheet_6x4_225
+  - first:
+      213: 3303925584428618784
+    second: background_sheet_6x4_226
+  - first:
+      213: -20454187730643343
+    second: background_sheet_6x4_227
+  - first:
+      213: 1018807252125476382
+    second: background_sheet_6x4_228
+  - first:
+      213: -1369933534835425672
+    second: background_sheet_6x4_229
+  - first:
+      213: 683296464093954540
+    second: background_sheet_6x4_230
+  - first:
+      213: -8198587051329371181
+    second: background_sheet_6x4_231
+  - first:
+      213: -7448597507287079632
+    second: background_sheet_6x4_232
+  - first:
+      213: -329131503782375354
+    second: background_sheet_6x4_233
+  - first:
+      213: 9129102930766465910
+    second: background_sheet_6x4_234
+  - first:
+      213: 1207160472128855505
+    second: background_sheet_6x4_235
+  - first:
+      213: -4777324308231318788
+    second: background_sheet_6x4_236
+  - first:
+      213: 193793128522538189
+    second: background_sheet_6x4_237
+  - first:
+      213: -738485438703871598
+    second: background_sheet_6x4_238
+  - first:
+      213: -4004835282213114546
+    second: background_sheet_6x4_239
+  - first:
+      213: -3849816859068827141
+    second: background_sheet_6x4_240
+  - first:
+      213: 8690184827849251743
+    second: background_sheet_6x4_241
+  - first:
+      213: 8029862619538683028
+    second: background_sheet_6x4_242
+  - first:
+      213: -2250652331178974050
+    second: background_sheet_6x4_243
+  - first:
+      213: -6414715989232093323
+    second: background_sheet_6x4_244
+  - first:
+      213: -4520656867893593265
+    second: background_sheet_6x4_245
+  - first:
+      213: 6932544228421608565
+    second: background_sheet_6x4_246
+  - first:
+      213: 2337598074692988828
+    second: background_sheet_6x4_247
+  - first:
+      213: 7970612415331547062
+    second: background_sheet_6x4_248
+  - first:
+      213: 5817393496851456811
+    second: background_sheet_6x4_249
+  - first:
+      213: 6609122514778246559
+    second: background_sheet_6x4_250
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: background_sheet_6x4_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6db5f5d2f12fc0c0800000000000000
+      internalID: -4553383371392828052
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_1
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c055c86a1fde32460800000000000000
+      internalID: 7215872650114782476
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_2
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc429d1395d3cf080800000000000000
+      internalID: -9152372889425992500
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_3
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de56aff2336943660800000000000000
+      internalID: 7364676437250041325
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_4
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3373453c8ace7b1a0800000000000000
+      internalID: -6793701303289366733
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_5
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 1152
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06eee79da959a0c00800000000000000
+      internalID: 867670370528718432
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 748c693a4d5f31c70800000000000000
+      internalID: 8940759978887006279
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_7
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b31187fe0b52cb8b0800000000000000
+      internalID: -5135188033247112901
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_8
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03946dd674a697760800000000000000
+      internalID: 7456107513106549040
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_9
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3a7e861859546100800000000000000
+      internalID: 100303326579423802
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_10
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9898640731b97e960800000000000000
+      internalID: 7631238601392949641
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_11
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 768
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b087f0bb1a4aaf750800000000000000
+      internalID: 6339560440012437515
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 845bbede9d9ab57e0800000000000000
+      internalID: -1775638874602883768
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_13
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c82372ed23bf37050800000000000000
+      internalID: 5797253341250007692
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_14
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17fb41cabc382ed80800000000000000
+      internalID: -8222865058836463759
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_15
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1bb257129d606760800000000000000
+      internalID: 7449074257894751007
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_16
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65906a09a6ec17280800000000000000
+      internalID: -9047223219321960106
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_17
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 384
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6f6e668150b373f0800000000000000
+      internalID: -904185235977113745
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c47e9c5965964550800000000000000
+      internalID: 6144763021351613634
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_19
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ca521fb5d32b0f90800000000000000
+      internalID: -6986450995994535227
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_20
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4940fd1d8dafa6230800000000000000
+      internalID: 3632991858568660116
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_21
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 971b9cddd2331d070800000000000000
+      internalID: 8129335074467983737
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_22
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dbcc5a1f3201a180800000000000000
+      internalID: -9105994501517947950
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: background_sheet_6x4_23
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 0
+        width: 320
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca51f7265df8a6030800000000000000
+      internalID: 3488759007995172268
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID:
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      background_sheet_6x4_0: -4553383371392828052
+      background_sheet_6x4_1: 7215872650114782476
+      background_sheet_6x4_10: 7631238601392949641
+      background_sheet_6x4_100: -7044074196236460859
+      background_sheet_6x4_101: 7388399987125678829
+      background_sheet_6x4_102: 5005139582588708622
+      background_sheet_6x4_103: 5888606779803777018
+      background_sheet_6x4_104: -431186859237182060
+      background_sheet_6x4_105: 491626942171736790
+      background_sheet_6x4_106: 1296369514699802564
+      background_sheet_6x4_107: -775526936139967978
+      background_sheet_6x4_108: -8131358746133602862
+      background_sheet_6x4_109: 1839369707276809843
+      background_sheet_6x4_11: 6339560440012437515
+      background_sheet_6x4_110: -7921901656393192016
+      background_sheet_6x4_111: 9163301202809058317
+      background_sheet_6x4_112: 7105218508222310796
+      background_sheet_6x4_113: -2358826112683649576
+      background_sheet_6x4_114: 2882845966262848390
+      background_sheet_6x4_115: 6723952051111055625
+      background_sheet_6x4_116: -6879155286712865090
+      background_sheet_6x4_117: -6399997017468807135
+      background_sheet_6x4_118: 2651252047709997979
+      background_sheet_6x4_119: 4601919822986723391
+      background_sheet_6x4_12: -1775638874602883768
+      background_sheet_6x4_120: 6351576087176269825
+      background_sheet_6x4_121: -4540875820835902158
+      background_sheet_6x4_122: 3750973337980528603
+      background_sheet_6x4_123: 2878342627629557123
+      background_sheet_6x4_124: -6382121062409760227
+      background_sheet_6x4_125: 7714461946416963062
+      background_sheet_6x4_126: -6899057082203163613
+      background_sheet_6x4_127: 6099988436318470191
+      background_sheet_6x4_128: 2858368966166587542
+      background_sheet_6x4_129: -6544314049034916227
+      background_sheet_6x4_13: 5797253341250007692
+      background_sheet_6x4_130: 1461906978781569211
+      background_sheet_6x4_131: -2699252260299139844
+      background_sheet_6x4_132: 2209010802889940170
+      background_sheet_6x4_133: -2306161735412313521
+      background_sheet_6x4_134: 4083442771476555497
+      background_sheet_6x4_135: -2446664478527632403
+      background_sheet_6x4_136: 495784209471551317
+      background_sheet_6x4_137: -8516811869947153299
+      background_sheet_6x4_138: 4414399644091336884
+      background_sheet_6x4_139: -4128145589673430520
+      background_sheet_6x4_14: -8222865058836463759
+      background_sheet_6x4_140: 8052648140772354004
+      background_sheet_6x4_141: -8325388376069962596
+      background_sheet_6x4_142: -337880347158510475
+      background_sheet_6x4_143: -2610458988815577390
+      background_sheet_6x4_144: -8835635360432525036
+      background_sheet_6x4_145: 4074208510312785551
+      background_sheet_6x4_146: 7825706020651790875
+      background_sheet_6x4_147: 1912145210381985796
+      background_sheet_6x4_148: -4648157017420819166
+      background_sheet_6x4_149: 3212784672893330066
+      background_sheet_6x4_15: 7449074257894751007
+      background_sheet_6x4_150: 8998831291054545666
+      background_sheet_6x4_151: 5648897169809043408
+      background_sheet_6x4_152: 5297976416841143186
+      background_sheet_6x4_153: -8972979302662893714
+      background_sheet_6x4_154: -2274320510486414077
+      background_sheet_6x4_155: -7133854115353472906
+      background_sheet_6x4_156: -3387201590185697378
+      background_sheet_6x4_157: 2776801789787381275
+      background_sheet_6x4_158: 672681020530440656
+      background_sheet_6x4_159: 6824319842203464834
+      background_sheet_6x4_16: -9047223219321960106
+      background_sheet_6x4_160: -8350234551900513692
+      background_sheet_6x4_161: -8354284931760551978
+      background_sheet_6x4_162: -7979264997944957608
+      background_sheet_6x4_163: -3214970100231387489
+      background_sheet_6x4_164: -8266040501898121003
+      background_sheet_6x4_165: 7750305409288534176
+      background_sheet_6x4_166: -4023128369408452117
+      background_sheet_6x4_167: 6924531973403022383
+      background_sheet_6x4_168: -1108938398906961817
+      background_sheet_6x4_169: 3922511858384763330
+      background_sheet_6x4_17: -904185235977113745
+      background_sheet_6x4_170: 8689932875247087152
+      background_sheet_6x4_171: -496264428533457777
+      background_sheet_6x4_172: -1007403576927522381
+      background_sheet_6x4_173: 6789179065159047333
+      background_sheet_6x4_174: 6984664097465772625
+      background_sheet_6x4_175: 4453396868647420363
+      background_sheet_6x4_176: -8169683876386243526
+      background_sheet_6x4_177: -4158902422070613397
+      background_sheet_6x4_178: -7996019755471836859
+      background_sheet_6x4_179: -6675676765723680922
+      background_sheet_6x4_18: 6144763021351613634
+      background_sheet_6x4_180: 2139297308926608694
+      background_sheet_6x4_181: -7410931405779524530
+      background_sheet_6x4_182: -2367186960925786091
+      background_sheet_6x4_183: -3971897944527716340
+      background_sheet_6x4_184: -7234617620541032515
+      background_sheet_6x4_185: -6265906082556368934
+      background_sheet_6x4_186: 8012039291861020677
+      background_sheet_6x4_187: 7766778408405669317
+      background_sheet_6x4_188: 5069002841572932098
+      background_sheet_6x4_189: 947848071002826300
+      background_sheet_6x4_19: -6986450995994535227
+      background_sheet_6x4_190: -3462254772097437090
+      background_sheet_6x4_191: 4061665595130139416
+      background_sheet_6x4_192: 1864474439010508268
+      background_sheet_6x4_193: -7387701475075860492
+      background_sheet_6x4_194: -2885811430139229588
+      background_sheet_6x4_195: 8735612156093669002
+      background_sheet_6x4_196: 3484751546837610208
+      background_sheet_6x4_197: -266271140219746563
+      background_sheet_6x4_198: -421287771152841927
+      background_sheet_6x4_199: 8112313240218648303
+      background_sheet_6x4_2: -9152372889425992500
+      background_sheet_6x4_20: 3632991858568660116
+      background_sheet_6x4_200: 4835115101648169749
+      background_sheet_6x4_201: -64183274978780822
+      background_sheet_6x4_202: 7478652786365395622
+      background_sheet_6x4_203: 99957364007665842
+      background_sheet_6x4_204: -7413347388513943534
+      background_sheet_6x4_205: -1550830228158138716
+      background_sheet_6x4_206: 4176225179049148218
+      background_sheet_6x4_207: 5466112663799525128
+      background_sheet_6x4_208: -8104837666064115021
+      background_sheet_6x4_209: 486530778169761852
+      background_sheet_6x4_21: 8129335074467983737
+      background_sheet_6x4_210: 6664982817901718539
+      background_sheet_6x4_211: 7717175300557930200
+      background_sheet_6x4_212: -7571173169970304807
+      background_sheet_6x4_213: 4816210805586827469
+      background_sheet_6x4_214: 7725349235498337153
+      background_sheet_6x4_215: -1618912397977652460
+      background_sheet_6x4_216: -7681819075014971283
+      background_sheet_6x4_217: 4460076038584493574
+      background_sheet_6x4_218: -3897054826145413049
+      background_sheet_6x4_219: -4343731049915719599
+      background_sheet_6x4_22: -9105994501517947950
+      background_sheet_6x4_220: -1417679108045041955
+      background_sheet_6x4_221: -6349368400002388397
+      background_sheet_6x4_222: 5298511654546316171
+      background_sheet_6x4_223: -2923829165974100835
+      background_sheet_6x4_224: 1631206376094694616
+      background_sheet_6x4_225: -2778673770080921618
+      background_sheet_6x4_226: 3303925584428618784
+      background_sheet_6x4_227: -20454187730643343
+      background_sheet_6x4_228: 1018807252125476382
+      background_sheet_6x4_229: -1369933534835425672
+      background_sheet_6x4_23: 3488759007995172268
+      background_sheet_6x4_230: 683296464093954540
+      background_sheet_6x4_231: -8198587051329371181
+      background_sheet_6x4_232: -7448597507287079632
+      background_sheet_6x4_233: -329131503782375354
+      background_sheet_6x4_234: 9129102930766465910
+      background_sheet_6x4_235: 1207160472128855505
+      background_sheet_6x4_236: -4777324308231318788
+      background_sheet_6x4_237: 193793128522538189
+      background_sheet_6x4_238: -738485438703871598
+      background_sheet_6x4_239: -4004835282213114546
+      background_sheet_6x4_24: -5379465394532294051
+      background_sheet_6x4_240: -3849816859068827141
+      background_sheet_6x4_241: 8690184827849251743
+      background_sheet_6x4_242: 8029862619538683028
+      background_sheet_6x4_243: -2250652331178974050
+      background_sheet_6x4_244: -6414715989232093323
+      background_sheet_6x4_245: -4520656867893593265
+      background_sheet_6x4_246: 6932544228421608565
+      background_sheet_6x4_247: 2337598074692988828
+      background_sheet_6x4_248: 7970612415331547062
+      background_sheet_6x4_249: 5817393496851456811
+      background_sheet_6x4_25: -8717462542851054327
+      background_sheet_6x4_250: 6609122514778246559
+      background_sheet_6x4_26: 3528475672197091863
+      background_sheet_6x4_27: -4614798108569825129
+      background_sheet_6x4_28: -8365108039955690362
+      background_sheet_6x4_29: 6676000692589331207
+      background_sheet_6x4_3: 7364676437250041325
+      background_sheet_6x4_30: 6778973441886956671
+      background_sheet_6x4_31: 7768840708971370468
+      background_sheet_6x4_32: 4441765498021257111
+      background_sheet_6x4_33: -5280142367987593077
+      background_sheet_6x4_34: -304013673525442580
+      background_sheet_6x4_35: -5007561034274509722
+      background_sheet_6x4_36: -7741522272349629069
+      background_sheet_6x4_37: 1940144745097307886
+      background_sheet_6x4_38: 2343348594044123385
+      background_sheet_6x4_39: 4429603352917431499
+      background_sheet_6x4_4: -6793701303289366733
+      background_sheet_6x4_40: -2828824823004620735
+      background_sheet_6x4_41: -3642499259461744190
+      background_sheet_6x4_42: 8241118298418773678
+      background_sheet_6x4_43: -1462155260299712269
+      background_sheet_6x4_44: 4394081526783159728
+      background_sheet_6x4_45: -2505386026556499807
+      background_sheet_6x4_46: 975988333656283281
+      background_sheet_6x4_47: 4911038452666068100
+      background_sheet_6x4_48: -5010336559799979237
+      background_sheet_6x4_49: -8608198119271987335
+      background_sheet_6x4_5: 867670370528718432
+      background_sheet_6x4_50: -3636938264253210308
+      background_sheet_6x4_51: -8931104094622920812
+      background_sheet_6x4_52: -2432130293717599484
+      background_sheet_6x4_53: -2119450045238304230
+      background_sheet_6x4_54: -8383650351007995127
+      background_sheet_6x4_55: 7859999697334307862
+      background_sheet_6x4_56: -5889488257490823538
+      background_sheet_6x4_57: 3700961350166449190
+      background_sheet_6x4_58: -3440099596808894796
+      background_sheet_6x4_59: 8564469984019295831
+      background_sheet_6x4_6: 8940759978887006279
+      background_sheet_6x4_60: -8634275287679419415
+      background_sheet_6x4_61: 2119250292612528663
+      background_sheet_6x4_62: 2859691186009323391
+      background_sheet_6x4_63: 6162533659170695192
+      background_sheet_6x4_64: -309262542514905198
+      background_sheet_6x4_65: -545124108510986018
+      background_sheet_6x4_66: -5136454875326578731
+      background_sheet_6x4_67: 3692504406330351768
+      background_sheet_6x4_68: 3242813075995478927
+      background_sheet_6x4_69: -3900796560311086703
+      background_sheet_6x4_7: -5135188033247112901
+      background_sheet_6x4_70: 2782802348707467440
+      background_sheet_6x4_71: -7273935384601906567
+      background_sheet_6x4_72: 7637235497572011255
+      background_sheet_6x4_73: -5333936236143863199
+      background_sheet_6x4_74: 8333116843642512779
+      background_sheet_6x4_75: 2888803524239712014
+      background_sheet_6x4_76: 4662910490938287464
+      background_sheet_6x4_77: -1709034801216476105
+      background_sheet_6x4_78: -2958632495019571279
+      background_sheet_6x4_79: 7219602271871283115
+      background_sheet_6x4_8: 7456107513106549040
+      background_sheet_6x4_80: 2730742606119088197
+      background_sheet_6x4_81: -5084084728508851128
+      background_sheet_6x4_82: 6851028555268343116
+      background_sheet_6x4_83: -3919705258254994498
+      background_sheet_6x4_84: -3431867739513563151
+      background_sheet_6x4_85: 6025578563967062239
+      background_sheet_6x4_86: 3530822062195421636
+      background_sheet_6x4_87: 586170142009665039
+      background_sheet_6x4_88: 5798248525951869049
+      background_sheet_6x4_89: -992126013614804589
+      background_sheet_6x4_9: 100303326579423802
+      background_sheet_6x4_90: 7699170551009179442
+      background_sheet_6x4_91: 8400803440042985285
+      background_sheet_6x4_92: 435827861045506274
+      background_sheet_6x4_93: 6479561446502624367
+      background_sheet_6x4_94: -4048996983935495555
+      background_sheet_6x4_95: 1186055219212997405
+      background_sheet_6x4_96: -4733128745867747343
+      background_sheet_6x4_97: -3017029848294768890
+      background_sheet_6x4_98: 182210773960539070
+      background_sheet_6x4_99: 6736917556321100479
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:
