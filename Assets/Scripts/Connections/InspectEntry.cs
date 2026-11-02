@@ -218,13 +218,10 @@ namespace Uptime.Connections
                     $" · WORK ×{state.EffectiveWorkRateMultiplier:G3}" : string.Empty;
             Set(throughput, status + reason + rateNote);
             if (throughput != null) throughput.color = tint;
-            float fraction = state.CurrentTotalWork > 0f ? state.CompletedWork / state.CurrentTotalWork : 0f;
+            float fraction = CurrentWorkFraction(state);
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
             Set(bottleneck, state.ActivityDescription);
-            string remaining = state.IsComplete ? "00:00" : !state.IsActive ? "--:--" :
-                workPaused ? "PAUSED" : state.ActualWorkRate <= 0f ? "--:--" :
-                FormatSeconds(state.RemainingWork / state.ActualWorkRate);
-            Set(eta, "ETA  " + remaining);
+            Set(eta, CurrentOperationEta(state));
             if (throughput != null) throughput.gameObject.SetActive(verbose);
             if (work != null) work.gameObject.SetActive(verbose && !state.IsComplete);
             if (bottleneck != null) bottleneck.gameObject.SetActive(verbose && !state.IsComplete);
@@ -245,6 +242,36 @@ namespace Uptime.Connections
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
         {
+            activeToken = RenderOperationTokens(state, tint, quietColor,
+                operationRow, operationTokenPrefab, operationTokens);
+            renderedState = state;
+            renderedStage = state.CurrentOperationIndex;
+            renderedOperationCount = state.OperationCount;
+            renderedComplete = state.IsComplete;
+            renderedTimelineWidth = operationRow != null ? operationRow.rect.width : 0f;
+        }
+
+        public static float CurrentWorkFraction(LogicalConnectionState state) =>
+            state.CurrentTotalWork > 0f ?
+                Mathf.Clamp01(state.CompletedWork / state.CurrentTotalWork) : 0f;
+
+        public static string CurrentOperationEta(LogicalConnectionState state)
+        {
+            bool workPaused = state.IsDemanding && state.AllocatedLoad > 0f &&
+                state.EffectiveWorkRateMultiplier == 0f;
+            string remaining = state.IsComplete ? "00:00" : !state.IsActive ? "--:--" :
+                workPaused ? "PAUSED" : state.ActualWorkRate <= 0f ? "--:--" :
+                FormatSeconds(state.RemainingWork / state.ActualWorkRate);
+            return "ETA  " + remaining;
+        }
+
+        // Shared by verbose inspect and the live node WORK row. The authored token
+        // prefab supplies the same measurements, colors, outlines, and checkmarks.
+        public static InspectOperationToken RenderOperationTokens(LogicalConnectionState state,
+            Color tint, Color quietColor, RectTransform operationRow,
+            InspectOperationToken operationTokenPrefab,
+            List<InspectOperationToken> operationTokens)
+        {
             bool completedNormally = state.Resolution == ConnectionResolution.Completed;
             foreach (InspectOperationToken token in operationTokens)
             {
@@ -253,8 +280,13 @@ namespace Uptime.Connections
                 else DestroyImmediate(token.gameObject);
             }
             operationTokens.Clear();
-            activeToken = null;
-            if (operationRow == null || operationTokenPrefab == null) return;
+            if (operationRow == null || operationTokenPrefab == null) return null;
+            InspectOperationToken AddToken()
+            {
+                InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
+                operationTokens.Add(token);
+                return token;
+            }
             string target = state.TargetNode.NodeId;
             int current = state.CurrentOperationIndex;
             int completedCount = completedNormally ? state.OperationCount - 1 : current;
@@ -321,23 +353,12 @@ namespace Uptime.Connections
             if (showPrevious)
                 AddToken().ShowOperation(state.Definition.OperationAt(current - 1), target, true,
                     quietColor, shortPrevious);
-            activeToken = AddToken();
+            InspectOperationToken activeToken = AddToken();
             activeToken.ShowOperation(state.Definition.OperationAt(current), target,
                 currentCompleted, tint, shortCurrent);
             if (currentWidth > available) activeToken.ConstrainWidth(available);
             if (showFuture) AddToken().ShowFuture(futureCount);
-            renderedState = state;
-            renderedStage = state.CurrentOperationIndex;
-            renderedOperationCount = state.OperationCount;
-            renderedComplete = state.IsComplete;
-            renderedTimelineWidth = available;
-        }
-
-        private InspectOperationToken AddToken()
-        {
-            InspectOperationToken token = Instantiate(operationTokenPrefab, operationRow);
-            operationTokens.Add(token);
-            return token;
+            return activeToken;
         }
 
         private static bool Fits(float widths, int count, float available, float spacing) =>

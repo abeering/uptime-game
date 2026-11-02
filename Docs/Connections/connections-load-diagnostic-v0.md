@@ -15,3 +15,7 @@ Rows start in descending requested-LOAD order and stay in place while values flu
 Future identity concealment must provide the player-visible label at the row binding seam; V0 follows the same visible connection ID as `inspect` and does not implement ID hopping or Probe.
 
 See the [focused review](../Review/ConnectionsLoadDiagnosticV0/README.md) for Unity witnesses, deterministic baseline-change measurements, and scripted Play Mode captures. Interactive review should check 16:9 terminal width, bar animation, command focus, and history scrolling.
+
+## Node WORK panel ordering follow-up (PR #77 review branch)
+
+The original descending-request sort above records LOAD V0. The later node WORK panel follow-up gives LOAD and WORK one shared visual order: older `EstablishedAtSeconds` first, with connection ID as a deterministic tie-breaker. Requested LOAD changes no longer move rows. A LOAD row still disappears during the one-step interval between operations because it has no active request; when its next operation starts, it returns to its establishment-time position. This changes presentation order only, not LOAD accounting or the row's request-only membership.

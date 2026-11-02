@@ -108,8 +108,6 @@ namespace Uptime.Connections
                     rows.Remove(order[i]);
                     order.RemoveAt(i);
                 }
-            if (order.Count == 0)
-                demanding.Sort((a, b) => b.DesiredLoad.CompareTo(a.DesiredLoad));
             foreach (LogicalConnectionState state in demanding)
             {
                 if (rows.ContainsKey(state)) continue;
@@ -124,6 +122,7 @@ namespace Uptime.Connections
                 order.Add(state);
                 rows.Add(state, row);
             }
+            order.Sort(NodePanelRowOrder.Compare);
             float capacity = node.LoadCapacity;
             float highest = 0f;
             foreach (LogicalConnectionState state in order)
@@ -208,6 +207,7 @@ namespace Uptime.Connections
         private void PlaceRow(LoadRequestRow row, int index, float width)
         {
             RectTransform rect = (RectTransform)row.transform;
+            if (rect.GetSiblingIndex() != index) rect.SetSiblingIndex(index);
             rect.anchoredPosition = new Vector2(0f, -index * (rowHeight + rowGap));
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowHeight);
             row.FitWidth(width);
