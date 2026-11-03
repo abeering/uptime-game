@@ -25,6 +25,7 @@ namespace Uptime.Connections.EditorTools
                 "scene services");
             Check(new SerializedObject(presenter).FindProperty("probeRegionPrefab")
                 .objectReferenceValue != null, "authored scanner binding");
+            ScannerShader();
             bool previousAuto = director.AutoGenerationEnabled;
             bool previousHostiles = director.HostileGenerationEnabled;
             bool previousRecording = recorder.RecordingEnabled;
@@ -291,6 +292,39 @@ namespace Uptime.Connections.EditorTools
                         hidden.PopulateUIVertex(ref vertex, i);
                         Check(vertex.position.x < 55f && vertex.color.g > 240,
                             "future segment stays hidden while Connecting");
+                    }
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(instance); }
+        }
+
+        private static void ScannerShader()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Connections/ProbeRegion.prefab");
+            Check(prefab != null && prefab.GetComponentsInChildren<Image>(true).Length == 0,
+                "scanner uses a custom graphic instead of unshaded Images");
+            var graphic = prefab.GetComponent<ProbeRegionGraphic>();
+            Check(graphic != null && !graphic.raycastTarget &&
+                AssetDatabase.GetAssetPath(graphic.material) ==
+                "Assets/Shaders/ConnectionsLine.mat", "scanner uses the shared line shader");
+            var instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                using (var mesh = new VertexHelper())
+                {
+                    typeof(ProbeRegionGraphic).GetMethod("OnPopulateMesh",
+                        BindingFlags.Instance | BindingFlags.NonPublic, null,
+                        new[] { typeof(VertexHelper) }, null)
+                        .Invoke(instance.GetComponent<ProbeRegionGraphic>(), new object[] { mesh });
+                    Check(mesh.currentVertCount == 20,
+                        "scanner fill and all four border lines use shader geometry");
+                    for (int i = 0; i < mesh.currentVertCount; i++)
+                    {
+                        UIVertex vertex = default;
+                        mesh.PopulateUIVertex(ref vertex, i);
+                        Check(vertex.uv0.z > 0f && vertex.uv0.w > 0f,
+                            "scanner vertices carry line coverage coordinates");
                     }
                 }
             }
