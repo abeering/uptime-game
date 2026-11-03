@@ -19,7 +19,9 @@ namespace Uptime.Connections.EditorTools
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var presenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
-            Check(host != null && director != null && presenter != null && recorder != null,
+            var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
+            Check(host != null && director != null && presenter != null &&
+                recorder != null && terminal != null,
                 "scene services");
             Check(new SerializedObject(presenter).FindProperty("probeRegionPrefab")
                 .objectReferenceValue != null, "authored scanner binding");
@@ -93,6 +95,23 @@ namespace Uptime.Connections.EditorTools
                         ProbeSegment(presenter, "probe-other") == -1,
                         "selected edge only, including multi-link route and independent target");
                     CheckScannerPadding(host, presenter, second);
+                    typeof(Terminal).GetMethod("HandleSubmit",
+                        BindingFlags.Instance | BindingFlags.NonPublic)
+                        .Invoke(terminal, new object[] { "probe reset" });
+                    Check(host.ProbedLink.View == second &&
+                        host.ProbeCooldownRemaining == 0f &&
+                        !host.TryActivateProbe(first.LinkId, "probe " + first.LinkId,
+                            out string activeResult) && activeResult.Contains("BUSY"),
+                        "development reset clears cooldown but keeps active Probe");
+                    Check(recorder.CurrentLog.events.Any(e => e.type == "player_action" &&
+                        e.command == "probe reset" && e.success &&
+                        e.reason == "probe_cooldown_reset" &&
+                        e.probeLinkId == second.LinkId),
+                        "development reset is recorded");
+                    host.StepSimulation(10f);
+                    Check(host.ProbedLink == null && host.ProbeCooldownRemaining == 0f &&
+                        host.TryActivateProbe(first.LinkId, "probe " + first.LinkId, out _),
+                        "cooldown reset allows deployment after active expiry");
                     Check(recorder.CurrentLog.events.Any(e => e.type == "probe_expired" &&
                         e.probeLinkId == first.LinkId && Mathf.Abs(e.timeSeconds - 10f) < .001f &&
                         Mathf.Abs(e.probeExpiresAtSeconds - 10f) < .001f),

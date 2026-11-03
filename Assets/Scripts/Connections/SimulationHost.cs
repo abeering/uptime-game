@@ -959,6 +959,15 @@ namespace Uptime.Connections
             return true;
         }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public void ResetProbeCooldown(string command)
+        {
+            probeReadyAtSeconds = simulationTimeSeconds;
+            recorder?.RecordPlayerAction(command, null, true, null,
+                "probe_cooldown_reset", probedLink?.View?.LinkId);
+        }
+#endif
+
         private void ExpireProbe()
         {
             string linkId = probedLink.View.LinkId;

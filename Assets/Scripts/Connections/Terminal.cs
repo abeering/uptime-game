@@ -344,6 +344,27 @@ namespace Uptime.Connections
                     Scan(tokens, command);
                     break;
                 case "probe":
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    if (tokens.Length == 2 && tokens[1].Equals("reset",
+                        System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (simulationHost == null)
+                        {
+                            recorder?.RecordPlayerAction(command, null, false, null,
+                                "simulation_unavailable");
+                            AppendText("PROBE  simulation unavailable", errorColor);
+                        }
+                        else
+                        {
+                            simulationHost.ResetProbeCooldown(command);
+                            AppendText(simulationHost.ProbedLink == null ?
+                                "PROBE COOLDOWN RESET  ready" :
+                                "PROBE COOLDOWN RESET  active on " +
+                                simulationHost.ProbedLink.View.LinkId, normalColor);
+                        }
+                        break;
+                    }
+#endif
                     if (tokens.Length != 2)
                     {
                         recorder?.RecordPlayerAction(command, null, false, null,
@@ -619,6 +640,7 @@ namespace Uptime.Connections
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
