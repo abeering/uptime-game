@@ -12,6 +12,17 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text valueText;
         [SerializeField] private TMP_Text rateText;
         [SerializeField] private Image healthFill;
+        [Header("Global tool readiness")]
+        [SerializeField] private Image probeStatusFill;
+        [SerializeField] private TMP_Text probeStatusText;
+        [SerializeField] private Image scanStatusFill;
+        [SerializeField] private TMP_Text scanStatusText;
+        [SerializeField] private Color readyFillColor = new Color(0.14f, 0.33f, 0.27f);
+        [SerializeField] private Color readyTextColor = new Color(0.70f, 0.91f, 0.78f);
+        [SerializeField] private Color activeFillColor = new Color(0.13f, 0.31f, 0.36f);
+        [SerializeField] private Color activeTextColor = new Color(0.70f, 0.87f, 0.90f);
+        [SerializeField] private Color coolingFillColor = new Color(0.34f, 0.28f, 0.13f);
+        [SerializeField] private Color coolingTextColor = new Color(0.96f, 0.81f, 0.53f);
         [SerializeField] private Color healthyBarColor = new Color(0.32f, 0.77f, 0.66f);
         [SerializeField] private Color drainingBarColor = new Color(0.85f, 0.53f, 0.32f);
         [SerializeField] private Color criticalBarColor = new Color(0.94f, 0.32f, 0.30f);
@@ -46,6 +57,7 @@ namespace Uptime.Connections
                 host.SimulationTimeSeconds * Mathf.Max(0.001f, clockMinutesPerSimulationSecond);
             int minuteOfDay = Mathf.FloorToInt(clockMinutes) % 1440;
             if (clockText != null) clockText.text = $"{minuteOfDay / 60:00}:{minuteOfDay % 60:00}";
+            RenderTools();
             NetworkHealthSnapshot health = host.Health;
             if (health == null) return;
             if (valueText != null) valueText.text = $"HEALTH {health.Value:0.#}";
@@ -59,6 +71,43 @@ namespace Uptime.Connections
             {
                 rateText.text = $"{displayRate:+0.00;-0.00;0.00}/s";
                 rateText.color = rateColor;
+            }
+        }
+
+        private void RenderTools()
+        {
+            if (host.ProbedLink != null)
+                SetToolStatus(probeStatusFill, probeStatusText,
+                    $"ACTIVE {Seconds(host.ProbeActiveRemaining)}s", activeFillColor,
+                    activeTextColor);
+            else if (host.ProbeCooldownRemaining > 0.00001f)
+                SetToolStatus(probeStatusFill, probeStatusText,
+                    $"{Seconds(host.ProbeCooldownRemaining)}s", coolingFillColor,
+                    coolingTextColor);
+            else
+                SetToolStatus(probeStatusFill, probeStatusText, "READY", readyFillColor,
+                    readyTextColor);
+
+            NodeScanSession scan = host.ActiveScan;
+            if (scan != null)
+                SetToolStatus(scanStatusFill, scanStatusText,
+                    $"ACTIVE {Seconds(scan.ScheduledCompletionAtSeconds - host.SimulationTimeSeconds)}s",
+                    activeFillColor, activeTextColor);
+            else
+                SetToolStatus(scanStatusFill, scanStatusText, "READY", readyFillColor,
+                    readyTextColor);
+        }
+
+        private static int Seconds(float remaining) => Mathf.Max(1, Mathf.CeilToInt(remaining));
+
+        private static void SetToolStatus(Image fill, TMP_Text text, string value,
+            Color fillColor, Color textColor)
+        {
+            if (fill != null) fill.color = fillColor;
+            if (text != null)
+            {
+                text.text = value;
+                text.color = textColor;
             }
         }
 

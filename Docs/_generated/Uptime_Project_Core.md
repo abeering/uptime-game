@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:32371daabab2e931af5287a35ffd654e6d8ed41e58feaee73f12c5f706243151`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:8711db0299416848de21acb6010df8f55bc7925a99a97dd102913f87690a045a`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Global Tool Readiness Strip V0 (implementation branch stacked on Probe #84):** Both Connections scenes' permanent 52-unit status bar now shows passive Probe and Scan labels with one fixed-width status rectangle each. Green `READY`, teal `ACTIVE Ns`, and amber Probe cooldown seconds read authoritative simulation state; Scan returns directly to ready. Positive times round up, hold still without simulation progress, and reset with the host. The authored groups size from their contents for later additional slots, but this slice adds no charges or gameplay rules. The clock, Health, and pane layout remain fixed. See [Global Tool Readiness Strip V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-global-tool-readiness-v0.md) and [Editor captures](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsToolReadinessV0/README.md). Interactive Play Mode review remains required.
 
 **Probe X-ray V0 (implementation branch):** `probe <linkId>` selects one physical edge for 10 simulation seconds with a 35-second activation-origin cooldown. The host truthfully classifies only killable Connecting/Active logical connections; a prefab scanner tints their visible in-box line sections red for hostile and gray for benign, leaving outside line treatment and existing pills intact. New arrivals are evaluated during the window; expiry and reset clear coloring. Probe does not act on traffic or consume LOAD/Health. Terminal receipts and recorder activation/expiry/action events are included. ID hopping and Payload-route revelation remain separate future work. See [Probe X-ray V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-probe-v0.md). Interactive 16:9 Play Mode review remains required.
 
