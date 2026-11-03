@@ -189,8 +189,9 @@ namespace Uptime.Connections.EditorTools
                     traffic.EffectiveAmbientWeight("basic-threat") == 0f,
                     scene + " manual fixed hostile profile only");
                 ConnectionSpawnPlan ambient = traffic.GenerateHostilePlan(host.SimulationTimeSeconds);
-                Check(ambient == null || ambient.IdentityMode == ConnectionIdentityMode.Normal,
-                    scene + " ambient identity behavior remains normal");
+                Check(ambient == null || ambient.GenerationTrace.identitySelectionEligible &&
+                    Enum.IsDefined(typeof(ConnectionIdentityMode), ambient.IdentityMode),
+                    scene + " ambient ordinary identity selection is explicit");
                 Debug.Log("ReactiveIdentityWitness PASS: " + scene);
             }
             finally

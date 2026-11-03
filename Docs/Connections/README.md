@@ -26,6 +26,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Probe X-ray V0](connections-probe-v0.md) — temporary, truthful physical-edge hostile classification and local line coloring.
 - [ID Hopping V0](connections-id-hopping-v0.md) — manual hostile identity aliases, canonical command lookup, and temporary Probe revelation.
 - [Reactive Identity Misdirection V0](connections-reactive-identity-v0.md) — stable false IDs that change after failed alias commands.
+- [Generated Identity Behaviors V0](connections-generated-identity-v0.md) — provisional ambient selection of hopping and reactive aliases on ordinary hostile connections.
 
 ## Selected phase plans (not yet implemented)
 

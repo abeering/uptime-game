@@ -60,6 +60,8 @@ namespace Uptime.Connections
         public float openingGraceSeconds;
         public bool hostileGenerationEnabled;
         public float hostileMeanIntervalSeconds;
+        public float ambientIdentityHopChance;
+        public float ambientIdentityReactiveChance;
         public float ordinaryActivityWeight;
         public float reconnaissanceActivityWeight;
         public float payloadActivityWeight;
@@ -1297,6 +1299,8 @@ namespace Uptime.Connections
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
                 hostileGenerationEnabled = trafficDirector.HostileGenerationEnabled,
                 hostileMeanIntervalSeconds = trafficDirector.HostileMeanIntervalSeconds,
+                ambientIdentityHopChance = trafficDirector.AmbientIdentityHopChance,
+                ambientIdentityReactiveChance = trafficDirector.AmbientIdentityReactiveChance,
                 benignPopulationGoal = trafficDirector.BenignPopulationGoal,
                 coverageStartupGoal = trafficDirector.CoverageStartupGoal,
                 coverageRampSeconds = trafficDirector.CoverageRampSeconds,
