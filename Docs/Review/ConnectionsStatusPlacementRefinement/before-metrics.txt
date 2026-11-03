@@ -1,17 +1,32 @@
 before Connections 1920x1080
 markers=4 pills=4
+pill E2 identity p1 (x:-203.97, y:-165.14, width:58.27, height:57.68)
+pill E2 identity p2 (x:-155.10, y:-165.14, width:58.27, height:57.68)
+pill E1 identity p3 (x:-14.00, y:114.00, width:28.00, height:54.00)
+pill E3 identity p4 (x:121.27, y:-165.14, width:58.27, height:57.68)
 pillChildren=4 active=4 enabled=4
 API: stack=(x:162.00, y:-28.10, width:220.00, height:75.00) node=(x:-145.00, y:-38.60, width:290.00, height:96.00) markerHits=0 pillHits=0
 DB: stack=(x:-410.80, y:-422.00, width:220.00, height:75.00) node=(x:-445.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 AUTH: stack=(x:190.80, y:-381.00, width:220.00, height:34.00) node=(x:155.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 before Connections 1280x720
 markers=4 pills=4
+pill E2 identity p1 (x:-203.97, y:-165.14, width:58.27, height:57.68)
+pill E2 identity p2 (x:-155.10, y:-165.14, width:58.27, height:57.68)
+pill E1 identity p3 (x:-14.00, y:114.00, width:28.00, height:54.00)
+pill E3 identity p4 (x:121.27, y:-165.14, width:58.27, height:57.68)
 pillChildren=4 active=4 enabled=4
 API: stack=(x:162.00, y:-28.10, width:220.00, height:75.00) node=(x:-145.00, y:-38.60, width:290.00, height:96.00) markerHits=0 pillHits=0
 DB: stack=(x:-410.80, y:-422.00, width:220.00, height:75.00) node=(x:-445.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 AUTH: stack=(x:190.80, y:-381.00, width:220.00, height:34.00) node=(x:155.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 before ConnectionsAdvanced 1920x1080
 markers=7 pills=7
+pill E4 identity p1 (x:-24.75, y:155.50, width:28.00, height:54.00)
+pill E4 identity p2 (x:-3.25, y:95.50, width:28.00, height:54.00)
+pill E2 identity p3 (x:-247.18, y:154.42, width:59.36, height:56.16)
+pill E3 identity p4 (x:-466.00, y:-209.50, width:28.00, height:54.00)
+pill E3 identity p7 (x:-432.00, y:-209.50, width:28.00, height:54.00)
+pill E5 identity p5 (x:-14.00, y:-209.50, width:28.00, height:54.00)
+pill E6 identity p6 (x:187.82, y:154.42, width:59.36, height:56.16)
 pillChildren=7 active=7 enabled=7
 WEB: stack=(x:-273.00, y:65.00, width:220.00, height:34.00) node=(x:-580.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 AUTH: stack=(x:-273.00, y:-300.00, width:220.00, height:34.00) node=(x:-580.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0
@@ -21,6 +36,13 @@ RPT: stack=(x:162.00, y:-300.00, width:220.00, height:34.00) node=(x:-145.00, y:
 JOBS: stack=(x:53.00, y:65.00, width:220.00, height:34.00) node=(x:290.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 before ConnectionsAdvanced 1280x720
 markers=7 pills=7
+pill E4 identity p1 (x:-24.75, y:155.50, width:28.00, height:54.00)
+pill E4 identity p2 (x:-3.25, y:95.50, width:28.00, height:54.00)
+pill E2 identity p3 (x:-247.18, y:154.42, width:59.36, height:56.16)
+pill E3 identity p4 (x:-466.00, y:-209.50, width:28.00, height:54.00)
+pill E3 identity p7 (x:-432.00, y:-209.50, width:28.00, height:54.00)
+pill E5 identity p5 (x:-14.00, y:-209.50, width:28.00, height:54.00)
+pill E6 identity p6 (x:187.82, y:154.42, width:59.36, height:56.16)
 pillChildren=7 active=7 enabled=7
 WEB: stack=(x:-273.00, y:65.00, width:220.00, height:34.00) node=(x:-580.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
 AUTH: stack=(x:-273.00, y:-300.00, width:220.00, height:34.00) node=(x:-580.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0

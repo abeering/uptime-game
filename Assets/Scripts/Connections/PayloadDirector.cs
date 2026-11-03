@@ -60,6 +60,7 @@ namespace Uptime.Connections
         private System.Random random;
         private int nextId;
         public event Action<PayloadState> InterceptSucceeded;
+        public event Action<InterceptionState> InterceptorActivated;
 
         public IReadOnlyList<PayloadState> Payloads => payloads;
         public IReadOnlyCollection<InterceptionState> Interceptors => interceptors.Values;
@@ -202,6 +203,7 @@ namespace Uptime.Connections
             host.RefreshPayloadAllocations();
             host.Recorder?.RecordIntercept("intercept_activated", state, now,
                 interceptRequestedLoad, node.DefensiveAllocatedLoad);
+            InterceptorActivated?.Invoke(state);
             error = null; return true;
         }
 

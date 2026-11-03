@@ -6,7 +6,7 @@ The optional width change was left out. The existing 220-unit panel keeps long l
 
 ## Before and after
 
-All eight images are **scripted Unity Editor renders**, not interactive Play Mode captures. The same temporary capture script opened each production scene, queued long-lived connections on adjacent links, stepped the simulation for two seconds, and applied `ScanJammed` and `PortScanned` Conditions to several nodes. This puts terminal markers on different sides of nodes and shows multiple simultaneous status families. The capture helper was kept outside the repository.
+All eight images are **scripted Unity Editor renders**, not interactive Play Mode captures. They were refreshed after production node stamps merged in PR #81, so both sides use the same band-free status presentation. The same temporary capture script opened each production scene, queued long-lived connections on adjacent links, stepped the simulation for two seconds, and applied `ScanJammed` and `PortScanned` Conditions to several nodes. It then dismissed the brief event stamps to expose the persistent panels for comparison. This puts terminal markers on different sides of nodes and shows multiple simultaneous status families. The capture helper was kept outside the repository.
 
 | Scene | Resolution | Current-main baseline | Above/below refinement |
 | --- | --- | --- | --- |

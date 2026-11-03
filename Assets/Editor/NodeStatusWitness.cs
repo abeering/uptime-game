@@ -19,8 +19,10 @@ namespace Uptime.Connections.EditorTools
             CheckPlacement();
             CheckModel();
             CheckHostLifecycle();
+            CheckProductionStamps("Assets/Scenes/Connections.unity", 4);
+            CheckProductionStamps("Assets/Scenes/ConnectionsAdvanced.unity", 8);
             Debug.Log("NodeStatusWitness PASS: both scenes, authored layers, placement, " +
-                "diagnostic knowledge, grouping, real-time expiry, clean and reset.");
+                "diagnostic knowledge, grouping, stamps, real-time expiry, clean and reset.");
         }
 
         private static void CheckScene(string path, int nodeCount)
@@ -32,10 +34,18 @@ namespace Uptime.Connections.EditorTools
                 path + " services and node count");
             Check(presenter.Host == host && presenter.NetworkArea != null &&
                 presenter.StatusLayer != null && presenter.StatusPrefab != null &&
+                presenter.StampLayer != null && presenter.StampPrefab != null &&
                 presenter.StatusLayer.parent == presenter.NetworkArea &&
-                presenter.StatusLayer.GetSiblingIndex() ==
+                presenter.StampLayer.parent == presenter.NetworkArea &&
+                presenter.StampLayer.GetSiblingIndex() ==
                     presenter.StatusLayer.parent.childCount - 1,
-                path + " authored presenter/layer bindings");
+                path + " authored presenter/layer bindings and stamp draw order");
+            Check(presenter.StatusLayer.GetSiblingIndex() <
+                presenter.StampLayer.GetSiblingIndex() &&
+                presenter.StampPrefab == AssetDatabase.LoadAssetAtPath<NodeEventStamp>(
+                    "Assets/Prefabs/Connections/NodeEventStamp.prefab") &&
+                presenter.StampPrefab.GetComponentsInChildren<Image>(true)
+                    .All(i => !i.raycastTarget), path + " shared stamp prefab is click-through");
             var prefab = presenter.StatusPrefab;
             var bands = prefab.GetComponentsInChildren<NodeStatusBandGraphic>(true);
             var panels = prefab.GetComponentsInChildren<NodeStatusPanel>(true);
@@ -244,6 +254,170 @@ namespace Uptime.Connections.EditorTools
             Check(!presenter.StateFor(db).HasAny(Time.unscaledTime) &&
                 !presenter.ViewFor(db).HasVisibleFamily,
                 "reset clears all visual state and timers");
+        }
+
+        private static void CheckProductionStamps(string path, int nodeCount)
+        {
+            EditorSceneManager.OpenScene(path);
+            var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
+            var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
+            traffic.AutoGenerationEnabled = false;
+            traffic.HostileGenerationEnabled = false;
+            host.SetRunMode(ConnectionRunMode.Generated);
+            float now = Time.unscaledTime;
+            presenter.RenderNow(now, 1f);
+            NodeResources db = host.FindNodeResources("DB");
+            NodeResources api = host.FindNodeResources("API");
+            NodeEventStamp dbStamp = presenter.StampFor(db.View);
+            NodeEventStamp apiStamp = presenter.StampFor(api.View);
+            Check(presenter.StampLayer.childCount == nodeCount && dbStamp != null &&
+                apiStamp != null && dbStamp != apiStamp && !dbStamp.IsPlaying &&
+                presenter.ViewFor(db.View) != null &&
+                presenter.ViewFor(db.View).GetComponentsInChildren<NodeStatusBandGraphic>(true)
+                    .All(b => !b.gameObject.activeSelf),
+                path + " independent dormant stamps and no exterior bands");
+            Rect card = EdgeGeometry.CardRect(db.View, presenter.NetworkArea);
+            Check((dbStamp.Rect.anchoredPosition - card.center).sqrMagnitude < .01f &&
+                dbStamp.Rect.sizeDelta.y > card.height &&
+                dbStamp.GetComponentsInChildren<Image>(true).All(i => !i.raycastTarget),
+                path + " centered large click-through stamp");
+            CheckStampArtwork(dbStamp, path);
+
+            Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 3f, out _) &&
+                !dbStamp.IsPlaying, path + " covert infection has no discovery stamp");
+            Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _) &&
+                apiStamp.IsPlaying && apiStamp.CurrentKind == NodeEventStamp.EventKind.Offline &&
+                !dbStamp.IsPlaying, path + " Blackout announces only its target");
+            host.ResetSimulation();
+            Check(!apiStamp.IsPlaying && !dbStamp.IsPlaying,
+                path + " reset cancels active stamps");
+
+            host.ApplyCondition(db, new ConditionPayload(ConditionKind.ScanJammed, 8f));
+            Check(dbStamp.IsPlaying && dbStamp.CurrentKind ==
+                NodeEventStamp.EventKind.ScanJammed, path + " SCAN JAMMED applied");
+            dbStamp.RenderNow(Time.unscaledTime + 1.1f);
+            presenter.RenderNow(now, 1f);
+            Check(!dbStamp.IsPlaying && presenter.StateFor(db.View).ScanJammed,
+                path + " persistent Condition does not replay each frame");
+            host.ApplyCondition(db, new ConditionPayload(ConditionKind.ScanJammed, 8f));
+            Check(dbStamp.IsPlaying && dbStamp.CurrentKind ==
+                NodeEventStamp.EventKind.ScanJammed, path + " Condition refresh replays once");
+            host.ApplyCondition(api, new ConditionPayload(ConditionKind.PortScanned, 20f));
+            Check(apiStamp.IsPlaying && apiStamp.CurrentKind ==
+                NodeEventStamp.EventKind.PortScanned && dbStamp.IsPlaying,
+                path + " separate nodes announce concurrently");
+            host.ResetSimulation();
+
+            Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 3f, out _) &&
+                host.StartScan("DB", "scan DB", out _) == ScanStartResult.Started,
+                path + " infected diagnostic starts");
+            host.StepSimulation(host.ScanDurationSeconds);
+            Check(dbStamp.IsPlaying && dbStamp.CurrentKind == NodeEventStamp.EventKind.Infected &&
+                presenter.StateFor(db.View).KnownInfected,
+                path + " completed infected diagnosis announces knowledge");
+            Check(host.StartClean("DB", "clean DB", out CleanSession clean) ==
+                CleanStartResult.Started, path + " cleaning starts");
+            int malicious = clean.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(malicious, out int removed) ==
+                CleanSelectionResult.Success && removed == 1 && dbStamp.IsPlaying &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Clean &&
+                !presenter.StateFor(db.View).CleanVisible(Time.unscaledTime),
+                path + " infection removal acknowledges without persistent CLEAN");
+            host.ResetSimulation();
+            Check(host.StartScan("DB", "scan DB", out _) == ScanStartResult.Started,
+                path + " clean diagnostic starts");
+            host.StepSimulation(host.ScanDurationSeconds);
+            Check(dbStamp.IsPlaying && dbStamp.CurrentKind == NodeEventStamp.EventKind.Clean &&
+                presenter.StateFor(db.View).CleanVisible(Time.unscaledTime),
+                path + " completed clean diagnosis shows stamp and acknowledgment");
+            host.ResetSimulation();
+
+            Check(host.Worms.TryIsolate("DB", "isolate DB", out _) &&
+                dbStamp.IsPlaying && dbStamp.CurrentKind ==
+                    NodeEventStamp.EventKind.Isolated,
+                path + " isolation announces without redundant OFFLINE");
+            presenter.RenderNow(now, 1f);
+            Check(presenter.StateFor(db.View).Offline && presenter.StateFor(db.View).Isolated &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Isolated,
+                path + " isolation symptom retains one stamp");
+            host.ResetSimulation();
+
+            Check(host.Payloads.TryIntercept(null, "DB", out _) && dbStamp.IsPlaying &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Intercept,
+                path + " broad interceptor activation announces once");
+            PhysicalLinkReference adjacent = host.PhysicalLinks.First(link =>
+                link.View.NodeA == db.View || link.View.NodeB == db.View);
+            NodeView origin = adjacent.View.NodeA == db.View ?
+                adjacent.View.NodeB : adjacent.View.NodeA;
+            PayloadState first = host.Payloads.Spawn("DB", PayloadMotionProfile.Steady,
+                origin.NodeId, new[] { .8f });
+            PayloadState later = host.Payloads.Spawn("DB", PayloadMotionProfile.Steady,
+                origin.NodeId, new[] { 2.8f });
+            host.StepSimulation(2f);
+            Check(first.Intercepted && dbStamp.IsPlaying &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Caught,
+                path + " first real broad catch announces CAUGHT");
+            dbStamp.Cancel();
+            host.StepSimulation(2f);
+            Check(later.Intercepted && dbStamp.IsPlaying &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Caught &&
+                host.Payloads.InterceptorAt(db.View).CaughtCount == 2,
+                path + " later broad catch replays CAUGHT in one window");
+            host.ResetSimulation();
+            PayloadState targeted = host.Payloads.Spawn("DB", PayloadMotionProfile.Steady,
+                origin.NodeId, new[] { .8f });
+            Check(host.Payloads.TryIntercept(targeted.Id, "DB", out _) &&
+                dbStamp.CurrentKind == NodeEventStamp.EventKind.Intercept,
+                path + " targeted interceptor activation");
+            host.StepSimulation(2f);
+            Check(targeted.Intercepted && dbStamp.CurrentKind ==
+                NodeEventStamp.EventKind.Caught, path + " targeted catch announces CAUGHT");
+            host.ResetSimulation();
+
+            host.ApplyCondition(api, new ConditionPayload(ConditionKind.PortScanned, 20f));
+            presenter.enabled = false;
+            presenter.enabled = true;
+            presenter.RenderNow(now, 1f);
+            NodeEventStamp reenabled = presenter.StampFor(api.View);
+            Check(reenabled != null && !reenabled.IsPlaying &&
+                presenter.StateFor(api.View).PortScanned,
+                path + " existing Condition is shown without a stale event replay");
+            host.ResetSimulation();
+            Check(!reenabled.IsPlaying && !presenter.StateFor(api.View).HasAny(now),
+                path + " reset clears reenabled presentation");
+        }
+
+        private static void CheckStampArtwork(NodeEventStamp stamp, string path)
+        {
+            var serialized = new SerializedObject(stamp);
+            var icon = (Image)serialized.FindProperty("icon").objectReferenceValue;
+            var background = (Image)serialized.FindProperty("background").objectReferenceValue;
+            var symbols = serialized.FindProperty("symbols");
+            var frames = serialized.FindProperty("frames");
+            Color pain = serialized.FindProperty("pain").colorValue;
+            Color awareness = serialized.FindProperty("awareness").colorValue;
+            Color beneficial = serialized.FindProperty("beneficial").colorValue;
+            Check(symbols.arraySize == 8 && frames.arraySize > 4,
+                path + " eight symbols and animated background bound");
+            foreach (NodeEventStamp.EventKind kind in Enum.GetValues(typeof(NodeEventStamp.EventKind)))
+            {
+                stamp.Play(kind);
+                stamp.RenderNow(Time.unscaledTime + .2f);
+                Color expected = kind == NodeEventStamp.EventKind.Offline ||
+                    kind == NodeEventStamp.EventKind.Infected ||
+                    kind == NodeEventStamp.EventKind.ScanJammed ? pain :
+                    kind == NodeEventStamp.EventKind.PortScanned ? awareness : beneficial;
+                Check(stamp.IsPlaying && icon.sprite ==
+                    symbols.GetArrayElementAtIndex((int)kind).objectReferenceValue &&
+                    background.sprite == frames.GetArrayElementAtIndex(4).objectReferenceValue &&
+                    Mathf.Abs(icon.color.r - expected.r) < .001f &&
+                    Mathf.Abs(icon.color.g - expected.g) < .001f &&
+                    Mathf.Abs(icon.color.b - expected.b) < .001f &&
+                    icon.color.a > 0f && background.color.a > 0f,
+                    path + " symbol, tint, and unscaled animation for " + kind);
+            }
+            stamp.Cancel();
         }
 
         private static void Check(bool condition, string message)
