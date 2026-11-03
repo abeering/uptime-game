@@ -35,6 +35,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Entities, Conditions, statuses, and reactive events](connections-entities-conditions-events-ideas.md) — exploratory separation of network motion, effects, timed Conditions, persistent infections, player-visible knowledge, and ambient/directed event lifecycles; candidate indirect-pressure Conditions and on-resolution villain behavior. **Not an implementation plan.**
 - [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
 - [Operation logs & live tailing](connections-operation-logs-design.md) — working design for bounded, operation-local log evidence emitted at WORK milestones and watched through a live `logs <connectionId>` terminal panel. **Not implemented or an approved phase contract.**
+- [Edge Probe X-ray & ID hopping](connections-probe-xray-design.md) — working design for temporary, cooldown-limited link surveillance, confirmed hostile traffic visualization, rotating-identity counterplay, and separately parked Payload-route tracking. **Not implemented or an approved phase contract.**
 - [Lane-spacing continuity](../research/connections-lane-spacing-continuity.md) — parked visual-layout research.
 
 ## Broader Uptime design
