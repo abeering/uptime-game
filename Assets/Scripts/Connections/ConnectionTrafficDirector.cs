@@ -517,7 +517,8 @@ namespace Uptime.Connections
         // Development command producer. It uses the same profile-to-plan path as ambient
         // generation; queue dispatch remains independent of the ambient toggle.
         public ConnectionSpawnPlan QueueProfile(string profileId,
-            ConnectionSpawnOverrides overrides = null, bool idHopping = false)
+            ConnectionSpawnOverrides overrides = null, bool idHopping = false,
+            bool idReactive = false)
         {
             if (random == null) ResetDirector();
             ConnectionTrafficProfile selected = null;
@@ -530,9 +531,11 @@ namespace Uptime.Connections
                 }
             if (selected == null)
                 throw new InvalidOperationException("Unknown traffic profile: " + profileId);
-            if (idHopping && (!selected.isHostile || selected.purposeTemplate))
+            if (idHopping && idReactive)
+                throw new InvalidOperationException("idhop and idreact cannot be combined.");
+            if ((idHopping || idReactive) && (!selected.isHostile || selected.purposeTemplate))
                 throw new InvalidOperationException(
-                    "ID hopping requires a fixed hostile profile such as basic-threat.");
+                    "Identity behavior requires a fixed hostile profile such as basic-threat.");
             if (overrides != null)
             {
                 if (!selected.purposeTemplate)
@@ -562,7 +565,7 @@ namespace Uptime.Connections
                     throw new InvalidOperationException("infp:cadence requires a finite positive number.");
             }
             ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds, false,
-                overrides, manualIdentityHop: idHopping);
+                overrides, manualIdentityHop: idHopping, manualIdentityReactive: idReactive);
             if (plan == null)
                 throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
             QueueSpawnPlan(plan, "manual");
@@ -850,7 +853,8 @@ namespace Uptime.Connections
             InfectorStructure? infectorStructure = null,
             InfectorSignature? infectorPrimary = null,
             InfectorSignature? infectorSecondary = null,
-            InfectionKind? selectedInfectionKind = null, bool manualIdentityHop = false)
+            InfectionKind? selectedInfectionKind = null, bool manualIdentityHop = false,
+            bool manualIdentityReactive = false)
         {
             string id = NewId();
             if (id == null) return null;
@@ -881,7 +885,10 @@ namespace Uptime.Connections
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors,
                 identityHopSeconds: manualIdentityHop ? identityHopIntervalSeconds : 0f,
-                identitySeed: manualIdentityHop ? IdentitySeed(seed, id) : 0);
+                identitySeed: manualIdentityHop || manualIdentityReactive ? IdentitySeed(seed, id) : 0,
+                identityMode: manualIdentityReactive ? ConnectionIdentityMode.ReactiveMisdirection :
+                    manualIdentityHop ? ConnectionIdentityMode.ContinuousHopping :
+                    ConnectionIdentityMode.Normal);
         }
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,

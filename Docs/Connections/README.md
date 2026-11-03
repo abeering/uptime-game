@@ -25,6 +25,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Infections V0: Phantom LOAD](connections-infections-v0.md) — typed operation delivery, persistent node demand, developer controls, and recorder evidence.
 - [Probe X-ray V0](connections-probe-v0.md) — temporary, truthful physical-edge hostile classification and local line coloring.
 - [ID Hopping V0](connections-id-hopping-v0.md) — manual hostile identity aliases, canonical command lookup, and temporary Probe revelation.
+- [Reactive Identity Misdirection V0](connections-reactive-identity-v0.md) — stable false IDs that change after failed alias commands.
 
 ## Selected phase plans (not yet implemented)
 
@@ -37,7 +38,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Entities, Conditions, statuses, and reactive events](connections-entities-conditions-events-ideas.md) — exploratory separation of network motion, effects, timed Conditions, persistent infections, player-visible knowledge, and ambient/directed event lifecycles; candidate indirect-pressure Conditions and on-resolution villain behavior. **Not an implementation plan.**
 - [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
 - [Operation logs & live tailing](connections-operation-logs-design.md) — working design for bounded, operation-local log evidence emitted at WORK milestones and watched through a live `logs <connectionId>` terminal panel. **Not implemented or an approved phase contract.**
-- [Edge Probe X-ray & ID hopping](connections-probe-xray-design.md) — working design for temporary, cooldown-limited link surveillance, confirmed hostile traffic visualization, rotating-identity counterplay, and separately parked Payload-route tracking. **Probe's first edge X-ray slice is implemented; ID hopping and Payload-route tracking are not.**
+- [Edge Probe X-ray & ID hopping](connections-probe-xray-design.md) — working design for temporary, cooldown-limited link surveillance, confirmed hostile traffic visualization, rotating-identity counterplay, and separately parked Payload-route tracking. **Probe and ID Hopping now have separate implementation contracts; Payload-route tracking remains parked.**
 - [Lane-spacing continuity](../research/connections-lane-spacing-continuity.md) — parked visual-layout research.
 
 ## Broader Uptime design

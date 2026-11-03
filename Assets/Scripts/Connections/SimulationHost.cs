@@ -108,7 +108,7 @@ namespace Uptime.Connections
         {
             if (string.IsNullOrEmpty(id) || runtimeConnections == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
-                if ((state.IsActive || state.IsConnecting) && state.Identity.IsHopping &&
+                if ((state.IsActive || state.IsConnecting) && state.Identity.IsDisguised &&
                     string.Equals(state.Identity.AliasIdentity, id,
                         StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase))
@@ -117,6 +117,25 @@ namespace Uptime.Connections
         }
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
+
+        // Called only after canonical command resolution has failed. An alias is never a target.
+        public void NotifyFailedIdentityAddress(string attemptedId, string command,
+            int actionSequence = 0)
+        {
+            if (runtimeConnections == null || string.IsNullOrEmpty(attemptedId)) return;
+            foreach (LogicalConnectionState state in runtimeConnections)
+            {
+                if ((!state.IsActive && !state.IsConnecting) ||
+                    state.Identity.Mode != ConnectionIdentityMode.ReactiveMisdirection) continue;
+                string previous = state.Identity.AliasIdentity;
+                if (!state.Identity.ReactToFailedAddress(attemptedId,
+                    candidate => AliasAvailable(state, candidate))) continue;
+                recorder?.RecordReactiveIdentityChange(state, previous, attemptedId,
+                    command, simulationTimeSeconds, actionSequence);
+                RefreshDisplays();
+                return;
+            }
+        }
 
         // Awake-time configuration for the separate generated-topology stress scene.
         public void ConfigureStressTopology(NodeResources[] generatedNodes,
@@ -240,7 +259,7 @@ namespace Uptime.Connections
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
-                    if (connection.Identity.Started)
+                    if (connection.Identity.IsHopping && connection.Identity.Started)
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             (float)(connection.Identity.NextHopAtSeconds - simulationTimeSeconds)));
                     if (connection.IsActive && connection.Definition.LoaderAttack != null)
@@ -1020,7 +1039,7 @@ namespace Uptime.Connections
             if (runtimeConnections == null) return true;
             foreach (LogicalConnectionState other in runtimeConnections)
                 if (other != owner && (other.IsActive || other.IsConnecting) &&
-                    other.Identity.IsHopping &&
+                    other.Identity.IsDisguised &&
                     string.Equals(other.Identity.AliasIdentity, candidate,
                         StringComparison.OrdinalIgnoreCase)) return false;
             return true;
@@ -1028,12 +1047,12 @@ namespace Uptime.Connections
 
         private void StartIdentity(LogicalConnectionState state)
         {
-            if (!state.Identity.IsHopping) return;
+            if (!state.Identity.IsDisguised) return;
             if (state.Identity.Start(simulationTimeSeconds,
                 candidate => AliasAvailable(state, candidate)))
                 recorder?.RecordIdentityAlias(state, simulationTimeSeconds);
             else if (state.Identity.Started && state.Identity.AliasIdentity == state.ConnectionId)
-                Debug.LogWarning("ID Hopping alias pool exhausted; showing true ID for " +
+                Debug.LogWarning("Identity alias pool exhausted; showing true ID for " +
                     state.ConnectionId, this);
         }
 
@@ -1100,10 +1119,15 @@ namespace Uptime.Connections
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
-            if (!FiniteNonnegative(definition.IdentityHopSeconds) ||
-                definition.IdentityHopSeconds > 0f && !definition.IsHostile)
+            if (!Enum.IsDefined(typeof(ConnectionIdentityMode), definition.IdentityMode) ||
+                !FiniteNonnegative(definition.IdentityHopSeconds) ||
+                definition.IdentityMode != ConnectionIdentityMode.Normal && !definition.IsHostile ||
+                definition.IdentityMode == ConnectionIdentityMode.ContinuousHopping &&
+                    definition.IdentityHopSeconds <= 0f ||
+                definition.IdentityMode == ConnectionIdentityMode.ReactiveMisdirection &&
+                    definition.IdentityHopSeconds > 0f)
                 throw new InvalidOperationException(
-                    "ID hopping requires a hostile connection and finite nonnegative interval.");
+                    "Identity behavior requires a hostile connection and a valid mode/interval.");
             LoaderAttackPlan attack = definition.LoaderAttack;
             if (attack != null && (!definition.IsHostile ||
                 !Enum.IsDefined(typeof(LoaderStructure), attack.structure) ||

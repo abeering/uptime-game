@@ -166,6 +166,8 @@ namespace Uptime.Connections
         public string type;
         public string connectionId;
         public string advertisedIdentity;
+        public string previousIdentity;
+        public string attemptedIdentity;
         public int identityHopIndex;
         public string source;
         public float scheduledSpawnTime;
@@ -312,6 +314,7 @@ namespace Uptime.Connections
         public int naturalLoadSeed;
         public float identityHopSeconds;
         public int identitySeed;
+        public string identityMode;
     }
 
     [Serializable] public sealed class OperationRecord
@@ -865,6 +868,21 @@ namespace Uptime.Connections
             entry.identityHopIndex = state.Identity.HopCount;
         }
 
+        public void RecordReactiveIdentityChange(LogicalConnectionState state,
+            string previousAlias, string attemptedId, string triggeringCommand,
+            float time, int actionSequence)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("identity_alias_changed", time);
+            entry.connectionId = state.ConnectionId;
+            entry.previousIdentity = previousAlias;
+            entry.advertisedIdentity = state.Identity.AliasIdentity;
+            entry.attemptedIdentity = attemptedId;
+            entry.command = triggeringCommand;
+            entry.actionSequence = actionSequence;
+            entry.identityHopIndex = state.Identity.HopCount;
+        }
+
         public void RecordOperationStarted(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -1382,6 +1400,7 @@ namespace Uptime.Connections
                 naturalLoadSeed = definition.NaturalLoadSeed,
                 identityHopSeconds = definition.IdentityHopSeconds,
                 identitySeed = definition.IdentitySeed,
+                identityMode = definition.IdentityMode.ToString(),
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;

@@ -331,7 +331,7 @@ namespace Uptime.Connections
                     break;
                 case "inspect":
                 case "i":
-                    Inspect(tokens);
+                    Inspect(tokens, command);
                     break;
                 case "kill":
                 case "k":
@@ -506,6 +506,7 @@ namespace Uptime.Connections
                 case "spawn":
                     if (!TryParseSpawn(tokens, out string profileId,
                         out ConnectionSpawnOverrides spawnOverrides, out bool idHopping,
+                        out bool idReactive,
                         out string spawnError))
                         AppendText(spawnError, errorColor);
                     else if (trafficDirector == null || simulationHost == null)
@@ -515,7 +516,7 @@ namespace Uptime.Connections
                         try
                         {
                             ConnectionSpawnPlan plan = trafficDirector.QueueProfile(profileId,
-                                spawnOverrides, idHopping);
+                                spawnOverrides, idHopping, idReactive);
                             recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
                             AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                 " from profile " + plan.ProfileId, normalColor);
@@ -644,6 +645,7 @@ namespace Uptime.Connections
                     AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  spawn basic-threat idhop  // manual hostile ID hopping", mutedColor);
+                    AppendText("DEV  spawn basic-threat idreact  // reactive false identity", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
@@ -670,12 +672,19 @@ namespace Uptime.Connections
 
         public static bool TryParseSpawn(string[] tokens, out string profileId,
             out ConnectionSpawnOverrides overrides, out bool idHopping, out string error)
+            => TryParseSpawn(tokens, out profileId, out overrides, out idHopping,
+                out _, out error);
+
+        public static bool TryParseSpawn(string[] tokens, out string profileId,
+            out ConnectionSpawnOverrides overrides, out bool idHopping,
+            out bool idReactive, out string error)
         {
             const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
-                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N] [idhop]";
+                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N] [idhop|idreact]";
             profileId = null;
             overrides = null;
             idHopping = false;
+            idReactive = false;
             error = usage;
             if (tokens == null || tokens.Length < 2) return false;
             profileId = tokens[1];
@@ -690,6 +699,11 @@ namespace Uptime.Connections
                 {
                     if (idHopping) { error = "SPAWN  duplicate idhop option"; return false; }
                     idHopping = true;
+                }
+                else if (token.Equals("idreact", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (idReactive) { error = "SPAWN  duplicate idreact option"; return false; }
+                    idReactive = true;
                 }
                 else if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
                 {
@@ -726,6 +740,8 @@ namespace Uptime.Connections
                 }
                 else { error = "SPAWN  unknown option: " + token; return false; }
             }
+            if (idHopping && idReactive)
+            { error = "SPAWN  idhop and idreact cannot be combined"; return false; }
             if (!objective.HasValue && (kind.HasValue || load.HasValue || cadence.HasValue))
             { error = "SPAWN  infection options require obj:delivery"; return false; }
             if (objective == ManualObjective.Loader && (kind.HasValue || load.HasValue || cadence.HasValue))
@@ -780,7 +796,8 @@ namespace Uptime.Connections
                     continue;
                 }
                 bool killed = simulationHost != null && simulationHost.KillConnection(id);
-                recorder?.RecordPlayerAction(command, id, killed);
+                int action = recorder != null ? recorder.RecordPlayerAction(command, id, killed) : 0;
+                if (!killed) simulationHost?.NotifyFailedIdentityAddress(id, "kill", action);
                 AppendText(killed ? "KILLED  " + displayId :
                     "KILL  no active connection " + displayId,
                     killed ? normalColor : errorColor);
@@ -933,7 +950,7 @@ namespace Uptime.Connections
             StartCoroutine(FocusInputNextFrame());
         }
 
-        private void Inspect(string[] tokens)
+        private void Inspect(string[] tokens, string command)
         {
             if (!TryParseInspect(tokens,
                 out InspectPresentationMode mode, out string[] ids, out string error))
@@ -953,6 +970,9 @@ namespace Uptime.Connections
                 LogicalConnectionState match = simulationHost.FindConnection(id);
                 if (match == null)
                 {
+                    int action = recorder != null ? recorder.RecordPlayerAction(command,
+                        id, false, reason: "unknown_connection") : 0;
+                    simulationHost.NotifyFailedIdentityAddress(id, "inspect", action);
                     AppendText("INSPECT  unknown connection " + id.ToLowerInvariant(), errorColor);
                     return;
                 }
