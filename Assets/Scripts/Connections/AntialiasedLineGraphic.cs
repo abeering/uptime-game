@@ -17,6 +17,12 @@ namespace Uptime.Connections
 
         protected void AddLine(VertexHelper mesh, Vector2 start, Vector2 end,
             float width, Color tint)
+            => AddLine(mesh, start, end, width, tint, tint);
+
+        // Per-side vertex colors allow a soft cross-line gradient while retaining
+        // the same antialiased coverage and end caps as ordinary Connections lines.
+        protected void AddLine(VertexHelper mesh, Vector2 start, Vector2 end,
+            float width, Color lowerTint, Color upperTint)
         {
             Vector2 delta = end - start;
             float length = delta.magnitude;
@@ -32,10 +38,10 @@ namespace Uptime.Connections
             float padding = 1.5f / Mathf.Max(0.01f, canvas != null ? canvas.scaleFactor : 1f);
             Vector2 extent = halfSize + Vector2.one * padding;
             int index = mesh.currentVertCount;
-            AddVertex(mesh, center, direction, normal, -extent.x, -extent.y, halfSize, tint);
-            AddVertex(mesh, center, direction, normal, -extent.x, extent.y, halfSize, tint);
-            AddVertex(mesh, center, direction, normal, extent.x, extent.y, halfSize, tint);
-            AddVertex(mesh, center, direction, normal, extent.x, -extent.y, halfSize, tint);
+            AddVertex(mesh, center, direction, normal, -extent.x, -extent.y, halfSize, lowerTint);
+            AddVertex(mesh, center, direction, normal, -extent.x, extent.y, halfSize, upperTint);
+            AddVertex(mesh, center, direction, normal, extent.x, extent.y, halfSize, upperTint);
+            AddVertex(mesh, center, direction, normal, extent.x, -extent.y, halfSize, lowerTint);
             mesh.AddTriangle(index, index + 1, index + 2);
             mesh.AddTriangle(index, index + 2, index + 3);
         }

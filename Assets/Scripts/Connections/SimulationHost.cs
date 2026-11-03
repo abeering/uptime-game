@@ -976,7 +976,7 @@ namespace Uptime.Connections
             float expiresAtSeconds = probeExpiresAtSeconds;
             probedLink = null;
             probeExpiresAtSeconds = 0f;
-            pathPresenter?.SetProbe(null);
+            pathPresenter?.SetProbe(null, fadeOut: true);
             recorder?.RecordProbe("probe_expired", linkId, simulationTimeSeconds,
                 expiresAtSeconds, probeReadyAtSeconds);
             ProbeExpired?.Invoke(linkId);
