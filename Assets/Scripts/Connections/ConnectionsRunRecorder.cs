@@ -165,6 +165,8 @@ namespace Uptime.Connections
         public float timeSeconds;
         public string type;
         public string connectionId;
+        public string advertisedIdentity;
+        public int identityHopIndex;
         public string source;
         public float scheduledSpawnTime;
         public string profileId;
@@ -308,6 +310,8 @@ namespace Uptime.Connections
         public LoaderAttackPlan loaderAttack;
         public bool naturalLoadNoise;
         public int naturalLoadSeed;
+        public float identityHopSeconds;
+        public int identitySeed;
     }
 
     [Serializable] public sealed class OperationRecord
@@ -852,6 +856,15 @@ namespace Uptime.Connections
             entry.definition = Definition(state.Definition);
         }
 
+        public void RecordIdentityAlias(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("identity_alias_changed", time);
+            entry.connectionId = state.ConnectionId;
+            entry.advertisedIdentity = state.Identity.AliasIdentity;
+            entry.identityHopIndex = state.Identity.HopCount;
+        }
+
         public void RecordOperationStarted(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -1367,6 +1380,8 @@ namespace Uptime.Connections
                 loaderAttack = definition.LoaderAttack?.Copy(),
                 naturalLoadNoise = definition.NaturalLoadNoise,
                 naturalLoadSeed = definition.NaturalLoadSeed,
+                identityHopSeconds = definition.IdentityHopSeconds,
+                identitySeed = definition.IdentitySeed,
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;

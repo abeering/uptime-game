@@ -73,6 +73,8 @@ The preferred V0 output is primarily **on the network**. A short terminal acknow
 
 ## ID hopping: a separate adversarial behavior countered by Probe
 
+**Later implementation decision:** [ID Hopping V0](connections-id-hopping-v0.md) preserves immutable true IDs and changing advertised aliases, but true IDs remain actionable even without Probe. The temporary addressability gate proposed below was superseded; the original exploration is retained here for provenance.
+
 A proposed connection modifier, provisionally **ID HOPPING** (also called rotating identity during exploration), changes the entity's *displayed* short ID roughly every **1–3 seconds**. It does **not** change the underlying persistent connection or its authoritative lifecycle.
 
 Examples: `a3 → p7 → m2 → h9`, all on the same logical connection.

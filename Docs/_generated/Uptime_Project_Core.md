@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:6fef0dfffe2ee691db2dfe1886ee41a3c9f0d79d06d7e99027ec1d9935afe7af`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:266b104b83dfecdf8f374561d0e8cfe19dc250506b6d1596880b969c51d12dbd`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**ID Hopping V0 (implementation branch):** Manual hostile `spawn basic-threat idhop` advertises a seeded, collision-safe short alias from the start of Connecting and changes it every two simulation seconds. Canonical IDs remain immutable and always resolve `inspect` and `kill`; aliases do not. Network pills and live LOAD/WORK rows update without rebuilding or reordering. Probe temporarily shows the true ID on all surfaces when the path visibly reaches its selected edge, including arrivals during the window; expiry restores the current alias immediately while the scanner fades. Ambient generation is unchanged. See [ID Hopping V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-id-hopping-v0.md). Interactive 16:9 Play Mode review remains required.
 
 **Probe X-ray visual sweep:** The authored Probe rectangle now flashes briefly on activation, sweeps a subtle gradient across the selected connection bundle while active, and fades shortly after gameplay expiry. The sweep is cosmetic; red/gray classification still starts and stops immediately from simulation state, and reset/disable clear the graphic without a lingering fade. The shared scanner prefab serves both Connections scenes with serialized tuning. See [Probe X-ray V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-probe-v0.md) and [Editor captures](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsProbeSweepV0/README.md). Probe and sweep were reviewed interactively in Unity before integration.
 

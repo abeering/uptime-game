@@ -24,6 +24,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Lifecycle V1](connections-lifecycle-v1.md) — Connecting route traversal, cancellation receipts, and connection-only Health.
 - [Infections V0: Phantom LOAD](connections-infections-v0.md) — typed operation delivery, persistent node demand, developer controls, and recorder evidence.
 - [Probe X-ray V0](connections-probe-v0.md) — temporary, truthful physical-edge hostile classification and local line coloring.
+- [ID Hopping V0](connections-id-hopping-v0.md) — manual hostile identity aliases, canonical command lookup, and temporary Probe revelation.
 
 ## Selected phase plans (not yet implemented)
 

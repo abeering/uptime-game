@@ -115,10 +115,7 @@ namespace Uptime.Connections
                 Color color = host.PresentationPalette != null &&
                     host.PresentationPalette.TryGet(state, out Color accent) ?
                     accent : mutedIdentityColor;
-                // This is the same player-visible identity currently used by inspect.
-                // Future concealment can change this one binding without exposing the
-                // simulation ID through the accounting model.
-                row.Bind(state.ConnectionId, color);
+                row.Bind(state.KnownIdentity, color);
                 order.Add(state);
                 rows.Add(state, row);
             }
@@ -129,7 +126,10 @@ namespace Uptime.Connections
                 highest = Mathf.Max(highest, state.DesiredLoad);
             UpdateScale(highest, now);
             foreach (LogicalConnectionState state in order)
+            {
+                rows[state].SetDisplayedId(state.KnownIdentity);
                 rows[state].Render(state.DesiredLoad, scale, BarColor(state.DesiredLoad, capacity));
+            }
 
             FitWidth();
             int count = order.Count;

@@ -10,6 +10,7 @@ namespace Uptime.Connections
         public struct LiveLine
         {
             public string Id;
+            public string DisplayId;
             public Vector2 TargetStart;
             public Vector2 TargetEnd;
             public Vector2 VisualStart;
@@ -21,9 +22,10 @@ namespace Uptime.Connections
 
             public LiveLine(string id, Vector2 targetStart, Vector2 targetEnd,
                 Vector2 visualStart, Vector2 visualEnd, Color accent, float visibleFraction,
-                float width, bool hasPill = true)
+                float width, bool hasPill = true, string displayId = null)
             {
                 Id = id;
+                DisplayId = displayId ?? id;
                 TargetStart = targetStart;
                 TargetEnd = targetEnd;
                 VisualStart = visualStart;
@@ -276,7 +278,7 @@ namespace Uptime.Connections
                     if (pill != null)
                     {
                         pill.name = $"{link.LinkId} identity {line.Id}";
-                        pill.Bind(line.Id, line.Accent);
+                        pill.Bind(line.DisplayId, line.Accent);
                     }
                     state.Pills.Add(pill);
                     state.PillIds.Add(line.Id);
@@ -284,6 +286,8 @@ namespace Uptime.Connections
                 foreach (IdentityPillView pill in old.Values)
                     DestroyView(pill.gameObject);
             }
+            for (int i = 0; i < state.Pills.Count; i++)
+                state.Pills[i]?.SetDisplayedId(state.Lines[i].DisplayId);
             Apply(state);
         }
 

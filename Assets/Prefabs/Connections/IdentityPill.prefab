@@ -86,6 +86,8 @@ MonoBehaviour:
   idText: {fileID: 4622619431550222199}
   dimensions: {x: 54, y: 28}
   fontSize: 22
+  identityChangeEmphasisSeconds: 0.22
+  identityChangeWhiteMix: 0.24
 --- !u!1 &2674788278054799834
 GameObject:
   m_ObjectHideFlags: 0

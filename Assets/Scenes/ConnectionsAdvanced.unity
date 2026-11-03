@@ -11357,6 +11357,7 @@ MonoBehaviour:
   - purposeId: sales-export
     eligibleTargetIds:
     - RPT
+  identityHopIntervalSeconds: 2
   profiles:
   - id: product-lookup
     claimedPurpose: Product Detail Retrieval
