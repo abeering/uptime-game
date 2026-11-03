@@ -138,14 +138,21 @@ namespace Uptime.Connections
 
         public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
             out float visibleFraction, out Color lineColor)
+            => TryGetVisualSegment(segment, out start, out end, out visibleFraction,
+                out lineColor, out _);
+
+        public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
+            out float visibleFraction, out Color lineColor, out float lineWidth)
         {
             start = end = Vector2.zero;
             visibleFraction = 0f;
             lineColor = path != null ? path.color : Color.white;
+            lineWidth = 0f;
             if (!establishedVisual || segment < 0 || segment >= starts.Length)
                 return false;
             start = starts[segment];
             end = ends[segment];
+            lineWidth = lineWidths[segment];
             float total = 0f;
             float before = 0f;
             for (int i = 0; i < starts.Length; i++)

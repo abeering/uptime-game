@@ -67,6 +67,7 @@ namespace Uptime.Connections.EditorTools
                 host.StepSimulation(1.3f);
                 Check(host.FindConnection("probe-hostile").IsActive,
                     "classification persists after establishment");
+                CheckScannerPadding(host, presenter, first);
                 Check(host.KillConnection("probe-hostile"), "ordinary kill remains available");
                 presenter.RefreshLayouts();
                 Check(ProbeSegment(presenter, "probe-hostile") == -1,
@@ -91,6 +92,7 @@ namespace Uptime.Connections.EditorTools
                     Check(ProbeSegment(presenter, "probe-benign") == 1 &&
                         ProbeSegment(presenter, "probe-other") == -1,
                         "selected edge only, including multi-link route and independent target");
+                    CheckScannerPadding(host, presenter, second);
                     Check(recorder.CurrentLog.events.Any(e => e.type == "probe_expired" &&
                         e.probeLinkId == first.LinkId && Mathf.Abs(e.timeSeconds - 10f) < .001f &&
                         Mathf.Abs(e.probeExpiresAtSeconds - 10f) < .001f),
@@ -165,6 +167,50 @@ namespace Uptime.Connections.EditorTools
         private static Color ProbeColor(LogicalPathPresenter presenter, string id) =>
             (Color)typeof(LogicalPathView).GetField("probeTint",
                 BindingFlags.Instance | BindingFlags.NonPublic).GetValue(View(presenter, id));
+
+        private static void CheckScannerPadding(SimulationHost host,
+            LogicalPathPresenter presenter, PhysicalLinkView link)
+        {
+            foreach (LogicalConnectionState state in host.RuntimeConnections)
+                View(presenter, state.ConnectionId).AdvanceVisual(.3f);
+            presenter.RefreshLayouts();
+            link.GetRenderedSpine(out Vector2 a, out Vector2 b);
+            Vector2 center = (a + b) * .5f;
+            Vector2 along = (b - a).normalized;
+            Vector2 across = new Vector2(-along.y, along.x);
+            float expectedHalfWidth = 10f;
+            foreach (LogicalConnectionState state in host.RuntimeConnections)
+            {
+                if (!state.IsActive && !state.IsConnecting) continue;
+                LogicalPathView view = View(presenter, state.ConnectionId);
+                for (int segment = 0; segment < state.Definition.Route.Length - 1; segment++)
+                {
+                    NodeView routeA = state.Definition.Route[segment].Node;
+                    NodeView routeB = state.Definition.Route[segment + 1].Node;
+                    if (!(routeA == link.NodeA && routeB == link.NodeB ||
+                          routeA == link.NodeB && routeB == link.NodeA)) continue;
+                    if (!view.TryGetVisualSegment(segment, out Vector2 start, out Vector2 end,
+                        out float visible, out _, out float width) || visible <= 0f) continue;
+                    end = Vector2.Lerp(start, end, visible);
+                    Vector2 direction = (end - start).normalized;
+                    Vector2 normal = new Vector2(-direction.y, direction.x);
+                    float centerlineExtent = Mathf.Max(
+                        Mathf.Abs(Vector2.Dot(start - center, across)),
+                        Mathf.Abs(Vector2.Dot(end - center, across)));
+                    float outerEdge = centerlineExtent + width * .5f *
+                        Mathf.Abs(Vector2.Dot(normal, across));
+                    expectedHalfWidth = Mathf.Max(expectedHalfWidth, outerEdge + 14f);
+                }
+            }
+            var scanner = (RectTransform)typeof(LogicalPathPresenter)
+                .GetField("probeRegion", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(presenter);
+            Check(scanner != null &&
+                Mathf.Abs(scanner.rect.height * .5f - expectedHalfWidth) < .5f,
+                "scanner includes rendered line thickness and 14 px side padding");
+            Check(Mathf.Abs(scanner.rect.width - Vector2.Distance(a, b) * .8f) < .5f,
+                "scanner retains 80 percent link coverage");
+        }
 
         private static void MeshClipping()
         {

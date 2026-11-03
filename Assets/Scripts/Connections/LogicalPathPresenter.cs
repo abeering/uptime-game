@@ -6,6 +6,7 @@ namespace Uptime.Connections
 {
     public sealed class LogicalPathPresenter : MonoBehaviour
     {
+        private const float ProbeSidePadding = 14f;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private RectTransform markerLayer;
@@ -449,12 +450,18 @@ namespace Uptime.Connections
                     {
                         if (connection.RouteLinks[i].View != probedLink) continue;
                         if (view.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
-                            out float visibleFraction, out _) && visibleFraction > 0f)
+                            out float visibleFraction, out _, out float lineWidth) &&
+                            visibleFraction > 0f)
                         {
                             end = Vector2.Lerp(start, end, visibleFraction);
+                            Vector2 pathDirection = (end - start).normalized;
+                            Vector2 pathNormal = new Vector2(-pathDirection.y, pathDirection.x);
+                            float projectedHalfThickness = lineWidth * 0.5f *
+                                Mathf.Abs(Vector2.Dot(pathNormal, across));
                             float extent = Mathf.Max(Mathf.Abs(Vector2.Dot(start - center, across)),
                                 Mathf.Abs(Vector2.Dot(end - center, across)));
-                            halfWidth = Mathf.Max(halfWidth, extent + 8f);
+                            halfWidth = Mathf.Max(halfWidth,
+                                extent + projectedHalfThickness + ProbeSidePadding);
                         }
                     }
                 }
@@ -462,12 +469,12 @@ namespace Uptime.Connections
                     if (entry.Value == probedLink)
                         halfWidth = Mathf.Max(halfWidth,
                             Mathf.Abs(EdgeGeometry.Offset(users.IndexOf(entry.Key.Id),
-                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + 8f);
+                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + ProbeSidePadding);
                 foreach (KeyValuePair<WormBranch, PhysicalLinkView> entry in wormLinks)
                     if (entry.Value == probedLink)
                         halfWidth = Mathf.Max(halfWidth,
                             Mathf.Abs(EdgeGeometry.Offset(users.IndexOf(entry.Key.Id),
-                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + 8f);
+                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + ProbeSidePadding);
             }
             probeHalfWidth = probeHalfWidth <= 0f || halfWidth > probeHalfWidth ? halfWidth :
                 Mathf.MoveTowards(probeHalfWidth, halfWidth, Time.deltaTime * 40f);
