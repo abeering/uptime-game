@@ -505,7 +505,8 @@ namespace Uptime.Connections
                     break;
                 case "spawn":
                     if (!TryParseSpawn(tokens, out string profileId,
-                        out ConnectionSpawnOverrides spawnOverrides, out string spawnError))
+                        out ConnectionSpawnOverrides spawnOverrides, out bool idHopping,
+                        out string spawnError))
                         AppendText(spawnError, errorColor);
                     else if (trafficDirector == null || simulationHost == null)
                         AppendText("SPAWN  simulation unavailable", errorColor);
@@ -514,7 +515,7 @@ namespace Uptime.Connections
                         try
                         {
                             ConnectionSpawnPlan plan = trafficDirector.QueueProfile(profileId,
-                                spawnOverrides);
+                                spawnOverrides, idHopping);
                             recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
                             AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                 " from profile " + plan.ProfileId, normalColor);
@@ -642,6 +643,7 @@ namespace Uptime.Connections
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  spawn basic-threat idhop  // manual hostile ID hopping", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
@@ -664,11 +666,16 @@ namespace Uptime.Connections
 
         public static bool TryParseSpawn(string[] tokens, out string profileId,
             out ConnectionSpawnOverrides overrides, out string error)
+            => TryParseSpawn(tokens, out profileId, out overrides, out _, out error);
+
+        public static bool TryParseSpawn(string[] tokens, out string profileId,
+            out ConnectionSpawnOverrides overrides, out bool idHopping, out string error)
         {
             const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
-                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]";
+                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N] [idhop]";
             profileId = null;
             overrides = null;
+            idHopping = false;
             error = usage;
             if (tokens == null || tokens.Length < 2) return false;
             profileId = tokens[1];
@@ -679,7 +686,12 @@ namespace Uptime.Connections
             for (int i = 2; i < tokens.Length; i++)
             {
                 string token = tokens[i];
-                if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
+                if (token.Equals("idhop", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (idHopping) { error = "SPAWN  duplicate idhop option"; return false; }
+                    idHopping = true;
+                }
+                else if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
                 {
                     if (objective.HasValue) { error = "SPAWN  duplicate obj option"; return false; }
                     string value = token.Substring(4);

@@ -76,6 +76,8 @@ namespace Uptime.Connections
         [Tooltip("Optional PURPOSE destination overrides for this scene. Empty retains each catalog definition.")]
         [SerializeField] private PurposeTargetOverride[] purposeTargetOverrides;
         [SerializeField] private ConnectionTrafficProfile[] profiles;
+        [Header("Manual identity behavior")]
+        [SerializeField, Min(0.1f)] private float identityHopIntervalSeconds = 2f;
         [Tooltip("Optional canonical PURPOSE weights by profile ID. Built-in operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
         [SerializeField] private AmbientWeightOverride[] ambientWeightOverrides;
         [Header("Hostile ambient arrivals")]
@@ -149,6 +151,7 @@ namespace Uptime.Connections
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
         public bool ConnectionIdsExhausted => idsExhausted;
+        public float IdentityHopIntervalSeconds => identityHopIntervalSeconds;
         public float HostileMeanIntervalSeconds
         {
             get => hostileMeanIntervalSeconds;
@@ -514,7 +517,7 @@ namespace Uptime.Connections
         // Development command producer. It uses the same profile-to-plan path as ambient
         // generation; queue dispatch remains independent of the ambient toggle.
         public ConnectionSpawnPlan QueueProfile(string profileId,
-            ConnectionSpawnOverrides overrides = null)
+            ConnectionSpawnOverrides overrides = null, bool idHopping = false)
         {
             if (random == null) ResetDirector();
             ConnectionTrafficProfile selected = null;
@@ -527,6 +530,9 @@ namespace Uptime.Connections
                 }
             if (selected == null)
                 throw new InvalidOperationException("Unknown traffic profile: " + profileId);
+            if (idHopping && (!selected.isHostile || selected.purposeTemplate))
+                throw new InvalidOperationException(
+                    "ID hopping requires a fixed hostile profile such as basic-threat.");
             if (overrides != null)
             {
                 if (!selected.purposeTemplate)
@@ -556,7 +562,7 @@ namespace Uptime.Connections
                     throw new InvalidOperationException("infp:cadence requires a finite positive number.");
             }
             ConnectionSpawnPlan plan = BuildPlan(selected, host.SimulationTimeSeconds, false,
-                overrides);
+                overrides, manualIdentityHop: idHopping);
             if (plan == null)
                 throw new InvalidOperationException("All 260 generated connection IDs are reserved for this run.");
             QueueSpawnPlan(plan, "manual");
@@ -844,7 +850,7 @@ namespace Uptime.Connections
             InfectorStructure? infectorStructure = null,
             InfectorSignature? infectorPrimary = null,
             InfectorSignature? infectorSecondary = null,
-            InfectionKind? selectedInfectionKind = null)
+            InfectionKind? selectedInfectionKind = null, bool manualIdentityHop = false)
         {
             string id = NewId();
             if (id == null) return null;
@@ -873,7 +879,9 @@ namespace Uptime.Connections
                     infectorStructure, infectorPrimary, infectorSecondary, selectedInfectionKind);
             return new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
-                selected.connectionBehaviors);
+                selected.connectionBehaviors,
+                identityHopSeconds: manualIdentityHop ? identityHopIntervalSeconds : 0f,
+                identitySeed: manualIdentityHop ? IdentitySeed(seed, id) : 0);
         }
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,
@@ -1398,7 +1406,8 @@ namespace Uptime.Connections
             while (nextIdIndex < shuffledIds.Length)
             {
                 string id = shuffledIds[nextIdIndex++];
-                if (!reservedIds.Contains(id) && !host.HasEverUsedId(id))
+                if (!reservedIds.Contains(id) && !host.HasEverUsedId(id) &&
+                    !host.IsLiveAlias(id))
                     return id;
             }
             if (!idsExhausted)
@@ -1407,6 +1416,13 @@ namespace Uptime.Connections
             return null;
         }
         public bool IsIdReserved(string id) => id != null && reservedIds.Contains(id);
+        private static int IdentitySeed(int runSeed, string id)
+        {
+            int hash = unchecked(runSeed ^ (int)0x49D10A5);
+            foreach (char character in id.ToLowerInvariant())
+                hash = unchecked((hash ^ character) * 16777619);
+            return hash;
+        }
         private float Range(float min, float max) => min + (float)random.NextDouble() * (max - min);
         private NodeView FindNode(string id)
         {

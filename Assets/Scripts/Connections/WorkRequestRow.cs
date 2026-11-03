@@ -37,6 +37,8 @@ namespace Uptime.Connections
             identityPill?.Bind(id, accent);
         }
 
+        public void SetDisplayedId(string id) => identityPill?.SetDisplayedId(id);
+
         public void FitWidth(float width)
         {
             RectTransform root = (RectTransform)transform;

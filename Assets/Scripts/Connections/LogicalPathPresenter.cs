@@ -332,7 +332,7 @@ namespace Uptime.Connections
                         lines.Add(new IdentityPresenter.LiveLine(connection.ConnectionId,
                             targetStart, targetEnd, visualStart, visualEnd,
                             views[connection].DisplayAccent, visibleFraction,
-                            width));
+                            width, displayId: connection.KnownIdentity));
                     }
                     if (width < minLineWidth)
                     {

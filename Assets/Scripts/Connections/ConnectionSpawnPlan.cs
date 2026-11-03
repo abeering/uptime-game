@@ -43,6 +43,8 @@ namespace Uptime.Connections
         public bool NaturalLoadNoise { get; }
         public int NaturalLoadSeed { get; }
         public string HostileEventId { get; }
+        public float IdentityHopSeconds { get; }
+        public int IdentitySeed { get; }
 
         public ConnectionSpawnPlan(float scheduledSpawnTime, string connectionId, NodeView[] route,
             string profileId, string claimedPurpose, OperationStage[] operations,
@@ -53,7 +55,8 @@ namespace Uptime.Connections
             float parentInfectionAppliedAtSeconds = 0f,
             LoaderAttackPlan loaderAttack = null,
             bool naturalLoadNoise = false, int naturalLoadSeed = 0,
-            string hostileEventId = null)
+            string hostileEventId = null,
+            float identityHopSeconds = 0f, int identitySeed = 0)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -81,13 +84,16 @@ namespace Uptime.Connections
             NaturalLoadNoise = naturalLoadNoise;
             NaturalLoadSeed = naturalLoadSeed;
             HostileEventId = hostileEventId;
+            IdentityHopSeconds = identityHopSeconds;
+            IdentitySeed = identitySeed;
         }
 
         public ConnectionSpawnPlan ForEvent(string eventId) => new ConnectionSpawnPlan(
             ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose,
             Operations, IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId,
             ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack,
-            NaturalLoadNoise, NaturalLoadSeed, eventId);
+            NaturalLoadNoise, NaturalLoadSeed, eventId,
+            IdentityHopSeconds, IdentitySeed);
     }
 
     public enum LoaderStructure { Single, Delayed }

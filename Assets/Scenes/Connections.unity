@@ -6338,6 +6338,7 @@ MonoBehaviour:
   coverageOutageRetryMaxSeconds: 20
   ambientOriginId: EXT1
   profiles: []
+  identityHopIntervalSeconds: 2
   ambientWeightOverrides: []
   hostileGenerationEnabled: 1
   hostileMeanIntervalSeconds: 54

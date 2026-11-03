@@ -185,6 +185,8 @@ namespace Uptime.Connections
         [SerializeReference] private LoaderAttackPlan loaderAttack;
         [SerializeField] private bool naturalLoadNoise;
         [SerializeField] private int naturalLoadSeed;
+        [SerializeField, Min(0f)] private float identityHopSeconds;
+        [SerializeField] private int identitySeed;
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
@@ -211,6 +213,8 @@ namespace Uptime.Connections
         public LoaderAttackPlan LoaderAttack => loaderAttack;
         public bool NaturalLoadNoise => naturalLoadNoise;
         public int NaturalLoadSeed => naturalLoadSeed;
+        public float IdentityHopSeconds => identityHopSeconds;
+        public int IdentitySeed => identitySeed;
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
             StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
         private bool HasArc => operations != null && operations.Length > 0;
@@ -232,7 +236,9 @@ namespace Uptime.Connections
                 connectionBehaviors = OperationStage.CopyBehaviors(plan.ConnectionBehaviors),
                 loaderAttack = plan.LoaderAttack?.Copy(),
                 naturalLoadNoise = plan.NaturalLoadNoise,
-                naturalLoadSeed = plan.NaturalLoadSeed
+                naturalLoadSeed = plan.NaturalLoadSeed,
+                identityHopSeconds = plan.IdentityHopSeconds,
+                identitySeed = plan.IdentitySeed
             };
             for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
             for (int i = 0; i < result.operations.Length; i++)
@@ -282,6 +288,8 @@ namespace Uptime.Connections
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
             Behaviors = new ConnectionBehaviorRuntime(definition);
+            Identity = new ConnectionIdentityRuntime(definition.ConnectionId,
+                definition.IdentityHopSeconds, definition.IdentitySeed);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
 
@@ -290,8 +298,10 @@ namespace Uptime.Connections
         public LogicalConnectionDefinition Definition { get; }
         public NodeResources TargetResources { get; }
         public ConnectionBehaviorRuntime Behaviors { get; }
+        public ConnectionIdentityRuntime Identity { get; }
         internal PhysicalLinkReference[] RouteLinks { get; }
         public string ConnectionId => Definition.ConnectionId;
+        public string KnownIdentity => Identity.KnownIdentity;
         public bool IsHostile => Definition.IsHostile;
         public int CurrentOperationIndex { get; internal set; }
         public int OperationCount => Definition.OperationCount;
