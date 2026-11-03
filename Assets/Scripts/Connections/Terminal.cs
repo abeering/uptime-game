@@ -69,6 +69,8 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.ProbeExpired += OnProbeExpired;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.SimulationReset += CancelNotificationTest;
@@ -87,8 +89,15 @@ namespace Uptime.Connections
 #endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
+            if (simulationHost != null)
+                simulationHost.ProbeExpired -= OnProbeExpired;
             if (simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+        }
+
+        private void OnProbeExpired(string linkId)
+        {
+            AppendText("PROBE EXPIRED  " + linkId, mutedColor);
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -334,6 +343,47 @@ namespace Uptime.Connections
                 case "scan":
                     Scan(tokens, command);
                     break;
+                case "probe":
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    if (tokens.Length == 2 && tokens[1].Equals("reset",
+                        System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (simulationHost == null)
+                        {
+                            recorder?.RecordPlayerAction(command, null, false, null,
+                                "simulation_unavailable");
+                            AppendText("PROBE  simulation unavailable", errorColor);
+                        }
+                        else
+                        {
+                            simulationHost.ResetProbeCooldown(command);
+                            AppendText(simulationHost.ProbedLink == null ?
+                                "PROBE COOLDOWN RESET  ready" :
+                                "PROBE COOLDOWN RESET  active on " +
+                                simulationHost.ProbedLink.View.LinkId, normalColor);
+                        }
+                        break;
+                    }
+#endif
+                    if (tokens.Length != 2)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "usage", tokens.Length > 1 ? tokens[1] : null);
+                        AppendText("USAGE  probe <linkId>", errorColor);
+                    }
+                    else if (simulationHost == null)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "simulation_unavailable", tokens[1]);
+                        AppendText("PROBE  simulation unavailable", errorColor);
+                    }
+                    else
+                    {
+                        bool deployed = simulationHost.TryActivateProbe(tokens[1], command,
+                            out string probeResult);
+                        AppendText(probeResult, deployed ? normalColor : errorColor);
+                    }
+                    break;
                 case "load":
                     Load(tokens);
                     break;
@@ -455,7 +505,8 @@ namespace Uptime.Connections
                     break;
                 case "spawn":
                     if (!TryParseSpawn(tokens, out string profileId,
-                        out ConnectionSpawnOverrides spawnOverrides, out string spawnError))
+                        out ConnectionSpawnOverrides spawnOverrides, out bool idHopping,
+                        out string spawnError))
                         AppendText(spawnError, errorColor);
                     else if (trafficDirector == null || simulationHost == null)
                         AppendText("SPAWN  simulation unavailable", errorColor);
@@ -464,7 +515,7 @@ namespace Uptime.Connections
                         try
                         {
                             ConnectionSpawnPlan plan = trafficDirector.QueueProfile(profileId,
-                                spawnOverrides);
+                                spawnOverrides, idHopping);
                             recorder?.RecordPlayerAction(command, plan.ConnectionId, true);
                             AppendText("QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                 " from profile " + plan.ProfileId, normalColor);
@@ -586,11 +637,13 @@ namespace Uptime.Connections
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
+                    AppendText("DEFENSE  probe <linkId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("DEV  spawn basic-threat idhop  // manual hostile ID hopping", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
@@ -613,11 +666,16 @@ namespace Uptime.Connections
 
         public static bool TryParseSpawn(string[] tokens, out string profileId,
             out ConnectionSpawnOverrides overrides, out string error)
+            => TryParseSpawn(tokens, out profileId, out overrides, out _, out error);
+
+        public static bool TryParseSpawn(string[] tokens, out string profileId,
+            out ConnectionSpawnOverrides overrides, out bool idHopping, out string error)
         {
             const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
-                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]";
+                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N] [idhop]";
             profileId = null;
             overrides = null;
+            idHopping = false;
             error = usage;
             if (tokens == null || tokens.Length < 2) return false;
             profileId = tokens[1];
@@ -628,7 +686,12 @@ namespace Uptime.Connections
             for (int i = 2; i < tokens.Length; i++)
             {
                 string token = tokens[i];
-                if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
+                if (token.Equals("idhop", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    if (idHopping) { error = "SPAWN  duplicate idhop option"; return false; }
+                    idHopping = true;
+                }
+                else if (token.StartsWith("obj:", System.StringComparison.OrdinalIgnoreCase))
                 {
                     if (objective.HasValue) { error = "SPAWN  duplicate obj option"; return false; }
                     string value = token.Substring(4);

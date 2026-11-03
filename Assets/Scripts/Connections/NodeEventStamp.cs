@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections
 {
-    // A single visual announcement. The lab owns triggering; no status state lives here.
+    // A single visual announcement. Status state remains with its existing owner.
     public sealed class NodeEventStamp : MonoBehaviour
     {
         public enum EventKind { Offline, Infected, ScanJammed, PortScanned, Clean, Isolated, Intercept, Caught }

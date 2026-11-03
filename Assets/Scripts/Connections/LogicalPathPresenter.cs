@@ -6,10 +6,14 @@ namespace Uptime.Connections
 {
     public sealed class LogicalPathPresenter : MonoBehaviour
     {
+        private const float ProbeSidePadding = 14f;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private RectTransform markerLayer;
         [SerializeField] private LogicalPathView pathPrefab;
+        [SerializeField] private RectTransform probeRegionPrefab;
+        [SerializeField] private Color probeHostileColor = new Color(1f, 0.11f, 0.16f, 1f);
+        [SerializeField] private Color probeBenignColor = new Color(0.55f, 0.62f, 0.65f, 1f);
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private PayloadDirector payloadDirector;
         [SerializeField] private PayloadPresenter payloadPresenter;
@@ -30,6 +34,9 @@ namespace Uptime.Connections
         private readonly HashSet<PhysicalLinkView> positionedLinks = new HashSet<PhysicalLinkView>();
         private readonly RouteLaneOrder laneOrder = new RouteLaneOrder();
         private bool previewMode;
+        private PhysicalLinkView probedLink;
+        private RectTransform probeRegion;
+        private float probeHalfWidth;
 
         public RectTransform NetworkArea => networkArea;
         public RectTransform PathLayer => pathLayer;
@@ -41,11 +48,49 @@ namespace Uptime.Connections
         public ConnectionIdentityPalette IdentityPalette => identityPalette;
         public void RefreshLayouts() => UpdateLayouts();
 
+        public void SetProbe(PhysicalLinkView link, bool fadeOut = false)
+        {
+            bool changed = probedLink != link;
+            if (changed) probeHalfWidth = 0f;
+            probedLink = link;
+            if (link != null && probeRegion == null && probeRegionPrefab != null && networkArea != null)
+            {
+                probeRegion = Instantiate(probeRegionPrefab, networkArea, false);
+                probeRegion.name = "Probe X-ray " + link.LinkId;
+            }
+            if (probeRegion != null)
+            {
+                ProbeRegionGraphic graphic = probeRegion.GetComponent<ProbeRegionGraphic>();
+                if (link != null)
+                {
+                    probeRegion.gameObject.SetActive(!previewMode);
+                    if (changed) graphic?.BeginActivation();
+                }
+                else if (fadeOut && !previewMode && graphic != null)
+                    graphic.BeginShutdown();
+                else if (graphic != null)
+                    graphic.HideImmediately();
+                else probeRegion.gameObject.SetActive(false);
+            }
+            if (link == null)
+                foreach (LogicalPathView view in views.Values)
+                    if (view != null) view.SetProbe(-1, Vector2.zero, Vector2.right,
+                        Vector2.zero, Color.clear);
+        }
+
         public void SetPreviewMode(bool enabled)
         {
             if (previewMode == enabled)
                 return;
             previewMode = enabled;
+            if (probeRegion != null)
+            {
+                ProbeRegionGraphic graphic = probeRegion.GetComponent<ProbeRegionGraphic>();
+                if (enabled && graphic?.IsShuttingDown == true)
+                    graphic.HideImmediately();
+                else probeRegion.gameObject.SetActive(!enabled && (probedLink != null ||
+                    graphic?.IsShuttingDown == true));
+            }
             foreach (LogicalPathView view in views.Values)
                 if (view != null)
                     view.SetPresentationActive(!enabled);
@@ -287,7 +332,7 @@ namespace Uptime.Connections
                         lines.Add(new IdentityPresenter.LiveLine(connection.ConnectionId,
                             targetStart, targetEnd, visualStart, visualEnd,
                             views[connection].DisplayAccent, visibleFraction,
-                            width));
+                            width, displayId: connection.KnownIdentity));
                     }
                     if (width < minLineWidth)
                     {
@@ -300,6 +345,7 @@ namespace Uptime.Connections
                 }
                 views[connection].SetLayout(starts, ends, widths, maximumSocketDiameter);
             }
+            UpdateProbeRegion(payloadLinks, wormLinks);
             foreach (KeyValuePair<PayloadState, PhysicalLinkView> entry in payloadLinks)
             {
                 PayloadState payload = entry.Key;
@@ -398,6 +444,82 @@ namespace Uptime.Connections
             positionedLinks.Clear();
         }
 
-        private void OnDisable() => ClearPhysicalPositions();
+        private void UpdateProbeRegion(
+            Dictionary<PayloadState, PhysicalLinkView> payloadLinks,
+            Dictionary<WormBranch, PhysicalLinkView> wormLinks)
+        {
+            if (probedLink == null || probeRegion == null) return;
+            probedLink.GetRenderedSpine(out Vector2 a, out Vector2 b);
+            Vector2 along = (b - a).normalized;
+            if (along.sqrMagnitude < 0.5f) return;
+            Vector2 center = (a + b) * 0.5f;
+            float halfLength = Vector2.Distance(a, b) * 0.4f;
+            Vector2 across = new Vector2(-along.y, along.x);
+            float halfWidth = 10f; // Empty edge still has a legible scanner.
+            if (laneOrder.Orders.TryGetValue(probedLink, out List<string> users))
+            {
+                float laneWidth = EdgeGeometry.LineWidth(probedLink.BundleWidth(networkArea),
+                    users.Count, minLineGap, maxLineWidth);
+                foreach (LogicalConnectionState connection in connections)
+                {
+                    if (!connection.IsActive && !connection.IsConnecting) continue;
+                    if (!views.TryGetValue(connection, out LogicalPathView view) || view == null)
+                        continue;
+                    for (int i = 0; i < connection.RouteLinks.Length; i++)
+                    {
+                        if (connection.RouteLinks[i].View != probedLink) continue;
+                        if (view.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
+                            out float visibleFraction, out _, out float lineWidth) &&
+                            visibleFraction > 0f)
+                        {
+                            end = Vector2.Lerp(start, end, visibleFraction);
+                            Vector2 pathDirection = (end - start).normalized;
+                            Vector2 pathNormal = new Vector2(-pathDirection.y, pathDirection.x);
+                            float projectedHalfThickness = lineWidth * 0.5f *
+                                Mathf.Abs(Vector2.Dot(pathNormal, across));
+                            float extent = Mathf.Max(Mathf.Abs(Vector2.Dot(start - center, across)),
+                                Mathf.Abs(Vector2.Dot(end - center, across)));
+                            halfWidth = Mathf.Max(halfWidth,
+                                extent + projectedHalfThickness + ProbeSidePadding);
+                        }
+                    }
+                }
+                foreach (KeyValuePair<PayloadState, PhysicalLinkView> entry in payloadLinks)
+                    if (entry.Value == probedLink)
+                        halfWidth = Mathf.Max(halfWidth,
+                            Mathf.Abs(EdgeGeometry.Offset(users.IndexOf(entry.Key.Id),
+                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + ProbeSidePadding);
+                foreach (KeyValuePair<WormBranch, PhysicalLinkView> entry in wormLinks)
+                    if (entry.Value == probedLink)
+                        halfWidth = Mathf.Max(halfWidth,
+                            Mathf.Abs(EdgeGeometry.Offset(users.IndexOf(entry.Key.Id),
+                                users.Count, laneWidth, minLineGap)) + laneWidth * 0.5f + ProbeSidePadding);
+            }
+            probeHalfWidth = probeHalfWidth <= 0f || halfWidth > probeHalfWidth ? halfWidth :
+                Mathf.MoveTowards(probeHalfWidth, halfWidth, Time.deltaTime * 40f);
+            Vector2 halfSize = new Vector2(halfLength, probeHalfWidth);
+            probeRegion.anchoredPosition = center;
+            probeRegion.localRotation = Quaternion.Euler(0f, 0f,
+                Mathf.Atan2(along.y, along.x) * Mathf.Rad2Deg);
+            probeRegion.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, halfLength * 2f);
+            probeRegion.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, probeHalfWidth * 2f);
+            foreach (LogicalConnectionState connection in connections)
+            {
+                if (!views.TryGetValue(connection, out LogicalPathView view) || view == null)
+                    continue;
+                int segment = -1;
+                if (connection.IsActive || connection.IsConnecting)
+                    for (int i = 0; i < connection.RouteLinks.Length; i++)
+                        if (connection.RouteLinks[i].View == probedLink) { segment = i; break; }
+                view.SetProbe(segment, center, along, halfSize,
+                    connection.IsHostile ? probeHostileColor : probeBenignColor);
+            }
+        }
+
+        private void OnDisable()
+        {
+            SetProbe(null);
+            ClearPhysicalPositions();
+        }
     }
 }

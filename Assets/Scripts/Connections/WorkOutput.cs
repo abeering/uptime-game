@@ -93,14 +93,17 @@ namespace Uptime.Connections
                 Color accent = host.PresentationPalette != null &&
                     host.PresentationPalette.TryGet(state, out Color color) ?
                     color : mutedIdentityColor;
-                row.Bind(state.ConnectionId, accent);
+                row.Bind(state.KnownIdentity, accent);
                 order.Add(state);
                 rows.Add(state, row);
             }
             order.Sort(NodePanelRowOrder.Compare);
             FitWidth();
             foreach (LogicalConnectionState state in order)
+            {
+                rows[state].SetDisplayedId(state.KnownIdentity);
                 rows[state].Render(state);
+            }
 
             int count = order.Count;
             if (emptyText != null) emptyText.gameObject.SetActive(count == 0);

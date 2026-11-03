@@ -31,6 +31,9 @@ namespace Uptime.Connections
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMinPeriodSeconds = 3f;
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMaxPeriodSeconds = 6f;
         [SerializeField, Min(0.1f)] private float scanDurationSeconds = 8f;
+        [Header("Probe")]
+        [SerializeField, Min(0.1f)] private float probeActiveSeconds = 10f;
+        [SerializeField, Min(0.1f)] private float probeCooldownSeconds = 35f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -46,6 +49,9 @@ namespace Uptime.Connections
         private int nextCleanSessionId;
         private NodeScanSession activeScan;
         private int nextScanId;
+        private PhysicalLinkReference probedLink;
+        private float probeExpiresAtSeconds;
+        private float probeReadyAtSeconds;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -69,6 +75,12 @@ namespace Uptime.Connections
         public CleanSession ActiveClean => activeClean;
         public NodeScanSession ActiveScan => activeScan;
         public float ScanDurationSeconds => scanDurationSeconds;
+        public PhysicalLinkReference ProbedLink => probedLink;
+        public float ProbeActiveSeconds => probeActiveSeconds;
+        public float ProbeCooldownSeconds => probeCooldownSeconds;
+        public float ProbeActiveRemaining => probedLink != null ?
+            Mathf.Max(0f, probeExpiresAtSeconds - simulationTimeSeconds) : 0f;
+        public float ProbeCooldownRemaining => Mathf.Max(0f, probeReadyAtSeconds - simulationTimeSeconds);
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
@@ -82,12 +94,27 @@ namespace Uptime.Connections
         public event Action<ConnectionEffectOccurrence> EffectOccurred;
         public event Action<NodeScanSession> ScanCompleted;
         public event Action<CleanSession, int> CleanSucceeded;
+        public event Action<NodeInfection> BlackoutApplied;
+        // Raised once for each successful application or refresh, not each render frame.
+        public event Action<NodeCondition> ConditionApplied;
         public event Action SimulationReset;
+        public event Action<string> ProbeExpired;
         public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
             payloadDirector != null && payloadDirector.HasEverUsedId(id) ||
             wormDirector != null && wormDirector.HasEverUsedId(id);
         public bool IsTrafficIdReserved(string id) => trafficDirector != null &&
             trafficDirector.IsIdReserved(id);
+        public bool IsLiveAlias(string id)
+        {
+            if (string.IsNullOrEmpty(id) || runtimeConnections == null) return false;
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if ((state.IsActive || state.IsConnecting) && state.Identity.IsHopping &&
+                    string.Equals(state.Identity.AliasIdentity, id,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            return false;
+        }
         public LogicalConnectionState FindConnection(string id) =>
             id != null && history.TryGetValue(id, out LogicalConnectionState state) ? state : null;
 
@@ -127,6 +154,7 @@ namespace Uptime.Connections
 
         private void OnDisable()
         {
+            ClearProbe();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -159,6 +187,10 @@ namespace Uptime.Connections
                 naturalLoadNoiseMaxPeriodSeconds = naturalLoadNoiseMinPeriodSeconds;
             if (float.IsNaN(scanDurationSeconds) || float.IsInfinity(scanDurationSeconds) ||
                 scanDurationSeconds <= 0f) scanDurationSeconds = 8f;
+            if (float.IsNaN(probeActiveSeconds) || float.IsInfinity(probeActiveSeconds) ||
+                probeActiveSeconds <= 0f) probeActiveSeconds = 10f;
+            if (float.IsNaN(probeCooldownSeconds) || float.IsInfinity(probeCooldownSeconds) ||
+                probeCooldownSeconds <= 0f) probeCooldownSeconds = 35f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -208,6 +240,9 @@ namespace Uptime.Connections
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
+                    if (connection.Identity.Started)
+                        segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                            (float)(connection.Identity.NextHopAtSeconds - simulationTimeSeconds)));
                     if (connection.IsActive && connection.Definition.LoaderAttack != null)
                     {
                         // A coarse witness step must still observe timed attack activation
@@ -227,6 +262,9 @@ namespace Uptime.Connections
                 if (activeScan != null)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         activeScan.ScheduledCompletionAtSeconds - simulationTimeSeconds));
+                if (probedLink != null)
+                    segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                        probeExpiresAtSeconds - simulationTimeSeconds));
                 foreach (NodeCondition condition in conditions)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         condition.ExpiresAtSeconds - simulationTimeSeconds));
@@ -241,6 +279,9 @@ namespace Uptime.Connections
                 payloadDirector?.Advance(segment, simulationTimeSeconds);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
+                if (probedLink != null && simulationTimeSeconds + 0.00001f >= probeExpiresAtSeconds)
+                    ExpireProbe();
+                AdvanceIdentities();
                 ExpireConditions();
                 remaining -= segment;
             }
@@ -258,6 +299,7 @@ namespace Uptime.Connections
                     connection.Definition.StartDelaySeconds)
                 {
                     connection.Lifecycle = Lifecycle.Connecting;
+                    StartIdentity(connection);
                     if (IsNodeOffline(connection.Definition.Route[0].Node))
                         CancelConnection(connection, connection.Definition.Route[0].Node.NodeId,
                             UnavailabilityCause(connection.Definition.Route[0].Node));
@@ -402,7 +444,8 @@ namespace Uptime.Connections
         {
             if (runtimeConnections == null) ResetSimulation();
             LogicalConnectionState state = BuildState(definition);
-            if (HasEverUsedId(state.ConnectionId) || !usedIds.Add(state.ConnectionId))
+            if (HasEverUsedId(state.ConnectionId) || IsLiveAlias(state.ConnectionId) ||
+                !usedIds.Add(state.ConnectionId))
                 throw new InvalidOperationException("Connection ID has already been used: " + state.ConnectionId);
             state.SpawnedAtSeconds = simulationTimeSeconds;
             state.TravelSecondsPerLink = connectionTravelSecondsPerLink;
@@ -410,6 +453,7 @@ namespace Uptime.Connections
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
             recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+            if (state.IsConnecting) StartIdentity(state);
             if (Application.isPlaying) pathPresenter?.Add(state);
             if (state.IsConnecting && IsNodeOffline(state.Definition.Route[0].Node))
                 CancelConnection(state, state.Definition.Route[0].Node.NodeId,
@@ -420,7 +464,8 @@ namespace Uptime.Connections
         public void ValidatePlan(ConnectionSpawnPlan plan)
         {
             if (plan == null || plan.Operations.Length == 0 ||
-                string.IsNullOrWhiteSpace(plan.ProfileId) || HasEverUsedId(plan.ConnectionId))
+                string.IsNullOrWhiteSpace(plan.ProfileId) || HasEverUsedId(plan.ConnectionId) ||
+                IsLiveAlias(plan.ConnectionId))
                 throw new InvalidOperationException("Spawn plan needs operations, profile ID, and an unused ID.");
             BuildState(LogicalConnectionDefinition.FromPlan(plan));
         }
@@ -439,6 +484,7 @@ namespace Uptime.Connections
                         sourceOperationIndex, sourceWormBranchId);
                     recorder?.RecordCondition("condition_refreshed", existing,
                         simulationTimeSeconds);
+                    ConditionApplied?.Invoke(existing);
                     return existing;
                 }
             var condition = new NodeCondition(target, payload, simulationTimeSeconds,
@@ -446,6 +492,7 @@ namespace Uptime.Connections
             conditions.Add(condition);
             recorder?.RecordCondition("condition_applied", condition,
                 simulationTimeSeconds);
+            ConditionApplied?.Invoke(condition);
             return condition;
         }
 
@@ -729,6 +776,8 @@ namespace Uptime.Connections
             infections.Add(infection);
             recorder?.RecordInfection("infection_applied", infection,
                 simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
+            if (payload.Kind == InfectionKind.Blackout)
+                BlackoutApplied?.Invoke(infection);
             RefreshPayloadAllocations();
             RefreshDisplays();
             return true;
@@ -847,6 +896,7 @@ namespace Uptime.Connections
 
         public void ResetSimulation()
         {
+            ClearProbe();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -883,6 +933,8 @@ namespace Uptime.Connections
             states.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             runtimeConnections = states.ToArray();
             trafficDirector?.ResetDirector();
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if (state.IsConnecting) StartIdentity(state);
             if (Application.isPlaying)
             {
                 recorder?.BeginRun();
@@ -896,6 +948,121 @@ namespace Uptime.Connections
             if (Application.isPlaying && pathPresenter != null)
                 pathPresenter.Bind(runtimeConnections);
             RefreshDisplays();
+        }
+
+        public bool TryActivateProbe(string linkId, string command, out string result)
+        {
+            PhysicalLinkReference selected = null;
+            if (!string.IsNullOrWhiteSpace(linkId) && physicalLinks != null)
+                foreach (PhysicalLinkReference link in physicalLinks)
+                    if (link?.View != null && string.Equals(link.View.LinkId, linkId,
+                        StringComparison.OrdinalIgnoreCase))
+                    { selected = link; break; }
+            string reason = null;
+            if (selected == null) reason = "unknown_edge";
+            else if (probedLink != null) reason = "busy";
+            else if (ProbeCooldownRemaining > 0.00001f) reason = "cooldown";
+            if (reason != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, null, reason, linkId);
+                result = reason == "unknown_edge" ? "UNKNOWN EDGE  " + linkId :
+                    reason == "busy" ? "PROBE BUSY  " + probedLink.View.LinkId :
+                    "PROBE COOLING  " + ProbeCooldownRemaining.ToString("0.0") + "s remaining";
+                return false;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            probedLink = selected;
+            probeExpiresAtSeconds = simulationTimeSeconds + probeActiveSeconds;
+            probeReadyAtSeconds = simulationTimeSeconds + probeCooldownSeconds;
+            pathPresenter?.SetProbe(selected.View);
+            UpdateIdentityRevelation();
+            recorder?.RecordPlayerAction(command, null, true, null, "activated", selected.View.LinkId);
+            recorder?.RecordProbe("probe_activated", selected.View.LinkId,
+                simulationTimeSeconds, probeExpiresAtSeconds, probeReadyAtSeconds);
+            result = "PROBE ACTIVE  " + selected.View.LinkId + "  " + probeActiveSeconds.ToString("0.#") + "s";
+            return true;
+        }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public void ResetProbeCooldown(string command)
+        {
+            probeReadyAtSeconds = simulationTimeSeconds;
+            recorder?.RecordPlayerAction(command, null, true, null,
+                "probe_cooldown_reset", probedLink?.View?.LinkId);
+        }
+#endif
+
+        private void ExpireProbe()
+        {
+            string linkId = probedLink.View.LinkId;
+            float expiresAtSeconds = probeExpiresAtSeconds;
+            probedLink = null;
+            probeExpiresAtSeconds = 0f;
+            pathPresenter?.SetProbe(null, fadeOut: true);
+            UpdateIdentityRevelation();
+            recorder?.RecordProbe("probe_expired", linkId, simulationTimeSeconds,
+                expiresAtSeconds, probeReadyAtSeconds);
+            ProbeExpired?.Invoke(linkId);
+        }
+
+        private void ClearProbe()
+        {
+            probedLink = null;
+            probeExpiresAtSeconds = 0f;
+            probeReadyAtSeconds = 0f;
+            pathPresenter?.SetProbe(null);
+            UpdateIdentityRevelation();
+        }
+
+        private bool AliasAvailable(LogicalConnectionState owner, string candidate)
+        {
+            if (HasEverUsedId(candidate) || IsTrafficIdReserved(candidate)) return false;
+            if (runtimeConnections == null) return true;
+            foreach (LogicalConnectionState other in runtimeConnections)
+                if (other != owner && (other.IsActive || other.IsConnecting) &&
+                    other.Identity.IsHopping &&
+                    string.Equals(other.Identity.AliasIdentity, candidate,
+                        StringComparison.OrdinalIgnoreCase)) return false;
+            return true;
+        }
+
+        private void StartIdentity(LogicalConnectionState state)
+        {
+            if (!state.Identity.IsHopping) return;
+            if (state.Identity.Start(simulationTimeSeconds,
+                candidate => AliasAvailable(state, candidate)))
+                recorder?.RecordIdentityAlias(state, simulationTimeSeconds);
+            else if (state.Identity.Started && state.Identity.AliasIdentity == state.ConnectionId)
+                Debug.LogWarning("ID Hopping alias pool exhausted; showing true ID for " +
+                    state.ConnectionId, this);
+        }
+
+        private void AdvanceIdentities()
+        {
+            if (runtimeConnections == null) return;
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if (state.IsActive || state.IsConnecting)
+                    state.Identity.Advance(simulationTimeSeconds,
+                        candidate => AliasAvailable(state, candidate),
+                        (at, alias) => recorder?.RecordIdentityAlias(state, (float)at));
+            UpdateIdentityRevelation();
+        }
+
+        private void UpdateIdentityRevelation()
+        {
+            if (runtimeConnections == null) return;
+            foreach (LogicalConnectionState state in runtimeConnections)
+            {
+                bool visibleOnEdge = false;
+                if (probedLink != null && (state.IsActive || state.IsConnecting))
+                    for (int i = 0; i < state.RouteLinks.Length; i++)
+                        if (state.RouteLinks[i] == probedLink &&
+                            (state.IsActive || i < state.ReachedRouteNodeIndex ||
+                             i == state.ReachedRouteNodeIndex &&
+                             state.LinkTravelElapsedSeconds > 0f))
+                        { visibleOnEdge = true; break; }
+                state.Identity.SetRevealed(visibleOnEdge);
+            }
         }
 
         private LogicalConnectionState BuildState(LogicalConnectionDefinition definition)
@@ -933,6 +1100,10 @@ namespace Uptime.Connections
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
+            if (!FiniteNonnegative(definition.IdentityHopSeconds) ||
+                definition.IdentityHopSeconds > 0f && !definition.IsHostile)
+                throw new InvalidOperationException(
+                    "ID hopping requires a hostile connection and finite nonnegative interval.");
             LoaderAttackPlan attack = definition.LoaderAttack;
             if (attack != null && (!definition.IsHostile ||
                 !Enum.IsDefined(typeof(LoaderStructure), attack.structure) ||
@@ -1123,7 +1294,7 @@ namespace Uptime.Connections
             var output = new StringBuilder("CONNECTIONS  •  allocated / desired LOAD; 1 LOAD = 1 WORK/s");
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                output.Append('\n').Append(connection.ConnectionId.ToLowerInvariant()).Append(' ')
+                output.Append('\n').Append(connection.KnownIdentity.ToLowerInvariant()).Append(' ')
                     .Append(connection.CurrentOperation.ToString().ToUpperInvariant())
                     .Append(' ').Append(connection.CurrentOperationIndex + 1)
                     .Append('/').Append(connection.OperationCount).Append(' ');

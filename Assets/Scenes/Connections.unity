@@ -2212,6 +2212,8 @@ MonoBehaviour:
   networkArea: {fileID: 772389560}
   statusLayer: {fileID: 376673012}
   statusPrefab: {fileID: 8825367730030652023, guid: 36e661bc16c43f74cb6b82742296bd34, type: 3}
+  stampLayer: {fileID: 990001001}
+  stampPrefab: {fileID: 7547793212573940451, guid: f101cddec84731d4f900c191bb8847bb, type: 3}
   cleanAcknowledgmentSeconds: 2.5
 --- !u!1001 &392641476
 PrefabInstance:
@@ -2990,6 +2992,7 @@ RectTransform:
   - {fileID: 394130997}
   - {fileID: 901162629}
   - {fileID: 376673012}
+  - {fileID: 990001001}
   m_Father: {fileID: 955173304}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4156,6 +4159,9 @@ MonoBehaviour:
   pathLayer: {fileID: 1033840603}
   markerLayer: {fileID: 901162629}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  probeRegionPrefab: {fileID: 2200942498571120334, guid: b5c10182d9e19cd498b043683f6bebad, type: 3}
+  probeHostileColor: {r: 1, g: 0.11, b: 0.16, a: 1}
+  probeBenignColor: {r: 0.55, g: 0.62, b: 0.65, a: 1}
   identityPresenter: {fileID: 901162628}
   payloadDirector: {fileID: 1996901020}
   payloadPresenter: {fileID: 1033840605}
@@ -6287,6 +6293,8 @@ MonoBehaviour:
   naturalLoadNoiseMinPeriodSeconds: 3
   naturalLoadNoiseMaxPeriodSeconds: 6
   scanDurationSeconds: 8
+  probeActiveSeconds: 10
+  probeCooldownSeconds: 35
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
@@ -6330,6 +6338,7 @@ MonoBehaviour:
   coverageOutageRetryMaxSeconds: 20
   ambientOriginId: EXT1
   profiles: []
+  identityHopIntervalSeconds: 2
   ambientWeightOverrides: []
   hostileGenerationEnabled: 1
   hostileMeanIntervalSeconds: 54
@@ -7318,3 +7327,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0979b755dcb3a47a05a395db154882, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.NetworkHealthPanel
+--- !u!1 &990001000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 990001001}
+  m_Layer: 0
+  m_Name: NodeStampLayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &990001001
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990001000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 772389560}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}

@@ -11,30 +11,43 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform statusLayer;
         [SerializeField] private NodeStatusView statusPrefab;
+        [SerializeField] private RectTransform stampLayer;
+        [SerializeField] private NodeEventStamp stampPrefab;
         [SerializeField, Min(.1f)] private float cleanAcknowledgmentSeconds = 2.5f;
 
         private readonly Dictionary<NodeView, NodeStatusState> states = new();
         private readonly Dictionary<NodeView, NodeStatusView> views = new();
-        private readonly Dictionary<NodeView, NodeStatusAnchor> anchors = new();
-        private readonly Dictionary<NodeView, Vector2> lastSizes = new();
-        private Vector2 lastViewportSize;
+        private readonly Dictionary<NodeView, NodeEventStamp> stamps = new();
+        private readonly Dictionary<NodeView, NodeStatusPlacementChoice> placements = new();
 
         public SimulationHost Host => host;
         public RectTransform NetworkArea => networkArea;
         public RectTransform StatusLayer => statusLayer;
         public NodeStatusView StatusPrefab => statusPrefab;
+        public RectTransform StampLayer => stampLayer;
+        public NodeEventStamp StampPrefab => stampPrefab;
         public float CleanAcknowledgmentSeconds => cleanAcknowledgmentSeconds;
         public NodeStatusState StateFor(NodeView node) => states.TryGetValue(node,
             out NodeStatusState state) ? state : null;
         public NodeStatusView ViewFor(NodeView node) => views.TryGetValue(node,
             out NodeStatusView view) ? view : null;
+        public NodeEventStamp StampFor(NodeView node) => stamps.TryGetValue(node,
+            out NodeEventStamp stamp) ? stamp : null;
 
         private void OnEnable()
         {
             if (host == null) return;
             host.ScanCompleted += OnScanCompleted;
             host.CleanSucceeded += OnCleanSucceeded;
+            host.BlackoutApplied += OnBlackoutApplied;
+            host.ConditionApplied += OnConditionApplied;
             host.SimulationReset += OnSimulationReset;
+            if (host.Worms != null) host.Worms.IsolationActivated += OnIsolationActivated;
+            if (host.Payloads != null)
+            {
+                host.Payloads.InterceptorActivated += OnInterceptorActivated;
+                host.Payloads.InterceptSucceeded += OnInterceptSucceeded;
+            }
         }
 
         private void OnDisable()
@@ -43,7 +56,15 @@ namespace Uptime.Connections
             {
                 host.ScanCompleted -= OnScanCompleted;
                 host.CleanSucceeded -= OnCleanSucceeded;
+                host.BlackoutApplied -= OnBlackoutApplied;
+                host.ConditionApplied -= OnConditionApplied;
                 host.SimulationReset -= OnSimulationReset;
+                if (host.Worms != null) host.Worms.IsolationActivated -= OnIsolationActivated;
+                if (host.Payloads != null)
+                {
+                    host.Payloads.InterceptorActivated -= OnInterceptorActivated;
+                    host.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+                }
             }
             foreach (NodeStatusView view in views.Values)
                 if (view != null)
@@ -52,10 +73,15 @@ namespace Uptime.Connections
                     else DestroyImmediate(view.gameObject);
                 }
             views.Clear();
+            foreach (NodeEventStamp stamp in stamps.Values)
+                if (stamp != null)
+                {
+                    if (Application.isPlaying) Destroy(stamp.gameObject);
+                    else DestroyImmediate(stamp.gameObject);
+                }
+            stamps.Clear();
             states.Clear();
-            anchors.Clear();
-            lastSizes.Clear();
-            lastViewportSize = Vector2.zero;
+            placements.Clear();
         }
 
         private void Update()
@@ -69,13 +95,16 @@ namespace Uptime.Connections
         {
             EnsureViews();
             if (host == null || networkArea == null) return;
-            Vector2 viewportSize = networkArea.rect.size;
-            if ((viewportSize - lastViewportSize).sqrMagnitude > 1f)
-            {
-                anchors.Clear();
-                lastSizes.Clear();
-                lastViewportSize = viewportSize;
-            }
+            var markers = new List<Rect>();
+            foreach (TerminalMarkerStyle socket in networkArea.GetComponentsInChildren<TerminalMarkerStyle>())
+                if (socket.isActiveAndEnabled)
+                    markers.Add(NodeStatusPlacement.Expanded(
+                        RelativeRect(socket.rectTransform), 12f));
+            var pills = new List<Rect>();
+            foreach (IdentityPillView pill in networkArea.GetComponentsInChildren<IdentityPillView>())
+                if (pill.isActiveAndEnabled)
+                    pills.Add(NodeStatusPlacement.Expanded(
+                        RelativeRect((RectTransform)pill.transform), 8f));
             foreach (NodeResources node in host.Nodes)
             {
                 if (node?.View == null || !views.TryGetValue(node.View, out NodeStatusView view))
@@ -92,23 +121,21 @@ namespace Uptime.Connections
                     host.SimulationTimeSeconds);
                 Rect cardRect = EdgeGeometry.CardRect(card, networkArea);
                 view.SetNodeRect(cardRect);
+                if (stamps.TryGetValue(card, out NodeEventStamp stamp))
+                    stamp.Rect.anchoredPosition = cardRect.center;
                 view.Render(state, realTime, deltaSeconds);
                 if (!view.HasVisibleFamily)
                 {
-                    anchors.Remove(card);
-                    lastSizes.Remove(card);
+                    placements.Remove(card);
                     continue;
                 }
                 Vector2 size = view.StackSize;
-                bool changedSize = !lastSizes.TryGetValue(card, out Vector2 last) ||
-                    (last - size).sqrMagnitude > .01f;
-                if (!anchors.TryGetValue(card, out NodeStatusAnchor anchor) || changedSize)
-                {
-                    anchor = ChooseAnchor(card, cardRect, size);
-                    anchors[card] = anchor;
-                    lastSizes[card] = size;
-                }
-                view.PlaceStack(NodeStatusPlacement.At(anchor, cardRect, size));
+                NodeStatusPlacementChoice? previous =
+                    placements.TryGetValue(card, out NodeStatusPlacementChoice held) ? held : null;
+                NodeStatusPlacementChoice placement = ChoosePlacement(card, cardRect,
+                    size, markers, pills, previous);
+                placements[card] = placement;
+                view.PlaceStack(NodeStatusPlacement.At(placement, cardRect, size));
             }
         }
 
@@ -123,58 +150,47 @@ namespace Uptime.Connections
                 NodeStatusView view = Instantiate(statusPrefab, statusLayer, false);
                 view.name = "Node status " + card.NodeId;
                 view.ClearVisuals();
+                view.SetBandsVisible(false);
                 views.Add(card, view);
                 states.Add(card, new NodeStatusState());
+                if (stampLayer != null && stampPrefab != null)
+                {
+                    NodeEventStamp stamp = Instantiate(stampPrefab, stampLayer, false);
+                    stamp.name = "Node event " + card.NodeId;
+                    stamp.Cancel();
+                    stamps.Add(card, stamp);
+                }
             }
         }
 
-        private NodeStatusAnchor ChooseAnchor(NodeView card, Rect cardRect, Vector2 size)
+        private void PlayStamp(NodeView card, NodeEventStamp.EventKind kind)
+        {
+            if (card == null) return;
+            EnsureViews();
+            if (!stamps.TryGetValue(card, out NodeEventStamp stamp)) return;
+            if (networkArea != null)
+                stamp.Rect.anchoredPosition = EdgeGeometry.CardRect(card, networkArea).center;
+            stamp.Play(kind);
+        }
+
+        private NodeStatusPlacementChoice ChoosePlacement(NodeView card, Rect cardRect,
+            Vector2 size, IReadOnlyList<Rect> markers, IReadOnlyList<Rect> pills,
+            NodeStatusPlacementChoice? previous)
         {
             var cards = new List<Rect>();
             foreach (NodeResources node in host.Nodes)
                 if (node?.View != null && node.View != card)
                     cards.Add(EdgeGeometry.CardRect(node.View, networkArea));
-            var critical = new List<Rect>();
-            var busyDirections = new List<Vector2>();
-            foreach (TerminalMarkerStyle socket in networkArea.GetComponentsInChildren<TerminalMarkerStyle>())
-                if (socket.isActiveAndEnabled)
-                {
-                    Rect socketRect = RelativeRect(socket.rectTransform);
-                    critical.Add(NodeStatusPlacement.Expanded(socketRect, 12f));
-                    if (NodeStatusPlacement.Expanded(cardRect, 20f)
-                        .Contains(socketRect.center))
-                        busyDirections.Add(socketRect.center - cardRect.center);
-                }
-            foreach (IdentityPillView pill in networkArea.GetComponentsInChildren<IdentityPillView>())
-                if (pill.isActiveAndEnabled)
-                    critical.Add(NodeStatusPlacement.Expanded(
-                        RelativeRect((RectTransform)pill.transform), 8f));
-            var beams = new List<NodeStatusPlacement.BeamSegment>();
-            foreach (LogicalPathView path in networkArea.GetComponentsInChildren<LogicalPathView>())
-                if (path.isActiveAndEnabled)
-                    for (int i = 0; i < path.VisualSegmentCount; i++)
-                        if (path.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
-                            out float visible, out _) && visible > .01f)
-                            beams.Add(new NodeStatusPlacement.BeamSegment(start,
-                                Vector2.Lerp(start, end, visible)));
-            WormPresenter wormPresenter = networkArea.GetComponentInChildren<WormPresenter>();
-            if (wormPresenter != null && host.Worms != null)
-                foreach (WormOutbreak outbreak in host.Worms.Outbreaks)
-                    foreach (WormBranch branch in outbreak.Branches)
-                        if (wormPresenter.TryGetVisualSegment(branch, out Vector2 start,
-                            out Vector2 end, out float visible) && visible > .01f)
-                            beams.Add(new NodeStatusPlacement.BeamSegment(start,
-                                Vector2.Lerp(start, end, visible)));
             var otherStacks = new List<Rect>();
             foreach (var pair in views)
-                if (pair.Key != card && anchors.TryGetValue(pair.Key, out _) &&
+                if (pair.Key != card && placements.TryGetValue(pair.Key, out _) &&
                     pair.Value.HasVisibleFamily)
                     otherStacks.Add(RelativeRect(pair.Value.StackRoot));
             Rect viewport = networkArea.rect;
             viewport.xMin += 8f; viewport.xMax -= 8f;
             viewport.yMin += 8f; viewport.yMax -= 8f;
             return NodeStatusPlacement.Choose(cardRect, size, viewport,
-                cards, critical, otherStacks, busyDirections, beams);
+                cards, markers, pills, otherStacks, previous);
         }
 
         private Rect RelativeRect(RectTransform rect)
@@ -189,23 +205,51 @@ namespace Uptime.Connections
             if (session == null || !session.IsComplete) return;
             EnsureViews();
             if (states.TryGetValue(session.Target.View, out NodeStatusState state))
+            {
                 state.ScanResult(session.Result, Time.unscaledTime,
                     cleanAcknowledgmentSeconds);
+                PlayStamp(session.Target.View, session.Result == NodeScanResult.Infected ?
+                    NodeEventStamp.EventKind.Infected : NodeEventStamp.EventKind.Clean);
+            }
         }
 
         private void OnCleanSucceeded(CleanSession session, int removedCount)
         {
+            EnsureViews();
             if (session != null && states.TryGetValue(session.Target.View,
                 out NodeStatusState state))
+            {
                 state.CleanSucceeded();
+                if (removedCount > 0)
+                    PlayStamp(session.Target.View, NodeEventStamp.EventKind.Clean);
+            }
         }
+
+        private void OnBlackoutApplied(NodeInfection infection) =>
+            PlayStamp(infection?.Target?.View, NodeEventStamp.EventKind.Offline);
+
+        private void OnConditionApplied(NodeCondition condition)
+        {
+            if (condition == null) return;
+            PlayStamp(condition.Target?.View, condition.Kind == ConditionKind.ScanJammed ?
+                NodeEventStamp.EventKind.ScanJammed : NodeEventStamp.EventKind.PortScanned);
+        }
+
+        private void OnIsolationActivated(IsolationState isolation) =>
+            PlayStamp(isolation?.Node?.View, NodeEventStamp.EventKind.Isolated);
+
+        private void OnInterceptorActivated(InterceptionState interceptor) =>
+            PlayStamp(interceptor?.Node?.View, NodeEventStamp.EventKind.Intercept);
+
+        private void OnInterceptSucceeded(PayloadState payload) =>
+            PlayStamp(payload?.FinalNode, NodeEventStamp.EventKind.Caught);
 
         private void OnSimulationReset()
         {
             foreach (NodeStatusState state in states.Values) state.Reset();
             foreach (NodeStatusView view in views.Values) view.ClearVisuals();
-            anchors.Clear();
-            lastSizes.Clear();
+            foreach (NodeEventStamp stamp in stamps.Values) stamp.Cancel();
+            placements.Clear();
         }
 
 #if UNITY_EDITOR

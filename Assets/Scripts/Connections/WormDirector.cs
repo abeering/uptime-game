@@ -98,6 +98,7 @@ namespace Uptime.Connections
         private readonly Dictionary<NodeView, float> cooldowns = new();
         private int rootSeed;
         private int nextOutbreak;
+        public event Action<IsolationState> IsolationActivated;
 
         public IReadOnlyList<WormOutbreak> Outbreaks => outbreaks;
         public IReadOnlyCollection<IsolationState> Isolations => isolations.Values;
@@ -352,6 +353,7 @@ namespace Uptime.Connections
             state.ConnectionsCanceled = host.InterruptForIsolation(node);
             host.Recorder?.RecordIsolation("isolation_activated", state, now);
             host.Recorder?.CaptureSnapshot(now);
+            IsolationActivated?.Invoke(state);
             error = null;
             return true;
         }

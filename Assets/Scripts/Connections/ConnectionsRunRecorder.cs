@@ -165,6 +165,8 @@ namespace Uptime.Connections
         public float timeSeconds;
         public string type;
         public string connectionId;
+        public string advertisedIdentity;
+        public int identityHopIndex;
         public string source;
         public float scheduledSpawnTime;
         public string profileId;
@@ -224,6 +226,9 @@ namespace Uptime.Connections
         public float loaderWithdrawAtSeconds;
         public string command;
         public bool success;
+        public string probeLinkId;
+        public float probeExpiresAtSeconds;
+        public float probeCooldownUntilSeconds;
         public int actionSequence;
         public int cleanSessionId;
         public int scanSessionId;
@@ -305,6 +310,8 @@ namespace Uptime.Connections
         public LoaderAttackPlan loaderAttack;
         public bool naturalLoadNoise;
         public int naturalLoadSeed;
+        public float identityHopSeconds;
+        public int identitySeed;
     }
 
     [Serializable] public sealed class OperationRecord
@@ -849,6 +856,15 @@ namespace Uptime.Connections
             entry.definition = Definition(state.Definition);
         }
 
+        public void RecordIdentityAlias(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("identity_alias_changed", time);
+            entry.connectionId = state.ConnectionId;
+            entry.advertisedIdentity = state.Identity.AliasIdentity;
+            entry.identityHopIndex = state.Identity.HopCount;
+        }
+
         public void RecordOperationStarted(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -1010,7 +1026,7 @@ namespace Uptime.Connections
         }
 
         public int RecordPlayerAction(string command, string connectionId, bool success,
-            string targetNodeId = null, string reason = null)
+            string targetNodeId = null, string reason = null, string probeLinkId = null)
         {
             if (!IsRecording) return 0;
             RunEvent entry = NewEvent("player_action", host.SimulationTimeSeconds);
@@ -1019,7 +1035,19 @@ namespace Uptime.Connections
             entry.targetNodeId = targetNodeId;
             entry.success = success;
             entry.reason = reason;
+            entry.probeLinkId = probeLinkId;
             return entry.sequence;
+        }
+
+        public void RecordProbe(string type, string linkId, float time,
+            float expiresAtSeconds, float cooldownUntilSeconds)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.probeLinkId = linkId;
+            entry.success = true;
+            entry.probeExpiresAtSeconds = expiresAtSeconds;
+            entry.probeCooldownUntilSeconds = cooldownUntilSeconds;
         }
 
         public void RecordScanStarted(NodeScanSession session)
@@ -1352,6 +1380,8 @@ namespace Uptime.Connections
                 loaderAttack = definition.LoaderAttack?.Copy(),
                 naturalLoadNoise = definition.NaturalLoadNoise,
                 naturalLoadSeed = definition.NaturalLoadSeed,
+                identityHopSeconds = definition.IdentityHopSeconds,
+                identitySeed = definition.IdentitySeed,
                 operations = new OperationRecord[definition.OperationCount] };
             for (int i = 0; i < result.route.Length; i++)
                 result.route[i] = definition.Route[i].Node.NodeId;

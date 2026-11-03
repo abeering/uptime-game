@@ -40,6 +40,11 @@ namespace Uptime.Connections
         private Color identityColor;
         private bool hasIdentityColor;
         private TerminalMarkerStyle terminalMarker;
+        private int probeSegment = -1;
+        private Vector2 probeCenter;
+        private Vector2 probeAlong;
+        private Vector2 probeHalfSize;
+        private Color probeTint;
 
         public event Action<LogicalConnectionState> Destroyed;
         public TerminalMarkerStyle TerminalMarker => terminalMarker;
@@ -60,6 +65,18 @@ namespace Uptime.Connections
         {
             identityColor = color;
             hasIdentityColor = true;
+        }
+
+        public void SetProbe(int segment, Vector2 center, Vector2 along,
+            Vector2 halfSize, Color tint)
+        {
+            probeSegment = segment;
+            probeCenter = center;
+            probeAlong = along;
+            probeHalfSize = halfSize;
+            probeTint = tint;
+            if (path != null)
+                path.SetProbe(segment, center, along, halfSize, tint);
         }
 
         public Color BeamColorFor(LoadPerformance performance) =>
@@ -121,14 +138,21 @@ namespace Uptime.Connections
 
         public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
             out float visibleFraction, out Color lineColor)
+            => TryGetVisualSegment(segment, out start, out end, out visibleFraction,
+                out lineColor, out _);
+
+        public bool TryGetVisualSegment(int segment, out Vector2 start, out Vector2 end,
+            out float visibleFraction, out Color lineColor, out float lineWidth)
         {
             start = end = Vector2.zero;
             visibleFraction = 0f;
             lineColor = path != null ? path.color : Color.white;
+            lineWidth = 0f;
             if (!establishedVisual || segment < 0 || segment >= starts.Length)
                 return false;
             start = starts[segment];
             end = ends[segment];
+            lineWidth = lineWidths[segment];
             float total = 0f;
             float before = 0f;
             for (int i = 0; i < starts.Length; i++)
@@ -263,6 +287,7 @@ namespace Uptime.Connections
                     networkArea, -direction, -endOffsets[i], lineWidths[i]);
             }
             path.SetPath(starts, ends, lineWidths, reveal);
+            path.SetProbe(probeSegment, probeCenter, probeAlong, probeHalfSize, probeTint);
             if (terminalMarker != null)
             {
                 bool reachedTarget = reveal >= 1f;
