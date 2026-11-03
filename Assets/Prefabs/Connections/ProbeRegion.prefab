@@ -68,3 +68,12 @@ MonoBehaviour:
   fillColor: {r: 0.25, g: 0.48, b: 0.62, a: 0.16}
   borderColor: {r: 0.39, g: 0.69, b: 0.82, a: 0.52}
   borderWidth: 2
+  sweepPeriodSeconds: 2
+  sweepWidth: 18
+  sweepOpacity: 0.16
+  leadingOpacity: 0.26
+  leadingWidth: 1.5
+  sweepColor: {r: 0.67, g: 0.9, b: 1, a: 1}
+  activationDuration: 0.18
+  activationOpacity: 0.12
+  expirationFadeDuration: 0.22

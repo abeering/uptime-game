@@ -317,8 +317,8 @@ namespace Uptime.Connections.EditorTools
                         BindingFlags.Instance | BindingFlags.NonPublic, null,
                         new[] { typeof(VertexHelper) }, null)
                         .Invoke(instance.GetComponent<ProbeRegionGraphic>(), new object[] { mesh });
-                    Check(mesh.currentVertCount == 20,
-                        "scanner fill and all four border lines use shader geometry");
+                    Check(mesh.currentVertCount >= 20 && mesh.currentVertCount % 4 == 0,
+                        "scanner fill, border, and optional sweep use shader geometry");
                     for (int i = 0; i < mesh.currentVertCount; i++)
                     {
                         UIVertex vertex = default;

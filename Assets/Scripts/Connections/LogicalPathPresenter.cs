@@ -48,9 +48,10 @@ namespace Uptime.Connections
         public ConnectionIdentityPalette IdentityPalette => identityPalette;
         public void RefreshLayouts() => UpdateLayouts();
 
-        public void SetProbe(PhysicalLinkView link)
+        public void SetProbe(PhysicalLinkView link, bool fadeOut = false)
         {
-            if (probedLink != link) probeHalfWidth = 0f;
+            bool changed = probedLink != link;
+            if (changed) probeHalfWidth = 0f;
             probedLink = link;
             if (link != null && probeRegion == null && probeRegionPrefab != null && networkArea != null)
             {
@@ -58,7 +59,19 @@ namespace Uptime.Connections
                 probeRegion.name = "Probe X-ray " + link.LinkId;
             }
             if (probeRegion != null)
-                probeRegion.gameObject.SetActive(link != null && !previewMode);
+            {
+                ProbeRegionGraphic graphic = probeRegion.GetComponent<ProbeRegionGraphic>();
+                if (link != null)
+                {
+                    probeRegion.gameObject.SetActive(!previewMode);
+                    if (changed) graphic?.BeginActivation();
+                }
+                else if (fadeOut && !previewMode && graphic != null)
+                    graphic.BeginShutdown();
+                else if (graphic != null)
+                    graphic.HideImmediately();
+                else probeRegion.gameObject.SetActive(false);
+            }
             if (link == null)
                 foreach (LogicalPathView view in views.Values)
                     if (view != null) view.SetProbe(-1, Vector2.zero, Vector2.right,
@@ -71,7 +84,13 @@ namespace Uptime.Connections
                 return;
             previewMode = enabled;
             if (probeRegion != null)
-                probeRegion.gameObject.SetActive(!enabled && probedLink != null);
+            {
+                ProbeRegionGraphic graphic = probeRegion.GetComponent<ProbeRegionGraphic>();
+                if (enabled && graphic?.IsShuttingDown == true)
+                    graphic.HideImmediately();
+                else probeRegion.gameObject.SetActive(!enabled && (probedLink != null ||
+                    graphic?.IsShuttingDown == true));
+            }
             foreach (LogicalPathView view in views.Values)
                 if (view != null)
                     view.SetPresentationActive(!enabled);
