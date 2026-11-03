@@ -6184,6 +6184,7 @@ GameObject:
   - component: {fileID: 1996901019}
   - component: {fileID: 1996901020}
   - component: {fileID: 1996901030}
+  - component: {fileID: 1996901040}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -6191,6 +6192,97 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1996901040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e9f5296e1a4d45b1a2a1765d6b0001, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.ConnectionsSoundController
+  simulationHost: {fileID: 1996901015}
+  terminal: {fileID: 1950420486}
+  textCommunications: {fileID: 336805104}
+  videoCall: {fileID: 2042184038}
+  sourcePrefab: {fileID: 4309772391047084770, guid: fa99b699d9b21ad409a69517124302f9, type: 3}
+  pooledSourceCount: 8
+  masterSfxVolume: 0.8
+  connectionArrivalCooldown: 0.18
+  messageCooldown: 0.12
+  wormStatus:
+    cueName: worm_status
+    clips:
+    - {fileID: 8300000, guid: 6c2e4ed36eaf649c5a0e7f29bc38d0df, type: 3}
+    volume: 0.75
+    pitchMin: 1
+    pitchMax: 1
+  statusPortscan:
+    cueName: status_portscan
+    clips:
+    - {fileID: 8300000, guid: 38783942d9c1e441b863257cb0d3959e, type: 3}
+    volume: 0.7
+    pitchMin: 1
+    pitchMax: 1
+  packetSpawn:
+    cueName: packet_spawn
+    clips:
+    - {fileID: 8300000, guid: 4dacedf2ac31b2b4bb4f41da949a4f45, type: 3}
+    volume: 0.25
+    pitchMin: 0.96
+    pitchMax: 1.04
+  probeSweepingLoop:
+    cueName: probe_sweeping_loop
+    clips:
+    - {fileID: 8300000, guid: e74487114168a4233a2973004a18e75d, type: 3}
+    volume: 0.35
+    pitchMin: 1
+    pitchMax: 1
+  interceptSuccess:
+    cueName: intercept_success
+    clips:
+    - {fileID: 8300000, guid: 78b6fdf56dce748218b914e746ea77d2, type: 3}
+    volume: 0.8
+    pitchMin: 1
+    pitchMax: 1
+  nodeInfected:
+    cueName: node_infected_2
+    clips:
+    - {fileID: 8300000, guid: 171fb56e6b54c4e4f94afb8366b648aa, type: 3}
+    volume: 0.8
+    pitchMin: 1
+    pitchMax: 1
+  scanCompleteBenign:
+    cueName: scan_complete_benign
+    clips:
+    - {fileID: 8300000, guid: 67ceba0f7e50b2b49a8c5b907b8ea706, type: 3}
+    volume: 0.7
+    pitchMin: 1
+    pitchMax: 1
+  chatNotification:
+    cueName: chat_notification
+    clips:
+    - {fileID: 8300000, guid: 03913aad0a2264f3986c33e8a1bcd89e, type: 3}
+    volume: 0.45
+    pitchMin: 0.98
+    pitchMax: 1.02
+  commandError:
+    cueName: command_error
+    clips:
+    - {fileID: 8300000, guid: 4754b81ce67feb44b9fb6f71a33a1784, type: 3}
+    volume: 0.6
+    pitchMin: 1
+    pitchMax: 1
+  videoCallOpen:
+    cueName: video_call_open
+    clips:
+    - {fileID: 8300000, guid: 890f97136703e466ca8391582090bf1b, type: 3}
+    volume: 0.75
+    pitchMin: 1
+    pitchMax: 1
 --- !u!114 &1996901015
 MonoBehaviour:
   m_ObjectHideFlags: 0

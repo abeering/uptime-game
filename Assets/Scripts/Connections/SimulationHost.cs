@@ -91,6 +91,7 @@ namespace Uptime.Connections
         public ConnectionIdentityPalette PresentationPalette => pathPresenter != null ?
             pathPresenter.IdentityPalette : null;
         public event Action<LogicalConnectionState, ConnectionResolution> ConnectionResolved;
+        public event Action<LogicalConnectionState> ConnectionRegistered;
         public event Action<ConnectionEffectOccurrence> EffectOccurred;
         public event Action<NodeScanSession> ScanCompleted;
         public event Action<CleanSession, int> CleanSucceeded;
@@ -472,6 +473,7 @@ namespace Uptime.Connections
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
             recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+            ConnectionRegistered?.Invoke(state);
             if (state.IsConnecting) StartIdentity(state);
             if (Application.isPlaying) pathPresenter?.Add(state);
             if (state.IsConnecting && IsNodeOffline(state.Definition.Route[0].Node))

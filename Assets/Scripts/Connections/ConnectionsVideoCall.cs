@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -35,6 +36,7 @@ namespace Uptime.Connections
         public bool IsActive => active && isActiveAndEnabled;
         public bool IsTyping { get; private set; }
         public bool CanDismissWithEscape => IsActive;
+        public event Action CallOpened;
 
         // Duplicate or unavailable requests leave the current call untouched.
         // Future directors supply content; typing remains independent of presentation and placement.
@@ -59,6 +61,7 @@ namespace Uptime.Connections
             escapeCoordinator.Register(this);
             bodyText.ForceMeshUpdate();
             typeRoutine = StartCoroutine(TypeBody());
+            CallOpened?.Invoke();
             return true;
         }
 
