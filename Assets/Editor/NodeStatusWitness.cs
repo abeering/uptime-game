@@ -90,46 +90,77 @@ namespace Uptime.Connections.EditorTools
         {
             Rect node = new Rect(-120, -40, 240, 80);
             Rect viewport = new Rect(-500, -300, 1000, 600);
-            var topPill = new[] { new Rect(-110, 50, 220, 90) };
-            NodeStatusAnchor choice = NodeStatusPlacement.Choose(node,
-                new Vector2(184, 63), viewport, Array.Empty<Rect>(), topPill,
-                Array.Empty<Rect>());
-            Check(choice != NodeStatusAnchor.N &&
-                !NodeStatusPlacement.At(choice, node, new Vector2(184, 63))
-                    .Overlaps(topPill[0]), "identity pill is protected at preferred N anchor");
-            var blocked = new[] { new Rect(130, -100, 220, 180) };
-            choice = NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
-                blocked, Array.Empty<Rect>(), Array.Empty<Rect>());
-            Check(choice != NodeStatusAnchor.E, "neighbor node card is avoided");
-            Rect topNode = new Rect(-120, 230, 240, 60);
-            choice = NodeStatusPlacement.Choose(topNode, new Vector2(184, 63), viewport,
-                Array.Empty<Rect>(), Array.Empty<Rect>(), Array.Empty<Rect>());
-            Check(NodeStatusPlacement.At(choice, topNode, new Vector2(184, 63)).yMax <=
-                viewport.yMax, "viewport edge is respected");
-            // DB-like case: a live connection enters from above, while adjacent
-            // cards occupy both sides and the area below remains clear.
-            var adjacent = new[] { new Rect(-480, -40, 240, 80),
-                new Rect(240, -40, 240, 80) };
-            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
-                adjacent, Array.Empty<Rect>(), Array.Empty<Rect>()) == NodeStatusAnchor.N,
-                "unoccupied DB-like node retains preferred north placement");
-            var socket = new[] { NodeStatusPlacement.Expanded(
-                new Rect(-13, 40, 26, 26), 12f) };
-            var beam = new[] { new NodeStatusPlacement.BeamSegment(
-                new Vector2(0, 240), new Vector2(0, 40)) };
-            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
-                adjacent, Array.Empty<Rect>(), Array.Empty<Rect>(), null, beam) !=
-                NodeStatusAnchor.N, "live beam alone discourages a covering callout");
-            Check(NodeStatusPlacement.Choose(node, new Vector2(184, 63), viewport,
-                adjacent, socket, Array.Empty<Rect>(),
-                new[] { Vector2.up }, beam) == NodeStatusAnchor.S,
-                "DB-like top socket and live approach place callout below");
-            for (int i = 0; i < 8; i++)
-            {
-                Rect position = NodeStatusPlacement.At((NodeStatusAnchor)i, node,
-                    new Vector2(184, 63));
-                Check(!position.Overlaps(node), "all eight anchors outside card " + i);
-            }
+            Vector2 size = new Vector2(220f, 75f);
+            var none = Array.Empty<Rect>();
+            NodeStatusPlacementChoice choice = NodeStatusPlacement.Choose(node, size,
+                viewport, none, none, none, none);
+            Check(choice.Anchor == NodeStatusAnchor.N && choice.HorizontalOffset == 0f &&
+                choice.OutwardOffset == 0f, "clear node prefers centered above");
+            var topMarker = new[] { NodeStatusPlacement.Expanded(
+                new Rect(-13f, 40f, 26f, 26f), 12f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                topMarker, none, none);
+            Rect placed = NodeStatusPlacement.At(choice, node, size);
+            Check(!placed.Overlaps(topMarker[0]) &&
+                Mathf.Abs(placed.center.x - node.center.x) <= 60.01f &&
+                (placed.yMin >= node.yMax || placed.yMax <= node.yMin),
+                "terminal marker stays clear within an above/below region");
+            var topPill = new[] { new Rect(-110f, 50f, 220f, 90f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                none, topPill, none);
+            Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(topPill[0]),
+                "identity pill is protected when a clear side exists");
+            var neighboringCard = new[] { new Rect(-120f, 42f, 240f, 125f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport,
+                neighboringCard, none, none, none);
+            Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(neighboringCard[0]),
+                "neighboring node card is protected");
+            var neighboringStack = new[] { new Rect(-110f, 57f, 220f, 75f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none, none,
+                none, neighboringStack);
+            Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(neighboringStack[0]),
+                "another status stack is avoided when clear space exists");
+            Rect topNode = new Rect(-120f, 230f, 240f, 60f);
+            choice = NodeStatusPlacement.Choose(topNode, size, viewport,
+                none, none, none, none);
+            Check(choice.Anchor == NodeStatusAnchor.S &&
+                NodeStatusPlacement.At(choice, topNode, size).yMax <= viewport.yMax,
+                "top-edge node places below");
+            Rect bottomNode = new Rect(-120f, -290f, 240f, 60f);
+            choice = NodeStatusPlacement.Choose(bottomNode, size, viewport,
+                none, none, none, none);
+            Check(choice.Anchor == NodeStatusAnchor.N &&
+                NodeStatusPlacement.At(choice, bottomNode, size).yMin >= viewport.yMin,
+                "bottom-edge node places above");
+            var blockedNorth = new[] { new Rect(-250f, 40f, 500f, 210f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                blockedNorth, none, none);
+            Check(choice.Anchor == NodeStatusAnchor.S,
+                "above obstruction chooses below instead of a diagonal");
+            NodeStatusPlacementChoice held = NodeStatusPlacement.Choose(node, size,
+                viewport, none, none, none, none, choice);
+            Check(held.Anchor == NodeStatusAnchor.S,
+                "clear existing placement stays stable after traffic departs");
+            var blockedSouth = new[] { new Rect(-250f, -260f, 500f, 220f) };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                blockedSouth, none, none, held);
+            Check(choice.Anchor == NodeStatusAnchor.N,
+                "new marker obstruction moves a held placement");
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                blockedNorth, blockedSouth, none);
+            Check(choice.Anchor == NodeStatusAnchor.S &&
+                !NodeStatusPlacement.At(choice, node, size).Overlaps(blockedNorth[0]),
+                "terminal marker takes priority over a pill when both sides are busy");
+            var bothBlocked = new[] { blockedNorth[0], blockedSouth[0] };
+            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
+                bothBlocked, none, none);
+            placed = NodeStatusPlacement.At(choice, node, size);
+            Check((placed.yMin >= node.yMax || placed.yMax <= node.yMin) &&
+                Mathf.Abs(placed.center.x - node.center.x) <= 60.01f,
+                "fully obstructed node still uses the best above/below candidate");
+            foreach (NodeStatusAnchor anchor in Enum.GetValues(typeof(NodeStatusAnchor)))
+                Check(!NodeStatusPlacement.At(anchor, node, size).Overlaps(node),
+                    "both regions remain outside the owning card");
         }
 
         private static void CheckModel()

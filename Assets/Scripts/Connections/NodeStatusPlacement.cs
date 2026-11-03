@@ -3,92 +3,124 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public enum NodeStatusAnchor { N, NE, E, SE, S, SW, W, NW }
+    public enum NodeStatusAnchor { N, S }
+
+    // A small offset keeps the stack floating while its region remains above or below the node.
+    public readonly struct NodeStatusPlacementChoice
+    {
+        public readonly NodeStatusAnchor Anchor;
+        public readonly float HorizontalOffset;
+        public readonly float OutwardOffset;
+
+        public NodeStatusPlacementChoice(NodeStatusAnchor anchor, float horizontalOffset,
+            float outwardOffset)
+        {
+            Anchor = anchor;
+            HorizontalOffset = horizontalOffset;
+            OutwardOffset = outwardOffset;
+        }
+    }
 
     public static class NodeStatusPlacement
     {
-        public readonly struct BeamSegment
-        {
-            public readonly Vector2 Start;
-            public readonly Vector2 End;
-
-            public BeamSegment(Vector2 start, Vector2 end)
-            { Start = start; End = end; }
-        }
-
         private const float Gap = 17f;
+        private static readonly NodeStatusAnchor[] Regions =
+            { NodeStatusAnchor.N, NodeStatusAnchor.S };
+        private static readonly float[] HorizontalOffsets = { 0f, -30f, 30f, -60f, 60f };
+        private static readonly float[] OutwardOffsets = { 0f, 24f, 48f };
 
-        public static Rect At(NodeStatusAnchor anchor, Rect node, Vector2 size)
+        public static Rect At(NodeStatusAnchor anchor, Rect node, Vector2 size) =>
+            At(new NodeStatusPlacementChoice(anchor, 0f, 0f), node, size);
+
+        public static Rect At(NodeStatusPlacementChoice choice, Rect node, Vector2 size)
         {
-            float x = node.center.x - size.x * .5f;
-            float y = node.center.y - size.y * .5f;
-            switch (anchor)
-            {
-                case NodeStatusAnchor.N: y = node.yMax + Gap; break;
-                case NodeStatusAnchor.NE:
-                    x = node.xMax + Gap; y = node.yMax + Gap; break;
-                case NodeStatusAnchor.E: x = node.xMax + Gap; break;
-                case NodeStatusAnchor.SE:
-                    x = node.xMax + Gap; y = node.yMin - Gap - size.y; break;
-                case NodeStatusAnchor.S: y = node.yMin - Gap - size.y; break;
-                case NodeStatusAnchor.SW:
-                    x = node.xMin - Gap - size.x; y = node.yMin - Gap - size.y; break;
-                case NodeStatusAnchor.W: x = node.xMin - Gap - size.x; break;
-                case NodeStatusAnchor.NW:
-                    x = node.xMin - Gap - size.x; y = node.yMax + Gap; break;
-            }
-            return new Rect(new Vector2(x, y), size);
+            float x = node.center.x - size.x * .5f + choice.HorizontalOffset;
+            float y = choice.Anchor == NodeStatusAnchor.N ?
+                node.yMax + Gap + choice.OutwardOffset :
+                node.yMin - Gap - size.y - choice.OutwardOffset;
+            return new Rect(x, y, size.x, size.y);
         }
 
-        public static NodeStatusAnchor Choose(Rect node, Vector2 size, Rect viewport,
-            IReadOnlyList<Rect> cards, IReadOnlyList<Rect> critical,
-            IReadOnlyList<Rect> otherStacks,
-            IReadOnlyList<Vector2> busyDirections = null,
-            IReadOnlyList<BeamSegment> beams = null)
+        public static NodeStatusPlacementChoice Choose(Rect node, Vector2 size, Rect viewport,
+            IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
+            IReadOnlyList<Rect> pills, IReadOnlyList<Rect> otherStacks,
+            NodeStatusPlacementChoice? previous = null)
         {
-            float best = float.PositiveInfinity;
-            NodeStatusAnchor winner = NodeStatusAnchor.N;
-            for (int i = 0; i < 8; i++)
-            {
-                NodeStatusAnchor anchor = (NodeStatusAnchor)i;
-                Rect candidate = At(anchor, node, size);
-                Rect inside = Intersection(candidate, viewport);
-                float score = (candidate.width * candidate.height -
-                    inside.width * inside.height) * 40f + i * 3f;
-                AddConflicts(cards, candidate, 20f, ref score);
-                AddConflicts(critical, candidate, 60f, ref score);
-                AddConflicts(otherStacks, candidate, 25f, ref score);
-                if (busyDirections != null)
-                {
-                    Vector2 direction = (candidate.center - node.center).normalized;
-                    foreach (Vector2 busy in busyDirections)
+            float bestScore = float.PositiveInfinity;
+            int bestPriority = int.MaxValue;
+            NodeStatusPlacementChoice best = new NodeStatusPlacementChoice(NodeStatusAnchor.N, 0f, 0f);
+            foreach (NodeStatusAnchor anchor in Regions)
+                foreach (float outward in OutwardOffsets)
+                    foreach (float horizontal in HorizontalOffsets)
                     {
-                        float alignment = Vector2.Dot(direction, busy.normalized);
-                        score += 120f * Mathf.Max(0f, alignment) -
-                            30f * Mathf.Pow(Mathf.Max(0f, -alignment), 2f);
+                        var choice = new NodeStatusPlacementChoice(anchor, horizontal, outward);
+                        Rect candidate = At(choice, node, size);
+                        int priority = Priority(candidate, viewport, cards, markers, pills);
+                        if (priority > bestPriority) continue;
+                        float score = Score(choice, candidate, viewport,
+                            cards, markers, pills, otherStacks);
+                        if (priority == bestPriority && score >= bestScore) continue;
+                        bestPriority = priority;
+                        bestScore = score;
+                        best = choice;
                     }
-                }
-                if (beams != null)
-                    foreach (BeamSegment beam in beams)
-                        score += SegmentLengthInside(beam, Expanded(candidate, 6f)) * 2f;
-                if (score < best)
-                {
-                    best = score;
-                    winner = anchor;
-                }
+
+            if (previous.HasValue)
+            {
+                NodeStatusPlacementChoice held = previous.Value;
+                Rect heldRect = At(held, node, size);
+                // Traffic can change every frame. Keep a clear placement unless the new
+                // choice is materially better; move promptly when a marker reaches it.
+                if (bestPriority <= 1 &&
+                    Priority(heldRect, viewport, cards, markers, pills) == bestPriority &&
+                    ConflictArea(otherStacks, heldRect) < 1f &&
+                    Score(held, heldRect, viewport, cards, markers, pills, otherStacks) <=
+                        bestScore + 200f)
+                    return held;
             }
-            return winner;
+            return best;
         }
 
-        private static void AddConflicts(IReadOnlyList<Rect> obstacles, Rect candidate,
-            float weight, ref float score)
+        private static int Priority(Rect candidate, Rect viewport,
+            IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
+            IReadOnlyList<Rect> pills)
         {
-            if (obstacles == null) return;
+            // A terminal marker stays clear whenever any above/below candidate can
+            // do so. A pill may overlap only after clear, on-screen choices run out.
+            if (ConflictArea(markers, candidate) >= .01f) return 4;
+            if (ConflictArea(cards, candidate) >= .01f) return 3;
+            if (OutsideArea(candidate, viewport) >= .01f) return 2;
+            return ConflictArea(pills, candidate) < .01f ? 0 : 1;
+        }
+
+        private static float Score(NodeStatusPlacementChoice choice, Rect candidate,
+            Rect viewport, IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
+            IReadOnlyList<Rect> pills, IReadOnlyList<Rect> otherStacks) =>
+            OutsideArea(candidate, viewport) * 1000f +
+            ConflictArea(markers, candidate) * 5000f +
+            ConflictArea(pills, candidate) * 2000f +
+            ConflictArea(cards, candidate) * 200f +
+            ConflictArea(otherStacks, candidate) * 80f +
+            Mathf.Abs(choice.HorizontalOffset) * 1.5f +
+            choice.OutwardOffset * .7f +
+            (choice.Anchor == NodeStatusAnchor.S ? 4f : 0f);
+
+        private static float OutsideArea(Rect candidate, Rect viewport)
+        {
+            Rect inside = Intersection(candidate, viewport);
+            return candidate.width * candidate.height - inside.width * inside.height;
+        }
+
+        private static float ConflictArea(IReadOnlyList<Rect> obstacles, Rect candidate)
+        {
+            if (obstacles == null) return 0f;
+            float area = 0f;
             foreach (Rect obstacle in obstacles)
             {
                 Rect overlap = Intersection(candidate, obstacle);
-                score += overlap.width * overlap.height * weight;
+                area += overlap.width * overlap.height;
             }
+            return area;
         }
 
         private static Rect Intersection(Rect a, Rect b)
@@ -102,26 +134,5 @@ namespace Uptime.Connections
         public static Rect Expanded(Rect rect, float padding) => new Rect(
             rect.xMin - padding, rect.yMin - padding,
             rect.width + padding * 2f, rect.height + padding * 2f);
-
-        private static float SegmentLengthInside(BeamSegment beam, Rect rect)
-        {
-            Vector2 delta = beam.End - beam.Start;
-            float enter = 0f, leave = 1f;
-            if (!Clip(-delta.x, beam.Start.x - rect.xMin, ref enter, ref leave) ||
-                !Clip(delta.x, rect.xMax - beam.Start.x, ref enter, ref leave) ||
-                !Clip(-delta.y, beam.Start.y - rect.yMin, ref enter, ref leave) ||
-                !Clip(delta.y, rect.yMax - beam.Start.y, ref enter, ref leave))
-                return 0f;
-            return Mathf.Max(0f, leave - enter) * delta.magnitude;
-        }
-
-        private static bool Clip(float p, float q, ref float enter, ref float leave)
-        {
-            if (Mathf.Abs(p) < .0001f) return q >= 0f;
-            float t = q / p;
-            if (p < 0f) enter = Mathf.Max(enter, t);
-            else leave = Mathf.Min(leave, t);
-            return enter <= leave;
-        }
     }
 }
