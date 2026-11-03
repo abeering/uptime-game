@@ -187,6 +187,7 @@ namespace Uptime.Connections
         [SerializeField] private int naturalLoadSeed;
         [SerializeField, Min(0f)] private float identityHopSeconds;
         [SerializeField] private int identitySeed;
+        [SerializeField] private ConnectionIdentityMode identityMode;
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
@@ -215,6 +216,8 @@ namespace Uptime.Connections
         public int NaturalLoadSeed => naturalLoadSeed;
         public float IdentityHopSeconds => identityHopSeconds;
         public int IdentitySeed => identitySeed;
+        public ConnectionIdentityMode IdentityMode => identityMode == ConnectionIdentityMode.Normal &&
+            identityHopSeconds > 0f ? ConnectionIdentityMode.ContinuousHopping : identityMode;
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
             StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
         private bool HasArc => operations != null && operations.Length > 0;
@@ -238,7 +241,8 @@ namespace Uptime.Connections
                 naturalLoadNoise = plan.NaturalLoadNoise,
                 naturalLoadSeed = plan.NaturalLoadSeed,
                 identityHopSeconds = plan.IdentityHopSeconds,
-                identitySeed = plan.IdentitySeed
+                identitySeed = plan.IdentitySeed,
+                identityMode = plan.IdentityMode
             };
             for (int i = 0; i < result.route.Length; i++) result.route[i] = new RouteNode(plan.Route[i]);
             for (int i = 0; i < result.operations.Length; i++)
@@ -289,7 +293,7 @@ namespace Uptime.Connections
             deliveredEffects = new bool[definition.OperationCount];
             Behaviors = new ConnectionBehaviorRuntime(definition);
             Identity = new ConnectionIdentityRuntime(definition.ConnectionId,
-                definition.IdentityHopSeconds, definition.IdentitySeed);
+                definition.IdentityHopSeconds, definition.IdentitySeed, definition.IdentityMode);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
 
