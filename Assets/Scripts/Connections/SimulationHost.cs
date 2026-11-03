@@ -82,6 +82,9 @@ namespace Uptime.Connections
         public event Action<ConnectionEffectOccurrence> EffectOccurred;
         public event Action<NodeScanSession> ScanCompleted;
         public event Action<CleanSession, int> CleanSucceeded;
+        public event Action<NodeInfection> BlackoutApplied;
+        // Raised once for each successful application or refresh, not each render frame.
+        public event Action<NodeCondition> ConditionApplied;
         public event Action SimulationReset;
         public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
             payloadDirector != null && payloadDirector.HasEverUsedId(id) ||
@@ -439,6 +442,7 @@ namespace Uptime.Connections
                         sourceOperationIndex, sourceWormBranchId);
                     recorder?.RecordCondition("condition_refreshed", existing,
                         simulationTimeSeconds);
+                    ConditionApplied?.Invoke(existing);
                     return existing;
                 }
             var condition = new NodeCondition(target, payload, simulationTimeSeconds,
@@ -446,6 +450,7 @@ namespace Uptime.Connections
             conditions.Add(condition);
             recorder?.RecordCondition("condition_applied", condition,
                 simulationTimeSeconds);
+            ConditionApplied?.Invoke(condition);
             return condition;
         }
 
@@ -729,6 +734,8 @@ namespace Uptime.Connections
             infections.Add(infection);
             recorder?.RecordInfection("infection_applied", infection,
                 simulationTimeSeconds, sourceConnectionId == null ? "debug_injection" : "delivery");
+            if (payload.Kind == InfectionKind.Blackout)
+                BlackoutApplied?.Invoke(infection);
             RefreshPayloadAllocations();
             RefreshDisplays();
             return true;

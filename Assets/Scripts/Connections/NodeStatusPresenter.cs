@@ -11,10 +11,13 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform statusLayer;
         [SerializeField] private NodeStatusView statusPrefab;
+        [SerializeField] private RectTransform stampLayer;
+        [SerializeField] private NodeEventStamp stampPrefab;
         [SerializeField, Min(.1f)] private float cleanAcknowledgmentSeconds = 2.5f;
 
         private readonly Dictionary<NodeView, NodeStatusState> states = new();
         private readonly Dictionary<NodeView, NodeStatusView> views = new();
+        private readonly Dictionary<NodeView, NodeEventStamp> stamps = new();
         private readonly Dictionary<NodeView, NodeStatusAnchor> anchors = new();
         private readonly Dictionary<NodeView, Vector2> lastSizes = new();
         private Vector2 lastViewportSize;
@@ -23,18 +26,30 @@ namespace Uptime.Connections
         public RectTransform NetworkArea => networkArea;
         public RectTransform StatusLayer => statusLayer;
         public NodeStatusView StatusPrefab => statusPrefab;
+        public RectTransform StampLayer => stampLayer;
+        public NodeEventStamp StampPrefab => stampPrefab;
         public float CleanAcknowledgmentSeconds => cleanAcknowledgmentSeconds;
         public NodeStatusState StateFor(NodeView node) => states.TryGetValue(node,
             out NodeStatusState state) ? state : null;
         public NodeStatusView ViewFor(NodeView node) => views.TryGetValue(node,
             out NodeStatusView view) ? view : null;
+        public NodeEventStamp StampFor(NodeView node) => stamps.TryGetValue(node,
+            out NodeEventStamp stamp) ? stamp : null;
 
         private void OnEnable()
         {
             if (host == null) return;
             host.ScanCompleted += OnScanCompleted;
             host.CleanSucceeded += OnCleanSucceeded;
+            host.BlackoutApplied += OnBlackoutApplied;
+            host.ConditionApplied += OnConditionApplied;
             host.SimulationReset += OnSimulationReset;
+            if (host.Worms != null) host.Worms.IsolationActivated += OnIsolationActivated;
+            if (host.Payloads != null)
+            {
+                host.Payloads.InterceptorActivated += OnInterceptorActivated;
+                host.Payloads.InterceptSucceeded += OnInterceptSucceeded;
+            }
         }
 
         private void OnDisable()
@@ -43,7 +58,15 @@ namespace Uptime.Connections
             {
                 host.ScanCompleted -= OnScanCompleted;
                 host.CleanSucceeded -= OnCleanSucceeded;
+                host.BlackoutApplied -= OnBlackoutApplied;
+                host.ConditionApplied -= OnConditionApplied;
                 host.SimulationReset -= OnSimulationReset;
+                if (host.Worms != null) host.Worms.IsolationActivated -= OnIsolationActivated;
+                if (host.Payloads != null)
+                {
+                    host.Payloads.InterceptorActivated -= OnInterceptorActivated;
+                    host.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+                }
             }
             foreach (NodeStatusView view in views.Values)
                 if (view != null)
@@ -52,6 +75,13 @@ namespace Uptime.Connections
                     else DestroyImmediate(view.gameObject);
                 }
             views.Clear();
+            foreach (NodeEventStamp stamp in stamps.Values)
+                if (stamp != null)
+                {
+                    if (Application.isPlaying) Destroy(stamp.gameObject);
+                    else DestroyImmediate(stamp.gameObject);
+                }
+            stamps.Clear();
             states.Clear();
             anchors.Clear();
             lastSizes.Clear();
@@ -92,6 +122,8 @@ namespace Uptime.Connections
                     host.SimulationTimeSeconds);
                 Rect cardRect = EdgeGeometry.CardRect(card, networkArea);
                 view.SetNodeRect(cardRect);
+                if (stamps.TryGetValue(card, out NodeEventStamp stamp))
+                    stamp.Rect.anchoredPosition = cardRect.center;
                 view.Render(state, realTime, deltaSeconds);
                 if (!view.HasVisibleFamily)
                 {
@@ -123,9 +155,27 @@ namespace Uptime.Connections
                 NodeStatusView view = Instantiate(statusPrefab, statusLayer, false);
                 view.name = "Node status " + card.NodeId;
                 view.ClearVisuals();
+                view.SetBandsVisible(false);
                 views.Add(card, view);
                 states.Add(card, new NodeStatusState());
+                if (stampLayer != null && stampPrefab != null)
+                {
+                    NodeEventStamp stamp = Instantiate(stampPrefab, stampLayer, false);
+                    stamp.name = "Node event " + card.NodeId;
+                    stamp.Cancel();
+                    stamps.Add(card, stamp);
+                }
             }
+        }
+
+        private void PlayStamp(NodeView card, NodeEventStamp.EventKind kind)
+        {
+            if (card == null) return;
+            EnsureViews();
+            if (!stamps.TryGetValue(card, out NodeEventStamp stamp)) return;
+            if (networkArea != null)
+                stamp.Rect.anchoredPosition = EdgeGeometry.CardRect(card, networkArea).center;
+            stamp.Play(kind);
         }
 
         private NodeStatusAnchor ChooseAnchor(NodeView card, Rect cardRect, Vector2 size)
@@ -189,21 +239,50 @@ namespace Uptime.Connections
             if (session == null || !session.IsComplete) return;
             EnsureViews();
             if (states.TryGetValue(session.Target.View, out NodeStatusState state))
+            {
                 state.ScanResult(session.Result, Time.unscaledTime,
                     cleanAcknowledgmentSeconds);
+                PlayStamp(session.Target.View, session.Result == NodeScanResult.Infected ?
+                    NodeEventStamp.EventKind.Infected : NodeEventStamp.EventKind.Clean);
+            }
         }
 
         private void OnCleanSucceeded(CleanSession session, int removedCount)
         {
+            EnsureViews();
             if (session != null && states.TryGetValue(session.Target.View,
                 out NodeStatusState state))
+            {
                 state.CleanSucceeded();
+                if (removedCount > 0)
+                    PlayStamp(session.Target.View, NodeEventStamp.EventKind.Clean);
+            }
         }
+
+        private void OnBlackoutApplied(NodeInfection infection) =>
+            PlayStamp(infection?.Target?.View, NodeEventStamp.EventKind.Offline);
+
+        private void OnConditionApplied(NodeCondition condition)
+        {
+            if (condition == null) return;
+            PlayStamp(condition.Target?.View, condition.Kind == ConditionKind.ScanJammed ?
+                NodeEventStamp.EventKind.ScanJammed : NodeEventStamp.EventKind.PortScanned);
+        }
+
+        private void OnIsolationActivated(IsolationState isolation) =>
+            PlayStamp(isolation?.Node?.View, NodeEventStamp.EventKind.Isolated);
+
+        private void OnInterceptorActivated(InterceptionState interceptor) =>
+            PlayStamp(interceptor?.Node?.View, NodeEventStamp.EventKind.Intercept);
+
+        private void OnInterceptSucceeded(PayloadState payload) =>
+            PlayStamp(payload?.FinalNode, NodeEventStamp.EventKind.Caught);
 
         private void OnSimulationReset()
         {
             foreach (NodeStatusState state in states.Values) state.Reset();
             foreach (NodeStatusView view in views.Values) view.ClearVisuals();
+            foreach (NodeEventStamp stamp in stamps.Values) stamp.Cancel();
             anchors.Clear();
             lastSizes.Clear();
         }
