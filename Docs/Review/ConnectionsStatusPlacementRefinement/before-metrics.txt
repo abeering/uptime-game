@@ -1,0 +1,30 @@
+before Connections 1920x1080
+markers=4 pills=4
+pillChildren=4 active=4 enabled=4
+API: stack=(x:162.00, y:-28.10, width:220.00, height:75.00) node=(x:-145.00, y:-38.60, width:290.00, height:96.00) markerHits=0 pillHits=0
+DB: stack=(x:-410.80, y:-422.00, width:220.00, height:75.00) node=(x:-445.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+AUTH: stack=(x:190.80, y:-381.00, width:220.00, height:34.00) node=(x:155.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+before Connections 1280x720
+markers=4 pills=4
+pillChildren=4 active=4 enabled=4
+API: stack=(x:162.00, y:-28.10, width:220.00, height:75.00) node=(x:-145.00, y:-38.60, width:290.00, height:96.00) markerHits=0 pillHits=0
+DB: stack=(x:-410.80, y:-422.00, width:220.00, height:75.00) node=(x:-445.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+AUTH: stack=(x:190.80, y:-381.00, width:220.00, height:34.00) node=(x:155.80, y:-330.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+before ConnectionsAdvanced 1920x1080
+markers=7 pills=7
+pillChildren=7 active=7 enabled=7
+WEB: stack=(x:-273.00, y:65.00, width:220.00, height:34.00) node=(x:-580.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+AUTH: stack=(x:-273.00, y:-300.00, width:220.00, height:34.00) node=(x:-580.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+API: stack=(x:162.00, y:327.50, width:220.00, height:75.00) node=(x:-145.00, y:317.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+DB: stack=(x:162.00, y:-140.00, width:220.00, height:75.00) node=(x:-145.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+RPT: stack=(x:162.00, y:-300.00, width:220.00, height:34.00) node=(x:-145.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+JOBS: stack=(x:53.00, y:65.00, width:220.00, height:34.00) node=(x:290.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+before ConnectionsAdvanced 1280x720
+markers=7 pills=7
+pillChildren=7 active=7 enabled=7
+WEB: stack=(x:-273.00, y:65.00, width:220.00, height:34.00) node=(x:-580.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+AUTH: stack=(x:-273.00, y:-300.00, width:220.00, height:34.00) node=(x:-580.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+API: stack=(x:162.00, y:327.50, width:220.00, height:75.00) node=(x:-145.00, y:317.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+DB: stack=(x:162.00, y:-140.00, width:220.00, height:75.00) node=(x:-145.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+RPT: stack=(x:162.00, y:-300.00, width:220.00, height:34.00) node=(x:-145.00, y:-413.00, width:290.00, height:96.00) markerHits=0 pillHits=0
+JOBS: stack=(x:53.00, y:65.00, width:220.00, height:34.00) node=(x:290.00, y:-48.00, width:290.00, height:96.00) markerHits=0 pillHits=0
