@@ -224,6 +224,9 @@ namespace Uptime.Connections
         public float loaderWithdrawAtSeconds;
         public string command;
         public bool success;
+        public string probeLinkId;
+        public float probeExpiresAtSeconds;
+        public float probeCooldownUntilSeconds;
         public int actionSequence;
         public int cleanSessionId;
         public int scanSessionId;
@@ -1010,7 +1013,7 @@ namespace Uptime.Connections
         }
 
         public int RecordPlayerAction(string command, string connectionId, bool success,
-            string targetNodeId = null, string reason = null)
+            string targetNodeId = null, string reason = null, string probeLinkId = null)
         {
             if (!IsRecording) return 0;
             RunEvent entry = NewEvent("player_action", host.SimulationTimeSeconds);
@@ -1019,7 +1022,19 @@ namespace Uptime.Connections
             entry.targetNodeId = targetNodeId;
             entry.success = success;
             entry.reason = reason;
+            entry.probeLinkId = probeLinkId;
             return entry.sequence;
+        }
+
+        public void RecordProbe(string type, string linkId, float time,
+            float expiresAtSeconds, float cooldownUntilSeconds)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.probeLinkId = linkId;
+            entry.success = true;
+            entry.probeExpiresAtSeconds = expiresAtSeconds;
+            entry.probeCooldownUntilSeconds = cooldownUntilSeconds;
         }
 
         public void RecordScanStarted(NodeScanSession session)

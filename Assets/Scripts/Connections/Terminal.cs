@@ -69,6 +69,8 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.ProbeExpired += OnProbeExpired;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.SimulationReset += CancelNotificationTest;
@@ -87,8 +89,15 @@ namespace Uptime.Connections
 #endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
+            if (simulationHost != null)
+                simulationHost.ProbeExpired -= OnProbeExpired;
             if (simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+        }
+
+        private void OnProbeExpired(string linkId)
+        {
+            AppendText("PROBE EXPIRED  " + linkId, mutedColor);
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -333,6 +342,47 @@ namespace Uptime.Connections
                     break;
                 case "scan":
                     Scan(tokens, command);
+                    break;
+                case "probe":
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    if (tokens.Length == 2 && tokens[1].Equals("reset",
+                        System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (simulationHost == null)
+                        {
+                            recorder?.RecordPlayerAction(command, null, false, null,
+                                "simulation_unavailable");
+                            AppendText("PROBE  simulation unavailable", errorColor);
+                        }
+                        else
+                        {
+                            simulationHost.ResetProbeCooldown(command);
+                            AppendText(simulationHost.ProbedLink == null ?
+                                "PROBE COOLDOWN RESET  ready" :
+                                "PROBE COOLDOWN RESET  active on " +
+                                simulationHost.ProbedLink.View.LinkId, normalColor);
+                        }
+                        break;
+                    }
+#endif
+                    if (tokens.Length != 2)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "usage", tokens.Length > 1 ? tokens[1] : null);
+                        AppendText("USAGE  probe <linkId>", errorColor);
+                    }
+                    else if (simulationHost == null)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "simulation_unavailable", tokens[1]);
+                        AppendText("PROBE  simulation unavailable", errorColor);
+                    }
+                    else
+                    {
+                        bool deployed = simulationHost.TryActivateProbe(tokens[1], command,
+                            out string probeResult);
+                        AppendText(probeResult, deployed ? normalColor : errorColor);
+                    }
                     break;
                 case "load":
                     Load(tokens);
@@ -586,10 +636,11 @@ namespace Uptime.Connections
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
+                    AppendText("DEFENSE  probe <linkId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
                     AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);

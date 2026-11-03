@@ -6815,6 +6815,9 @@ MonoBehaviour:
   pathLayer: {fileID: 1033840603}
   markerLayer: {fileID: 901162629}
   pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  probeRegionPrefab: {fileID: 2200942498571120334, guid: b5c10182d9e19cd498b043683f6bebad, type: 3}
+  probeHostileColor: {r: 1, g: 0.11, b: 0.16, a: 1}
+  probeBenignColor: {r: 0.55, g: 0.62, b: 0.65, a: 1}
   identityPresenter: {fileID: 901162628}
   payloadDirector: {fileID: 1996901020}
   payloadPresenter: {fileID: 1033840605}
@@ -11295,6 +11298,8 @@ MonoBehaviour:
   naturalLoadNoiseMinPeriodSeconds: 3
   naturalLoadNoiseMaxPeriodSeconds: 6
   scanDurationSeconds: 8
+  probeActiveSeconds: 10
+  probeCooldownSeconds: 35
   references:
     version: 2
     RefIds: []
