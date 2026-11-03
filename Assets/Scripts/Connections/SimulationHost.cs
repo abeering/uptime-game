@@ -31,6 +31,9 @@ namespace Uptime.Connections
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMinPeriodSeconds = 3f;
         [SerializeField, Min(0.1f)] private float naturalLoadNoiseMaxPeriodSeconds = 6f;
         [SerializeField, Min(0.1f)] private float scanDurationSeconds = 8f;
+        [Header("Probe")]
+        [SerializeField, Min(0.1f)] private float probeActiveSeconds = 10f;
+        [SerializeField, Min(0.1f)] private float probeCooldownSeconds = 35f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -46,6 +49,9 @@ namespace Uptime.Connections
         private int nextCleanSessionId;
         private NodeScanSession activeScan;
         private int nextScanId;
+        private PhysicalLinkReference probedLink;
+        private float probeExpiresAtSeconds;
+        private float probeReadyAtSeconds;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -69,6 +75,10 @@ namespace Uptime.Connections
         public CleanSession ActiveClean => activeClean;
         public NodeScanSession ActiveScan => activeScan;
         public float ScanDurationSeconds => scanDurationSeconds;
+        public PhysicalLinkReference ProbedLink => probedLink;
+        public float ProbeActiveSeconds => probeActiveSeconds;
+        public float ProbeCooldownSeconds => probeCooldownSeconds;
+        public float ProbeCooldownRemaining => Mathf.Max(0f, probeReadyAtSeconds - simulationTimeSeconds);
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
@@ -86,6 +96,7 @@ namespace Uptime.Connections
         // Raised once for each successful application or refresh, not each render frame.
         public event Action<NodeCondition> ConditionApplied;
         public event Action SimulationReset;
+        public event Action<string> ProbeExpired;
         public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
             payloadDirector != null && payloadDirector.HasEverUsedId(id) ||
             wormDirector != null && wormDirector.HasEverUsedId(id);
@@ -130,6 +141,7 @@ namespace Uptime.Connections
 
         private void OnDisable()
         {
+            ClearProbe();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -162,6 +174,10 @@ namespace Uptime.Connections
                 naturalLoadNoiseMaxPeriodSeconds = naturalLoadNoiseMinPeriodSeconds;
             if (float.IsNaN(scanDurationSeconds) || float.IsInfinity(scanDurationSeconds) ||
                 scanDurationSeconds <= 0f) scanDurationSeconds = 8f;
+            if (float.IsNaN(probeActiveSeconds) || float.IsInfinity(probeActiveSeconds) ||
+                probeActiveSeconds <= 0f) probeActiveSeconds = 10f;
+            if (float.IsNaN(probeCooldownSeconds) || float.IsInfinity(probeCooldownSeconds) ||
+                probeCooldownSeconds <= 0f) probeCooldownSeconds = 35f;
             if (nodes != null)
             {
                 foreach (NodeResources node in nodes)
@@ -230,6 +246,9 @@ namespace Uptime.Connections
                 if (activeScan != null)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         activeScan.ScheduledCompletionAtSeconds - simulationTimeSeconds));
+                if (probedLink != null)
+                    segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                        probeExpiresAtSeconds - simulationTimeSeconds));
                 foreach (NodeCondition condition in conditions)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         condition.ExpiresAtSeconds - simulationTimeSeconds));
@@ -244,6 +263,8 @@ namespace Uptime.Connections
                 payloadDirector?.Advance(segment, simulationTimeSeconds);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
+                if (probedLink != null && simulationTimeSeconds + 0.00001f >= probeExpiresAtSeconds)
+                    ExpireProbe();
                 ExpireConditions();
                 remaining -= segment;
             }
@@ -854,6 +875,7 @@ namespace Uptime.Connections
 
         public void ResetSimulation()
         {
+            ClearProbe();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -903,6 +925,58 @@ namespace Uptime.Connections
             if (Application.isPlaying && pathPresenter != null)
                 pathPresenter.Bind(runtimeConnections);
             RefreshDisplays();
+        }
+
+        public bool TryActivateProbe(string linkId, string command, out string result)
+        {
+            PhysicalLinkReference selected = null;
+            if (!string.IsNullOrWhiteSpace(linkId) && physicalLinks != null)
+                foreach (PhysicalLinkReference link in physicalLinks)
+                    if (link?.View != null && string.Equals(link.View.LinkId, linkId,
+                        StringComparison.OrdinalIgnoreCase))
+                    { selected = link; break; }
+            string reason = null;
+            if (selected == null) reason = "unknown_edge";
+            else if (probedLink != null) reason = "busy";
+            else if (ProbeCooldownRemaining > 0.00001f) reason = "cooldown";
+            if (reason != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, null, reason, linkId);
+                result = reason == "unknown_edge" ? "UNKNOWN EDGE  " + linkId :
+                    reason == "busy" ? "PROBE BUSY  " + probedLink.View.LinkId :
+                    "PROBE COOLING  " + ProbeCooldownRemaining.ToString("0.0") + "s remaining";
+                return false;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            probedLink = selected;
+            probeExpiresAtSeconds = simulationTimeSeconds + probeActiveSeconds;
+            probeReadyAtSeconds = simulationTimeSeconds + probeCooldownSeconds;
+            pathPresenter?.SetProbe(selected.View);
+            recorder?.RecordPlayerAction(command, null, true, null, "activated", selected.View.LinkId);
+            recorder?.RecordProbe("probe_activated", selected.View.LinkId,
+                simulationTimeSeconds, probeExpiresAtSeconds, probeReadyAtSeconds);
+            result = "PROBE ACTIVE  " + selected.View.LinkId + "  " + probeActiveSeconds.ToString("0.#") + "s";
+            return true;
+        }
+
+        private void ExpireProbe()
+        {
+            string linkId = probedLink.View.LinkId;
+            float expiresAtSeconds = probeExpiresAtSeconds;
+            probedLink = null;
+            probeExpiresAtSeconds = 0f;
+            pathPresenter?.SetProbe(null);
+            recorder?.RecordProbe("probe_expired", linkId, simulationTimeSeconds,
+                expiresAtSeconds, probeReadyAtSeconds);
+            ProbeExpired?.Invoke(linkId);
+        }
+
+        private void ClearProbe()
+        {
+            probedLink = null;
+            probeExpiresAtSeconds = 0f;
+            probeReadyAtSeconds = 0f;
+            pathPresenter?.SetProbe(null);
         }
 
         private LogicalConnectionState BuildState(LogicalConnectionDefinition definition)

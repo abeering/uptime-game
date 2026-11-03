@@ -69,6 +69,8 @@ namespace Uptime.Connections
         {
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.ScanCompleted += OnScanCompleted;
+            if (Application.isPlaying && simulationHost != null)
+                simulationHost.ProbeExpired += OnProbeExpired;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (Application.isPlaying && simulationHost != null)
                 simulationHost.SimulationReset += CancelNotificationTest;
@@ -87,8 +89,15 @@ namespace Uptime.Connections
 #endif
             if (simulationHost != null)
                 simulationHost.ScanCompleted -= OnScanCompleted;
+            if (simulationHost != null)
+                simulationHost.ProbeExpired -= OnProbeExpired;
             if (simulationHost?.Payloads != null)
                 simulationHost.Payloads.InterceptSucceeded -= OnInterceptSucceeded;
+        }
+
+        private void OnProbeExpired(string linkId)
+        {
+            AppendText("PROBE EXPIRED  " + linkId, mutedColor);
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -333,6 +342,26 @@ namespace Uptime.Connections
                     break;
                 case "scan":
                     Scan(tokens, command);
+                    break;
+                case "probe":
+                    if (tokens.Length != 2)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "usage", tokens.Length > 1 ? tokens[1] : null);
+                        AppendText("USAGE  probe <linkId>", errorColor);
+                    }
+                    else if (simulationHost == null)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null,
+                            "simulation_unavailable", tokens[1]);
+                        AppendText("PROBE  simulation unavailable", errorColor);
+                    }
+                    else
+                    {
+                        bool deployed = simulationHost.TryActivateProbe(tokens[1], command,
+                            out string probeResult);
+                        AppendText(probeResult, deployed ? normalColor : errorColor);
+                    }
                     break;
                 case "load":
                     Load(tokens);
@@ -586,7 +615,7 @@ namespace Uptime.Connections
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
+                    AppendText("DEFENSE  probe <linkId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
