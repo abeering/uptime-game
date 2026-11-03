@@ -98,6 +98,23 @@ namespace Uptime.Connections
             ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack,
             NaturalLoadNoise, NaturalLoadSeed, eventId,
             IdentityHopSeconds, IdentitySeed, IdentityMode);
+
+        public ConnectionSpawnPlan WithAmbientIdentity(ConnectionIdentityMode mode,
+            float hopSeconds, int aliasSeed, float selectionRoll)
+        {
+            ConnectionGenerationTrace trace = GenerationTrace?.Copy();
+            if (trace != null)
+            {
+                trace.identitySelectionEligible = true;
+                trace.identitySelectionRoll = selectionRoll;
+                trace.identitySelectionMode = mode.ToString();
+            }
+            return new ConnectionSpawnPlan(ScheduledSpawnTime, ConnectionId, Route,
+                ProfileId, ClaimedPurpose, Operations, IsHostile, ConnectionBehaviors,
+                trace, ParentNodeId, ParentConnectionId, ParentInfectionAppliedAtSeconds,
+                LoaderAttack, NaturalLoadNoise, NaturalLoadSeed, HostileEventId,
+                hopSeconds, aliasSeed, mode);
+        }
     }
 
     public enum LoaderStructure { Single, Delayed }
@@ -150,6 +167,9 @@ namespace Uptime.Connections
     {
         public string purposeId;
         public string objective;
+        public bool identitySelectionEligible;
+        public float identitySelectionRoll;
+        public string identitySelectionMode;
         // Explains whether anomaly omission was intentional, and distinguishes benign outliers.
         public string generationDecision;
         public string selectedInfectionKind;
@@ -167,6 +187,9 @@ namespace Uptime.Connections
         public ConnectionGenerationTrace Copy() => new ConnectionGenerationTrace
         {
             purposeId = purposeId, objective = objective,
+            identitySelectionEligible = identitySelectionEligible,
+            identitySelectionRoll = identitySelectionRoll,
+            identitySelectionMode = identitySelectionMode,
             generationDecision = generationDecision,
             selectedInfectionKind = selectedInfectionKind,
             selectedInfectionLoad = selectedInfectionLoad,

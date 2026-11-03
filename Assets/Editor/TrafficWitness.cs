@@ -50,6 +50,11 @@ namespace Uptime.Connections.EditorTools
                 CheckGeneratedIdentifiers(host, director);
                 foreach (ConnectionSpawnPlan plan in replay)
                 {
+                    Check(plan.IsHostile ? plan.GenerationTrace.identitySelectionEligible &&
+                        plan.GenerationTrace.identitySelectionMode == plan.IdentityMode.ToString() :
+                        !plan.GenerationTrace.identitySelectionEligible &&
+                        plan.IdentityMode == ConnectionIdentityMode.Normal,
+                        "only ordinary hostile plans receive an explicit identity selection");
                     Check(plan.Route.Length >= 2 && plan.Origin.NodeId == "EXT1" &&
                         plan.Target == plan.Route[plan.Route.Length - 1], "generated valid route");
                     ConnectionTrafficProfile profile = director.Profiles.First(p => p.id == plan.ProfileId);

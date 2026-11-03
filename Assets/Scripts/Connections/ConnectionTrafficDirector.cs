@@ -76,8 +76,12 @@ namespace Uptime.Connections
         [Tooltip("Optional PURPOSE destination overrides for this scene. Empty retains each catalog definition.")]
         [SerializeField] private PurposeTargetOverride[] purposeTargetOverrides;
         [SerializeField] private ConnectionTrafficProfile[] profiles;
-        [Header("Manual identity behavior")]
+        [Header("Identity behavior")]
         [SerializeField, Min(0.1f)] private float identityHopIntervalSeconds = 2f;
+        [Tooltip("Chance of hopping within successfully generated ordinary hostile connections.")]
+        [SerializeField, Range(0f, 1f)] private float ambientIdentityHopChance = .1f;
+        [Tooltip("Chance of reactive misdirection within successfully generated ordinary hostile connections.")]
+        [SerializeField, Range(0f, 1f)] private float ambientIdentityReactiveChance = .1f;
         [Tooltip("Optional canonical PURPOSE weights by profile ID. Built-in operations stay intact; zero disables ambient selection but not spawn <profileId>.")]
         [SerializeField] private AmbientWeightOverride[] ambientWeightOverrides;
         [Header("Hostile ambient arrivals")]
@@ -134,6 +138,7 @@ namespace Uptime.Connections
         private System.Random coverageRandom;
         private System.Random benignPlanRandom;
         private System.Random hostileScheduleRandom;
+        private System.Random identitySelectionRandom;
         private float nextHostileAt;
         private float nextCoverageAt;
         private bool hostileClockPaused;
@@ -152,6 +157,16 @@ namespace Uptime.Connections
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
         public bool ConnectionIdsExhausted => idsExhausted;
         public float IdentityHopIntervalSeconds => identityHopIntervalSeconds;
+        public float AmbientIdentityHopChance
+        {
+            get { EffectiveIdentityChances(out float hop, out _); return hop; }
+            set => ambientIdentityHopChance = Mathf.Clamp01(value);
+        }
+        public float AmbientIdentityReactiveChance
+        {
+            get { EffectiveIdentityChances(out _, out float reactive); return reactive; }
+            set => ambientIdentityReactiveChance = Mathf.Clamp01(value);
+        }
         public float HostileMeanIntervalSeconds
         {
             get => hostileMeanIntervalSeconds;
@@ -237,6 +252,7 @@ namespace Uptime.Connections
             coverageRandom = new System.Random(unchecked(seed ^ (int)0xC0B3A63));
             benignPlanRandom = new System.Random(unchecked(seed ^ (int)0xB36E610));
             hostileScheduleRandom = new System.Random(unchecked(seed ^ (int)0x4853541));
+            identitySelectionRandom = new System.Random(unchecked(seed ^ (int)0x1D37A11));
             queue.Clear();
             recentBenignCancellations.Clear();
             reservedIds.Clear();
@@ -595,8 +611,32 @@ namespace Uptime.Connections
             if (random == null) ResetDirector();
             string objective = random.NextDouble() < deliveryChance ? "DELIVERY" : "LOADER";
             InfectionKind? infection = objective == "DELIVERY" ? ChooseInfection() : null;
-            return GenerateWeightedPurposePlan(atTime, false, objective,
+            ConnectionSpawnPlan plan = GenerateWeightedPurposePlan(atTime, false, objective,
                 selectedInfectionKind: infection);
+            if (plan == null) return null;
+            // The activity category and complete recipe are already fixed. This stream
+            // never advances traffic, hostile scheduling, or recipe random state.
+            float roll = (float)identitySelectionRandom.NextDouble();
+            EffectiveIdentityChances(out float hop, out float reactive);
+            ConnectionIdentityMode mode = roll < hop ? ConnectionIdentityMode.ContinuousHopping :
+                roll < hop + reactive ? ConnectionIdentityMode.ReactiveMisdirection :
+                ConnectionIdentityMode.Normal;
+            return plan.WithAmbientIdentity(mode,
+                mode == ConnectionIdentityMode.ContinuousHopping ? identityHopIntervalSeconds : 0f,
+                mode == ConnectionIdentityMode.Normal ? 0 : IdentitySeed(seed, plan.ConnectionId),
+                roll);
+        }
+
+        private void EffectiveIdentityChances(out float hop, out float reactive)
+        {
+            hop = Mathf.Clamp01(ambientIdentityHopChance);
+            reactive = Mathf.Clamp01(ambientIdentityReactiveChance);
+            float total = hop + reactive;
+            if (total <= 1f) return;
+            // When authored values exceed 100% together, preserve their ratio and
+            // assign no normal category. Metadata reports these effective chances.
+            hop /= total;
+            reactive /= total;
         }
 
         public ConnectionSpawnPlan GeneratePortScanPlan(float atTime,

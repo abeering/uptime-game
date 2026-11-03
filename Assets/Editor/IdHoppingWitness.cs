@@ -216,8 +216,13 @@ namespace Uptime.Connections.EditorTools
                     manual.IdentitySeed != 0 && traffic.EffectiveAmbientWeight("basic-threat") == 0f,
                     scene + " manual hostile profile only; ambient weight stays zero");
                 ConnectionSpawnPlan ambient = traffic.GenerateHostilePlan(host.SimulationTimeSeconds);
-                Check(ambient == null || ambient.IdentityHopSeconds == 0f,
-                    scene + " ambient generation does not select hopping");
+                Check(ambient == null || ambient.GenerationTrace.identitySelectionEligible &&
+                    (ambient.IdentityMode == ConnectionIdentityMode.Normal ||
+                     ambient.IdentityMode == ConnectionIdentityMode.ContinuousHopping &&
+                        ambient.IdentityHopSeconds == 2f ||
+                     ambient.IdentityMode == ConnectionIdentityMode.ReactiveMisdirection &&
+                        ambient.IdentityHopSeconds == 0f),
+                    scene + " ambient ordinary identity mode is explicit");
                 Debug.Log("IdHoppingWitness PASS: " + scene);
             }
             finally

@@ -6339,6 +6339,8 @@ MonoBehaviour:
   ambientOriginId: EXT1
   profiles: []
   identityHopIntervalSeconds: 2
+  ambientIdentityHopChance: 0.1
+  ambientIdentityReactiveChance: 0.1
   ambientWeightOverrides: []
   hostileGenerationEnabled: 1
   hostileMeanIntervalSeconds: 54

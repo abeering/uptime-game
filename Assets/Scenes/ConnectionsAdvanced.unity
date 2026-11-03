@@ -11358,6 +11358,8 @@ MonoBehaviour:
     eligibleTargetIds:
     - RPT
   identityHopIntervalSeconds: 2
+  ambientIdentityHopChance: 0.1
+  ambientIdentityReactiveChance: 0.1
   profiles:
   - id: product-lookup
     claimedPurpose: Product Detail Retrieval
