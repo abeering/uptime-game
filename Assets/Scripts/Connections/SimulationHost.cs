@@ -78,6 +78,8 @@ namespace Uptime.Connections
         public PhysicalLinkReference ProbedLink => probedLink;
         public float ProbeActiveSeconds => probeActiveSeconds;
         public float ProbeCooldownSeconds => probeCooldownSeconds;
+        public float ProbeActiveRemaining => probedLink != null ?
+            Mathf.Max(0f, probeExpiresAtSeconds - simulationTimeSeconds) : 0f;
         public float ProbeCooldownRemaining => Mathf.Max(0f, probeReadyAtSeconds - simulationTimeSeconds);
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
