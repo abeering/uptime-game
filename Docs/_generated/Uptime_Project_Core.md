@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:f6a06bd4a6e946c1b9701a2741f3ed3010651a18457d0b7923e51c355d0f6c26`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:fc92193cd40a57fd90e2debad54867fa5068fff7c9a2ecc339dfab0a2185dd48`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**CLEAN submission focus (implementation branch, November 4, 2026):** Valid PID submission now returns terminal typing through its normal next-frame focus path and writes the outcome immediately, while the result window lingers for 1.1 real seconds (previously 1.3). Invalid PIDs retain minigame focus. Result expiry/disable does not repeat feedback or alter the terminal draft/selection; another `clean` can replace a lingering result without inheriting its close timer. Both scenes inherit the authored prefab timing. See the [CLEAN lifecycle and tuning notes](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-infections-v0.md#clean-focus-and-window-lifecycle-november-4-2026). Physical keyboard and native Game view review remains required.
 
 **Payload Final-Approach Timing V1 (implementation branch, November 4, 2026):** Both Connections scenes now default to an 8-simulation-second interception window and Inspector-tunable 5–6-second final-hop traversal for Steady and Variable Payloads. The unchanged 1.2-second establishment gives a red approach about 6.2–7.2 seconds from establishment start to arrival, so an interceptor armed immediately when red appears covers a default strike. One-hop Payloads use the same final range; orange intermediate-hop timing, seeded sampling, explicit witness overrides, recorder duration receipts, route selection, matching, the 15-second cooldown, and 4-LOAD demand remain intact. These are provisional difficulty settings. See the [Payload timing update](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-interception-v0.md#payload-final-approach-timing-v1-update) and [deterministic timing evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsPayloadFinalApproachTimingV1/README.md). Interactive interception timing remains to be reviewed.
 

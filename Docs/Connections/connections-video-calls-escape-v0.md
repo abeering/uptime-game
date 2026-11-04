@@ -40,7 +40,7 @@ Each Connections scene authors one `EscapeCoordinator` on its Canvas. It owns Es
 
 ## CLEAN and native input
 
-CLEAN registers during its existing SSH splash and PID selection. Its result display deregisters before the existing 1.3-second hold; results cannot be canceled and never display `[ESC] CANCEL`. Its old independent Escape handler is removed. Correct/invalid/innocent PID consequences, infection capture/removal/provenance, five-Health failure penalty, ordinary timings, feedback, and terminal/PID focus transfers remain unchanged. External window disable cancels an owned unfinished session without penalty, releases ownership, and returns typing when the terminal is active; host reset also closes/deregisters the UI.
+CLEAN registers during its SSH splash and PID selection. Its result display deregisters before its hold; results cannot be canceled and never display `[ESC] CANCEL`. The November 4 [CLEAN focus follow-up](connections-infections-v0.md#clean-focus-and-window-lifecycle-november-4-2026) shortens that hold from 1.3 to 1.1 real seconds and returns terminal typing and feedback at valid PID submission, before the result window hides. Correct/invalid/innocent PID consequences, infection capture/removal/provenance, and the five-Health failure penalty remain unchanged. Its old independent Escape handler is removed. External window disable cancels an owned unfinished session without penalty, releases ownership, and returns typing when the terminal is active; host reset also closes/deregisters unfinished CLEAN UI. Completed-result expiry or disable makes no additional input or feedback change.
 
 Two orders are supported:
 

@@ -807,7 +807,7 @@ namespace Uptime.Connections.EditorTools
                 input.GetComponent<Image>() != null && input.GetComponent<Outline>() != null &&
                 ((TMP_Text)input.placeholder).text == "> PID" &&
                 new SerializedObject(overlay).FindProperty("characterSeconds").floatValue == 0.012f &&
-                new SerializedObject(overlay).FindProperty("resultSeconds").floatValue == 1.3f,
+                new SerializedObject(overlay).FindProperty("resultSeconds").floatValue == 1.1f,
                 "CLEAN retains body/input styling and timing beneath compact chrome");
         }
 
