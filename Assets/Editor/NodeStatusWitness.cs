@@ -41,7 +41,9 @@ namespace Uptime.Connections.EditorTools
                     presenter.StatusLayer.parent.childCount - 1,
                 path + " authored presenter/layer bindings and stamp draw order");
             Check(presenter.StatusLayer.GetSiblingIndex() <
-                presenter.StampLayer.GetSiblingIndex() &&
+                presenter.NetworkArea.Find("IdentityOverlay").GetSiblingIndex() &&
+                presenter.NetworkArea.Find("IdentityOverlay").GetSiblingIndex() <
+                    presenter.StampLayer.GetSiblingIndex() &&
                 presenter.StampPrefab == AssetDatabase.LoadAssetAtPath<NodeEventStamp>(
                     "Assets/Prefabs/Connections/NodeEventStamp.prefab") &&
                 presenter.StampPrefab.GetComponentsInChildren<Image>(true)
@@ -82,6 +84,21 @@ namespace Uptime.Connections.EditorTools
                 panel.SetContent("CLEAN", null, Color.green);
                 Check(!first.gameObject.activeSelf && !third.gameObject.activeSelf,
                     path + " untimed statuses hide seconds timers");
+                Rect node = new Rect(-120f, -40f, 240f, 80f);
+                preview.SetNodeRect(node);
+                Vector2 size = new Vector2(220f, 34f);
+                Rect close = NodeStatusPlacement.At(NodeStatusAnchor.N, node, size);
+                Rect far = NodeStatusPlacement.At(new NodeStatusPlacementChoice(
+                    NodeStatusAnchor.N, 0f, 24f), node, size);
+                preview.PlaceStack(far);
+                preview.PlaceStack(close, .016f);
+                Check(preview.StackRoot.anchoredPosition.y < far.center.y - node.center.y &&
+                    preview.StackRoot.anchoredPosition.y > close.center.y - node.center.y,
+                    path + " returning status slides inward");
+                preview.PlaceStack(far, .016f);
+                Check(Mathf.Approximately(preview.StackRoot.anchoredPosition.y,
+                    far.center.y - node.center.y),
+                    path + " newly obstructed status moves outward immediately");
             }
             finally { UnityEngine.Object.DestroyImmediate(preview.gameObject); }
         }
@@ -93,83 +110,77 @@ namespace Uptime.Connections.EditorTools
             Vector2 size = new Vector2(220f, 75f);
             var none = Array.Empty<Rect>();
             NodeStatusPlacementChoice choice = NodeStatusPlacement.Choose(node, size,
-                viewport, none, none, none, none);
+                viewport, none, none, none);
             Check(choice.Anchor == NodeStatusAnchor.N && choice.HorizontalOffset == 0f &&
                 choice.OutwardOffset == 0f, "clear node prefers centered above");
-            var topMarker = new[] { NodeStatusPlacement.Expanded(
-                new Rect(-13f, 40f, 26f, 26f), 12f) };
-            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                topMarker, none, none);
-            Rect placed = NodeStatusPlacement.At(choice, node, size);
-            Check(!placed.Overlaps(topMarker[0]) &&
-                Mathf.Abs(placed.center.x - node.center.x) <= 60.01f &&
-                (placed.yMin >= node.yMax || placed.yMax <= node.yMin),
-                "terminal marker stays clear within an above/below region");
-            // Production sockets center two units outside the node border.
-            var borderSocket = new[] { NodeStatusPlacement.Expanded(
-                new Rect(-13f, 29f, 26f, 26f), 12f) };
+            // A 26-unit production socket centered two units outside the border
+            // leaves two units of clearance at the same 17-unit base gap.
+            var borderSocket = new[] { new Rect(-13f, 29f, 26f, 26f) };
             var aboveViewport = new Rect(-500f, -50f, 1000f, 350f);
             NodeStatusPlacementChoice above = NodeStatusPlacement.Choose(node, size,
-                aboveViewport, none, borderSocket, none, none);
+                aboveViewport, none, borderSocket, none);
             Rect aboveRect = NodeStatusPlacement.At(above, node, size);
             Check(above.Anchor == NodeStatusAnchor.N &&
-                above.OutwardOffset == 12f &&
-                aboveRect.yMin - node.yMax == 29f &&
+                above.OutwardOffset == 0f &&
+                aboveRect.yMin - node.yMax == 17f &&
                 !aboveRect.Overlaps(borderSocket[0]),
-                "above status uses the nearest clear offset for a top socket");
+                "top socket allows the same base gap as an unobstructed side");
             Rect below = NodeStatusPlacement.At(NodeStatusAnchor.S, node, size);
             Check(node.yMin - below.yMax == 17f,
                 "unobstructed below status keeps its existing gap");
-            var topPill = new[] { new Rect(-110f, 50f, 220f, 90f) };
-            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                none, topPill, none);
-            Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(topPill[0]),
-                "identity pill is protected when a clear side exists");
+            var raisedSocket = new[] { new Rect(-13f, 40f, 26f, 26f) };
+            NodeStatusPlacementChoice raised = NodeStatusPlacement.Choose(node, size,
+                aboveViewport, none, raisedSocket, none, above);
+            Rect raisedRect = NodeStatusPlacement.At(raised, node, size);
+            Check(raised.Anchor == NodeStatusAnchor.N &&
+                Mathf.Approximately(raised.OutwardOffset, 11f) &&
+                Mathf.Approximately(raisedRect.yMin - node.yMax, 28f) &&
+                !raisedRect.Overlaps(raisedSocket[0]),
+                "a larger socket gets only the extra clearance it needs");
+            NodeStatusPlacementChoice settled = NodeStatusPlacement.Choose(node, size,
+                aboveViewport, none, none, none, raised);
+            Check(settled.Anchor == NodeStatusAnchor.N && settled.OutwardOffset == 0f,
+                "status returns to base gap when socket clears");
             var neighboringCard = new[] { new Rect(-120f, 42f, 240f, 125f) };
             choice = NodeStatusPlacement.Choose(node, size, viewport,
-                neighboringCard, none, none, none);
+                neighboringCard, none, none);
             Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(neighboringCard[0]),
                 "neighboring node card is protected");
             var neighboringStack = new[] { new Rect(-110f, 57f, 220f, 75f) };
             choice = NodeStatusPlacement.Choose(node, size, viewport, none, none,
-                none, neighboringStack);
+                neighboringStack);
             Check(!NodeStatusPlacement.At(choice, node, size).Overlaps(neighboringStack[0]),
                 "another status stack is avoided when clear space exists");
             Rect topNode = new Rect(-120f, 230f, 240f, 60f);
             choice = NodeStatusPlacement.Choose(topNode, size, viewport,
-                none, none, none, none);
+                none, none, none);
             Check(choice.Anchor == NodeStatusAnchor.S &&
                 NodeStatusPlacement.At(choice, topNode, size).yMax <= viewport.yMax,
                 "top-edge node places below");
             Rect bottomNode = new Rect(-120f, -290f, 240f, 60f);
             choice = NodeStatusPlacement.Choose(bottomNode, size, viewport,
-                none, none, none, none);
+                none, none, none);
             Check(choice.Anchor == NodeStatusAnchor.N &&
                 NodeStatusPlacement.At(choice, bottomNode, size).yMin >= viewport.yMin,
                 "bottom-edge node places above");
             var blockedNorth = new[] { new Rect(-250f, 40f, 500f, 210f) };
             choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                blockedNorth, none, none);
+                blockedNorth, none);
             Check(choice.Anchor == NodeStatusAnchor.S,
                 "above obstruction chooses below instead of a diagonal");
             NodeStatusPlacementChoice held = NodeStatusPlacement.Choose(node, size,
-                viewport, none, none, none, none, choice);
+                viewport, none, none, none, choice);
             Check(held.Anchor == NodeStatusAnchor.S,
                 "clear existing placement stays stable after traffic departs");
             var blockedSouth = new[] { new Rect(-250f, -260f, 500f, 220f) };
             choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                blockedSouth, none, none, held);
+                blockedSouth, none, held);
             Check(choice.Anchor == NodeStatusAnchor.N,
                 "new marker obstruction moves a held placement");
-            choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                blockedNorth, blockedSouth, none);
-            Check(choice.Anchor == NodeStatusAnchor.S &&
-                !NodeStatusPlacement.At(choice, node, size).Overlaps(blockedNorth[0]),
-                "terminal marker takes priority over a pill when both sides are busy");
             var bothBlocked = new[] { blockedNorth[0], blockedSouth[0] };
             choice = NodeStatusPlacement.Choose(node, size, viewport, none,
-                bothBlocked, none, none);
-            placed = NodeStatusPlacement.At(choice, node, size);
+                bothBlocked, none);
+            Rect placed = NodeStatusPlacement.At(choice, node, size);
             Check((placed.yMin >= node.yMax || placed.yMax <= node.yMin) &&
                 Mathf.Abs(placed.center.x - node.center.x) <= 60.01f,
                 "fully obstructed node still uses the best above/below candidate");

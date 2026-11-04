@@ -98,13 +98,7 @@ namespace Uptime.Connections
             var markers = new List<Rect>();
             foreach (TerminalMarkerStyle socket in networkArea.GetComponentsInChildren<TerminalMarkerStyle>())
                 if (socket.isActiveAndEnabled)
-                    markers.Add(NodeStatusPlacement.Expanded(
-                        RelativeRect(socket.rectTransform), 12f));
-            var pills = new List<Rect>();
-            foreach (IdentityPillView pill in networkArea.GetComponentsInChildren<IdentityPillView>())
-                if (pill.isActiveAndEnabled)
-                    pills.Add(NodeStatusPlacement.Expanded(
-                        RelativeRect((RectTransform)pill.transform), 8f));
+                    markers.Add(RelativeRect(socket.rectTransform));
             foreach (NodeResources node in host.Nodes)
             {
                 if (node?.View == null || !views.TryGetValue(node.View, out NodeStatusView view))
@@ -133,9 +127,11 @@ namespace Uptime.Connections
                 NodeStatusPlacementChoice? previous =
                     placements.TryGetValue(card, out NodeStatusPlacementChoice held) ? held : null;
                 NodeStatusPlacementChoice placement = ChoosePlacement(card, cardRect,
-                    size, markers, pills, previous);
+                    size, markers, previous);
                 placements[card] = placement;
-                view.PlaceStack(NodeStatusPlacement.At(placement, cardRect, size));
+                view.PlaceStack(NodeStatusPlacement.At(placement, cardRect, size),
+                    previous.HasValue && previous.Value.Anchor == placement.Anchor ?
+                        deltaSeconds : 0f);
             }
         }
 
@@ -174,7 +170,7 @@ namespace Uptime.Connections
         }
 
         private NodeStatusPlacementChoice ChoosePlacement(NodeView card, Rect cardRect,
-            Vector2 size, IReadOnlyList<Rect> markers, IReadOnlyList<Rect> pills,
+            Vector2 size, IReadOnlyList<Rect> markers,
             NodeStatusPlacementChoice? previous)
         {
             var cards = new List<Rect>();
@@ -190,7 +186,7 @@ namespace Uptime.Connections
             viewport.xMin += 8f; viewport.xMax -= 8f;
             viewport.yMin += 8f; viewport.yMax -= 8f;
             return NodeStatusPlacement.Choose(cardRect, size, viewport,
-                cards, markers, pills, otherStacks, previous);
+                cards, markers, otherStacks, previous);
         }
 
         private Rect RelativeRect(RectTransform rect)

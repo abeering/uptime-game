@@ -51,6 +51,19 @@ socket. This chooses the clear space below DB in the reported case while
 retaining the chosen anchor as traffic changes. Beams remain a soft constraint;
 the card, socket, and viewport protections have higher priority.
 
+## Minimum-gap placement follow-up (November 4, 2026)
+
+The later
+above/below solver keeps a visible stack on its chosen side while that side
+remains clear. Its base gap is 17 UI units on either side. Live terminal
+sockets use their visible bounds plus two units of clearance; if one truly
+crosses the base gap, the stack moves only as far as needed. The stack eases
+back toward the node when space clears and moves away immediately when a new
+socket requires it. Moving connection ID pills no longer affect status
+placement. In both Connections scenes, the identity overlay draws above the
+status layer so pills remain visible when their paths cross a panel. Cards,
+other status stacks, and the viewport still participate in placement.
+
 ## Validation and review
 
 `NodeStatusWitness` checks both scene and prefab bindings, state transitions,
