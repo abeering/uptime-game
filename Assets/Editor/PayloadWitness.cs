@@ -82,7 +82,11 @@ namespace Uptime.Connections.EditorTools
             Check(webStatus.CleanVisible(1.1f) && webStatus.InterceptPayloadId == "x1" &&
                 status.ViewFor(host.FindNodeResources("WEB").View).BenefitVisible &&
                 status.ViewFor(host.FindNodeResources("WEB").View)
-                    .GetComponentsInChildren<NodeStatusPanel>(true)[2].Height == 63f,
+                    .GetComponentsInChildren<TMPro.TMP_Text>(true)
+                    .Any(t => t.text == "CLEAN") &&
+                status.ViewFor(host.FindNodeResources("WEB").View)
+                    .GetComponentsInChildren<TMPro.TMP_Text>(true)
+                    .Any(t => t.text == "INTERCEPT x1"),
                 "CLEAN and timed interception share the beneficial panel");
             host.StepSimulation(5f);
             Check(director.InterceptorAt(host.FindNodeResources("WEB").View) == null &&
@@ -420,7 +424,90 @@ namespace Uptime.Connections.EditorTools
             foreach (string field in new[] { "payloadDirector", "payloadPresenter" })
                 Check(pathBindings.FindProperty(field).objectReferenceValue != null,
                     scene + " shared lane binding " + field);
+            CheckTelegraph(host, presenter, path, scene);
         }
+
+        private static void CheckTelegraph(SimulationHost host, PayloadPresenter presenter,
+            LogicalPathPresenter path, string scene)
+        {
+            host.SetRunMode(ConnectionRunMode.Generated);
+            host.ResetSimulation();
+            PayloadDirector director = host.Payloads;
+            path.Bind(host.RuntimeConnections.ToArray());
+            float[] hopTimes = scene.EndsWith("Connections.unity", StringComparison.Ordinal) ?
+                new[] { 1f, 1f } : new[] { 1f, 1f, 1f };
+            PayloadState multi = director.Spawn("DB", PayloadMotionProfile.Steady,
+                "EXT1", hopTimes);
+            Check(multi.Route.Length == hopTimes.Length + 1 &&
+                multi.CurrentNode.NodeId == "EXT1" && multi.FinalNode.NodeId == "DB",
+                scene + " telegraph route");
+            for (int hop = 0; hop < hopTimes.Length - 1; hop++)
+            {
+                path.RefreshLayouts();
+                presenter.RenderNow();
+                CheckVisualColor(multi, director.PayloadColor, scene + " orange establishment");
+                host.StepSimulation(1.2f);
+                presenter.RenderNow();
+                CheckVisualColor(multi, director.PayloadColor, scene + " orange traversal");
+                host.StepSimulation(1f);
+                Check(multi.Hop == hop + 1 && multi.Phase == PayloadPhase.Establishing &&
+                    !multi.EffectApplied && host.Infections.Count == 0,
+                    scene + " intermediate arrival has no infection attempt");
+            }
+            path.RefreshLayouts();
+            presenter.RenderNow();
+            CheckVisualColor(multi, director.StrikeColor, scene + " red at final establishment start");
+            host.StepSimulation(.6f);
+            presenter.RenderNow();
+            CheckVisualColor(multi, director.StrikeColor, scene + " red during establishment");
+            host.StepSimulation(.6f);
+            presenter.RenderNow();
+            CheckVisualColor(multi, director.StrikeColor, scene + " red at traversal start");
+            host.StepSimulation(.5f);
+            presenter.RenderNow();
+            CheckVisualColor(multi, director.StrikeColor, scene + " red during traversal");
+
+            PayloadState oneHop = director.Spawn("DB", PayloadMotionProfile.Variable,
+                "API", new[] { 20f });
+            PayloadState orange = director.Spawn("DB", PayloadMotionProfile.Steady,
+                "EXT1", scene.EndsWith("Connections.unity", StringComparison.Ordinal) ?
+                    new[] { 20f, 20f } : new[] { 20f, 20f, 20f });
+            path.RefreshLayouts(); // Occupancy changes drive the normal animated lane reflow.
+            presenter.RenderNow();
+            CheckVisualColor(multi, director.StrikeColor, scene + " red during reflow");
+            CheckVisualColor(oneHop, director.StrikeColor, scene + " one-hop red on first appearance");
+            CheckVisualColor(orange, director.PayloadColor, scene + " concurrent orange during reflow");
+
+            host.StepSimulation(.5f);
+            presenter.RenderNow();
+            Check(multi.Phase == PayloadPhase.Resolved &&
+                !HasVisual(multi), scene + " resolved visual removed");
+            host.ResetSimulation();
+            presenter.RenderNow();
+            Check(!HasVisual(oneHop) && !HasVisual(orange),
+                scene + " reset removes remaining visuals");
+        }
+
+        private static void CheckVisualColor(PayloadState payload, Color expected, string label)
+        {
+            PathGraphic line = UnityEngine.Object.FindObjectsByType<PathGraphic>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Single(v => v.name == "Payload " + payload.Id + " hop");
+            TerminalMarkerStyle socket = UnityEngine.Object.FindObjectsByType<TerminalMarkerStyle>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Single(v => v.name == "Payload " + payload.Id + " next-hop socket");
+            PayloadBodyView body = UnityEngine.Object.FindObjectsByType<PayloadBodyView>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Single(v => v.name == "Payload " + payload.Id + " traveler");
+            Check(line.color == expected && socket.color == expected &&
+                body.Marker.color == expected && body.IdText.color == expected,
+                label + " line, socket, body, and ID");
+        }
+
+        private static bool HasVisual(PayloadState payload) =>
+            UnityEngine.Object.FindObjectsByType<PathGraphic>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .Any(v => v.name == "Payload " + payload.Id + " hop");
 
         private static void Check(bool condition, string message)
         { if (!condition) throw new InvalidOperationException("PayloadWitness: " + message); }

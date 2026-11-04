@@ -52,6 +52,7 @@ namespace Uptime.Connections
         [SerializeField, Min(.1f)] private float interceptCooldownSeconds = 15f;
         [SerializeField, Min(0f)] private float interceptRequestedLoad = 4f;
         [SerializeField] private Color payloadColor = new Color(1f, .72f, .35f, 1f);
+        [SerializeField] private Color strikeColor = new Color(1f, .19f, .22f, 1f);
 
         private readonly List<PayloadState> payloads = new();
         private readonly Dictionary<NodeView, InterceptionState> interceptors = new();
@@ -68,6 +69,9 @@ namespace Uptime.Connections
         public float InterceptWindowSeconds => interceptWindowSeconds;
         public float InterceptCooldownSeconds => interceptCooldownSeconds;
         public Color PayloadColor => payloadColor;
+        public Color StrikeColor => strikeColor;
+        public Color PresentationColor(PayloadState payload) =>
+            payload.NextNode == payload.FinalNode ? strikeColor : payloadColor;
         public SimulationHost Host => host;
 
         private void Awake() { if (host == null) host = GetComponent<SimulationHost>(); }

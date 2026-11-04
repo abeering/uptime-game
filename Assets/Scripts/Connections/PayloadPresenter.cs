@@ -103,7 +103,10 @@ namespace Uptime.Connections
                 start = visual.Start;
                 end = visual.End;
                 float reveal = state.Phase == PayloadPhase.Establishing ? state.Progress : 1f;
-                visual.Line.color = host.Payloads.PayloadColor;
+                Color accent = host.Payloads.PresentationColor(state);
+                visual.Line.color = accent;
+                visual.Socket.SetAccent(accent);
+                visual.Traveler.SetAccent(accent);
                 visual.Line.SetPath(new[] { start }, new[] { end },
                     new[] { thinWidth }, reveal);
                 visual.Socket.gameObject.SetActive(true);
@@ -141,7 +144,7 @@ namespace Uptime.Connections
             line.material = lineStyle.material;
             line.raycastTarget = false;
             line.SetActivity(0f, 0f, 0f);
-            Color accent = host.Payloads.PayloadColor;
+            Color accent = host.Payloads.PresentationColor(state);
             TerminalMarkerStyle socket = Instantiate(socketPrefab, markerLayer, false);
             socket.name = "Payload " + state.Id + " next-hop socket";
             socket.SetMaximumDiameter(17f, .01f);
