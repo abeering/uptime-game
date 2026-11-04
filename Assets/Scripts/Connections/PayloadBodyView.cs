@@ -16,9 +16,14 @@ namespace Uptime.Connections
 
         public void Bind(string id, Color accent)
         {
-            marker.SetAccent(accent);
             if (marker.InnerDot != null) marker.InnerDot.gameObject.SetActive(false);
             idText.text = id;
+            SetAccent(accent);
+        }
+
+        public void SetAccent(Color accent)
+        {
+            marker.SetAccent(accent);
             idText.color = accent;
         }
     }

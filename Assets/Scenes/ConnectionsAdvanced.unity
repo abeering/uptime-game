@@ -11981,6 +11981,7 @@ MonoBehaviour:
   interceptCooldownSeconds: 15
   interceptRequestedLoad: 4
   payloadColor: {r: 1, g: 0.72, b: 0.35, a: 1}
+  strikeColor: {r: 1, g: 0.19, b: 0.22, a: 1}
 --- !u!114 &1996901030
 MonoBehaviour:
   m_ObjectHideFlags: 0
