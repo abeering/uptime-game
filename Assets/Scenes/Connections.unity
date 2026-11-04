@@ -7346,6 +7346,7 @@ GameObject:
   - component: {fileID: 336805106}
   - component: {fileID: 336805105}
   - component: {fileID: 336805104}
+  - component: {fileID: 336805107}
   m_Layer: 5
   m_Name: TextCommunications
   m_TagString: Untagged
@@ -7377,6 +7378,24 @@ MonoBehaviour:
   charactersPerReadingSecond: 24
   instantMessageAccent: {r: 0.22, g: 0.79, b: 0.76, a: 1}
   systemNotificationAccent: {r: 0.91, g: 0.68, b: 0.3, a: 1}
+--- !u!114 &336805107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336805103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b53804ad3bc34c398e312f41f13e14ac, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.CompanyKillFeedback
+  simulationHost: {fileID: 1996901015}
+  textCommunications: {fileID: 336805104}
+  company: {fileID: 11400000, guid: cfa05afc85df4d1fb6537748c323fe3b, type: 2}
+  reactionDelaySeconds: 1
+  cooldownSeconds: 12
+  responseSeed: 4109
 --- !u!114 &336805105
 MonoBehaviour:
   m_ObjectHideFlags: 0

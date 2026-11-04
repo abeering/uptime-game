@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2319a626943451b96a813019b8c309d, type: 3}
+  m_Name: NorthstarMarket
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.CompanyDefinition
+  companyId: northstar-market
+  displayName: Northstar Market
+  customerSupport:
+    id: support
+    displayName: Maya Chen
+    role: Customer Support
+  operations:
+    id: operations
+    displayName: Eli Rivera
+    role: Operations
+  orderSubmitKillResponses:
+  - 'A customer says checkout stopped just as they placed an order. Can you check the order path?'
+  - 'We lost an order submission mid-checkout. Support is getting questions from that customer.'
+  - 'Checkout dropped an order request. Do we know what interrupted it?'
+  genericBenignKillResponses:
+  - 'A routine service request just dropped. Can you see what happened?'
+  - 'We lost a normal request on the network. Is that expected?'
+  - 'One of our business requests was cut off. Please take a look.'
