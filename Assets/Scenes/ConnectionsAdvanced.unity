@@ -11897,7 +11897,7 @@ MonoBehaviour:
   seed: 1701
   randomizeSeed: 1
   initialGraceSeconds: 3
-  benignPopulationGoal: 5
+  benignPopulationGoal: 4
   coverageStartupGoal: 1
   coverageRampSeconds: 75
   coverageMeanIntervalSeconds: 8
