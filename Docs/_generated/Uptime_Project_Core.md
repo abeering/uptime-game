@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:008eb3def0e7ad236017f2006f7e3dd2daae44bb239b7edf2308b905658a77c6`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:141ffe5ed3e42ff27e85daebb87faa3df2ce7a791300666d931bb9ce7a96c0b8`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Connections SFX V0 (implementation branch):** Both gameplay scenes now author a scene-owned sound controller for successful connection arrival, Worm/recon condition application, intercepted Payloads, delivered text messages, terminal command rejection, clean/infected diagnostic results, active Probe, and opened video calls. Ambient arrivals and message bursts have short cooldowns; command errors are explicit once-per-submission events, independent of later error-colored results. Playback cannot alter traffic randomness or simulation state. See [Connections SFX V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-sfx-v0.md). The scripted binding and Play Mode routing witnesses cover both scenes; human listening at 16:9 remains required.
 
 **Generated Identity Behaviors V0 (stacked implementation branch):** Successfully generated ordinary ambient hostile LOADER and DELIVERY/INFECTOR plans now make one seeded identity selection: 80% normal, 10% continuous hopping, or 10% reactive misdirection by provisional scene settings. The roll uses a dedicated random stream after the ordinary recipe is fixed and is recorded with the concrete mode, seed, and timer. Benign traffic, Reconnaissance, Spawner children, Payloads, Worms, explicit spawns, and deterministic recipe builders are excluded. Both scenes keep their hostile activity weights and arrival intervals. See [Generated Identity Behaviors V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-generated-identity-v0.md). Interactive 16:9 Play Mode pacing and focus review remains required.
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ namespace Uptime.Connections
         private Vector2 lastSize;
         public IReadOnlyList<TextCommunicationView> ActiveEntries => active;
         public int ExitingCount => exiting.Count;
+        public event Action<TextCommunication> MessageDelivered;
 
         public bool PushMessage(TextCommunication message)
         {
@@ -39,6 +41,7 @@ namespace Uptime.Connections
                 entriesRoot.rect.height, LifetimeFor(message), now);
             active.Insert(0, entry);
             FitAndReflow(now);
+            MessageDelivered?.Invoke(message);
             return true;
         }
 

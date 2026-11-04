@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -46,6 +47,15 @@ namespace Uptime.Connections
         private readonly List<string> commandHistory = new();
         private int commandHistoryIndex = -1;
         private string commandDraft = string.Empty;
+        private bool commandFailed;
+        public event Action CommandFailed;
+
+        // Command handlers mark rejection explicitly; asynchronous rows use AppendText.
+        private Color CommandFailureColor()
+        {
+            commandFailed = true;
+            return errorColor;
+        }
 
         private void Awake()
         {
@@ -117,12 +127,12 @@ namespace Uptime.Connections
                         CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
                     float.IsInfinity(delay) || delay < 1 || delay > 30)))
             {
-                AppendText("USAGE  notifytest im|system|burst [delay=1..30]", errorColor);
+                AppendText("USAGE  notifytest im|system|burst [delay=1..30]", CommandFailureColor());
                 return;
             }
             if (textCommunications == null || !textCommunications.isActiveAndEnabled || delayedNotification != null)
             {
-                AppendText("DEVELOPER MESSAGE TEST UNAVAILABLE OR ALREADY SCHEDULED", mutedColor);
+                AppendText("DEVELOPER MESSAGE TEST UNAVAILABLE OR ALREADY SCHEDULED", CommandFailureColor());
                 return;
             }
             if (delay == 0) textCommunications.PushSample(tokens[1]);
@@ -146,17 +156,21 @@ namespace Uptime.Connections
                     CultureInfo.InvariantCulture, out delay) || float.IsNaN(delay) ||
                 float.IsInfinity(delay) || delay < 1f || delay > 30f))
             {
-                AppendText("USAGE  calltest [delay=1..30]", errorColor);
+                AppendText("USAGE  calltest [delay=1..30]", CommandFailureColor());
                 return;
             }
             if (delayedCall != null || videoCall == null || videoCall.IsActive)
             {
-                AppendText("TEST CALL UNAVAILABLE, ACTIVE OR ALREADY SCHEDULED", mutedColor);
+                AppendText("TEST CALL UNAVAILABLE, ACTIVE OR ALREADY SCHEDULED", CommandFailureColor());
                 return;
             }
             if (delay == 0f)
-                AppendText(videoCall.TryStartSampleCall() ? "DEVELOPER TEST CALL OPENED" :
-                    "TEST CALL UNAVAILABLE OR ALREADY ACTIVE", mutedColor);
+            {
+                bool opened = videoCall.TryStartSampleCall();
+                AppendText(opened ? "DEVELOPER TEST CALL OPENED" :
+                    "TEST CALL UNAVAILABLE OR ALREADY ACTIVE",
+                    opened ? mutedColor : CommandFailureColor());
+            }
             else
             {
                 delayedCall = StartCoroutine(OpenDelayedCall(delay));
@@ -316,6 +330,7 @@ namespace Uptime.Connections
             }
 
             string command = raw.Trim();
+            commandFailed = false;
             RememberCommand(command);
             commandInput.SetTextWithoutNotify(string.Empty);
             AppendText($"> {command}", normalColor);
@@ -352,7 +367,7 @@ namespace Uptime.Connections
                         {
                             recorder?.RecordPlayerAction(command, null, false, null,
                                 "simulation_unavailable");
-                            AppendText("PROBE  simulation unavailable", errorColor);
+                            AppendText("PROBE  simulation unavailable", CommandFailureColor());
                         }
                         else
                         {
@@ -369,19 +384,19 @@ namespace Uptime.Connections
                     {
                         recorder?.RecordPlayerAction(command, null, false, null,
                             "usage", tokens.Length > 1 ? tokens[1] : null);
-                        AppendText("USAGE  probe <linkId>", errorColor);
+                        AppendText("USAGE  probe <linkId>", CommandFailureColor());
                     }
                     else if (simulationHost == null)
                     {
                         recorder?.RecordPlayerAction(command, null, false, null,
                             "simulation_unavailable", tokens[1]);
-                        AppendText("PROBE  simulation unavailable", errorColor);
+                        AppendText("PROBE  simulation unavailable", CommandFailureColor());
                     }
                     else
                     {
                         bool deployed = simulationHost.TryActivateProbe(tokens[1], command,
                             out string probeResult);
-                        AppendText(probeResult, deployed ? normalColor : errorColor);
+                        AppendText(probeResult, deployed ? normalColor : CommandFailureColor());
                     }
                     break;
                 case "load":
@@ -392,9 +407,9 @@ namespace Uptime.Connections
                     break;
                 case "intercept":
                     if (!TryParseIntercept(tokens, out string interceptPayloadId, out string interceptNodeId))
-                        AppendText("USAGE  intercept [payloadId] @ <nodeId>", errorColor);
+                        AppendText("USAGE  intercept [payloadId] @ <nodeId>", CommandFailureColor());
                     else if (simulationHost?.Payloads == null)
-                        AppendText("INTERCEPT  simulation unavailable", errorColor);
+                        AppendText("INTERCEPT  simulation unavailable", CommandFailureColor());
                     else
                     {
                         bool armed = simulationHost.Payloads.TryIntercept(interceptPayloadId, interceptNodeId,
@@ -403,14 +418,14 @@ namespace Uptime.Connections
                             interceptNodeId, interceptError);
                         AppendText(armed ? "INTERCEPT ACTIVE  " + (interceptPayloadId?.ToLowerInvariant() ?? "ALL") +
                             " @ " + interceptNodeId.ToUpperInvariant() : "INTERCEPT  " + interceptError,
-                            armed ? normalColor : errorColor);
+                            armed ? normalColor : CommandFailureColor());
                     }
                     break;
                 case "isolate":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  isolate <nodeId>", errorColor);
+                        AppendText("USAGE  isolate <nodeId>", CommandFailureColor());
                     else if (simulationHost?.Worms == null)
-                        AppendText("ISOLATE  simulation unavailable", errorColor);
+                        AppendText("ISOLATE  simulation unavailable", CommandFailureColor());
                     else
                     {
                         bool isolated = simulationHost.Worms.TryIsolate(tokens[1], command,
@@ -418,7 +433,7 @@ namespace Uptime.Connections
                         if (!isolated) recorder?.RecordPlayerAction(command, null, false,
                             tokens[1], isolateError);
                         AppendText(isolated ? "ISOLATED  " + tokens[1].ToUpperInvariant() :
-                            "ISOLATE  " + isolateError, isolated ? normalColor : errorColor);
+                            "ISOLATE  " + isolateError, isolated ? normalColor : CommandFailureColor());
                     }
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -430,9 +445,9 @@ namespace Uptime.Connections
                     break;
                 case "worm":
                     if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
-                        AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", errorColor);
+                        AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", CommandFailureColor());
                     else if (simulationHost?.Worms == null)
-                        AppendText("WORM  simulation unavailable", errorColor);
+                        AppendText("WORM  simulation unavailable", CommandFailureColor());
                     else try
                     {
                         WormOutbreak outbreak = simulationHost.Worms.Spawn(tokens[1], effect);
@@ -445,16 +460,16 @@ namespace Uptime.Connections
                     {
                         recorder?.RecordPlayerAction(command, null, false,
                             tokens[1], error.Message);
-                        AppendText("WORM  " + error.Message, errorColor);
+                        AppendText("WORM  " + error.Message, CommandFailureColor());
                     }
                     break;
                 case "payload":
                     if (tokens.Length < 2 || tokens.Length > 3 || tokens.Length == 3 &&
                         (!System.Enum.TryParse(tokens[2], true, out PayloadMotionProfile parsedProfile) ||
                          !System.Enum.IsDefined(typeof(PayloadMotionProfile), parsedProfile)))
-                        AppendText("USAGE  payload <targetNodeId> [steady|variable]", errorColor);
+                        AppendText("USAGE  payload <targetNodeId> [steady|variable]", CommandFailureColor());
                     else if (simulationHost?.Payloads == null)
-                        AppendText("PAYLOAD  simulation unavailable", errorColor);
+                        AppendText("PAYLOAD  simulation unavailable", CommandFailureColor());
                     else try
                     {
                         PayloadMotionProfile profile = tokens.Length == 3 ?
@@ -470,19 +485,19 @@ namespace Uptime.Connections
                     {
                         recorder?.RecordPlayerAction(command, null, false,
                             tokens[1], error.Message);
-                        AppendText("PAYLOAD  " + error.Message, errorColor);
+                        AppendText("PAYLOAD  " + error.Message, CommandFailureColor());
                     }
                     break;
                 case "portscan":
                 case "recon":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  " + tokens[0].ToLowerInvariant() + " <nodeId>", errorColor);
+                        AppendText("USAGE  " + tokens[0].ToLowerInvariant() + " <nodeId>", CommandFailureColor());
                     else
                     {
                         HostileActivityDirector activities = simulationHost != null ?
                             simulationHost.GetComponent<HostileActivityDirector>() : null;
                         if (activities == null)
-                            AppendText("RECON  activity director unavailable", errorColor);
+                            AppendText("RECON  activity director unavailable", CommandFailureColor());
                         else
                             try
                             {
@@ -494,12 +509,12 @@ namespace Uptime.Connections
                                 recorder?.RecordPlayerAction(command, plan?.ConnectionId, success);
                                 AppendText(success ? "QUEUED  " + plan.ConnectionId.ToLowerInvariant() +
                                     " to " + plan.Target.NodeId : "RECON  connection IDs exhausted",
-                                    success ? normalColor : errorColor);
+                                    success ? normalColor : CommandFailureColor());
                             }
                             catch (System.InvalidOperationException error)
                             {
                                 recorder?.RecordPlayerAction(command, null, false);
-                                AppendText("RECON  " + error.Message, errorColor);
+                                AppendText("RECON  " + error.Message, CommandFailureColor());
                             }
                     }
                     break;
@@ -508,9 +523,9 @@ namespace Uptime.Connections
                         out ConnectionSpawnOverrides spawnOverrides, out bool idHopping,
                         out bool idReactive,
                         out string spawnError))
-                        AppendText(spawnError, errorColor);
+                        AppendText(spawnError, CommandFailureColor());
                     else if (trafficDirector == null || simulationHost == null)
-                        AppendText("SPAWN  simulation unavailable", errorColor);
+                        AppendText("SPAWN  simulation unavailable", CommandFailureColor());
                     else
                     {
                         try
@@ -524,7 +539,7 @@ namespace Uptime.Connections
                         catch (System.InvalidOperationException error)
                         {
                             recorder?.RecordPlayerAction(command, null, false);
-                            AppendText("SPAWN  " + error.Message, errorColor);
+                            AppendText("SPAWN  " + error.Message, CommandFailureColor());
                         }
                     }
                     break;
@@ -532,15 +547,15 @@ namespace Uptime.Connections
                     if ((tokens.Length != 3 && tokens.Length != 4) ||
                         !TryParseInfectionKind(tokens[2], out InfectionKind injectKind) ||
                         injectKind == InfectionKind.Blackout && tokens.Length == 4)
-                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner [load|cadence]", errorColor);
+                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner [load|cadence]", CommandFailureColor());
                     else if (simulationHost == null)
-                        AppendText("INFECT  simulation unavailable", errorColor);
+                        AppendText("INFECT  simulation unavailable", CommandFailureColor());
                     else if (tokens.Length == 4 &&
                         (!float.TryParse(tokens[3], System.Globalization.NumberStyles.Float,
                             System.Globalization.CultureInfo.InvariantCulture, out float parsedParameter) ||
                          parsedParameter <= 0f || float.IsNaN(parsedParameter) ||
                          float.IsInfinity(parsedParameter)))
-                        AppendText("INFECT  parameter must be a finite positive number", errorColor);
+                        AppendText("INFECT  parameter must be a finite positive number", CommandFailureColor());
                     else
                     {
                         float parameter = tokens.Length == 4 ?
@@ -552,15 +567,15 @@ namespace Uptime.Connections
                         recorder?.RecordPlayerAction(command, null, applied);
                         AppendText(applied ? "INJECTED  " + injectKind + " on " +
                             tokens[1].ToUpperInvariant() : "INFECT  " + infectionError,
-                            applied ? normalColor : errorColor);
+                            applied ? normalColor : CommandFailureColor());
                     }
                     break;
                 case "uninfect":
                     if ((tokens.Length != 2 && tokens.Length != 3) ||
                         tokens.Length == 3 && !TryParseInfectionKind(tokens[2], out _))
-                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner]", errorColor);
+                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner]", CommandFailureColor());
                     else if (simulationHost == null)
-                        AppendText("UNINFECT  simulation unavailable", errorColor);
+                        AppendText("UNINFECT  simulation unavailable", CommandFailureColor());
                     else
                     {
                         InfectionKind removeKind = InfectionKind.PhantomLoad;
@@ -570,12 +585,12 @@ namespace Uptime.Connections
                         recorder?.RecordPlayerAction(command, null, removed);
                         AppendText(removed ? "REMOVED  " + removeKind + " from " +
                             tokens[1].ToUpperInvariant() : "UNINFECT  " + removalError,
-                            removed ? normalColor : errorColor);
+                            removed ? normalColor : CommandFailureColor());
                     }
                     break;
                 case "infections":
                     if (tokens.Length != 1 || simulationHost == null)
-                        AppendText("USAGE  infections", errorColor);
+                        AppendText("USAGE  infections", CommandFailureColor());
                     else if (simulationHost.Infections.Count == 0)
                         AppendText("INFECTIONS  none", mutedColor);
                     else
@@ -593,7 +608,7 @@ namespace Uptime.Connections
                 case "demandtest":
                     if (trafficDirector == null || simulationHost == null ||
                         simulationHost.RunMode != ConnectionRunMode.Generated)
-                        AppendText("DEMANDTEST  generated mode required", errorColor);
+                        AppendText("DEMANDTEST  generated mode required", CommandFailureColor());
                     else
                     {
                         try
@@ -605,7 +620,7 @@ namespace Uptime.Connections
                         }
                         catch (System.InvalidOperationException error)
                         {
-                            AppendText("DEMANDTEST  " + error.Message, errorColor);
+                            AppendText("DEMANDTEST  " + error.Message, CommandFailureColor());
                         }
                     }
                     break;
@@ -613,26 +628,26 @@ namespace Uptime.Connections
                     string note = raw.TrimStart().Substring(tokens[0].Length).TrimStart(' ', '\t');
                     if (recorder != null && recorder.Mark(note))
                         AppendText("MARK SAVED  " + System.IO.Path.GetFileName(recorder.OutputPath), normalColor);
-                    else AppendText("MARK  " + (recorder?.LastError ?? "recording unavailable"), errorColor);
+                    else AppendText("MARK  " + (recorder?.LastError ?? "recording unavailable"), CommandFailureColor());
                     break;
                 case "log":
                     if (tokens.Length != 2)
-                        AppendText("USAGE  log save | dir | folder", errorColor);
+                        AppendText("USAGE  log save | dir | folder", CommandFailureColor());
                     else if (tokens[1].Equals("dir", System.StringComparison.OrdinalIgnoreCase))
                         AppendText("LOG DIR  " + ConnectionsRunRecorder.LogDirectory, normalColor);
                     else if (tokens[1].Equals("folder", System.StringComparison.OrdinalIgnoreCase))
                     {
                         if (ConnectionsRunRecorder.RevealDirectory(out string error))
                             AppendText("LOG FOLDER OPENED", normalColor);
-                        else AppendText("LOG FOLDER  " + error, errorColor);
+                        else AppendText("LOG FOLDER  " + error, CommandFailureColor());
                     }
                     else if (tokens[1].Equals("save", System.StringComparison.OrdinalIgnoreCase))
                     {
                         if (recorder != null && recorder.Save(true))
                             AppendText("LOG SAVED  " + System.IO.Path.GetFileName(recorder.OutputPath), normalColor);
-                        else AppendText("LOG SAVE  " + (recorder?.LastError ?? "recording unavailable"), errorColor);
+                        else AppendText("LOG SAVE  " + (recorder?.LastError ?? "recording unavailable"), CommandFailureColor());
                     }
-                    else AppendText("USAGE  log save | dir | folder", errorColor);
+                    else AppendText("USAGE  log save | dir | folder", CommandFailureColor());
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
@@ -658,10 +673,11 @@ namespace Uptime.Connections
 #endif
                     break;
                 default:
-                    AppendText($"UNKNOWN COMMAND  {command}  // type help", errorColor);
+                    AppendText($"UNKNOWN COMMAND  {command}  // type help", CommandFailureColor());
                     break;
             }
 
+            if (commandFailed) CommandFailed?.Invoke();
             if (cleanOverlay == null || !cleanOverlay.IsOpen)
                 StartCoroutine(FocusInputNextFrame());
         }
@@ -782,7 +798,7 @@ namespace Uptime.Connections
         {
             if (tokens.Length < 2)
             {
-                AppendText("USAGE  kill|k <id> [id ...]", errorColor);
+                AppendText("USAGE  kill|k <id> [id ...]", CommandFailureColor());
                 return;
             }
             var attempted = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
@@ -792,7 +808,7 @@ namespace Uptime.Connections
                 string displayId = id.ToLowerInvariant();
                 if (!attempted.Add(id))
                 {
-                    AppendText("KILL  duplicate connection " + displayId + " (skipped)", errorColor);
+                    AppendText("KILL  duplicate connection " + displayId + " (skipped)", CommandFailureColor());
                     continue;
                 }
                 bool killed = simulationHost != null && simulationHost.KillConnection(id);
@@ -800,18 +816,18 @@ namespace Uptime.Connections
                 if (!killed) simulationHost?.NotifyFailedIdentityAddress(id, "kill", action);
                 AppendText(killed ? "KILLED  " + displayId :
                     "KILL  no active connection " + displayId,
-                    killed ? normalColor : errorColor);
+                    killed ? normalColor : CommandFailureColor());
             }
         }
 
         private void Clean(string[] tokens, string command)
         {
             if (tokens.Length != 2)
-                AppendText("USAGE  clean <nodeId>", errorColor);
+                AppendText("USAGE  clean <nodeId>", CommandFailureColor());
             else if (simulationHost == null)
-                AppendText("CLEAN FAILED  simulation unavailable", errorColor);
+                AppendText("CLEAN FAILED  simulation unavailable", CommandFailureColor());
             else if (cleanOverlay == null)
-                AppendText("CLEAN FAILED  interface unavailable", errorColor);
+                AppendText("CLEAN FAILED  interface unavailable", CommandFailureColor());
             else
             {
                 CleanStartResult result = simulationHost.StartClean(tokens[1], command,
@@ -825,7 +841,7 @@ namespace Uptime.Connections
                 }
                 else AppendText(result == CleanStartResult.AlreadyActive ?
                     "CLEAN FAILED  SESSION ALREADY ACTIVE" :
-                    "CLEAN FAILED  UNKNOWN NODE " + nodeId, errorColor);
+                    "CLEAN FAILED  UNKNOWN NODE " + nodeId, CommandFailureColor());
             }
         }
 
@@ -833,17 +849,17 @@ namespace Uptime.Connections
         {
             if (tokens.Length != 2)
             {
-                AppendText("USAGE  scan <nodeId>", errorColor);
+                AppendText("USAGE  scan <nodeId>", CommandFailureColor());
                 return;
             }
             if (simulationHost == null)
             {
-                AppendText("SCAN FAILED  simulation unavailable", errorColor);
+                AppendText("SCAN FAILED  simulation unavailable", CommandFailureColor());
                 return;
             }
             if (scanPrefab == null || historyContent == null)
             {
-                AppendText("SCAN FAILED  output unavailable", errorColor);
+                AppendText("SCAN FAILED  output unavailable", CommandFailureColor());
                 return;
             }
             ScanStartResult result = simulationHost.StartScan(tokens[1], command,
@@ -855,17 +871,17 @@ namespace Uptime.Connections
                     block.Bind(session, simulationHost);
                     break;
                 case ScanStartResult.AlreadyScanning:
-                    AppendText("ALREADY SCANNING  " + tokens[1].ToUpperInvariant(), errorColor);
+                    AppendText("ALREADY SCANNING  " + tokens[1].ToUpperInvariant(), CommandFailureColor());
                     break;
                 case ScanStartResult.Busy:
-                    AppendText("SCAN BUSY  " + simulationHost.ActiveScan.NodeId, errorColor);
+                    AppendText("SCAN BUSY  " + simulationHost.ActiveScan.NodeId, CommandFailureColor());
                     break;
                 case ScanStartResult.Jammed:
-                    AppendText("SCAN JAMMED  " + tokens[1].ToUpperInvariant(), errorColor);
+                    AppendText("SCAN JAMMED  " + tokens[1].ToUpperInvariant(), CommandFailureColor());
                     break;
                 default:
                     AppendText("SCAN FAILED  UNKNOWN NODE " + tokens[1].ToUpperInvariant(),
-                        errorColor);
+                        CommandFailureColor());
                     break;
             }
         }
@@ -874,23 +890,23 @@ namespace Uptime.Connections
         {
             if (!TryParseLoad(tokens, out string nodeId, out string error))
             {
-                AppendText(error, errorColor);
+                AppendText(error, CommandFailureColor());
                 return;
             }
             if (simulationHost == null)
             {
-                AppendText("LOAD  simulation unavailable", errorColor);
+                AppendText("LOAD  simulation unavailable", CommandFailureColor());
                 return;
             }
             NodeResources node = simulationHost.FindNodeResources(nodeId);
             if (node == null)
             {
-                AppendText("LOAD  unknown node " + nodeId.ToUpperInvariant(), errorColor);
+                AppendText("LOAD  unknown node " + nodeId.ToUpperInvariant(), CommandFailureColor());
                 return;
             }
             LoadOutput block = AppendOutputBlock(loadPrefab);
             if (block == null)
-                AppendText("LOAD  output unavailable", errorColor);
+                AppendText("LOAD  output unavailable", CommandFailureColor());
             else
                 block.Bind(node.View.NodeId, simulationHost);
         }
@@ -899,23 +915,23 @@ namespace Uptime.Connections
         {
             if (!TryParseWork(tokens, out string nodeId, out string error))
             {
-                AppendText(error, errorColor);
+                AppendText(error, CommandFailureColor());
                 return;
             }
             if (simulationHost == null)
             {
-                AppendText("WORK  simulation unavailable", errorColor);
+                AppendText("WORK  simulation unavailable", CommandFailureColor());
                 return;
             }
             NodeResources node = simulationHost.FindNodeResources(nodeId);
             if (node == null)
             {
-                AppendText("WORK  unknown node " + nodeId.ToUpperInvariant(), errorColor);
+                AppendText("WORK  unknown node " + nodeId.ToUpperInvariant(), CommandFailureColor());
                 return;
             }
             WorkOutput block = AppendOutputBlock(workPrefab);
             if (block == null)
-                AppendText("WORK  output unavailable", errorColor);
+                AppendText("WORK  output unavailable", CommandFailureColor());
             else
                 block.Bind(node.View.NodeId, simulationHost);
         }
@@ -955,12 +971,12 @@ namespace Uptime.Connections
             if (!TryParseInspect(tokens,
                 out InspectPresentationMode mode, out string[] ids, out string error))
             {
-                AppendText(error, errorColor);
+                AppendText(error, CommandFailureColor());
                 return;
             }
             if (simulationHost == null || simulationHost.RuntimeConnections == null)
             {
-                AppendText("INSPECT  simulation unavailable", errorColor);
+                AppendText("INSPECT  simulation unavailable", CommandFailureColor());
                 return;
             }
 
@@ -973,19 +989,19 @@ namespace Uptime.Connections
                     int action = recorder != null ? recorder.RecordPlayerAction(command,
                         id, false, reason: "unknown_connection") : 0;
                     simulationHost.NotifyFailedIdentityAddress(id, "inspect", action);
-                    AppendText("INSPECT  unknown connection " + id.ToLowerInvariant(), errorColor);
+                    AppendText("INSPECT  unknown connection " + id.ToLowerInvariant(), CommandFailureColor());
                     return;
                 }
                 if (selected.Contains(match))
                 {
-                    AppendText("INSPECT  duplicate connection " + id.ToLowerInvariant(), errorColor);
+                    AppendText("INSPECT  duplicate connection " + id.ToLowerInvariant(), CommandFailureColor());
                     return;
                 }
                 selected.Add(match);
             }
             InspectOutput block = AppendOutputBlock(inspectPrefab);
             if (block == null)
-                AppendText("INSPECT  output unavailable", errorColor);
+                AppendText("INSPECT  output unavailable", CommandFailureColor());
             else
                 block.Bind(selected.ToArray(), simulationHost.PresentationPalette, mode);
         }
