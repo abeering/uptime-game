@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using Uptime.Connections;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
@@ -42,14 +42,14 @@ namespace Uptime.Connections.EditorTools
                 presenter.ViewFor(db.View).AwarenessVisible,
                 "presenter reads condition and shows Awareness");
             var awarenessPanel = presenter.ViewFor(db.View).GetComponentsInChildren<NodeStatusPanel>(true)[1];
-            var timer = (Image)new SerializedObject(awarenessPanel)
-                .FindProperty("firstRadialTimer").objectReferenceValue;
-            Check(timer.gameObject.activeSelf && Mathf.Approximately(timer.fillAmount, 1f),
-                "authored radial timer follows condition");
+            var timer = (TMP_Text)new SerializedObject(awarenessPanel)
+                .FindProperty("timers").GetArrayElementAtIndex(0).objectReferenceValue;
+            Check(timer.gameObject.activeSelf && timer.text == "20s",
+                "authored seconds timer follows condition");
             host.StepSimulation(10f);
             presenter.RenderNow(2f, 1f);
             Check(Mathf.Abs(state.PortScanRemainingFraction - .5f) < .001f &&
-                Mathf.Abs(timer.fillAmount - .5f) < .001f, "simulation-time radial countdown");
+                timer.text == "10s", "simulation-time seconds countdown");
             host.StepSimulation(10f);
             presenter.RenderNow(3f, 1f);
             Check(host.Conditions.Count == 0 && !state.PortScanned,
@@ -71,7 +71,8 @@ namespace Uptime.Connections.EditorTools
                 scan.Operations[0].Operation == OperationKind.Read &&
                 scan.Operations[0].EffectOnCompletion == CompletionEffect.ConditionApplication &&
                 scan.Operations[0].ConditionPayload.Kind == ConditionKind.PortScanned &&
-                scan.Operations[0].DesiredLoad == 8f && scan.Operations[0].TotalWork == 56f,
+                scan.Operations[0].DesiredLoad == 4f && scan.Operations[0].TotalWork == 28f &&
+                scan.Operations[0].TotalWork / scan.Operations[0].DesiredLoad == 7f,
                 "PORT SCAN concrete plan and payload");
             host.StepSimulation(.1f);
             host.StepSimulation(10f);
@@ -206,6 +207,7 @@ namespace Uptime.Connections.EditorTools
             Check(host != null && traffic != null && activities != null &&
                 host.Nodes.Length == nodeCount && traffic.HostileMeanIntervalSeconds == mean &&
                 activities.ReconnaissanceWeight == reconWeight &&
+                activities.PortScanLoad == 4f && activities.PortScanWork == 28f &&
                 activities.PortScannedSeconds == 20f, path + " authored configuration");
             Check(new SerializedObject(traffic).FindProperty("hostileActivities")
                 .objectReferenceValue == activities &&

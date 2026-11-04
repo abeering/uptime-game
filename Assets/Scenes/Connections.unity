@@ -6501,8 +6501,8 @@ MonoBehaviour:
   scanJammedWormChance: 0.7
   followupChance: 0.4
   followupDelaySeconds: 8
-  portScanLoad: 8
-  portScanWork: 56
+  portScanLoad: 4
+  portScanWork: 28
   portScannedSeconds: 20
 --- !u!114 &1996901020
 MonoBehaviour:
