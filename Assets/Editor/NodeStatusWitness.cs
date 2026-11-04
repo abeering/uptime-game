@@ -105,6 +105,21 @@ namespace Uptime.Connections.EditorTools
                 Mathf.Abs(placed.center.x - node.center.x) <= 60.01f &&
                 (placed.yMin >= node.yMax || placed.yMax <= node.yMin),
                 "terminal marker stays clear within an above/below region");
+            // Production sockets center two units outside the node border.
+            var borderSocket = new[] { NodeStatusPlacement.Expanded(
+                new Rect(-13f, 29f, 26f, 26f), 12f) };
+            var aboveViewport = new Rect(-500f, -50f, 1000f, 350f);
+            NodeStatusPlacementChoice above = NodeStatusPlacement.Choose(node, size,
+                aboveViewport, none, borderSocket, none, none);
+            Rect aboveRect = NodeStatusPlacement.At(above, node, size);
+            Check(above.Anchor == NodeStatusAnchor.N &&
+                above.OutwardOffset == 12f &&
+                aboveRect.yMin - node.yMax == 29f &&
+                !aboveRect.Overlaps(borderSocket[0]),
+                "above status uses the nearest clear offset for a top socket");
+            Rect below = NodeStatusPlacement.At(NodeStatusAnchor.S, node, size);
+            Check(node.yMin - below.yMax == 17f,
+                "unobstructed below status keeps its existing gap");
             var topPill = new[] { new Rect(-110f, 50f, 220f, 90f) };
             choice = NodeStatusPlacement.Choose(node, size, viewport, none,
                 none, topPill, none);

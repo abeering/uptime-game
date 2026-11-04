@@ -27,7 +27,7 @@ namespace Uptime.Connections
         private static readonly NodeStatusAnchor[] Regions =
             { NodeStatusAnchor.N, NodeStatusAnchor.S };
         private static readonly float[] HorizontalOffsets = { 0f, -30f, 30f, -60f, 60f };
-        private static readonly float[] OutwardOffsets = { 0f, 24f, 48f };
+        private static readonly float[] OutwardOffsets = { 0f, 12f, 24f, 36f, 48f };
 
         public static Rect At(NodeStatusAnchor anchor, Rect node, Vector2 size) =>
             At(new NodeStatusPlacementChoice(anchor, 0f, 0f), node, size);
