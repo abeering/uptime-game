@@ -11977,7 +11977,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.PayloadDirector
   host: {fileID: 1996901015}
   establishmentSeconds: 1.2
-  interceptWindowSeconds: 5
+  finalHopMinSeconds: 5
+  finalHopMaxSeconds: 6
+  interceptWindowSeconds: 8
   interceptCooldownSeconds: 15
   interceptRequestedLoad: 4
   payloadColor: {r: 1, g: 0.72, b: 0.35, a: 1}

@@ -48,7 +48,9 @@ namespace Uptime.Connections
     {
         [SerializeField] private SimulationHost host;
         [SerializeField, Min(.1f)] private float establishmentSeconds = 1.2f;
-        [SerializeField, Min(.1f)] private float interceptWindowSeconds = 5f;
+        [SerializeField, Min(.1f)] private float finalHopMinSeconds = 5f;
+        [SerializeField, Min(.1f)] private float finalHopMaxSeconds = 6f;
+        [SerializeField, Min(.1f)] private float interceptWindowSeconds = 8f;
         [SerializeField, Min(.1f)] private float interceptCooldownSeconds = 15f;
         [SerializeField, Min(0f)] private float interceptRequestedLoad = 4f;
         [SerializeField] private Color payloadColor = new Color(1f, .72f, .35f, 1f);
@@ -68,6 +70,8 @@ namespace Uptime.Connections
         public float InterceptRequestedLoad => interceptRequestedLoad;
         public float InterceptWindowSeconds => interceptWindowSeconds;
         public float InterceptCooldownSeconds => interceptCooldownSeconds;
+        public float FinalHopMinSeconds => finalHopMinSeconds;
+        public float FinalHopMaxSeconds => finalHopMaxSeconds;
         public Color PayloadColor => payloadColor;
         public Color StrikeColor => strikeColor;
         public Color PresentationColor(PayloadState payload) =>
@@ -78,7 +82,11 @@ namespace Uptime.Connections
         private void OnValidate()
         {
             if (!Positive(establishmentSeconds)) establishmentSeconds = 1.2f;
-            if (!Positive(interceptWindowSeconds)) interceptWindowSeconds = 5f;
+            if (!Positive(finalHopMinSeconds)) finalHopMinSeconds = 5f;
+            if (!Positive(finalHopMaxSeconds)) finalHopMaxSeconds = 6f;
+            if (finalHopMaxSeconds < finalHopMinSeconds)
+                finalHopMaxSeconds = finalHopMinSeconds;
+            if (!Positive(interceptWindowSeconds)) interceptWindowSeconds = 8f;
             if (!Positive(interceptCooldownSeconds)) interceptCooldownSeconds = 15f;
             if (float.IsNaN(interceptRequestedLoad) ||
                 float.IsInfinity(interceptRequestedLoad) || interceptRequestedLoad < 0f)
@@ -144,9 +152,11 @@ namespace Uptime.Connections
             var durations = new float[hops];
             for (int i = 0; i < hops; i++)
             {
-                float duration = witnessTravelSeconds == null ?
+                float duration = witnessTravelSeconds != null ? witnessTravelSeconds[i] :
+                    i == hops - 1 ? finalHopMinSeconds +
+                        (finalHopMaxSeconds - finalHopMinSeconds) * (float)random.NextDouble() :
                     profile == PayloadMotionProfile.Steady ? 15f + 5f * (float)random.NextDouble() :
-                    7f + 18f * (float)random.NextDouble() : witnessTravelSeconds[i];
+                    7f + 18f * (float)random.NextDouble();
                 if (duration <= 0f || float.IsNaN(duration) || float.IsInfinity(duration))
                     throw new InvalidOperationException("Payload travel timing must be finite and positive.");
                 durations[i] = duration;

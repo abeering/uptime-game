@@ -88,12 +88,12 @@ namespace Uptime.Connections.EditorTools
                     .GetComponentsInChildren<TMPro.TMP_Text>(true)
                     .Any(t => t.text == "INTERCEPT x1"),
                 "CLEAN and timed interception share the beneficial panel");
-            host.StepSimulation(5f);
+            host.StepSimulation(8f);
             Check(director.InterceptorAt(host.FindNodeResources("WEB").View) == null &&
                 host.FindNodeResources("WEB").DefensiveRequestedLoad == 0f &&
                 !director.TryIntercept(first.Id, "WEB", out _),
                 "expiry releases LOAD but node cooldown remains");
-            host.StepSimulation(10f);
+            host.StepSimulation(7f);
             Check(director.TryIntercept(first.Id, "WEB", out _),
                 "cooldown starts at activation, not expiration");
             host.ResetSimulation();
@@ -103,8 +103,10 @@ namespace Uptime.Connections.EditorTools
 
             PayloadState sampled = director.Spawn("DB", PayloadMotionProfile.Variable, "EXT1");
             float[] timings = (float[])sampled.TravelSeconds.Clone();
-            Check(timings.All(t => t >= 7f && t <= 25f),
-                "Variable samples within configured movement range");
+            Check(timings.Take(timings.Length - 1).All(t => t >= 7f && t <= 25f) &&
+                timings.Last() >= director.FinalHopMinSeconds &&
+                timings.Last() <= director.FinalHopMaxSeconds,
+                "Variable intermediate and final-hop samples use their own ranges");
             host.ResetSimulation();
             PayloadState replay = director.Spawn("DB", PayloadMotionProfile.Variable, "EXT1");
             Check(replay.Id == sampled.Id && replay.TravelSeconds.SequenceEqual(timings),
@@ -112,8 +114,11 @@ namespace Uptime.Connections.EditorTools
             host.ResetSimulation();
             PayloadState steadySample = director.Spawn("DB", PayloadMotionProfile.Steady,
                 "EXT1");
-            Check(steadySample.TravelSeconds.All(t => t >= 15f && t <= 20f),
-                "Steady samples within consistent movement range");
+            Check(steadySample.TravelSeconds.Take(steadySample.TravelSeconds.Length - 1)
+                    .All(t => t >= 15f && t <= 20f) &&
+                steadySample.TravelSeconds.Last() >= director.FinalHopMinSeconds &&
+                steadySample.TravelSeconds.Last() <= director.FinalHopMaxSeconds,
+                "Steady intermediate and final-hop samples use their own ranges");
             host.ResetSimulation();
             bool invalidProfile = false;
             try { director.Spawn("DB", (PayloadMotionProfile)99, "EXT1"); }
@@ -156,9 +161,9 @@ namespace Uptime.Connections.EditorTools
             host.ResetSimulation();
             recorder.BeginRun();
             PayloadState threat = director.Spawn("DB", PayloadMotionProfile.Steady,
-                "EXT1", new[] { 1f, 1f, 1f });
+                "EXT1", new[] { 1f, 1f, 4f });
             PayloadState other = director.Spawn("DB", PayloadMotionProfile.Variable,
-                "EXT1", new[] { 1f, 1f, 1f });
+                "EXT1", new[] { 1f, 1f, 4f });
             Check(threat.Id == "x1" && other.Id == "x2", "simultaneous IDs do not collide");
             pathPresenter.RefreshLayouts();
             payloadPresenter.RenderNow();
@@ -174,7 +179,7 @@ namespace Uptime.Connections.EditorTools
                 "one target selected from simultaneous Payloads");
             Check(host.FindNodeResources("DB").DefensiveRequestedLoad == 4f,
                 "one slot reserves one defense demand");
-            host.StepSimulation(5f);
+            host.StepSimulation(8f);
             Check(director.InterceptorAt(host.FindNodeResources("DB").View) == null,
                 "window expires before late arrivals");
             host.StepSimulation(1.6f);
@@ -331,8 +336,8 @@ namespace Uptime.Connections.EditorTools
             PayloadState first = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { .8f });
             PayloadState simultaneous = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { .8f });
             PayloadState later = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 2.8f });
-            PayloadState boundary = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 3.8f });
-            PayloadState late = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 4f });
+            PayloadState boundary = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 6.8f });
+            PayloadState late = director.Spawn("DB", PayloadMotionProfile.Steady, "API", new[] { 7f });
             Check(!director.TryIntercept(first.Id, "DB", out _) &&
                 !director.TryIntercept(null, "DB", out _), "both modes share one occupied node slot");
             host.StepSimulation(2f);
@@ -353,7 +358,7 @@ namespace Uptime.Connections.EditorTools
             host.StepSimulation(2f);
             Check(later.Intercepted && armed.CaughtCount == 3 && db.DefensiveRequestedLoad == 4f,
                 "later arrival is caught after the earlier successes");
-            host.StepSimulation(1f);
+            host.StepSimulation(4f);
             Check(boundary.Intercepted && armed.CaughtCount == 4 && director.InterceptorAt(db.View) == null &&
                 db.DefensiveRequestedLoad == 0f && !director.TryIntercept(null, "DB", out _),
                 "arrival wins at expiry; LOAD releases and cooldown persists");
@@ -374,7 +379,7 @@ namespace Uptime.Connections.EditorTools
             Check(roundTrip.events.Count(e => e.type == "intercept_succeeded" && e.interceptAllPayloads) == 4 &&
                 roundTrip.snapshots[snapshotIndex].interceptors.Single().caughtCount == 2,
                 "broad scope and catch history survive recorder JSON");
-            host.StepSimulation(9.8f);
+            host.StepSimulation(6.8f);
             Check(director.TryIntercept(null, "DB", out _), "broad cooldown ends fifteen seconds from activation");
 
             host.ResetSimulation();
@@ -425,6 +430,95 @@ namespace Uptime.Connections.EditorTools
                 Check(pathBindings.FindProperty(field).objectReferenceValue != null,
                     scene + " shared lane binding " + field);
             CheckTelegraph(host, presenter, path, scene);
+            CheckFinalApproachTiming(host, scene);
+        }
+
+        private static void CheckFinalApproachTiming(SimulationHost host, string scene)
+        {
+            var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
+            traffic.AutoGenerationEnabled = false;
+            traffic.RandomizeSeed = false;
+            PayloadDirector director = host.Payloads;
+            ConnectionsRunRecorder recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
+            Check(director.InterceptWindowSeconds == 8f &&
+                director.InterceptCooldownSeconds == 15f &&
+                director.InterceptRequestedLoad == 4f &&
+                director.FinalHopMinSeconds == 5f && director.FinalHopMaxSeconds == 6f,
+                scene + " final approach Inspector defaults");
+            foreach (PayloadMotionProfile profile in new[] {
+                PayloadMotionProfile.Steady, PayloadMotionProfile.Variable })
+            {
+                foreach (bool oneHop in new[] { true, false })
+                {
+                    host.ResetSimulation();
+                    recorder.BeginRun();
+                    PayloadState payload = director.Spawn("DB", profile,
+                        oneHop ? "API" : "EXT1");
+                    Check(payload.TravelSeconds.Length == payload.Route.Length - 1 &&
+                        (oneHop ? payload.TravelSeconds.Length == 1 :
+                            payload.TravelSeconds.Length > 1) &&
+                        Mathf.Abs(payload.EstablishSeconds - 1.2f) < .0001f,
+                        scene + " route and unchanged establishment");
+                    for (int hop = 0; hop < payload.TravelSeconds.Length - 1; hop++)
+                    {
+                        float duration = payload.TravelSeconds[hop];
+                        Check(profile == PayloadMotionProfile.Steady ?
+                            duration >= 15f && duration <= 20f :
+                            duration >= 7f && duration <= 25f,
+                            scene + " unchanged orange hop timing");
+                        host.StepSimulation(payload.EstablishSeconds + duration);
+                        Check(payload.Hop == hop + 1 &&
+                            payload.Phase == PayloadPhase.Establishing &&
+                            host.Infections.Count == 0,
+                            scene + " orange arrival begins next hop without delivery");
+                    }
+                    float finalTravel = payload.TravelSeconds.Last();
+                    Check(finalTravel >= 5f && finalTravel <= 6f &&
+                        director.PresentationColor(payload) == director.StrikeColor,
+                        scene + " red hop uses final traversal range");
+                    float redAt = host.SimulationTimeSeconds;
+                    Check(director.TryIntercept(oneHop ? null : payload.Id, "DB", out _),
+                        scene + " immediate red-hop interception activation");
+                    InterceptionState defense = director.InterceptorAt(payload.FinalNode);
+                    Check(Mathf.Abs(defense.ExpiresAt - redAt - 8f) < .0001f &&
+                        Mathf.Abs(defense.CooldownUntil - redAt - 15f) < .0001f &&
+                        host.FindNodeResources("DB").DefensiveRequestedLoad == 4f,
+                        scene + " eight-second window, fifteen-second cooldown, four LOAD");
+                    host.StepSimulation(payload.EstablishSeconds + finalTravel);
+                    float arrivalAt = host.SimulationTimeSeconds;
+                    Check(payload.Phase == PayloadPhase.Resolved && payload.Intercepted &&
+                        !payload.EffectApplied && host.Infections.Count == 0 &&
+                        arrivalAt <= defense.ExpiresAt + .0001f &&
+                        Mathf.Abs(arrivalAt - redAt - payload.EstablishSeconds - finalTravel) < .001f,
+                        scene + " immediate red interception catches final action");
+                    Check(recorder.CurrentLog.events.Any(e => e.type == "payload_created" &&
+                        e.payloadId == payload.Id &&
+                        e.payloadHopTravelSeconds.SequenceEqual(payload.TravelSeconds)) &&
+                        recorder.CurrentLog.events.Any(e => e.type == "intercept_succeeded" &&
+                            e.payloadId == payload.Id),
+                        scene + " sampled timing and catch retained in recorder");
+                    Debug.Log($"PayloadTimingWitness {scene} {profile} " +
+                        $"{(oneHop ? "one-hop" : "multi-hop")}: redAt={redAt:F3}, " +
+                        $"establish={payload.EstablishSeconds:F3}, finalTravel={finalTravel:F3}, " +
+                        $"arrival={arrivalAt:F3}, windowExpires={defense.ExpiresAt:F3}, caught=true");
+                }
+            }
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            PayloadState missed = director.Spawn("DB", PayloadMotionProfile.Steady, "API");
+            host.StepSimulation(missed.EstablishSeconds + missed.TravelSeconds[0]);
+            Check(missed.Phase == PayloadPhase.Resolved && missed.EffectApplied &&
+                host.Infections.Count == 1 && !director.TryIntercept(missed.Id, "DB", out _),
+                scene + " targeted interception after impact rejects resolved ID");
+            Check(director.TryIntercept(null, "DB", out _),
+                scene + " node-wide interception may arm after impact");
+            host.StepSimulation(8f);
+            Check(!missed.Intercepted && host.Infections.Count == 1,
+                scene + " late node-wide interception cannot undo delivery");
+            Debug.Log($"PayloadTimingWitness {scene} late action: " +
+                $"impactAt={missed.EstablishSeconds + missed.TravelSeconds[0]:F3}, " +
+                "infectionPersists=true");
         }
 
         private static void CheckTelegraph(SimulationHost host, PayloadPresenter presenter,
@@ -469,6 +563,8 @@ namespace Uptime.Connections.EditorTools
 
             PayloadState oneHop = director.Spawn("DB", PayloadMotionProfile.Variable,
                 "API", new[] { 20f });
+            Check(oneHop.TravelSeconds[0] == 20f,
+                scene + " one-hop witness timing overrides final range");
             PayloadState orange = director.Spawn("DB", PayloadMotionProfile.Steady,
                 "EXT1", scene.EndsWith("Connections.unity", StringComparison.Ordinal) ?
                     new[] { 20f, 20f } : new[] { 20f, 20f, 20f });

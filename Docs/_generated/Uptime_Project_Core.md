@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:6a6dc5d0ff1788f0f8a9ec564144352d70903b6f287e2bf136dcccc3ce1ba092`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:f6a06bd4a6e946c1b9701a2741f3ed3010651a18457d0b7923e51c355d0f6c26`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Payload Final-Approach Timing V1 (implementation branch, November 4, 2026):** Both Connections scenes now default to an 8-simulation-second interception window and Inspector-tunable 5–6-second final-hop traversal for Steady and Variable Payloads. The unchanged 1.2-second establishment gives a red approach about 6.2–7.2 seconds from establishment start to arrival, so an interceptor armed immediately when red appears covers a default strike. One-hop Payloads use the same final range; orange intermediate-hop timing, seeded sampling, explicit witness overrides, recorder duration receipts, route selection, matching, the 15-second cooldown, and 4-LOAD demand remain intact. These are provisional difficulty settings. See the [Payload timing update](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-interception-v0.md#payload-final-approach-timing-v1-update) and [deterministic timing evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsPayloadFinalApproachTimingV1/README.md). Interactive interception timing remains to be reviewed.
 
 **Payload Strike Telegraphing V0 (implementation branch, November 4, 2026):** The current Payload hop is orange when its next node is transit, and red from the start of establishment when its next node is its final target. The line, next-hop socket, circular body, and `xN` ID share that color through lane reflow and traversal. A one-hop Payload appears red immediately. Red signals an infection-delivery attempt, not guaranteed infection; interception and infection rejection remain possible. Movement, timing, interception, and effects are unchanged. Both scene Inspectors expose the provisional red value alongside the existing orange value. See [Payload & Interception V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-interception-v0.md) and the [scripted Play Mode review frames](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsPayloadStrikeTelegraphV0/README.md). Interactive review remains needed.
 
