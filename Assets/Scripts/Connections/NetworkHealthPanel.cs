@@ -17,6 +17,8 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text probeStatusText;
         [SerializeField] private Image scanStatusFill;
         [SerializeField] private TMP_Text scanStatusText;
+        [SerializeField] private Image overclockStatusFill;
+        [SerializeField] private TMP_Text overclockStatusText;
         [SerializeField] private Color readyFillColor = new Color(0.14f, 0.33f, 0.27f);
         [SerializeField] private Color readyTextColor = new Color(0.70f, 0.91f, 0.78f);
         [SerializeField] private Color activeFillColor = new Color(0.13f, 0.31f, 0.36f);
@@ -95,6 +97,18 @@ namespace Uptime.Connections
                     activeFillColor, activeTextColor);
             else
                 SetToolStatus(scanStatusFill, scanStatusText, "READY", readyFillColor,
+                    readyTextColor);
+
+            if (host.OverclockedNode != null)
+                SetToolStatus(overclockStatusFill, overclockStatusText,
+                    $"ACTIVE {Seconds(host.OverclockActiveRemaining)}s", activeFillColor,
+                    activeTextColor);
+            else if (host.OverclockCooldownRemaining > 0.00001f)
+                SetToolStatus(overclockStatusFill, overclockStatusText,
+                    $"{Seconds(host.OverclockCooldownRemaining)}s", coolingFillColor,
+                    coolingTextColor);
+            else
+                SetToolStatus(overclockStatusFill, overclockStatusText, "READY", readyFillColor,
                     readyTextColor);
         }
 

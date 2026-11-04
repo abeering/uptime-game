@@ -402,6 +402,25 @@ namespace Uptime.Connections
                 case "load":
                     Load(tokens);
                     break;
+                case "overclock":
+                    if (tokens.Length != 2)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, null, "usage");
+                        AppendText("USAGE  overclock <nodeId>", CommandFailureColor());
+                    }
+                    else if (simulationHost == null)
+                    {
+                        recorder?.RecordPlayerAction(command, null, false, tokens[1],
+                            "simulation_unavailable");
+                        AppendText("OVERCLOCK  simulation unavailable", CommandFailureColor());
+                    }
+                    else
+                    {
+                        bool activated = simulationHost.TryActivateOverclock(tokens[1], command,
+                            out string overclockResult);
+                        AppendText(overclockResult, activated ? normalColor : CommandFailureColor());
+                    }
+                    break;
                 case "work":
                     Work(tokens);
                     break;
@@ -653,7 +672,7 @@ namespace Uptime.Connections
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
-                    AppendText("DEFENSE  probe <linkId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
+                    AppendText("DEFENSE  probe <linkId>  overclock <nodeId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
                     AppendText("RECALL  Up/Down  // Enter to run", mutedColor);
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD

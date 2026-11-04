@@ -11392,6 +11392,8 @@ MonoBehaviour:
   scanDurationSeconds: 8
   probeActiveSeconds: 10
   probeCooldownSeconds: 35
+  overclockActiveSeconds: 15
+  overclockCooldownSeconds: 60
   references:
     version: 2
     RefIds: []

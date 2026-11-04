@@ -32,7 +32,8 @@ namespace Uptime.Connections.EditorTools
                     name + " permanent 52-unit right-aligned strip");
                 Check(row.GetComponent<HorizontalLayoutGroup>() != null &&
                     row.Find("ProbeGroup/Slots")?.GetComponent<HorizontalLayoutGroup>() != null &&
-                    row.Find("ScanGroup/Slots")?.GetComponent<HorizontalLayoutGroup>() != null,
+                    row.Find("ScanGroup/Slots")?.GetComponent<HorizontalLayoutGroup>() != null &&
+                    row.Find("OverclockGroup/Slots")?.GetComponent<HorizontalLayoutGroup>() != null,
                     name + " expandable horizontal slot containers");
                 Check(row.GetComponent<ContentSizeFitter>()?.horizontalFit ==
                     ContentSizeFitter.FitMode.PreferredSize &&
@@ -43,10 +44,13 @@ namespace Uptime.Connections.EditorTools
                     row.Find("ProbeGroup/Slots")?.GetComponent<ContentSizeFitter>()?.horizontalFit ==
                     ContentSizeFitter.FitMode.PreferredSize &&
                     row.Find("ScanGroup/Slots")?.GetComponent<ContentSizeFitter>()?.horizontalFit ==
+                    ContentSizeFitter.FitMode.PreferredSize &&
+                    row.Find("OverclockGroup/Slots")?.GetComponent<ContentSizeFitter>()?.horizontalFit ==
                     ContentSizeFitter.FitMode.PreferredSize,
                     name + " groups grow left as future slots are authored");
                 Check(row.Find("ProbeGroup/Slots").childCount == 1 &&
-                    row.Find("ScanGroup/Slots").childCount == 1,
+                    row.Find("ScanGroup/Slots").childCount == 1 &&
+                    row.Find("OverclockGroup/Slots").childCount == 1,
                     name + " exactly one slot per tool");
                 CheckExpandableSlots(row);
                 Check(root.Find("Clock") != null && root.Find("HealthValue") != null &&
@@ -55,13 +59,18 @@ namespace Uptime.Connections.EditorTools
                 var fields = new SerializedObject(panel);
                 var probeFill = (Image)fields.FindProperty("probeStatusFill").objectReferenceValue;
                 var scanFill = (Image)fields.FindProperty("scanStatusFill").objectReferenceValue;
+                var overclockFill = (Image)fields.FindProperty("overclockStatusFill").objectReferenceValue;
                 var probeText = (TMP_Text)fields.FindProperty("probeStatusText").objectReferenceValue;
                 var scanText = (TMP_Text)fields.FindProperty("scanStatusText").objectReferenceValue;
+                var overclockText = (TMP_Text)fields.FindProperty("overclockStatusText").objectReferenceValue;
                 Check(probeFill != null && scanFill != null && probeText != null &&
-                    scanText != null && !probeFill.raycastTarget && !scanFill.raycastTarget &&
-                    !probeText.raycastTarget && !scanText.raycastTarget &&
-                    Mathf.Abs(probeFill.rectTransform.rect.width - 130f) < .01f &&
-                    Mathf.Abs(scanFill.rectTransform.rect.width - 130f) < .01f,
+                    scanText != null && overclockFill != null && overclockText != null &&
+                    !probeFill.raycastTarget && !scanFill.raycastTarget &&
+                    !overclockFill.raycastTarget && !probeText.raycastTarget &&
+                    !scanText.raycastTarget && !overclockText.raycastTarget &&
+                    Mathf.Abs(probeFill.rectTransform.rect.width - 105f) < .01f &&
+                    Mathf.Abs(scanFill.rectTransform.rect.width - 105f) < .01f &&
+                    Mathf.Abs(overclockFill.rectTransform.rect.width - 105f) < .01f,
                     name + " passive fixed-width authored indicators");
 
                 bool previousAuto = director.AutoGenerationEnabled;
@@ -76,6 +85,8 @@ namespace Uptime.Connections.EditorTools
                         "initial Probe");
                     Status(scanText, scanFill, "READY", new Color(.14f, .33f, .27f),
                         "initial Scan");
+                    Status(overclockText, overclockFill, "READY", new Color(.14f, .33f, .27f),
+                        "initial Overclock");
                     Capture(name, "ready", panel);
 
                     string linkId = host.PhysicalLinks[0].View.LinkId;
@@ -84,11 +95,15 @@ namespace Uptime.Connections.EditorTools
                         "Probe activation");
                     Check(host.StartScan(nodeId, "scan " + nodeId, out _) ==
                         ScanStartResult.Started, "Scan activation");
+                    Check(host.TryActivateOverclock(nodeId, "overclock " + nodeId, out _),
+                        "Overclock activation");
                     panel.Render();
                     Status(probeText, probeFill, "ACTIVE 10s", new Color(.13f, .31f, .36f),
                         "simultaneous Probe");
                     Status(scanText, scanFill, "ACTIVE 8s", new Color(.13f, .31f, .36f),
                         "simultaneous Scan");
+                    Status(overclockText, overclockFill, "ACTIVE 15s",
+                        new Color(.13f, .31f, .36f), "simultaneous Overclock");
                     Capture(name, "active", panel);
 
                     host.StepSimulation(.2f);
@@ -110,9 +125,16 @@ namespace Uptime.Connections.EditorTools
                     panel.Render();
                     Status(probeText, probeFill, "25s", new Color(.34f, .28f, .13f),
                         "Probe expires into activation-origin cooldown");
+                    Status(overclockText, overclockFill, "ACTIVE 5s",
+                        new Color(.13f, .31f, .36f), "Overclock remains active");
                     Check(scanText.text == "READY", "Scan has no cooldown");
                     Capture(name, "cooldown", panel);
-                    host.StepSimulation(24.1f);
+                    host.StepSimulation(5f);
+                    panel.Render();
+                    Status(overclockText, overclockFill, "45s",
+                        new Color(.34f, .28f, .13f), "Overclock cooldown");
+                    Capture(name, "overclock-cooldown", panel);
+                    host.StepSimulation(19.1f);
                     panel.Render();
                     Check(probeText.text == "1s", "fractional cooldown stays cooling");
                     host.StepSimulation(.9f);
@@ -124,8 +146,9 @@ namespace Uptime.Connections.EditorTools
                         ScanStartResult.Started, "Scan slot reusable");
                     host.ResetSimulation();
                     panel.Render();
-                    Check(probeText.text == "READY" && scanText.text == "READY",
-                        "reset immediately clears both displayed states");
+                    Check(probeText.text == "READY" && scanText.text == "READY" &&
+                        overclockText.text == "READY",
+                        "reset immediately clears all displayed states");
                     Debug.Log("ToolReadinessWitness PASS: " + name +
                         " bindings, layout, simulation countdowns, concurrent use and reset");
                 }
@@ -157,7 +180,7 @@ namespace Uptime.Connections.EditorTools
                 LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)slots.parent);
                 LayoutRebuilder.ForceRebuildLayoutImmediate(row);
                 Canvas.ForceUpdateCanvases();
-                Check(row.rect.width >= originalWidth + 130f,
+                Check(row.rect.width >= originalWidth + 105f,
                     "authoring another slot grows the row instead of overlapping Scan: " +
                     originalWidth + " -> " + row.rect.width + ", slots " + slots.rect.width);
             }
@@ -196,6 +219,9 @@ namespace Uptime.Connections.EditorTools
                     canvas.planeDistance = 10f;
                     Canvas.ForceUpdateCanvases();
                     panel.Render();
+                    UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>()?
+                        .RenderNow(Time.unscaledTime, 1f);
+                    Canvas.ForceUpdateCanvases();
                     camera.Render();
                     var previous = RenderTexture.active;
                     try

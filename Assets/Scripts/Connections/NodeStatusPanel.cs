@@ -23,14 +23,15 @@ namespace Uptime.Connections
 
         public void SetRows(string first, string second, string third, Color accent,
             float? firstRemainingSeconds = null, float? secondRemainingSeconds = null,
-            float? thirdRemainingSeconds = null)
+            float? thirdRemainingSeconds = null, string fourth = null,
+            float? fourthRemainingSeconds = null)
         {
-            rowCount = string.IsNullOrEmpty(third) ?
+            rowCount = !string.IsNullOrEmpty(fourth) ? 4 : string.IsNullOrEmpty(third) ?
                 string.IsNullOrEmpty(second) ? 1 : 2 : 3;
-            string[] text = { first, second, third };
+            string[] text = { first, second, third, fourth };
             float?[] remaining = { firstRemainingSeconds, secondRemainingSeconds,
-                thirdRemainingSeconds };
-            for (int i = 0; i < 3; i++)
+                thirdRemainingSeconds, fourthRemainingSeconds };
+            for (int i = 0; i < labels.Length; i++)
             {
                 bool visible = i < rowCount;
                 labels[i].gameObject.SetActive(visible);

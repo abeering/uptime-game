@@ -25,10 +25,19 @@ namespace Uptime.Connections
         public bool InterceptSucceeded { get; private set; }
         public float InterceptRemainingFraction { get; private set; }
         public float InterceptRemainingSeconds { get; private set; }
+        public bool Overclocked { get; private set; }
+        public float OverclockRemainingSeconds { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || KnownInfected ||
             AwarenessPreview || PortScanned || ScanJammed || Isolated ||
-            CleanVisible(realTime) || InterceptActive;
+            CleanVisible(realTime) || InterceptActive || Overclocked;
+
+        public void SetOverclock(NodeResources node, NodeResources activeNode,
+            float remainingSeconds)
+        {
+            Overclocked = node != null && node == activeNode;
+            OverclockRemainingSeconds = Overclocked ? Mathf.Max(0f, remainingSeconds) : 0f;
+        }
 
         public void SetOffline(bool offline) => Offline = offline;
 
@@ -126,6 +135,8 @@ namespace Uptime.Connections
             InterceptSucceeded = false;
             InterceptRemainingFraction = 0f;
             InterceptRemainingSeconds = 0f;
+            Overclocked = false;
+            OverclockRemainingSeconds = 0f;
             cleanUntil = -1f;
         }
     }

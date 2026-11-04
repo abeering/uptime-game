@@ -6387,6 +6387,8 @@ MonoBehaviour:
   scanDurationSeconds: 8
   probeActiveSeconds: 10
   probeCooldownSeconds: 35
+  overclockActiveSeconds: 15
+  overclockCooldownSeconds: 60
 --- !u!4 &1996901016
 Transform:
   m_ObjectHideFlags: 0
