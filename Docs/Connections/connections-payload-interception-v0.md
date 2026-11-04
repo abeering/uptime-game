@@ -26,6 +26,15 @@ The current experimental Connections defaults give `intercept [payloadId] @ <nod
 
 The 8-second window and 5–6-second final traversal are provisional playtest values. Red still announces an infection attempt rather than guaranteed installation. An interception started after impact cannot reverse an applied infection. [Timing witness results](../Review/ConnectionsPayloadFinalApproachTimingV1/README.md) provide one-hop and multi-hop evidence in both scenes; interactive interception timing remains to be reviewed.
 
+## Payload body and status layer follow-up
+
+Payload hop lines remain in the network path layer behind node status panels.
+The moving circular `xN` body remains in the identity overlay above them. A
+traveling body can cross a panel without making its placement solver move the
+panel; the fixed next-hop socket still receives normal terminal-marker
+clearance. This is visual layering only and does not change Payload movement,
+interception, or infection timing.
+
 ## Manual Play Mode review
 
 The original amber-only and five-second-window review instructions below remain as V0 provenance. For the current telegraph and timing, review orange pass-through hops, red final-hop establishment and traversal, a one-hop red appearance, and simultaneous orange/red Payloads at 16:9. Arm `intercept @ db` as soon as red appears and confirm a catch for both one-hop and multi-hop defaults; separately arm only after impact and confirm the delivered infection remains. Verify the 8-second expiry, 15-second cooldown, and 4-LOAD cost while checking command focus.
