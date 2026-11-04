@@ -131,6 +131,8 @@ namespace Uptime.Connections.EditorTools
         private GameObject CleanHint => Field<GameObject>(clean, "cancelHint");
         private Image CallCircle => Field<Image>(call, "hangUpCircle");
         private void Command(string text) => command.onSubmit.Invoke(text);
+        private int Receipts(string prefix) => Field<RectTransform>(terminal, "historyContent")
+            .GetComponentsInChildren<TMP_Text>().Count(text => text.text.StartsWith(prefix, StringComparison.Ordinal));
         private void Native(TMP_InputField input, KeyCode key, char character = '\0')
         {
             // Exercise the native IMGUI event path actually consumed by TMP. Only
@@ -301,15 +303,51 @@ namespace Uptime.Connections.EditorTools
 
             call.TryStartSampleCall(); Command("clean DB");
             yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            foreach (string invalid in new[] { "not-a-pid", "0" })
+            {
+                pid.SetTextWithoutNotify(invalid); Native(pid, KeyCode.Return, '\n');
+                yield return Wait(.1f);
+                Check(clean.WantsKeyboardFocus && host.ActiveClean != null && pid.isFocused && !command.isFocused,
+                    "invalid PID keeps the minigame session and typing focus: " + invalid);
+            }
             int malicious = host.ActiveClean.Processes.Single(p => p.CpuPercent >= 82).Pid;
-            pid.onSubmit.Invoke(malicious.ToString());
+            int successReceipts = Receipts("CLEAN COMPLETE  DB");
+            pid.SetTextWithoutNotify(malicious.ToString()); Native(pid, KeyCode.Return, '\n');
             Check(clean.IsOpen && !clean.CanDismissWithEscape && !CleanHint.activeSelf && host.Infections.Count == 0,
                 "CLEAN result leaves the stack and retains successful removal");
+            Check(!clean.WantsKeyboardFocus && host.ActiveClean == null &&
+                Receipts("CLEAN COMPLETE  DB") == successReceipts + 1,
+                "success releases the session and writes its terminal receipt on submission");
+            yield return Wait(.1f);
+            Check(clean.IsOpen && command.isFocused && EventSystem.current.currentSelectedGameObject == command.gameObject,
+                "terminal typing returns while successful CLEAN result still lingers");
+            command.SetTextWithoutNotify("help"); Native(command, KeyCode.Return, '\n');
+            yield return Wait(.1f);
+            Check(clean.IsOpen && command.isFocused && command.text == "",
+                "native terminal command submits and refocuses during the result linger");
+            Draft(command, "draft");
             Owners(call); Capture("clean-result-with-call");
             yield return Wait(); Press(command); yield return Wait(.1f);
             Check(!call.IsActive && clean.IsOpen, "Escape can hang up the call while CLEAN results remain noncancelable");
             Release(); yield return new WaitUntil(() => !clean.IsOpen); yield return Wait(.1f);
-            Check(command.isFocused, "CLEAN result closes and restores typing after its existing hold");
+            Preserved(command, "draft");
+            Check(Receipts("CLEAN COMPLETE  DB") == successReceipts + 1,
+                "result expiry preserves terminal draft/selection and never duplicates the receipt");
+
+            // The completed window must not keep its old timer when another clean begins.
+            Command("infect DB phantom-load"); Command("clean DB");
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            malicious = host.ActiveClean.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            pid.onSubmit.Invoke(malicious.ToString()); yield return Wait(.1f);
+            Check(clean.IsOpen && command.isFocused, "completed result remains visible before replacement");
+            Command("clean DB");
+            CleanSession replacement = host.ActiveClean;
+            Check(replacement != null && clean.WantsKeyboardFocus, "new clean replaces a lingering result immediately");
+            yield return new WaitUntil(() => pid.gameObject.activeInHierarchy && pid.isFocused);
+            yield return Wait(Field<float>(clean, "resultSeconds") + .1f);
+            Check(clean.IsOpen && host.ActiveClean == replacement && pid.isFocused,
+                "old result timer cannot close the replacement session or steal PID focus");
+            clean.DismissFromEscape(); yield return Wait(.1f);
 
             // All non-Escape exit paths must release ownership too.
             Command("clean DB"); yield return Wait(.25f); call.TryStartSampleCall();
@@ -463,12 +501,24 @@ namespace Uptime.Connections.EditorTools
             Owners(clean); Capture("minor-frame-overlap");
             float beforePenalty = host.Health.Value;
             int innocent = host.ActiveClean.Processes.First(p => p.CpuPercent < 82).Pid;
-            pid.onSubmit.Invoke(innocent.ToString());
+            int failureReceipts = Receipts("CLEAN FAILED  ");
+            pid.SetTextWithoutNotify(innocent.ToString()); Native(pid, KeyCode.Return, '\n');
             Check(!clean.CanDismissWithEscape && Mathf.Abs(host.Health.Value - (beforePenalty - 5)) < .001f &&
                 Field<TMP_Text>(clean, "body").text.Contains("CLEAN FAILED"),
                 "innocent PID retains exact five-Health penalty and noncancelable failure result");
+            yield return Wait(.1f);
+            Check(clean.IsOpen && !clean.WantsKeyboardFocus && command.isFocused &&
+                Receipts("CLEAN FAILED  ") == failureReceipts + 1,
+                "innocent selection returns terminal typing and one failure receipt before the linger ends");
             Owners(call); Capture("innocent-pid-result");
-            yield return new WaitUntil(() => !clean.IsOpen); yield return Wait(.1f); call.EndCall();
+            Draft(command, "draft");
+            int endedReceipts = Receipts("CLEAN SESSION ENDED  ");
+            clean.gameObject.SetActive(false); yield return Wait(.1f);
+            Preserved(command, "draft");
+            Check(Receipts("CLEAN FAILED  ") == failureReceipts + 1 &&
+                Receipts("CLEAN SESSION ENDED  ") == endedReceipts,
+                "external result disable neither duplicates feedback nor refocuses the terminal");
+            call.EndCall();
 
             // A real delayed developer command arrives while the PID field owns typing.
             Command("calltest delay=5");

@@ -71,7 +71,7 @@ namespace Uptime.Connections
         {
             AppendText("CONNECTIONS // TERMINAL READY", normalColor);
             AppendText("Type help for commands.", mutedColor);
-            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+            if (cleanOverlay == null || !cleanOverlay.WantsKeyboardFocus)
                 StartCoroutine(FocusInputNextFrame());
         }
 
@@ -678,7 +678,7 @@ namespace Uptime.Connections
             }
 
             if (commandFailed) CommandFailed?.Invoke();
-            if (cleanOverlay == null || !cleanOverlay.IsOpen)
+            if (cleanOverlay == null || !cleanOverlay.WantsKeyboardFocus)
                 StartCoroutine(FocusInputNextFrame());
         }
 
@@ -1156,7 +1156,7 @@ namespace Uptime.Connections
         private IEnumerator FocusInputNextFrame()
         {
             yield return null;
-            if (commandInput == null || cleanOverlay != null && cleanOverlay.IsOpen)
+            if (commandInput == null || cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
                 yield break;
             commandInput.ActivateInputField();
             commandInput.Select();

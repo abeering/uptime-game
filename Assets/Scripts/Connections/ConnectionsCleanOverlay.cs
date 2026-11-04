@@ -15,7 +15,8 @@ namespace Uptime.Connections
         [SerializeField] private GameObject cancelHint;
         [SerializeField] private TMP_InputField pidInput;
         [SerializeField, Min(0f)] private float characterSeconds = 0.012f;
-        [SerializeField, Min(0f)] private float resultSeconds = 1.3f;
+        [SerializeField, Min(0f), Tooltip("Result visibility in real seconds; terminal typing resumes on submission.")]
+        private float resultSeconds = 1.1f;
 
         private CleanSession session;
         private SimulationHost host;
@@ -25,6 +26,9 @@ namespace Uptime.Connections
         private bool showingResult;
 
         public bool IsOpen => gameObject.activeInHierarchy && session != null;
+
+        // The completed result can remain visible after typing returns to the terminal.
+        public bool WantsKeyboardFocus => IsOpen && !showingResult;
 
         public bool CanDismissWithEscape => IsOpen && !showingResult;
 
@@ -46,7 +50,8 @@ namespace Uptime.Connections
             session = null;
             if (sequence != null) StopCoroutine(sequence);
             sequence = null;
-            if (terminal != null && terminal.isActiveAndEnabled) terminal.FinishClean(message, false);
+            if (!showingResult && terminal != null && terminal.isActiveAndEnabled)
+                terminal.FinishClean(message, false);
         }
 
         private void Awake()
@@ -63,6 +68,9 @@ namespace Uptime.Connections
         public void Open(CleanSession cleanSession, SimulationHost simulationHost,
             Terminal sourceTerminal)
         {
+            // A new command may replace a lingering result. Retire its close timer first.
+            if (sequence != null) StopCoroutine(sequence);
+            sequence = null;
             session = cleanSession;
             host = simulationHost;
             terminal = sourceTerminal;
@@ -146,7 +154,9 @@ namespace Uptime.Connections
             string terminalMessage = success ?
                 "CLEAN COMPLETE  " + session.NodeId + "  /  " + removed + " infection(s) removed" :
                 "CLEAN FAILED  " + session.NodeId + "  /  innocent process terminated";
-            sequence = StartCoroutine(ShowResult(terminalMessage, success));
+            if (terminal != null && terminal.isActiveAndEnabled)
+                terminal.FinishClean(terminalMessage, success);
+            sequence = StartCoroutine(ShowResult());
         }
 
         private void RefocusPid() => StartCoroutine(RefocusNextFrame());
@@ -161,20 +171,21 @@ namespace Uptime.Connections
             }
         }
 
-        private IEnumerator ShowResult(string message, bool success)
+        private IEnumerator ShowResult()
         {
             yield return new WaitForSecondsRealtime(resultSeconds);
-            Close(message, success);
+            Close();
         }
 
-        private void Close(string message, bool success)
+        private void Close(string message = null, bool success = false)
         {
             escapeCoordinator.Unregister(this);
             if (sequence != null) StopCoroutine(sequence);
             sequence = null;
             session = null;
             gameObject.SetActive(false);
-            if (terminal != null && terminal.isActiveAndEnabled) terminal.FinishClean(message, success);
+            if (message != null && terminal != null && terminal.isActiveAndEnabled)
+                terminal.FinishClean(message, success);
         }
     }
 }

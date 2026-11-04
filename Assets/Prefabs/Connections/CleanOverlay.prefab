@@ -324,7 +324,7 @@ MonoBehaviour:
   cancelHint: {fileID: 5806194354289469654}
   pidInput: {fileID: 421689625806193843}
   characterSeconds: 0.012
-  resultSeconds: 1.3
+  resultSeconds: 1.1
 --- !u!1 &5120515522776176707
 GameObject:
   m_ObjectHideFlags: 0
