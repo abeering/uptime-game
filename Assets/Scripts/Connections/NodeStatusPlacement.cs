@@ -24,10 +24,11 @@ namespace Uptime.Connections
     public static class NodeStatusPlacement
     {
         private const float Gap = 17f;
+        private const float MarkerClearance = 2f;
         private static readonly NodeStatusAnchor[] Regions =
             { NodeStatusAnchor.N, NodeStatusAnchor.S };
         private static readonly float[] HorizontalOffsets = { 0f, -30f, 30f, -60f, 60f };
-        private static readonly float[] OutwardOffsets = { 0f, 24f, 48f };
+        private static readonly float[] OutwardOffsets = { 0f, 12f, 24f, 36f, 48f };
 
         public static Rect At(NodeStatusAnchor anchor, Rect node, Vector2 size) =>
             At(new NodeStatusPlacementChoice(anchor, 0f, 0f), node, size);
@@ -43,62 +44,88 @@ namespace Uptime.Connections
 
         public static NodeStatusPlacementChoice Choose(Rect node, Vector2 size, Rect viewport,
             IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
-            IReadOnlyList<Rect> pills, IReadOnlyList<Rect> otherStacks,
+            IReadOnlyList<Rect> otherStacks,
             NodeStatusPlacementChoice? previous = null)
         {
             float bestScore = float.PositiveInfinity;
             int bestPriority = int.MaxValue;
             NodeStatusPlacementChoice best = new NodeStatusPlacementChoice(NodeStatusAnchor.N, 0f, 0f);
+            float sameSideScore = float.PositiveInfinity;
+            int sameSidePriority = int.MaxValue;
+            NodeStatusPlacementChoice sameSide = best;
             foreach (NodeStatusAnchor anchor in Regions)
                 foreach (float outward in OutwardOffsets)
                     foreach (float horizontal in HorizontalOffsets)
                     {
-                        var choice = new NodeStatusPlacementChoice(anchor, horizontal, outward);
+                        var choice = ClearMarkers(new NodeStatusPlacementChoice(anchor,
+                            horizontal, outward), node, size, markers);
                         Rect candidate = At(choice, node, size);
-                        int priority = Priority(candidate, viewport, cards, markers, pills);
-                        if (priority > bestPriority) continue;
+                        int priority = Priority(candidate, viewport, cards, markers);
                         float score = Score(choice, candidate, viewport,
-                            cards, markers, pills, otherStacks);
-                        if (priority == bestPriority && score >= bestScore) continue;
-                        bestPriority = priority;
-                        bestScore = score;
-                        best = choice;
+                            cards, markers, otherStacks);
+                        if (priority < bestPriority ||
+                            (priority == bestPriority && score < bestScore))
+                        {
+                            bestPriority = priority;
+                            bestScore = score;
+                            best = choice;
+                        }
+                        if (previous.HasValue && anchor == previous.Value.Anchor &&
+                            (priority < sameSidePriority ||
+                             (priority == sameSidePriority && score < sameSideScore)))
+                        {
+                            sameSidePriority = priority;
+                            sameSideScore = score;
+                            sameSide = choice;
+                        }
                     }
-
-            if (previous.HasValue)
-            {
-                NodeStatusPlacementChoice held = previous.Value;
-                Rect heldRect = At(held, node, size);
-                // Traffic can change every frame. Keep a clear placement unless the new
-                // choice is materially better; move promptly when a marker reaches it.
-                if (bestPriority <= 1 &&
-                    Priority(heldRect, viewport, cards, markers, pills) == bestPriority &&
-                    ConflictArea(otherStacks, heldRect) < 1f &&
-                    Score(held, heldRect, viewport, cards, markers, pills, otherStacks) <=
-                        bestScore + 200f)
-                    return held;
-            }
+            // Keep the chosen side, while allowing its gap to return to the
+            // closest clear position as sockets appear and disappear.
+            if (sameSidePriority == 0 &&
+                ConflictArea(otherStacks, At(sameSide, node, size)) < 1f)
+                return sameSide;
             return best;
         }
 
-        private static int Priority(Rect candidate, Rect viewport,
-            IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
-            IReadOnlyList<Rect> pills)
+        private static NodeStatusPlacementChoice ClearMarkers(NodeStatusPlacementChoice choice,
+            Rect node, Vector2 size, IReadOnlyList<Rect> markers)
         {
-            // A terminal marker stays clear whenever any above/below candidate can
-            // do so. A pill may overlap only after clear, on-screen choices run out.
-            if (ConflictArea(markers, candidate) >= .01f) return 4;
-            if (ConflictArea(cards, candidate) >= .01f) return 3;
-            if (OutsideArea(candidate, viewport) >= .01f) return 2;
-            return ConflictArea(pills, candidate) < .01f ? 0 : 1;
+            if (markers == null) return choice;
+            float outward = choice.OutwardOffset;
+            for (int pass = 0; pass < markers.Count; pass++)
+            {
+                Rect candidate = At(new NodeStatusPlacementChoice(choice.Anchor,
+                    choice.HorizontalOffset, outward), node, size);
+                float extra = 0f;
+                foreach (Rect marker in markers)
+                {
+                    if (candidate.xMin >= marker.xMax || candidate.xMax <= marker.xMin ||
+                        candidate.yMin >= marker.yMax + MarkerClearance ||
+                        candidate.yMax <= marker.yMin - MarkerClearance) continue;
+                    extra = Mathf.Max(extra, choice.Anchor == NodeStatusAnchor.N ?
+                        marker.yMax + MarkerClearance - candidate.yMin :
+                        candidate.yMax - marker.yMin + MarkerClearance);
+                }
+                if (extra <= 0f) break;
+                outward += extra;
+            }
+            return new NodeStatusPlacementChoice(choice.Anchor, choice.HorizontalOffset,
+                outward);
+        }
+
+        private static int Priority(Rect candidate, Rect viewport,
+            IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers)
+        {
+            if (ConflictArea(markers, candidate) >= .01f) return 3;
+            if (ConflictArea(cards, candidate) >= .01f) return 2;
+            return OutsideArea(candidate, viewport) >= .01f ? 1 : 0;
         }
 
         private static float Score(NodeStatusPlacementChoice choice, Rect candidate,
             Rect viewport, IReadOnlyList<Rect> cards, IReadOnlyList<Rect> markers,
-            IReadOnlyList<Rect> pills, IReadOnlyList<Rect> otherStacks) =>
+            IReadOnlyList<Rect> otherStacks) =>
             OutsideArea(candidate, viewport) * 1000f +
             ConflictArea(markers, candidate) * 5000f +
-            ConflictArea(pills, candidate) * 2000f +
             ConflictArea(cards, candidate) * 200f +
             ConflictArea(otherStacks, candidate) * 80f +
             Mathf.Abs(choice.HorizontalOffset) * 1.5f +
@@ -130,9 +157,5 @@ namespace Uptime.Connections
             return new Rect(left, bottom, Mathf.Max(0f, Mathf.Min(a.xMax, b.xMax) - left),
                 Mathf.Max(0f, Mathf.Min(a.yMax, b.yMax) - bottom));
         }
-
-        public static Rect Expanded(Rect rect, float padding) => new Rect(
-            rect.xMin - padding, rect.yMin - padding,
-            rect.width + padding * 2f, rect.height + padding * 2f);
     }
 }

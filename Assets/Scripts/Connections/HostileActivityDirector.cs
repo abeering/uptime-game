@@ -37,8 +37,8 @@ namespace Uptime.Connections
         [SerializeField, Range(0f, 1f)] private float scanJammedWormChance = .7f;
         [SerializeField, Range(0f, 1f)] private float followupChance = .4f;
         [SerializeField, Min(0f)] private float followupDelaySeconds = 8f;
-        [SerializeField, Min(.01f)] private float portScanLoad = 8f;
-        [SerializeField, Min(.01f)] private float portScanWork = 56f;
+        [SerializeField, Min(.01f)] private float portScanLoad = 4f;
+        [SerializeField, Min(.01f)] private float portScanWork = 28f;
         [SerializeField, Min(.01f)] private float portScannedSeconds = 20f;
 
         private sealed class ReconEvent

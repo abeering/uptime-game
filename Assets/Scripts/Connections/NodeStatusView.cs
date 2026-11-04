@@ -40,10 +40,19 @@ namespace Uptime.Connections
             Rect.sizeDelta = card.size;
         }
 
-        public void PlaceStack(Rect target)
+        public void PlaceStack(Rect target, float settleDeltaSeconds = 0f)
         {
             stackRoot.sizeDelta = target.size;
-            stackRoot.anchoredPosition = target.center - nodeRect.center;
+            Vector2 desired = target.center - nodeRect.center;
+            Vector2 current = stackRoot.anchoredPosition;
+            // Only the return toward the card eases. Moving away from a new
+            // obstruction or switching sides must clear it immediately.
+            if (settleDeltaSeconds > 0f &&
+                Mathf.Sign(current.y) == Mathf.Sign(desired.y) &&
+                Mathf.Abs(current.y) > Mathf.Abs(desired.y))
+                desired.y = Mathf.Lerp(current.y, desired.y,
+                    1f - Mathf.Exp(-settleDeltaSeconds / .08f));
+            stackRoot.anchoredPosition = desired;
         }
 
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
