@@ -424,6 +424,15 @@ namespace Uptime.Connections.EditorTools
                 "socketPrefab", "bodyPrefab", "lineStyle" })
                 Check(serialized.FindProperty(field).objectReferenceValue != null,
                     scene + " presenter binding " + field);
+            var status = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
+            Check(status != null &&
+                presenter.transform.parent == status.NetworkArea &&
+                ((RectTransform)serialized.FindProperty("pathLayer").objectReferenceValue)
+                    .GetSiblingIndex() < status.StatusLayer.GetSiblingIndex() &&
+                status.StatusLayer.GetSiblingIndex() <
+                    ((RectTransform)serialized.FindProperty("markerLayer").objectReferenceValue)
+                    .GetSiblingIndex(),
+                scene + " Payload line below status and moving ID above it");
             var path = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
             var pathBindings = new SerializedObject(path);
             foreach (string field in new[] { "payloadDirector", "payloadPresenter" })

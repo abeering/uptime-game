@@ -97,7 +97,8 @@ namespace Uptime.Connections
             if (host == null || networkArea == null) return;
             var markers = new List<Rect>();
             foreach (TerminalMarkerStyle socket in networkArea.GetComponentsInChildren<TerminalMarkerStyle>())
-                if (socket.isActiveAndEnabled)
+                if (socket.isActiveAndEnabled &&
+                    socket.GetComponentInParent<PayloadBodyView>() == null)
                     markers.Add(RelativeRect(socket.rectTransform));
             foreach (NodeResources node in host.Nodes)
             {

@@ -284,6 +284,21 @@ namespace Uptime.Connections.EditorTools
             Check(presenter.ViewFor(db).AwarenessVisible &&
                 presenter.ViewFor(db).BenefitVisible,
                 "two families coexist in Editor preview");
+            var bodyPrefab = AssetDatabase.LoadAssetAtPath<PayloadBodyView>(
+                "Assets/Prefabs/Connections/PayloadBody.prefab");
+            var body = UnityEngine.Object.Instantiate(bodyPrefab,
+                presenter.NetworkArea.Find("IdentityOverlay"), false);
+            try
+            {
+                NodeStatusView status = presenter.ViewFor(db);
+                Vector2 before = status.StackRoot.anchoredPosition;
+                body.rectTransform.anchoredPosition =
+                    EdgeGeometry.CardRect(db, presenter.NetworkArea).center + before;
+                presenter.RenderNow(Time.unscaledTime, 0f);
+                Check((status.StackRoot.anchoredPosition - before).sqrMagnitude < .01f,
+                    "moving Payload ID may cross a status without displacing it");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(body.gameObject); }
             host.ResetSimulation();
             presenter.RenderNow(Time.unscaledTime, 1f);
             Check(!presenter.StateFor(db).HasAny(Time.unscaledTime) &&
