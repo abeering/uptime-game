@@ -16,9 +16,11 @@ namespace Uptime.Connections
         [NonSerialized] private float allocatedToInfections;
         [NonSerialized] private float requestedByDefense;
         [NonSerialized] private float allocatedToDefense;
+        [NonSerialized] private float capacityMultiplier = 1f;
 
         public NodeView View => view;
-        public float LoadCapacity => Mathf.Max(0f, loadCapacity);
+        public float BaseLoadCapacity => Mathf.Max(0f, loadCapacity);
+        public float LoadCapacity => BaseLoadCapacity * (capacityMultiplier <= 0f ? 1f : capacityMultiplier);
         public float BaselineLoad => Mathf.Clamp(baselineLoad, 0f, LoadCapacity);
         public float ConnectionRequestedLoad => requestedByConnections;
         public float ConnectionAllocatedLoad => allocatedToConnections;
@@ -63,9 +65,12 @@ namespace Uptime.Connections
 
         internal void ClampToCapacity()
         {
-            loadCapacity = LoadCapacity;
+            loadCapacity = BaseLoadCapacity;
             baselineLoad = BaselineLoad;
         }
+
+        internal void SetCapacityMultiplier(float multiplier) =>
+            capacityMultiplier = Mathf.Max(1f, multiplier);
     }
 
     // Physical links still define routes and visual lanes, but carry no LOAD cost.

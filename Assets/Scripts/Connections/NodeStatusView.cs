@@ -61,7 +61,7 @@ namespace Uptime.Connections
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
             bool intercept = state.InterceptActive;
-            bool benefit = clean || intercept || state.Isolated;
+            bool benefit = clean || intercept || state.Isolated || state.Overclocked;
             bool[] desired = { pain, awareness, benefit };
             NodeStatusBandGraphic[] bands = { painBand, awarenessBand, benefitBand };
             NodeStatusPanel[] panels = { painPanel, awarenessPanel, benefitPanel };
@@ -118,6 +118,8 @@ namespace Uptime.Connections
                 { rows.Add(state.InterceptAllPayloads ? "INTERCEPT ALL" :
                         interceptText + state.InterceptPayloadId);
                     timers.Add(state.InterceptRemainingSeconds); }
+                if (state.Overclocked)
+                { rows.Add("OVERCLOCKED"); timers.Add(state.OverclockRemainingSeconds); }
                 SetRows(benefitPanel, rows, timers, benefitColor);
             }
 
@@ -140,7 +142,9 @@ namespace Uptime.Connections
             panel.SetRows(rows[0], rows.Count > 1 ? rows[1] : null,
                 rows.Count > 2 ? rows[2] : null, color,
                 timers[0], rows.Count > 1 ? timers[1] : null,
-                rows.Count > 2 ? timers[2] : null);
+                rows.Count > 2 ? timers[2] : null,
+                rows.Count > 3 ? rows[3] : null,
+                rows.Count > 3 ? timers[3] : null);
         }
 
         public void ClearVisuals()

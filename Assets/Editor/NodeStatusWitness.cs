@@ -56,10 +56,11 @@ namespace Uptime.Connections.EditorTools
             foreach (NodeStatusPanel panel in panels)
             {
                 var serialized = new SerializedObject(panel);
+                int rows = panel.name == "BenefitPanel" ? 4 : 3;
                 Check(serialized.FindProperty("plate").objectReferenceValue != null &&
-                    serialized.FindProperty("labels").arraySize == 3 &&
-                    serialized.FindProperty("timers").arraySize == 3 &&
-                    Enumerable.Range(0, 3).All(i =>
+                    serialized.FindProperty("labels").arraySize == rows &&
+                    serialized.FindProperty("timers").arraySize == rows &&
+                    Enumerable.Range(0, rows).All(i =>
                         serialized.FindProperty("labels").GetArrayElementAtIndex(i).objectReferenceValue != null &&
                         serialized.FindProperty("timers").GetArrayElementAtIndex(i).objectReferenceValue != null),
                     path + " authored three-row panel and seconds timers");
@@ -84,6 +85,14 @@ namespace Uptime.Connections.EditorTools
                 panel.SetContent("CLEAN", null, Color.green);
                 Check(!first.gameObject.activeSelf && !third.gameObject.activeSelf,
                     path + " untimed statuses hide seconds timers");
+                var benefitPanel = preview.GetComponentsInChildren<NodeStatusPanel>(true)
+                    .First(p => p.name == "BenefitPanel");
+                benefitPanel.SetRows("CLEAN", "ISOLATED", "INTERCEPT ALL", Color.green,
+                    null, 9f, 8f, "OVERCLOCKED", 7.01f);
+                var benefitTimers = new SerializedObject(benefitPanel).FindProperty("timers");
+                var fourth = (TMP_Text)benefitTimers.GetArrayElementAtIndex(3).objectReferenceValue;
+                Check(benefitPanel.Height == 100f && fourth.gameObject.activeSelf &&
+                    fourth.text == "8s", path + " four beneficial rows retain all statuses");
                 Rect node = new Rect(-120f, -40f, 240f, 80f);
                 preview.SetNodeRect(node);
                 Vector2 size = new Vector2(220f, 34f);

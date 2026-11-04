@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:fc92193cd40a57fd90e2debad54867fa5068fff7c9a2ecc339dfab0a2185dd48`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:8dbed899c1f624a44aac30d087518880b5ecdf8c4832a96dd1253b3ca2fa1e7d`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Overclock V0 (implementation branch, November 4, 2026):** `overclock <nodeId>` temporarily gives one node 150% of its authored LOAD capacity for 15 simulation seconds, with a global 60-second activation-origin cooldown. It changes effective capacity only; the existing allocator, requested LOAD, WORK requirements, and legitimate/hostile sharing rules remain intact. Both scenes show global readiness beside Probe and Scan and an OVERCLOCKED countdown in the affected node's beneficial status stack, independent of infection and outage warnings. Reset clears the ability. See [Overclock V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-overclock-v0.md). Interactive 16:9 Play Mode review remains required.
 
 **CLEAN submission focus (implementation branch, November 4, 2026):** Valid PID submission now returns terminal typing through its normal next-frame focus path and writes the outcome immediately, while the result window lingers for 1.1 real seconds (previously 1.3). Invalid PIDs retain minigame focus. Result expiry/disable does not repeat feedback or alter the terminal draft/selection; another `clean` can replace a lingering result without inheriting its close timer. Both scenes inherit the authored prefab timing. See the [CLEAN lifecycle and tuning notes](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-infections-v0.md#clean-focus-and-window-lifecycle-november-4-2026). Physical keyboard and native Game view review remains required.
 

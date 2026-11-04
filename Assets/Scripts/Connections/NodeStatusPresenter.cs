@@ -113,6 +113,8 @@ namespace Uptime.Connections
                 state.SetIsolation(host.Worms?.IsolationAt(card), host.SimulationTimeSeconds);
                 state.SetInterceptor(host.Payloads?.InterceptorAt(card),
                     host.SimulationTimeSeconds);
+                state.SetOverclock(node, host.OverclockedNode,
+                    host.OverclockActiveRemaining);
                 Rect cardRect = EdgeGeometry.CardRect(card, networkArea);
                 view.SetNodeRect(cardRect);
                 if (stamps.TryGetValue(card, out NodeEventStamp stamp))

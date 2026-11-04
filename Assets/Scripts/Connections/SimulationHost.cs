@@ -34,6 +34,9 @@ namespace Uptime.Connections
         [Header("Probe")]
         [SerializeField, Min(0.1f)] private float probeActiveSeconds = 10f;
         [SerializeField, Min(0.1f)] private float probeCooldownSeconds = 35f;
+        [Header("Overclock")]
+        [SerializeField, Min(0.1f)] private float overclockActiveSeconds = 15f;
+        [SerializeField, Min(0.1f)] private float overclockCooldownSeconds = 60f;
 
         private LogicalConnectionState[] runtimeConnections;
         private readonly Dictionary<string, LogicalConnectionState> history =
@@ -52,6 +55,9 @@ namespace Uptime.Connections
         private PhysicalLinkReference probedLink;
         private float probeExpiresAtSeconds;
         private float probeReadyAtSeconds;
+        private NodeResources overclockedNode;
+        private float overclockExpiresAtSeconds;
+        private float overclockReadyAtSeconds;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -81,6 +87,13 @@ namespace Uptime.Connections
         public float ProbeActiveRemaining => probedLink != null ?
             Mathf.Max(0f, probeExpiresAtSeconds - simulationTimeSeconds) : 0f;
         public float ProbeCooldownRemaining => Mathf.Max(0f, probeReadyAtSeconds - simulationTimeSeconds);
+        public NodeResources OverclockedNode => overclockedNode;
+        public float OverclockActiveRemaining => overclockedNode != null ?
+            Mathf.Max(0f, overclockExpiresAtSeconds - simulationTimeSeconds) : 0f;
+        public float OverclockCooldownRemaining =>
+            Mathf.Max(0f, overclockReadyAtSeconds - simulationTimeSeconds);
+        public float OverclockActiveSeconds => overclockActiveSeconds;
+        public float OverclockCooldownSeconds => overclockCooldownSeconds;
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
@@ -175,6 +188,7 @@ namespace Uptime.Connections
         private void OnDisable()
         {
             ClearProbe();
+            ClearOverclock();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -285,6 +299,9 @@ namespace Uptime.Connections
                 if (probedLink != null)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         probeExpiresAtSeconds - simulationTimeSeconds));
+                if (overclockedNode != null)
+                    segment = Mathf.Min(segment, Mathf.Max(0.000001f,
+                        overclockExpiresAtSeconds - simulationTimeSeconds));
                 foreach (NodeCondition condition in conditions)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         condition.ExpiresAtSeconds - simulationTimeSeconds));
@@ -301,6 +318,9 @@ namespace Uptime.Connections
                 CompleteDueScan();
                 if (probedLink != null && simulationTimeSeconds + 0.00001f >= probeExpiresAtSeconds)
                     ExpireProbe();
+                if (overclockedNode != null && simulationTimeSeconds + 0.00001f >=
+                    overclockExpiresAtSeconds)
+                    ExpireOverclock();
                 AdvanceIdentities();
                 ExpireConditions();
                 remaining -= segment;
@@ -918,6 +938,7 @@ namespace Uptime.Connections
         public void ResetSimulation()
         {
             ClearProbe();
+            ClearOverclock();
             activeClean = null;
             activeScan?.Reset(simulationTimeSeconds);
             activeScan = null;
@@ -1033,6 +1054,51 @@ namespace Uptime.Connections
             probeReadyAtSeconds = 0f;
             pathPresenter?.SetProbe(null);
             UpdateIdentityRevelation();
+        }
+
+        public bool TryActivateOverclock(string nodeId, string command, out string result)
+        {
+            NodeResources target = FindNodeResources(nodeId);
+            string reason = target == null ? "unknown_node" :
+                overclockedNode != null ? "busy" :
+                OverclockCooldownRemaining > 0.00001f ? "cooldown" : null;
+            if (reason != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, nodeId, reason);
+                result = reason == "unknown_node" ? "UNKNOWN NODE  " + nodeId :
+                    reason == "busy" ? "OVERCLOCK ACTIVE  " + overclockedNode.View.NodeId +
+                        "  " + Mathf.CeilToInt(OverclockActiveRemaining) + "s remaining" :
+                    "OVERCLOCK COOLING  " + Mathf.CeilToInt(OverclockCooldownRemaining) +
+                        "s remaining";
+                return false;
+            }
+            if (runtimeConnections == null) ResetSimulation();
+            overclockedNode = target;
+            overclockExpiresAtSeconds = simulationTimeSeconds + overclockActiveSeconds;
+            overclockReadyAtSeconds = simulationTimeSeconds + overclockCooldownSeconds;
+            target.SetCapacityMultiplier(1.5f);
+            RefreshPayloadAllocations();
+            recorder?.RecordPlayerAction(command, null, true, nodeId, "activated");
+            result = "OVERCLOCK ACTIVE  " + target.View.NodeId + "  " +
+                overclockActiveSeconds.ToString("0.#") + "s  LOAD " +
+                target.LoadCapacity.ToString("0.#");
+            return true;
+        }
+
+        private void ExpireOverclock()
+        {
+            overclockedNode.SetCapacityMultiplier(1f);
+            overclockedNode = null;
+            overclockExpiresAtSeconds = 0f;
+            RefreshPayloadAllocations();
+        }
+
+        private void ClearOverclock()
+        {
+            if (overclockedNode != null) overclockedNode.SetCapacityMultiplier(1f);
+            overclockedNode = null;
+            overclockExpiresAtSeconds = 0f;
+            overclockReadyAtSeconds = 0f;
         }
 
         private bool AliasAvailable(LogicalConnectionState owner, string candidate)

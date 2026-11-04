@@ -1290,7 +1290,7 @@ namespace Uptime.Connections
             {
                 NodeResources node = host.Nodes[i];
                 metadata.nodes[i] = new NodeConfiguration { id = node.View.NodeId,
-                    loadCapacity = node.LoadCapacity, baselineLoad = node.BaselineLoad };
+                    loadCapacity = node.BaseLoadCapacity, baselineLoad = node.BaselineLoad };
             }
             if (trafficDirector == null) return metadata;
             IReadOnlyList<ConnectionTrafficProfile> configuredProfiles = trafficDirector.Profiles;
