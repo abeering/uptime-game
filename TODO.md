@@ -9,3 +9,5 @@ If necessary, experiment with faster, irregular noise cadence (~1 second) and a 
 Goal: make individual LOAD changes feel organic without sacrificing the larger behavioral pattern.
 
 # TODO - check tool card gutters - minimize 
+
+# TODO - a status that speeds up infections work 
