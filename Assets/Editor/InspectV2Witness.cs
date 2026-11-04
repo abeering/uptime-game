@@ -81,18 +81,18 @@ namespace Uptime.Connections.EditorTools
                 try
                 {
                     compact.Bind(new[] { first, second });
-                    Check(Height(compact) == 232f && Entry(compact, 0).rect.height == 98f &&
+                    Check(Height(compact) == 220f && Entry(compact, 0).rect.height == 98f &&
                         Entry(compact, 1).rect.height == 98f,
                         "two consecutive compact results use two-row cards");
                     CheckCompact(compact, 0, "LOAD 2.0", 1);
                     CheckCompact(compact, 1, "LOAD 2.0", 1);
                     verbose.Bind(new[] { first }, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(verbose) == 234f && Entry(verbose, 0).rect.height == 210f,
-                        "verbose active result retains its detailed height");
+                    Check(Height(verbose) == 188f && Entry(verbose, 0).rect.height == 176f,
+                        "normal verbose result closes the redundant status row");
                     LogicalConnectionState[] five = Enumerable.Range(1, 5)
                         .Select(i => host.FindConnection("iv" + i)).ToArray();
                     many.Bind(five);
-                    Check(Height(many) == 562f &&
+                    Check(Height(many) == 550f &&
                         many.GetComponentsInChildren<InspectEntry>().Length == 5 &&
                         Enumerable.Range(0, 5).All(i =>
                             EntryComponent(many, i).GetComponent<RectTransform>().rect.height == 98f),
@@ -100,13 +100,15 @@ namespace Uptime.Connections.EditorTools
                     for (int i = 0; i < 5; i++)
                         CheckCompact(many, i, i < 2 ? "LOAD 2.0" : "LOAD 1.0", 1);
                     many.Bind(five, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(many) == 1122f && Enumerable.Range(0, 5).All(i =>
+                    Check(Height(many) == 940f && Enumerable.Range(0, 5).All(i =>
                         ((TMP_Text)new SerializedObject(EntryComponent(many, i))
-                            .FindProperty("throughput").objectReferenceValue).gameObject.activeSelf),
-                        "five-ID verbose output keeps each detailed card");
+                            .FindProperty("throughput").objectReferenceValue).gameObject.activeSelf == false),
+                        "five-ID normal verbose output omits redundant status lines");
                     var detail = new SerializedObject(EntryComponent(verbose, 0));
                     Check(((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
                             .text == "AT SPEED" &&
+                        !((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
+                            .gameObject.activeSelf &&
                         ((TMP_Text)detail.FindProperty("work").objectReferenceValue)
                             .text.Contains("WORK") &&
                         ((TMP_Text)detail.FindProperty("bottleneck").objectReferenceValue)
@@ -115,11 +117,20 @@ namespace Uptime.Connections.EditorTools
                             .gameObject.activeSelf &&
                         ((Image)detail.FindProperty("progressFill").objectReferenceValue)
                             .transform.parent.gameObject.activeSelf,
-                        "verbose retains allocation, WORK, activity, ETA, and progress bar");
-                    Check(((TMP_Text)detail.FindProperty("throughput").objectReferenceValue)
-                        .gameObject.activeSelf, "verbose retains performance explanation");
+                        "verbose retains WORK, activity, ETA, and progress bar");
                     CheckCardGeometry(EntryComponent(compact, 0), false, pillMaterial);
                     CheckCardGeometry(EntryComponent(verbose, 0), true, pillMaterial);
+                    Check(host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 10f, out _),
+                        "contention setup for verbose exception status");
+                    host.StepSimulation(.1f);
+                    verbose.Bind(new[] { first }, presentationMode: InspectPresentationMode.Verbose);
+                    var exception = (TMP_Text)new SerializedObject(EntryComponent(verbose, 0))
+                        .FindProperty("throughput").objectReferenceValue;
+                    Check(first.Performance != LoadPerformance.AtSpeed &&
+                        exception.gameObject.activeSelf &&
+                        (exception.text.StartsWith("SLOWED") || exception.text.StartsWith("STALLED")) &&
+                        Entry(verbose, 0).rect.height == 204f,
+                        "contention keeps explicit status and its space");
                 }
                 finally
                 {
@@ -182,9 +193,9 @@ namespace Uptime.Connections.EditorTools
                     narrowRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 330f);
                     narrow.Bind(new[] { longState });
                     InspectOperationToken[] tight = Tokens(EntryComponent(narrow, 0));
-                    Check(tight.Any(t => t.Text == "READ") &&
+                    Check(tight.Any(t => t.Text.Contains("READ")) &&
                         ((RectTransform)narrow.transform).rect.width == 330f,
-                        "tighter card keeps current operation without reducing pill size: " +
+                        "tighter card keeps current operation within the wider card: " +
                         string.Join(",", tight.Select(t => t.Text)));
                     narrowRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 300f);
                     narrow.Bind(new[] { longState });
@@ -433,12 +444,12 @@ namespace Uptime.Connections.EditorTools
             var pillFields = new SerializedObject(pill);
             var plate = (PillGraphic)pillFields.FindProperty("plate").objectReferenceValue;
             var label = (TMP_Text)pillFields.FindProperty("idText").objectReferenceValue;
-            Check(pill != null && plate.material == material && pill.Size == new Vector2(104f, 70f) &&
-                pillFields.FindProperty("fontSize").floatValue == 51f &&
+            Check(pill != null && plate.material == material && pill.Size == new Vector2(100f, 66f) &&
+                pillFields.FindProperty("fontSize").floatValue == 50f &&
                 pillFields.FindProperty("tintTextWithAccent").boolValue &&
                 label.alignment == TextAlignmentOptions.Center &&
                 label.rectTransform.sizeDelta == new Vector2(-16f, -8f) &&
-                new SerializedObject(plate).FindProperty("cornerRadius").floatValue == 13f &&
+                new SerializedObject(plate).FindProperty("cornerRadius").floatValue == 12f &&
                 new SerializedObject(plate).FindProperty("borderThickness").floatValue == 3f,
                 "authored large ID pill typography, border, padding, and antialiasing");
             Check(rail.rectTransform.rect.height == card.rect.height &&
@@ -447,12 +458,12 @@ namespace Uptime.Connections.EditorTools
                 pillRect.anchoredPosition == new Vector2(16f, -12f) &&
                 purpose.rectTransform.anchoredPosition.x >= pillRect.anchoredPosition.x + pill.Size.x + 12f &&
                 row.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
-                row.rect.height == 40f &&
+                row.rect.height == 38f &&
                 ((RectTransform)load.transform).rect.width == load.Measure(load.Text) &&
                 row.anchoredPosition.x + row.rect.width + 12f <=
                     card.rect.width - 16f - ((RectTransform)load.transform).rect.width + 0.5f &&
                 status.rectTransform.anchoredPosition.x == purpose.rectTransform.anchoredPosition.x &&
-                status.gameObject.activeSelf == verbose &&
+                !status.gameObject.activeSelf &&
                 work.rectTransform.anchoredPosition.x == 16f &&
                 purpose.text != "INSPECT /",
                 "compact and verbose upper geometry preserves rail, timeline, and LOAD sizes");

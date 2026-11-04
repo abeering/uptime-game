@@ -124,7 +124,7 @@ namespace Uptime.Connections.EditorTools
                     float firstDeadline = Deadlines(mixed)[0];
                     Advance(mixed, CollapseEnd(mixed, firstDeadline));
                     Check(Entries(mixed)[0].IsResolvedSummary && !Entries(mixed)[1].IsResolvedSummary &&
-                        Rect(Entries(mixed)[1]).rect.height == 210f, "resolved and active cards are independent");
+                        Rect(Entries(mixed)[1]).rect.height == 176f, "resolved and active cards are independent");
                     host.KillConnection(active.ConnectionId);
                     Advance(mixed, firstDeadline + 1f);
                     Check(Deadlines(mixed)[1] == firstDeadline + 5f && !Entries(mixed)[1].IsResolvedSummary,

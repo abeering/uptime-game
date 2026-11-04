@@ -11,8 +11,10 @@ namespace Uptime.Connections
         [SerializeField] private LayoutElement layout;
         [SerializeField] private PillGraphic nodePill;
         [SerializeField] private TMP_Text nodeIdText;
+        [SerializeField] private TMP_Text headingText;
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_Text timeText;
+        [SerializeField] private TMP_Text etaText;
         [SerializeField] private Image progressFill;
         [SerializeField] private Image accentRail;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.1f;
@@ -47,13 +49,31 @@ namespace Uptime.Connections
             RectTransform parent = transform.parent as RectTransform;
             float width = parent != null && parent.rect.width > 0f ?
                 Mathf.Min(580f, parent.rect.width) : root.rect.width;
+            ScrollRect scroll = GetComponentInParent<ScrollRect>();
+            if (scroll != null && scroll.viewport != null && scroll.viewport.rect.width > 12f)
+                width = Mathf.Min(width, scroll.viewport.rect.width - 12f);
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             if (card != null) card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                Mathf.Max(0f, width - 28f));
+                Mathf.Max(0f, width - 14f));
+            float contentWidth = card != null ? Mathf.Max(0f, card.rect.width) :
+                Mathf.Max(0f, width - 14f);
+            if (headingText != null) headingText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+            if (statusText != null) statusText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+            if (timeText != null) timeText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 32f));
+            if (etaText != null) etaText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Clamp(contentWidth - 128f, 0f, 160f));
+            if (progressFill != null && progressFill.transform.parent is RectTransform progressTrack)
+                progressTrack.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(0f, contentWidth - 32f));
             if (layout != null) layout.preferredHeight = root.rect.height;
 
             bool complete = session.IsComplete;
             bool reset = session.WasReset;
+            float now = host != null ? host.SimulationTimeSeconds : session.StartedAtSeconds;
+            float progress = session.ProgressAt(now);
             Color color = complete ? session.Result == NodeScanResult.Infected ?
                 infectedColor : cleanColor : reset ? infectedColor : scanningColor;
             if (nodePill != null) nodePill.SetOutline(color);
@@ -67,22 +87,22 @@ namespace Uptime.Connections
             if (progressFill != null)
             {
                 progressFill.color = color;
-                float progress = session.ProgressAt(host != null ?
-                    host.SimulationTimeSeconds : session.StartedAtSeconds);
                 var track = (RectTransform)progressFill.transform.parent;
                 progressFill.rectTransform.SetSizeWithCurrentAnchors(
                     RectTransform.Axis.Horizontal, track.rect.width * progress);
             }
             if (accentRail != null) accentRail.color = color;
             if (timeText != null)
+                timeText.text = reset ? "SCAN --" :
+                    "SCAN " + Mathf.RoundToInt(progress * 100f) + "%";
+            if (etaText != null)
             {
-                float remaining = Mathf.Max(0f, session.ScheduledCompletionAtSeconds -
-                    (host != null ? host.SimulationTimeSeconds : session.StartedAtSeconds));
-                timeText.text = complete ? "100%  /  RESULT AT " +
-                    session.CompletedAtSeconds.ToString("0.0") + "s" : reset ? "SESSION RESET" :
-                    Mathf.RoundToInt(session.ProgressAt(host != null ?
-                        host.SimulationTimeSeconds : session.StartedAtSeconds) * 100f) +
-                    "%  /  " + remaining.ToString("0.0") + "s REMAINING";
+                float remaining = Mathf.Max(0f, session.ScheduledCompletionAtSeconds - now);
+                int seconds = Mathf.CeilToInt(remaining);
+                etaText.text = complete ? "RESULT AT " +
+                    session.CompletedAtSeconds.ToString("0.0") + "s" :
+                    reset ? "SESSION RESET" :
+                    $"ETA  {seconds / 60:00}:{seconds % 60:00}";
             }
             if (complete || reset) enabled = false;
         }
