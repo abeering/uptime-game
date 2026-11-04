@@ -88,7 +88,8 @@ namespace Uptime.Connections.EditorTools
                         BindingFlags.NonPublic).Invoke(ui, null);
                     var fill = new SerializedObject(ui).FindProperty("progressFill")
                         .objectReferenceValue as Image;
-                    Check(Mathf.Abs(fill.rectTransform.rect.width - 130f) < .01f,
+                    float trackWidth = ((RectTransform)fill.transform.parent).rect.width;
+                    Check(Mathf.Abs(fill.rectTransform.rect.width - trackWidth * .25f) < .01f,
                         "progress bar uses authoritative quarter-duration width");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(ui.gameObject); }
@@ -225,7 +226,7 @@ namespace Uptime.Connections.EditorTools
             Check(prefab != null && AssetDatabase.GetAssetPath(prefab) ==
                 "Assets/Prefabs/Connections/ScanOutput.prefab", "scene scan prefab binding");
             var data = new SerializedObject(prefab);
-            foreach (string field in new[] { "card", "layout", "nodePill", "nodeIdText",
+            foreach (string field in new[] { "card", "layout", "nodePill", "nodeIdText", "headingText",
                 "statusText", "timeText", "progressFill", "accentRail" })
                 Check(data.FindProperty(field).objectReferenceValue != null,
                     "prefab binding " + field);

@@ -42,10 +42,12 @@ namespace Uptime.Connections
         private float renderedTimelineWidth = -1f;
         private InspectOperationToken activeToken;
         private bool stackedUpper;
+        private bool condensedVerbose;
         private bool resolvedSummary;
         private bool summaryTransition;
 
-        public float ExtraHeight => !resolvedSummary && stackedUpper ? 52f : 0f;
+        public float ExtraHeight => (!resolvedSummary && stackedUpper ? 52f : 0f) -
+            (condensedVerbose && !resolvedSummary ? 28f : 0f);
         public bool IsResolvedSummary => resolvedSummary;
         public bool IsSummaryTransitioning => summaryTransition;
 
@@ -118,8 +120,9 @@ namespace Uptime.Connections
                 stateTag.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
 
-        public void SetCardWidth(float width, float requestedLoad)
+        public void SetCardWidth(float width, float requestedLoad, bool hideNormalStatus = false)
         {
+            condensedVerbose = hideNormalStatus;
             float loadBadgeWidth = loadBadge != null ?
                 loadBadge.Measure(InspectOperationToken.LoadLabel(requestedLoad)) : 0f;
             RectTransform card = (RectTransform)transform;
@@ -161,7 +164,7 @@ namespace Uptime.Connections
                 badge.anchoredPosition = new Vector2(-contentInset,
                     stackedUpper ? -90f : -39f);
                 badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, loadBadgeWidth);
-                badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 40f);
+                badge.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 38f);
             }
             SetTextWidth(throughput, stackedUpper ? contentWidth : upperWidth);
             SetTextWidth(work, contentWidth);
@@ -174,21 +177,23 @@ namespace Uptime.Connections
             SetLeftInset(bottleneck, contentInset);
             if (work != null)
                 work.rectTransform.anchoredPosition = new Vector2(contentInset,
-                    -120f - detailOffset);
+                    -120f - detailOffset + (condensedVerbose ? 28f : 0f));
             if (bottleneck != null)
                 bottleneck.rectTransform.anchoredPosition = new Vector2(contentInset,
-                    -172f - detailOffset);
+                    -166f - detailOffset + (condensedVerbose ? 28f : 0f));
             if (eta != null)
             {
                 RectTransform rect = eta.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
                 rect.pivot = new Vector2(1f, 1f);
-                rect.anchoredPosition = new Vector2(-contentInset, -172f - detailOffset);
+                rect.anchoredPosition = new Vector2(-contentInset,
+                    -166f - detailOffset + (condensedVerbose ? 28f : 0f));
             }
             if (progressFill != null)
             {
                 RectTransform progress = progressFill.transform.parent.GetComponent<RectTransform>();
-                progress.anchoredPosition = new Vector2(contentInset, -148f - detailOffset);
+                progress.anchoredPosition = new Vector2(contentInset,
+                    -148f - detailOffset + (condensedVerbose ? 28f : 0f));
                 progressFill.transform.parent.GetComponent<RectTransform>()
                     .SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, contentWidth);
             }
@@ -253,7 +258,8 @@ namespace Uptime.Connections
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
             Set(bottleneck, state.ActivityDescription);
             Set(eta, CurrentOperationEta(state));
-            if (throughput != null) throughput.gameObject.SetActive(verbose);
+            if (throughput != null)
+                throughput.gameObject.SetActive(verbose && ShowsVerboseStatus(state));
             if (work != null) work.gameObject.SetActive(verbose && !state.IsComplete);
             if (bottleneck != null) bottleneck.gameObject.SetActive(verbose && !state.IsComplete);
             if (eta != null) eta.gameObject.SetActive(verbose && !state.IsComplete);
@@ -270,6 +276,10 @@ namespace Uptime.Connections
             if (progressFill != null && progressFill.color != chrome) progressFill.color = chrome;
             if (stateTag != null && stateTag.color != chrome) stateTag.color = chrome;
         }
+
+        public static bool ShowsVerboseStatus(LogicalConnectionState state) =>
+            !state.IsDemanding || state.Performance != LoadPerformance.AtSpeed ||
+            state.EffectiveWorkRateMultiplier != 1f;
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)
         {

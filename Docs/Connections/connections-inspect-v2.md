@@ -24,6 +24,12 @@ The shared authored token prefab gives active, completed, future-count, and LOAD
 
 The extended Inspect V2 Witness checks padding/centering, one-decimal LOAD under a comma-decimal locale, stable `1.9 → 2.0 → 2.1` widths, live one-/two-digit badge resizing, narrow cards, and completed/killed/canceled output. See the [Editor previews and manual review steps](../Review/ConnectionsInspectPillFit/README.md).
 
+## Terminal card density follow-up
+
+The Connections terminal's `inspect`, `load`, `work`, and `scan` cards now share a 7-unit outer side gutter and 6-unit outer top/bottom gutter. Their internal content padding remains independent. The terminal history's own padding and row separation are unchanged; multi-ID inspect keeps its 12-unit gap between distinct connections. Each card uses the available history width with the same scrollbar allowance, capped at 580 units. LOAD and WORK retain their 12-unit inset below the last row. Scan's text and progress track fit the wider card at narrow terminal widths.
+
+Inspect's large identity pill, purpose, and operation/LOAD tokens each step down slightly in size. The WORK text, bar, activity, and ETA type remain at their prior sizes; the bar-to-activity gap is smaller. In verbose mode, a normal at-speed operation uses the green operation pill without a repeated `AT SPEED` line. The WORK section moves up and the card shrinks in that case. Slowed, stalled, work-rate-modified, connecting, transition, and resolved states retain explicit status text and its space. Compact mode continues to omit status and WORK details. The visual changes do not alter LOAD allocation, WORK progress, command timing, or the information available through inspection.
+
 ## Resolved summary follow-up — gameplay QoL branch
 
 The existing active card and immediate resolution transition remain unchanged in the requested compact or verbose mode. On first rendering a resolved state, each card starts its own four-second hold using unscaled UI time. It then becomes a 48-unit horizontal summary with a 54×28 ID pill, purpose, operation badge, and explicit outcome. The smaller operation badge reuses the authored token and pill material, with 28-unit height and proportionally reduced padding/type. The existing muted color and left accent remain; LOAD, WORK, progress, activity, and ETA are hidden. Long purposes ellipsize; narrow rows can shorten the operation label to its kind before constraining it.

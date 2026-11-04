@@ -70,7 +70,7 @@ namespace Uptime.Connections.EditorTools
                 load.Bind("db", host);
                 Check(db.ConnectionRowCount == 0 && Empty(db).gameObject.activeSelf &&
                     ((RectTransform)db.transform).rect.width == 320f &&
-                    ((RectTransform)db.transform).rect.height == 146f,
+                    ((RectTransform)db.transform).rect.height == 134f,
                     "empty state and narrow width");
                 ((RectTransform)parent.transform).sizeDelta = new Vector2(580f, 800f);
                 Refresh(db); Refresh(secondDb); Refresh(auth);
@@ -118,8 +118,8 @@ namespace Uptime.Connections.EditorTools
                 Check(Row(auth, "w3").DisplayedEta == "ETA  --:--" &&
                     host.FindConnection("w3").AllocatedLoad == 0f,
                     "zero allocation shows unknown ETA even with a pause modifier");
-                Check(((RectTransform)db.transform).rect.height == 270f &&
-                    ((RectTransform)auth.transform).rect.height == 190f,
+                Check(((RectTransform)db.transform).rect.height == 258f &&
+                    ((RectTransform)auth.transform).rect.height == 178f,
                     "two-row height reflow");
                 ((RectTransform)parent.transform).sizeDelta = new Vector2(320f, 800f);
                 Refresh(db);

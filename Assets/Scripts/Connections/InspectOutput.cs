@@ -132,11 +132,16 @@ namespace Uptime.Connections
             RectTransform parent = transform.parent as RectTransform;
             float available = parent != null && parent.rect.width > 0f ?
                 Mathf.Min(580f, parent.rect.width) : root.rect.width;
+            ScrollRect scroll = GetComponentInParent<ScrollRect>();
+            if (scroll != null && scroll.viewport != null && scroll.viewport.rect.width > 12f)
+                available = Mathf.Min(available, scroll.viewport.rect.width - 12f);
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, available);
-            float cardWidth = Mathf.Max(0f, available - 28f);
+            float cardWidth = Mathf.Max(0f, available - 14f);
             for (int i = 0; i < cards.Count; i++)
                 cards[i].SetCardWidth(cardWidth,
-                    i < states.Length && states[i].IsDemanding ? states[i].DesiredLoad : 0f);
+                    i < states.Length && states[i].IsDemanding ? states[i].DesiredLoad : 0f,
+                    mode == InspectPresentationMode.Verbose && i < states.Length &&
+                    !InspectEntry.ShowsVerboseStatus(states[i]));
         }
 
         private void Reflow(float now)
@@ -170,7 +175,7 @@ namespace Uptime.Connections
             {
                 float height = EntryHeight(i, now);
                 RectTransform entry = (RectTransform)cards[i].transform;
-                entry.anchoredPosition = new Vector2(14f, -y);
+                entry.anchoredPosition = new Vector2(7f, -y);
                 cards[i].SetHeight(height);
                 y += height + (i + 1 < states.Length ? entryGap : 0f);
             }

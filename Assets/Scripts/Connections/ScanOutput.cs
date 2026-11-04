@@ -11,6 +11,7 @@ namespace Uptime.Connections
         [SerializeField] private LayoutElement layout;
         [SerializeField] private PillGraphic nodePill;
         [SerializeField] private TMP_Text nodeIdText;
+        [SerializeField] private TMP_Text headingText;
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_Text timeText;
         [SerializeField] private Image progressFill;
@@ -47,9 +48,23 @@ namespace Uptime.Connections
             RectTransform parent = transform.parent as RectTransform;
             float width = parent != null && parent.rect.width > 0f ?
                 Mathf.Min(580f, parent.rect.width) : root.rect.width;
+            ScrollRect scroll = GetComponentInParent<ScrollRect>();
+            if (scroll != null && scroll.viewport != null && scroll.viewport.rect.width > 12f)
+                width = Mathf.Min(width, scroll.viewport.rect.width - 12f);
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             if (card != null) card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                Mathf.Max(0f, width - 28f));
+                Mathf.Max(0f, width - 14f));
+            float contentWidth = card != null ? Mathf.Max(0f, card.rect.width) :
+                Mathf.Max(0f, width - 14f);
+            if (headingText != null) headingText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+            if (statusText != null) statusText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+            if (timeText != null) timeText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+            if (progressFill != null && progressFill.transform.parent is RectTransform progressTrack)
+                progressTrack.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(0f, contentWidth - 32f));
             if (layout != null) layout.preferredHeight = root.rect.height;
 
             bool complete = session.IsComplete;

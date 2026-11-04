@@ -134,7 +134,7 @@ namespace Uptime.Connections
             FitWidth();
             int count = order.Count;
             if (emptyText != null) emptyText.gameObject.SetActive(count == 0);
-            float height = 114f + Mathf.Max(1, count) * rowHeight +
+            float height = 102f + Mathf.Max(1, count) * rowHeight +
                 Mathf.Max(0, count - 1) * rowGap;
             RectTransform root = (RectTransform)transform;
             if (Mathf.Abs(root.rect.height - height) > 0.01f)
@@ -189,12 +189,13 @@ namespace Uptime.Connections
             ScrollRect scroll = GetComponentInParent<ScrollRect>();
             float viewportWidth = scroll != null && scroll.viewport != null ?
                 scroll.viewport.rect.width - 12f : 0f;
-            float available = viewportWidth > 0f ? viewportWidth :
-                parent != null && parent.rect.width > 0f ? parent.rect.width : root.rect.width;
+            float available = parent != null && parent.rect.width > 0f ?
+                parent.rect.width : root.rect.width;
+            if (viewportWidth > 0f) available = Mathf.Min(available, viewportWidth);
             float width = Mathf.Min(580f, available);
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             if (layout != null) layout.preferredWidth = width;
-            float cardWidth = Mathf.Max(0f, width - 28f);
+            float cardWidth = Mathf.Max(0f, width - 14f);
             if (card != null)
                 card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, cardWidth);
             float contentWidth = Mathf.Max(0f, cardWidth - 32f);
@@ -218,7 +219,7 @@ namespace Uptime.Connections
             RectTransform root = (RectTransform)transform;
             root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
             if (card != null)
-                card.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height - 24f);
+                card.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height - 12f);
             if (layout != null) layout.preferredHeight = height;
         }
 

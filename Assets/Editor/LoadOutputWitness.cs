@@ -74,7 +74,7 @@ namespace Uptime.Connections.EditorTools
                         !Rows(panel).Any() && panel.CurrentScale == 3f,
                         "zero-demand node has no obsolete rows");
                     Check(((RectTransform)panel.transform).rect.width == 320f &&
-                        ((RectTransform)panel.transform).rect.height == 146f &&
+                        ((RectTransform)panel.transform).rect.height == 134f &&
                         Empty(panel).preferredWidth <= Empty(panel).rectTransform.rect.width,
                         "narrow terminal width and empty layout");
                     CheckBottomGutter(panel, 0);
@@ -343,9 +343,9 @@ namespace Uptime.Connections.EditorTools
             var rows = (RectTransform)card.Find("Rows");
             float outside = root.rect.height + card.anchoredPosition.y - card.rect.height;
             LoadRequestRow[] active = Rows(panel);
-            Check(active.Length == expectedRows && Mathf.Abs(outside - 12f) < .01f &&
+            Check(active.Length == expectedRows && Mathf.Abs(outside - 6f) < .01f &&
                 Mathf.Abs(rail.rect.height - card.rect.height) < .01f,
-                "LOAD card has the same 12-unit outer bottom gutter and full-height rail as other cards");
+                "LOAD card has a 6-unit outer bottom gutter and full-height rail");
             if (active.Length == 0)
             {
                 TMP_Text empty = Empty(panel);
