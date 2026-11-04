@@ -88,9 +88,13 @@ namespace Uptime.Connections.EditorTools
                         BindingFlags.NonPublic).Invoke(ui, null);
                     var fill = new SerializedObject(ui).FindProperty("progressFill")
                         .objectReferenceValue as Image;
+                    var output = new SerializedObject(ui);
+                    var scanProgress = output.FindProperty("timeText").objectReferenceValue as TMP_Text;
+                    var eta = output.FindProperty("etaText").objectReferenceValue as TMP_Text;
                     float trackWidth = ((RectTransform)fill.transform.parent).rect.width;
-                    Check(Mathf.Abs(fill.rectTransform.rect.width - trackWidth * .25f) < .01f,
-                        "progress bar uses authoritative quarter-duration width");
+                    Check(Mathf.Abs(fill.rectTransform.rect.width - trackWidth * .25f) < .01f &&
+                        scanProgress.text == "SCAN 25%" && eta.text == "ETA  00:06",
+                        "scan progress and ETA use authoritative simulation time");
                 }
                 finally { UnityEngine.Object.DestroyImmediate(ui.gameObject); }
                 host.StepSimulation(5.9f);
@@ -227,12 +231,16 @@ namespace Uptime.Connections.EditorTools
                 "Assets/Prefabs/Connections/ScanOutput.prefab", "scene scan prefab binding");
             var data = new SerializedObject(prefab);
             foreach (string field in new[] { "card", "layout", "nodePill", "nodeIdText", "headingText",
-                "statusText", "timeText", "progressFill", "accentRail" })
+                "statusText", "timeText", "etaText", "progressFill", "accentRail" })
                 Check(data.FindProperty(field).objectReferenceValue != null,
                     "prefab binding " + field);
             var pill = data.FindProperty("nodePill").objectReferenceValue as PillGraphic;
             var card = data.FindProperty("card").objectReferenceValue as RectTransform;
             var fill = data.FindProperty("progressFill").objectReferenceValue as Image;
+            var heading = data.FindProperty("headingText").objectReferenceValue as TMP_Text;
+            var status = data.FindProperty("statusText").objectReferenceValue as TMP_Text;
+            var progress = data.FindProperty("timeText").objectReferenceValue as TMP_Text;
+            var eta = data.FindProperty("etaText").objectReferenceValue as TMP_Text;
             Check(pill.material != null && AssetDatabase.GetAssetPath(pill.material) ==
                 "Assets/Shaders/ConnectionsPill.mat" &&
                 pill.rectTransform.rect.width >= 100f && pill.rectTransform.rect.height >= 60f &&
@@ -241,6 +249,14 @@ namespace Uptime.Connections.EditorTools
             Check(prefab.GetComponent<LayoutElement>().preferredHeight <= 170f &&
                 prefab.GetComponent<RectTransform>().localScale == Vector3.one,
                 "compact unscaled terminal block");
+            Check(Mathf.Abs(status.rectTransform.anchoredPosition.y + 42f) < .01f &&
+                Mathf.Abs(status.rectTransform.anchoredPosition.y -
+                    (heading.rectTransform.anchoredPosition.y - heading.rectTransform.rect.height)) <= 2f &&
+                progress.rectTransform.anchoredPosition.x == 16f &&
+                eta.rectTransform.anchoredPosition.x == -16f &&
+                progress.alignment == TextAlignmentOptions.TopLeft &&
+                eta.alignment == TextAlignmentOptions.TopRight,
+                "scan status aligns with the node pill and progress/ETA flank the bar");
         }
 
         private static void QueueDelivery(SimulationHost host,

@@ -14,6 +14,7 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text headingText;
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private TMP_Text timeText;
+        [SerializeField] private TMP_Text etaText;
         [SerializeField] private Image progressFill;
         [SerializeField] private Image accentRail;
         [SerializeField, Min(0.05f)] private float refreshSeconds = 0.1f;
@@ -61,7 +62,9 @@ namespace Uptime.Connections
             if (statusText != null) statusText.rectTransform.SetSizeWithCurrentAnchors(
                 RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
             if (timeText != null) timeText.rectTransform.SetSizeWithCurrentAnchors(
-                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 164f));
+                RectTransform.Axis.Horizontal, Mathf.Max(0f, contentWidth - 32f));
+            if (etaText != null) etaText.rectTransform.SetSizeWithCurrentAnchors(
+                RectTransform.Axis.Horizontal, Mathf.Clamp(contentWidth - 128f, 0f, 160f));
             if (progressFill != null && progressFill.transform.parent is RectTransform progressTrack)
                 progressTrack.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
                     Mathf.Max(0f, contentWidth - 32f));
@@ -69,6 +72,8 @@ namespace Uptime.Connections
 
             bool complete = session.IsComplete;
             bool reset = session.WasReset;
+            float now = host != null ? host.SimulationTimeSeconds : session.StartedAtSeconds;
+            float progress = session.ProgressAt(now);
             Color color = complete ? session.Result == NodeScanResult.Infected ?
                 infectedColor : cleanColor : reset ? infectedColor : scanningColor;
             if (nodePill != null) nodePill.SetOutline(color);
@@ -82,22 +87,22 @@ namespace Uptime.Connections
             if (progressFill != null)
             {
                 progressFill.color = color;
-                float progress = session.ProgressAt(host != null ?
-                    host.SimulationTimeSeconds : session.StartedAtSeconds);
                 var track = (RectTransform)progressFill.transform.parent;
                 progressFill.rectTransform.SetSizeWithCurrentAnchors(
                     RectTransform.Axis.Horizontal, track.rect.width * progress);
             }
             if (accentRail != null) accentRail.color = color;
             if (timeText != null)
+                timeText.text = reset ? "SCAN --" :
+                    "SCAN " + Mathf.RoundToInt(progress * 100f) + "%";
+            if (etaText != null)
             {
-                float remaining = Mathf.Max(0f, session.ScheduledCompletionAtSeconds -
-                    (host != null ? host.SimulationTimeSeconds : session.StartedAtSeconds));
-                timeText.text = complete ? "100%  /  RESULT AT " +
-                    session.CompletedAtSeconds.ToString("0.0") + "s" : reset ? "SESSION RESET" :
-                    Mathf.RoundToInt(session.ProgressAt(host != null ?
-                        host.SimulationTimeSeconds : session.StartedAtSeconds) * 100f) +
-                    "%  /  " + remaining.ToString("0.0") + "s REMAINING";
+                float remaining = Mathf.Max(0f, session.ScheduledCompletionAtSeconds - now);
+                int seconds = Mathf.CeilToInt(remaining);
+                etaText.text = complete ? "RESULT AT " +
+                    session.CompletedAtSeconds.ToString("0.0") + "s" :
+                    reset ? "SESSION RESET" :
+                    $"ETA  {seconds / 60:00}:{seconds % 60:00}";
             }
             if (complete || reset) enabled = false;
         }
