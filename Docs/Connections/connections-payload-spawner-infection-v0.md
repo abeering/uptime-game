@@ -1,6 +1,6 @@
 # Payload Spawner Infection V0
 
-**Later integration:** [Ambient Payload Threats V0](connections-ambient-payload-threats-v0.md) lets Advanced generated INFECTORs select this existing infection while keeping the connection Spawner's children on their earlier three-kind selection.
+**Later integration:** [Ambient Payload Threats V0](connections-ambient-payload-threats-v0.md) lets Advanced generated INFECTORs select this existing infection. [BACKDOOR V0](connections-backdoor-v0.md) later expands connection Spawner children to Phantom LOAD, Blackout, Spawner, and BACKDOOR; Payload Spawner remains excluded.
 
 **Scope:** Connections implementation, November 5, 2026. This is a manual playtest infection, separate from the existing connection Spawner. It does not add an ambient INFECTOR outcome or change Packet.
 

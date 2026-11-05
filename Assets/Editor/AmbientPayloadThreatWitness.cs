@@ -28,6 +28,21 @@ namespace Uptime.Connections.EditorTools
                 traffic.HostileMeanIntervalSeconds == 30f &&
                 activity.PayloadLauncherWeight == 1f && traffic.PayloadSpawnerWeight == 1f,
                 "Advanced authored weights and unchanged opportunity interval");
+            var weights = new[] { "phantomLoadWeight", "blackoutWeight", "spawnerWeight",
+                "payloadSpawnerWeight", "backdoorWeight" }.Select(name =>
+                    typeof(ConnectionTrafficDirector).GetField(name,
+                        BindingFlags.Instance | BindingFlags.NonPublic) ??
+                    throw new InvalidOperationException("Missing infection weight: " + name)).ToArray();
+            float[] originals = weights.Select(field => (float)field.GetValue(traffic)).ToArray();
+            float[] originalActivity = { activity.OrdinaryWeight, activity.ReconnaissanceWeight,
+                activity.PayloadWeight, activity.WormWeight, activity.PayloadLauncherWeight };
+            int originalSeed = traffic.Seed;
+            bool originalRandomizeSeed = traffic.RandomizeSeed;
+            bool originalAutoGeneration = traffic.AutoGenerationEnabled;
+            bool originalHostileGeneration = traffic.HostileGenerationEnabled;
+            ConnectionRunMode originalMode = host.RunMode;
+            try
+            {
             traffic.RandomizeSeed = false;
             traffic.AutoGenerationEnabled = false;
             host.SetRunMode(ConnectionRunMode.Generated);
@@ -68,13 +83,11 @@ namespace Uptime.Connections.EditorTools
                 host.Infections.All(i => i.Target.View.NodeId != "API"),
                 "completed launcher starts one API-to-DB strike without infecting API");
 
-            var weights = new[] { "phantomLoadWeight", "blackoutWeight", "spawnerWeight",
-                "payloadSpawnerWeight" }.Select(name => typeof(ConnectionTrafficDirector)
-                    .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)).ToArray();
-            float[] originals = weights.Select(field => (float)field.GetValue(traffic)).ToArray();
             try
             {
-                for (int i = 0; i < weights.Length; i++) weights[i].SetValue(traffic, i == 3 ? 1f : 0f);
+                // Explicitly disable BACKDOOR while forcing Payload Spawner.
+                for (int i = 0; i < weights.Length; i++)
+                    weights[i].SetValue(traffic, i == 3 ? 1f : 0f);
                 Reset(host, traffic, recorder, 1701);
                 ConnectionSpawnPlan carrier = traffic.GenerateInfectorPlanForWitness(0f);
                 Check(carrier.Operations.Last().InfectionPayload.Kind == InfectionKind.PayloadSpawner &&
@@ -110,8 +123,9 @@ namespace Uptime.Connections.EditorTools
                     recorder.CurrentLog.events.Count(e => e.type == "payload_spawner_attempt") == 1,
                     "cleaning stops future launches and leaves the in-flight Payload independent");
 
-                // The connection Spawner keeps its original three-way child selection.
-                for (int i = 0; i < weights.Length; i++) weights[i].SetValue(traffic, i == 0 ? 1f : i == 3 ? 100f : 0f);
+                // Payload Spawner is excluded from connection Spawner children.
+                for (int i = 0; i < weights.Length; i++)
+                    weights[i].SetValue(traffic, i == 0 ? 1f : i == 3 ? 100f : 0f);
                 Reset(host, traffic, recorder, 1701);
                 Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
                     "connection Spawner setup");
@@ -122,6 +136,19 @@ namespace Uptime.Connections.EditorTools
                     recorder.CurrentLog.events.Count(e => e.type == "plan_queued" &&
                         e.source == "spawner") >= 4,
                     "connection Spawner excludes recursive Payload Spawner outcome");
+
+                // BACKDOOR is the fourth eligible child kind, still excluding Payload Spawner.
+                for (int i = 0; i < weights.Length; i++)
+                    weights[i].SetValue(traffic, i == 4 ? 1f : i == 3 ? 100f : 0f);
+                Reset(host, traffic, recorder, 1701);
+                Check(host.TryInjectInfection("DB", InfectionKind.Spawner, 1f, out _),
+                    "BACKDOOR child selection setup");
+                host.StepSimulation(5f);
+                var backdoorChildren = recorder.CurrentLog.events.Where(e =>
+                    e.type == "plan_queued" && e.source == "spawner").ToArray();
+                Check(backdoorChildren.Length >= 4 && backdoorChildren.All(e =>
+                    e.definition.operations.Last().infectionKind == "Backdoor"),
+                    "connection Spawner can select BACKDOOR without selecting Payload Spawner");
             }
             finally
             {
@@ -159,6 +186,29 @@ namespace Uptime.Connections.EditorTools
             Check(first == replay, "seeded ambient reset/replay");
             foreach (int seed in new[] { 1702, 1703, 1704 })
                 RunSignature(host, traffic, recorder, seed);
+            }
+            finally
+            {
+                for (int i = 0; i < weights.Length; i++)
+                    weights[i].SetValue(traffic, originals[i]);
+                host.SetRunMode(originalMode);
+                traffic.Seed = originalSeed;
+                traffic.RandomizeSeed = originalRandomizeSeed;
+                traffic.AutoGenerationEnabled = originalAutoGeneration;
+                traffic.HostileGenerationEnabled = originalHostileGeneration;
+                SetActivity(activity, originalActivity[0], originalActivity[1],
+                    originalActivity[2], originalActivity[3], originalActivity[4]);
+            }
+            Check(weights.Select(field => (float)field.GetValue(traffic))
+                    .SequenceEqual(originals) && traffic.Seed == originalSeed &&
+                traffic.RandomizeSeed == originalRandomizeSeed &&
+                traffic.AutoGenerationEnabled == originalAutoGeneration &&
+                traffic.HostileGenerationEnabled == originalHostileGeneration &&
+                host.RunMode == originalMode &&
+                new[] { activity.OrdinaryWeight, activity.ReconnaissanceWeight,
+                    activity.PayloadWeight, activity.WormWeight,
+                    activity.PayloadLauncherWeight }.SequenceEqual(originalActivity),
+                "scene configuration restored after forced selections");
             Debug.Log("AmbientPayloadThreatWitness PASS: both scene weights, Launcher lineage/kill, " +
                 "INFECTOR cadence, CLEAN independence, Spawner exclusion, toggles, replay, " +
                 "and four 600-second Advanced simulations.");

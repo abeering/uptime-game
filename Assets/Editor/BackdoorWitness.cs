@@ -31,6 +31,7 @@ namespace Uptime.Connections.EditorTools
             RunRace(host, traffic, db, edge, false);
             RunRace(host, traffic, db, edge, true);
             RunDynamicRates(host, traffic, db, edge);
+            RunScanCleanLifecycle(host, traffic, presenter, recorder, db, edge);
 
             host.ResetSimulation();
             recorder.BeginRun();
@@ -71,7 +72,107 @@ namespace Uptime.Connections.EditorTools
                 Terminal.TryParseInfectionKind("backdoor", out InfectionKind kind) &&
                 kind == InfectionKind.Backdoor, "developer commands parse");
             Debug.Log("BackdoorWitness PASS: 10 capacity / 6+6 LOAD race, 5 vs 10 WORK/s, " +
-                "kill at 12s, multi-operation rate, coexistence, expiry, presentation, receipts.");
+                "kill at 12s, multi-operation rate, scan/CLEAN, coexistence, expiry, " +
+                "presentation, receipts.");
+        }
+
+        private static void RunScanCleanLifecycle(SimulationHost host,
+            ConnectionTrafficDirector traffic, NodeStatusPresenter presenter,
+            ConnectionsRunRecorder recorder, NodeResources db, NodeView[] route)
+        {
+            host.ResetSimulation();
+            recorder.BeginRun();
+            Queue(traffic, route, "backdoor-source", true, 6f, 1f, false);
+            Queue(traffic, route, "active-infector", true, 6f, 1000f, false);
+            host.StepSimulation(.01f);
+            host.StepSimulation(.5f);
+            var active = host.FindConnection("active-infector");
+            NodeInfection installed = host.Infections.Single(i =>
+                i.Payload.Kind == InfectionKind.Backdoor);
+            Check(installed.SourceConnectionId == "backdoor-source" &&
+                installed.SourceOperationIndex == 0 && active.IsActive &&
+                active.EffectiveWorkRateMultiplier == 2f,
+                "delivered BACKDOOR accelerates an already-active INFECTOR");
+            presenter.RenderNow(10f, 1f);
+            NodeStatusState status = presenter.StateFor(db.View);
+            Check(!status.KnownInfected && !status.Backdoor &&
+                !presenter.ViewFor(db.View).PainVisible &&
+                !presenter.StampFor(db.View).IsPlaying,
+                "persistent delivery does not reveal infection status or stamp");
+
+            Check(host.StartScan("DB", "scan DB", out NodeScanSession scan) ==
+                ScanStartResult.Started, "scan starts on covert BACKDOOR");
+            host.StepSimulation(host.ScanDurationSeconds);
+            presenter.RenderNow(11f, 1f);
+            Check(scan.IsComplete && scan.Result == NodeScanResult.Infected &&
+                status.KnownInfected && active.IsActive,
+                "completed scan reports INFECTED without naming the kind");
+            RunEvent scanStarted = recorder.CurrentLog.events.Single(e =>
+                e.type == "scan_started" && e.scanSessionId == scan.Id);
+            RunEvent scanCompleted = recorder.CurrentLog.events.Single(e =>
+                e.type == "scan_completed" && e.scanSessionId == scan.Id);
+            Check(scanCompleted.scanResult == "INFECTED" &&
+                scanCompleted.targetNodeId == "DB" &&
+                scanCompleted.actionSequence == scanStarted.actionSequence &&
+                recorder.CurrentLog.events.Any(e => e.type == "player_action" &&
+                    e.command == "scan DB" && e.sequence == scanStarted.actionSequence),
+                "scan action and result retain recorder linkage");
+
+            Check(host.StartClean("DB", "clean DB", out CleanSession clean) ==
+                CleanStartResult.Started && !clean.WasHealthy && host.Infections.Count == 1,
+                "PID-Select captures persistent BACKDOOR");
+            int pid = clean.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(pid, out int removed) ==
+                CleanSelectionResult.Success && removed == 1 &&
+                host.Infections.All(i => i.Payload.Kind != InfectionKind.Backdoor) &&
+                active.IsActive && active.EffectiveWorkRateMultiplier == 1f &&
+                active.ActualWorkRate == active.AllocatedLoad,
+                "CLEAN removes the only source and immediately restores active WORK rate");
+            RunEvent cleanStarted = recorder.CurrentLog.events.Single(e =>
+                e.type == "clean_started" && e.cleanSessionId == clean.Id);
+            RunEvent cleanSucceeded = recorder.CurrentLog.events.Single(e =>
+                e.type == "clean_succeeded" && e.cleanSessionId == clean.Id);
+            RunEvent removal = recorder.CurrentLog.events.Single(e =>
+                e.type == "infection_removed" && e.infectionKind == "Backdoor");
+            Check(cleanSucceeded.removedInfectionCount == 1 &&
+                cleanSucceeded.selectedPid == pid &&
+                cleanSucceeded.actionSequence == cleanStarted.actionSequence &&
+                removal.actionSequence == cleanStarted.actionSequence &&
+                removal.reason == "player_clean" && removal.source == "player_clean" &&
+                removal.sourceConnectionId == installed.SourceConnectionId &&
+                removal.sourceOperationIndex == installed.SourceOperationIndex &&
+                removal.infectionAppliedAtSeconds == installed.AppliedAtSeconds &&
+                recorder.CurrentLog.events.Any(e => e.type == "player_action" &&
+                    e.command == "clean DB" && e.sequence == cleanStarted.actionSequence),
+                "CLEAN and removal receipts retain action and delivery provenance");
+
+            host.ResetSimulation();
+            recorder.BeginRun();
+            Queue(traffic, route, "overlap-infector", true, 6f, 1000f, false);
+            host.StepSimulation(.01f);
+            var overlap = host.FindConnection("overlap-infector");
+            host.ApplyCondition(db, new ConditionPayload(ConditionKind.Backdoor, 20f));
+            Check(host.TryInjectInfection("DB", InfectionKind.Backdoor, 0f, out _) &&
+                overlap.EffectiveWorkRateMultiplier == 2f,
+                "temporary and persistent sources overlap without stacking");
+            Check(host.StartClean("DB", "clean DB", out CleanSession overlappingClean) ==
+                CleanStartResult.Started, "overlap CLEAN starts");
+            int overlappingPid = overlappingClean.Processes.Single(p => p.CpuPercent >= 82).Pid;
+            Check(host.SelectCleanPid(overlappingPid, out int overlapRemoved) ==
+                CleanSelectionResult.Success && overlapRemoved == 1 &&
+                host.ConditionFor(db.View, ConditionKind.Backdoor) != null &&
+                overlap.EffectiveWorkRateMultiplier == 2f,
+                "CLEAN leaves the temporary acceleration active");
+            Check(host.StartScan("DB", "scan DB", out NodeScanSession cleanScan) ==
+                ScanStartResult.Started, "scan starts while only condition remains");
+            host.StepSimulation(host.ScanDurationSeconds);
+            Check(cleanScan.IsComplete && cleanScan.Result == NodeScanResult.Clean &&
+                overlap.EffectiveWorkRateMultiplier == 2f,
+                "condition does not make the scan report an infection");
+            host.StepSimulation(20f - host.ScanDurationSeconds);
+            Check(host.ConditionFor(db.View, ConditionKind.Backdoor) == null &&
+                overlap.IsActive && overlap.EffectiveWorkRateMultiplier == 1f,
+                "last source expiry restores normal WORK rate after CLEAN");
         }
 
         private static void RunRace(SimulationHost host, ConnectionTrafficDirector traffic,

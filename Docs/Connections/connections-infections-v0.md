@@ -1,5 +1,7 @@
 # Connections Infections V0 — Phantom LOAD, Blackout, and Spawner
 
+**BACKDOOR V0 update (November 5, 2026):** Connection Spawner children now choose among Phantom LOAD, Blackout, Spawner, and BACKDOOR. Payload Spawner remains excluded. The three-kind descriptions and witness results below retain their earlier PR #33 baseline; see [BACKDOOR V0](connections-backdoor-v0.md) for the later interaction.
+
 **Payload Spawner follow-up (November 5, 2026):** A separately named, manually injected `PayloadSpawner` infection periodically launches one-hop Payloads. It is not the connection-generating Spawner described below. See [Payload Spawner Infection V0](connections-payload-spawner-infection-v0.md) for its narrow current contract.
 
 ## CLEAN focus and window lifecycle (November 4, 2026)
