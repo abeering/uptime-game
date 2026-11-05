@@ -12153,6 +12153,27 @@ MonoBehaviour:
       meanWork: 0
       completionEffect: 0
       behaviors: []
+  - id: payload-launcher
+    claimedPurpose: Application Updates
+    eligibleTargetIds:
+    - API
+    ambientWeight: 0
+    purposeTemplate: 0
+    isHostile: 1
+    connectionBehaviors: []
+    operations:
+    - operation: 2
+      activityDescription: Applying service update
+      minimumLoad: 3
+      maximumLoad: 3
+      minimumDuration: 20
+      maximumDuration: 20
+      meanWork: 0
+      completionEffect: 3
+      launchSpec:
+        destinationNodeId: DB
+        motionProfile: 0
+      behaviors: []
   - id: basic-threat
     claimedPurpose: Database Maintenance
     eligibleTargetIds:

@@ -135,6 +135,8 @@ namespace Uptime.Connections
     {
         public string kind;
         public string completionEffect;
+        public string launchDestinationNodeId;
+        public string launchMotionProfile;
         public string activityDescription;
         public BehaviorRecord[] behaviors;
         public float minimumLoad;
@@ -197,6 +199,8 @@ namespace Uptime.Connections
         public float hostileActivityRoll;
         public string activityOriginNodeId;
         public string targetNodeId;
+        public string launchOriginNodeId;
+        public string launchDestinationNodeId;
         public string infectionKind;
         public float infectionLoad;
         public float infectionCadence;
@@ -323,6 +327,8 @@ namespace Uptime.Connections
     {
         public string kind;
         public string completionEffect;
+        public string launchDestinationNodeId;
+        public string launchMotionProfile;
         public string conditionKind;
         public float conditionDurationSeconds;
         public string infectionKind;
@@ -926,6 +932,23 @@ namespace Uptime.Connections
             entry.infectionCadence = occurrence.Payload?.CadenceSeconds ?? 0f;
             entry.conditionKind = occurrence.ConditionPayload?.Kind.ToString();
             entry.conditionDurationSeconds = occurrence.ConditionPayload?.DurationSeconds ?? 0f;
+            entry.launchOriginNodeId = occurrence.Type == CompletionEffect.PayloadLaunch ?
+                occurrence.TargetNodeId : null;
+            entry.launchDestinationNodeId = occurrence.LaunchSpec?.DestinationNodeId;
+        }
+
+        public void RecordPayloadLaunch(ConnectionEffectOccurrence occurrence, PayloadState payload)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("payload_launched", occurrence.TimeSeconds);
+            entry.connectionId = occurrence.ConnectionId;
+            entry.operationIndex = occurrence.OperationIndex;
+            entry.effectType = occurrence.Type.ToString();
+            entry.payloadId = payload.Id;
+            entry.payloadProfile = payload.Profile.ToString();
+            entry.launchOriginNodeId = occurrence.TargetNodeId;
+            entry.launchDestinationNodeId = occurrence.LaunchSpec.DestinationNodeId;
+            entry.targetNodeId = occurrence.LaunchSpec.DestinationNodeId;
         }
 
         public void RecordInfection(string type, NodeInfection infection, float time,
@@ -1379,6 +1402,8 @@ namespace Uptime.Connections
                     ConnectionOperationProfile operation = source.operations[j];
                     profile.operations[j] = new OperationRange { kind = operation.operation.ToString(),
                         completionEffect = operation.completionEffect.ToString(),
+                        launchDestinationNodeId = operation.launchSpec?.DestinationNodeId,
+                        launchMotionProfile = operation.launchSpec?.MotionProfile.ToString(),
                         activityDescription = operation.activityDescription,
                         behaviors = Behaviors(operation.behaviors),
                         minimumLoad = operation.minimumLoad, maximumLoad = operation.maximumLoad,
@@ -1415,6 +1440,8 @@ namespace Uptime.Connections
                 float load = definition.LoadAt(i);
                 result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
                     completionEffect = definition.EffectAt(i).ToString(),
+                    launchDestinationNodeId = definition.LaunchAt(i)?.DestinationNodeId,
+                    launchMotionProfile = definition.LaunchAt(i)?.MotionProfile.ToString(),
                     infectionKind = definition.PayloadAt(i)?.Kind.ToString(),
                     infectionLoad = definition.PayloadAt(i)?.RequestedLoad ?? 0f,
                     infectionCadence = definition.PayloadAt(i)?.CadenceSeconds ?? 0f,

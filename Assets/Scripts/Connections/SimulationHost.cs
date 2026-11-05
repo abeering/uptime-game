@@ -245,6 +245,20 @@ namespace Uptime.Connections
         {
             if (deltaSeconds <= 0f || float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds))
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
+            // A launched Payload must begin moving at its actual fixed-step completion,
+            // including when a witness advances a long interval in one call.
+            float fixedStep = Mathf.Max(.000001f, Time.fixedDeltaTime);
+            if (deltaSeconds > fixedStep + .000001f && HasPendingPayloadLaunch())
+            {
+                float remainingLaunch = deltaSeconds;
+                while (remainingLaunch > .000001f)
+                {
+                    float piece = Mathf.Min(fixedStep, remainingLaunch);
+                    StepSimulation(piece);
+                    remainingLaunch -= piece;
+                }
+                return;
+            }
             // Ambient opportunities are scheduled on the simulation clock. A coarse
             // witness step must visit that clock, so new Payloads and Worms move from
             // their actual opportunity time rather than all appearing at the end.
@@ -311,9 +325,10 @@ namespace Uptime.Connections
                 if (wormDirector != null)
                     segment = Mathf.Min(segment,
                         wormDirector.TimeToNextBoundary(simulationTimeSeconds));
+                int payloadsBeforeSegment = payloadDirector?.Payloads.Count ?? 0;
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
-                payloadDirector?.Advance(segment, simulationTimeSeconds);
+                payloadDirector?.Advance(segment, simulationTimeSeconds, payloadsBeforeSegment);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
                 if (probedLink != null && simulationTimeSeconds + 0.00001f >= probeExpiresAtSeconds)
@@ -394,6 +409,14 @@ namespace Uptime.Connections
                         ApplyCondition(FindNodeResources(occurrence.TargetNodeId),
                             occurrence.ConditionPayload, occurrence.ConnectionId,
                             occurrence.OperationIndex);
+                    else if (occurrence.Type == CompletionEffect.PayloadLaunch)
+                    {
+                        PayloadState launched = payloadDirector.Spawn(
+                            occurrence.LaunchSpec.DestinationNodeId,
+                            occurrence.LaunchSpec.MotionProfile, occurrence.TargetNodeId);
+                        occurrence.LaunchedPayloadId = launched.Id;
+                        recorder?.RecordPayloadLaunch(occurrence, launched);
+                    }
                     EffectOccurred?.Invoke(occurrence);
                 }
                 completion.State.Behaviors.EndOperation(simulationTimeSeconds);
@@ -422,6 +445,18 @@ namespace Uptime.Connections
                 }
                 runtimeConnections = remaining.ToArray();
             }
+        }
+
+        private bool HasPendingPayloadLaunch()
+        {
+            if (trafficDirector != null && trafficDirector.HasQueuedPayloadLaunch) return true;
+            if (runtimeConnections == null) return false;
+            foreach (LogicalConnectionState state in runtimeConnections)
+                if (!state.IsComplete)
+                    for (int i = 0; i < state.Definition.OperationCount; i++)
+                        if (state.Definition.EffectAt(i) == CompletionEffect.PayloadLaunch)
+                            return true;
+            return false;
         }
 
         private void AdvanceConnecting(float deltaSeconds)
@@ -1184,6 +1219,24 @@ namespace Uptime.Connections
                 if (definition.EffectAt(i) == CompletionEffect.ConditionApplication &&
                     (definition.ConditionAt(i) == null || !definition.ConditionAt(i).IsValid))
                     throw new InvalidOperationException("Condition application needs a valid typed payload.");
+                if (definition.EffectAt(i) == CompletionEffect.PayloadLaunch)
+                {
+                    PayloadLaunchSpec launch = definition.LaunchAt(i);
+                    NodeView destination = launch == null ? null :
+                        FindNodeResources(launch.DestinationNodeId)?.View;
+                    bool adjacent = false;
+                    foreach (PhysicalLinkReference link in physicalLinks)
+                        if (link?.View != null &&
+                            (link.View.NodeA == definition.TargetNode &&
+                                link.View.NodeB == destination ||
+                             link.View.NodeB == definition.TargetNode &&
+                                link.View.NodeA == destination))
+                        { adjacent = true; break; }
+                    if (!definition.IsHostile || payloadDirector == null ||
+                        launch == null || !launch.IsValid || destination == null || !adjacent)
+                        throw new InvalidOperationException(
+                            "Payload launch needs a hostile connection and an adjacent destination.");
+                }
                 ValidateBehaviors(definition.BehaviorsAt(i), BehaviorScope.Operation);
             }
             ValidateBehaviors(definition.ConnectionBehaviors, BehaviorScope.Connection);
