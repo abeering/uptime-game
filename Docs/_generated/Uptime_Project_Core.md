@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:9ab3b287d61f1bf54c068e4a224d2e503d343dabdd8640d3cc4fe988e2dc1df2`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:f0af271ade58d1af481d62e0c2d129159c58122bbaf7e03f45c3f59f6c74ee34`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Payload Spawner Infection V0 (implementation branch, November 5, 2026):** Manual `infect api payload-spawner 20` installs a persistent, cleanable infection that launches one seeded, one-hop red Payload toward an adjacent internal node every 20 simulation seconds, starting after the first full cadence. Both scenes expose a separate default cadence in the Inspector. Scan and PID-Select CLEAN use their existing lifecycle; cleaning stops future attempts while launched Payloads remain independent. Attempts, skipped destinations, and connection provenance are recorded. The kind is excluded from ambient INFECTOR generation. Existing Phantom LOAD nonstacking applies to repeated strikes. See [Payload Spawner Infection V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-spawner-infection-v0.md) and [review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsPayloadSpawnerInfectionV0/README.md). Interactive ambient-traffic playtesting remains required.
 
 **Payload Launcher V0 (implementation branch, November 4, 2026):** Manual `spawn payload-launcher` creates an ordinary-looking hostile connection to API with one EXECUTE operation requesting 3 LOAD and 60 WORK. Completion launches one Steady, one-hop red Payload from API to DB through a typed `PayloadLaunch` effect; killing the connection before completion prevents launch. The profile has no ambient weight. Existing Payload timing, infection delivery, interception, and ordinary connection commands apply, giving separate opportunities to kill the carrier or catch the strike. The recorder links the connection operation to the Payload ID and subsequent Payload receipts. See [Payload Launcher V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-launcher-v0.md); interactive Play Mode review remains required.
 

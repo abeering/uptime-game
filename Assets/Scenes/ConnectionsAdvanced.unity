@@ -11851,6 +11851,7 @@ MonoBehaviour:
     substantialSlowdownThreshold: 0.98
   defaultPhantomLoad: 8
   defaultSpawnerCadence: 20
+  defaultPayloadSpawnerCadence: 20
   connectionTravelSecondsPerLink: 0.6
   naturalLoadNoiseEnabled: 1
   naturalLoadNoiseAmplitude: 0.1

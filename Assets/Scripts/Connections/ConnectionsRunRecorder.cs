@@ -32,6 +32,7 @@ namespace Uptime.Connections
         public float fixedStepSeconds;
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
+        public float defaultPayloadSpawnerCadence;
         public float connectionTravelSecondsPerLink;
         public float scanDurationSeconds;
         public float payloadInterceptWindowSeconds;
@@ -991,6 +992,24 @@ namespace Uptime.Connections
             }
         }
 
+        public void RecordPayloadSpawnerAttempt(NodeInfection source, string destinationNodeId,
+            PayloadState payload, string reason, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("payload_spawner_attempt", time);
+            entry.launchOriginNodeId = source.Target.View.NodeId;
+            entry.launchDestinationNodeId = destinationNodeId;
+            entry.targetNodeId = source.Target.View.NodeId;
+            entry.sourceConnectionId = source.SourceConnectionId;
+            entry.sourceOperationIndex = source.SourceOperationIndex;
+            entry.infectionKind = source.Payload.Kind.ToString();
+            entry.infectionAppliedAtSeconds = source.AppliedAtSeconds;
+            entry.infectionCadence = source.Payload.CadenceSeconds;
+            entry.payloadId = payload?.Id;
+            entry.payloadProfile = payload?.Profile.ToString();
+            entry.reason = reason;
+        }
+
         public void RecordModifierChange(LogicalConnectionState state, ModifierHistoryEntry change)
         {
             if (!IsRecording) return;
@@ -1296,6 +1315,7 @@ namespace Uptime.Connections
                 fixedStepSeconds = Time.fixedDeltaTime,
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
+                defaultPayloadSpawnerCadence = host.DefaultPayloadSpawnerCadence,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
                 scanDurationSeconds = host.ScanDurationSeconds,
                 payloadInterceptWindowSeconds = host.Payloads != null ?
