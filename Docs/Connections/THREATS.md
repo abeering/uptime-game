@@ -58,7 +58,7 @@ The ambient connection recipe below still selects **genus/objective before a com
 
 **What to preserve for later development:** when authoring an attack or extending runtime generation, ask *what observable evidence distinguishes this instance from legitimate traffic, how familiar is its cover in this particular run, and how much attention should recognizing it cost?* Eventually those decisions can be made per spawned threat and recorded for testing; no specific probabilities, tiers, schema, dynamic adaptation, or implementation phase is selected here.
 
-**Playtest provenance:** the manual [Payload Launcher V0](connections-payload-launcher-v0.md) example claims "Application Updates", which is not part of the regular ambient benign PURPOSE mix. That made its cover easy to memorize, even though the underlying operation-to-Payload mechanic was fun. This is a useful demonstration of the lever—not necessarily a defect to repair in a deliberately simple first prototype.
+**Playtest provenance:** the manual [Payload Launcher V0 (PR #99)](https://github.com/abeering/uptime-game/pull/99) example claims "Application Updates", which is not part of the regular ambient benign PURPOSE mix. That made its cover easy to memorize, even though the underlying operation-to-Payload mechanic was fun. This is a useful demonstration of the lever—not necessarily a defect to repair in a deliberately simple first prototype.
 
 ## Ownership: ambient Traffic Director versus Level Director
 
