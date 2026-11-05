@@ -12412,6 +12412,7 @@ MonoBehaviour:
   phantomLoadWeight: 1
   blackoutWeight: 1
   spawnerWeight: 1
+  payloadSpawnerWeight: 1
 --- !u!114 &1996901018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12447,6 +12448,7 @@ MonoBehaviour:
   reconnaissanceWeight: 2
   payloadWeight: 2
   wormWeight: 1
+  payloadLauncherWeight: 1
   variablePayloadChance: 0.5
   scanJammedWormChance: 0.7
   followupChance: 0.4

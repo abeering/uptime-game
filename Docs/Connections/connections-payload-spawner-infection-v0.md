@@ -1,5 +1,7 @@
 # Payload Spawner Infection V0
 
+**Later integration:** [Ambient Payload Threats V0](connections-ambient-payload-threats-v0.md) lets Advanced generated INFECTORs select this existing infection while keeping the connection Spawner's children on their earlier three-kind selection.
+
 **Scope:** Connections implementation, November 5, 2026. This is a manual playtest infection, separate from the existing connection Spawner. It does not add an ambient INFECTOR outcome or change Packet.
 
 `infect api payload-spawner 20` installs a persistent, cleanable `PayloadSpawner` infection on API. The kind is appended after the existing infection enum values. Its Inspector-tunable default cadence is 20 simulation seconds in both Connections scenes; the development command accepts another finite positive cadence. The first attempt occurs one full cadence after application. The infection requests no LOAD and has no direct Health effect.

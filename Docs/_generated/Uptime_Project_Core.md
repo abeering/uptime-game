@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:f0af271ade58d1af481d62e0c2d129159c58122bbaf7e03f45c3f59f6c74ee34`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:210beca8f532711855c745453dd463facc51129c109b27297d3bd8b63743f8e5`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Ambient Payload Threats V0 (implementation branch, November 5, 2026):** Advanced ambient hostile opportunities add the existing Payload Launcher at provisional 4:2:2:1:1 activity weights and existing INFECTOR generation adds Payload Spawner at 1:1:1:1 infection weights. The four-node scene gives both new ambient outcomes zero weight. The connection Spawner's children retain their earlier three-kind selection. The 30-second mean opportunity clock, Launcher profile, 20-second Spawner cadence, Payload and interception behavior, and scan/CLEAN rules are unchanged. The earlier manual-only descriptions below record the two preceding slices and are superseded by this ambient integration. See [implementation and review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-ambient-payload-threats-v0.md).
 
 **Payload Spawner Infection V0 (implementation branch, November 5, 2026):** Manual `infect api payload-spawner 20` installs a persistent, cleanable infection that launches one seeded, one-hop red Payload toward an adjacent internal node every 20 simulation seconds, starting after the first full cadence. Both scenes expose a separate default cadence in the Inspector. Scan and PID-Select CLEAN use their existing lifecycle; cleaning stops future attempts while launched Payloads remain independent. Attempts, skipped destinations, and connection provenance are recorded. The kind is excluded from ambient INFECTOR generation. Existing Phantom LOAD nonstacking applies to repeated strikes. See [Payload Spawner Infection V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-payload-spawner-infection-v0.md) and [review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsPayloadSpawnerInfectionV0/README.md). Interactive ambient-traffic playtesting remains required.
 

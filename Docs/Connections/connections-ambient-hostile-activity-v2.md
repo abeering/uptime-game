@@ -1,5 +1,7 @@
 # Connections — Ambient Hostile Activity V2
 
+**Later integration:** [Ambient Payload Threats V0](connections-ambient-payload-threats-v0.md) adds a fifth Advanced activity, Payload Launcher, while retaining this opportunity clock and the four earlier outcomes.
+
 **Scope:** Connections ambient generation on the Advanced Scenario branch. This phase integrates the existing Payload and Worm entities; it does not change their movement, effects, interception, isolation, LOAD, WORK, or Health rules. Packet is unchanged.
 
 ## One hostile opportunity clock

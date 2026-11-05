@@ -118,6 +118,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float phantomLoadWeight = 1f;
         [SerializeField, Min(0f)] private float blackoutWeight = 1f;
         [SerializeField, Min(0f)] private float spawnerWeight = 1f;
+        [SerializeField, Min(0f)] private float payloadSpawnerWeight;
 
         private sealed class Queued
         {
@@ -230,6 +231,7 @@ namespace Uptime.Connections
         public float PhantomLoadWeight => phantomLoadWeight;
         public float BlackoutWeight => blackoutWeight;
         public float SpawnerWeight => spawnerWeight;
+        public float PayloadSpawnerWeight => payloadSpawnerWeight;
         public float EffectiveAmbientWeight(string profileId) =>
             profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
 
@@ -653,6 +655,18 @@ namespace Uptime.Connections
                 roll);
         }
 
+        // Ambient selection uses the authored launcher profile at the opportunity time.
+        // Queueing and recording are owned by HostileActivityDirector.
+        public ConnectionSpawnPlan GeneratePayloadLauncherPlan(float atTime)
+        {
+            if (random == null) ResetDirector();
+            ConnectionTrafficProfile profile = Array.Find(profiles, p => p != null &&
+                string.Equals(p.id, "payload-launcher", StringComparison.OrdinalIgnoreCase));
+            if (profile == null)
+                throw new InvalidOperationException("Payload Launcher profile unavailable.");
+            return BuildPlan(profile, atTime);
+        }
+
         private void EffectiveIdentityChances(out float hop, out float reactive)
         {
             hop = Mathf.Clamp01(ambientIdentityHopChance);
@@ -890,7 +904,7 @@ namespace Uptime.Connections
             random = spawnerRandom;
             try
             {
-                InfectionKind kind = ChooseInfection();
+                InfectionKind kind = ChooseInfection(includePayloadSpawner: false);
                 var chosen = choices[random.Next(choices.Count)];
                 var overrides = new ConnectionSpawnOverrides(ManualObjective.Delivery, kind);
                 ConnectionSpawnPlan basePlan = BuildPlan(chosen.profile, atTime, false,
@@ -1396,18 +1410,22 @@ namespace Uptime.Connections
         private InfectionPayload Payload(InfectionKind kind, ConnectionSpawnOverrides overrides) =>
             new InfectionPayload(kind,
                 kind == InfectionKind.PhantomLoad ? overrides?.InfectionLoad ?? host.DefaultPhantomLoad : 0f,
-                kind == InfectionKind.Spawner ? overrides?.InfectionCadence ?? host.DefaultSpawnerCadence : 0f);
+                kind == InfectionKind.Spawner ? overrides?.InfectionCadence ?? host.DefaultSpawnerCadence :
+                kind == InfectionKind.PayloadSpawner ? host.DefaultPayloadSpawnerCadence : 0f);
 
-        private InfectionKind ChooseInfection()
+        private InfectionKind ChooseInfection(bool includePayloadSpawner = true)
         {
             float phantom = Mathf.Max(0f, phantomLoadWeight);
             float blackout = Mathf.Max(0f, blackoutWeight);
             float spawner = Mathf.Max(0f, spawnerWeight);
-            float total = phantom + blackout + spawner;
+            float payloadSpawner = includePayloadSpawner ? Mathf.Max(0f, payloadSpawnerWeight) : 0f;
+            float total = phantom + blackout + spawner + payloadSpawner;
             if (total <= 0f) throw new InvalidOperationException("Delivery infection weights must include a positive kind.");
             float draw = (float)random.NextDouble() * total;
             return draw < phantom ? InfectionKind.PhantomLoad :
-                draw < phantom + blackout ? InfectionKind.Blackout : InfectionKind.Spawner;
+                draw < phantom + blackout ? InfectionKind.Blackout :
+                draw < phantom + blackout + spawner ? InfectionKind.Spawner :
+                InfectionKind.PayloadSpawner;
         }
 
         private string RandomAnomaly()
