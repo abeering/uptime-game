@@ -1,3 +1,10 @@
+# Main priorities
+
+- infector work multipliers (BACKDOOR)
+- hacker duels 
+- trace/block 
+- logs 
+
 # TODO — WAVING / Natural LOAD Noise
 
 WAVING V0 works well, but the one-decimal LOAD readout can feel metronomic because its changes occur at predictable intervals.
@@ -8,6 +15,6 @@ If necessary, experiment with faster, irregular noise cadence (~1 second) and a 
 
 Goal: make individual LOAD changes feel organic without sacrificing the larger behavioral pattern.
 
-# TODO - check tool card gutters - minimize 
+# bug - worms size on longer edges 
 
-# TODO - a status that speeds up infections work 
+Maybe make it move faster at the same size rather than become elongated 
