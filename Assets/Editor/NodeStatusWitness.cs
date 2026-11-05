@@ -448,15 +448,16 @@ namespace Uptime.Connections.EditorTools
             Color pain = serialized.FindProperty("pain").colorValue;
             Color awareness = serialized.FindProperty("awareness").colorValue;
             Color beneficial = serialized.FindProperty("beneficial").colorValue;
-            Check(symbols.arraySize == 8 && frames.arraySize > 4,
-                path + " eight symbols and animated background bound");
+            Check(symbols.arraySize == 9 && frames.arraySize > 4,
+                path + " nine symbols and animated background bound");
             foreach (NodeEventStamp.EventKind kind in Enum.GetValues(typeof(NodeEventStamp.EventKind)))
             {
                 stamp.Play(kind);
                 stamp.RenderNow(Time.unscaledTime + .2f);
                 Color expected = kind == NodeEventStamp.EventKind.Offline ||
                     kind == NodeEventStamp.EventKind.Infected ||
-                    kind == NodeEventStamp.EventKind.ScanJammed ? pain :
+                    kind == NodeEventStamp.EventKind.ScanJammed ||
+                    kind == NodeEventStamp.EventKind.Backdoor ? pain :
                     kind == NodeEventStamp.EventKind.PortScanned ? awareness : beneficial;
                 Check(stamp.IsPlaying && icon.sprite ==
                     symbols.GetArrayElementAtIndex((int)kind).objectReferenceValue &&

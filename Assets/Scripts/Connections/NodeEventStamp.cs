@@ -6,7 +6,7 @@ namespace Uptime.Connections
     // A single visual announcement. Status state remains with its existing owner.
     public sealed class NodeEventStamp : MonoBehaviour
     {
-        public enum EventKind { Offline, Infected, ScanJammed, PortScanned, Clean, Isolated, Intercept, Caught }
+        public enum EventKind { Offline, Infected, ScanJammed, PortScanned, Clean, Isolated, Intercept, Caught, Backdoor }
 
         [SerializeField] private Image background;
         [SerializeField] private Image icon;
@@ -42,7 +42,7 @@ namespace Uptime.Connections
                 return;
             CurrentKind = kind;
             tint = kind == EventKind.Offline || kind == EventKind.Infected ||
-                kind == EventKind.ScanJammed ? pain :
+                kind == EventKind.ScanJammed || kind == EventKind.Backdoor ? pain :
                 kind == EventKind.PortScanned ? awareness : beneficial;
             startedAt = Time.unscaledTime;
             playing = true;

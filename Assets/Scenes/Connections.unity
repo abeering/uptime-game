@@ -6380,6 +6380,7 @@ MonoBehaviour:
   defaultPhantomLoad: 8
   defaultSpawnerCadence: 20
   defaultPayloadSpawnerCadence: 20
+  backdoorWorkMultiplier: 2
   connectionTravelSecondsPerLink: 0.6
   naturalLoadNoiseEnabled: 1
   naturalLoadNoiseAmplitude: 0.1
@@ -6466,6 +6467,7 @@ MonoBehaviour:
   blackoutWeight: 1
   spawnerWeight: 1
   payloadSpawnerWeight: 0
+  backdoorWeight: 0
 --- !u!114 &1996901018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6504,6 +6506,7 @@ MonoBehaviour:
   payloadLauncherWeight: 0
   variablePayloadChance: 0.5
   scanJammedWormChance: 0.7
+  backdoorWormChance: 0
   followupChance: 0.4
   followupDelaySeconds: 8
   portScanLoad: 4
@@ -6550,6 +6553,7 @@ MonoBehaviour:
     travelSeconds: 12
     actionSeconds: 8
     conditionSeconds: 8
+    backdoorConditionSeconds: 45
   isolationSeconds: 8
   isolationCooldownSeconds: 30
   wormColor: {r: 0.85, g: 0.92, b: 0.37, a: 1}

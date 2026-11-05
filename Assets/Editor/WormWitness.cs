@@ -176,7 +176,7 @@ namespace Uptime.Connections.EditorTools
                 status.ViewFor(Node(host, "API")).BenefitVisible &&
                 status.ViewFor(Node(host, "API"))
                     .GetComponentsInChildren<NodeStatusPanel>(true)
-                    .Any(p => p.Height == 84f),
+                    .Any(p => p.Height == 78f),
                 "OFFLINE, INFECTED and SCAN JAMMED fit one Pain stack with ISOLATED benefit");
             Check(host.TryInjectInfection("API", InfectionKind.PhantomLoad, 2f, out _) &&
                 host.StartClean("API", "clean API", out CleanSession clean) ==

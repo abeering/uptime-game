@@ -36,6 +36,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float payloadLauncherWeight;
         [SerializeField, Range(0f, 1f)] private float variablePayloadChance = .5f;
         [SerializeField, Range(0f, 1f)] private float scanJammedWormChance = .7f;
+        [SerializeField, Range(0f, 1f)] private float backdoorWormChance;
         [SerializeField, Range(0f, 1f)] private float followupChance = .4f;
         [SerializeField, Min(0f)] private float followupDelaySeconds = 8f;
         [SerializeField, Min(.01f)] private float portScanLoad = 4f;
@@ -67,6 +68,7 @@ namespace Uptime.Connections
         public float PayloadLauncherWeight { get => payloadLauncherWeight; set => payloadLauncherWeight = Mathf.Max(0f, value); }
         public float VariablePayloadChance { get => variablePayloadChance; set => variablePayloadChance = Mathf.Clamp01(value); }
         public float ScanJammedWormChance { get => scanJammedWormChance; set => scanJammedWormChance = Mathf.Clamp01(value); }
+        public float BackdoorWormChance { get => backdoorWormChance; set => backdoorWormChance = Mathf.Clamp01(value); }
         public float FollowupChance { get => followupChance; set => followupChance = Mathf.Clamp01(value); }
         public float FollowupDelaySeconds { get => followupDelaySeconds; set => followupDelaySeconds = Mathf.Max(0f, value); }
         public float PortScanLoad => portScanLoad;
@@ -192,7 +194,9 @@ namespace Uptime.Connections
             if (origins.Count == 0)
             { result.Reason = "no_available_ingress"; return; }
             NodeView origin = ChooseOrigin(origins);
-            WormEffect effect = random.NextDouble() < scanJammedWormChance ?
+            WormEffect effect = backdoorWormChance > 0f &&
+                random.NextDouble() < backdoorWormChance ?
+                WormEffect.Backdoor : random.NextDouble() < scanJammedWormChance ?
                 WormEffect.ScanJammed : WormEffect.PortScanned;
             result.OriginNodeId = origin.NodeId;
             result.WormEffect = effect.ToString();

@@ -119,6 +119,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float blackoutWeight = 1f;
         [SerializeField, Min(0f)] private float spawnerWeight = 1f;
         [SerializeField, Min(0f)] private float payloadSpawnerWeight;
+        [SerializeField, Min(0f)] private float backdoorWeight;
 
         private sealed class Queued
         {
@@ -232,6 +233,7 @@ namespace Uptime.Connections
         public float BlackoutWeight => blackoutWeight;
         public float SpawnerWeight => spawnerWeight;
         public float PayloadSpawnerWeight => payloadSpawnerWeight;
+        public float BackdoorWeight => backdoorWeight;
         public float EffectiveAmbientWeight(string profileId) =>
             profileId != null && effectiveWeights.TryGetValue(profileId, out float weight) ? weight : 0f;
 
@@ -1419,13 +1421,15 @@ namespace Uptime.Connections
             float blackout = Mathf.Max(0f, blackoutWeight);
             float spawner = Mathf.Max(0f, spawnerWeight);
             float payloadSpawner = includePayloadSpawner ? Mathf.Max(0f, payloadSpawnerWeight) : 0f;
-            float total = phantom + blackout + spawner + payloadSpawner;
+            float backdoor = Mathf.Max(0f, backdoorWeight);
+            float total = phantom + blackout + spawner + payloadSpawner + backdoor;
             if (total <= 0f) throw new InvalidOperationException("Delivery infection weights must include a positive kind.");
             float draw = (float)random.NextDouble() * total;
             return draw < phantom ? InfectionKind.PhantomLoad :
                 draw < phantom + blackout ? InfectionKind.Blackout :
                 draw < phantom + blackout + spawner ? InfectionKind.Spawner :
-                InfectionKind.PayloadSpawner;
+                draw < phantom + blackout + spawner + payloadSpawner ?
+                    InfectionKind.PayloadSpawner : InfectionKind.Backdoor;
         }
 
         private string RandomAnomaly()

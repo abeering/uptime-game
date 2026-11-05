@@ -57,7 +57,7 @@ namespace Uptime.Connections
 
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
         {
-            bool pain = state.Offline || state.KnownInfected || state.ScanJammed;
+            bool pain = state.Offline || state.KnownInfected || state.ScanJammed || state.Backdoor;
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
             bool intercept = state.InterceptActive;
@@ -99,6 +99,8 @@ namespace Uptime.Connections
                 if (state.KnownInfected) { rows.Add("INFECTED"); timers.Add(null); }
                 if (state.ScanJammed)
                 { rows.Add("SCAN JAMMED"); timers.Add(state.ScanJamRemainingSeconds); }
+                if (state.Backdoor)
+                { rows.Add("BACKDOOR"); timers.Add(state.BackdoorRemainingSeconds); }
                 SetRows(painPanel, rows, timers, painColor);
             }
             if (awareness)

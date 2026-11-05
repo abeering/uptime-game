@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public enum WormEffect { ScanJammed, PortScanned }
+    public enum WormEffect { ScanJammed, PortScanned, Backdoor }
     public enum WormPhase { Establishing, Traversing, Entering, Acting, Resolved }
 
     [Serializable]
@@ -16,6 +16,7 @@ namespace Uptime.Connections
         [Min(.1f)] public float travelSeconds = 12f;
         [Min(.1f)] public float actionSeconds = 8f;
         [Min(.1f)] public float conditionSeconds = 8f;
+        [Min(.1f)] public float backdoorConditionSeconds = 45f;
 
         public WormTuning Copy() => new WormTuning
         {
@@ -24,12 +25,14 @@ namespace Uptime.Connections
             establishSeconds = establishSeconds,
             travelSeconds = travelSeconds,
             actionSeconds = actionSeconds,
-            conditionSeconds = conditionSeconds
+            conditionSeconds = conditionSeconds,
+            backdoorConditionSeconds = backdoorConditionSeconds
         };
 
         public bool IsValid => propagationProbability >= 0f && propagationProbability <= 1f &&
             maximumNodes >= 1 && Positive(establishSeconds) && Positive(travelSeconds) &&
-            Positive(actionSeconds) && Positive(conditionSeconds);
+            Positive(actionSeconds) && Positive(conditionSeconds) &&
+            Positive(backdoorConditionSeconds);
         private static bool Positive(float value) => value > 0f &&
             !float.IsNaN(value) && !float.IsInfinity(value);
     }
@@ -184,10 +187,13 @@ namespace Uptime.Connections
         private void ApplyEffect(WormBranch branch)
         {
             ConditionKind kind = branch.Outbreak.Effect == WormEffect.ScanJammed ?
-                ConditionKind.ScanJammed : ConditionKind.PortScanned;
+                ConditionKind.ScanJammed : branch.Outbreak.Effect == WormEffect.Backdoor ?
+                ConditionKind.Backdoor : ConditionKind.PortScanned;
             NodeResources target = host.FindNodeResources(branch.CurrentNode.NodeId);
             host.ApplyCondition(target,
-                new ConditionPayload(kind, branch.Outbreak.Tuning.conditionSeconds),
+                new ConditionPayload(kind, kind == ConditionKind.Backdoor ?
+                    branch.Outbreak.Tuning.backdoorConditionSeconds :
+                    branch.Outbreak.Tuning.conditionSeconds),
                 sourceWormBranchId: branch.Id);
             host.Recorder?.RecordWormBranch("worm_effect_applied", branch,
                 host.SimulationTimeSeconds);

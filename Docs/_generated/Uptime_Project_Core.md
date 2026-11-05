@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:210beca8f532711855c745453dd463facc51129c109b27297d3bd8b63743f8e5`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:280ff82353f8da2ed10c96445a7a504c76155614cc24b3d29b41934c812b72c4`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**BACKDOOR V0 (implementation branch, November 5, 2026):** A hostile INFECTOR plan with an `InfectionDelivery` effect receives an Inspector-tunable 2× WORK-rate factor on every operation while its fixed target has either an overt timed BACKDOOR Condition or a covert persistent BACKDOOR infection. Sources do not stack. The Condition is delivered by Worms, refreshes, lasts 45 simulation seconds by default, and appears as timed red Pain; the infection is selected by generated DELIVERY, survives the carrier, and is removed by ordinary PID-Select cleaning. Requested/allocated LOAD and required WORK remain unchanged; inspect, WORK ETA, progress, and recorder read the effective rate. Advanced enables both ambient forms; the four-node scene keeps their ambient weights at zero. See [BACKDOOR V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-backdoor-v0.md) for commands, scene tuning, and review checks. Interactive 16:9 Play Mode review remains required.
 
 **Ambient Payload Threats V0 (implementation branch, November 5, 2026):** Advanced ambient hostile opportunities add the existing Payload Launcher at provisional 4:2:2:1:1 activity weights and existing INFECTOR generation adds Payload Spawner at 1:1:1:1 infection weights. The four-node scene gives both new ambient outcomes zero weight. The connection Spawner's children retain their earlier three-kind selection. The 30-second mean opportunity clock, Launcher profile, 20-second Spawner cadence, Payload and interception behavior, and scan/CLEAN rules are unchanged. The earlier manual-only descriptions below record the two preceding slices and are superseded by this ambient integration. See [implementation and review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-ambient-payload-threats-v0.md).
 

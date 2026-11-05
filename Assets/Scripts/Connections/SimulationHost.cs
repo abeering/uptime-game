@@ -26,6 +26,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
         [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
         [SerializeField, Min(0.01f)] private float defaultPayloadSpawnerCadence = 20f;
+        [SerializeField, Min(1f)] private float backdoorWorkMultiplier = 2f;
         [SerializeField, Min(0.01f)] private float connectionTravelSecondsPerLink = 0.6f;
         [SerializeField] private bool naturalLoadNoiseEnabled = true;
         [SerializeField, Range(0f, 0.2f)] private float naturalLoadNoiseAmplitude = 0.1f;
@@ -99,6 +100,7 @@ namespace Uptime.Connections
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
         public float DefaultPayloadSpawnerCadence => defaultPayloadSpawnerCadence;
+        public float BackdoorWorkMultiplier => backdoorWorkMultiplier;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
         public bool NaturalLoadNoiseEnabled => naturalLoadNoiseEnabled;
         public float NaturalLoadNoiseAmplitude => naturalLoadNoiseAmplitude;
@@ -212,6 +214,8 @@ namespace Uptime.Connections
             if (float.IsNaN(defaultPayloadSpawnerCadence) ||
                 float.IsInfinity(defaultPayloadSpawnerCadence) ||
                 defaultPayloadSpawnerCadence <= 0f) defaultPayloadSpawnerCadence = 20f;
+            if (float.IsNaN(backdoorWorkMultiplier) || float.IsInfinity(backdoorWorkMultiplier) ||
+                backdoorWorkMultiplier < 1f) backdoorWorkMultiplier = 2f;
             if (float.IsNaN(connectionTravelSecondsPerLink) ||
                 float.IsInfinity(connectionTravelSecondsPerLink) ||
                 connectionTravelSecondsPerLink <= 0f) connectionTravelSecondsPerLink = 0.6f;
@@ -385,6 +389,7 @@ namespace Uptime.Connections
                     connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
                 }
             }
+            RefreshBackdoorRates();
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
@@ -570,6 +575,7 @@ namespace Uptime.Connections
                         sourceOperationIndex, sourceWormBranchId);
                     recorder?.RecordCondition("condition_refreshed", existing,
                         simulationTimeSeconds);
+                    RefreshBackdoorRates();
                     ConditionApplied?.Invoke(existing);
                     return existing;
                 }
@@ -578,6 +584,7 @@ namespace Uptime.Connections
             conditions.Add(condition);
             recorder?.RecordCondition("condition_applied", condition,
                 simulationTimeSeconds);
+            RefreshBackdoorRates();
             ConditionApplied?.Invoke(condition);
             return condition;
         }
@@ -591,6 +598,7 @@ namespace Uptime.Connections
                         conditions[i].ExpiresAtSeconds);
                     conditions.RemoveAt(i);
                 }
+            RefreshBackdoorRates();
         }
 
         public bool KillConnection(string id)
@@ -649,11 +657,11 @@ namespace Uptime.Connections
                 return false;
             }
             if (!Enum.IsDefined(typeof(InfectionKind), kind) ||
-                (kind != InfectionKind.Blackout &&
+                (kind != InfectionKind.Blackout && kind != InfectionKind.Backdoor &&
                  (parameter <= 0f || float.IsNaN(parameter) || float.IsInfinity(parameter))) ||
-                kind == InfectionKind.Blackout && parameter != 0f)
+                 (kind == InfectionKind.Blackout || kind == InfectionKind.Backdoor) && parameter != 0f)
             {
-                error = "Infection parameter must be finite and positive except for Blackout, which takes none.";
+                error = "Infection parameter must be finite and positive except for Blackout and Backdoor, which take none.";
                 return false;
             }
             if (runtimeConnections == null) ResetSimulation();
@@ -881,9 +889,25 @@ namespace Uptime.Connections
         public void RefreshPayloadAllocations()
         {
             if (runtimeConnections == null || nodes == null) return;
+            RefreshBackdoorRates();
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections,
                 payloadDirector != null ? payloadDirector.DemandAt : null);
             RefreshDisplays();
+        }
+
+        private void RefreshBackdoorRates()
+        {
+            if (runtimeConnections == null) return;
+            foreach (LogicalConnectionState connection in runtimeConnections)
+            {
+                NodeResources target = connection.TargetResources;
+                bool active = conditions.Exists(condition => condition.Target == target &&
+                    condition.Kind == ConditionKind.Backdoor) ||
+                    infections.Exists(infection => infection.Target == target &&
+                        infection.Payload.Kind == InfectionKind.Backdoor);
+                connection.BackdoorWorkFactor = connection.IsInfector && active ?
+                    backdoorWorkMultiplier : 1f;
+            }
         }
 
         public bool IsNodeOffline(NodeView view) => view != null &&

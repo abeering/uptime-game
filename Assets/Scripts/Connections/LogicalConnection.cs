@@ -41,7 +41,7 @@ namespace Uptime.Connections
         public PayloadLaunchSpec Copy() => new PayloadLaunchSpec(destinationNodeId, motionProfile);
     }
 
-    public enum InfectionKind { PhantomLoad, Blackout, Spawner, PayloadSpawner }
+    public enum InfectionKind { PhantomLoad, Blackout, Spawner, PayloadSpawner, Backdoor }
 
     [Serializable]
     public sealed class InfectionPayload
@@ -56,7 +56,8 @@ namespace Uptime.Connections
         public bool IsValid => kind == InfectionKind.PhantomLoad ?
             requestedLoad > 0f && !float.IsNaN(requestedLoad) &&
             !float.IsInfinity(requestedLoad) && cadenceSeconds == 0f :
-            kind == InfectionKind.Blackout ? requestedLoad == 0f && cadenceSeconds == 0f :
+            kind == InfectionKind.Blackout || kind == InfectionKind.Backdoor ?
+                requestedLoad == 0f && cadenceSeconds == 0f :
             (kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner) &&
             requestedLoad == 0f &&
             cadenceSeconds > 0f && !float.IsNaN(cadenceSeconds) &&
@@ -324,6 +325,10 @@ namespace Uptime.Connections
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
             Behaviors = new ConnectionBehaviorRuntime(definition);
+            for (int index = 0; index < definition.OperationCount; index++)
+                if (definition.IsHostile &&
+                    definition.EffectAt(index) == CompletionEffect.InfectionDelivery)
+                { IsInfector = true; break; }
             Identity = new ConnectionIdentityRuntime(definition.ConnectionId,
                 definition.IdentityHopSeconds, definition.IdentitySeed, definition.IdentityMode);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
@@ -353,8 +358,11 @@ namespace Uptime.Connections
         public float CompletedWork { get; internal set; }
         public float RemainingWork => Mathf.Max(0f, CurrentTotalWork - CompletedWork);
         public float AllocatedLoad { get; internal set; }
+        internal float BackdoorWorkFactor { get; set; } = 1f;
+        // Scope is a plan property: every operation of a hostile delivery carrier qualifies.
+        internal bool IsInfector { get; }
         public float EffectiveWorkRateMultiplier =>
-            Behaviors.EffectiveWorkRateMultiplier(CurrentOperationIndex);
+            Behaviors.EffectiveWorkRateMultiplier(CurrentOperationIndex) * BackdoorWorkFactor;
         public float ActualWorkRate
         {
             get
