@@ -25,6 +25,7 @@ namespace Uptime.Connections
         [SerializeField] private NetworkHealthTuning healthTuning = new NetworkHealthTuning();
         [SerializeField, Min(0.01f)] private float defaultPhantomLoad = 8f;
         [SerializeField, Min(0.01f)] private float defaultSpawnerCadence = 20f;
+        [SerializeField, Min(0.01f)] private float defaultPayloadSpawnerCadence = 20f;
         [SerializeField, Min(0.01f)] private float connectionTravelSecondsPerLink = 0.6f;
         [SerializeField] private bool naturalLoadNoiseEnabled = true;
         [SerializeField, Range(0f, 0.2f)] private float naturalLoadNoiseAmplitude = 0.1f;
@@ -46,6 +47,7 @@ namespace Uptime.Connections
             new List<ConnectionEffectOccurrence>();
         private readonly List<NodeInfection> infections = new List<NodeInfection>();
         private readonly List<NodeCondition> conditions = new List<NodeCondition>();
+        private System.Random payloadSpawnerRandom;
         private float simulationTimeSeconds;
         private NetworkHealth health;
         private CleanSession activeClean;
@@ -96,6 +98,7 @@ namespace Uptime.Connections
         public float OverclockCooldownSeconds => overclockCooldownSeconds;
         public float DefaultPhantomLoad => defaultPhantomLoad;
         public float DefaultSpawnerCadence => defaultSpawnerCadence;
+        public float DefaultPayloadSpawnerCadence => defaultPayloadSpawnerCadence;
         public float ConnectionTravelSecondsPerLink => connectionTravelSecondsPerLink;
         public bool NaturalLoadNoiseEnabled => naturalLoadNoiseEnabled;
         public float NaturalLoadNoiseAmplitude => naturalLoadNoiseAmplitude;
@@ -206,6 +209,9 @@ namespace Uptime.Connections
                 defaultPhantomLoad <= 0f) defaultPhantomLoad = 8f;
             if (float.IsNaN(defaultSpawnerCadence) || float.IsInfinity(defaultSpawnerCadence) ||
                 defaultSpawnerCadence <= 0f) defaultSpawnerCadence = 20f;
+            if (float.IsNaN(defaultPayloadSpawnerCadence) ||
+                float.IsInfinity(defaultPayloadSpawnerCadence) ||
+                defaultPayloadSpawnerCadence <= 0f) defaultPayloadSpawnerCadence = 20f;
             if (float.IsNaN(connectionTravelSecondsPerLink) ||
                 float.IsInfinity(connectionTravelSecondsPerLink) ||
                 connectionTravelSecondsPerLink <= 0f) connectionTravelSecondsPerLink = 0.6f;
@@ -245,10 +251,10 @@ namespace Uptime.Connections
         {
             if (deltaSeconds <= 0f || float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds))
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
-            // A launched Payload must begin moving at its actual fixed-step completion,
-            // including when a witness advances a long interval in one call.
+            // A Payload launch or Payload Spawner installation must take effect at
+            // its fixed-step completion, even in a coarse witness interval.
             float fixedStep = Mathf.Max(.000001f, Time.fixedDeltaTime);
-            if (deltaSeconds > fixedStep + .000001f && HasPendingPayloadLaunch())
+            if (deltaSeconds > fixedStep + .000001f && HasPendingPayloadSource())
             {
                 float remainingLaunch = deltaSeconds;
                 while (remainingLaunch > .000001f)
@@ -325,12 +331,14 @@ namespace Uptime.Connections
                 if (wormDirector != null)
                     segment = Mathf.Min(segment,
                         wormDirector.TimeToNextBoundary(simulationTimeSeconds));
+                segment = Mathf.Min(segment, TimeToNextPayloadSpawnerBoundary());
                 int payloadsBeforeSegment = payloadDirector?.Payloads.Count ?? 0;
                 StepSegment(segment, completedThisStep);
                 AdvanceConnecting(segment);
                 payloadDirector?.Advance(segment, simulationTimeSeconds, payloadsBeforeSegment);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
+                StepPayloadSpawners();
                 if (probedLink != null && simulationTimeSeconds + 0.00001f >= probeExpiresAtSeconds)
                     ExpireProbe();
                 if (overclockedNode != null && simulationTimeSeconds + 0.00001f >=
@@ -447,14 +455,16 @@ namespace Uptime.Connections
             }
         }
 
-        private bool HasPendingPayloadLaunch()
+        private bool HasPendingPayloadSource()
         {
-            if (trafficDirector != null && trafficDirector.HasQueuedPayloadLaunch) return true;
+            if (trafficDirector != null && trafficDirector.HasQueuedPayloadSource) return true;
             if (runtimeConnections == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
                 if (!state.IsComplete)
                     for (int i = 0; i < state.Definition.OperationCount; i++)
-                        if (state.Definition.EffectAt(i) == CompletionEffect.PayloadLaunch)
+                        if (state.Definition.EffectAt(i) == CompletionEffect.PayloadLaunch ||
+                            state.Definition.EffectAt(i) == CompletionEffect.InfectionDelivery &&
+                            state.Definition.PayloadAt(i)?.Kind == InfectionKind.PayloadSpawner)
                             return true;
             return false;
         }
@@ -643,13 +653,14 @@ namespace Uptime.Connections
                  (parameter <= 0f || float.IsNaN(parameter) || float.IsInfinity(parameter))) ||
                 kind == InfectionKind.Blackout && parameter != 0f)
             {
-                error = "Infection parameter must be finite and positive for Phantom LOAD or Spawner; Blackout takes none.";
+                error = "Infection parameter must be finite and positive except for Blackout, which takes none.";
                 return false;
             }
             if (runtimeConnections == null) ResetSimulation();
             var payload = new InfectionPayload(kind,
                 kind == InfectionKind.PhantomLoad ? parameter : 0f,
-                kind == InfectionKind.Spawner ? parameter : 0f);
+                kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner ?
+                    parameter : 0f);
             bool applied = ApplyInfection(target, payload, null, -1);
             if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
             error = applied ? null : kind + " is already active on " + target.View.NodeId;
@@ -961,6 +972,65 @@ namespace Uptime.Connections
             }
         }
 
+        private float TimeToNextPayloadSpawnerBoundary()
+        {
+            float next = float.PositiveInfinity;
+            foreach (NodeInfection infection in infections)
+                if (infection.Payload.Kind == InfectionKind.PayloadSpawner)
+                    next = Mathf.Min(next, Mathf.Max(.000001f,
+                        infection.NextSpawnAtSeconds - simulationTimeSeconds));
+            return next;
+        }
+
+        private void StepPayloadSpawners()
+        {
+            foreach (NodeInfection infection in infections.ToArray())
+            {
+                if (infection.Payload.Kind != InfectionKind.PayloadSpawner ||
+                    !infections.Contains(infection)) continue;
+                int attempts = 0;
+                while (simulationTimeSeconds + .00001f >= infection.NextSpawnAtSeconds &&
+                    attempts++ < 128)
+                {
+                    float attemptAt = infection.NextSpawnAtSeconds;
+                    infection.NextSpawnAtSeconds += infection.Payload.CadenceSeconds;
+                    var destinations = new List<NodeView>();
+                    NodeView source = infection.Target.View;
+                    if (trafficDirector != null)
+                        foreach (PhysicalLinkReference link in physicalLinks)
+                        {
+                            NodeView adjacent = link?.View == null ? null :
+                                link.View.NodeA == source ? link.View.NodeB :
+                                link.View.NodeB == source ? link.View.NodeA : null;
+                            if (trafficDirector.IsInternalNode(adjacent) &&
+                                !destinations.Contains(adjacent)) destinations.Add(adjacent);
+                        }
+                    destinations.Sort((a, b) => string.CompareOrdinal(a.NodeId, b.NodeId));
+                    PayloadState launched = null;
+                    NodeView destination = null;
+                    string reason = trafficDirector == null ? "no_traffic_director" :
+                        payloadDirector == null ? "no_payload_director" :
+                        destinations.Count == 0 ? "no_adjacent_internal_node" : null;
+                    if (reason == null)
+                    {
+                        destination = destinations[payloadSpawnerRandom.Next(destinations.Count)];
+                        launched = payloadDirector.Spawn(destination.NodeId,
+                            PayloadMotionProfile.Steady, source.NodeId);
+                        reason = "launched";
+                    }
+                    recorder?.RecordPayloadSpawnerAttempt(infection,
+                        destination?.NodeId, launched, reason, attemptAt);
+                }
+                if (simulationTimeSeconds + .00001f >= infection.NextSpawnAtSeconds)
+                {
+                    recorder?.RecordPayloadSpawnerAttempt(infection, null, null,
+                        "step_attempt_limit", simulationTimeSeconds);
+                    infection.NextSpawnAtSeconds = simulationTimeSeconds +
+                        Mathf.Max(Time.fixedDeltaTime, infection.Payload.CadenceSeconds);
+                }
+            }
+        }
+
         public NodeResources FindNodeResources(string id)
         {
             if (id == null || nodes == null) return null;
@@ -989,6 +1059,8 @@ namespace Uptime.Connections
             conditions.Clear();
             if (payloadDirector == null) payloadDirector = GetComponent<PayloadDirector>();
             payloadDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
+            payloadSpawnerRandom = new System.Random(unchecked(
+                (trafficDirector != null ? trafficDirector.Seed : 1701) ^ 0x50A7D102));
             if (wormDirector == null) wormDirector = GetComponent<WormDirector>();
             wormDirector?.ResetDirector(trafficDirector != null ? trafficDirector.Seed : 1701);
             SimulationReset?.Invoke();

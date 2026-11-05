@@ -1,5 +1,7 @@
 # Connections Infections V0 — Phantom LOAD, Blackout, and Spawner
 
+**Payload Spawner follow-up (November 5, 2026):** A separately named, manually injected `PayloadSpawner` infection periodically launches one-hop Payloads. It is not the connection-generating Spawner described below. See [Payload Spawner Infection V0](connections-payload-spawner-infection-v0.md) for its narrow current contract.
+
 ## CLEAN focus and window lifecycle (November 4, 2026)
 
 This Connections-only follow-up separates keyboard ownership from result visibility in both gameplay scenes. A valid listed PID resolves success or innocent-process failure immediately, writes its terminal receipt, and returns terminal typing through the normal next-frame focus path. The result window stays visible for **1.1 real seconds** (previously 1.3), then hides without another receipt or focus transfer. Invalid or unlisted PIDs retain the session and PID focus without penalty. Existing infection removal, failure penalties, and Escape coordination remain authoritative.

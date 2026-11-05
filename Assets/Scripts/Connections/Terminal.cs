@@ -566,7 +566,7 @@ namespace Uptime.Connections
                     if ((tokens.Length != 3 && tokens.Length != 4) ||
                         !TryParseInfectionKind(tokens[2], out InfectionKind injectKind) ||
                         injectKind == InfectionKind.Blackout && tokens.Length == 4)
-                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner [load|cadence]", CommandFailureColor());
+                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner|payload-spawner [load|cadence]", CommandFailureColor());
                     else if (simulationHost == null)
                         AppendText("INFECT  simulation unavailable", CommandFailureColor());
                     else if (tokens.Length == 4 &&
@@ -580,7 +580,9 @@ namespace Uptime.Connections
                         float parameter = tokens.Length == 4 ?
                             float.Parse(tokens[3], System.Globalization.CultureInfo.InvariantCulture) :
                             injectKind == InfectionKind.PhantomLoad ? simulationHost.DefaultPhantomLoad :
-                            injectKind == InfectionKind.Spawner ? simulationHost.DefaultSpawnerCadence : 0f;
+                            injectKind == InfectionKind.Spawner ? simulationHost.DefaultSpawnerCadence :
+                            injectKind == InfectionKind.PayloadSpawner ?
+                                simulationHost.DefaultPayloadSpawnerCadence : 0f;
                         bool applied = simulationHost.TryInjectInfection(tokens[1], injectKind, parameter,
                             out string infectionError);
                         recorder?.RecordPlayerAction(command, null, applied);
@@ -592,7 +594,7 @@ namespace Uptime.Connections
                 case "uninfect":
                     if ((tokens.Length != 2 && tokens.Length != 3) ||
                         tokens.Length == 3 && !TryParseInfectionKind(tokens[2], out _))
-                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner]", CommandFailureColor());
+                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner|payload-spawner]", CommandFailureColor());
                     else if (simulationHost == null)
                         AppendText("UNINFECT  simulation unavailable", CommandFailureColor());
                     else
@@ -686,6 +688,7 @@ namespace Uptime.Connections
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
+                    AppendText("DEV  infect api payload-spawner 20  // periodic internal Payloads", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
 #else
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
@@ -756,6 +759,8 @@ namespace Uptime.Connections
                     string value = token.Substring(4);
                     if (!TryParseInfectionKind(value, out InfectionKind parsedKind))
                     { error = "SPAWN  unknown infection type: " + value; return false; }
+                    if (parsedKind == InfectionKind.PayloadSpawner)
+                    { error = "SPAWN  payload-spawner is direct-injection only in V0"; return false; }
                     kind = parsedKind;
                 }
                 else if (token.StartsWith("infp:", System.StringComparison.OrdinalIgnoreCase))
@@ -810,6 +815,8 @@ namespace Uptime.Connections
             { kind = InfectionKind.Blackout; return true; }
             if (text.Equals("spawner", System.StringComparison.OrdinalIgnoreCase))
             { kind = InfectionKind.Spawner; return true; }
+            if (text.Equals("payload-spawner", System.StringComparison.OrdinalIgnoreCase))
+            { kind = InfectionKind.PayloadSpawner; return true; }
             return false;
         }
 

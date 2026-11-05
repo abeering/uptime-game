@@ -41,7 +41,7 @@ namespace Uptime.Connections
         public PayloadLaunchSpec Copy() => new PayloadLaunchSpec(destinationNodeId, motionProfile);
     }
 
-    public enum InfectionKind { PhantomLoad, Blackout, Spawner }
+    public enum InfectionKind { PhantomLoad, Blackout, Spawner, PayloadSpawner }
 
     [Serializable]
     public sealed class InfectionPayload
@@ -57,7 +57,8 @@ namespace Uptime.Connections
             requestedLoad > 0f && !float.IsNaN(requestedLoad) &&
             !float.IsInfinity(requestedLoad) && cadenceSeconds == 0f :
             kind == InfectionKind.Blackout ? requestedLoad == 0f && cadenceSeconds == 0f :
-            kind == InfectionKind.Spawner && requestedLoad == 0f &&
+            (kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner) &&
+            requestedLoad == 0f &&
             cadenceSeconds > 0f && !float.IsNaN(cadenceSeconds) &&
             !float.IsInfinity(cadenceSeconds);
 
@@ -80,11 +81,12 @@ namespace Uptime.Connections
             if (kind == InfectionKind.PhantomLoad &&
                 (requestedLoad <= 0f || float.IsNaN(requestedLoad) || float.IsInfinity(requestedLoad)))
                 throw new ArgumentOutOfRangeException(nameof(requestedLoad));
-            if (kind == InfectionKind.Spawner &&
+            if ((kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner) &&
                 (cadenceSeconds <= 0f || float.IsNaN(cadenceSeconds) || float.IsInfinity(cadenceSeconds)))
                 throw new ArgumentOutOfRangeException(nameof(cadenceSeconds));
             if (kind != InfectionKind.PhantomLoad && requestedLoad != 0f ||
-                kind != InfectionKind.Spawner && cadenceSeconds != 0f)
+                kind != InfectionKind.Spawner && kind != InfectionKind.PayloadSpawner &&
+                    cadenceSeconds != 0f)
                 throw new ArgumentException("Infection parameters do not match the kind.");
             this.kind = kind;
             this.requestedLoad = requestedLoad;
@@ -104,7 +106,8 @@ namespace Uptime.Connections
             AppliedAtSeconds = appliedAtSeconds;
             SourceConnectionId = sourceConnectionId;
             SourceOperationIndex = sourceOperationIndex;
-            NextSpawnAtSeconds = payload.Kind == InfectionKind.Spawner ?
+            NextSpawnAtSeconds = payload.Kind == InfectionKind.Spawner ||
+                payload.Kind == InfectionKind.PayloadSpawner ?
                 appliedAtSeconds + payload.CadenceSeconds : 0f;
         }
 

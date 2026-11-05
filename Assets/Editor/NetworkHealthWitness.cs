@@ -350,8 +350,8 @@ namespace Uptime.Connections.EditorTools
                 fields.FindProperty("healthFill").objectReferenceValue != null,
                 "compact panel simulation and presentation bindings");
             Check(panel.transform.Find("ExpandedDetails") == null &&
-                panel.GetComponentsInChildren<TMP_Text>(true).Length == 7,
-                "compact Health text and two tool labels/statuses only");
+                panel.GetComponentsInChildren<TMP_Text>(true).Length == 9,
+                "compact Health text and three tool labels/statuses only");
             var rect = (RectTransform)panel.transform;
             var terminal = (RectTransform)UnityEngine.Object.FindFirstObjectByType<Terminal>().transform;
             var network = (RectTransform)terminal.parent.Find("NetworkPanel");

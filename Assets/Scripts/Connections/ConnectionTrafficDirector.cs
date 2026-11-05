@@ -154,13 +154,15 @@ namespace Uptime.Connections
         public int Seed { get => seed; set => seed = value; }
         public bool RandomizeSeed { get => randomizeSeed; set => randomizeSeed = value; }
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
-        public bool HasQueuedPayloadLaunch
+        public bool HasQueuedPayloadSource
         {
             get
             {
                 foreach (Queued entry in queue)
                     foreach (OperationStage stage in entry.Plan.Operations)
-                        if (stage?.EffectOnCompletion == CompletionEffect.PayloadLaunch)
+                        if (stage?.EffectOnCompletion == CompletionEffect.PayloadLaunch ||
+                            stage?.EffectOnCompletion == CompletionEffect.InfectionDelivery &&
+                            stage.InfectionPayload?.Kind == InfectionKind.PayloadSpawner)
                             return true;
                 return false;
             }
@@ -413,6 +415,15 @@ namespace Uptime.Connections
             return false;
         }
 
+        public bool IsInternalNode(NodeView node)
+        {
+            if (node == null || host?.Nodes == null || IsAmbientOrigin(node.NodeId))
+                return false;
+            foreach (NodeResources resources in host.Nodes)
+                if (resources?.View == node) return true;
+            return false;
+        }
+
         private NodeView ChooseAmbientOrigin()
         {
             if (ambientOrigins == null || ambientOrigins.Length == 0)
@@ -577,6 +588,9 @@ namespace Uptime.Connections
                 if (overrides.InfectionKind.HasValue &&
                     !Enum.IsDefined(typeof(InfectionKind), overrides.InfectionKind.Value))
                     throw new InvalidOperationException("Unknown infection type.");
+                if (overrides.InfectionKind == InfectionKind.PayloadSpawner)
+                    throw new InvalidOperationException(
+                        "Payload Spawner is direct-injection only in V0.");
                 if (overrides.InfectionLoad.HasValue && overrides.InfectionKind != InfectionKind.PhantomLoad)
                     throw new InvalidOperationException("infp:load requires inf:phantom-load.");
                 if (overrides.InfectionCadence.HasValue && overrides.InfectionKind != InfectionKind.Spawner)

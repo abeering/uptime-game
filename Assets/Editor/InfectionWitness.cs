@@ -488,7 +488,9 @@ namespace Uptime.Connections.EditorTools
             float[] original = weights.Select(field => (float)field.GetValue(director)).ToArray();
             try
             {
-                foreach (InfectionKind kind in Enum.GetValues(typeof(InfectionKind)))
+                // Connection Spawner generation retains its original three-kind mix.
+                foreach (InfectionKind kind in new[] { InfectionKind.PhantomLoad,
+                    InfectionKind.Blackout, InfectionKind.Spawner })
                 {
                     host.ResetSimulation();
                     recorder.BeginRun();
