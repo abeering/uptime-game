@@ -33,6 +33,7 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float reconnaissanceWeight;
         [SerializeField, Min(0f)] private float payloadWeight;
         [SerializeField, Min(0f)] private float wormWeight;
+        [SerializeField, Min(0f)] private float payloadLauncherWeight;
         [SerializeField, Range(0f, 1f)] private float variablePayloadChance = .5f;
         [SerializeField, Range(0f, 1f)] private float scanJammedWormChance = .7f;
         [SerializeField, Range(0f, 1f)] private float followupChance = .4f;
@@ -63,6 +64,7 @@ namespace Uptime.Connections
         public float ReconnaissanceWeight { get => reconnaissanceWeight; set => reconnaissanceWeight = Mathf.Max(0f, value); }
         public float PayloadWeight { get => payloadWeight; set => payloadWeight = Mathf.Max(0f, value); }
         public float WormWeight { get => wormWeight; set => wormWeight = Mathf.Max(0f, value); }
+        public float PayloadLauncherWeight { get => payloadLauncherWeight; set => payloadLauncherWeight = Mathf.Max(0f, value); }
         public float VariablePayloadChance { get => variablePayloadChance; set => variablePayloadChance = Mathf.Clamp01(value); }
         public float ScanJammedWormChance { get => scanJammedWormChance; set => scanJammedWormChance = Mathf.Clamp01(value); }
         public float FollowupChance { get => followupChance; set => followupChance = Mathf.Clamp01(value); }
@@ -96,7 +98,8 @@ namespace Uptime.Connections
         {
             if (random == null) ResetActivity(traffic.Seed);
             float total = Mathf.Max(0f, ordinaryWeight) + Mathf.Max(0f, reconnaissanceWeight) +
-                Mathf.Max(0f, payloadWeight) + Mathf.Max(0f, wormWeight);
+                Mathf.Max(0f, payloadWeight) + Mathf.Max(0f, wormWeight) +
+                Mathf.Max(0f, payloadLauncherWeight);
             var result = new AmbientHostileActivityResult();
             if (total <= 0f)
             {
@@ -110,7 +113,9 @@ namespace Uptime.Connections
                 result.Activity = choice < ordinaryWeight ? "ordinary" :
                     choice < ordinaryWeight + reconnaissanceWeight ? "reconnaissance" :
                     choice < ordinaryWeight + reconnaissanceWeight + payloadWeight ?
-                        "payload" : "worm";
+                        "payload" :
+                    choice < ordinaryWeight + reconnaissanceWeight + payloadWeight +
+                        wormWeight ? "worm" : "payload_launcher";
                 try
                 {
                     switch (result.Activity)
@@ -133,6 +138,16 @@ namespace Uptime.Connections
                             break;
                         case "worm":
                             SpawnAmbientWorm(result);
+                            break;
+                        case "payload_launcher":
+                            ConnectionSpawnPlan launcherPlan =
+                                traffic.GeneratePayloadLauncherPlan(atTime);
+                            if (launcherPlan != null)
+                            {
+                                traffic.QueueSpawnPlan(launcherPlan, "ambient_payload_launcher");
+                                result.ConnectionPlan = launcherPlan;
+                            }
+                            else result.Reason = "ids_exhausted";
                             break;
                     }
                 }

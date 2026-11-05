@@ -67,6 +67,7 @@ namespace Uptime.Connections
         public float reconnaissanceActivityWeight;
         public float payloadActivityWeight;
         public float wormActivityWeight;
+        public float payloadLauncherActivityWeight;
         public float variablePayloadChance;
         public float scanJammedWormChance;
         public float reconnaissanceFollowupChance;
@@ -110,6 +111,7 @@ namespace Uptime.Connections
         public float phantomLoadWeight;
         public float blackoutWeight;
         public float spawnerWeight;
+        public float payloadSpawnerWeight;
         public ProfileConfiguration[] profiles;
     }
 
@@ -197,6 +199,7 @@ namespace Uptime.Connections
         public float reconnaissanceActivityWeight;
         public float payloadActivityWeight;
         public float wormActivityWeight;
+        public float payloadLauncherActivityWeight;
         public float hostileActivityRoll;
         public string activityOriginNodeId;
         public string targetNodeId;
@@ -700,6 +703,7 @@ namespace Uptime.Connections
             entry.reconnaissanceActivityWeight = director.ReconnaissanceWeight;
             entry.payloadActivityWeight = director.PayloadWeight;
             entry.wormActivityWeight = director.WormWeight;
+            entry.payloadLauncherActivityWeight = director.PayloadLauncherWeight;
             entry.hostileActivityRoll = result.SelectionRoll;
             entry.source = "ambient";
             CopyHostileResult(entry, result);
@@ -712,6 +716,13 @@ namespace Uptime.Connections
             entry.hostileActivity = result.Activity;
             entry.success = result.Succeeded;
             entry.connectionId = result.ConnectionId;
+            if (result.Activity == "payload_launcher" && result.ConnectionPlan != null)
+            {
+                entry.profileId = result.ConnectionPlan.ProfileId;
+                entry.operationIndex = 0;
+                entry.operationKind = result.ConnectionPlan.Operations[0].Operation.ToString();
+                entry.effectType = result.ConnectionPlan.Operations[0].EffectOnCompletion.ToString();
+            }
             entry.hostileEventId = result.EventId;
             entry.payloadId = result.PayloadId;
             entry.wormOutbreakId = result.WormOutbreakId;
@@ -1382,6 +1393,7 @@ namespace Uptime.Connections
                 phantomLoadWeight = trafficDirector.PhantomLoadWeight,
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
+                payloadSpawnerWeight = trafficDirector.PayloadSpawnerWeight,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
             HostileActivityDirector activities = trafficDirector.GetComponent<HostileActivityDirector>();
             if (activities != null)
@@ -1390,6 +1402,7 @@ namespace Uptime.Connections
                 traffic.reconnaissanceActivityWeight = activities.ReconnaissanceWeight;
                 traffic.payloadActivityWeight = activities.PayloadWeight;
                 traffic.wormActivityWeight = activities.WormWeight;
+                traffic.payloadLauncherActivityWeight = activities.PayloadLauncherWeight;
                 traffic.variablePayloadChance = activities.VariablePayloadChance;
                 traffic.scanJammedWormChance = activities.ScanJammedWormChance;
                 traffic.reconnaissanceFollowupChance = activities.FollowupChance;

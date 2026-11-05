@@ -19,6 +19,8 @@ namespace Uptime.Connections.EditorTools
             var fourTraffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             Check(fourNode != null && fourTraffic != null &&
                 fourNode.PayloadWeight == 0f && fourNode.WormWeight == 0f &&
+                fourNode.PayloadLauncherWeight == 0f &&
+                fourTraffic.PayloadSpawnerWeight == 0f &&
                 fourTraffic.HostileMeanIntervalSeconds == 54f,
                 "four-node ordinary ambient baseline is retained");
             EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsAdvanced.unity");
@@ -30,6 +32,8 @@ namespace Uptime.Connections.EditorTools
                 traffic.HostileMeanIntervalSeconds == 30f &&
                 activities.OrdinaryWeight == 4f && activities.ReconnaissanceWeight == 2f &&
                 activities.PayloadWeight == 2f && activities.WormWeight == 1f &&
+                activities.PayloadLauncherWeight == 1f &&
+                traffic.PayloadSpawnerWeight == 1f &&
                 activities.VariablePayloadChance == .5f &&
                 activities.ScanJammedWormChance == .7f,
                 "advanced authored selector and provisional tuning");
@@ -329,6 +333,7 @@ namespace Uptime.Connections.EditorTools
             director.ReconnaissanceWeight = recon;
             director.PayloadWeight = payload;
             director.WormWeight = worm;
+            director.PayloadLauncherWeight = 0f;
         }
 
         private static bool IsIngress(ConnectionTrafficDirector traffic, string id) =>

@@ -1,5 +1,7 @@
 # Payload Launcher V0
 
+**Later integration:** [Ambient Payload Threats V0](connections-ambient-payload-threats-v0.md) gives this existing profile a weighted Advanced hostile opportunity without changing its operation or Payload behavior.
+
 **Scope:** Connections implementation, November 4, 2026. This is a manual playtest slice in both Connections scenes. It does not set a general rule for adversary pacing or Payload sources.
 
 `spawn payload-launcher` queues an ordinary-looking hostile logical connection through the existing profile path. Its claimed purpose is **Application Updates** and its single EXECUTE operation targets API, requesting 3 LOAD for 60 WORK (20 seconds at full allocation). The connection can be inspected, blocked, or killed through the existing commands and allocator. The profile has zero ambient weight.
