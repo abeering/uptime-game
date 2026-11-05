@@ -1,6 +1,6 @@
 # Connections — THREATS
 
-> **Status:** Active working design foundation, updated October 26, 2026. Captures the current design agreements and unresolved questions. **Not** a claim that the proposed changes have been implemented, or that provisional tuning values are final.
+> **Status:** Active working design foundation; original working baseline updated October 26, 2026, with a **November 4, 2026 disguise/difficulty design addendum** below. Captures current design agreements and unresolved questions. **Not** a claim that the proposed changes have been implemented, or that provisional tuning values are final.
 >
 > **Scope:** Uptime's **Connections** prototype. Packet remains separate and playable. This page is the conceptual entry point for ambient threat generation; the linked focused contracts and current runtime/serialized scene remain authoritative for implemented behavior.
 
@@ -25,6 +25,7 @@ Keep these concepts distinct:
 | **PURPOSE** | The expected business activity: claim, eligible destination(s), operation sequence, normal LOAD, and normal WORK. It is primarily an **investigative expectation** and secondarily world-building. |
 | **Genus / objective** | What a hostile connection tries to achieve. Initially **LOADER** or **INFECTOR**; not an exhaustive taxonomy. |
 | **Anomaly / signature** | A measurable mismatch with the legitimate PURPOSE baseline: LOAD, WORK, or operation deviation. Anomaly is **evidence**, not a threat verdict. |
+| **Disguise sophistication / recognizability** | How readily the player can distinguish a hostile connection from the *legitimate traffic actually appearing in this run*. An independent gameplay/difficulty lever, not the attack's objective, severity, or simply an anomaly count. |
 | **Attack pattern / tactic** | How and when pressure appears: immediate high LOAD, OVERLOAD, SPIKING, etc. |
 | **Connection structure** | The number/order of operations; **DELAYED** means the original normal PURPOSE arc is retained and **an additional malicious operation is appended**. This can apply to LOADERs and INFECTORs. |
 | **Payload** | What an INFECTOR installs on delivery (e.g. Phantom LOAD, Blackout, Spawner); separate from the carrier's investigative signature. |
@@ -33,6 +34,31 @@ Keep these concepts distinct:
 The canonical PURPOSE is **not** a placeholder label applied after making arbitrary hostile traffic. Normal and hostile connections share a credible legitimate baseline. A LOADER can *abuse the actual functionality* of Customer Authentication by forcing it to consume excessive processing capacity; it need not be fictionally pretending to do something entirely unrelated. An INFECTOR can use the same purpose as cover for delivering a persistent infection.
 
 We do **not** need to redesign PURPOSE, introduce UNKNOWN/UNCATEGORIZED, implement independent classification, or add node *types* to complete this generation pass. Those are interesting open lines of inquiry. Preserve the current PURPOSE system for now.
+
+## Disguise sophistication is a first-order difficulty lever (working direction, November 4)
+
+A central tuning question for a level, run, or villain is **"How well do hostile entities disguise themselves?"** It is distinct from **how often they attack**, **how much damage they can cause**, and **how quickly the player must respond**. The same underlying attack can demand radically different amounts of recognition and investigation depending on its cover.
+
+This is also a **learning-curve tool**, not just a way to punish experienced players. A first-time player may benefit from a threat whose claimed PURPOSE is conspicuously fake or unique: "What's that?" can teach "That doesn't belong on this network" and establish the idea of hostile traffic. That is a valid deliberately overt encounter, *even though it is not a canonical legitimate PURPOSE*. It should not require adding the fake claim to the benign PURPOSE catalog. Later, familiar business activity can conceal the exact same attack.
+
+| Illustrative disguise | What the player learns / must notice |
+|---|---|
+| **Overt / no convincing cover** | A clearly hostile or nonexistent PURPOSE, or a connection that immediately behaves outrageously. Recognizing the threat is almost the whole lesson; execution still matters. |
+| **Plausible but conspicuous** | A credible-sounding claim that *rarely or never occurs legitimately in this run*. A player learns the business's normal traffic and realizes something doesn't fit. |
+| **Credible cover, visible mismatch** | A frequent benign PURPOSE with abnormal LOAD, WORK, operation arc, or temporal behavior. The player compares this instance to a learned baseline. |
+| **Convincing cover, deeper tell** | Purpose and routine behavior largely fit; the player may need context, detailed inspection, eventual operation logs, or a scarce Probe to identify or act on the threat. The clue need not live in the same tool for every attack. |
+
+**The legitimacy of a disguise is relational.** A label is only good camouflage if the player also encounters credible, benign uses of it. A hostile connection that is the *only* source of "Application Updates" quickly teaches the player that the label means danger—even if the words sound innocuous. Conversely, adding meaningless benign lookalikes for every new attack is not automatically the solution. Some attacks should be intentionally obvious.
+
+**Disguise quality is not merely "fewer anomalies."** A threat may have ordinary LOAD but suspicious logs; another may have outrageous LOAD but mundane logs; another may be easy to recognize yet difficult to address because its identity changes. These are distinct axes of *recognition*, *investigation cost*, and *counterplay*. The player should be rewarded for interpreting evidence, not reduced to blind guessing or a mandatory inspect-everything sequence. Benign outliers remain important: one mismatch is evidence, not automatic proof of hostility.
+
+**Disguise should eventually vary per encounter.** The future Level Director/run difficulty, villain's cleverness and preferred tactics, and authored story beats can influence the **distribution** of covers and tells selected when an attack is created. They need not force every connection into the same tier. A sophisticated villain can still send something absurdly obvious, a beginner level can occasionally introduce a more demanding clue, and a single villain can mix overwhelming overt attacks with subtle ones. Attack frequency, objective, consequence, and disguise sophistication should remain separable controls.
+
+The ambient connection recipe below still selects **genus/objective before a compatible PURPOSE baseline**. This addendum records a future *composition decision about the cover and available evidence*, not a requirement to insert a new step, invent a `DisguiseTier` enum, or replace the canonical-purpose generator. Deliberately false PURPOSE claims can be special authored/tutorial cases; ordinary generated camouflage should remain grounded in recognizable legitimate behavior.
+
+**What to preserve for later development:** when authoring an attack or extending runtime generation, ask *what observable evidence distinguishes this instance from legitimate traffic, how familiar is its cover in this particular run, and how much attention should recognizing it cost?* Eventually those decisions can be made per spawned threat and recorded for testing; no specific probabilities, tiers, schema, dynamic adaptation, or implementation phase is selected here.
+
+**Playtest provenance:** the manual [Payload Launcher V0](connections-payload-launcher-v0.md) example claims "Application Updates", which is not part of the regular ambient benign PURPOSE mix. That made its cover easy to memorize, even though the underlying operation-to-Payload mechanic was fun. This is a useful demonstration of the lever—not necessarily a defect to repair in a deliberately simple first prototype.
 
 ## Ownership: ambient Traffic Director versus Level Director
 
@@ -244,7 +270,7 @@ Throughout: retain seeded determinism, stable purpose baselines, source/target v
 4. **Temporal variety:** weights for immediate/OVERLOAD/SPIKING and DELAYED, onset-delay ranges, peak capacity fractions, and the minimum useful number of spikes.
 5. **WORK rate semantics:** Phase 2 now uses multiplicative scoped factors and shows `WORK PAUSED` / `ETA PAUSED` at 0× with positive LOAD. Future attack-state priority and deeper player explanation remain open.
 6. **INFECTOR delivery timing:** how long should baseline and anomalous carriers take, and where should an appended delivery operation fit in that window?
-7. **PURPOSE / information evolution:** future node types, unknown/unclassified behavior, reference baselines, logs/probes/trace, and degree of trustworthy activity descriptions.
+7. **PURPOSE / information evolution:** how disguise sophistication varies across levels, villains, and individual encounters; how actual benign PURPOSE frequency affects cover; future node types, unknown/unclassified behavior, reference baselines, logs/probes/trace, and degree of trustworthy activity descriptions.
 8. **Future genera:** THROTTLER, TUNNELER, other attackers—are they distinct objectives, tactics, payloads, or attack surfaces?
 
 ## Future genera are possibilities, not scope
