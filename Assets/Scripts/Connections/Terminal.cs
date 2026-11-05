@@ -464,7 +464,7 @@ namespace Uptime.Connections
                     break;
                 case "worm":
                     if (tokens.Length != 3 || !TryParseWormEffect(tokens[2], out WormEffect effect))
-                        AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned", CommandFailureColor());
+                        AppendText("USAGE  worm <originNodeId> scan-jammed|port-scanned|backdoor", CommandFailureColor());
                     else if (simulationHost?.Worms == null)
                         AppendText("WORM  simulation unavailable", CommandFailureColor());
                     else try
@@ -565,8 +565,8 @@ namespace Uptime.Connections
                 case "infect":
                     if ((tokens.Length != 3 && tokens.Length != 4) ||
                         !TryParseInfectionKind(tokens[2], out InfectionKind injectKind) ||
-                        injectKind == InfectionKind.Blackout && tokens.Length == 4)
-                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner|payload-spawner [load|cadence]", CommandFailureColor());
+                        (injectKind == InfectionKind.Blackout || injectKind == InfectionKind.Backdoor) && tokens.Length == 4)
+                        AppendText("USAGE  infect <nodeId> phantom-load|blackout|spawner|payload-spawner|backdoor [load|cadence]", CommandFailureColor());
                     else if (simulationHost == null)
                         AppendText("INFECT  simulation unavailable", CommandFailureColor());
                     else if (tokens.Length == 4 &&
@@ -594,7 +594,7 @@ namespace Uptime.Connections
                 case "uninfect":
                     if ((tokens.Length != 2 && tokens.Length != 3) ||
                         tokens.Length == 3 && !TryParseInfectionKind(tokens[2], out _))
-                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner|payload-spawner]", CommandFailureColor());
+                        AppendText("USAGE  uninfect <nodeId> [phantom-load|blackout|spawner|payload-spawner|backdoor]", CommandFailureColor());
                     else if (simulationHost == null)
                         AppendText("UNINFECT  simulation unavailable", CommandFailureColor());
                     else
@@ -679,14 +679,14 @@ namespace Uptime.Connections
                     AppendText("SCROLL  Ctrl/Cmd + Up/Down  Page Up/Down", mutedColor);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     AppendText("DEV  probe reset  // clear Probe cooldown", mutedColor);
-                    AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N]", mutedColor);
+                    AppendText("MORE  spawn <profileId> [obj:delivery|loader] [inf:phantom-load|blackout|spawner|backdoor] [infp:load=N|cadence=N]", mutedColor);
                     AppendText("DEV  spawn basic-threat idhop  // manual hostile ID hopping", mutedColor);
                     AppendText("DEV  spawn basic-threat idreact  // reactive false identity", mutedColor);
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
-                    AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned", mutedColor);
+                    AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned|backdoor", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
                     AppendText("DEV  infect api payload-spawner 20  // periodic internal Payloads", mutedColor);
                     AppendText("MORE  demandtest  mark  log save|dir|folder  test  help", mutedColor);
@@ -718,7 +718,7 @@ namespace Uptime.Connections
             out bool idReactive, out string error)
         {
             const string usage = "USAGE  spawn <profileId> [obj:delivery|loader] " +
-                "[inf:phantom-load|blackout|spawner] [infp:load=N|cadence=N] [idhop|idreact]";
+                "[inf:phantom-load|blackout|spawner|backdoor] [infp:load=N|cadence=N] [idhop|idreact]";
             profileId = null;
             overrides = null;
             idHopping = false;
@@ -802,6 +802,8 @@ namespace Uptime.Connections
             { effect = WormEffect.ScanJammed; return true; }
             if (string.Equals(text, "port-scanned", System.StringComparison.OrdinalIgnoreCase))
             { effect = WormEffect.PortScanned; return true; }
+            if (string.Equals(text, "backdoor", System.StringComparison.OrdinalIgnoreCase))
+            { effect = WormEffect.Backdoor; return true; }
             effect = default;
             return false;
         }
@@ -817,6 +819,8 @@ namespace Uptime.Connections
             { kind = InfectionKind.Spawner; return true; }
             if (text.Equals("payload-spawner", System.StringComparison.OrdinalIgnoreCase))
             { kind = InfectionKind.PayloadSpawner; return true; }
+            if (text.Equals("backdoor", System.StringComparison.OrdinalIgnoreCase))
+            { kind = InfectionKind.Backdoor; return true; }
             return false;
         }
 

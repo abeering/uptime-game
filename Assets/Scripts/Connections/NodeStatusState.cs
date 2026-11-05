@@ -16,6 +16,8 @@ namespace Uptime.Connections
         public bool ScanJammed { get; private set; }
         public float ScanJamRemainingFraction { get; private set; }
         public float ScanJamRemainingSeconds { get; private set; }
+        public bool Backdoor { get; private set; }
+        public float BackdoorRemainingSeconds { get; private set; }
         public bool Isolated { get; private set; }
         public float IsolationRemainingFraction { get; private set; }
         public float IsolationRemainingSeconds { get; private set; }
@@ -29,7 +31,7 @@ namespace Uptime.Connections
         public float OverclockRemainingSeconds { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || KnownInfected ||
-            AwarenessPreview || PortScanned || ScanJammed || Isolated ||
+            AwarenessPreview || PortScanned || ScanJammed || Backdoor || Isolated ||
             CleanVisible(realTime) || InterceptActive || Overclocked;
 
         public void SetOverclock(NodeResources node, NodeResources activeNode,
@@ -92,6 +94,13 @@ namespace Uptime.Connections
                 (condition.ExpiresAtSeconds - condition.AppliedAtSeconds));
         }
 
+        public void SetBackdoor(NodeCondition condition, float simulationTime)
+        {
+            Backdoor = condition != null;
+            BackdoorRemainingSeconds = condition == null ? 0f : Mathf.Max(0f,
+                condition.ExpiresAtSeconds - simulationTime);
+        }
+
         public void SetIsolation(IsolationState isolation, float simulationTime)
         {
             Isolated = isolation != null;
@@ -124,6 +133,8 @@ namespace Uptime.Connections
             PortScanRemainingFraction = 0f;
             PortScanRemainingSeconds = 0f;
             ScanJammed = false;
+            Backdoor = false;
+            BackdoorRemainingSeconds = 0f;
             ScanJamRemainingFraction = 0f;
             ScanJamRemainingSeconds = 0f;
             Isolated = false;

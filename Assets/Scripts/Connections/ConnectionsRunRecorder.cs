@@ -33,6 +33,7 @@ namespace Uptime.Connections
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
         public float defaultPayloadSpawnerCadence;
+        public float backdoorWorkMultiplier;
         public float connectionTravelSecondsPerLink;
         public float scanDurationSeconds;
         public float payloadInterceptWindowSeconds;
@@ -70,6 +71,7 @@ namespace Uptime.Connections
         public float payloadLauncherActivityWeight;
         public float variablePayloadChance;
         public float scanJammedWormChance;
+        public float backdoorWormChance;
         public float reconnaissanceFollowupChance;
         public float reconnaissanceFollowupDelaySeconds;
         public float portScanLoad;
@@ -112,6 +114,7 @@ namespace Uptime.Connections
         public float blackoutWeight;
         public float spawnerWeight;
         public float payloadSpawnerWeight;
+        public float backdoorWeight;
         public ProfileConfiguration[] profiles;
     }
 
@@ -301,6 +304,7 @@ namespace Uptime.Connections
         public float wormTravelSeconds;
         public float wormActionSeconds;
         public float wormConditionSeconds;
+        public float wormBackdoorConditionSeconds;
         public string sourceWormBranchId;
         public float isolationActivatedAtSeconds;
         public float isolationExpiresAtSeconds;
@@ -780,6 +784,7 @@ namespace Uptime.Connections
             entry.wormTravelSeconds = outbreak.Tuning.travelSeconds;
             entry.wormActionSeconds = outbreak.Tuning.actionSeconds;
             entry.wormConditionSeconds = outbreak.Tuning.conditionSeconds;
+            entry.wormBackdoorConditionSeconds = outbreak.Tuning.backdoorConditionSeconds;
         }
 
         public void RecordWormBranch(string type, WormBranch branch, float time)
@@ -1327,6 +1332,7 @@ namespace Uptime.Connections
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 defaultPayloadSpawnerCadence = host.DefaultPayloadSpawnerCadence,
+                backdoorWorkMultiplier = host.BackdoorWorkMultiplier,
                 connectionTravelSecondsPerLink = host.ConnectionTravelSecondsPerLink,
                 scanDurationSeconds = host.ScanDurationSeconds,
                 payloadInterceptWindowSeconds = host.Payloads != null ?
@@ -1394,6 +1400,7 @@ namespace Uptime.Connections
                 blackoutWeight = trafficDirector.BlackoutWeight,
                 spawnerWeight = trafficDirector.SpawnerWeight,
                 payloadSpawnerWeight = trafficDirector.PayloadSpawnerWeight,
+                backdoorWeight = trafficDirector.BackdoorWeight,
                 profiles = new ProfileConfiguration[configuredProfiles != null ? configuredProfiles.Count : 0] };
             HostileActivityDirector activities = trafficDirector.GetComponent<HostileActivityDirector>();
             if (activities != null)
@@ -1405,6 +1412,7 @@ namespace Uptime.Connections
                 traffic.payloadLauncherActivityWeight = activities.PayloadLauncherWeight;
                 traffic.variablePayloadChance = activities.VariablePayloadChance;
                 traffic.scanJammedWormChance = activities.ScanJammedWormChance;
+                traffic.backdoorWormChance = activities.BackdoorWormChance;
                 traffic.reconnaissanceFollowupChance = activities.FollowupChance;
                 traffic.reconnaissanceFollowupDelaySeconds = activities.FollowupDelaySeconds;
                 traffic.portScanLoad = activities.PortScanLoad;
