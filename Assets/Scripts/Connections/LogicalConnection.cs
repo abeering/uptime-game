@@ -19,7 +19,27 @@ namespace Uptime.Connections
         Execute
     }
 
-    public enum CompletionEffect { None, InfectionDelivery, ConditionApplication }
+    public enum CompletionEffect { None, InfectionDelivery, ConditionApplication, PayloadLaunch }
+
+    [Serializable]
+    public sealed class PayloadLaunchSpec
+    {
+        [SerializeField] private string destinationNodeId;
+        [SerializeField] private PayloadMotionProfile motionProfile;
+
+        public string DestinationNodeId => destinationNodeId;
+        public PayloadMotionProfile MotionProfile => motionProfile;
+        public bool IsValid => !string.IsNullOrWhiteSpace(destinationNodeId) &&
+            Enum.IsDefined(typeof(PayloadMotionProfile), motionProfile);
+
+        public PayloadLaunchSpec(string destinationNodeId, PayloadMotionProfile motionProfile)
+        {
+            this.destinationNodeId = destinationNodeId;
+            this.motionProfile = motionProfile;
+        }
+
+        public PayloadLaunchSpec Copy() => new PayloadLaunchSpec(destinationNodeId, motionProfile);
+    }
 
     public enum InfectionKind { PhantomLoad, Blackout, Spawner }
 
@@ -100,7 +120,8 @@ namespace Uptime.Connections
     {
         public ConnectionEffectOccurrence(CompletionEffect type, string connectionId,
             int operationIndex, string targetNodeId, float timeSeconds,
-            InfectionPayload payload = null, ConditionPayload conditionPayload = null)
+            InfectionPayload payload = null, ConditionPayload conditionPayload = null,
+            PayloadLaunchSpec launchSpec = null)
         {
             Type = type;
             ConnectionId = connectionId;
@@ -109,6 +130,7 @@ namespace Uptime.Connections
             TimeSeconds = timeSeconds;
             Payload = payload?.Copy();
             ConditionPayload = conditionPayload?.Copy();
+            LaunchSpec = launchSpec?.Copy();
         }
 
         public CompletionEffect Type { get; }
@@ -118,6 +140,8 @@ namespace Uptime.Connections
         public float TimeSeconds { get; }
         public InfectionPayload Payload { get; }
         public ConditionPayload ConditionPayload { get; }
+        public PayloadLaunchSpec LaunchSpec { get; }
+        public string LaunchedPayloadId { get; internal set; }
         // Filled by the host before publishing the existing completion occurrence.
         public bool? InfectionApplied { get; internal set; }
     }
@@ -132,6 +156,7 @@ namespace Uptime.Connections
         [SerializeField] private CompletionEffect completionEffect;
         [SerializeField] private InfectionPayload infectionPayload;
         [SerializeField] private ConditionPayload conditionPayload;
+        [SerializeField] private PayloadLaunchSpec launchSpec;
         [SerializeField] private TimedModifierBehaviorDefinition[] behaviors;
 
         public OperationKind Operation => operation;
@@ -141,17 +166,20 @@ namespace Uptime.Connections
         public CompletionEffect EffectOnCompletion => completionEffect;
         public InfectionPayload InfectionPayload => infectionPayload;
         public ConditionPayload ConditionPayload => conditionPayload;
+        public PayloadLaunchSpec LaunchSpec => launchSpec;
         public TimedModifierBehaviorDefinition[] Behaviors => behaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public OperationStage() { }
         public OperationStage(OperationKind kind, float work, float load, string description,
             CompletionEffect effect = CompletionEffect.None,
             TimedModifierBehaviorDefinition[] behaviors = null,
-            InfectionPayload payload = null, ConditionPayload condition = null)
+            InfectionPayload payload = null, ConditionPayload condition = null,
+            PayloadLaunchSpec launch = null)
         { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
             completionEffect = effect; this.behaviors = CopyBehaviors(behaviors);
             infectionPayload = effect == CompletionEffect.InfectionDelivery ?
                 (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null;
-            conditionPayload = effect == CompletionEffect.ConditionApplication ? condition?.Copy() : null; }
+            conditionPayload = effect == CompletionEffect.ConditionApplication ? condition?.Copy() : null;
+            launchSpec = effect == CompletionEffect.PayloadLaunch ? launch?.Copy() : null; }
 
         internal static TimedModifierBehaviorDefinition[] CopyBehaviors(
             TimedModifierBehaviorDefinition[] source)
@@ -209,6 +237,7 @@ namespace Uptime.Connections
             CompletionEffect.None;
         public InfectionPayload PayloadAt(int index) => HasArc ? StageAt(index).InfectionPayload : null;
         public ConditionPayload ConditionAt(int index) => HasArc ? StageAt(index).ConditionPayload : null;
+        public PayloadLaunchSpec LaunchAt(int index) => HasArc ? StageAt(index).LaunchSpec : null;
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors =>
             connectionBehaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
         public LoaderAttackPlan LoaderAttack => loaderAttack;
@@ -250,7 +279,7 @@ namespace Uptime.Connections
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
                     stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
-                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload);
+                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec);
             }
             return result;
         }
@@ -379,7 +408,7 @@ namespace Uptime.Connections
             deliveredEffects[operationIndex] = true;
             return new ConnectionEffectOccurrence(effect, ConnectionId, operationIndex,
                 TargetNode.NodeId, timeSeconds, Definition.PayloadAt(operationIndex),
-                Definition.ConditionAt(operationIndex));
+                Definition.ConditionAt(operationIndex), Definition.LaunchAt(operationIndex));
         }
 
         internal void FinishOperation()

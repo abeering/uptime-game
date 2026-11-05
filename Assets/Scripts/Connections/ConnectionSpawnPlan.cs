@@ -75,7 +75,7 @@ namespace Uptime.Connections
                 Operations[i] = stage == null ? null : new OperationStage(stage.Operation,
                     stage.TotalWork, stage.DesiredLoad, stage.ActivityDescription,
                     stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload,
-                    stage.ConditionPayload);
+                    stage.ConditionPayload, stage.LaunchSpec);
             }
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
