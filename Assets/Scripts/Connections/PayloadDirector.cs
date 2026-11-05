@@ -234,10 +234,13 @@ namespace Uptime.Connections
         }
 
         // Arrival wins at the exact expiry timestamp; expiry is processed afterward.
-        public void Advance(float deltaSeconds, float now)
+        public void Advance(float deltaSeconds, float now, int payloadsBeforeSegment)
         {
-            foreach (PayloadState payload in payloads)
+            // A Payload created by an operation completing at this segment's end
+            // starts with zero elapsed time; earlier Payloads still advance.
+            for (int i = 0; i < payloadsBeforeSegment; i++)
             {
+                PayloadState payload = payloads[i];
                 if (payload.Phase == PayloadPhase.Resolved) continue;
                 payload.PhaseElapsed += deltaSeconds;
                 if (payload.PhaseElapsed + .00001f < payload.PhaseDuration) continue;

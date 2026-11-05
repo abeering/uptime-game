@@ -15,6 +15,7 @@ namespace Uptime.Connections
         [Min(0.01f)] public float maximumDuration = 75f;
         [Min(0f)] public float meanWork;
         public CompletionEffect completionEffect;
+        public PayloadLaunchSpec launchSpec;
         public TimedModifierBehaviorDefinition[] behaviors;
     }
 
@@ -153,6 +154,17 @@ namespace Uptime.Connections
         public int Seed { get => seed; set => seed = value; }
         public bool RandomizeSeed { get => randomizeSeed; set => randomizeSeed = value; }
         public IReadOnlyList<ConnectionTrafficProfile> Profiles => profiles;
+        public bool HasQueuedPayloadLaunch
+        {
+            get
+            {
+                foreach (Queued entry in queue)
+                    foreach (OperationStage stage in entry.Plan.Operations)
+                        if (stage?.EffectOnCompletion == CompletionEffect.PayloadLaunch)
+                            return true;
+                return false;
+            }
+        }
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
         public bool ConnectionIdsExhausted => idsExhausted;
@@ -915,7 +927,8 @@ namespace Uptime.Connections
                     spec.activityDescription, spec.completionEffect, spec.behaviors,
                     spec.completionEffect == CompletionEffect.InfectionDelivery ?
                         new InfectionPayload(InfectionKind.PhantomLoad,
-                            host.DefaultPhantomLoad) : null);
+                            host.DefaultPhantomLoad) : null,
+                    launch: spec.launchSpec);
             }
             if (selected.purposeTemplate)
                 return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
@@ -1443,7 +1456,7 @@ namespace Uptime.Connections
             new OperationStage(kind ?? stage.Operation, work ?? stage.TotalWork,
                 load ?? stage.DesiredLoad, description ?? stage.ActivityDescription,
                 effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors,
-                payload ?? stage.InfectionPayload);
+                payload ?? stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec);
 
         private static string Activity(OperationKind kind) => kind == OperationKind.Read
             ? "Reading records" : kind == OperationKind.Write ? "Writing records" : "Processing request";
@@ -1530,6 +1543,20 @@ namespace Uptime.Connections
                 Stage(OperationKind.Read, "Verifying updates", 1f, 2.5f, 20f, 35f)),
             Profile("quick-lookup", "Quick Record Lookup", "DB", 0f,
                 Stage(OperationKind.Read, "Looking up a record", 0.5f, 1.5f, 4f, 8f)),
+            new ConnectionTrafficProfile
+            {
+                id = "payload-launcher", claimedPurpose = "Application Updates",
+                eligibleTargetIds = new[] { "API" }, ambientWeight = 0f, isHostile = true,
+                operations = new[] { new ConnectionOperationProfile
+                {
+                    operation = OperationKind.Execute,
+                    activityDescription = "Applying service update",
+                    minimumLoad = 3f, maximumLoad = 3f,
+                    minimumDuration = 20f, maximumDuration = 20f,
+                    completionEffect = CompletionEffect.PayloadLaunch,
+                    launchSpec = new PayloadLaunchSpec("DB", PayloadMotionProfile.Steady)
+                } }
+            },
             new ConnectionTrafficProfile
             {
                 id = "basic-threat", claimedPurpose = "Database Maintenance",
