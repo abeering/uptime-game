@@ -430,14 +430,14 @@ namespace Uptime.Connections
             public float Threshold { get; }
         }
 
-        internal void EmitReachedLogs(float previousWork, float timeSeconds,
+        internal void EmitReachedLogs(float previousWork, float reachedWork, float timeSeconds,
             Action<EmittedConnectionLog> onEmitted)
         {
             if (!IsActive || CompletedWork <= previousWork) return;
             int operationIndex = CurrentOperationIndex;
             LogMilestone[] milestones = logMilestones[operationIndex];
             while (nextLogMilestone[operationIndex] < milestones.Length &&
-                milestones[nextLogMilestone[operationIndex]].Threshold <= CompletedWork)
+                milestones[nextLogMilestone[operationIndex]].Threshold <= reachedWork)
             {
                 LogMilestone milestone = milestones[nextLogMilestone[operationIndex]++];
                 var emitted = new EmittedConnectionLog(ConnectionId, emittedLogs.Count + 1,

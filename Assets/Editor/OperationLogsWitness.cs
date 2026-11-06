@@ -62,6 +62,47 @@ namespace Uptime.Connections.EditorTools
             host.StepSimulation(5f);
             Check(single.EmittedLogs.Count == 5, "resolved connection cannot emit");
 
+            // Normal completion may be just short of the authored final WORK.
+            Reset(host, recorder);
+            Queue(traffic, dbRoute, "fractional", Stage(OperationKind.Read, 2.00005f, 1f,
+                Log(.99999f, "near-final"), Log(1f, "final-a"),
+                Log(1f, "final-b")));
+            host.StepSimulation(2f);
+            var fractional = host.FindConnection("fractional");
+            var boundary = recorder.CurrentLog.events.Single(e =>
+                e.type == "operation_completed" && e.connectionId == "fractional");
+            Check(fractional.IsComplete && boundary.completedWork < boundary.requiredWork &&
+                boundary.requiredWork - boundary.completedWork <= .0001f,
+                "fractional operation completes inside existing tolerance");
+            Check(fractional.EmittedLogs.Select(e => e.Activity).SequenceEqual(
+                    new[] { "near-final", "final-a", "final-b" }) &&
+                fractional.EmittedLogs.Select(e => e.AuthoredIndex).SequenceEqual(
+                    new[] { 0, 1, 2 }) &&
+                fractional.EmittedLogs.All(e => e.TimeSeconds == boundary.timeSeconds),
+                "all final milestones emit once in stable order at completion time");
+            Check(recorder.CurrentLog.events.Where(e => e.type == "connection_log_emitted" &&
+                e.connectionId == "fractional").Select(e => e.logAuthoredIndex)
+                .SequenceEqual(new[] { 0, 1, 2 }), "recorder preserves boundary order");
+            Debug.Log($"OperationLogsWitness fractional completion: required " +
+                $"{boundary.requiredWork:0.#####}, completed {boundary.completedWork:0.#####}; " +
+                $"expected/observed final logs 3/{fractional.EmittedLogs.Count}");
+            host.StepSimulation(3f);
+            Check(fractional.EmittedLogs.Count == 3 &&
+                ReferenceEquals(fractional, host.FindConnection("fractional")),
+                "resolved fractional operation emits no duplicates");
+
+            Reset(host, recorder);
+            Queue(traffic, dbRoute, "reduced-tail", Stage(OperationKind.Read,
+                2.00005f, 1f,
+                new[] { new TimedModifierBehaviorDefinition("reduce-tail", 0f, 0f,
+                    -.00005f, 0f) }, Log(1f, "beyond-effective-work")));
+            host.StepSimulation(2f);
+            Check(host.FindConnection("reduced-tail").IsComplete &&
+                host.FindConnection("reduced-tail").EmittedLogs.Count == 0,
+                "completion tolerance cannot pass a reduced effective requirement");
+            Debug.Log($"OperationLogsWitness reduced effective WORK: expected/observed " +
+                $"unearned logs 0/{host.FindConnection("reduced-tail").EmittedLogs.Count}");
+
             // Fixture B: the previous operation survives the transition.
             Reset(host, recorder);
             Queue(traffic, dbRoute, "arc", Stage(OperationKind.Read, 4f, 2f,
@@ -195,6 +236,9 @@ namespace Uptime.Connections.EditorTools
                 $"reduced requirement does not fabricate logs (complete={reduced.IsComplete}, " +
                 $"count={reduced.EmittedLogs.Count}, work={reduced.CompletedWork:0.###}, " +
                 $"required={reduced.CurrentTotalWork:0.###})");
+            host.StepSimulation(5f);
+            Check(reduced.EmittedLogs.Count == 1,
+                "resolved reduced-WORK operation emits no unearned late entry");
 
             Reset(host, recorder);
             Queue(traffic, dbRoute, "empty", Stage(OperationKind.Read, 4f, 2f));

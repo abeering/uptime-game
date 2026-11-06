@@ -54,7 +54,13 @@ namespace Uptime.Connections
                 connection.CompletedWork = Mathf.Max(connection.CompletedWork,
                     Mathf.Min(connection.CurrentTotalWork,
                         connection.CompletedWork + connection.ActualWorkRate * deltaSeconds));
-                connection.EmitReachedLogs(previousWork, stepEndTimeSeconds, onLogEmitted);
+                // Match the existing completion tolerance, but never pass the effective
+                // requirement when it is lower than an authored base-WORK milestone.
+                float logWork = connection.RemainingWork <= Epsilon ?
+                    Mathf.Min(connection.CurrentTotalWork, connection.CompletedWork + Epsilon) :
+                    connection.CompletedWork;
+                connection.EmitReachedLogs(previousWork, logWork, stepEndTimeSeconds,
+                    onLogEmitted);
                 if (connection.RemainingWork > Epsilon)
                     continue;
 
