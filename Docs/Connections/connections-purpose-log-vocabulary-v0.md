@@ -260,23 +260,109 @@ This example stays singular while being repetitive. It has no hostile tell; its 
 
 The export repeatedly reads and aggregates, not because it is secretly many exports, but because one report requires many processing steps. Whether an individual line is technically emitted by a READ operation is part of the game's abstract fiction, not a real filesystem or database trace.
 
-## Contrasting evidence examples, not a signature catalog
+## Evidence vocabulary — not a threat-signature catalog
 
-The same vocabulary can be contextual, innocuous, or suspicious depending on the claimed PURPOSE and established baseline. Examples below are *candidate encounter writing*, not runtime hostility tags or mandatory tells.
+This is an **initial authored evidence corpus**, not a procedural hostile-line generator. The entries are fictional observations that a writer may place among ordinary PURPOSE-specific activity. **Their grouping below is an authoring note, never a property exposed to the player.** In the actual log they have exactly the same typography, operation label, timestamp treatment, and ordinary result vocabulary as any other line.
 
-| Example observation | Fictional context | Why it might matter |
-| --- | --- | --- |
-| report.chunk.emit OK | Sales Report Export | Expected progress, no suspicion implied |
-| report.export START | Customer Authentications | Contextual mismatch with the claimed workload; not a claim of access to a separate DB node |
-| credentials.download START | Customer Authentications | Recognizably concerning, but not a formal threat classification |
-| checkout.session.export START | Customer Checkouts | Contextual evidence during otherwise normal checkout activity |
-| login.token.verify REJECTED | Customer Authentications | Benign failures should happen; error does not equal attacker |
-| payment.authorize RETRY | Customer Checkouts | Ordinary retry noise, not necessarily fraud |
-| inventory.batch.conflict RETRY | Inventory Reconciliations | Operational friction without a threat |
-| INITIATE_ATTACK_PROTOCOL START | Any deliberately overt/tutorial threat | Intentionally comical, obvious exception; not a default style |
-| ordinary repeated activity only | A disruptive LOADER | Threat's useful evidence may be LOAD, not logs |
+Use these as examples of *what a line might lead the player to suspect*, not automatic proof of attacker state or proof that a gameplay effect happened. A hostile connection can have unremarkable logs, and a benign one can have unexpected entries or errors. Nothing in this corpus assigns specific attack genera, infection kinds, or fixed evidence chances.
 
-No line by itself proves or disproves hostility. A player may choose logs as a deep investigation tool but should not be trained to run it on every connection to find a fixed giveaway.
+### Candidate overt, recognizable, and contextual clues
+
+The 22 candidates below deliberately range from silly to subtle. For **contextual** examples, the sample PURPOSE is the *unexpected* context; the final column names where the same action would seem ordinary. An event may be inappropriate for a PURPOSE without being impossible at that connection's real target. If a proposed line implicitly requires a new route or node, rewrite or reject it.
+
+| Authoring feel | Candidate line | Illustrative connection and operation | What the player might infer |
+| --- | --- | --- | --- |
+| Overt | `attack.protocol.arm START` | Deliberately obvious hostile connection, appropriate active stage | Absurdly conspicuous preparation |
+| Overt | `stealth.mode.enable START` | Tutorial/demo threat, any appropriate operation | Intentionally obvious evasive intent |
+| Overt | `audit.disable.request START` | Overt hostile connection, EXECUTE | Suspicious intent, *not* proof auditing was disabled |
+| Recognizable | `login.session.enumerate START` | Customer Authentications, EXECUTE | Bulk session probing rather than normal authentication |
+| Recognizable | `login.token.bulk.issue START` | Customer Authentications, EXECUTE | Unusually broad credential issuance |
+| Recognizable | `checkout.session.export START` | Customer Checkouts, WRITE | Session material being packaged during checkouts |
+| Recognizable | `payment.authorization.replay START` | Customer Checkouts, WRITE | Reuse of prior payment authorizations |
+| Recognizable | `pricing.rule.force START` | Cart Price Calculations, EXECUTE | Bypassing ordinary price evaluation |
+| Recognizable | `pricing.discount.override START` | Cart Price Calculations, EXECUTE | Unusual adjustment of pricing decisions |
+| Recognizable | `inventory.delta.inject START` | Inventory Reconciliations, WRITE | Manufactured adjustments among legitimate inventory updates |
+| Recognizable | `inventory.ledger.skip START` | Inventory Reconciliations, WRITE | Skipping expected reconciliation bookkeeping |
+| Recognizable | `product.catalog.bulk.dump START` | Product Detail Lookups, READ | Bulk extraction rather than ordinary lookups |
+| Recognizable | `report.private_fields.include START` | Sales Report Export, READ | Unexpected inclusion of sensitive report fields |
+| Contextual | `report.chunk.emit OK` | Customer Authentications, EXECUTE | Ordinary export work, but expected for Sales Report Export |
+| Contextual | `receipt.fetch OK` | Inventory Reconciliations, READ | Ordinary confirmation work, but expected for Customer Checkouts |
+| Contextual | `inventory.segment.read OK` | Product Detail Lookups, READ | Normal in Inventory Reconciliations, not normal product detail activity |
+| Contextual | `product.variant.read OK` | Inventory Reconciliations, READ | Normal in Product Detail Lookups, questionable here |
+| Contextual | `login.session.refresh OK` | Cart Price Calculations, EXECUTE | Normal in Customer Authentications, questionable during pricing |
+| Contextual | `pricing.promo.evaluate APPLIED` | Customer Authentications, EXECUTE | Normal in Cart Price Calculations, questionable during login work |
+| Contextual | `checkout.status.read OK` | Sales Report Export, READ | Normal in Customer Checkouts, unexpected in one export job |
+| Contextual | `report.aggregate.partial OK` | Product Detail Lookups, READ | Normal in Sales Report Export, not obviously part of a product lookup |
+| Contextual | `inventory.snapshot.open OK` | Sales Report Export, READ | Normal in Inventory Reconciliations, incongruous with the export claim |
+
+Three overt clues and ten recognizable clues are deliberately *examples*, not a promise that each hostile run contains one. An attentive player may find one important line among many innocuous ones; alternatively, the right evidence may live in LOAD, WORK, the operation arc, or Probe instead of logs.
+
+### Benign lookalikes and ambiguous observations
+
+The following should appear naturally in legitimate traffic too. Don't let error- or retry-looking vocabulary become a trivial hostile classifier.
+
+| Candidate line | Plausible legitimate reason |
+| --- | --- |
+| `login.token.verify REJECTED` | Mistyped or expired credentials |
+| `payment.authorize RETRY` | Ordinary payment retry |
+| `inventory.batch.conflict RETRY` | Competing reconciliation work |
+| `product.sku.lookup MISS` | Missing or retired catalog item |
+| `report.segment.read RETRY` | Transient retry within one long export |
+
+Even a recognizable clue might turn out to be part of an unusual authorized process in a later authored encounter. The fiction should allow interpretation and uncertainty, not demand that every ominous token is a real attack.
+
+### Short embedding sketches
+
+These are **compositions of previously listed vocabulary**, not new implementation fixtures. They show how evidence can be buried amid repeated legitimate activity without a special clue format.
+
+**Customer Checkouts — suspicious WRITE amid ordinary aggregate work:**
+
+~~~text
+WRITE  checkout.received             OK
+WRITE  checkout.validate             OK
+WRITE  payment.authorize             OK
+WRITE  checkout.commit               OK
+WRITE  checkout.received             OK
+WRITE  checkout.session.export       START
+WRITE  payment.authorize             RETRY
+WRITE  checkout.commit               OK
+~~~
+
+**Customer Authentications — contextual EXECUTE anomaly among many attempts:**
+
+~~~text
+EXECUTE login.attempt                 START
+EXECUTE login.token.verify            OK
+EXECUTE login.session.issue           OK
+EXECUTE login.attempt                 START
+EXECUTE report.chunk.emit             OK
+EXECUTE login.policy.check            OK
+EXECUTE login.session.refresh         OK
+EXECUTE login.token.verify            REJECTED
+~~~
+
+**Sales Report Export — one heavyweight READ whose repetitive work hides an unusual choice:**
+
+~~~text
+READ   report.segment.read           OK
+READ   report.aggregate.partial      OK
+READ   report.segment.read           OK
+READ   report.private_fields.include START
+READ   report.chunk.emit             OK
+READ   report.segment.read           OK
+READ   report.aggregate.partial      OK
+READ   report.footer.prepare         OK
+~~~
+
+The last example is still a **single export**, not many separate exports. In all three cases the emitted lines describe abstract activity at the connection's actual target; they do not establish secondary network traffic, completed infections, or new gameplay state.
+
+### Placement and fairness notes for later encounter authoring
+
+- Volume, burst timing, clue frequency, and recognizability are independently useful choices. More difficult does not simply mean more lines or one smaller keyword.
+- A meaningful clue may appear during an earlier apparently benign operation, foreshadowing a later dangerous operation. The rolling tail must retain **emitted** lines across operation boundaries, subject to the player's display count.
+- A line can arrive in a burst and later leave the default five-line view. The player may retrieve older emitted lines with a larger tail; **not currently on screen** does not mean **deleted from the connection's history**.
+- For encounters where logs are meant to be the actionable path, don't place the only useful clue after the effect has already happened, or bury it at an impossible reaction time. Other encounters can deliberately be easier to diagnose through a different tool.
+- Avoid always pairing a particular entry with one genus or infection; the eventual connection grammar and villain disguise composition can select a distribution of evidence. No frequency table, evidence tier enum, or procedural framework is approved here.
 
 ## Relationship to the proposed live-tail viewer
 
