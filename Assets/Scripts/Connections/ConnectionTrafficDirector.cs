@@ -1103,7 +1103,8 @@ namespace Uptime.Connections
             behaviors.Add(TimedModifierBehaviorDefinition.Rate("LOADER_ACTIVE", onset, 0f, 0f));
             stages[attackIndex] = new OperationStage(source.Operation, work,
                 pattern == LoaderPattern.Immediate ? attackLoad : source.DesiredLoad,
-                source.ActivityDescription, CompletionEffect.None, behaviors.ToArray());
+                source.ActivityDescription, CompletionEffect.None, behaviors.ToArray(),
+                logs: source.PlannedLogs);
             return new LoaderAttackPlan
             {
                 structure = structure, pattern = pattern,
@@ -1492,7 +1493,8 @@ namespace Uptime.Connections
             new OperationStage(kind ?? stage.Operation, work ?? stage.TotalWork,
                 load ?? stage.DesiredLoad, description ?? stage.ActivityDescription,
                 effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors,
-                payload ?? stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec);
+                payload ?? stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec,
+                stage.PlannedLogs);
 
         private static string Activity(OperationKind kind) => kind == OperationKind.Read
             ? "Reading records" : kind == OperationKind.Write ? "Writing records" : "Processing request";
