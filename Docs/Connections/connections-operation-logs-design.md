@@ -1,132 +1,143 @@
 # Connections — Operation Logs & Live Tailing (Working Design)
 
-**Status:** Working design captured November 2, 2026, from the October 31 Connections investigation discussion and the follow-up idea of WORK-triggered, operation-local log entries. **Not implemented, not an approved implementation contract.**
+**Status:** Working design first captured November 2, 2026, updated after the November 5 Logs V0 discussion. **Not implemented, and not an approved implementation contract.** This page records the preferred first-playable interaction direction while retaining important unsettled questions. The original five-entries-*per-connection* and current-operation-only viewing ideas have been reconsidered and superseded below.
 
-**Scope:** The Connections prototype. Packet-era logging and existing Connections run-recorder commands are separate systems. For implemented behavior, use [Current State](Current_State.md), [operation arcs](connections-arcade-operation-arcs-v1.md), [behavior/modifier foundation](connections-behavior-foundation-v0.md), and [Inspect V2](connections-inspect-v2.md). This refines the earlier [threat-investigation ideas](connections-threat-investigation-ideas.md), which deliberately left the log lifetime and content model unsettled.
+**Scope:** Connections only. Packet-era logging and the Connections run recorder are separate systems. For implementation authority consult [Current State](Current_State.md), [operation arcs](connections-arcade-operation-arcs-v1.md), [behavior/modifier foundation](connections-behavior-foundation-v0.md), [Inspect V2](connections-inspect-v2.md), and the runtime. For authored content, see the separate [PURPOSE Activity Vocabulary & Initial Log Corpus](connections-purpose-log-vocabulary-v0.md). The earlier [Threat Signals, Investigation, and Response](connections-threat-investigation-ideas.md) note preserves the investigation hypothesis and its original open questions.
 
 ## Why logs exist
 
-Investigating every connection all the way down should **not** be the universally correct strategy. Different kinds of hostile connections should betray themselves at different levels of inquiry:
+`logs` is a **deep, expert-facing investigation tool**, not a replacement for fast `inspect`, `load`, `work`, or scarce `probe`. Different threats reveal themselves at different layers of evidence:
 
-| Tool / depth | What the player can notice | Typical effort |
+| Tool / depth | What the player can notice | Cost / character |
 | --- | --- | --- |
-| `load <nodeId>` and ordinary `inspect <id>` | Exorbitant requested LOAD, implausible claimed purpose/target, clearly wrong operation type | Fast triage, sometimes sufficient to act |
-| `inspect -v <id>` | Excessive WORK for that purpose, inconsistent operation arc or time spent working | Some comparison and judgment |
-| `logs <id>` (proposed) | Actual activity evidence among a handful of mundane, technical-looking entries | Attention spent reading, recognizing, and sometimes comparing context |
-| `probe <linkId>` (separately explored) | Temporary, scarce, direct intelligence about hostile traffic on one physical link | Minimal reading effort, but opportunity/cooldown cost |
+| `load <nodeId>` and `inspect <id>` | Excessive LOAD, an implausible claimed PURPOSE/target, or an obvious operation mismatch | Quick triage; sometimes enough |
+| `work <nodeId>` and `inspect -v <id>` | Unexpected WORK requirements, progress, operation arc, or duration | Comparison and judgment |
+| `logs <id>` | A succession of ordinary activity observations, occasional anomalous entries, contextual contradictions, and sometimes no tell | Player attention, literacy, and time |
+| `probe <linkId>` | Temporary direct intelligence on traffic at one physical edge | A limited defensive opportunity rather than sustained reading |
 
-These layers are **not a mandatory sequence** and not a rule that deeper evidence must always be stronger. A huge LOADER may be obvious in `load` and have completely ordinary logs; a subtle INFECTOR may have normal LOAD and a plausible arc but incriminating activity. An occasional benign connection can look unusual without being hostile. The player may decide to kill without conclusive evidence and accept the risk.
+These are **not a mandatory sequence**. A huge LOADER may be obvious in LOAD while its application logs are boring. A subtle INFECTOR may look normal until an odd log line arrives, or may have another clue entirely. A benign outlier may look unusual. An occasional threatening line is not automatically proof of an attacker.
 
-A long-term aspiration is for a connection's real nature to be potentially discoverable through evidence, with different levels of effort. That is *not* an approved guarantee that every individual threat exposes a perfect tell, and it does not override separate identity-hopping/Probe rules.
+Logs may legitimately be arcane to a new player; this is intended to be the deepest, hardest layer of investigation and a learned skill ceiling. Do not automatically highlight bad entries, translate them into verdicts, or guarantee a readable giveaway in every attack. The difficulty should arise from understanding the connection's claimed business activity and noticing meaningful deviations, not only from making text fly past impossibly fast.
 
-**Player tradeoff:** `logs` spends the player's attention; `probe` potentially saves attention by spending a limited opportunity. The network continues evolving while the player reads.
+**Tradeoff:** the network keeps evolving while the player studies logs. `probe` can provide earlier direct intelligence for a resource/opportunity cost; logs cost attention and require interpretation.
 
-## Proposed player interaction: `logs <connectionId>`
+## Preferred V0 interaction — a rolling, persistent live tail
 
-`logs a3` opens **one live, structured terminal-history panel bound to that logical connection**, in the vein of `inspect` and `load`. It behaves more like `watch tail` than a one-time dump or an endless console feed.
+**Working command surfaces:**
 
-- Opening the panel is immediate. It displays **entries already emitted for the currently active operation**, then appends later entries as that operation progresses. It never shows future entries just because they were authored in the plan.
-- The panel continuously watches its connection while it exists in terminal history; there is no need to reissue the command for each new line.
-- The panel identifies the connection and **current operation** (for example, `2/3 WRITE`). Its main content is a short, readable ordered log stream, not a duplicate of `inspect -v`.
-- Each line may carry a simulation-time stamp and a terse protocol/service/action label. It should feel like fictional TCP/IP and application logs, not require professional networking knowledge.
-- Ordinary terminal scrollback, prompt focus, and other live panels should continue behaving normally. A new log must not steal keyboard focus or forcibly yank a player who has scrolled back to read something else.
-- When the connection finishes, is killed, or is canceled, no unearned future entries appear. A retained final panel/state is attractive, but the exact completed-panel treatment remains open.
+~~~text
+logs x1           # live tail of the five most recently emitted entries
+logs -n 20 x1     # same live tail, with a larger 20-line display window
+~~~
 
-The command name is deliberately **`logs` (plural)**, distinct from today's run-recorder management commands `log save`, `log dir`, and `log folder`. This proposal does not modify the recorder's player-facing management commands.
+- `logs <connectionId>` immediately opens a small, structured **terminal-history card bound to that logical connection**. Like `load` and `work`, it stays live without repeatedly issuing the command.
+- **Five displayed lines is the default viewing budget, not a log-production budget.** A connection may produce many more entries over its operations; the panel renders the latest N *already emitted* entries at the moment it is opened.
+- `-n` lets a player explicitly spend more terminal space to get more context. The same panel behavior applies at larger counts; there is no separate history-navigation mode. A reasonable positive-integer limit is still to be selected, so `-n 20` is illustrative and supported by the current design direction, not a finalized maximum.
+- New emitted entries appear in deterministic sequence at the bottom of the display. Entries displaced by the five-line tail **are not deleted from the connection's actual retained history**. Reissuing the command with a larger `-n` can recover earlier entries.
+- The view is one chronological tail **across every operation**. Each line carries its originating READ/WRITE/EXECUTE label, so an operation transition does **not** wipe the panel or require a selector. Previous-stage lines roll off naturally as later-stage lines arrive.
+- Entries generated *before the player opens a panel* are still available, including after the connection resolves, subject only to the requested last-N viewing budget.
+- This is not `grep` or a pipeline parser. `logs | grep`, alternate filters, keyword search, sorting, and output redirection are interesting future expert tools but **not Logs V0**.
+- `logs` (plural) is distinct from today's recorder-management `log save`, `log dir`, and `log folder`. Neither the recorder command names nor the recorder's purpose change.
 
-## Finite log budgets, not infinite noise
+**Window size and terminal discipline:** the card's maximum displayed-row count derives from N rather than from total connection lifetime. The five-line default must be genuinely compact, reflecting the recent effort to reduce inspect/diagnostic footprint. A larger `-n` intentionally consumes space at the player's discretion. Ordinary history scrollback, anchor-preserving reflow, and keyboard-first command focus still apply. A newly emitted line must never steal focus or forcibly pull the player back from scrollback they are reading. Do not add nested scrolling or mouse-only operation controls merely to view previous stages.
 
-A connection should produce a **bounded handful of purposeful log entries**, rather than fabricating a new line every update.
+For a not-yet-active connection the panel can show a compact waiting/empty state rather than invented logs. Exact empty-state copy and whether repeated requests for the same connection create independent cards follow normal terminal conventions and can be checked in the playable slice.
 
-- Roughly **five lines over a connection** is a useful initial feel, not a fixed universal count or balance commitment.
-- A multi-operation connection's total budget can be distributed unevenly among its operations: one stage may emit several entries, another only one, and another none.
-- Noise is important: normal acknowledgments, session checks, transport chatter, retries, and service activity make players scan the lines. But noise must stay bounded so reading logs does not become compulsory clerical work.
-- Don't implicitly multiply a five-line budget by every stage of a long arc and create an accidental wall of text.
-- The content budget and severity mix can vary by purpose, connection archetype, and eventual villain/level design.
+### Example: a short tail crossing operations
 
-The panel is **live** because *when* a line appears matters, not because the screen should constantly scroll.
+The stream below represents a **single** Customer Checkouts connection, presently in READ. The previous WRITE lines are still visible because they are among the last five emitted observations.
 
-## Authored entries belong to individual operations
+~~~text
+> logs x1
 
-**Proposed authoring mental model:** a connection's ordered READ/WRITE/EXECUTE operations each may carry their own planned log entries. An entry is associated with that operation and an **operation-local WORK progress milestone**, not an arbitrary wall-clock delay.
+X1 / API / CUSTOMER CHECKOUTS               LIVE · TAIL 5
+00:29.3  WRITE  checkout.validate          OK
+00:30.7  WRITE  checkout.session.export    START
+00:32.0  WRITE  checkout.commit            OK
+00:42.4  READ   receipt.fetch              OK
+00:42.9  READ   checkout.status.read       OK
+~~~
 
-For example, in an operation requiring 80 WORK, fictional entries might be scheduled near 8, 35, and 66 completed WORK. The exact representation (absolute WORK milestone versus normalized progress) is not yet selected.
+It does **not** imply another logical connection or an independent route to another network node. The actual target comes from the connection; the log line's activity name describes observed work at that target.
 
-The simulator advances WORK according to actual allocation and effective WORK-rate modifiers. Log emission follows the actual crossing of those milestones:
+## Log production is separate from the viewing window
 
-- Heavy contention delays the log because the operation completes WORK more slowly.
-- A faster operation emits the associated lines sooner in simulation time.
-- A killed or canceled connection never emits entries it did not reach.
-- Multiple milestones passed in one simulation step should be emitted once, in deterministic order.
-- An operation transition must not accidentally replay an earlier stage's entries or expose the next stage's future content.
-- Dynamic effective WORK requirements can change while a stage is in progress. The rule for milestones under such changes needs deliberate design; don't assume fixed percentages or current total WORK always behave identically.
+Operations may emit **many** authored entries rather than a handful over an entire connection. A first sample might have 15–30 entries over one connection, or more for a chatty or multi-operation case. These are playtest examples, not fixed per-operation quotas, a hard connection cap, or a content-generation formula. The [initial corpus](connections-purpose-log-vocabulary-v0.md) includes a 24-entry two-operation Customer Checkouts example and a 19-entry singular Sales Report Export example.
 
-This is a proposed **future simulation-data seam**, not a request to add logging behavior to `OperationStage` or `SimulationHost` in this PR. Runtime emission and optional recorder provenance would be the authoritative source; the terminal panel would only present already-emitted events.
+- Mundane repeated application activity is most of the stream. Within a PURPOSE, that activity should feel like recurring instances (aggregate Customer Checkouts) or repeated sub-work of one heavyweight job (singular Sales Report Export).
+- Entries should arrive in **bursts and quiet stretches**, not necessarily evenly spaced. One cluster might cross several WORK milestones in rapid succession, followed by meaningful silence.
+- Some hostile connections may contain one incriminating observation among dozens of normal ones. Others have no suspicious log entries at all. Benign connections can include retries, errors, anomalies, and occasional alarming-looking content.
+- The stream is finite with respect to its concrete plan: it does **not** fabricate infinite entries once per update simply to keep the window moving.
+- A five-line window makes a clue temporarily prominent, then pushes it offscreen as later entries arrive. This creates *observation pressure*, but the emitted evidence persists and is recoverable with a larger `-n`. Displacement is a **display choice**, not irreversible erasure.
 
-### The multi-operation viewing question
+There is no need for an endless background log writer or extra wall-clock emission system to get the desired effect.
 
-The current design instinct is: **the log panel follows the connection's current operation and shows the entries belonging to that operation**.
+## Authored entries belong to operations; WORK drives emission
 
-A possible V0 behavior is:
+**Working mental model:** every READ/WRITE/EXECUTE operation in the final concrete connection plan may carry an ordered set of planned log observations. Each has application activity/result content and an **operation-local WORK milestone**. No line appears simply because the viewer opened.
 
-1. `logs a3` opens during operation 1 and shows its already-emitted lines.
-2. New lines arrive as operation 1 advances through WORK.
-3. When operation 2 becomes current, the same panel changes its operation heading and begins showing that operation's emitted lines.
-4. Future operation-2 lines stay hidden until the required WORK milestones are reached.
+- As actual `CompletedWork` crosses a milestone, the simulator emits the entry once, with the current simulation timestamp, concrete connection identity, originating operation index/kind, and content.
+- Contention delays emission because productive WORK advances more slowly. More allocated LOAD or a WORK-rate multiplier makes entries arrive earlier in simulation time. A 0× WORK rate (as used by active LOADERs) stops WORK-driven entries too, even if requested LOAD remains high. BACKDOOR's accelerated INFECTOR WORK likewise accelerates milestone crossings.
+- If one fixed simulation step crosses several milestones, emit every eligible entry exactly once in stable authored order. A burst should not silently lose lines.
+- Stage transitions must not replay earlier entries, reset chronological history, or reveal the next stage's future activity. The operation index must be captured before a completed stage advances and resets `CompletedWork`.
+- A killed, canceled, withdrawn, or naturally completed connection can never produce future *unearned* WORK entries; it retains everything legitimately emitted before its resolution.
 
-**Open:** Should previous-operation logs remain accessible through a compact per-stage history, a manual selection, or only a reissued command? Showing just the current operation keeps the panel small, but permanently losing earlier evidence could be unfair if the player starts investigating late. Preserve prior emitted events in the eventual data model until this UI decision is tested.
+**Authoring-coordinate question:** absolute completed WORK or normalized operation progress remain options. One attractive V0 authoring approach is to specify fractions (e.g., 3%, 4%, 5%, then 25%) and convert them to **fixed concrete WORK thresholds after plan composition**. This lets normal-work variation scale the authored rhythm without dynamically rescaling lines each time effective required WORK changes. The exact transformation and any effect of runtime WORK-requirement modifiers need explicit validation, not an unexamined percentage comparison each frame. In particular, a reduced requirement can finish an operation before some originally scheduled entries would have been reached; those lines should not be fabricated as a reward for completion.
 
-### Illustrative operation-local output
+The **simulator** owns the emitted facts. Presentation consumes the retained emitted history, never planned-but-unearned entries or hidden hostile intent. The existing completion-effect path remains authoritative: do not claim an infection was installed, a Payload launched, or a node changed state merely because a fictional log line says an attempt was prepared. Optional recorder provenance is useful, but the viewer should not read the recorder JSON as gameplay state.
 
-```text
-> logs k7
+## Presentation and lifecycle
 
-K7  /  OP 2 OF 3  /  WRITE      LIVE
-00:41.2  TCP   ACK received
-00:44.9  AUTH  session.validate       OK
-00:48.1  DB    credentials.download   START
-         (watching for further entries)
-```
+The intended presentation is a **small attractive live terminal-history panel**, borrowing existing `InspectOutput`, `LoadOutput`, `WorkOutput`, history layout, and focus patterns rather than creating a new window manager.
 
-The lines above are authored fictional *examples*, not an assertion that a real TCP/IP stack is being simulated or that every connection produces a suspicious third line.
+- Header: verified connection identity, optional actual target / claimed PURPOSE for context, and LIVE or final-state label.
+- Entries: a terse chronological stream with operation label on **every line**, application activity, short result, and optionally simulation timestamp. Avoid separate `AUTH`, `DB`, `CACHE`, or other pseudo-service columns that could be mistaken for nodes or implied network routes.
+- Do **not** duplicate `inspect -v` details, a full WORK progress bar, or a complete operation timeline inside the logs panel.
+- One rolling tail spans operation changes. A five-line display remains compact; a twenty-line display will occupy much more history space by deliberate player choice.
+- When the connection ends, freeze the final earned tail and show COMPLETE, KILLED, CANCELED, or WITHDRAWN accurately. A short final hold followed by an inspect-style compact summary is an attractive direction to prevent terminal history from filling with resolved panels. The exact compact layout/hold and how a newly requested historical panel behaves are presentation-tuning details, not established contracts.
+- Historical `logs` requests should read the retained emitted stream, not regenerate logs, even after the original live card has collapsed. Simulation reset clears old-run state and should not leave panels bound to new unrelated connections.
 
-## Evidence should vary in obviousness and in where it appears
+**Identity/addressability:** current ID hopping retains a canonical ID for `inspect` and `kill`; visible aliases do not resolve those commands, while Probe can expose the true ID. Logs V0 should follow the same existing command-addressability semantics, not create a new alias-based backdoor or a new guarantee that guessing a real canonical ID is impossible. The displayed panel should respect the already-established identity presentation conventions.
 
-An important aim is a **spectrum of readable evidence**, not a binary "logs contain one bad keyword" puzzle:
+## Evidence quality, PURPOSE fiction, and difficulty
 
-| Log difficulty | Illustrative tell | Player realization |
+The [PURPOSE/log vocabulary document](connections-purpose-log-vocabulary-v0.md) is the content reference for V0. Its proposed small naming pass pluralizes naturally aggregate workloads, including **Customer Checkouts** and **Cart Price Calculations**, while keeping **Sales Report Export** deliberately singular as a heavyweight job. That is a proposed *player-facing naming change* for the later implementation, not a mutation of stable internal purpose IDs, targets, or arcs.
+
+The same logging system supports both fictions: many checkouts can yield recurring authorize/commit observations within one WRITE operation, while one heavyweight report can yield repeated reads, partial aggregates, and emitted chunks within one READ operation. No separate transaction, report-chunk simulation, or perfect lifecycle of messages is required.
+
+Clues may be:
+
+| Evidence feel | Example | What the player does |
 | --- | --- | --- |
-| Comically overt | `INITIATE_ATTACK_PROTOCOL` | Sometimes the game should just hand you a satisfying, obvious clue |
-| Recognizably bad | `credentials.download` | Looks inappropriate without specialized knowledge |
-| Contextual | `report.export` while the connection claims to validate authentication sessions | The line itself may be normal elsewhere; compare it with purpose, operation, WORK, or target |
+| Comically obvious | `attack.protocol.arm START` | Understands the danger immediately |
+| Recognizably concerning | `credentials.download START` | Notices an action that seems improper |
+| Contextual | `report.chunk.emit OK` during Customer Authentications | Relates an ordinary-looking action to an unexpected PURPOSE |
+| Mundane / ambiguous | `payment.authorize RETRY` during Customer Checkouts | Uses context rather than treating retries as verdicts |
+| No tell here | A LOADER with entirely ordinary log activity | Should have investigated abnormal LOAD instead |
 
-Every sample should contain ordinary-looking surrounding activity. Sometimes a malicious connection's logs can look mundane because its **main tell is elsewhere** (for example, excessive LOAD). Sometimes legitimate activity can appear surprising until its business purpose is considered.
+Avoid a universal one-threat/one-bad-line pattern or an inevitable `logs` step for every attack. The existing [THREATS](THREATS.md) design treats disguise sophistication as a level/run/villain lever **separate from** objective, frequency, severity, timing, operation anomaly, and identity counterplay. The future connection-construction grammar may select purpose-appropriate activity vocabulary, log volume, rhythm, evidence frequency, and where the useful tell lives. It is not this V0 task.
 
-Avoid two traps:
+Two illustrative ends of that spectrum remain useful: an overwhelming attacker can be frequent, loud and best handled by fast triage; a patient infiltrator can be rare, credible and detectable only after expertise-intensive observation. Those illustrative attack ratios and difficulties are **not** selected spawn rates. Where logs are the intended actionable clue, it should appear before the attack has already succeeded, with enough reaction time to act; this timing must be checked with current WORK rates, including acceleration.
 
-1. **Always-check-logs:** If every hostile connection has a reliably obvious log signature, players will skip earlier tools and automatically run `logs` on everything.
-2. **Too-arcane-to-read:** If every log requires careful cross-referencing of five technical fields and three other panels, investigation becomes a chore rather than a game.
+## First playable slice to test
 
-Aim for an authored mix: many obvious or recognizable clues, some contextual cases that reward growing expertise, and some connections whose useful clue lives in `load` or `inspect -v` instead of their logs. Do not turn evidence difficulty into a rigid inverse formula that itself becomes predictable.
+Prefer a **small manually authored comparison set**, using the existing operation and terminal systems, before ambient procedural logging:
 
-## Connection to villain tempo and threat severity
+1. An aggregate, two-stage Customer Checkouts stream containing recurring ordinary activity and one contextual WRITE clue, with READ entries continuing to displace it from a five-line tail.
+2. A singular heavyweight Sales Report Export with repetitive but uneventful READ activity and bursts/gaps.
+3. A disruptive LOADER or similarly obvious hostile example whose log content is mostly mundane, proving `logs` is not always the best investigative response.
 
-The evidence distribution can make different attackers feel different **without inventing entirely new mechanics**.
+A deliberately overt sample, benign errors/false positives, and other PURPOSE vocabularies can be added without attempting a complete generator. The actual playable test is whether a player can notice and interpret a surprising entry among mundane ones, decide how much space to dedicate with `-n`, and react while the network continues moving.
 
-- **Overwhelming attacker (illustrative 1 hostile in 4 connections):** frequent and relatively obvious attacks, continuous LOAD pressure, infections and distractions. The challenge is triage, execution, and limited attention. Reading logs may be a poor use of time.
-- **Patient infiltrator (illustrative 1 hostile in 12 connections):** rare and comparatively subtle attacks with catastrophic potential. Ordinary LOAD/purpose can look fine; a late log entry or contextual mismatch may be critical. Suspense and vigilance replace nonstop reaction.
+Review: entry order, no future-content leaks, contention/backdoor timing, 0× WORK, completion and early kills, operation transitions, historical queries, stable terminal scrolling, focus, 16:9 size, and replay/recorder determinism where relevant.
 
-These rates are expressive poles, not selected spawn configuration. Rare, catastrophic attacks need **actionable, discoverable evidence early enough to respond**. Requiring the player to wait until the attack has already succeeded before emitting the only useful log line would feel arbitrary.
+## Remaining open choices and deliberate deferrals
 
-## Boundaries and open design questions
+- **WORK coordinate details:** percentage-to-fixed WORK translation, dynamic requirement changes, and exact coarse-step timestamp semantics.
+- **Display policy:** maximum `-n`, narrow-width and very-large-tail layout, empty-state wording, resolved-card hold/collapse measurements, and whether repeated same-ID requests reuse or append cards.
+- **Content tuning:** actual volume/rhythm distributions, how much boring repetition feels authentic rather than tiresome, and whether some operations emit no lines.
+- **Evidence and fairness:** how early clues arrive for subtle/accelerated attacks, and how many benign lookalikes support useful learned patterns.
+- **Generation:** seeded selection and replay provenance when PURPOSE vocabulary, attack objective, disguise sophistication, and villain/run pacing eventually compose concrete logs.
+- **Other tools:** `grep`/pipes, trace/source blocking, more sophisticated investigations, and interactions with Probe remain separate future work.
 
-- **Current-only versus history:** Should the panel show exclusively current-operation entries, retain a folded previous-stage summary, or allow revisiting past operations? What happens to a panel once the connection resolves?
-- **WORK authoring coordinates:** Are events placed at absolute completed-WORK milestones or normalized operation progress? How do WORK-changing modifiers affect those thresholds?
-- **Budget:** What is a good typical number of entries per connection and per operation? Which purposes warrant none or more?
-- **Generation:** How are believable benign noise and meaningful hostile evidence selected for a generated connection while maintaining deterministic replay and not accidentally revealing hostile state via a fixed template?
-- **Player readability:** How much protocol jargon, timestamp detail, and line formatting makes this feel like tailing a terminal without overwhelming a nontechnical player?
-- **Clue timing and fairness:** What fraction of an operation should pass before meaningful evidence appears? How do early kill, fast completion, and late inspection affect access to clues?
-- **Identity concealment:** Future ID-hopping must not be bypassed by guessing an internal connection ID through `logs`; discovery and command-addressability are separate questions.
-- **Relationship to other tools:** `load`, `inspect -v`, `probe`, and future trace/source-block mechanics may provide overlapping evidence. Keep their costs and roles distinct without assuming a mandatory investigative chain.
-
-No UI prefab, runtime type, recorder schema, traffic configuration, test, or level contract is approved by this document. Its purpose is to preserve the direction for a later small gameplay experiment.
+No UI prefab, runtime type, recorder schema, traffic configuration, test, level contract, procedural log generator, or exact balance value is approved by this **docs-only** update. The aim is a grounded first experiment, with vocabulary and mechanics kept in separate documents for a later focused Codex implementation handoff.
