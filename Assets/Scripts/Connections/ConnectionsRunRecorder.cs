@@ -186,6 +186,11 @@ namespace Uptime.Connections
         public ConnectionDefinitionRecord definition;
         public int operationIndex;
         public string operationKind;
+        public int logSequence;
+        public int logAuthoredIndex;
+        public float logWorkThreshold;
+        public string logActivity;
+        public string logResult;
         public string effectType;
         public string conditionKind;
         public float conditionAppliedAtSeconds;
@@ -343,10 +348,19 @@ namespace Uptime.Connections
         public float infectionLoad;
         public float infectionCadence;
         public string activityDescription;
+        public PlannedLogRecord[] plannedLogs;
         public BehaviorRecord[] behaviors;
         public float desiredLoad;
         public float totalWork;
         public float nominalDurationSeconds;
+    }
+
+    [Serializable] public sealed class PlannedLogRecord
+    {
+        public int authoredIndex;
+        public float workFraction;
+        public string activity;
+        public string result;
     }
 
     [Serializable] public sealed class NetworkSnapshot
@@ -936,6 +950,20 @@ namespace Uptime.Connections
                 entry.actualDurationSeconds = Mathf.Max(0f, time - started);
         }
 
+        public void RecordConnectionLog(EmittedConnectionLog emitted)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("connection_log_emitted", emitted.TimeSeconds);
+            entry.connectionId = emitted.ConnectionId;
+            entry.operationIndex = emitted.OperationIndex;
+            entry.operationKind = emitted.Operation.ToString();
+            entry.logSequence = emitted.Sequence;
+            entry.logAuthoredIndex = emitted.AuthoredIndex;
+            entry.logWorkThreshold = emitted.WorkThreshold;
+            entry.logActivity = emitted.Activity;
+            entry.logResult = emitted.Result;
+        }
+
         public void RecordEffect(ConnectionEffectOccurrence occurrence)
         {
             if (!IsRecording) return;
@@ -1489,10 +1517,23 @@ namespace Uptime.Connections
                     conditionKind = definition.ConditionAt(i)?.Kind.ToString(),
                     conditionDurationSeconds = definition.ConditionAt(i)?.DurationSeconds ?? 0f,
                     activityDescription = definition.ActivityAt(i), desiredLoad = load,
+                    plannedLogs = PlannedLogs(definition.PlannedLogsAt(i)),
                     behaviors = Behaviors(definition.BehaviorsAt(i)),
                     totalWork = definition.WorkAt(i),
                     nominalDurationSeconds = load > 0f ? definition.WorkAt(i) / load : 0f };
             }
+            return result;
+        }
+
+        private static PlannedLogRecord[] PlannedLogs(PlannedOperationLog[] source)
+        {
+            var result = new PlannedLogRecord[source.Length];
+            for (int i = 0; i < source.Length; i++)
+                result[i] = source[i] == null ? null : new PlannedLogRecord
+                {
+                    authoredIndex = i, workFraction = source[i].WorkFraction,
+                    activity = source[i].Activity, result = source[i].Result
+                };
             return result;
         }
 

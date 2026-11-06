@@ -394,7 +394,9 @@ namespace Uptime.Connections
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
                     connection => !completedThisStep.Contains(connection),
-                    payloadDirector != null ? payloadDirector.DemandAt : null);
+                    payloadDirector != null ? payloadDirector.DemandAt : null,
+                    simulationTimeSeconds + deltaSeconds,
+                    emitted => recorder?.RecordConnectionLog(emitted));
             simulationTimeSeconds += deltaSeconds;
             var newlyBlackout = new List<NodeResources>();
             foreach (ResourceAllocator.OperationCompletion completion in completed)

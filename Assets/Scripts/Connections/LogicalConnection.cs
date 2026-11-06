@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -151,6 +152,54 @@ namespace Uptime.Connections
     }
 
     [Serializable]
+    public sealed class PlannedOperationLog
+    {
+        [SerializeField, Range(0f, 1f)] private float workFraction;
+        [SerializeField] private string activity;
+        [SerializeField] private string result;
+
+        public float WorkFraction => workFraction;
+        public string Activity => activity;
+        public string Result => result;
+
+        public PlannedOperationLog(float workFraction, string activity, string result = null)
+        {
+            if (float.IsNaN(workFraction) || float.IsInfinity(workFraction) ||
+                workFraction < 0f || workFraction > 1f)
+                throw new ArgumentOutOfRangeException(nameof(workFraction));
+            this.workFraction = workFraction;
+            this.activity = activity;
+            this.result = result;
+        }
+
+        public PlannedOperationLog Copy() => new PlannedOperationLog(workFraction, activity, result);
+    }
+
+    // Only this earned observation is exposed to future terminal presentation.
+    public sealed class EmittedConnectionLog
+    {
+        public EmittedConnectionLog(string connectionId, int sequence, int operationIndex,
+            OperationKind operation, int authoredIndex, float timeSeconds,
+            float workThreshold, string activity, string result)
+        {
+            ConnectionId = connectionId; Sequence = sequence;
+            OperationIndex = operationIndex; Operation = operation;
+            AuthoredIndex = authoredIndex; TimeSeconds = timeSeconds;
+            WorkThreshold = workThreshold; Activity = activity; Result = result;
+        }
+
+        public string ConnectionId { get; }
+        public int Sequence { get; }
+        public int OperationIndex { get; }
+        public OperationKind Operation { get; }
+        public int AuthoredIndex { get; }
+        public float TimeSeconds { get; }
+        public float WorkThreshold { get; }
+        public string Activity { get; }
+        public string Result { get; }
+    }
+
+    [Serializable]
     public sealed class OperationStage
     {
         [SerializeField] private OperationKind operation;
@@ -162,6 +211,7 @@ namespace Uptime.Connections
         [SerializeField] private ConditionPayload conditionPayload;
         [SerializeField] private PayloadLaunchSpec launchSpec;
         [SerializeField] private TimedModifierBehaviorDefinition[] behaviors;
+        [SerializeField] private PlannedOperationLog[] plannedLogs;
 
         public OperationKind Operation => operation;
         public float TotalWork => Mathf.Max(0f, totalWork);
@@ -172,18 +222,29 @@ namespace Uptime.Connections
         public ConditionPayload ConditionPayload => conditionPayload;
         public PayloadLaunchSpec LaunchSpec => launchSpec;
         public TimedModifierBehaviorDefinition[] Behaviors => behaviors ?? Array.Empty<TimedModifierBehaviorDefinition>();
+        public PlannedOperationLog[] PlannedLogs => plannedLogs ?? Array.Empty<PlannedOperationLog>();
         public OperationStage() { }
         public OperationStage(OperationKind kind, float work, float load, string description,
             CompletionEffect effect = CompletionEffect.None,
             TimedModifierBehaviorDefinition[] behaviors = null,
             InfectionPayload payload = null, ConditionPayload condition = null,
-            PayloadLaunchSpec launch = null)
+            PayloadLaunchSpec launch = null,
+            PlannedOperationLog[] logs = null)
         { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
             completionEffect = effect; this.behaviors = CopyBehaviors(behaviors);
             infectionPayload = effect == CompletionEffect.InfectionDelivery ?
                 (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null;
             conditionPayload = effect == CompletionEffect.ConditionApplication ? condition?.Copy() : null;
-            launchSpec = effect == CompletionEffect.PayloadLaunch ? launch?.Copy() : null; }
+            launchSpec = effect == CompletionEffect.PayloadLaunch ? launch?.Copy() : null;
+            plannedLogs = CopyLogs(logs); }
+
+        internal static PlannedOperationLog[] CopyLogs(PlannedOperationLog[] source)
+        {
+            if (source == null || source.Length == 0) return Array.Empty<PlannedOperationLog>();
+            var result = new PlannedOperationLog[source.Length];
+            for (int i = 0; i < result.Length; i++) result[i] = source[i]?.Copy();
+            return result;
+        }
 
         internal static TimedModifierBehaviorDefinition[] CopyBehaviors(
             TimedModifierBehaviorDefinition[] source)
@@ -253,6 +314,8 @@ namespace Uptime.Connections
             identityHopSeconds > 0f ? ConnectionIdentityMode.ContinuousHopping : identityMode;
         public TimedModifierBehaviorDefinition[] BehaviorsAt(int index) => HasArc ?
             StageAt(index).Behaviors : Array.Empty<TimedModifierBehaviorDefinition>();
+        public PlannedOperationLog[] PlannedLogsAt(int index) => HasArc ?
+            StageAt(index).PlannedLogs : Array.Empty<PlannedOperationLog>();
         private bool HasArc => operations != null && operations.Length > 0;
         private OperationStage StageAt(int index) => operations[index] ??
             throw new InvalidOperationException($"Connection {connectionId} has an empty operation stage.");
@@ -283,7 +346,8 @@ namespace Uptime.Connections
                 OperationStage stage = plan.Operations[i];
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
                     stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
-                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec);
+                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec,
+                    stage.PlannedLogs);
             }
             return result;
         }
@@ -324,6 +388,23 @@ namespace Uptime.Connections
             RouteLinks = routeLinks;
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
+            logMilestones = new LogMilestone[definition.OperationCount][];
+            nextLogMilestone = new int[definition.OperationCount];
+            for (int operationIndex = 0; operationIndex < definition.OperationCount; operationIndex++)
+            {
+                PlannedOperationLog[] source = definition.PlannedLogsAt(operationIndex);
+                var milestones = new List<LogMilestone>(source.Length);
+                for (int authoredIndex = 0; authoredIndex < source.Length; authoredIndex++)
+                    if (source[authoredIndex] != null)
+                        milestones.Add(new LogMilestone(source[authoredIndex].Copy(),
+                            authoredIndex, definition.WorkAt(operationIndex)));
+                milestones.Sort((a, b) =>
+                {
+                    int byWork = a.Threshold.CompareTo(b.Threshold);
+                    return byWork != 0 ? byWork : a.AuthoredIndex.CompareTo(b.AuthoredIndex);
+                });
+                logMilestones[operationIndex] = milestones.ToArray();
+            }
             Behaviors = new ConnectionBehaviorRuntime(definition);
             for (int index = 0; index < definition.OperationCount; index++)
                 if (definition.IsHostile &&
@@ -335,6 +416,38 @@ namespace Uptime.Connections
         }
 
         private readonly bool[] deliveredEffects;
+        private readonly LogMilestone[][] logMilestones;
+        private readonly int[] nextLogMilestone;
+        private readonly List<EmittedConnectionLog> emittedLogs = new List<EmittedConnectionLog>();
+        public IReadOnlyList<EmittedConnectionLog> EmittedLogs => emittedLogs;
+
+        private readonly struct LogMilestone
+        {
+            public LogMilestone(PlannedOperationLog entry, int authoredIndex, float baseWork)
+            { Entry = entry; AuthoredIndex = authoredIndex; Threshold = baseWork * entry.WorkFraction; }
+            public PlannedOperationLog Entry { get; }
+            public int AuthoredIndex { get; }
+            public float Threshold { get; }
+        }
+
+        internal void EmitReachedLogs(float previousWork, float reachedWork, float timeSeconds,
+            Action<EmittedConnectionLog> onEmitted)
+        {
+            if (!IsActive || CompletedWork <= previousWork) return;
+            int operationIndex = CurrentOperationIndex;
+            LogMilestone[] milestones = logMilestones[operationIndex];
+            while (nextLogMilestone[operationIndex] < milestones.Length &&
+                milestones[nextLogMilestone[operationIndex]].Threshold <= reachedWork)
+            {
+                LogMilestone milestone = milestones[nextLogMilestone[operationIndex]++];
+                var emitted = new EmittedConnectionLog(ConnectionId, emittedLogs.Count + 1,
+                    operationIndex, Definition.OperationAt(operationIndex), milestone.AuthoredIndex,
+                    timeSeconds, milestone.Threshold, milestone.Entry.Activity,
+                    milestone.Entry.Result);
+                emittedLogs.Add(emitted);
+                onEmitted?.Invoke(emitted);
+            }
+        }
 
         public LogicalConnectionDefinition Definition { get; }
         public NodeResources TargetResources { get; }

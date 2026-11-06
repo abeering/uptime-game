@@ -27,7 +27,9 @@ namespace Uptime.Connections
             float deltaSeconds,
             Action<IReadOnlyList<LogicalConnectionState>> afterAllocation = null,
             Func<LogicalConnectionState, bool> mayStartTransition = null,
-            Func<NodeView, float> defensiveDemand = null)
+            Func<NodeView, float> defensiveDemand = null,
+            float stepEndTimeSeconds = 0f,
+            Action<EmittedConnectionLog> onLogEmitted = null)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
@@ -47,10 +49,18 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in ordered)
             {
                 if (!connection.IsDemanding) continue;
+                float previousWork = connection.CompletedWork;
                 // A reduced requirement cannot erase WORK already accomplished.
                 connection.CompletedWork = Mathf.Max(connection.CompletedWork,
                     Mathf.Min(connection.CurrentTotalWork,
                         connection.CompletedWork + connection.ActualWorkRate * deltaSeconds));
+                // Match the existing completion tolerance, but never pass the effective
+                // requirement when it is lower than an authored base-WORK milestone.
+                float logWork = connection.RemainingWork <= Epsilon ?
+                    Mathf.Min(connection.CurrentTotalWork, connection.CompletedWork + Epsilon) :
+                    connection.CompletedWork;
+                connection.EmitReachedLogs(previousWork, logWork, stepEndTimeSeconds,
+                    onLogEmitted);
                 if (connection.RemainingWork > Epsilon)
                     continue;
 
