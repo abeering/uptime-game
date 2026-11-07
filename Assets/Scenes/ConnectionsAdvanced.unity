@@ -11500,6 +11500,7 @@ MonoBehaviour:
   scanPrefab: {fileID: 4954846012338825431, guid: 82388e005f909294f8075c3afc4fa676, type: 3}
   loadPrefab: {fileID: 2305129265954828056, guid: 6af792156d4292441a4507dea22bfe58, type: 3}
   workPrefab: {fileID: 6459443834686597475, guid: 16efd7e6f4fa5144db47851a2b9496d8, type: 3}
+  logsPrefab: {fileID: 4240373064237646051, guid: ce82b280d036ea44a9385bfd09f75d59, type: 3}
   simulationHost: {fileID: 1996901015}
   trafficDirector: {fileID: 1996901017}
   recorder: {fileID: 1996901018}
@@ -12381,6 +12382,71 @@ MonoBehaviour:
         loadDelta: 0
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+  - id: logs-demo
+    claimedPurpose: Diagnostic Transfer
+    eligibleTargetIds:
+    - DB
+    ambientWeight: 0
+    purposeTemplate: 0
+    isHostile: 0
+    connectionBehaviors: []
+    operations:
+    - operation: 0
+      activityDescription: Reading diagnostic sample
+      minimumLoad: 2
+      maximumLoad: 2
+      minimumDuration: 60
+      maximumDuration: 60
+      meanWork: 0
+      completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: sample.open
+        result: OK
+      - workFraction: 0.05
+        activity: sample.header.read
+        result: OK
+      - workFraction: 0.07
+        activity: sample.index.read
+        result: OK
+      - workFraction: 0.45
+        activity: sample.rows.read
+        result: OK
+      - workFraction: 0.82
+        activity: sample.verify
+        result: OK
+    - operation: 1
+      activityDescription: Writing diagnostic summary
+      minimumLoad: 2
+      maximumLoad: 2
+      minimumDuration: 60
+      maximumDuration: 60
+      meanWork: 0
+      completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.04
+        activity: summary.open
+        result: OK
+      - workFraction: 0.06
+        activity: summary.header.write
+        result: OK
+      - workFraction: 0.08
+        activity: summary.body.write
+        result: OK
+      - workFraction: 0.52
+        activity: summary.flush
+        result: OK
+      - workFraction: 0.9
+        activity: summary.close
+        result: OK
   identityHopIntervalSeconds: 2
   ambientIdentityHopChance: 0.1
   ambientIdentityReactiveChance: 0.1

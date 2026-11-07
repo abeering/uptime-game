@@ -20,6 +20,7 @@ namespace Uptime.Connections
         [SerializeField] private ScanOutput scanPrefab;
         [SerializeField] private LoadOutput loadPrefab;
         [SerializeField] private WorkOutput workPrefab;
+        [SerializeField] private LogsOutput logsPrefab;
         [SerializeField] private SimulationHost simulationHost;
         [SerializeField] private ConnectionTrafficDirector trafficDirector;
         [SerializeField] private ConnectionsRunRecorder recorder;
@@ -348,6 +349,9 @@ namespace Uptime.Connections
                 case "i":
                     Inspect(tokens, command);
                     break;
+                case "logs":
+                    Logs(tokens, command);
+                    break;
                 case "kill":
                 case "k":
                     Kill(tokens, command);
@@ -672,6 +676,7 @@ namespace Uptime.Connections
                     break;
                 case "help":
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
+                    AppendText("LOGS  logs <id>  logs -n <1..30> <id>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);
                     AppendText("NODES  scan <nodeId>  clean <nodeId>", mutedColor);
                     AppendText("DEFENSE  probe <linkId>  overclock <nodeId>  intercept [payloadId] @ <nodeId>  isolate <nodeId>", mutedColor);
@@ -1034,6 +1039,66 @@ namespace Uptime.Connections
                 AppendText("INSPECT  output unavailable", CommandFailureColor());
             else
                 block.Bind(selected.ToArray(), simulationHost.PresentationPalette, mode);
+        }
+
+        private void Logs(string[] tokens, string command)
+        {
+            if (!TryParseLogs(tokens, out string id, out int count, out string error))
+            {
+                AppendText(error, CommandFailureColor());
+                return;
+            }
+            if (simulationHost == null || simulationHost.RuntimeConnections == null)
+            {
+                AppendText("LOGS  simulation unavailable", CommandFailureColor());
+                return;
+            }
+            LogicalConnectionState state = simulationHost.FindConnection(id);
+            if (state == null)
+            {
+                int action = recorder != null ? recorder.RecordPlayerAction(command,
+                    id, false, reason: "unknown_connection") : 0;
+                simulationHost.NotifyFailedIdentityAddress(id, "logs", action);
+                AppendText("LOGS  unknown connection " + id.ToLowerInvariant(),
+                    CommandFailureColor());
+                return;
+            }
+            LogsOutput block = AppendOutputBlock(logsPrefab);
+            if (block == null)
+                AppendText("LOGS  output unavailable", CommandFailureColor());
+            else block.Bind(state, simulationHost, count);
+        }
+
+        public const int DefaultLogTailCount = 5;
+        public const int MaxLogTailCount = 30;
+
+        public static bool TryParseLogs(string[] tokens, out string id, out int count,
+            out string error)
+        {
+            const string usage = "USAGE  logs [-n 1..30] <connectionId>";
+            id = null;
+            count = DefaultLogTailCount;
+            error = usage;
+            if (tokens == null || tokens.Length < 1 ||
+                !tokens[0].Equals("logs", StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (tokens.Length == 2 && !tokens[1].StartsWith("-", StringComparison.Ordinal))
+                id = tokens[1];
+            else if (tokens.Length == 4 &&
+                tokens[1].Equals("-n", StringComparison.OrdinalIgnoreCase) &&
+                !tokens[3].StartsWith("-", StringComparison.Ordinal) &&
+                int.TryParse(tokens[2], NumberStyles.None, CultureInfo.InvariantCulture,
+                    out int requested) && requested >= 1 && requested <= MaxLogTailCount)
+            {
+                count = requested;
+                id = tokens[3];
+            }
+            else if (tokens.Length > 1 && tokens[1].StartsWith("-", StringComparison.Ordinal) &&
+                !tokens[1].Equals("-n", StringComparison.OrdinalIgnoreCase))
+                error = "LOGS  invalid flag " + tokens[1] + " // " + usage;
+            if (string.IsNullOrWhiteSpace(id)) return false;
+            error = null;
+            return true;
         }
 
         public static bool TryParseIntercept(string[] tokens, out string payloadId, out string nodeId)

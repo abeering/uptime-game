@@ -44,7 +44,7 @@ namespace Uptime.Connections.EditorTools
                 Check(initial.schemaVersion == 2 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
-                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 19 &&
+                    initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 20 &&
                     initial.run.traffic.hostileGenerationEnabled &&
                     initial.run.traffic.hostileMeanIntervalSeconds == 54f &&
                     initial.run.traffic.normalWorkSpread == 0.25f &&
@@ -68,6 +68,10 @@ namespace Uptime.Connections.EditorTools
                     "copied run metadata and generator configuration");
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "product-lookup");
+                ProfileConfiguration demoProfile = initial.run.traffic.profiles.Single(p =>
+                    p.id == "logs-demo");
+                Check(demoProfile.ambientWeight == 0f && demoProfile.operations.Length == 2,
+                    "synthetic LOGS demonstration is recorded but never ambient");
                 Check(purposeProfile.purposeTemplate && purposeProfile.ambientWeight == 1.5f &&
                     purposeProfile.operations[0].meanWork == 48f,
                     "purpose template and independent WORK mean recorded");

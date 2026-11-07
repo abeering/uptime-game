@@ -6120,6 +6120,7 @@ MonoBehaviour:
   scanPrefab: {fileID: 4954846012338825431, guid: 82388e005f909294f8075c3afc4fa676, type: 3}
   loadPrefab: {fileID: 2305129265954828056, guid: 6af792156d4292441a4507dea22bfe58, type: 3}
   workPrefab: {fileID: 6459443834686597475, guid: 16efd7e6f4fa5144db47851a2b9496d8, type: 3}
+  logsPrefab: {fileID: 4240373064237646051, guid: ce82b280d036ea44a9385bfd09f75d59, type: 3}
   simulationHost: {fileID: 1996901015}
   trafficDirector: {fileID: 1996901017}
   recorder: {fileID: 1996901018}

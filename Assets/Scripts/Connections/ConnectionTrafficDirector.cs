@@ -17,6 +17,7 @@ namespace Uptime.Connections
         public CompletionEffect completionEffect;
         public PayloadLaunchSpec launchSpec;
         public TimedModifierBehaviorDefinition[] behaviors;
+        public PlannedOperationLog[] logs;
     }
 
     [Serializable]
@@ -958,7 +959,7 @@ namespace Uptime.Connections
                     spec.completionEffect == CompletionEffect.InfectionDelivery ?
                         new InfectionPayload(InfectionKind.PhantomLoad,
                             host.DefaultPhantomLoad) : null,
-                    launch: spec.launchSpec);
+                    launch: spec.launchSpec, logs: spec.logs);
             }
             if (selected.purposeTemplate)
                 return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
@@ -1569,6 +1570,19 @@ namespace Uptime.Connections
                 PurposeStage(OperationKind.Write, "Updating inventory", 1.7f, 3.2f, 130f)),
             Purpose("sales-export", "Sales Report Export", "DB", 0.25f,
                 PurposeStage(OperationKind.Read, "Exporting sales report", 2.5f, 4.5f, 290f)),
+            Profile("logs-demo", "Diagnostic Transfer", "DB", 0f,
+                LogStage(OperationKind.Read, "Reading diagnostic sample", 2f, 60f,
+                    new PlannedOperationLog(.03f, "sample.open", "OK"),
+                    new PlannedOperationLog(.05f, "sample.header.read", "OK"),
+                    new PlannedOperationLog(.07f, "sample.index.read", "OK"),
+                    new PlannedOperationLog(.45f, "sample.rows.read", "OK"),
+                    new PlannedOperationLog(.82f, "sample.verify", "OK")),
+                LogStage(OperationKind.Write, "Writing diagnostic summary", 2f, 60f,
+                    new PlannedOperationLog(.04f, "summary.open", "OK"),
+                    new PlannedOperationLog(.06f, "summary.header.write", "OK"),
+                    new PlannedOperationLog(.08f, "summary.body.write", "OK"),
+                    new PlannedOperationLog(.52f, "summary.flush", "OK"),
+                    new PlannedOperationLog(.9f, "summary.close", "OK"))),
             Profile("retrieval", "Record Retrieval", "DB", 0f,
                 Stage(OperationKind.Read, "Reading records", 1f, 2.5f, 40f, 70f)),
             Profile("indexing", "Record Indexing", "DB", 0f,
@@ -1684,5 +1698,11 @@ namespace Uptime.Connections
             float lowLoad, float highLoad, float lowSeconds, float highSeconds) => new ConnectionOperationProfile
             { operation = kind, activityDescription = description, minimumLoad = lowLoad,
                 maximumLoad = highLoad, minimumDuration = lowSeconds, maximumDuration = highSeconds };
+        private static ConnectionOperationProfile LogStage(OperationKind kind, string description,
+            float load, float seconds, params PlannedOperationLog[] logs) =>
+            new ConnectionOperationProfile
+            { operation = kind, activityDescription = description,
+                minimumLoad = load, maximumLoad = load,
+                minimumDuration = seconds, maximumDuration = seconds, logs = logs };
     }
 }
