@@ -11,11 +11,14 @@ namespace Uptime.Connections
     {
         [SerializeField] private RectTransform card;
         [SerializeField] private LayoutElement layout;
+        [SerializeField] private RectMask2D clipBoundary;
+        [SerializeField] private Image panelBackground;
+        [SerializeField] private Image accentRail;
+        [SerializeField] private IdentityPillView identityPill;
         [SerializeField] private RectTransform fullContent;
         [SerializeField] private CanvasGroup fullAlpha;
-        [SerializeField] private TMP_Text identityText;
-        [SerializeField] private TMP_Text contextText;
-        [SerializeField] private TMP_Text statusText;
+        [SerializeField] private TMP_Text panelTypeText;
+        [SerializeField] private TMP_Text purposeText;
         [SerializeField] private TMP_Text tailText;
         [SerializeField] private RectTransform rowsRoot;
         [SerializeField] private LogsEntryRow rowPrefab;
@@ -25,19 +28,20 @@ namespace Uptime.Connections
         [SerializeField, Min(.05f)] private float refreshSeconds = .12f;
         [SerializeField, Min(0f)] private float resolvedHoldSeconds = 4f;
         [SerializeField, Min(.01f)] private float collapseSeconds = .22f;
-        [SerializeField, Min(1f)] private float baseHeight = 70f;
-        [SerializeField, Min(1f)] private float rowHeight = 23f;
+        [SerializeField, Min(1f)] private float baseHeight = 80f;
+        [SerializeField, Min(1f)] private float rowHeight = 26f;
+        [SerializeField, Min(1f)] private float narrowRowHeight = 48f;
         [SerializeField, Min(1f)] private float summaryHeight = 48f;
         [SerializeField] private Color activeColor = new(.35f, .92f, .72f);
-        [SerializeField] private Color quietColor = new(.47f, .63f, .62f);
+        [SerializeField] private Color quietColor = new(.52f, .67f, .66f);
+        [SerializeField] private Color activeBackground = new(.035f, .105f, .13f);
+        [SerializeField] private Color completeBackground = new(.026f, .078f, .095f);
 
         private readonly List<LogsEntryRow> rows = new();
         private LogicalConnectionState state;
         private SimulationHost host;
         private int tailCount;
         private int lastEmittedCount = -1;
-        private string lastIdentity;
-        private bool historical;
         private bool collapsed;
         private float collapseAt = -1f;
         private float collapseFromHeight;
@@ -47,7 +51,8 @@ namespace Uptime.Connections
         public int DisplayedRowCount => rows.Count;
         public int TailCount => tailCount;
         public bool IsSummary => collapsed;
-        public bool IsHistoricalSnapshot => historical;
+        public RectTransform ClipBounds => clipBoundary != null ?
+            (RectTransform)clipBoundary.transform : null;
 
         public void Bind(LogicalConnectionState selected, SimulationHost owner, int requestedTail)
         {
@@ -58,12 +63,15 @@ namespace Uptime.Connections
             state = selected;
             host = owner;
             tailCount = requestedTail;
-            historical = selected.IsComplete;
             collapsed = false;
             collapseAt = -1f;
             lastEmittedCount = -1;
-            lastIdentity = null;
+            enabled = true;
             host.SimulationReset += OnSimulationReset;
+            Color accent = host.PresentationPalette != null &&
+                host.PresentationPalette.TryGet(state, out Color assigned) ? assigned : activeColor;
+            if (identityPill != null)
+                identityPill.Bind(state.ConnectionId, selected.IsComplete ? quietColor : accent);
             if (fullContent != null) fullContent.gameObject.SetActive(true);
             if (summaryText != null) summaryText.gameObject.SetActive(false);
             if (fullAlpha != null) fullAlpha.alpha = 1f;
@@ -74,9 +82,15 @@ namespace Uptime.Connections
 
         private void Update()
         {
-            if (state == null || Time.unscaledTime < nextRefresh) return;
-            nextRefresh = Time.unscaledTime + refreshSeconds;
-            RefreshNow(Time.unscaledTime);
+            float now = Time.unscaledTime;
+            if (state == null || now < nextRefresh && (collapseAt < 0f || now < collapseAt)) return;
+            nextRefresh = now + refreshSeconds;
+            RefreshNow(now);
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            if (collapsed && card != null) FitWidth();
         }
 
         // Kept callable by Editor witnesses; refresh does not advance simulation.
@@ -84,26 +98,28 @@ namespace Uptime.Connections
         {
             if (state == null || collapsed) return;
             float width = FitWidth();
-            string identity = state.KnownIdentity.ToUpperInvariant();
-            if (identity != lastIdentity)
-            {
-                lastIdentity = identity;
-                if (identityText != null) identityText.text = identity;
-            }
             bool resolved = state.IsComplete;
-            string outcome = resolved ? state.Resolution?.ToString().ToUpperInvariant() ?? "COMPLETE" : "LIVE";
-            if (statusText != null) statusText.text = outcome;
-            if (statusText != null) statusText.color = resolved ? quietColor : activeColor;
-            if (identityText != null)
+            string outcome = state.Resolution?.ToString().ToUpperInvariant() ?? "COMPLETE";
+            Color accent = host.PresentationPalette != null &&
+                host.PresentationPalette.TryGet(state, out Color assigned) ? assigned : activeColor;
+            Color chrome = resolved ? quietColor : accent;
+            if (identityPill != null) identityPill.SetAccentColor(chrome);
+            if (purposeText != null)
             {
-                Color accent = host.PresentationPalette != null &&
-                    host.PresentationPalette.TryGet(state, out Color assigned) ? assigned : activeColor;
-                identityText.color = resolved ? quietColor : accent;
+                purposeText.text = state.Definition.ClaimedPurpose ?? string.Empty;
+                purposeText.color = chrome;
             }
-            if (contextText != null)
-                contextText.text = state.TargetNode.NodeId + " / " + state.Definition.ClaimedPurpose;
+            if (panelTypeText != null) panelTypeText.color = quietColor;
+            if (tailText != null) tailText.color = quietColor;
+            if (accentRail != null) accentRail.color = chrome;
+            if (panelBackground != null)
+                panelBackground.color = resolved ? completeBackground : activeBackground;
             if (tailText != null) tailText.text = "TAIL " + tailCount;
-            if (summaryText != null) summaryText.text = identity + "  /  LOGS  /  " + outcome;
+            if (summaryText != null)
+            {
+                summaryText.text = "LOGS  /  " + outcome;
+                summaryText.color = quietColor;
+            }
 
             int emittedCount = state.EmittedLogs.Count;
             int visible = Mathf.Min(tailCount, emittedCount);
@@ -123,16 +139,20 @@ namespace Uptime.Connections
                     rows[i].Bind(state.EmittedLogs[first + i]);
                 lastEmittedCount = emittedCount;
             }
+            if (resolved)
+                for (int i = 0; i < rows.Count; i++) rows[i].SetResolved(quietColor);
             if (emptyText != null)
             {
                 emptyText.gameObject.SetActive(visible == 0);
                 emptyText.text = state.IsPending ? "WAITING FOR CONNECTION" :
                     state.IsConnecting ? "CONNECTING" : "NO LOGS EMITTED";
+                if (resolved) emptyText.color = quietColor;
             }
             if (rowCountChanged || Mathf.Abs(contentWidth - width) > .01f)
-                FitRows(width);
-            float fullHeight = baseHeight + visible * rowHeight;
-            if (resolved && !historical && collapseAt < 0f)
+                FitRows(width, width < 330f ? narrowRowHeight : rowHeight);
+            float fullHeight = baseHeight + visible *
+                (width < 330f ? narrowRowHeight : rowHeight);
+            if (resolved && collapseAt < 0f)
             {
                 collapseAt = now + resolvedHoldSeconds;
                 collapseFromHeight = fullHeight;
@@ -171,30 +191,31 @@ namespace Uptime.Connections
             if (card != null) card.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, cardWidth);
             if (fullContent != null)
                 fullContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, cardWidth);
-            float inner = Mathf.Max(0f, cardWidth - 32f);
+            const float gutterLeft = 94f;
+            float inner = Mathf.Max(0f, cardWidth - gutterLeft - 16f);
             if (rowsRoot != null)
                 rowsRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inner);
-            if (contextText != null)
-            {
-                contextText.gameObject.SetActive(cardWidth >= 400f);
-                contextText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                    Mathf.Max(0f, cardWidth - 278f));
-            }
-            if (statusText != null)
-                statusText.rectTransform.anchoredPosition = new Vector2(cardWidth - 172f, -10f);
+            if (purposeText != null)
+                purposeText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(0f, cardWidth - gutterLeft - 100f));
             if (tailText != null)
                 tailText.rectTransform.anchoredPosition = new Vector2(cardWidth - 84f, -10f);
+            if (emptyText != null)
+                emptyText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inner);
+            if (summaryText != null)
+                summaryText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                    Mathf.Max(0f, cardWidth - gutterLeft - 16f));
             return inner;
         }
 
-        private void FitRows(float width)
+        private void FitRows(float width, float height)
         {
             contentWidth = width;
             for (int i = 0; i < rows.Count; i++)
             {
                 RectTransform rect = (RectTransform)rows[i].transform;
-                rect.anchoredPosition = new Vector2(0f, -i * rowHeight);
-                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowHeight);
+                rect.anchoredPosition = new Vector2(0f, -i * height);
+                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
                 rows[i].FitWidth(width);
             }
         }
@@ -237,6 +258,7 @@ namespace Uptime.Connections
                 summaryText.gameObject.SetActive(true);
             }
             if (summaryAlpha != null) summaryAlpha.alpha = 1f;
+            if (identityPill != null) identityPill.SetAccentColor(quietColor);
             collapsed = true;
             SetHeightAnchored(summaryHeight);
             enabled = false;
