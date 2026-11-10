@@ -1,6 +1,5 @@
 # Main priorities
 
-- infector work multipliers (BACKDOOR)
 - hacker duels 
 - trace/block 
 - logs 
