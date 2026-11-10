@@ -64,9 +64,11 @@ An **infection** remains a different kind of object: a persistent hostile presen
 | **SCAN JAMMED** | The player's node infection scan is temporarily unavailable | Pain / urgent; future |
 | **CLEAN LOCKED** | The player's node cleaning tool is temporarily unavailable | Pain / urgent; future |
 | **WORK STALLED** | Productive WORK at the node temporarily stops or is interfered with | Pain / urgent; future; exact scope unsettled |
-| **HOSTILE ACCELERATED** (working name) | Hostile connections make WORK approximately 2× as fast at the **same requested LOAD**; may be irrelevant if no hostile is present | Pain / indirect pressure; future; numeric example, not balance |
+| **HOSTILE ACCELERATED** (historical working name) | Hostile connections make WORK approximately 2× as fast at the **same requested LOAD**; may be irrelevant if no hostile is present | Pain / indirect pressure; narrower INFECTOR-only **BACKDOOR V0 implemented**; broader variants exploratory |
 | **ISOLATED** | A protective player-imposed window, with lost productive WORK as a meaningful cost, originally proposed against infection-carrying Payload arrival | Beneficial/control with a tradeoff; future |
 | **WORK BOOSTED** (illustrative) | Helpful temporary improvement; potential positive Condition | Beneficial; speculative |
+
+**Later implementation note (November 5, 2026):** [BACKDOOR V0](connections-backdoor-v0.md) realizes a narrower form of the HOSTILE ACCELERATED idea: a timed, visible Worm Condition or covert persistent infection accelerates only infection-delivery carriers, with no extra LOAD and no stacking. The historical candidate is **not** a separate unimplemented condition to build by default. The BACKDOOR contract also preserves a possible delivery-operation-only stealth variant and the still-open question of coordinated follow-ups.
 
 The important distinction is **potential** versus **present damage**. For example, HOSTILE ACCELERATED would not prove that a malicious connection is currently active or identify one. CLEAN LOCKED might matter little until an infection needs removal. PORT SCANNED is reconnaissance evidence, not a guaranteed forecast.
 
