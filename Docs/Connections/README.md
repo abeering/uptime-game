@@ -23,6 +23,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 - [Network Health V0](connections-network-health-v0.md) — live service Health, deadlines, recovery, failure latch, and permanent compact status strip.
 - [Lifecycle V1](connections-lifecycle-v1.md) — Connecting route traversal, cancellation receipts, and connection-only Health.
 - [Infections V0: Phantom LOAD](connections-infections-v0.md) — typed operation delivery, persistent node demand, developer controls, and recorder evidence.
+- [BACKDOOR V0](connections-backdoor-v0.md) — overt timed Worm Condition and covert persistent infection accelerating INFECTOR WORK without extra LOAD; includes the cascading-threat rationale and deferred experiments.
 - [Probe X-ray V0](connections-probe-v0.md) — temporary, truthful physical-edge hostile classification and local line coloring.
 - [ID Hopping V0](connections-id-hopping-v0.md) — manual hostile identity aliases, canonical command lookup, and temporary Probe revelation.
 - [Reactive Identity Misdirection V0](connections-reactive-identity-v0.md) — stable false IDs that change after failed alias commands.
