@@ -1,14 +1,10 @@
 # Connections — PURPOSE Activity Vocabulary & Initial Log Corpus V0
 
-**Status:** Working content reference, November 5, 2026. Originally a docs-only starting dataset for the first Connections logs experiment; not a generation grammar or gameplay/UI contract. Phase 3 implements a finite corpus based on it, as noted below.
+**Status:** Working content reference originating November 5, 2026; its six naming choices and a finite baseline corpus were **implemented and merged in Logs V0 Phase 3 (PR #107)**. This document preserves additional vocabulary and evidence-writing ideas, not a generation grammar or a final gameplay/UI contract.
 
 **Scope:** Connections, not Packet. This page captures how the six **existing canonical PURPOSES** should sound when expressed through repeated, operation-local log activity. It is deliberately separate from [Operation Logs & Live Tailing](connections-operation-logs-design.md) (the mechanic), [Purpose & Anomaly Generation](connections-purpose-anomaly-generation-v0.md) (the current generated recipes), and [THREATS](THREATS.md) (objectives, cover, and disguise sophistication). Use the actual scene/code for current names, targets, operation arcs, and values.
 
-**Phase 3 implementation addendum:** The six proposed display names and a
-finite V0 corpus based on this page are implemented on the Phase 3 branch;
-see the [implementation note](connections-purpose-logs-phase3-implementation.md).
-The original proposal wording and candidate evidence below remain as
-provenance, not a procedural generation rule.
+**Implementation note:** The six agreed player-facing names and initial fixed operation-local log schedules are now merged. See the [Phase 3 implementation note](connections-purpose-logs-phase3-implementation.md) for the precise counts and behavior. The alternative examples and evidence candidates below remain **authored possibilities**, not automatic hostility signatures or procedural generation rules.
 
 ## Core fiction
 
@@ -23,11 +19,11 @@ Both use the **same** logical connection, target, READ/WRITE/EXECUTE arc, LOAD/W
 
 Repetition is a feature, not filler: for an aggregate purpose it evokes successive instances; for a heavyweight purpose it evokes incremental processing within the same job.
 
-## Canonical PURPOSE baseline and proposed display names
+## Canonical PURPOSE baseline and implemented display names
 
-These IDs, targets, and operation kinds reflect the six built-in canonical-purpose recipes at this document's original baseline. The **proposed display names** were a content direction from the Logs V0 design discussion and are implemented in Phase 3. The old-name column preserves the pre-implementation claim. Internal purpose IDs remain stable.
+These IDs, targets, and operation kinds reflect the six built-in canonical-purpose recipes at this document's original baseline. The **current display names** were agreed during Logs V0 and implemented in Phase 3. The old-name column preserves the pre-implementation claim. Internal purpose IDs remain stable.
 
-| Stable purpose ID | Current player-facing claim | Proposed player-facing claim | Target | Normal arc | Fictional scale |
+| Stable purpose ID | Previous claim (historical) | Current claim (Logs V0) | Baseline target | Normal arc | Fictional scale |
 | --- | --- | --- | --- | --- | --- |
 | product-lookup | Product Detail Retrieval | **Product Detail Lookups** | DB | READ | Aggregate lookups |
 | customer-login | Customer Authentication | **Customer Authentications** | AUTH | EXECUTE | Aggregate attempts/sessions |
@@ -36,7 +32,7 @@ These IDs, targets, and operation kinds reflect the six built-in canonical-purpo
 | inventory-sync | Inventory Reconciliation | **Inventory Reconciliations** | DB | READ → WRITE | Aggregate reconciliation batches |
 | sales-export | Sales Report Export | **Sales Report Export** | DB | READ | One heavyweight export |
 
-The naming pass should affect the displayed PURPOSE claim, not the target, route, arc, demand, WORK values, weights, objective selection, or infection mechanics. The singular/plural choice is a *fictional scope*, not a request for separate simulation types. Some future PURPOSES may also be intentionally singular.
+The implemented naming pass changed only the displayed PURPOSE claim, not the target, route, arc, demand, WORK values, weights, objective selection, or infection mechanics. The singular/plural choice is a *fictional scope*, not a request for separate simulation types. Some future PURPOSES may also be intentionally singular.
 
 ## Content grammar and guardrails (not a parser grammar)
 
@@ -207,7 +203,7 @@ This is intentionally singular. One large export can process numerous segments a
 
 This example demonstrates multiple instances of checkout activity under one connection; clustered emissions; a contextual clue during an otherwise ordinary WRITE; and later READ activity that can roll that clue out of a short tail. **The contextual clue is an authored example, not a mandatory signature on every hostile checkout.**
 
-Milestones are *illustrative percentages of WORK completed within the named operation*. They show creative rhythm only; the runtime representation, interpretation under dynamic WORK requirements, and exact tuning belong in the later Logs V0 implementation contract.
+Milestones here are *illustrative percentages of operation-local WORK*, included as authored narrative examples rather than exact runtime fixtures. The implemented runtime fixes normalized milestones against each concrete operation's base WORK; see the [Logs design](connections-operation-logs-design.md) and [Phase 3 implementation](connections-purpose-logs-phase3-implementation.md) for the actual schedules.
 
 | Operation | Illustrative progress | Activity | Result |
 | --- | ---: | --- | --- |
@@ -370,32 +366,32 @@ The last example is still a **single export**, not many separate exports. In all
 - For encounters where logs are meant to be the actionable path, don't place the only useful clue after the effect has already happened, or bury it at an impossible reaction time. Other encounters can deliberately be easier to diagnose through a different tool.
 - Avoid always pairing a particular entry with one genus or infection; the eventual connection grammar and villain disguise composition can select a distribution of evidence. No frequency table, evidence tier enum, or procedural framework is approved here.
 
-## Relationship to the proposed live-tail viewer
+## Relationship to the implemented live-tail viewer
 
-This page is **not** the viewer implementation spec. It is designed to supply content for the separate Logs V0 handoff. The latest working interaction direction discussed on November 5 is:
+This page is a **content reference**, not the viewer implementation spec. Logs V0 now implements the key interaction decisions:
 
-- Every operation may emit a **much longer stream** of entries as actual WORK progresses, often in clusters with gaps.
-- A connection retains emitted entries across operation transitions and after resolution; killing prevents future emission.
-- The default live tail shows the most recent **five** entries regardless of operation, with each line labeled by its actual operation.
-- A larger tail (for example, **logs -n 20 x1**) uses the same panel with a greater display budget. These are viewer decisions, not log-content grammar.
-- A five-line **visible window is not a five-line production budget**. A connection may produce dozens of lines over its lifetime.
-- Filtering/pipelines such as grep, automatic evidence scoring, and authored per-villain generation are deferred.
+- Each concrete operation may emit many entries as actual productive WORK crosses authored milestones, with bursts and quiet intervals.
+- Earned history persists across operation transitions and resolution, but future unearned entries do not appear after kill/cancel/withdrawal.
+- `logs <id>` defaults to the latest five entries across all completed/current operations, each labeled with its actual READ/WRITE/EXECUTE kind.
+- `logs -n N <id>` accepts **N = 1–30**. Larger tails can recover recently displaced entries, but the terminal cannot navigate beyond the latest 30, despite complete retained simulation/recorder history.
+- LOGS is designed for defending the **live network**: active panels have an observation indicator; resolved panels grey out and collapse after four unscaled seconds, including newly requested historical panels. It is not intended as an indefinite postmortem browser.
+- `grep`/pipelines, filtering, procedural evidence scoring, and per-villain log generation remain deferred.
 
-These are conversation-level directions and may supersede older examples in the separate logs design document, which still describes a five-entry *total* feel and a current-operation-only view. Reconcile that mechanic document when preparing the implementation handoff; do not silently implement its older suggestions.
+For exact behavior see the [Phase 2 viewer implementation note](connections-operation-logs-phase2-implementation.md). The earlier five-entry-total and current-operation-only design proposals were **already superseded**, not outstanding reconciliation tasks.
 
 ## Future composition questions (deferred)
 
 Eventually a connection planner may choose normal activity vocabulary, volume, emission rhythms, evidence location, and disguise quality based on PURPOSE, operation, objective, villain, level, and run. This follows [THREATS](THREATS.md)'s principle that disguise sophistication is separate from frequency/severity, and the deferred canonical connection/threat grammar work.
 
-Do **not** build a procedural log-generation framework, fixed evidence tiers, one-clue-per-threat rule, new simulated business entities, or new operations from this document. For the first playable slice, a small number of complete, manually authored streams can prove the experience.
+Do **not** infer approval for a procedural log-generation framework, fixed evidence tiers, one-clue-per-threat rule, new simulated business entities, or new operations from this document. The first playable slice now exists as finite authored PURPOSE streams and a manual checkout-evidence example; future variation remains a separate design decision.
 
 ## Content review checklist
 
 - The six current internal IDs, target nodes, and normal operation arcs are represented correctly.
-- Proposed display-name changes are explicit and can be applied without changing ID keys or simulation balance.
+- Implemented display-name changes are explicit, with original ID keys and simulation balance preserved.
 - Aggregate and singular examples both feature repeatable activity without requiring different mechanics.
 - No example implies traffic to another real or imaginary node, a new route, or an unmodeled gameplay effect.
 - A normal workload can contain retries/errors; a hostile workload can contain mundane logs.
 - Bursts and quiet WORK intervals exist in the complete examples.
 - Each example remains legible with a five-line rolling window and makes sense when read with a larger tail.
-- Unity compilation, scene review, prefab validation, and mechanical tests belong to the later implementation task, not this content document.
+- Implementation tests and remaining Play Mode review are recorded in the Phase 2/3 implementation notes rather than this content-writing reference.
