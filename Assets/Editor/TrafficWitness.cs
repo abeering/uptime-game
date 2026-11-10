@@ -94,7 +94,7 @@ namespace Uptime.Connections.EditorTools
                         Check(plan.Operations.All(o => o.EffectOnCompletion == CompletionEffect.None),
                             "benign anomalies and keywords have no delivery");
                 }
-                Check(director.Profiles.Count == 19 &&
+                Check(director.Profiles.Count == 21 &&
                     replay.Select(p => p.ProfileId).Distinct().Count() == 6 &&
                     replay.Any(p => p.GenerationTrace.objective == "LOADER") &&
                     replay.Any(p => p.GenerationTrace.objective == "DELIVERY") &&

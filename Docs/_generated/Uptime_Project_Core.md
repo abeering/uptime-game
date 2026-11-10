@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:38ca8f9945df45e4558cb925c28ba848ed47fcf8991092600ef04c8e8b45fb6e`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:506498899fee4371c90ec52befd0fc3fe7829c3acde9e3cd7c1dd0f21031ea3a`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -320,6 +320,17 @@ Unity 6000.3.11f1 compiled an isolated project copy. The Traffic and Recorder Wi
 The scene has an authored four-node, three-physical-link topology: EXT1–API, API–DB, and API–AUTH. A **logical connection** has a stable short ID and a route through that graph. Physical links and logical paths have separate view responsibilities. The scene's serialized `runMode` is **Generated**; Authored Witness mode retains c1/c2/c3 for focused review and tests.
 
 `SimulationHost` owns one fixed-step simulation clock, active connection state, inspection history, and resolution. `ConnectionTrafficDirector` uses separate seeded schedules to queue benign coverage and hostile arrivals, then registers concrete plans through the host; queued plans can also be supplied explicitly. Both ambient streams select from [six ecommerce purpose templates](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-purpose-anomaly-generation-v0.md) with their eligible targets. Each purpose samples normal LOAD and WORK independently, then the hostile stream composes a LOADER or DELIVERY attempt while the benign stream may generate an outlier. Inspector weight overrides tune the canonical purpose mix without copying built-in operations. The earlier ten profiles have zero default ambient weight and remain available through explicit `spawn <profileId>` and witnesses; ambient generation now selects canonical PURPOSE templates only. Rates and timing are playtest tuning, not balanced game rules. Completed or killed generated connections leave active ownership but remain inspectable for that run. The [traffic document](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-arcade-traffic-v0.md) preserves prior phase provenance.
+
+**Operation Logs V0 content (Phase 3 review branch):** The six canonical
+PURPOSES now use their agreed display names and finite, operation-local
+application log schedules in both Connections scenes. Generated benign and
+hostile plans inherit the same ordinary schedules. A zero-weight,
+manually spawnable `logs-checkout-evidence` example adds one suspicious
+checkout line before a real final-stage infection delivery; the line itself
+has no effect. The existing `logs` viewer, WORK milestones, retention, and
+recorder present and preserve earned observations. See the
+[Phase 3 implementation note](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-purpose-logs-phase3-implementation.md)
+for counts, provenance, and playtest limits.
 
 The current allocator grants **target-node LOAD** proportionally when requests exceed capacity after baseline LOAD. Transit nodes and physical links are route geometry in this model; they are not CPU/disk/memory/link-bandwidth allocation constraints. Productive WORK advances by allocated LOAD × effective WORK rate multiplier × simulation seconds; existing plans have a neutral 1× factor. An operation may be READ, WRITE, or EXECUTE and have its own WORK and desired LOAD. Authored multi-operation arcs advance to the next operation on the following fixed step, retaining the connection ID, route, target, and path; only final completion resolves the connection. See [LOAD](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-arcade-load-v1.md) and [operation arcs](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-arcade-operation-arcs-v1.md). The current arcs do not change target or route between operations.
 

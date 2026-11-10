@@ -1,8 +1,14 @@
 # Connections — PURPOSE Activity Vocabulary & Initial Log Corpus V0
 
-**Status:** Working content reference, November 5, 2026. A docs-only starting dataset for the first Connections logs experiment; not an implemented feature, an approved generation grammar, or a gameplay/UI contract.
+**Status:** Working content reference, November 5, 2026. Originally a docs-only starting dataset for the first Connections logs experiment; not a generation grammar or gameplay/UI contract. Phase 3 implements a finite corpus based on it, as noted below.
 
 **Scope:** Connections, not Packet. This page captures how the six **existing canonical PURPOSES** should sound when expressed through repeated, operation-local log activity. It is deliberately separate from [Operation Logs & Live Tailing](connections-operation-logs-design.md) (the mechanic), [Purpose & Anomaly Generation](connections-purpose-anomaly-generation-v0.md) (the current generated recipes), and [THREATS](THREATS.md) (objectives, cover, and disguise sophistication). Use the actual scene/code for current names, targets, operation arcs, and values.
+
+**Phase 3 implementation addendum:** The six proposed display names and a
+finite V0 corpus based on this page are implemented on the Phase 3 branch;
+see the [implementation note](connections-purpose-logs-phase3-implementation.md).
+The original proposal wording and candidate evidence below remain as
+provenance, not a procedural generation rule.
 
 ## Core fiction
 
@@ -19,7 +25,7 @@ Repetition is a feature, not filler: for an aggregate purpose it evokes successi
 
 ## Canonical PURPOSE baseline and proposed display names
 
-These IDs, targets, and operation kinds reflect the current six built-in canonical-purpose recipes. The **proposed display names** are a content direction from the Logs V0 design discussion, **not names already changed in code**. Keep internal purpose IDs stable when implementing the later naming pass.
+These IDs, targets, and operation kinds reflect the six built-in canonical-purpose recipes at this document's original baseline. The **proposed display names** were a content direction from the Logs V0 design discussion and are implemented in Phase 3. The old-name column preserves the pre-implementation claim. Internal purpose IDs remain stable.
 
 | Stable purpose ID | Current player-facing claim | Proposed player-facing claim | Target | Normal arc | Fictional scale |
 | --- | --- | --- | --- | --- | --- |
