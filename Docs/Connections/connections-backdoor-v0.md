@@ -14,6 +14,24 @@ Connection Spawner children use the same seeded infection selection with Payload
 
 The run recorder retains condition application/refresh/expiry and source Worm branch, infection delivery/rejection/removal and carrier provenance, and authoritative connection rate snapshots. No coordination between Worm outbreaks and later INFECTORs is added.
 
+## Design motivation and open experiments (November 10, 2026)
+
+BACKDOOR is the first deliberate Connections experiment in **compounding hostile advantages**, not merely a way to make individual INFECTORs faster. Advanced playtests showed that independent hostile attempts were often identifiable and stoppable before installing persistent consequences, while legitimate service and Network Health stayed comparatively healthy. We deliberately chose **not** to give hostile connections LOAD priority or reserved capacity just to improve delivery success. Instead, an earlier hostile success should be able to change how dangerous later attacks are.
+
+A Worm can establish a visible, short-lived opportunity; an INFECTOR can establish a covert foothold that outlives its carrier. Either can make a later INFECTOR targeting the same node finish sooner and potentially install Blackout, Phantom LOAD, Spawner, or another infection before intervention. The intended player experience is to notice and dismantle **accumulated vulnerabilities**, not merely respond to one unrelated hostile connection after another. A node may look healthy in the service/LOAD sense while becoming more dangerous to defend. Cascading failure, including situations the player cannot fully recover from, is acceptable; its causal path should remain understandable in retrospect through truthful WORK, node conditions, diagnostics, and recorded events. The V0 witnesses demonstrate the mechanics, **not yet** that this broader escalation reliably happens during sustained human play.
+
+### Possible stealth variant: delivery-operation-only acceleration (not implemented)
+
+V0 deliberately accelerates **all** operations of an eligible INFECTOR, creating a stronger advantage but potentially revealing unusual WORK speed earlier. A future, more covert BACKDOOR might accelerate **only operations whose completion effect is InfectionDelivery**. A DELAYED INFECTOR could progress at ordinary speed through its believable preparatory operations, then complete an 18-second nominal delivery operation in roughly 9 seconds at unchanged allocation. The reduced reaction window, rather than falsified inspect information, is the stealth: WORK progress, multiplier, and ETA must still reflect reality once acceleration applies.
+
+This is a gameplay variant to consider, **not** a request to implement a second effect scope, new status framework, or new carrier type. The earlier design discussion favored retaining nonstacking acceleration if variants coexist, but the eventual source, frequency, and tuning remain open.
+
+### Ambient emergence versus coordinated exploitation (unresolved)
+
+V0 introduces both BACKDOOR sources to the existing Advanced ambient mix **without deliberately pairing them** with subsequent INFECTORs. Seeded runs confirmed that both sources occur and sometimes overlap; that does not establish how often a human player experiences a meaningful compounded threat. Playtesting should ask whether missed footholds visibly change subsequent outcomes, whether players learn to prioritize scanning/cleaning an apparently healthy node, and whether failures can cascade in a legible way rather than just raising attack success rates.
+
+If natural overlap is too rare, a later Level Director or authored event could deliberately target a node with an existing foothold or sequence an opening with a follow-up attack. That possibility is preserved, **not approved as a V0 extension**. Do not introduce a separate hostile scheduling clock, a guaranteed follow-up, or artificial recovery protection based on this note.
+
 ## Review
 
 Run `Tools/Connections/Run Backdoor Witness` with the Resource, Infection, Condition, Worm, Traffic, Recorder, and presentation witnesses in a compiling Unity Editor. The central witness has a capacity-10 target and two 6-LOAD connections: both receive 5 LOAD. The INFECTOR's 100-WORK delivery takes 20 seconds at 5 WORK/s without BACKDOOR, so a kill at 12 seconds prevents installation; at 10 WORK/s with BACKDOOR it completes in 10 seconds, so installation has already persisted at 12 seconds. Other checks cover a multi-operation arc, source coexistence, cleaning/removal, expiry, status visibility, and receipts.
