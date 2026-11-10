@@ -1,0 +1,78 @@
+# Connections Hacker Duel V0 review
+
+Scope: Connections implementation in `Connections.unity` and
+`ConnectionsAdvanced.unity`. Packet is unchanged. This is the first DUEL
+encounter, using Command Race. CLEAN remains the separate player initiated PID
+Killer. The broader consequences and attack surface ideas in
+`Docs/Connections/connections-hacker-command-races.md` and
+`Docs/Connections/connections-entities-conditions-events-ideas.md` remain open
+design work.
+
+## Launch and play
+
+1. Open either Connections scene and enter Play Mode. Use `duel auth 5` or
+   `duel db 5` in the terminal. The number is simulation seconds before launch;
+   omit it for the Inspector default. The target shows `INTRUSION` and a
+   countdown. `duel auth 0` starts immediately.
+2. Type the displayed commands in the **YOU** pane. The `>` prompts are not
+   typed; Enter is not needed. A wrong character must be removed with Backspace.
+   The hacker types independently, including visible mistakes and corrections.
+3. For a connection-triggered demonstration, run `spawn duel-auth`. It queues a
+   hostile AUTH probe whose completion schedules the same Duel with the default
+   warning. This fixed profile has no ambient weight. Killing the connection
+   before completion prevents scheduling.
+4. For interruption, run `infect db phantom-load 2`, then `clean db` and leave
+   the PID input in progress. Trigger `duel auth 0` from a scripted director
+   call or let the `spawn duel-auth` carrier finish. The Duel covers CLEAN and
+   takes the keyboard; the CLEAN session, draft, and process list remain below.
+   On result close, focus returns to CLEAN if it is still valid, otherwise to
+   the terminal. During a Duel, Escape has no dismiss action.
+
+`ConnectionsDuelDirector.TrySchedule` is the director-facing entry point.
+Only one pending or active Duel is allowed across all nodes. Rejections are
+recorded with a reason. The slot releases when the race resolves; the brief
+result display can remain on screen. Reset closes the Duel and clears the slot.
+
+## Tuning and subjective review
+
+The scene's `ConnectionsDuelDirector` Inspector owns warning duration,
+simulation continuation policy (default on), player and hacker command arrays,
+hacker character time, timing variance, hesitation and typo chances, and the
+loss infection type/parameter. The initial player sequence is about 86 typed
+characters; the default hacker is intended to finish around 18–20 real seconds.
+This needs physical keyboard playtesting, particularly novice readability and
+whether the race pressure is enjoyable. `ConnectionsDuelOverlay` owns only the
+result display duration.
+
+At **1920×1080** and **1280×720**, inspect the two-pane text size and line
+spacing, target-aware placement around crowded nodes, simultaneous CLEAN and
+call windows, INTRUSION status among other statuses, and the terminal's
+command focus after both victory and defeat. Also test held keys, Backspace,
+Escape, and a CLEAN session that ends authoritatively while it is covered.
+
+## Scripted checks and captures
+
+`Tools > Connections > Run Duel Witness` runs deterministic race and scene
+checks in Edit Mode. `Tools > Connections > Capture Duel Play Mode Review`
+starts a scripted Play Mode run for a scene selected with `-duelScene` and a
+size selected with `-duelWidth`/`-duelHeight`. It captures countdown, partial
+race, player error/correction, victory, Duel over CLEAN, defeat, and restored
+CLEAN. These captures use scripted character entry; they are **not physical
+keyboard playtest evidence**. The capture runner also checks live versus
+paused simulation, Escape ownership, and focus transfer.
+
+Unity 6000.3.11f1 validation on an isolated project copy passed the Duel
+Edit Mode witness in both scenes, the existing Infection Edit Mode witness,
+and the existing Escape/video-call Play Mode witness in `Connections`. All
+four scripted capture runs passed: both scenes at 1920×1080 and 1280×720.
+The 32 PNGs in `Captures/` are the final authored UI captures. For batch
+captures only, the isolated copy suppressed a broken Unity Search startup
+callback; the workaround is not part of this PR. Physical-keyboard timing,
+long holds, and subjective difficulty still need a human Play Mode pass.
+
+The V0 loss effect goes through `SimulationHost.TryApplyDuelInfection` and the
+normal infection system. A duplicate or invalid application is recorded as a
+rejection; the receipt does not claim installation. Hidden infection knowledge
+is unchanged. Future consequence packages, beneficial wins, Worm effects,
+CLEAN LOCKED, randomized event selection, and a Level Director remain for a
+separate design and implementation slice.

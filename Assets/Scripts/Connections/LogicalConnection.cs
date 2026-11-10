@@ -20,7 +20,8 @@ namespace Uptime.Connections
         Execute
     }
 
-    public enum CompletionEffect { None, InfectionDelivery, ConditionApplication, PayloadLaunch }
+    public enum CompletionEffect { None, InfectionDelivery, ConditionApplication, PayloadLaunch,
+        DuelSchedule }
 
     [Serializable]
     public sealed class PayloadLaunchSpec

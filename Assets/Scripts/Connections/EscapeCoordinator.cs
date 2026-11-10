@@ -64,7 +64,14 @@ namespace Uptime.Connections
         private void Refresh(double now, bool protect)
         {
             targets.RemoveAll(target => !Eligible(target));
-            IEscapeTarget next = isActiveAndEnabled && targets.Count > 0 ? targets[^1] : null;
+            IEscapeTarget next = null;
+            if (isActiveAndEnabled && targets.Count > 0)
+            {
+                next = targets[^1];
+                for (int i = targets.Count - 1; i >= 0; i--)
+                    if (targets[i] is IExclusiveEscapeTarget)
+                    { next = targets[i]; break; }
+            }
             if (ReferenceEquals(next, currentTarget)) return;
             if (Alive(currentTarget)) currentTarget.SetEscapeTarget(false);
             currentTarget = next;

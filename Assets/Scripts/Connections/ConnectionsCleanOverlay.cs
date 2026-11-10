@@ -24,11 +24,35 @@ namespace Uptime.Connections
         private Coroutine sequence;
         private bool acceptingPid;
         private bool showingResult;
+        private bool keyboardSuspended;
+        private bool wasPidFocused;
+        private int pidAnchor;
+        private int pidFocus;
 
         public bool IsOpen => gameObject.activeInHierarchy && session != null;
 
         // The completed result can remain visible after typing returns to the terminal.
         public bool WantsKeyboardFocus => IsOpen && !showingResult;
+
+        public void SuspendKeyboard(bool suspended)
+        {
+            keyboardSuspended = suspended;
+            if (pidInput == null) return;
+            if (suspended)
+            {
+                wasPidFocused = pidInput.isFocused;
+                pidAnchor = pidInput.selectionStringAnchorPosition;
+                pidFocus = pidInput.selectionStringFocusPosition;
+                pidInput.DeactivateInputField();
+            }
+            pidInput.interactable = !suspended;
+        }
+
+        public void RestoreKeyboardFocus()
+        {
+            if (WantsKeyboardFocus && acceptingPid && !keyboardSuspended)
+                RefocusPid();
+        }
 
         public bool CanDismissWithEscape => IsOpen && !showingResult;
 
@@ -116,13 +140,16 @@ namespace Uptime.Connections
             pidInput.gameObject.SetActive(true);
             acceptingPid = true;
             yield return null;
-            pidInput.ActivateInputField();
-            pidInput.Select();
+            if (!keyboardSuspended)
+            {
+                pidInput.ActivateInputField();
+                pidInput.Select();
+            }
         }
 
         private void Submit(string raw)
         {
-            if (!acceptingPid || session == null) return;
+            if (!acceptingPid || session == null || keyboardSuspended) return;
             pidInput.SetTextWithoutNotify(string.Empty);
             if (!int.TryParse(raw.Trim(), out int pid))
             {
@@ -164,10 +191,16 @@ namespace Uptime.Connections
         private IEnumerator RefocusNextFrame()
         {
             yield return null;
-            if (acceptingPid && pidInput != null)
+            if (acceptingPid && pidInput != null && !keyboardSuspended)
             {
                 pidInput.ActivateInputField();
                 pidInput.Select();
+                if (wasPidFocused)
+                {
+                    pidInput.selectionStringAnchorPosition = pidAnchor;
+                    pidInput.selectionStringFocusPosition = pidFocus;
+                }
+                wasPidFocused = false;
             }
         }
 

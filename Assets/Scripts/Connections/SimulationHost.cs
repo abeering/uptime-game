@@ -61,6 +61,7 @@ namespace Uptime.Connections
         private NodeResources overclockedNode;
         private float overclockExpiresAtSeconds;
         private float overclockReadyAtSeconds;
+        private ConnectionsDuelDirector duelDirector;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -186,7 +187,7 @@ namespace Uptime.Connections
 
         private void FixedUpdate()
         {
-            if (Application.isPlaying)
+            if (Application.isPlaying && (duelDirector == null || !duelDirector.PausesSimulation))
                 StepSimulation(Time.fixedDeltaTime);
         }
 
@@ -287,6 +288,7 @@ namespace Uptime.Connections
             }
             if (runtimeConnections == null)
                 ResetSimulation();
+            if (duelDirector == null) duelDirector = GetComponent<ConnectionsDuelDirector>();
 
             trafficDirector?.Tick(simulationTimeSeconds, runMode == ConnectionRunMode.Generated);
             float remaining = deltaSeconds;
@@ -329,6 +331,8 @@ namespace Uptime.Connections
                 foreach (NodeCondition condition in conditions)
                     segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                         condition.ExpiresAtSeconds - simulationTimeSeconds));
+                if (duelDirector != null)
+                    segment = Mathf.Min(segment, duelDirector.TimeToBoundary(simulationTimeSeconds));
                 if (payloadDirector != null)
                     segment = Mathf.Min(segment,
                         payloadDirector.TimeToNextBoundary(simulationTimeSeconds));
@@ -350,6 +354,7 @@ namespace Uptime.Connections
                     ExpireOverclock();
                 AdvanceIdentities();
                 ExpireConditions();
+                duelDirector?.Advance(simulationTimeSeconds);
                 remaining -= segment;
             }
             WithdrawDueLoaders();
@@ -674,6 +679,27 @@ namespace Uptime.Connections
             bool applied = ApplyInfection(target, payload, null, -1);
             if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
             error = applied ? null : kind + " is already active on " + target.View.NodeId;
+            return applied;
+        }
+
+        public bool TryApplyDuelInfection(NodeResources target, InfectionKind kind,
+            float parameter, int duelId, out string error)
+        {
+            if (target == null || Array.IndexOf(nodes, target) < 0)
+            { error = "unknown_node"; return false; }
+            bool usesParameter = kind == InfectionKind.PhantomLoad ||
+                kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner;
+            if (!Enum.IsDefined(typeof(InfectionKind), kind) ||
+                float.IsNaN(parameter) || float.IsInfinity(parameter) ||
+                usesParameter && parameter <= 0f || !usesParameter && parameter != 0f)
+            { error = "invalid_duel_infection"; return false; }
+            bool applied = ApplyInfection(target,
+                new InfectionPayload(kind,
+                    kind == InfectionKind.PhantomLoad ? parameter : 0f,
+                    kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner ?
+                        parameter : 0f), "duel:" + duelId, -1);
+            if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
+            error = applied ? null : "infection_already_active";
             return applied;
         }
 
@@ -1314,6 +1340,9 @@ namespace Uptime.Connections
                 if (definition.EffectAt(i) == CompletionEffect.InfectionDelivery &&
                     (payload == null || !payload.IsValid))
                     throw new InvalidOperationException("Delivery needs a valid typed infection payload.");
+                if (definition.EffectAt(i) == CompletionEffect.DuelSchedule &&
+                    !definition.IsHostile)
+                    throw new InvalidOperationException("Duel scheduling needs a hostile connection.");
                 if (definition.EffectAt(i) == CompletionEffect.ConditionApplication &&
                     (definition.ConditionAt(i) == null || !definition.ConditionAt(i).IsValid))
                     throw new InvalidOperationException("Condition application needs a valid typed payload.");

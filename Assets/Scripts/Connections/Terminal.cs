@@ -49,7 +49,44 @@ namespace Uptime.Connections
         private int commandHistoryIndex = -1;
         private string commandDraft = string.Empty;
         private bool commandFailed;
+        private bool keyboardSuspended;
+        private int suspendedAnchor;
+        private int suspendedFocus;
+        private bool restoreSelection;
         public event Action CommandFailed;
+
+        public void SuspendKeyboard(bool suspended)
+        {
+            keyboardSuspended = suspended;
+            if (commandInput == null) return;
+            if (suspended)
+            {
+                restoreSelection = commandInput.isFocused;
+                suspendedAnchor = commandInput.selectionStringAnchorPosition;
+                suspendedFocus = commandInput.selectionStringFocusPosition;
+                commandInput.DeactivateInputField();
+            }
+            commandInput.interactable = !suspended;
+        }
+
+        public void RestoreKeyboardFocus()
+        {
+            if (!keyboardSuspended && isActiveAndEnabled)
+                StartCoroutine(FocusInputNextFrame());
+        }
+
+        public void DuelReceipt(DuelEncounter encounter)
+        {
+            if (encounter == null) return;
+            string node = encounter.Target.View.NodeId;
+            if (encounter.PlayerWon == true)
+                AppendText("DUEL WON  " + node + "  /  intrusion prevented", normalColor);
+            else if (encounter.InfectionApplied == true)
+                AppendText("DUEL LOST  " + node + "  /  intrusion succeeded", errorColor);
+            else
+                AppendText("DUEL LOST  " + node + "  /  infection rejected (" +
+                    encounter.ApplicationReason + ")", errorColor);
+        }
 
         // Command handlers mark rejection explicitly; asynchronous rows use AppendText.
         private Color CommandFailureColor()
@@ -324,6 +361,7 @@ namespace Uptime.Connections
 
         private void HandleSubmit(string raw)
         {
+            if (keyboardSuspended) return;
             if (commandInput == null || string.IsNullOrWhiteSpace(raw))
             {
                 StartCoroutine(FocusInputNextFrame());
@@ -460,6 +498,32 @@ namespace Uptime.Connections
                     }
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                case "duel":
+                    if (tokens.Length < 2 || tokens.Length > 3 ||
+                        tokens.Length == 3 &&
+                        (!float.TryParse(tokens[2], NumberStyles.Float,
+                            CultureInfo.InvariantCulture, out float parsedWarning) ||
+                         float.IsNaN(parsedWarning) || float.IsInfinity(parsedWarning) ||
+                         parsedWarning < 0f))
+                        AppendText("USAGE  duel <nodeId> [warningSeconds>=0]", CommandFailureColor());
+                    else
+                    {
+                        ConnectionsDuelDirector duels = simulationHost != null ?
+                            simulationHost.GetComponent<ConnectionsDuelDirector>() : null;
+                        float warning = tokens.Length == 3 ?
+                            float.Parse(tokens[2], CultureInfo.InvariantCulture) :
+                            duels?.DefaultWarningSeconds ?? 0f;
+                        string duelReason = "duel_unavailable";
+                        bool scheduled = duels != null && duels.TrySchedule(tokens[1],
+                            DuelVariant.CommandRace, warning, "developer_command", out duelReason);
+                        recorder?.RecordPlayerAction(command, null, scheduled, tokens[1],
+                            scheduled ? null : duels == null ? "duel_unavailable" : duelReason);
+                        AppendText(scheduled ? "INTRUSION SCHEDULED  " +
+                            tokens[1].ToUpperInvariant() : "DUEL  " +
+                            (duels == null ? "unavailable" : duelReason),
+                            scheduled ? normalColor : CommandFailureColor());
+                    }
+                    break;
                 case "notifytest":
                     DeveloperNotificationTest(tokens);
                     break;
@@ -690,6 +754,8 @@ namespace Uptime.Connections
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
+                    AppendText("DEV  duel <nodeId> [warningSeconds]  // Command Race", mutedColor);
+                    AppendText("DEV  spawn duel-auth  // completion schedules AUTH Duel", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned|backdoor", mutedColor);
                     AppendText("DEV  infect <nodeId> <kind> [load|cadence]  uninfect <nodeId> [kind]  infections", mutedColor);
@@ -1251,10 +1317,17 @@ namespace Uptime.Connections
         private IEnumerator FocusInputNextFrame()
         {
             yield return null;
-            if (commandInput == null || cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
+            if (commandInput == null || keyboardSuspended ||
+                cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
                 yield break;
             commandInput.ActivateInputField();
             commandInput.Select();
+            if (restoreSelection)
+            {
+                commandInput.selectionStringAnchorPosition = suspendedAnchor;
+                commandInput.selectionStringFocusPosition = suspendedFocus;
+                restoreSelection = false;
+            }
         }
     }
 }
