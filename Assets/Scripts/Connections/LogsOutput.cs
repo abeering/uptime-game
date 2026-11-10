@@ -20,6 +20,7 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text panelTypeText;
         [SerializeField] private TMP_Text purposeText;
         [SerializeField] private TMP_Text tailText;
+        [SerializeField] private Image activityIndicator;
         [SerializeField] private RectTransform rowsRoot;
         [SerializeField] private LogsEntryRow rowPrefab;
         [SerializeField] private TMP_Text emptyText;
@@ -82,10 +83,23 @@ namespace Uptime.Connections
 
         private void Update()
         {
+            AdvanceIndicator(Time.deltaTime);
             float now = Time.unscaledTime;
             if (state == null || now < nextRefresh && (collapseAt < 0f || now < collapseAt)) return;
             nextRefresh = now + refreshSeconds;
             RefreshNow(now);
+        }
+
+        // Scaled frame time keeps this observation cue in step with FixedUpdate's
+        // simulation clock; the card's resolution hold remains unscaled.
+        private void AdvanceIndicator(float scaledDeltaSeconds)
+        {
+            if (activityIndicator == null) return;
+            bool monitoring = state != null && !state.IsComplete && !collapsed;
+            if (activityIndicator.gameObject.activeSelf != monitoring)
+                activityIndicator.gameObject.SetActive(monitoring);
+            if (monitoring && Time.timeScale > 0f && scaledDeltaSeconds > 0f)
+                activityIndicator.rectTransform.Rotate(0f, 0f, -180f * scaledDeltaSeconds);
         }
 
         private void OnRectTransformDimensionsChange()
@@ -99,10 +113,17 @@ namespace Uptime.Connections
             if (state == null || collapsed) return;
             float width = FitWidth();
             bool resolved = state.IsComplete;
+            AdvanceIndicator(0f);
             string outcome = state.Resolution?.ToString().ToUpperInvariant() ?? "COMPLETE";
             Color accent = host.PresentationPalette != null &&
                 host.PresentationPalette.TryGet(state, out Color assigned) ? assigned : activeColor;
             Color chrome = resolved ? quietColor : accent;
+            if (!resolved && activityIndicator != null)
+            {
+                Color indicatorColor = accent;
+                indicatorColor.a = .72f;
+                activityIndicator.color = indicatorColor;
+            }
             if (identityPill != null) identityPill.SetAccentColor(chrome);
             if (purposeText != null)
             {
@@ -197,9 +218,12 @@ namespace Uptime.Connections
                 rowsRoot.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inner);
             if (purposeText != null)
                 purposeText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
-                    Mathf.Max(0f, cardWidth - gutterLeft - 100f));
+                    Mathf.Max(0f, cardWidth - gutterLeft - 124f));
             if (tailText != null)
                 tailText.rectTransform.anchoredPosition = new Vector2(cardWidth - 84f, -10f);
+            if (activityIndicator != null)
+                activityIndicator.rectTransform.anchoredPosition =
+                    new Vector2(cardWidth - 103f, -21.5f);
             if (emptyText != null)
                 emptyText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, inner);
             if (summaryText != null)
@@ -250,6 +274,7 @@ namespace Uptime.Connections
             host.SimulationReset -= OnSimulationReset;
             host = null;
             state = null;
+            AdvanceIndicator(0f);
             ClearRows();
             if (fullContent != null) fullContent.gameObject.SetActive(false);
             if (summaryText != null)

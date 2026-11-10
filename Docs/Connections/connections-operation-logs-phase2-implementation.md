@@ -21,6 +21,18 @@ run recorder.
   entry uses a deliberate two-line layout, with the activity below its time
   and operation; the optional result hides when space is too tight. There is
   no `LIVE` label.
+- A small Lucide `loader-circle` sprite sits just left of `TAIL N`. Its Image
+  uses the active connection accent at reduced opacity and rotates clockwise
+  at 180 degrees per scaled second while the card monitors an unresolved
+  connection, including pending, connecting, quiet, and zero-WORK states.
+  `Time.timeScale = 0` pauses rotation with the FixedUpdate simulation.
+  Resolution hides the icon immediately; reset invalidates the old card.
+  The icon indicates observation, not new entries or productive WORK.
+  The supplied PNG and Unity sprite metadata are in
+  `Assets/Images/Connections/UI/`; its original SVG is in
+  `ThirdPartySources/Lucide/loader-circle.svg`, under the retained ISC license
+  in `ThirdPartyLicenses/Lucide-LICENSE.txt`. Source: Lucide's
+  `https://lucide.dev/icons/loader-circle`.
 - The pill is bound once to `state.ConnectionId`. Identity hops and Probe
   expiration cannot change the verified identity on an opened LOGS card.
 - A card updates from retained `EmittedLogs` on an unscaled UI interval. It
@@ -50,7 +62,9 @@ ID returned by the terminal with `logs <id>` and `logs -n 15 <id>`. Check narrow
 terminal widths, two cards for the same ID, early burst and quiet periods,
 READ-to-WRITE transition, `load`/`work`/`inspect` alongside logs, keyboard
 focus and command recall, bottom-follow and manual scrollback, kill/completion,
-historical retrieval and its collapse, summary clipping, and reset. The demo's roughly
+historical retrieval and its collapse, summary clipping, and reset. Pause and
+resume simulation during a quiet interval; verify each active card's icon
+rotates independently, then disappears on resolution. The demo's roughly
 two-minute uncontended operation duration allows time for command entry.
 
 Interactive Play Mode layout and focus review remains necessary after batch

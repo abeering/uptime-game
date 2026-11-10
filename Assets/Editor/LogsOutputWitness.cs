@@ -66,6 +66,46 @@ namespace Uptime.Connections.EditorTools
                 one.Bind(state, host, 1);
                 fifteen.Bind(state, host, 15);
                 twenty.Bind(state, host, 20);
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+                    "Assets/Images/Connections/UI/loader-circle.png");
+                var importer = AssetImporter.GetAtPath(
+                    "Assets/Images/Connections/UI/loader-circle.png") as TextureImporter;
+                Check(sprite != null && importer != null &&
+                    importer.textureType == TextureImporterType.Sprite &&
+                    importer.alphaIsTransparency &&
+                    importer.textureCompression == TextureImporterCompression.Uncompressed &&
+                    Indicator(five).sprite == sprite &&
+                    Indicator(five).rectTransform.rect.width >= 16f &&
+                    Indicator(five).rectTransform.rect.width <= 20f &&
+                    Indicator(five).rectTransform.pivot == new Vector2(.5f, .5f),
+                    "supplied transparent sprite is imported and centered");
+                Check(Indicator(five).gameObject.activeSelf &&
+                    Indicator(five).rectTransform.anchoredPosition.x + 9f <
+                    Tail(five).rectTransform.anchoredPosition.x &&
+                    Purpose(five).rectTransform.anchoredPosition.x +
+                    Purpose(five).rectTransform.rect.width <
+                    Indicator(five).rectTransform.anchoredPosition.x - 9f,
+                    "indicator sits between purpose and TAIL without collision");
+                int pendingEvents = recorder.CurrentLog.events.Count;
+                Spin(five, .5f);
+                Check(state.IsPending && state.CompletedWork == 0f &&
+                    state.EmittedLogs.Count == 0 && Mathf.Abs(Angle(five) + 90f) < .01f &&
+                    Mathf.Abs(Angle(one)) < .01f &&
+                    recorder.CurrentLog.events.Count == pendingEvents,
+                    "pending quiet card rotates clockwise independently without simulation effects");
+                float oldScale = Time.timeScale;
+                try
+                {
+                    Time.timeScale = 0f;
+                    Spin(five, 1f);
+                    Check(Mathf.Abs(Angle(five) + 90f) < .01f,
+                        "simulation pause stops the indicator");
+                }
+                finally { Time.timeScale = oldScale; }
+                Spin(one, .25f);
+                Check(Mathf.Abs(Angle(one) + 45f) < .01f &&
+                    Mathf.Abs(Angle(five) + 90f) < .01f,
+                    "multiple LOGS panels rotate independently");
                 Check(Empty(five).text == "WAITING FOR CONNECTION" &&
                     five.DisplayedRowCount == 0 && Height(five) == 80f &&
                     Width(five) <= 320f, "pending compact state and narrow width");
@@ -77,6 +117,10 @@ namespace Uptime.Connections.EditorTools
                 five.RefreshNow(0f);
                 Check(state.IsActive && Empty(five).text == "NO LOGS EMITTED",
                     "established no-log state");
+                Spin(five, .5f);
+                Check(Mathf.Abs(Mathf.Abs(Angle(five)) - 180f) < .01f &&
+                    state.EmittedLogs.Count == 0,
+                    "indicator continues through active quiet period");
                 int recorderBefore = recorder.CurrentLog.events.Count;
                 float workBefore = state.CompletedWork;
                 five.RefreshNow(0f); one.RefreshNow(0f);
@@ -143,10 +187,16 @@ namespace Uptime.Connections.EditorTools
                 five.RefreshNow(0f);
                 Check(state.IsComplete && state.Resolution == ConnectionResolution.Completed &&
                     !five.IsSummary && Activities(five).Last() == "write-b" &&
+                    !Indicator(five).gameObject.activeSelf &&
                     Purpose(five).color == Quiet(five) &&
                     Pill(five).AccentColor == Quiet(five) &&
                     Rows(five).All(r => r.ActivityText.color == Quiet(five)),
                     "completion immediately mutes the expanded earned tail");
+                float stoppedAngle = Angle(five);
+                Spin(five, 1f);
+                Check(!Indicator(five).gameObject.activeSelf &&
+                    Mathf.Abs(Mathf.DeltaAngle(stoppedAngle, Angle(five))) < .01f,
+                    "resolved card stops rotating immediately");
                 five.RefreshNow(4.1f);
                 Check(!five.IsSummary && Height(five) < 320f && Height(five) > 48f &&
                     Mathf.Abs(five.ClipBounds.rect.height - Height(five) + 12f) < .01f,
@@ -156,6 +206,8 @@ namespace Uptime.Connections.EditorTools
                     "live card collapses after short resolved hold");
                 historical = UnityEngine.Object.Instantiate(prefab, parent.transform);
                 historical.Bind(state, host, 20);
+                Check(!Indicator(historical).gameObject.activeSelf,
+                    "historical card never shows monitoring indicator");
                 float historicalOpenedAt = Time.unscaledTime;
                 historical.RefreshNow(historicalOpenedAt + 3.9f);
                 Check(!historical.IsSummary &&
@@ -173,15 +225,19 @@ namespace Uptime.Connections.EditorTools
                 historical.RefreshNow(200f);
                 Check(historical.IsSummary && Height(historical) == 48f &&
                     Summary(historical).text.Contains("RUN RESET") &&
-                    historical.DisplayedRowCount == 0,
+                    historical.DisplayedRowCount == 0 &&
+                    !Indicator(historical).gameObject.activeSelf &&
+                    !Indicator(five).gameObject.activeSelf,
                     "reset invalidates old binding without following reused ID");
+                ZeroWorkCase(host, recorder, route, prefab, parent.transform, travelField);
                 ResolutionCases(host, recorder, route, prefab, parent.transform, travelField);
                 IdentityCases(host, traffic, recorder, terminal, route, travelField);
                 Check(terminal != null, "terminal remains present");
                 Debug.Log("LogsOutputWitness PASS: parsing, scene bindings, pending/connecting/empty, " +
                     "burst and retained tails, command addressability, operation transition, " +
                     "completion hold, kill/cancel/withdraw, historical collapse, reset, " +
-                    "canonical hopping identity, clipping, narrow and wide widths, recorder isolation.");
+                    "canonical hopping identity, clipping, narrow and wide widths, " +
+                    "scaled independent spinner, zero WORK, recorder isolation.");
             }
             catch (Exception failure)
             {
@@ -255,6 +311,44 @@ namespace Uptime.Connections.EditorTools
         private static OperationStage Stage(OperationKind kind, float work,
             params PlannedOperationLog[] logs) =>
             new OperationStage(kind, work, 2f, "logs witness", logs: logs);
+
+        private static void ZeroWorkCase(SimulationHost host, ConnectionsRunRecorder recorder,
+            NodeView[] route, LogsOutput prefab, Transform parent, FieldInfo travelField)
+        {
+            travelField.SetValue(host, .000001f);
+            host.ResetSimulation();
+            recorder.BeginRun();
+            var stage = new OperationStage(OperationKind.Read, 20f, 2f, "logs witness",
+                behaviors: new[] {
+                    TimedModifierBehaviorDefinition.Rate("pause-work", 0f, 0f, 0f) });
+            var plan = new ConnectionSpawnPlan(0f, "zero-work", route,
+                "logs-witness", "Diagnostic", new[] { stage }, false);
+            var state = host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
+            host.StepSimulation(.01f);
+            host.StepSimulation(1f);
+            LogsOutput panel = UnityEngine.Object.Instantiate(prefab, parent);
+            try
+            {
+                panel.Bind(state, host, 5);
+                Check(state.IsActive && state.ActualWorkRate == 0f &&
+                    state.CompletedWork == 0f && state.EmittedLogs.Count == 0,
+                    "zero productive WORK remains unresolved and quiet");
+                int events = recorder.CurrentLog.events.Count;
+                Spin(panel, .5f);
+                Check(Mathf.Abs(Angle(panel) + 90f) < .01f &&
+                    state.CompletedWork == 0f && state.EmittedLogs.Count == 0 &&
+                    recorder.CurrentLog.events.Count == events,
+                    "monitoring indicator is independent of productive WORK and recorder");
+                float angleAtReset = Angle(panel);
+                host.ResetSimulation();
+                Spin(panel, 1f);
+                Check(!Indicator(panel).gameObject.activeSelf &&
+                    Mathf.Abs(Mathf.DeltaAngle(angleAtReset, Angle(panel))) < .01f &&
+                    Summary(panel).text.Contains("RUN RESET"),
+                    "reset of an active card stops and hides the indicator");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(panel.gameObject); }
+        }
 
         private static void ResolutionCases(SimulationHost host, ConnectionsRunRecorder recorder,
             NodeView[] route, LogsOutput prefab, Transform parent, FieldInfo travelField)
@@ -383,6 +477,21 @@ namespace Uptime.Connections.EditorTools
 
         private static TMP_Text Summary(LogsOutput panel) =>
             (TMP_Text)new SerializedObject(panel).FindProperty("summaryText").objectReferenceValue;
+
+        private static TMP_Text Tail(LogsOutput panel) =>
+            (TMP_Text)new SerializedObject(panel).FindProperty("tailText").objectReferenceValue;
+
+        private static Image Indicator(LogsOutput panel) =>
+            (Image)new SerializedObject(panel).FindProperty("activityIndicator")
+                .objectReferenceValue;
+
+        private static float Angle(LogsOutput panel) =>
+            Mathf.DeltaAngle(0f, Indicator(panel).rectTransform.localEulerAngles.z);
+
+        private static void Spin(LogsOutput panel, float deltaSeconds) =>
+            typeof(LogsOutput).GetMethod("AdvanceIndicator",
+                BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(panel, new object[] { deltaSeconds });
 
         private static TMP_Text Purpose(LogsOutput panel) =>
             (TMP_Text)new SerializedObject(panel).FindProperty("purposeText").objectReferenceValue;
