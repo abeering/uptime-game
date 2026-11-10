@@ -11923,7 +11923,7 @@ MonoBehaviour:
     - RPT
   profiles:
   - id: product-lookup
-    claimedPurpose: Product Detail Retrieval
+    claimedPurpose: Product Detail Lookups
     eligibleTargetIds:
     - DB
     ambientWeight: 1.5
@@ -11939,9 +11939,73 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 48
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.02
+        activity: product.key.normalize
+        result: OK
+      - workFraction: 0.03
+        activity: product.sku.lookup
+        result: HIT
+      - workFraction: 0.04
+        activity: product.variant.read
+        result: OK
+      - workFraction: 0.12
+        activity: product.price.read
+        result: OK
+      - workFraction: 0.13
+        activity: product.availability.read
+        result: OK
+      - workFraction: 0.14
+        activity: product.detail.assemble
+        result: OK
+      - workFraction: 0.15
+        activity: product.detail.return
+        result: OK
+      - workFraction: 0.27
+        activity: product.key.normalize
+        result: OK
+      - workFraction: 0.28
+        activity: product.sku.lookup
+        result: MISS
+      - workFraction: 0.29
+        activity: product.lookup.retry
+        result: RETRY
+      - workFraction: 0.3
+        activity: product.sku.lookup
+        result: HIT
+      - workFraction: 0.43
+        activity: product.catalog.scan
+        result: OK
+      - workFraction: 0.44
+        activity: product.variant.read
+        result: OK
+      - workFraction: 0.45
+        activity: product.price.read
+        result: OK
+      - workFraction: 0.57
+        activity: product.availability.read
+        result: OK
+      - workFraction: 0.58
+        activity: product.detail.assemble
+        result: OK
+      - workFraction: 0.59
+        activity: product.detail.return
+        result: OK
+      - workFraction: 0.73
+        activity: product.batch.lookup
+        result: DONE
+      - workFraction: 0.74
+        activity: product.sku.lookup
+        result: HIT
+      - workFraction: 0.91
+        activity: product.detail.return
+        result: OK
   - id: customer-login
-    claimedPurpose: Customer Authentication
+    claimedPurpose: Customer Authentications
     eligibleTargetIds:
     - AUTH
     ambientWeight: 1
@@ -11957,9 +12021,73 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 48
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.02
+        activity: login.attempt
+        result: START
+      - workFraction: 0.03
+        activity: login.token.parse
+        result: OK
+      - workFraction: 0.04
+        activity: login.token.verify
+        result: OK
+      - workFraction: 0.05
+        activity: login.policy.check
+        result: OK
+      - workFraction: 0.14
+        activity: login.session.issue
+        result: OK
+      - workFraction: 0.15
+        activity: login.session.validate
+        result: OK
+      - workFraction: 0.27
+        activity: login.attempt
+        result: START
+      - workFraction: 0.28
+        activity: login.token.parse
+        result: OK
+      - workFraction: 0.29
+        activity: login.token.verify
+        result: REJECTED
+      - workFraction: 0.3
+        activity: login.challenge.request
+        result: START
+      - workFraction: 0.44
+        activity: login.challenge.verify
+        result: OK
+      - workFraction: 0.45
+        activity: login.session.issue
+        result: OK
+      - workFraction: 0.58
+        activity: login.session.refresh
+        result: OK
+      - workFraction: 0.59
+        activity: login.session.validate
+        result: OK
+      - workFraction: 0.72
+        activity: login.attempt
+        result: RETRY
+      - workFraction: 0.73
+        activity: login.token.verify
+        result: OK
+      - workFraction: 0.74
+        activity: login.policy.check
+        result: OK
+      - workFraction: 0.86
+        activity: login.session.issue
+        result: OK
+      - workFraction: 0.87
+        activity: login.session.expire
+        result: OK
+      - workFraction: 0.96
+        activity: login.session.validate
+        result: OK
   - id: cart-pricing
-    claimedPurpose: Cart Price Calculation
+    claimedPurpose: Cart Price Calculations
     eligibleTargetIds:
     - API
     ambientWeight: 1
@@ -11975,9 +12103,73 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 70
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.02
+        activity: pricing.cart.open
+        result: OK
+      - workFraction: 0.03
+        activity: pricing.item.normalize
+        result: OK
+      - workFraction: 0.04
+        activity: pricing.promo.evaluate
+        result: NONE
+      - workFraction: 0.12
+        activity: pricing.tax.estimate
+        result: OK
+      - workFraction: 0.13
+        activity: pricing.shipping.estimate
+        result: OK
+      - workFraction: 0.14
+        activity: pricing.cart.total
+        result: OK
+      - workFraction: 0.15
+        activity: pricing.total.commit
+        result: OK
+      - workFraction: 0.27
+        activity: pricing.cart.open
+        result: OK
+      - workFraction: 0.28
+        activity: pricing.item.normalize
+        result: OK
+      - workFraction: 0.29
+        activity: pricing.promo.evaluate
+        result: APPLIED
+      - workFraction: 0.3
+        activity: pricing.discount.reconcile
+        result: OK
+      - workFraction: 0.43
+        activity: pricing.tax.estimate
+        result: OK
+      - workFraction: 0.44
+        activity: pricing.cart.reprice
+        result: START
+      - workFraction: 0.45
+        activity: pricing.cart.total
+        result: OK
+      - workFraction: 0.58
+        activity: pricing.calculation.retry
+        result: RETRY
+      - workFraction: 0.59
+        activity: pricing.shipping.estimate
+        result: OK
+      - workFraction: 0.73
+        activity: pricing.promo.evaluate
+        result: NONE
+      - workFraction: 0.74
+        activity: pricing.cart.total
+        result: OK
+      - workFraction: 0.87
+        activity: pricing.total.commit
+        result: OK
+      - workFraction: 0.95
+        activity: pricing.cart.reprice
+        result: START
   - id: order-submit
-    claimedPurpose: Checkout Order Submission
+    claimedPurpose: Customer Checkouts
     eligibleTargetIds:
     - API
     ambientWeight: 0.9
@@ -11993,7 +12185,53 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 120
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.04
+        activity: checkout.validate
+        result: OK
+      - workFraction: 0.05
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.14
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.17
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.18
+        activity: payment.authorize
+        result: RETRY
+      - workFraction: 0.19
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.21
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.51
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.53
+        activity: checkout.validate
+        result: OK
+      - workFraction: 0.55
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.56
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.85
+        activity: checkout.batch.flush
+        result: OK
+      - workFraction: 0.92
+        activity: checkout.receipt.queue
+        result: QUEUED
     - operation: 0
       activityDescription: Reading order confirmation
       minimumLoad: 0.6
@@ -12002,9 +12240,40 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 36
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.04
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.05
+        activity: checkout.status.read
+        result: OK
+      - workFraction: 0.06
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.18
+        activity: receipt.fetch
+        result: RETRY
+      - workFraction: 0.19
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.4
+        activity: checkout.confirmation.read
+        result: OK
+      - workFraction: 0.71
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.72
+        activity: checkout.status.read
+        result: OK
+      - workFraction: 0.93
+        activity: checkout.confirmation.read
+        result: OK
   - id: inventory-sync
-    claimedPurpose: Inventory Reconciliation
+    claimedPurpose: Inventory Reconciliations
     eligibleTargetIds:
     - DB
     ambientWeight: 0.6
@@ -12020,7 +12289,44 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 80
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.02
+        activity: inventory.snapshot.open
+        result: OK
+      - workFraction: 0.03
+        activity: inventory.segment.read
+        result: OK
+      - workFraction: 0.04
+        activity: inventory.batch.compare
+        result: OK
+      - workFraction: 0.13
+        activity: inventory.discrepancy.count
+        result: 3
+      - workFraction: 0.14
+        activity: inventory.stock.check
+        result: OK
+      - workFraction: 0.28
+        activity: inventory.segment.read
+        result: OK
+      - workFraction: 0.29
+        activity: inventory.batch.compare
+        result: OK
+      - workFraction: 0.43
+        activity: inventory.discrepancy.count
+        result: 0
+      - workFraction: 0.44
+        activity: inventory.snapshot.verify
+        result: OK
+      - workFraction: 0.72
+        activity: inventory.segment.read
+        result: OK
+      - workFraction: 0.91
+        activity: inventory.snapshot.verify
+        result: OK
     - operation: 1
       activityDescription: Updating inventory
       minimumLoad: 1.7
@@ -12029,7 +12335,41 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 130
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: inventory.delta.prepare
+        result: OK
+      - workFraction: 0.04
+        activity: inventory.delta.apply
+        result: OK
+      - workFraction: 0.05
+        activity: inventory.ledger.update
+        result: OK
+      - workFraction: 0.19
+        activity: inventory.batch.conflict
+        result: RETRY
+      - workFraction: 0.2
+        activity: inventory.delta.prepare
+        result: OK
+      - workFraction: 0.21
+        activity: inventory.delta.apply
+        result: OK
+      - workFraction: 0.53
+        activity: inventory.ledger.update
+        result: OK
+      - workFraction: 0.54
+        activity: inventory.commit.verify
+        result: OK
+      - workFraction: 0.83
+        activity: inventory.reconciliation.commit
+        result: OK
+      - workFraction: 0.94
+        activity: inventory.commit.verify
+        result: OK
   - id: sales-export
     claimedPurpose: Sales Report Export
     eligibleTargetIds:
@@ -12047,7 +12387,68 @@ MonoBehaviour:
       maximumDuration: 75
       meanWork: 290
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs:
+      - workFraction: 0.02
+        activity: export.job.open
+        result: OK
+      - workFraction: 0.03
+        activity: report.query.prepare
+        result: OK
+      - workFraction: 0.04
+        activity: report.partition.read
+        result: OK
+      - workFraction: 0.12
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.13
+        activity: report.aggregate.partial
+        result: OK
+      - workFraction: 0.22
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.23
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.24
+        activity: report.aggregate.partial
+        result: OK
+      - workFraction: 0.4
+        activity: report.chunk.emit
+        result: OK
+      - workFraction: 0.41
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.42
+        activity: report.aggregate.partial
+        result: OK
+      - workFraction: 0.55
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.56
+        activity: report.index.seek
+        result: OK
+      - workFraction: 0.57
+        activity: report.segment.read
+        result: OK
+      - workFraction: 0.58
+        activity: report.aggregate.partial
+        result: OK
+      - workFraction: 0.72
+        activity: report.chunk.emit
+        result: OK
+      - workFraction: 0.86
+        activity: report.footer.prepare
+        result: OK
+      - workFraction: 0.94
+        activity: report.finalize
+        result: OK
+      - workFraction: 0.98
+        activity: export.job.complete
+        result: OK
   - id: retrieval
     claimedPurpose: Record Retrieval
     eligibleTargetIds:
@@ -12065,7 +12466,11 @@ MonoBehaviour:
       maximumDuration: 70
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: indexing
     claimedPurpose: Record Indexing
     eligibleTargetIds:
@@ -12083,7 +12488,11 @@ MonoBehaviour:
       maximumDuration: 35
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
     - operation: 0
       activityDescription: Reading the updated index
       minimumLoad: 1
@@ -12092,7 +12501,11 @@ MonoBehaviour:
       maximumDuration: 35
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: auth
     claimedPurpose: Customer Authentications
     eligibleTargetIds:
@@ -12110,7 +12523,11 @@ MonoBehaviour:
       maximumDuration: 70
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: updates
     claimedPurpose: Application Updates
     eligibleTargetIds:
@@ -12128,7 +12545,11 @@ MonoBehaviour:
       maximumDuration: 35
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
     - operation: 0
       activityDescription: Verifying updates
       minimumLoad: 1
@@ -12137,7 +12558,11 @@ MonoBehaviour:
       maximumDuration: 35
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: quick-lookup
     claimedPurpose: Quick Record Lookup
     eligibleTargetIds:
@@ -12155,7 +12580,11 @@ MonoBehaviour:
       maximumDuration: 8
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: payload-launcher
     claimedPurpose: Application Updates
     eligibleTargetIds:
@@ -12177,6 +12606,7 @@ MonoBehaviour:
         destinationNodeId: DB
         motionProfile: 0
       behaviors: []
+      logs: []
   - id: basic-threat
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12194,7 +12624,11 @@ MonoBehaviour:
       maximumDuration: 20
       meanWork: 0
       completionEffect: 1
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: delayed-threat
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12212,7 +12646,11 @@ MonoBehaviour:
       maximumDuration: 8
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
     - operation: 1
       activityDescription: Writing records
       minimumLoad: 12
@@ -12221,7 +12659,11 @@ MonoBehaviour:
       maximumDuration: 20
       meanWork: 0
       completionEffect: 1
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors: []
+      logs: []
   - id: spiking-threat
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12239,6 +12681,9 @@ MonoBehaviour:
       maximumDuration: 120
       meanWork: 0
       completionEffect: 1
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors:
       - id: SPIKING
         kind: 2
@@ -12254,6 +12699,7 @@ MonoBehaviour:
         loadDelta: 10
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+      logs: []
   - id: spiking-benign
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12271,6 +12717,9 @@ MonoBehaviour:
       maximumDuration: 120
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors:
       - id: SPIKING
         kind: 2
@@ -12286,6 +12735,7 @@ MonoBehaviour:
         loadDelta: 10
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+      logs: []
   - id: overload-demo
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12303,6 +12753,9 @@ MonoBehaviour:
       maximumDuration: 120
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors:
       - id: OVERLOAD
         kind: 1
@@ -12318,6 +12771,7 @@ MonoBehaviour:
         loadDelta: 10
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+      logs: []
   - id: waving-moderate
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12335,6 +12789,9 @@ MonoBehaviour:
       maximumDuration: 180
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors:
       - id: WAVING_MODERATE
         kind: 3
@@ -12350,6 +12807,7 @@ MonoBehaviour:
         loadDelta: 0
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+      logs: []
   - id: waving-strong
     claimedPurpose: Database Maintenance
     eligibleTargetIds:
@@ -12367,6 +12825,9 @@ MonoBehaviour:
       maximumDuration: 360
       meanWork: 0
       completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
       behaviors:
       - id: WAVING_STRONG
         kind: 3
@@ -12382,6 +12843,7 @@ MonoBehaviour:
         loadDelta: 0
         hasWorkRateMultiplier: 0
         workRateMultiplier: 1
+      logs: []
   - id: logs-demo
     claimedPurpose: Diagnostic Transfer
     eligibleTargetIds:
@@ -12446,6 +12908,113 @@ MonoBehaviour:
         result: OK
       - workFraction: 0.9
         activity: summary.close
+        result: OK
+  - id: logs-checkout-evidence
+    claimedPurpose: Customer Checkouts
+    eligibleTargetIds:
+    - API
+    ambientWeight: 0
+    purposeTemplate: 0
+    isHostile: 1
+    connectionBehaviors: []
+    operations:
+    - operation: 1
+      activityDescription: Submitting order
+      minimumLoad: 2
+      maximumLoad: 2
+      minimumDuration: 50
+      maximumDuration: 50
+      meanWork: 0
+      completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.04
+        activity: checkout.validate
+        result: OK
+      - workFraction: 0.05
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.14
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.17
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.18
+        activity: payment.authorize
+        result: RETRY
+      - workFraction: 0.19
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.21
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.51
+        activity: checkout.received
+        result: OK
+      - workFraction: 0.53
+        activity: checkout.validate
+        result: OK
+      - workFraction: 0.54
+        activity: checkout.session.export
+        result: START
+      - workFraction: 0.55
+        activity: payment.authorize
+        result: OK
+      - workFraction: 0.56
+        activity: checkout.commit
+        result: OK
+      - workFraction: 0.85
+        activity: checkout.batch.flush
+        result: OK
+      - workFraction: 0.92
+        activity: checkout.receipt.queue
+        result: QUEUED
+    - operation: 0
+      activityDescription: Reading order confirmation
+      minimumLoad: 1
+      maximumLoad: 1
+      minimumDuration: 35
+      maximumDuration: 35
+      meanWork: 0
+      completionEffect: 1
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.04
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.05
+        activity: checkout.status.read
+        result: OK
+      - workFraction: 0.06
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.18
+        activity: receipt.fetch
+        result: RETRY
+      - workFraction: 0.19
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.4
+        activity: checkout.confirmation.read
+        result: OK
+      - workFraction: 0.71
+        activity: receipt.fetch
+        result: OK
+      - workFraction: 0.72
+        activity: checkout.status.read
+        result: OK
+      - workFraction: 0.93
+        activity: checkout.confirmation.read
         result: OK
   identityHopIntervalSeconds: 2
   ambientIdentityHopChance: 0.1
