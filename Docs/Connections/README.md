@@ -9,6 +9,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 ## Current state and integrated contracts
 
 - [Current State](Current_State.md) — implementation baseline, validation, and source authority.
+- [Surprise V0](connections-surprise-v0.md) — reusable scheduling-time consequence plans, initial compound Tactics, Duel integration, and two Advanced ambient Duel routes.
 - [Hacker Duel V0 review](../Review/ConnectionsHackerDuelV0/README.md) — merged PR #110: node INTRUSION warning, CLEAN-sized Command Race with startup splash, one global Duel slot, interruption/focus restoration, and single-infection loss effect.
 - [LOAD foundation](connections-arcade-load-v1.md) — target-node LOAD capacity, proportional allocation, and WORK.
 - [Operation arcs](connections-arcade-operation-arcs-v1.md) — READ/WRITE/EXECUTE stages and visual presentation.

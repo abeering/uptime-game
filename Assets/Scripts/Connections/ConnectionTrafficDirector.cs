@@ -716,6 +716,32 @@ namespace Uptime.Connections
                 "Service Metadata Retrieval", new[] { stage }, true);
         }
 
+        public ConnectionSpawnPlan GenerateDuelCarrierPlan(float atTime,
+            string targetNodeId = null)
+        {
+            if (random == null) ResetDirector();
+            NodeView origin = ChooseAmbientOrigin();
+            var eligible = new List<(NodeView target, NodeView[] route)>();
+            foreach (NodeResources node in host.Nodes)
+            {
+                NodeView target = node?.View;
+                if (target == null || target == origin || IsAmbientOrigin(target.NodeId) ||
+                    targetNodeId != null && !string.Equals(target.NodeId, targetNodeId,
+                        StringComparison.OrdinalIgnoreCase)) continue;
+                try { eligible.Add((target, FindRoute(origin, target))); }
+                catch (InvalidOperationException) { }
+            }
+            if (eligible.Count == 0) throw new InvalidOperationException(
+                "No reachable internal Duel carrier target.");
+            var selected = eligible[random.Next(eligible.Count)];
+            string id = NewId();
+            if (id == null) return null;
+            var stage = new OperationStage(OperationKind.Read, 40f, 4f,
+                "Retrieving authentication controls", CompletionEffect.DuelSchedule);
+            return new ConnectionSpawnPlan(atTime, id, selected.route, "duel-carrier",
+                "Authentication Control Review", new[] { stage }, true);
+        }
+
         public ConnectionSpawnPlan GenerateTargetedInfectorPlan(float atTime,
             string targetNodeId)
         {
