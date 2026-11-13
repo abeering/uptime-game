@@ -1,8 +1,10 @@
 # Main priorities
 
-- hacker duels 
-- trace/block 
-- logs 
+- **Duel V0 merged (PR #110):** preserve the current playable race; initial opponent speed feels punishing after one or two errors, to be tuned from physical-keyboard playtesting rather than blocking later work.
+- **Surprise V0:** small, seeded Duel consequence pool with a few real, testable outcomes. Distinguish attack surface from consequence; don't build a universal event framework yet. See [Attack pathways & surprise](Docs/Connections/connections-attack-pathways-and-surprise.md).
+- **Progression vertical slice:** authored shift(s), escalation, events, and ending using existing topologies. No full campaign or procedural topology prerequisite.
+- trace/block (separate later investigation work)
+- logs (separate later investigation work)
 
 # TODO — WAVING / Natural LOAD Noise
 

@@ -4,6 +4,18 @@
 >
 > **Scope:** Uptime's active **Connections** prototype. This is the first proposed *hacker-initiated* skill encounter in the earlier "tug-of-war / hacker repartee" design space, now framed as a **race** rather than literal back-and-forth tug-of-war. Packet remains independent. The positive-outcome and event-presentation ideas may eventually apply to other Uptime interactions.
 
+## Implementation reconciliation — November 13, 2026
+
+**Hacker Duel V0 is implemented and merged in PR #110.** This document is the original November 1 design exploration; the [Duel review](../Review/ConnectionsHackerDuelV0/README.md) and current runtime/scene assets take precedence where its early hypotheses differ from shipped behavior.
+
+- One INTRUSION countdown per network at a time, then one active Command Race; developer, director, and explicit hostile-operation completion can schedule it. Scheduling attempts while occupied are rejected rather than queued.
+- Duel shares CLEAN's 710×465 footprint, target-aware floating placement and terminal chrome. Its short startup splash establishes the operator session before the race. The racing command sequences therefore need not begin with `ssh` again.
+- The player has stable reference commands, current row/token/character highlighting, conspicuous error feedback and Backspace correction, with automatic line advancement (no Enter). The independent seeded hacker types, errs and corrects. No mandatory tutorial or separate input field was added.
+- Duel preempts typing/Escape without cancelling an existing CLEAN; CLEAN resumes if still valid. The network continues by default, with a configurable pause policy, while the race/splash uses real time.
+- **V0 stakes:** win prevents the attempt; loss tries one configured infection via the normal infection system. The result/receipt reports application or rejection truthfully. **Neither randomized win rewards nor variable loss packages are implemented.** The first physical-keyboard tuning has felt relatively hard (one or two mistakes can cost the race); this is a playtest note, not a settled target.
+
+The November 9–13 follow-up design prioritizes **surprising and composable consequences** beyond one fixed infection, with a bounded consequence-pool slice before authored shift progression. See [Attack Pathways, Consequences & Surprise](connections-attack-pathways-and-surprise.md). The later direction does not authorize a generic event engine now; earlier sample commands, reward tables, timings, and example encounter below remain exploratory/historical where they differ from V0.
+
 ## The fantasy and why this is a distinct interaction
 
 An adversary sometimes directly challenges the operator to a short, high-pressure, keyboard-first contest. The operator sees **two people typing competing sequences of credible shell commands**, attempting to finish before the other. The point is the immediately understandable one-versus-one feeling of TypeRacer, not a deep shell parser, real execution of the displayed tools, or a test of prior Unix knowledge.
@@ -122,13 +134,13 @@ The more important realization is on **player victory**:
 
 The player knows what the hacker is trying to do, but **does not necessarily know in advance which benefit victory will produce**. Do **not** make the player stop to select one of three rewards. **Roll / dynamically resolve a benefit on success.** Some outcomes can feel especially powerful, others minor or awkwardly timed; that variance is acceptable and potentially interesting. It should be legible, attributable and at least mechanically valid, not necessarily optimized for the player's current situation.
 
-Potential successful-challenge outcomes (candidate pool, **not** fixed guarantees):
+Potential successful-challenge outcomes (candidate pool, **not** fixed guarantees; **not part of merged V0**):
 
 | Benefit | Tactical meaning / caveat |
 | --- | --- |
 | **Source revealed** | Reveal a hacker source identity useful for the proposed `block <source>` command. This should expose an *actionable source*, not magically block the entire adversary forever. Connections' future source tracing/blocking remains design work; see [investigation ideas](connections-threat-investigation-ideas.md). |
 | **Node protection** | Target node becomes immune to infections, Payload effects and/or Worm effects for a limited duration, with explicit scope. Exact protections and interactions with already-active infections/Conditions must be defined. |
-| **Probe recharge** | Reset or shorten cooldowns on proposed edge-mounted `probe` tools; its value depends on the player's current tools and cooldowns. Probe remains a proposed surveillance device, not a firewall. |
+| **Probe recharge** | Reset or shorten cooldowns on proposed edge-mounted `probe` tools; its value depends on the player's current tools and cooldowns. Probe X-ray is now implemented as temporary edge surveillance, not a firewall. |
 | **Delayed hostile plan** | The attacker must postpone an upcoming action, when such a scheduled action actually exists. |
 | **Hostile intelligence** | Reveal or flag relevant hostile traffic elsewhere, with knowledge distinct from hidden authoritative truth. |
 

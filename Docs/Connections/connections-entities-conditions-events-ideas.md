@@ -4,6 +4,14 @@
 
 **Implementation context:** [Node Status Presentation V0 (PR #61)](https://github.com/abeering/uptime-game/pull/61) and [Conditions & Port Scan V0 (PR #62)](https://github.com/abeering/uptime-game/pull/62) are the current experimental basis at the time of writing; both were open and PR #62 was stacked on #61. Their branch code is implementation authority, not the proposals below. Refer to [Connections Current State](Current_State.md), [Infections V0](connections-infections-v0.md), and the [PR #62 review notes](../Review/ConnectionsConditionsPortScanV0/README.md) before assuming what has shipped.
 
+## November 13, 2026 synthesis: pathways and surprise
+
+The early vocabulary here has become more concrete through BACKDOOR, Payload Launchers, Worms, and the merged [Hacker Duel V0](../Review/ConnectionsHackerDuelV0/README.md). The key new emphasis is **attack pathways rather than fixed species-specific consequences**: a connection, Worm, Payload, infection, or Duel supplies recognizable presentation and counterplay, but an event may request a different or compound consequence. A completed connection might start a Duel or Worm; a Duel loss might eventually cause a Condition-spreading outbreak or a Payload burst; a particular infection could later react to successful CLEAN. These example compositions are **not** evidence that all those chains already execute.
+
+**Surprise is a design goal, not a requirement for universal randomness.** The player should know the mechanics but not necessarily the hostile plan. Authored signature events, seeded eligible pools, context-sensitive follow-ups, delayed effects, difficulty, and future hacker preferences can all drive variety. Observable consequences should remain legible and actionable; covert infection knowledge and authoritative outcomes must not be fabricated. Do not hardcode one delivery surface to one consequence, or force every effect through a general-purpose framework prematurely.
+
+The consolidated working direction and next milestones are in [Attack Pathways, Consequences & Surprise](connections-attack-pathways-and-surprise.md). **Next:** a bounded Duel consequence experiment, then an authored progression/shift vertical slice. The full Level Director, generic packages, infection-spreading Worms, on-clean reactions, and attacker personalities remain deferred.
+
 ## Central design realization
 
 **Entity behavior and what an entity does are not one-to-one.** We can dramatically expand Uptime's hostile vocabulary by changing either dimension, then composing existing pieces into events. The most valuable distinction between entities is often the **kind of network motion, timing, evidence, and counterplay** they create — not a hardcoded attack attached to each entity class.
@@ -141,4 +149,4 @@ Completed events should retire from the **active runtime collection** after any 
 - How can reactive events create memorable differences between villains while maintaining room for randomness and genuine player agency?
 - When is a tiny new seam useful, and when would a general framework actually pay for itself?
 
-**Near-term posture:** Keep the initial Port Scan, Condition, and Reconnaissance V0 small; playtest first. This note preserves possible future mechanics, event grammar, and the architectural boundaries between them. It authorizes **no** new Conditions, entities, balancing changes, LevelDirector, or event scripting framework.
+**Original October 29 posture:** Keep the initial Port Scan, Condition, and Reconnaissance V0 small; playtest first. Those initial slices have since evolved; see [Current State](Current_State.md). The current near-term direction is a bounded Duel consequence experiment followed by authored shift progression, **not** a general event-scripting framework. This document remains design context, not implementation authorization.
