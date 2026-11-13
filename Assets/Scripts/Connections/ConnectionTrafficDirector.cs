@@ -573,6 +573,10 @@ namespace Uptime.Connections
                     selected = profile;
                     break;
                 }
+            // The manual Duel carrier is available in both scenes without changing
+            // their ambient profile catalog or weights.
+            if (selected == null && string.Equals(profileId, "duel-auth",
+                StringComparison.OrdinalIgnoreCase)) selected = DuelProfile();
             if (selected == null)
                 throw new InvalidOperationException("Unknown traffic profile: " + profileId);
             if (idHopping && idReactive)
@@ -1807,6 +1811,23 @@ namespace Uptime.Connections
             float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile
             { id = id, claimedPurpose = purpose, eligibleTargetIds = new[] { target },
                 ambientWeight = weight, operations = stages };
+        private static ConnectionTrafficProfile DuelProfile() => new ConnectionTrafficProfile
+        {
+            id = "duel-auth", claimedPurpose = "Auth intrusion probe",
+            eligibleTargetIds = new[] { "AUTH" }, ambientWeight = 0f,
+            isHostile = true,
+            operations = new[]
+            {
+                new ConnectionOperationProfile
+                {
+                    operation = OperationKind.Execute,
+                    activityDescription = "Probing authentication controls",
+                    minimumLoad = 2f, maximumLoad = 2f,
+                    minimumDuration = 8f, maximumDuration = 8f,
+                    completionEffect = CompletionEffect.DuelSchedule
+                }
+            }
+        };
         private static ConnectionTrafficProfile Purpose(string id, string purpose, string target,
             float weight, params ConnectionOperationProfile[] stages) => new ConnectionTrafficProfile
             { id = id, claimedPurpose = purpose, eligibleTargetIds = new[] { target },

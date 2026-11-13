@@ -8,6 +8,7 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform viewport;
         [SerializeField] private ConnectionsVideoCall videoCall;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
+        [SerializeField] private ConnectionsDuelOverlay duelOverlay;
         [SerializeField] private RectTransform[] callContent;
         [SerializeField] private RectTransform[] cleanContent;
         [SerializeField] private TextCommunicationDirector textCommunications;
@@ -18,8 +19,16 @@ namespace Uptime.Connections
         public void PlaceClean(NodeView target) => Place((RectTransform)cleanOverlay.transform,
             videoCall.IsActive ? (RectTransform)videoCall.transform : null, callContent, target);
 
+        public void PlaceDuel(NodeView target) => Place((RectTransform)duelOverlay.transform,
+            cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform :
+                videoCall.IsActive ? (RectTransform)videoCall.transform : null,
+            cleanOverlay.IsOpen ? cleanContent : callContent, target,
+            cleanOverlay.IsOpen && videoCall.IsActive ?
+                (RectTransform)videoCall.transform : null, callContent);
+
         private void Place(RectTransform window, RectTransform other,
-            RectTransform[] otherContent, NodeView target)
+            RectTransform[] otherContent, NodeView target,
+            RectTransform extraOther = null, RectTransform[] extraContent = null)
         {
             Canvas.ForceUpdateCanvases();
             Rect current = InViewport(window);
@@ -70,6 +79,13 @@ namespace Uptime.Connections
                     score += Overlap(rect, InViewport(other)) * .03f;
                     foreach (RectTransform existingPart in otherContent)
                         score += Overlap(rect, InViewport(existingPart)) * 10f;
+                }
+                if (extraOther != null)
+                {
+                    score += Overlap(rect, InViewport(extraOther)) * .03f;
+                    if (extraContent != null)
+                        foreach (RectTransform existingPart in extraContent)
+                            score += Overlap(rect, InViewport(existingPart)) * 10f;
                 }
                 if (textCommunications != null && textCommunications.isActiveAndEnabled)
                     foreach (RectTransform content in textCommunications.ReadableContent())

@@ -8,6 +8,8 @@ namespace Uptime.Connections
         private float cleanUntil = -1f;
 
         public bool Offline { get; private set; }
+        public bool IntrusionPending { get; private set; }
+        public float IntrusionRemainingSeconds { get; private set; }
         public bool KnownInfected { get; private set; }
         public bool AwarenessPreview { get; private set; }
         public bool PortScanned { get; private set; }
@@ -30,7 +32,7 @@ namespace Uptime.Connections
         public bool Overclocked { get; private set; }
         public float OverclockRemainingSeconds { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
-        public bool HasAny(float realTime) => Offline || KnownInfected ||
+        public bool HasAny(float realTime) => Offline || IntrusionPending || KnownInfected ||
             AwarenessPreview || PortScanned || ScanJammed || Backdoor || Isolated ||
             CleanVisible(realTime) || InterceptActive || Overclocked;
 
@@ -42,6 +44,12 @@ namespace Uptime.Connections
         }
 
         public void SetOffline(bool offline) => Offline = offline;
+
+        public void SetIntrusion(float remainingSeconds)
+        {
+            IntrusionPending = remainingSeconds >= 0f;
+            IntrusionRemainingSeconds = IntrusionPending ? remainingSeconds : 0f;
+        }
 
         // Presentation lab only: permit synthetic knowledge/acknowledgment overlap.
         // Gameplay continues to acquire these through ScanResult/CleanSucceeded.
@@ -127,6 +135,8 @@ namespace Uptime.Connections
         public void Reset()
         {
             Offline = false;
+            IntrusionPending = false;
+            IntrusionRemainingSeconds = 0f;
             KnownInfected = false;
             AwarenessPreview = false;
             PortScanned = false;

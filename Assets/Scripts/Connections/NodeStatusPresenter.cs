@@ -8,6 +8,7 @@ namespace Uptime.Connections
     public sealed class NodeStatusPresenter : MonoBehaviour
     {
         [SerializeField] private SimulationHost host;
+        [SerializeField] private ConnectionsDuelDirector duelDirector;
         [SerializeField] private RectTransform networkArea;
         [SerializeField] private RectTransform statusLayer;
         [SerializeField] private NodeStatusView statusPrefab;
@@ -37,6 +38,7 @@ namespace Uptime.Connections
         private void OnEnable()
         {
             if (host == null) return;
+            if (duelDirector == null) duelDirector = host.GetComponent<ConnectionsDuelDirector>();
             host.ScanCompleted += OnScanCompleted;
             host.CleanSucceeded += OnCleanSucceeded;
             host.BlackoutApplied += OnBlackoutApplied;
@@ -107,6 +109,8 @@ namespace Uptime.Connections
                 NodeView card = node.View;
                 NodeStatusState state = states[card];
                 state.SetOffline(host.IsNodeOffline(card));
+                state.SetIntrusion(duelDirector != null ?
+                    duelDirector.RemainingFor(card) : -1f);
                 state.SetPortScanned(host.ConditionFor(card, ConditionKind.PortScanned),
                     host.SimulationTimeSeconds);
                 state.SetScanJammed(host.ConditionFor(card, ConditionKind.ScanJammed),

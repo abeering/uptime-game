@@ -174,6 +174,21 @@ namespace Uptime.Connections
         public int sequence;
         public float timeSeconds;
         public string type;
+        public int duelId;
+        public string duelVariant;
+        public string duelLifecycle;
+        public string duelSource;
+        public float duelWarningSeconds;
+        public float duelPlayerSeconds;
+        public float duelHackerSeconds;
+        public bool duelPlayerCompleted;
+        public bool duelHackerCompleted;
+        public int duelPlayerMistakes;
+        public int duelPlayerCorrections;
+        public int duelHackerMistakes;
+        public int duelHackerCorrections;
+        public string duelOutcome;
+        public bool duelInfectionApplied;
         public string connectionId;
         public string advertisedIdentity;
         public string previousIdentity;
@@ -1143,6 +1158,33 @@ namespace Uptime.Connections
             entry.reason = reason;
             entry.probeLinkId = probeLinkId;
             return entry.sequence;
+        }
+
+        public void RecordDuel(string type, DuelEncounter encounter, float time,
+            string attemptedSource = null, string attemptedTarget = null,
+            string reason = null, CommandRaceSession race = null)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(type, time);
+            entry.duelId = encounter?.Id ?? 0;
+            entry.duelVariant = encounter?.Variant.ToString();
+            entry.duelLifecycle = encounter?.Lifecycle.ToString();
+            entry.duelSource = attemptedSource ?? encounter?.Source;
+            entry.targetNodeId = attemptedTarget ?? encounter?.Target?.View?.NodeId;
+            entry.duelWarningSeconds = encounter?.WarningSeconds ?? 0f;
+            entry.reason = reason;
+            entry.duelOutcome = encounter?.PlayerWon == true ? "won" :
+                encounter?.PlayerWon == false ? "lost" : null;
+            entry.duelInfectionApplied = encounter?.InfectionApplied == true;
+            if (race == null) return;
+            entry.duelPlayerCompleted = race.PlayerCompletedAt.HasValue;
+            entry.duelHackerCompleted = race.HackerCompletedAt.HasValue;
+            entry.duelPlayerSeconds = race.PlayerCompletedAt ?? -1f;
+            entry.duelHackerSeconds = race.HackerCompletedAt ?? -1f;
+            entry.duelPlayerMistakes = race.Player.Mistakes;
+            entry.duelPlayerCorrections = race.Player.Corrections;
+            entry.duelHackerMistakes = race.Hacker.Mistakes;
+            entry.duelHackerCorrections = race.Hacker.Corrections;
         }
 
         public void RecordProbe(string type, string linkId, float time,

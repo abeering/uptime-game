@@ -7,4 +7,7 @@ namespace Uptime.Connections
         void SetEscapeTarget(bool targeted);
         void DismissFromEscape();
     }
+
+    // The active Duel keeps Escape even when a passive call opens later.
+    public interface IExclusiveEscapeTarget { }
 }
