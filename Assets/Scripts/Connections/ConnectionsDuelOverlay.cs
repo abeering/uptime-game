@@ -17,23 +17,28 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private Terminal terminal;
         [SerializeField] private TMP_Text title;
+        [SerializeField] private TMP_Text splashText;
         [SerializeField] private TMP_Text playerCommands;
         [SerializeField] private TMP_Text hackerCommands;
         [SerializeField] private TMP_Text resultText;
         [SerializeField] private Image playerProgress;
         [SerializeField] private Image hackerProgress;
         [SerializeField, Min(0f)] private float resultSeconds = 1.1f;
+        [SerializeField, Min(0f)] private float splashCharacterSeconds = 0.012f;
 
         private DuelEncounter encounter;
         private CommandRaceSession race;
         private ConnectionsDuelDirector director;
         private Coroutine resultRoutine;
+        private Coroutine splashRoutine;
         private Keyboard subscribedKeyboard;
         private float nextBackspaceAt;
         private bool backspaceHeld;
         private bool waitingForRelease;
+        private bool racing;
 
         public bool IsOpen => encounter != null && gameObject.activeInHierarchy;
+        public bool IsRacing => IsOpen && racing;
         public bool CanDismissWithEscape => IsOpen;
         public void SetEscapeTarget(bool targeted) { }
         public void DismissFromEscape() { } // Consumed; a Duel has no dismissal action.
@@ -45,9 +50,14 @@ namespace Uptime.Connections
             this.encounter = encounter;
             this.race = race;
             this.director = director;
+            racing = false;
             gameObject.SetActive(true);
             title.text = "INTRUSION DUEL  /  " + encounter.Target.View.NodeId;
             resultText.gameObject.SetActive(false);
+            playerCommands.transform.parent.gameObject.SetActive(false);
+            hackerCommands.transform.parent.gameObject.SetActive(false);
+            splashText.text = string.Empty;
+            splashText.gameObject.SetActive(true);
             terminal?.SuspendKeyboard(true);
             cleanOverlay?.SuspendKeyboard(true);
             placement.PlaceDuel(encounter.Target.View);
@@ -59,11 +69,37 @@ namespace Uptime.Connections
                 subscribedKeyboard.anyKey.isPressed;
             if (subscribedKeyboard != null) subscribedKeyboard.onTextInput += OnTextInput;
             Render();
+            splashRoutine = StartCoroutine(ShowSplash());
+        }
+
+        private IEnumerator ShowSplash()
+        {
+            string node = encounter.Target.View.NodeId;
+            string text = "INTRUSION DETECTED / " + node + "\n\nssh operator@" +
+                node.ToLowerInvariant() + "\nAUTHENTICATING... OK\n" +
+                "INITIALIZING COUNTERMEASURES...";
+            foreach (char character in text)
+            {
+                splashText.text += character;
+                yield return new WaitForSecondsRealtime(splashCharacterSeconds);
+            }
+            yield return new WaitForSecondsRealtime(.25f);
+            // A held key at the handoff must not type into the newly revealed race.
+            while (Keyboard.current != null && Keyboard.current.anyKey.isPressed)
+                yield return null;
+            if (encounter == null) yield break;
+            splashText.gameObject.SetActive(false);
+            playerCommands.transform.parent.gameObject.SetActive(true);
+            hackerCommands.transform.parent.gameObject.SetActive(true);
+            waitingForRelease = false;
+            racing = true;
+            splashRoutine = null;
+            Render();
         }
 
         private void OnTextInput(char character)
         {
-            if (encounter == null || encounter.Lifecycle != DuelLifecycle.Active ||
+            if (!racing || encounter == null || encounter.Lifecycle != DuelLifecycle.Active ||
                 waitingForRelease) return;
             if (character == '\b') return;
             race.TypePlayer(character);
@@ -86,6 +122,7 @@ namespace Uptime.Connections
                 if (keyboard != null && keyboard.anyKey.isPressed) return;
                 waitingForRelease = false;
             }
+            if (!racing) return;
             bool pressed = keyboard != null && keyboard.backspaceKey.isPressed;
             if (!pressed) backspaceHeld = false;
             else if (!backspaceHeld || Time.unscaledTime >= nextBackspaceAt)
@@ -139,6 +176,8 @@ namespace Uptime.Connections
 
         private void CloseWindow()
         {
+            if (splashRoutine != null) StopCoroutine(splashRoutine);
+            splashRoutine = null;
             if (resultRoutine != null) StopCoroutine(resultRoutine);
             resultRoutine = null;
             if (subscribedKeyboard != null) subscribedKeyboard.onTextInput -= OnTextInput;
@@ -147,6 +186,7 @@ namespace Uptime.Connections
             encounter = null;
             race = null;
             director = null;
+            racing = false;
             gameObject.SetActive(false);
             cleanOverlay?.SuspendKeyboard(false);
             terminal?.SuspendKeyboard(false);

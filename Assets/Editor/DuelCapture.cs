@@ -146,6 +146,39 @@ namespace Uptime.Connections.EditorTools
                 Frame("01-intrusion-countdown");
                 host.StepSimulation(3f);
                 if (!overlay.IsOpen) throw new InvalidOperationException("Duel did not open");
+                CommandRaceSession race = Race();
+                if (overlay.IsRacing || race.ElapsedSeconds != 0f ||
+                    race.Hacker.CorrectCharacters != 0)
+                    throw new InvalidOperationException("Race started during startup splash");
+                Frame("02-splash-start");
+                Type('s');
+                if (race.Player.Draft.Length != 0)
+                    throw new InvalidOperationException("Splash accepted race typing");
+                Time.timeScale = 1f;
+                yield return new WaitForSecondsRealtime(.35f);
+                TMP_Text splash = Field<TMP_Text>(overlay, "splashText");
+                if (!splash.text.Contains("INTRUSION DETECTED / AUTH") ||
+                    splash.text.Contains("INITIALIZING COUNTERMEASURES..."))
+                    throw new InvalidOperationException("Splash did not reveal progressively");
+                if (race.ElapsedSeconds != 0f || race.Hacker.Draft.Length != 0)
+                    throw new InvalidOperationException("Hacker progressed during splash");
+                Frame("02-splash-mid");
+                for (int i = 0; i < 120 &&
+                    !splash.text.Contains("INITIALIZING COUNTERMEASURES..."); i++)
+                    yield return new WaitForSecondsRealtime(.025f);
+                if (!splash.text.Contains("ssh operator@auth\nAUTHENTICATING... OK\n" +
+                    "INITIALIZING COUNTERMEASURES...") || overlay.IsRacing ||
+                    race.ElapsedSeconds != 0f || race.Hacker.Draft.Length != 0)
+                    throw new InvalidOperationException("Complete splash or frozen race missing");
+                Frame("02-splash-ready");
+                for (int i = 0; i < 120 && !overlay.IsRacing; i++)
+                    yield return new WaitForSecondsRealtime(.025f);
+                if (!overlay.IsRacing || !splash.text.Contains("ssh operator@auth") ||
+                    race.ElapsedSeconds > .1f || race.Hacker.CorrectCharacters != 0 ||
+                    race.Player.Draft.Length != 0)
+                    throw new InvalidOperationException("Splash handoff or equal race start failed");
+                Time.timeScale = 0f;
+                Frame("02-splash-complete");
                 Frame("02-duel-start");
                 float frozenClock = host.SimulationTimeSeconds;
                 Set(director, "continueSimulationDuringDuel", false);
@@ -158,20 +191,19 @@ namespace Uptime.Connections.EditorTools
                 if (host.SimulationTimeSeconds <= frozenClock)
                     throw new InvalidOperationException("Continuing Duel froze simulation");
                 Time.timeScale = 0f;
-                CommandRaceSession race = Race();
-                foreach (char c in "ssh operator@") Type(c);
+                foreach (char c in "ss -tnp | grep ") Type(c);
                 race.Advance(5f);
                 RenderOverlay();
                 Frame("03-duel-partial");
                 Type('x');
-                if (race.Player.CorrectCharacters != "ssh operator@".Length)
+                if (race.Player.CorrectCharacters != "ss -tnp | grep ".Length)
                     throw new InvalidOperationException("Player error advanced correct progress");
                 Frame("04-player-error");
                 Type('u');
                 Type('t');
-                if (race.Player.ErrorStartIndex != "ssh operator@".Length ||
+                if (race.Player.ErrorStartIndex != "ss -tnp | grep ".Length ||
                     race.Player.Mistakes != 3 ||
-                    race.Player.CorrectCharacters != "ssh operator@".Length)
+                    race.Player.CorrectCharacters != "ss -tnp | grep ".Length)
                     throw new InvalidOperationException("Extended error run granted progress");
                 Frame("05-error-run");
                 race.BackspacePlayer();
@@ -225,7 +257,7 @@ namespace Uptime.Connections.EditorTools
                 TMP_InputField pid = Field<TMP_InputField>(clean, "pidInput");
                 string draft = "123";
                 pid.SetTextWithoutNotify(draft);
-                if (!director.TrySchedule("AUTH", DuelVariant.CommandRace, 0f,
+                if (!director.TrySchedule("API", DuelVariant.CommandRace, 0f,
                     "scripted_capture", out reason))
                     throw new InvalidOperationException(reason);
                 if (!clean.IsOpen || host.ActiveClean != session || pid.text != draft ||
@@ -241,7 +273,13 @@ namespace Uptime.Connections.EditorTools
                 typeof(EscapeCoordinator).GetMethod("ProcessEscape", Private)
                     .Invoke(escape, new object[] { false, Time.unscaledTimeAsDouble + 1.1d });
                 CommandRaceSession defeat = Race();
-                foreach (char c in "ssh opera") Type(c);
+                for (int i = 0; i < 120 && !overlay.IsRacing; i++)
+                    yield return new WaitForSecondsRealtime(.025f);
+                if (!overlay.IsRacing || !Field<TMP_Text>(overlay, "splashText").text
+                    .Contains("ssh operator@api") || pid.text != draft ||
+                    commandInput.text.Length != 0)
+                    throw new InvalidOperationException("CLEAN or focus changed during Duel startup");
+                foreach (char c in "ss -tnp") Type(c);
                 if (pid.text != draft || commandInput.text.Length != 0)
                     throw new InvalidOperationException("Duel typing leaked to another field");
                 defeat.Advance(3f);
@@ -259,7 +297,7 @@ namespace Uptime.Connections.EditorTools
                     throw new InvalidOperationException("CLEAN did not resume intact");
                 Frame("13-clean-restored");
                 Debug.Log("DuelCapture PASS: " + gameObject.scene.name + " " + width +
-                    "x" + height + " thirteen scripted Play Mode frames in " + output);
+                    "x" + height + " seventeen scripted Play Mode frames in " + output);
         }
 
         private CommandRaceSession Race() => Field<CommandRaceSession>(overlay, "race");
@@ -278,7 +316,7 @@ namespace Uptime.Connections.EditorTools
             statuses.RenderNow(Time.unscaledTime, 1f);
             paths.RefreshLayouts();
             Canvas.ForceUpdateCanvases();
-            if (overlay.IsOpen) CheckReferenceLayout();
+            if (overlay.IsRacing) CheckReferenceLayout();
             cameraForCapture.Render();
             RenderTexture previous = RenderTexture.active;
             try

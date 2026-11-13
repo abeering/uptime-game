@@ -13,8 +13,12 @@ design work.
 1. Open either Connections scene and enter Play Mode. Use `duel auth 5` or
    `duel db 5` in the terminal. The number is simulation seconds before launch;
    omit it for the Inspector default. The target shows `INTRUSION` and a
-   countdown. `duel auth 0` starts immediately.
-2. Type the displayed commands in the **YOU** pane. The `>` prompts are not
+   countdown. `duel auth 0` opens the window immediately, types an unscaled
+   `INTRUSION DETECTED / AUTH` startup with `ssh operator@auth`, then reveals
+   the race. The splash establishes the operator's remote session; no racer
+   clock or hacker typing advances until the splash ends and held keys release.
+2. Type the displayed commands in the **YOU** pane. The first command now
+   checks the active SSH connection rather than reconnecting. The `>` prompts are not
    typed; Enter is not needed. A wrong character must be removed with Backspace.
    The hacker types independently, including visible mistakes and corrections.
 3. For a connection-triggered demonstration, run `spawn duel-auth`. It queues a
@@ -51,11 +55,12 @@ when a command completes; Enter is ignored. The hacker still displays its own
 typed characters, including mistakes and corrections. This remains a single text
 surface with no extra input field.
 
-For a manual typing check, trigger `duel auth 0`, type `ssh operator@`, then
-press `xut`. Confirm the expected `aut` remains visible in red while the
+For a manual typing check, trigger `duel auth 0`, wait for the startup to
+finish, type `ss -tnp | grep `, then press `xut`. Confirm the expected `:22`
+remains visible in red while the
 progress bar stays at the clean prefix. Backspace three times, checking that
 the red run shrinks one character at a time, then continue through
-`ssh operator@auth`. Press Enter and immediately type `t`:
+`ss -tnp | grep :22`. Press Enter and immediately type `t`:
 the second command should accept it. Check the active token again while
 typing the `/var/log/auth.log` path, and finish all commands without Enter.
 
@@ -67,8 +72,11 @@ hacker character time, timing variance, hesitation and typo chances, and the
 loss infection type/parameter. The initial player sequence is about 86 typed
 characters; the default hacker is intended to finish around 18–20 real seconds.
 This needs physical keyboard playtesting, particularly novice readability and
-whether the race pressure is enjoyable. `ConnectionsDuelOverlay` owns only the
-result display duration.
+whether the race pressure is enjoyable. `ConnectionsDuelOverlay` owns the
+unscaled splash character interval (0.012 seconds), the 0.25-second handoff,
+and result display duration. The startup uses the actual node ID; it does not
+assert that an infection is already installed. The race starts both competitors
+together after the splash.
 
 At **1920×1080** and **1280×720**, inspect the two-pane text size and line
 spacing, target-aware placement around crowded nodes, simultaneous CLEAN and
@@ -81,14 +89,16 @@ Escape, and a CLEAN session that ends authoritatively while it is covered.
 `Tools > Connections > Run Duel Witness` runs deterministic race and scene
 checks in Edit Mode. `Tools > Connections > Capture Duel Play Mode Review`
 starts a scripted Play Mode run for a scene selected with `-duelScene` and a
-size selected with `-duelWidth`/`-duelHeight`. Its thirteen frames show the
-countdown, start, partial input, one error, a three-character error run, two
-stages of Backspace correction, automatic line advance, a punctuation-heavy
+size selected with `-duelWidth`/`-duelHeight`. Its seventeen frames show the
+countdown, startup opening/partial reveal/full text/handoff, race start, partial input,
+one error, a three-character error run, two stages of Backspace correction,
+automatic line advance, a punctuation-heavy
 path token, victory, Duel over CLEAN, defeat, and restored CLEAN. These
 captures use scripted character entry; they are **not
 physical keyboard playtest evidence**. The capture runner also checks that the
 parsed reference and every glyph position, baseline, and line number stay unchanged
-through the race, as well as live versus paused simulation, Escape ownership,
+through the race, as well as no typing or hacker progress during startup, the
+AUTH and API target text, live versus paused simulation, Escape ownership,
 and focus transfer.
 
 Unity 6000.3.11f1 validation on an isolated project copy passed the Duel
@@ -96,7 +106,7 @@ Edit Mode witness, the CLEAN window Edit Mode witness in both scenes, and the
 Escape/video-call Play Mode witness in both scenes. All four scripted capture
 runs passed: both scenes at 1920×1080 and 1280×720. The earlier V0 Infection
 Edit Mode witness also passed before this presentation refinement.
-The 52 PNGs in `Captures/` are the final authored UI captures. For batch
+The 68 PNGs in `Captures/` are the final authored UI captures. For batch
 captures only, the isolated copy suppressed a broken Unity Search startup
 callback; the workaround is not part of this PR. Physical-keyboard timing,
 long holds, and subjective difficulty still need a human Play Mode pass.
