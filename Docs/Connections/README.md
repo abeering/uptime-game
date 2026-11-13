@@ -9,6 +9,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 ## Current state and integrated contracts
 
 - [Current State](Current_State.md) — implementation baseline, validation, and source authority.
+- [Hacker Duel V0 review](../Review/ConnectionsHackerDuelV0/README.md) — merged PR #110: node INTRUSION warning, CLEAN-sized Command Race with startup splash, one global Duel slot, interruption/focus restoration, and single-infection loss effect.
 - [LOAD foundation](connections-arcade-load-v1.md) — target-node LOAD capacity, proportional allocation, and WORK.
 - [Operation arcs](connections-arcade-operation-arcs-v1.md) — READ/WRITE/EXECUTE stages and visual presentation.
 - [Traffic generation](connections-arcade-traffic-v0.md) — generated benign profiles, spawn plans, and cadence.
@@ -35,7 +36,8 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 
 ## Working designs, not implemented contracts
 
-- [Hacker challenges, command races & skill rewards](connections-hacker-command-races.md) — working two-pane hacker-initiated TypeRacer design, optional live network, authentic-feeling commands, rolled success benefits, reusable terminal Event Cards, and upgrade ideas. **Design exploration; not an implementation contract.**
+- [Attack pathways, consequences & surprise](connections-attack-pathways-and-surprise.md) — November 2026 design synthesis separating triggers, delivery surfaces, consequences, and selection policy; bounded Surprise V0 followed by an authored progression slice. **Future direction, not an implemented event framework.**
+- [Hacker challenges, command races & skill rewards](connections-hacker-command-races.md) — November 1 historical design with a November 13 implementation reconciliation; Duel V0 is merged, while variable consequences, positive rewards, event cards, and upgrade ideas remain proposals.
 - [Windowed workspace, Escape & communications V0](connections-windowed-workspace-comms-v0.md) — original October 30 direction, reconciled with implemented desktop/CLEAN/calls/Escape/text messaging (#69–#74) and still-open menu, pause, narrative and density questions. **Partially implemented; use current contracts for executable behavior.**
 - [Entities, Conditions, statuses, and reactive events](connections-entities-conditions-events-ideas.md) — exploratory separation of network motion, effects, timed Conditions, persistent infections, player-visible knowledge, and ambient/directed event lifecycles; candidate indirect-pressure Conditions and on-resolution villain behavior. **Not an implementation plan.**
 - [Threat signals, investigation, and response](connections-threat-investigation-ideas.md) — exploratory connection logs, SPIKING, proposed kill/trace/source-block commands, temporary edge probes, covert node infections, asynchronous scanning, and risky blind cleaning. **Not an approved implementation plan.**
