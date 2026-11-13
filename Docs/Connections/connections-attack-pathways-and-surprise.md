@@ -33,15 +33,15 @@ An event need not die when its initiating entity dies. Conversely, killing a car
 - **Preserve causal evidence.** Record the selected package, source, target, seed/roll where relevant, scheduled and actual action times, and each success/rejection. Player-facing receipts report what was genuinely observed or applied, not secret future intentions.
 - **Avoid fake comeback mechanics.** A Duel opponent's progress remains its own; unpredictable consequences should not secretly rubber-band to the player's momentary performance.
 
-### Illustrative consequence candidates (not implemented as a common package pool)
+### Illustrative consequence candidates
 
 | Candidate | New tactical situation | Current limitation |
 | --- | --- | --- |
-| Infection + temporary **CLEAN LOCKED** | Compromise persists while immediate remediation is unavailable | CLEAN LOCKED is a proposed Condition/tool restriction, not implemented |
-| Condition-spreading Worm outbreak | Visible branching pressure and node isolation decisions | Existing Worm effects include SCAN JAMMED, PORT SCANNED, BACKDOOR; a generic Duel-loss Worm package is not integrated |
+| Infection + temporary **CLEAN LOCKED** | Compromise persists while immediate remediation is unavailable | Implemented in Surprise V0 as Breach & Lockdown; the lock may apply when infection installation fails |
+| Condition-spreading Worm outbreak | Visible branching pressure and node isolation decisions | Surprise V0 selects SCAN JAMMED or BACKDOOR on the existing Worm system |
 | Infection-spreading Worm | Persistent compromise may spread across multiple nodes | Worms do **not** currently install persistent infections |
-| CLEAN LOCKED without an infection | Creates uncertainty without fabricating a diagnosis | Requires the new lock behavior; a subsequent CLEAN may legitimately find nothing |
-| Multiple attacking Payloads from one location | Immediate interception/triage under pressure | Individual Payload launch mechanisms exist; a reusable burst package is not implemented |
+| CLEAN LOCKED without an infection | Creates uncertainty without fabricating a diagnosis | Supported as a direct atomic Condition; the default Duel Tactic also attempts an infection |
+| Multiple attacking Payloads from one location | Immediate interception/triage under pressure | Surprise V0 resolves distinct reachable destinations at Duel scheduling |
 | Duel victory benefit | Skill creates an unexpected *advantage*, not just the absence of harm | Source reveal, protection, Probe recharge and other rolled benefits remain candidates |
 
 Other possible pathways include a hostile connection scheduling a Duel or a Worm, a targeted infection with an **onClean** reaction, and a coordinated follow-up after reconnaissance. These are **examples of composition**, not a checklist to ship in one milestone. Don't assume any example is balanced or guaranteed to be feasible at an arbitrary target.
@@ -56,11 +56,11 @@ Selection should be valid for the current topology and available systems. If a p
 
 A chain may emit another event, but recursion, repeated on-clean triggers and unlimited outbreak fan-out require explicit bounded behavior. Do **not** build an arbitrary event graph now.
 
-## Grounded implementation boundary — after Duel PR #110
+## Grounded implementation boundary — Surprise V0 branch
 
-**Implemented:** Connections Command Race Duel has a visible INTRUSION countdown, a CLEAN-sized node-targeted terminal window and operator-session startup splash, one global pending/active Duel slot, developer/director/hostile-connection scheduling, an independent seeded hacker, CLEAN focus suspension/restoration, and V0 outcomes (**win prevents intrusion; loss attempts one configured infection**). See the [Duel review](../Review/ConnectionsHackerDuelV0/README.md). The initial opponent tuning has felt fairly punishing even after a mistake or two; retain this as playtest balancing feedback, not a new architectural requirement.
+**Implemented in the Surprise V0 branch:** Connections Command Race Duel retains its visible warning, startup splash, global slot, seeded hacker, and CLEAN focus behavior from [Duel V0](../Review/ConnectionsHackerDuelV0/README.md). Each accepted Duel now stores a concrete, seeded loss plan before countdown. The shared planner accepts atomic effects, named Tactics, and inline compound candidates; defaults, additions, explicit together-lists, and custom weight overrides share one vocabulary. A loss executes that stored plan component by component. Advanced hostile opportunities can schedule a Duel directly or queue a killable target-aware connection whose completion schedules one. See [Surprise V0](connections-surprise-v0.md). Rival difficulty remains a playtest tuning question.
 
-**Not implemented:** A rolled Duel-success reward, a Duel-loss consequence pool, CLEAN LOCKED, infection-spreading Worms, shared cross-system event packages, general on-clean reactions, a Level Director, hacker personalities, or shift-to-shift progression. Existing Worm/Condition/Payload/connection mechanisms are building blocks, not evidence that these compositions already run.
+**Not implemented:** A rolled Duel-success reward, infection-spreading Worms, migration of every threat into the shared planner, general on-clean reactions, a Level Director, hacker personalities, or shift-to-shift progression. The planner is threat-neutral, but Duel is its first runtime consumer.
 
 ### Intended order of work
 

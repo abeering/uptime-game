@@ -6507,6 +6507,8 @@ MonoBehaviour:
   payloadWeight: 0
   wormWeight: 0
   payloadLauncherWeight: 0
+  directDuelWeight: 0
+  connectionDuelWeight: 0
   variablePayloadChance: 0.5
   scanJammedWormChance: 0.7
   backdoorWormChance: 0

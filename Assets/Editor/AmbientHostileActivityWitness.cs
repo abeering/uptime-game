@@ -19,6 +19,8 @@ namespace Uptime.Connections.EditorTools
             var fourTraffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             Check(fourNode != null && fourTraffic != null &&
                 fourNode.PayloadWeight == 0f && fourNode.WormWeight == 0f &&
+                fourNode.DirectDuelWeight == 0f &&
+                fourNode.ConnectionDuelWeight == 0f &&
                 fourNode.PayloadLauncherWeight == 0f &&
                 fourTraffic.PayloadSpawnerWeight == 0f &&
                 fourTraffic.HostileMeanIntervalSeconds == 54f,
@@ -33,6 +35,8 @@ namespace Uptime.Connections.EditorTools
                 activities.OrdinaryWeight == 4f && activities.ReconnaissanceWeight == 2f &&
                 activities.PayloadWeight == 2f && activities.WormWeight == 1f &&
                 activities.PayloadLauncherWeight == 1f &&
+                activities.DirectDuelWeight == 1f &&
+                activities.ConnectionDuelWeight == 1f &&
                 traffic.PayloadSpawnerWeight == 1f &&
                 activities.VariablePayloadChance == .5f &&
                 activities.ScanJammedWormChance == .7f,
@@ -334,6 +338,8 @@ namespace Uptime.Connections.EditorTools
             director.PayloadWeight = payload;
             director.WormWeight = worm;
             director.PayloadLauncherWeight = 0f;
+            director.DirectDuelWeight = 0f;
+            director.ConnectionDuelWeight = 0f;
         }
 
         private static bool IsIngress(ConnectionTrafficDirector traffic, string id) =>

@@ -19,9 +19,10 @@ namespace Uptime.Connections
         public string TargetNodeId { get; internal set; }
         public string PayloadProfile { get; internal set; }
         public string WormEffect { get; internal set; }
+        public int DuelId { get; internal set; }
         public string Reason { get; internal set; }
         public bool Succeeded => ConnectionId != null || PayloadId != null ||
-            WormOutbreakId != null;
+            WormOutbreakId != null || DuelId > 0;
     }
 
     // Chooses activity at the existing hostile opportunity; owns one short event lifecycle.
@@ -34,6 +35,8 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float payloadWeight;
         [SerializeField, Min(0f)] private float wormWeight;
         [SerializeField, Min(0f)] private float payloadLauncherWeight;
+        [SerializeField, Min(0f)] private float directDuelWeight;
+        [SerializeField, Min(0f)] private float connectionDuelWeight;
         [SerializeField, Range(0f, 1f)] private float variablePayloadChance = .5f;
         [SerializeField, Range(0f, 1f)] private float scanJammedWormChance = .7f;
         [SerializeField, Range(0f, 1f)] private float backdoorWormChance;
@@ -66,6 +69,8 @@ namespace Uptime.Connections
         public float PayloadWeight { get => payloadWeight; set => payloadWeight = Mathf.Max(0f, value); }
         public float WormWeight { get => wormWeight; set => wormWeight = Mathf.Max(0f, value); }
         public float PayloadLauncherWeight { get => payloadLauncherWeight; set => payloadLauncherWeight = Mathf.Max(0f, value); }
+        public float DirectDuelWeight { get => directDuelWeight; set => directDuelWeight = Mathf.Max(0f, value); }
+        public float ConnectionDuelWeight { get => connectionDuelWeight; set => connectionDuelWeight = Mathf.Max(0f, value); }
         public float VariablePayloadChance { get => variablePayloadChance; set => variablePayloadChance = Mathf.Clamp01(value); }
         public float ScanJammedWormChance { get => scanJammedWormChance; set => scanJammedWormChance = Mathf.Clamp01(value); }
         public float BackdoorWormChance { get => backdoorWormChance; set => backdoorWormChance = Mathf.Clamp01(value); }
@@ -102,6 +107,8 @@ namespace Uptime.Connections
             float total = Mathf.Max(0f, ordinaryWeight) + Mathf.Max(0f, reconnaissanceWeight) +
                 Mathf.Max(0f, payloadWeight) + Mathf.Max(0f, wormWeight) +
                 Mathf.Max(0f, payloadLauncherWeight);
+            total += Mathf.Max(0f, directDuelWeight) +
+                Mathf.Max(0f, connectionDuelWeight);
             var result = new AmbientHostileActivityResult();
             if (total <= 0f)
             {
@@ -117,7 +124,11 @@ namespace Uptime.Connections
                     choice < ordinaryWeight + reconnaissanceWeight + payloadWeight ?
                         "payload" :
                     choice < ordinaryWeight + reconnaissanceWeight + payloadWeight +
-                        wormWeight ? "worm" : "payload_launcher";
+                        wormWeight ? "worm" :
+                    choice < ordinaryWeight + reconnaissanceWeight + payloadWeight +
+                        wormWeight + payloadLauncherWeight ? "payload_launcher" :
+                    choice < total - connectionDuelWeight ? "direct_duel" :
+                        "connection_duel";
                 try
                 {
                     switch (result.Activity)
@@ -151,6 +162,16 @@ namespace Uptime.Connections
                             }
                             else result.Reason = "ids_exhausted";
                             break;
+                        case "direct_duel":
+                            SpawnDirectDuel(result);
+                            break;
+                        case "connection_duel":
+                            result.ConnectionPlan = traffic.GenerateDuelCarrierPlan(atTime);
+                            if (result.ConnectionPlan != null)
+                                traffic.QueueSpawnPlan(result.ConnectionPlan,
+                                    "ambient_duel_carrier");
+                            else result.Reason = "ids_exhausted";
+                            break;
                     }
                 }
                 catch (InvalidOperationException error)
@@ -166,6 +187,34 @@ namespace Uptime.Connections
             host.Recorder?.RecordHostileActivity(host.SimulationTimeSeconds, atTime,
                 result, this);
             return result;
+        }
+
+        private void SpawnDirectDuel(AmbientHostileActivityResult result)
+        {
+            ConnectionsDuelDirector duels = host.GetComponent<ConnectionsDuelDirector>();
+            if (duels == null)
+            { result.Reason = "duel_unavailable"; return; }
+            var targets = new List<NodeView>();
+            foreach (NodeResources node in host.Nodes)
+                if (node?.View != null && !IsAmbientOrigin(node.View.NodeId))
+                    targets.Add(node.View);
+            if (targets.Count == 0)
+            { result.Reason = "no_internal_target"; return; }
+            targets.Sort((a, b) => StringComparer.Ordinal.Compare(a.NodeId, b.NodeId));
+            NodeView target = targets[random.Next(targets.Count)];
+            result.TargetNodeId = target.NodeId;
+            if (duels.TrySchedule(target.NodeId, DuelVariant.CommandRace,
+                duels.DefaultWarningSeconds, "ambient_direct_duel", out string reason))
+                result.DuelId = duels.Current.Id;
+            else result.Reason = reason;
+        }
+
+        private bool IsAmbientOrigin(string id)
+        {
+            foreach (AmbientOriginWeight entry in traffic.EffectiveAmbientOrigins)
+                if (entry != null && string.Equals(entry.nodeId, id,
+                    StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
         }
 
         private void SpawnAmbientPayload(AmbientHostileActivityResult result)

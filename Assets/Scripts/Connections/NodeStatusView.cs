@@ -58,7 +58,7 @@ namespace Uptime.Connections
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
         {
             bool pain = state.Offline || state.IntrusionPending || state.KnownInfected ||
-                state.ScanJammed || state.Backdoor;
+                state.ScanJammed || state.Backdoor || state.CleanLocked;
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
             bool intercept = state.InterceptActive;
@@ -98,6 +98,8 @@ namespace Uptime.Connections
                 var timers = new List<float?>();
                 if (state.IntrusionPending)
                 { rows.Add("INTRUSION"); timers.Add(state.IntrusionRemainingSeconds); }
+                if (state.CleanLocked)
+                { rows.Add("CLEAN LOCKED"); timers.Add(state.CleanLockRemainingSeconds); }
                 if (state.Offline) { rows.Add("OFFLINE"); timers.Add(null); }
                 if (state.KnownInfected) { rows.Add("INFECTED"); timers.Add(null); }
                 if (state.ScanJammed)

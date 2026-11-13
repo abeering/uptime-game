@@ -20,6 +20,8 @@ namespace Uptime.Connections
         public float ScanJamRemainingSeconds { get; private set; }
         public bool Backdoor { get; private set; }
         public float BackdoorRemainingSeconds { get; private set; }
+        public bool CleanLocked { get; private set; }
+        public float CleanLockRemainingSeconds { get; private set; }
         public bool Isolated { get; private set; }
         public float IsolationRemainingFraction { get; private set; }
         public float IsolationRemainingSeconds { get; private set; }
@@ -33,7 +35,7 @@ namespace Uptime.Connections
         public float OverclockRemainingSeconds { get; private set; }
         public bool CleanVisible(float realTime) => realTime < cleanUntil;
         public bool HasAny(float realTime) => Offline || IntrusionPending || KnownInfected ||
-            AwarenessPreview || PortScanned || ScanJammed || Backdoor || Isolated ||
+            AwarenessPreview || PortScanned || ScanJammed || Backdoor || CleanLocked || Isolated ||
             CleanVisible(realTime) || InterceptActive || Overclocked;
 
         public void SetOverclock(NodeResources node, NodeResources activeNode,
@@ -109,6 +111,13 @@ namespace Uptime.Connections
                 condition.ExpiresAtSeconds - simulationTime);
         }
 
+        public void SetCleanLocked(NodeCondition condition, float simulationTime)
+        {
+            CleanLocked = condition != null;
+            CleanLockRemainingSeconds = condition == null ? 0f : Mathf.Max(0f,
+                condition.ExpiresAtSeconds - simulationTime);
+        }
+
         public void SetIsolation(IsolationState isolation, float simulationTime)
         {
             Isolated = isolation != null;
@@ -145,6 +154,8 @@ namespace Uptime.Connections
             ScanJammed = false;
             Backdoor = false;
             BackdoorRemainingSeconds = 0f;
+            CleanLocked = false;
+            CleanLockRemainingSeconds = 0f;
             ScanJamRemainingFraction = 0f;
             ScanJamRemainingSeconds = 0f;
             Isolated = false;
