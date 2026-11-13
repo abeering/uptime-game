@@ -33,12 +33,21 @@ namespace Uptime.Connections.EditorTools
             race.TypePlayer('q');
             Check(race.Player.CorrectCharacters == 1 && race.Player.Mistakes == 1 &&
                 race.Player.Draft == "aq", "player error blocks actual progress");
-            race.TypePlayer('b');
-            Check(race.Player.Draft == "aq", "wrong character requires Backspace");
+            race.TypePlayer('c'); // Matches the later reference, but remains in the error run.
+            Check(race.Player.Draft == "aqc" && race.Player.ErrorStartIndex == 1 &&
+                race.Player.Mistakes == 2 && race.Player.CorrectCharacters == 1,
+                "continued mistypes extend the red run without granting progress");
+            race.TypePlayer('z');
+            Check(race.Player.Draft == "aqc", "error run stops at the authored line end");
             race.BackspacePlayer();
+            Check(race.Player.Draft == "aq" && race.Player.ErrorStartIndex == 1 &&
+                race.Player.Corrections == 1, "first Backspace shortens the error run");
+            race.BackspacePlayer();
+            Check(race.Player.Draft == "a" && race.Player.ErrorStartIndex == -1 &&
+                race.Player.Corrections == 2, "last Backspace clears error state");
             foreach (char c in "bcde") race.TypePlayer(c);
             Check(race.PlayerWon == true && race.Player.Line == 2 &&
-                race.Player.CorrectCharacters == 5 && race.Player.Corrections == 1 &&
+                race.Player.CorrectCharacters == 5 && race.Player.Corrections == 2 &&
                 race.PlayerCompletedAt == 0f, "automatic line advance and immediate win");
 
             var opponent = new CommandRaceSession(new[] { "abcdef" },
@@ -179,29 +188,41 @@ namespace Uptime.Connections.EditorTools
                 new[] { "echo x" }, 17, .2f, 0f, 0f, 0f);
             string start = RenderReference(race);
             Check(PlainReference(start) == expected && UnderlinedToken(start) == "ssh" &&
-                start.Contains("<mark=#55E9C1B8>"),
+                start.Contains("<mark=#55E9C140>"),
                 "first command, token, and expected character are marked");
             foreach (char c in "ssh operator@") race.TypePlayer(c);
             string partial = RenderReference(race);
             Check(PlainReference(partial) == expected &&
                 UnderlinedToken(partial) == "operator@auth" &&
-                partial.Contains("<mark=#55E9C1B8>"),
+                partial.Contains("<mark=#55E9C140>"),
                 "typed prefix keeps the complete reference and current token");
             race.TypePlayer('x');
             string error = RenderReference(race);
             Check(PlainReference(error) == expected &&
                 UnderlinedToken(error) == "operator@auth" &&
-                error.Contains("<mark=#E94D59E0>"),
+                error.Contains("<mark=#B4404E80>") &&
+                error.Contains("<mark=#E94D5988>"),
                 "error marks the expected character without replacing it");
-            race.TypePlayer('z');
-            Check(RenderReference(race) == error,
-                "unresolved error does not move the reference indicator");
+            race.TypePlayer('u');
+            race.TypePlayer('t');
+            string run = RenderReference(race);
+            Check(PlainReference(run) == expected &&
+                Regex.Matches(run, "<mark=#B4404E80>").Count == 3 &&
+                race.Player.CorrectCharacters == "ssh operator@".Length,
+                "three expected characters turn red while correct progress stays blocked");
+            race.BackspacePlayer();
+            string shorter = RenderReference(race);
+            Check(Regex.Matches(shorter, "<mark=#B4404E80>").Count == 2 &&
+                PlainReference(shorter) == expected,
+                "Backspace removes one red character at a time");
+            race.BackspacePlayer();
             race.BackspacePlayer();
             string corrected = RenderReference(race);
             Check(PlainReference(corrected) == expected &&
-                corrected.Contains("<mark=#55E9C1B8>") &&
-                !corrected.Contains("<mark=#E94D59E0>"),
-                "Backspace immediately restores the normal character indicator");
+                corrected.Contains("<mark=#55E9C140>") &&
+                !corrected.Contains("<mark=#B4404E80>") &&
+                race.Player.Corrections == 3,
+                "clearing the error run restores the readable normal cursor");
             foreach (char c in "auth") race.TypePlayer(c);
             race.TypePlayer('\n');
             race.TypePlayer('t');

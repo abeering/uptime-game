@@ -167,9 +167,24 @@ namespace Uptime.Connections.EditorTools
                 if (race.Player.CorrectCharacters != "ssh operator@".Length)
                     throw new InvalidOperationException("Player error advanced correct progress");
                 Frame("04-player-error");
+                Type('u');
+                Type('t');
+                if (race.Player.ErrorStartIndex != "ssh operator@".Length ||
+                    race.Player.Mistakes != 3 ||
+                    race.Player.CorrectCharacters != "ssh operator@".Length)
+                    throw new InvalidOperationException("Extended error run granted progress");
+                Frame("05-error-run");
                 race.BackspacePlayer();
                 RenderOverlay();
-                Frame("05-player-correction");
+                if (race.Player.ErrorStartIndex < 0 || race.Player.Corrections != 1)
+                    throw new InvalidOperationException("First Backspace cleared the whole error run");
+                Frame("06-partial-correction");
+                race.BackspacePlayer();
+                race.BackspacePlayer();
+                RenderOverlay();
+                if (race.Player.ErrorStartIndex >= 0 || race.Player.Corrections != 3)
+                    throw new InvalidOperationException("Backspace did not clear the error run");
+                Frame("07-player-correction");
                 string first = race.Player.Commands[0];
                 for (int i = race.Player.Draft.Length; i < first.Length; i++)
                     Type(first[i]);
@@ -179,11 +194,11 @@ namespace Uptime.Connections.EditorTools
                 Type('\r');
                 if (race.Player.Line != 1 || race.Player.Draft.Length != 0)
                     throw new InvalidOperationException("Enter changed the command state");
-                Frame("06-next-command");
+                Frame("08-next-command");
                 foreach (char c in "tail -f /var/") Type(c);
                 if (race.Player.Draft != "tail -f /var/")
                     throw new InvalidOperationException("Next command rejected immediate typing");
-                Frame("07-path-token");
+                Frame("09-path-token");
                 while (!race.Player.Complete)
                 {
                     string command = race.Player.Commands[race.Player.Line];
@@ -193,7 +208,7 @@ namespace Uptime.Connections.EditorTools
                 if (director.Current != null || !Race().PlayerWon.HasValue ||
                     Race().PlayerWon != true)
                     throw new InvalidOperationException("Scripted victory failed");
-                Frame("08-duel-won");
+                Frame("10-duel-won");
                 yield return new WaitForSecondsRealtime(1.3f);
                 TMP_InputField commandInput = Field<TMP_InputField>(terminal, "commandInput");
                 if (!commandInput.isFocused || !commandInput.interactable)
@@ -231,20 +246,20 @@ namespace Uptime.Connections.EditorTools
                     throw new InvalidOperationException("Duel typing leaked to another field");
                 defeat.Advance(3f);
                 RenderOverlay();
-                Frame("09-duel-over-clean");
+                Frame("11-duel-over-clean");
                 defeat.Advance(100f);
                 yield return null;
                 if (defeat.PlayerWon != false)
                     throw new InvalidOperationException("Scripted defeat failed");
-                Frame("10-duel-lost");
+                Frame("12-duel-lost");
                 yield return new WaitForSecondsRealtime(1.3f);
                 if (!clean.IsOpen || host.ActiveClean != session || pid.text != draft ||
                     !pid.interactable || !pid.isFocused ||
                     EventSystem.current.currentSelectedGameObject != pid.gameObject)
                     throw new InvalidOperationException("CLEAN did not resume intact");
-                Frame("11-clean-restored");
+                Frame("13-clean-restored");
                 Debug.Log("DuelCapture PASS: " + gameObject.scene.name + " " + width +
-                    "x" + height + " eleven scripted Play Mode frames in " + output);
+                    "x" + height + " thirteen scripted Play Mode frames in " + output);
         }
 
         private CommandRaceSession Race() => Field<CommandRaceSession>(overlay, "race");

@@ -11,6 +11,7 @@ namespace Uptime.Connections
             private readonly string[] commands;
             public int Line { get; private set; }
             public string Draft { get; private set; } = string.Empty;
+            public int ErrorStartIndex { get; private set; } = -1;
             public int Mistakes { get; private set; }
             public int Corrections { get; private set; }
             public bool Complete => Line >= commands.Length;
@@ -23,11 +24,7 @@ namespace Uptime.Connections
                     int count = 0;
                     for (int i = 0; i < Line; i++) count += commands[i].Length;
                     if (!Complete)
-                        for (int i = 0; i < Math.Min(Draft.Length, commands[Line].Length); i++)
-                        {
-                            if (Draft[i] != commands[Line][i]) break;
-                            count++;
-                        }
+                        count += ErrorStartIndex >= 0 ? ErrorStartIndex : Draft.Length;
                     return count;
                 }
             }
@@ -40,18 +37,23 @@ namespace Uptime.Connections
                 foreach (string command in commands) TotalCharacters += command.Length;
             }
 
-            public bool Type(char character)
+            public bool Type(char character, bool allowErrorRun = false)
             {
                 if (Complete || Draft.Length >= commands[Line].Length) return false;
-                if (Draft.Length > 0 &&
-                    Draft[^1] != commands[Line][Draft.Length - 1]) return false;
-                bool correct = character == commands[Line][Draft.Length];
-                if (!correct) Mistakes++;
+                if (ErrorStartIndex >= 0 && !allowErrorRun) return false;
+                bool correct = ErrorStartIndex < 0 &&
+                    character == commands[Line][Draft.Length];
+                if (!correct)
+                {
+                    if (ErrorStartIndex < 0) ErrorStartIndex = Draft.Length;
+                    Mistakes++;
+                }
                 Draft += character;
                 if (correct && Draft == commands[Line])
                 {
                     Line++;
                     Draft = string.Empty;
+                    ErrorStartIndex = -1;
                 }
                 return correct;
             }
@@ -59,12 +61,14 @@ namespace Uptime.Connections
             public bool Backspace()
             {
                 if (Complete || Draft.Length == 0) return false;
-                if (Draft[^1] != commands[Line][Draft.Length - 1]) Corrections++;
+                if (ErrorStartIndex >= 0) Corrections++;
                 Draft = Draft.Substring(0, Draft.Length - 1);
+                if (Draft.Length <= ErrorStartIndex) ErrorStartIndex = -1;
                 return true;
             }
 
-            public char NextExpected => Complete ? '\0' : commands[Line][Draft.Length];
+            public char NextExpected => Complete || Draft.Length >= commands[Line].Length ?
+                '\0' : commands[Line][Draft.Length];
         }
 
         private readonly Random random;
@@ -106,7 +110,7 @@ namespace Uptime.Connections
         public void TypePlayer(char character)
         {
             if (PlayerWon.HasValue || character < ' ' || character > '~') return;
-            Player.Type(character);
+            Player.Type(character, allowErrorRun: true);
             if (Player.Complete)
             {
                 PlayerCompletedAt = ElapsedSeconds;

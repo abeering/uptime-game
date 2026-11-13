@@ -199,33 +199,39 @@ namespace Uptime.Connections
                     result.Append("<color=#A5C6BA>").Append(Escape(command)).Append("</color>");
                 else if (current)
                 {
-                    bool error = competitor.Draft.Length > 0 &&
-                        competitor.Draft[^1] != command[competitor.Draft.Length - 1];
-                    int position = competitor.Draft.Length - (error ? 1 : 0);
+                    bool error = competitor.ErrorStartIndex >= 0;
+                    int position = error && !player ? competitor.ErrorStartIndex :
+                        competitor.Draft.Length;
                     TokenBounds(command, position, out int tokenStart, out int tokenEnd);
                     for (int i = 0; i < command.Length; i++)
                     {
                         if (i == tokenStart) result.Append("<u>");
                         char ch = command[i];
-                        bool correct = i < competitor.Draft.Length &&
+                        bool errorTail = player && error &&
+                            i >= competitor.ErrorStartIndex && i < competitor.Draft.Length;
+                        bool correct = player ? i < (error ? competitor.ErrorStartIndex :
+                            competitor.Draft.Length) : i < competitor.Draft.Length &&
                             competitor.Draft[i] == ch;
                         bool activeToken = i >= tokenStart && i < tokenEnd;
-                        string color = correct ? player ? "#55E9C1" : "#F27A7C" :
+                        string color = errorTail ? "#FFE8EA" :
+                            correct ? player ? "#55E9C1" : "#F27A7C" :
                             i < competitor.Draft.Length && !player ? "#FFBA52" :
                             player ? activeToken ? "#DEF8EC" : "#A9C7BB" :
                             activeToken ? "#F1CECE" : "#B69B9B";
-                        if (player && i == position)
+                        if (errorTail) result.Append("<mark=#B4404E80>");
+                        else if (player && i == position)
                         {
-                            result.Append(error ? "<mark=#E94D59E0>" :
-                                "<mark=#55E9C1B8>");
-                            color = error ? "#FFF0ED" : "#092A25";
+                            result.Append(error ? "<mark=#E94D5988>" :
+                                "<mark=#55E9C140>");
+                            color = error ? "#FFF0ED" : "#F5FFFB";
                         }
                         result.Append("<color=").Append(color).Append(">");
                         // The player's reference never changes, even while a wrong key blocks progress.
                         result.Append(Escape(!player && i < competitor.Draft.Length ?
                             competitor.Draft[i].ToString() : ch.ToString()));
                         result.Append("</color>");
-                        if (player && i == position) result.Append("</mark>");
+                        if (errorTail || (player && i == position))
+                            result.Append("</mark>");
                         if (i == tokenEnd - 1) result.Append("</u>");
                     }
                 }

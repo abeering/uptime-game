@@ -38,18 +38,24 @@ result display can remain on screen. Reset closes the Duel and clears the slot.
 The player's authored reference commands remain visible and stationary while
 typing. The active command has a restrained backing highlight and brighter
 prompt. The current whitespace-delimited token is underlined and brighter;
-the next expected character has a teal background. Correct input lights the
-reference prefix in teal. A wrong key leaves the expected character in place
-with a red background, blocks progress, and stays at that position until
-Backspace removes the error. The next line becomes active immediately when a
-command completes; Enter is ignored. The hacker still displays its own typed
-characters, including mistakes and corrections. This remains a single text
+the next expected character has a light translucent teal backing and a bright
+glyph. Correct input lights the reference prefix in teal. A wrong key leaves
+the expected character in place and colors it red. Further typing colors the
+following reference positions red, even if those keys happen to match; no
+mistyped characters replace the reference. Correct progress stays at the first
+mistake. Backspace removes one red position at a time, and the normal cursor
+returns when the whole error run is gone. The run stops at the authored line
+end. Each red-run keystroke counts as a mistake in the recorder; each removed
+red position counts as a correction. The next line becomes active immediately
+when a command completes; Enter is ignored. The hacker still displays its own
+typed characters, including mistakes and corrections. This remains a single text
 surface with no extra input field.
 
 For a manual typing check, trigger `duel auth 0`, type `ssh operator@`, then
-press an incorrect key. Confirm the expected `a` remains visible in red.
-Press another key to confirm the indicator stays put, then Backspace and
-continue through `ssh operator@auth`. Press Enter and immediately type `t`:
+press `xut`. Confirm the expected `aut` remains visible in red while the
+progress bar stays at the clean prefix. Backspace three times, checking that
+the red run shrinks one character at a time, then continue through
+`ssh operator@auth`. Press Enter and immediately type `t`:
 the second command should accept it. Check the active token again while
 typing the `/var/log/auth.log` path, and finish all commands without Enter.
 
@@ -75,10 +81,11 @@ Escape, and a CLEAN session that ends authoritatively while it is covered.
 `Tools > Connections > Run Duel Witness` runs deterministic race and scene
 checks in Edit Mode. `Tools > Connections > Capture Duel Play Mode Review`
 starts a scripted Play Mode run for a scene selected with `-duelScene` and a
-size selected with `-duelWidth`/`-duelHeight`. Its eleven frames show the
-countdown, start, partial input, error, Backspace correction, automatic line
-advance, punctuation-heavy path token, victory, Duel over CLEAN, defeat, and
-restored CLEAN. These captures use scripted character entry; they are **not
+size selected with `-duelWidth`/`-duelHeight`. Its thirteen frames show the
+countdown, start, partial input, one error, a three-character error run, two
+stages of Backspace correction, automatic line advance, a punctuation-heavy
+path token, victory, Duel over CLEAN, defeat, and restored CLEAN. These
+captures use scripted character entry; they are **not
 physical keyboard playtest evidence**. The capture runner also checks that the
 parsed reference and every glyph position, baseline, and line number stay unchanged
 through the race, as well as live versus paused simulation, Escape ownership,
@@ -89,7 +96,7 @@ Edit Mode witness, the CLEAN window Edit Mode witness in both scenes, and the
 Escape/video-call Play Mode witness in both scenes. All four scripted capture
 runs passed: both scenes at 1920×1080 and 1280×720. The earlier V0 Infection
 Edit Mode witness also passed before this presentation refinement.
-The 44 PNGs in `Captures/` are the final authored UI captures. For batch
+The 52 PNGs in `Captures/` are the final authored UI captures. For batch
 captures only, the isolated copy suppressed a broken Unity Search startup
 callback; the workaround is not part of this PR. Physical-keyboard timing,
 long holds, and subjective difficulty still need a human Play Mode pass.
