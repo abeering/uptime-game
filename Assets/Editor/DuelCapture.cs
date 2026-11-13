@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using TMPro;
 using Uptime.Connections;
 using UnityEditor;
@@ -63,6 +64,9 @@ namespace Uptime.Connections.EditorTools
         private float originalScale;
         private int width, height;
         private string output;
+        private float[] referenceOrigins;
+        private float[] referenceBaselines;
+        private int[] referenceLines;
 
         public void Begin() => StartCoroutine(Guard(Cases()));
 
@@ -142,6 +146,7 @@ namespace Uptime.Connections.EditorTools
                 Frame("01-intrusion-countdown");
                 host.StepSimulation(3f);
                 if (!overlay.IsOpen) throw new InvalidOperationException("Duel did not open");
+                Frame("02-duel-start");
                 float frozenClock = host.SimulationTimeSeconds;
                 Set(director, "continueSimulationDuringDuel", false);
                 Time.timeScale = 1f;
@@ -157,23 +162,38 @@ namespace Uptime.Connections.EditorTools
                 foreach (char c in "ssh operator@") Type(c);
                 race.Advance(5f);
                 RenderOverlay();
-                Frame("02-duel-partial");
+                Frame("03-duel-partial");
                 Type('x');
-                Frame("03-player-error");
+                if (race.Player.CorrectCharacters != "ssh operator@".Length)
+                    throw new InvalidOperationException("Player error advanced correct progress");
+                Frame("04-player-error");
                 race.BackspacePlayer();
                 RenderOverlay();
-                Frame("04-player-correction");
-                foreach (string command in race.Player.Commands)
+                Frame("05-player-correction");
+                string first = race.Player.Commands[0];
+                for (int i = race.Player.Draft.Length; i < first.Length; i++)
+                    Type(first[i]);
+                if (race.Player.Line != 1 || race.Player.Draft.Length != 0)
+                    throw new InvalidOperationException("First command did not auto advance");
+                Type('\n');
+                Type('\r');
+                if (race.Player.Line != 1 || race.Player.Draft.Length != 0)
+                    throw new InvalidOperationException("Enter changed the command state");
+                Frame("06-next-command");
+                foreach (char c in "tail -f /var/") Type(c);
+                if (race.Player.Draft != "tail -f /var/")
+                    throw new InvalidOperationException("Next command rejected immediate typing");
+                Frame("07-path-token");
+                while (!race.Player.Complete)
                 {
-                    int start = race.Player.Line == 0 ? race.Player.Draft.Length : 0;
-                    if (race.Player.Complete) break;
-                    if (command != race.Player.Commands[race.Player.Line]) continue;
-                    for (int i = start; i < command.Length; i++) Type(command[i]);
+                    string command = race.Player.Commands[race.Player.Line];
+                    for (int i = race.Player.Draft.Length; i < command.Length; i++)
+                        Type(command[i]);
                 }
                 if (director.Current != null || !Race().PlayerWon.HasValue ||
                     Race().PlayerWon != true)
                     throw new InvalidOperationException("Scripted victory failed");
-                Frame("05-duel-won");
+                Frame("08-duel-won");
                 yield return new WaitForSecondsRealtime(1.3f);
                 TMP_InputField commandInput = Field<TMP_InputField>(terminal, "commandInput");
                 if (!commandInput.isFocused || !commandInput.interactable)
@@ -211,20 +231,20 @@ namespace Uptime.Connections.EditorTools
                     throw new InvalidOperationException("Duel typing leaked to another field");
                 defeat.Advance(3f);
                 RenderOverlay();
-                Frame("06-duel-over-clean");
+                Frame("09-duel-over-clean");
                 defeat.Advance(100f);
                 yield return null;
                 if (defeat.PlayerWon != false)
                     throw new InvalidOperationException("Scripted defeat failed");
-                Frame("07-duel-lost");
+                Frame("10-duel-lost");
                 yield return new WaitForSecondsRealtime(1.3f);
                 if (!clean.IsOpen || host.ActiveClean != session || pid.text != draft ||
                     !pid.interactable || !pid.isFocused ||
                     EventSystem.current.currentSelectedGameObject != pid.gameObject)
                     throw new InvalidOperationException("CLEAN did not resume intact");
-                Frame("08-clean-restored");
+                Frame("11-clean-restored");
                 Debug.Log("DuelCapture PASS: " + gameObject.scene.name + " " + width +
-                    "x" + height + " eight scripted Play Mode frames in " + output);
+                    "x" + height + " eleven scripted Play Mode frames in " + output);
         }
 
         private CommandRaceSession Race() => Field<CommandRaceSession>(overlay, "race");
@@ -243,6 +263,7 @@ namespace Uptime.Connections.EditorTools
             statuses.RenderNow(Time.unscaledTime, 1f);
             paths.RefreshLayouts();
             Canvas.ForceUpdateCanvases();
+            if (overlay.IsOpen) CheckReferenceLayout();
             cameraForCapture.Render();
             RenderTexture previous = RenderTexture.active;
             try
@@ -259,6 +280,41 @@ namespace Uptime.Connections.EditorTools
                 finally { Destroy(image); }
             }
             finally { RenderTexture.active = previous; }
+        }
+
+        private void CheckReferenceLayout()
+        {
+            TMP_Text text = Field<TMP_Text>(overlay, "playerCommands");
+            text.ForceMeshUpdate(true, true);
+            var expected = new StringBuilder();
+            foreach (string command in Race().Player.Commands)
+            {
+                if (expected.Length > 0) expected.Append('\n');
+                expected.Append("> ").Append(command);
+            }
+            if (text.GetParsedText() != expected.ToString())
+                throw new InvalidOperationException("Player reference changed while typing");
+            int count = text.textInfo.characterCount;
+            if (referenceOrigins == null)
+            {
+                referenceOrigins = new float[count];
+                referenceBaselines = new float[count];
+                referenceLines = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    referenceOrigins[i] = text.textInfo.characterInfo[i].origin;
+                    referenceBaselines[i] = text.textInfo.characterInfo[i].baseLine;
+                    referenceLines[i] = text.textInfo.characterInfo[i].lineNumber;
+                }
+                return;
+            }
+            if (count != referenceOrigins.Length)
+                throw new InvalidOperationException("Player reference glyph count changed");
+            for (int i = 0; i < count; i++)
+                if (Mathf.Abs(text.textInfo.characterInfo[i].origin - referenceOrigins[i]) > .01f ||
+                    Mathf.Abs(text.textInfo.characterInfo[i].baseLine - referenceBaselines[i]) > .01f ||
+                    text.textInfo.characterInfo[i].lineNumber != referenceLines[i])
+                    throw new InvalidOperationException("Player reference position or wrapping changed at glyph " + i);
         }
     }
 }

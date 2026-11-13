@@ -33,6 +33,26 @@ Only one pending or active Duel is allowed across all nodes. Rejections are
 recorded with a reason. The slot releases when the race resolves; the brief
 result display can remain on screen. Reset closes the Duel and clears the slot.
 
+## Typing UX experiment
+
+The player's authored reference commands remain visible and stationary while
+typing. The active command has a restrained backing highlight and brighter
+prompt. The current whitespace-delimited token is underlined and brighter;
+the next expected character has a teal background. Correct input lights the
+reference prefix in teal. A wrong key leaves the expected character in place
+with a red background, blocks progress, and stays at that position until
+Backspace removes the error. The next line becomes active immediately when a
+command completes; Enter is ignored. The hacker still displays its own typed
+characters, including mistakes and corrections. This remains a single text
+surface with no extra input field.
+
+For a manual typing check, trigger `duel auth 0`, type `ssh operator@`, then
+press an incorrect key. Confirm the expected `a` remains visible in red.
+Press another key to confirm the indicator stays put, then Backspace and
+continue through `ssh operator@auth`. Press Enter and immediately type `t`:
+the second command should accept it. Check the active token again while
+typing the `/var/log/auth.log` path, and finish all commands without Enter.
+
 ## Tuning and subjective review
 
 The scene's `ConnectionsDuelDirector` Inspector owns warning duration,
@@ -55,17 +75,21 @@ Escape, and a CLEAN session that ends authoritatively while it is covered.
 `Tools > Connections > Run Duel Witness` runs deterministic race and scene
 checks in Edit Mode. `Tools > Connections > Capture Duel Play Mode Review`
 starts a scripted Play Mode run for a scene selected with `-duelScene` and a
-size selected with `-duelWidth`/`-duelHeight`. It captures countdown, partial
-race, player error/correction, victory, Duel over CLEAN, defeat, and restored
-CLEAN. These captures use scripted character entry; they are **not physical
-keyboard playtest evidence**. The capture runner also checks live versus
-paused simulation, Escape ownership, and focus transfer.
+size selected with `-duelWidth`/`-duelHeight`. Its eleven frames show the
+countdown, start, partial input, error, Backspace correction, automatic line
+advance, punctuation-heavy path token, victory, Duel over CLEAN, defeat, and
+restored CLEAN. These captures use scripted character entry; they are **not
+physical keyboard playtest evidence**. The capture runner also checks that the
+parsed reference and every glyph position, baseline, and line number stay unchanged
+through the race, as well as live versus paused simulation, Escape ownership,
+and focus transfer.
 
 Unity 6000.3.11f1 validation on an isolated project copy passed the Duel
-Edit Mode witness in both scenes, the existing Infection Edit Mode witness,
-and the existing Escape/video-call Play Mode witness in `Connections`. All
-four scripted capture runs passed: both scenes at 1920×1080 and 1280×720.
-The 32 PNGs in `Captures/` are the final authored UI captures. For batch
+Edit Mode witness, the CLEAN window Edit Mode witness in both scenes, and the
+Escape/video-call Play Mode witness in both scenes. All four scripted capture
+runs passed: both scenes at 1920×1080 and 1280×720. The earlier V0 Infection
+Edit Mode witness also passed before this presentation refinement.
+The 44 PNGs in `Captures/` are the final authored UI captures. For batch
 captures only, the isolated copy suppressed a broken Unity Search startup
 callback; the workaround is not part of this PR. Physical-keyboard timing,
 long holds, and subjective difficulty still need a human Play Mode pass.

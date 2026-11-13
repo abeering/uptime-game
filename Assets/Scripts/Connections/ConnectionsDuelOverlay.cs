@@ -189,33 +189,70 @@ namespace Uptime.Connections
                 if (line > 0) result.Append('\n');
                 string command = competitor.Commands[line];
                 bool current = line == competitor.Line;
-                result.Append(current ? "<color=#C9EAE0>" :
-                    line < competitor.Line ? "<color=#A5C6BA>" : "<color=#829B97>");
+                if (current && player) result.Append("<mark=#255D4C70>");
+                result.Append(current ? player ? "<color=#71E2C1>" :
+                    "<color=#F27A7C>" : line < competitor.Line ?
+                    "<color=#A5C6BA>" : "<color=#829B97>");
                 result.Append("> ");
                 result.Append("</color>");
                 if (line < competitor.Line)
                     result.Append("<color=#A5C6BA>").Append(Escape(command)).Append("</color>");
                 else if (current)
                 {
+                    bool error = competitor.Draft.Length > 0 &&
+                        competitor.Draft[^1] != command[competitor.Draft.Length - 1];
+                    int position = competitor.Draft.Length - (error ? 1 : 0);
+                    TokenBounds(command, position, out int tokenStart, out int tokenEnd);
                     for (int i = 0; i < command.Length; i++)
                     {
+                        if (i == tokenStart) result.Append("<u>");
                         char ch = command[i];
-                        string color = i < competitor.Draft.Length ?
-                            competitor.Draft[i] == ch ? player ? "#55E9C1" : "#F27A7C" :
-                                "#FFBA52" : "#829B97";
+                        bool correct = i < competitor.Draft.Length &&
+                            competitor.Draft[i] == ch;
+                        bool activeToken = i >= tokenStart && i < tokenEnd;
+                        string color = correct ? player ? "#55E9C1" : "#F27A7C" :
+                            i < competitor.Draft.Length && !player ? "#FFBA52" :
+                            player ? activeToken ? "#DEF8EC" : "#A9C7BB" :
+                            activeToken ? "#F1CECE" : "#B69B9B";
+                        if (player && i == position)
+                        {
+                            result.Append(error ? "<mark=#E94D59E0>" :
+                                "<mark=#55E9C1B8>");
+                            color = error ? "#FFF0ED" : "#092A25";
+                        }
                         result.Append("<color=").Append(color).Append(">");
-                        result.Append(Escape(i < competitor.Draft.Length ?
+                        // The player's reference never changes, even while a wrong key blocks progress.
+                        result.Append(Escape(!player && i < competitor.Draft.Length ?
                             competitor.Draft[i].ToString() : ch.ToString()));
                         result.Append("</color>");
-                        if (player && i == competitor.Draft.Length)
-                            result.Append("<color=#D5FFF0>|</color>");
+                        if (player && i == position) result.Append("</mark>");
+                        if (i == tokenEnd - 1) result.Append("</u>");
                     }
-                    if (player && competitor.Draft.Length >= command.Length)
-                        result.Append("<color=#D5FFF0>|</color>");
                 }
                 else result.Append("<color=#829B97>").Append(Escape(command)).Append("</color>");
+                if (current && player) result.Append("</mark>");
             }
             return result.ToString();
+        }
+
+        private static void TokenBounds(string command, int position, out int start, out int end)
+        {
+            int at = Mathf.Min(position, command.Length - 1);
+            while (at < command.Length && char.IsWhiteSpace(command[at])) at++;
+            if (at == command.Length)
+            {
+                at = Mathf.Min(position, command.Length - 1);
+                while (at >= 0 && char.IsWhiteSpace(command[at])) at--;
+            }
+            if (at < 0)
+            {
+                start = end = -1;
+                return;
+            }
+            start = at;
+            while (start > 0 && !char.IsWhiteSpace(command[start - 1])) start--;
+            end = at;
+            while (end < command.Length && !char.IsWhiteSpace(command[end])) end++;
         }
 
         private static string Escape(string source) => source.Replace("&", "&amp;")

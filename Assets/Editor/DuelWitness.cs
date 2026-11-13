@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TMPro;
 using Uptime.Connections;
 using UnityEditor;
@@ -15,9 +16,11 @@ namespace Uptime.Connections.EditorTools
         public static void Run()
         {
             CheckRaceRules();
+            CheckReferenceFormatting();
             CheckScene("Assets/Scenes/Connections.unity");
             CheckScene("Assets/Scenes/ConnectionsAdvanced.unity");
-            Debug.Log("DuelWitness PASS: race state, pending/active exclusivity, " +
+            Debug.Log("DuelWitness PASS: race state, immutable typing reference, " +
+                "token/character/error highlights, pending/active exclusivity, " +
                 "connection effect, status countdown, outcomes, infection rejection, " +
                 "pause policy, reset, and both authored scene bindings.");
         }
@@ -166,6 +169,69 @@ namespace Uptime.Connections.EditorTools
                 Set(director, "continueSimulationDuringDuel", true);
                 host.ResetSimulation();
             }
+        }
+
+        private static void CheckReferenceFormatting()
+        {
+            const string expected = "> ssh operator@auth\n> tail -f /var/log/auth.log";
+            var race = new CommandRaceSession(
+                new[] { "ssh operator@auth", "tail -f /var/log/auth.log" },
+                new[] { "echo x" }, 17, .2f, 0f, 0f, 0f);
+            string start = RenderReference(race);
+            Check(PlainReference(start) == expected && UnderlinedToken(start) == "ssh" &&
+                start.Contains("<mark=#55E9C1B8>"),
+                "first command, token, and expected character are marked");
+            foreach (char c in "ssh operator@") race.TypePlayer(c);
+            string partial = RenderReference(race);
+            Check(PlainReference(partial) == expected &&
+                UnderlinedToken(partial) == "operator@auth" &&
+                partial.Contains("<mark=#55E9C1B8>"),
+                "typed prefix keeps the complete reference and current token");
+            race.TypePlayer('x');
+            string error = RenderReference(race);
+            Check(PlainReference(error) == expected &&
+                UnderlinedToken(error) == "operator@auth" &&
+                error.Contains("<mark=#E94D59E0>"),
+                "error marks the expected character without replacing it");
+            race.TypePlayer('z');
+            Check(RenderReference(race) == error,
+                "unresolved error does not move the reference indicator");
+            race.BackspacePlayer();
+            string corrected = RenderReference(race);
+            Check(PlainReference(corrected) == expected &&
+                corrected.Contains("<mark=#55E9C1B8>") &&
+                !corrected.Contains("<mark=#E94D59E0>"),
+                "Backspace immediately restores the normal character indicator");
+            foreach (char c in "auth") race.TypePlayer(c);
+            race.TypePlayer('\n');
+            race.TypePlayer('t');
+            string next = RenderReference(race);
+            Check(race.Player.Line == 1 && race.Player.Draft == "t" &&
+                PlainReference(next) == expected && UnderlinedToken(next) == "tail",
+                "next command accepts its first character without Enter");
+            foreach (char c in "ail -f /var/") race.TypePlayer(c);
+            string path = RenderReference(race);
+            Check(PlainReference(path) == expected &&
+                UnderlinedToken(path) == "/var/log/auth.log",
+                "punctuation-heavy path remains one active token");
+        }
+
+        private static string RenderReference(CommandRaceSession race)
+        {
+            return (string)typeof(ConnectionsDuelOverlay)
+                .GetMethod("Format", BindingFlags.Static | BindingFlags.NonPublic)
+                .Invoke(null, new object[] { race.Player, true });
+        }
+
+        private static string PlainReference(string formatted) =>
+            Regex.Replace(formatted, "<[^>]+>", "");
+
+        private static string UnderlinedToken(string formatted)
+        {
+            int start = formatted.IndexOf("<u>", StringComparison.Ordinal) + 3;
+            int end = formatted.IndexOf("</u>", start, StringComparison.Ordinal);
+            return start < 3 || end < start ? string.Empty :
+                Regex.Replace(formatted.Substring(start, end - start), "<[^>]+>", "");
         }
 
         private static void Set(object owner, string field, object value) =>
