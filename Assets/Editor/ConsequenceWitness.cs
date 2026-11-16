@@ -126,6 +126,23 @@ namespace Uptime.Connections.EditorTools
                 .consequenceCandidates.Any(c => c.id == "payload-burst" &&
                     !c.eligible && c.ineligibilityReason == "zero_weight"),
                 "recorder includes exclusion reason for replay");
+            var scheduledWorm = Plan(host, "worm-record", null,
+                ConsequenceConfiguration.Explicit(ConsequenceCandidate.Tactic(
+                    "worm", ConsequenceTactic.ConditionWormOutbreak)), 31);
+            recorder.RecordConsequencePlan(scheduledWorm);
+            var wormRecord = recorder.CurrentLog.events.Last(e =>
+                e.type == "consequence_planned").consequenceEffects.Single(e =>
+                e.kind == ConsequenceKind.WormOutbreak.ToString());
+            WormTuning frozen = scheduledWorm.Effects.Single(e =>
+                e.Kind == ConsequenceKind.WormOutbreak).WormTuning;
+            Check(wormRecord.wormMaximumNodes == frozen.maximumNodes &&
+                wormRecord.wormPropagationProbability == frozen.propagationProbability &&
+                wormRecord.wormEstablishSeconds == frozen.establishSeconds &&
+                wormRecord.wormTravelSeconds == frozen.travelSeconds &&
+                wormRecord.wormActionSeconds == frozen.actionSeconds &&
+                wormRecord.wormConditionSeconds == frozen.conditionSeconds &&
+                wormRecord.wormBackdoorConditionSeconds == frozen.backdoorConditionSeconds,
+                "planned Worm recorder retains the full frozen tuning snapshot");
             host.ResetSimulation();
             bool staleRejected = false;
             try { ConsequenceExecutor.Execute(host, fixedPlan); }
