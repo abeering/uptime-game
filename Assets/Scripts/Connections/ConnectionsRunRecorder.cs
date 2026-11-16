@@ -330,6 +330,11 @@ namespace Uptime.Connections
         public int wormClaimedNodes;
         public int wormMaximumNodes;
         public float wormPropagationProbability;
+        public float wormEstablishSeconds;
+        public float wormTravelSeconds;
+        public float wormActionSeconds;
+        public float wormConditionSeconds;
+        public float wormBackdoorConditionSeconds;
         public float wormPropagationRoll;
         public bool wormPropagationSelected;
         public float wormEstablishSeconds;
@@ -1265,7 +1270,12 @@ namespace Uptime.Connections
                     payloadProfile = effect.Kind == ConsequenceKind.Payload ?
                         effect.PayloadProfile.ToString() : null,
                     wormMaximumNodes = tuning?.maximumNodes ?? 0,
-                    wormPropagationProbability = tuning?.propagationProbability ?? 0f
+                    wormPropagationProbability = tuning?.propagationProbability ?? 0f,
+                    wormEstablishSeconds = tuning?.establishSeconds ?? 0f,
+                    wormTravelSeconds = tuning?.travelSeconds ?? 0f,
+                    wormActionSeconds = tuning?.actionSeconds ?? 0f,
+                    wormConditionSeconds = tuning?.conditionSeconds ?? 0f,
+                    wormBackdoorConditionSeconds = tuning?.backdoorConditionSeconds ?? 0f
                 };
             }
         }
