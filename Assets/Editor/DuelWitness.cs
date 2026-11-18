@@ -106,6 +106,10 @@ namespace Uptime.Connections.EditorTools
                 host.SetRunMode(ConnectionRunMode.Generated);
                 Check(director.TrySchedule("AUTH", DuelVariant.CommandRace, 2f,
                     "witness", out _), "director API schedules Duel");
+                Check(director.Current.LossPlan != null &&
+                    director.Current.LossPlan.Candidates.Count == 4 &&
+                    director.Current.LossPlan.Effects.Count > 0,
+                    "accepted Duel stores one concrete weighted loss plan at scheduling");
                 Check(!director.TrySchedule("DB", DuelVariant.CommandRace, 1f,
                     "second", out string busy) && busy.Contains("pending"),
                     "pending slot rejects second Duel");
@@ -153,8 +157,12 @@ namespace Uptime.Connections.EditorTools
                 director.FinishResult();
                 host.ResetSimulation();
 
+                var infectionChoice = ConsequenceConfiguration.Explicit(
+                    ConsequenceCandidate.Atomic("infection", new ConsequenceEffectSpec
+                    { kind = ConsequenceKind.Infection,
+                        infectionKind = InfectionKind.PhantomLoad, parameter = 3f }));
                 Check(director.TrySchedule("AUTH", DuelVariant.CommandRace, 0f,
-                    "loss", out _), "loss encounter opens");
+                    "loss", out _, infectionChoice), "loss encounter opens");
                 var loss = new CommandRaceSession(new[] { "abc" }, new[] { "x" },
                     7, .1f, 0f, 0f, 0f);
                 DuelEncounter lostEncounter = director.Current;
@@ -162,20 +170,22 @@ namespace Uptime.Connections.EditorTools
                 director.Resolve(loss);
                 Check(lostEncounter.PlayerWon == false &&
                     lostEncounter.InfectionApplied == true && host.Infections.Count == 1 &&
-                    host.Infections[0].SourceConnectionId.StartsWith("duel:"),
+                    host.Infections[0].SourceConnectionId.StartsWith("consequence:duel-") &&
+                    lostEncounter.LossExecution.Components.Count == 1,
                     "loss applies authoritative infection with Duel provenance");
                 director.FinishResult();
                 host.ResetSimulation();
                 Check(host.TryInjectPhantomLoad("AUTH", 2f, out _), "preexisting infection installed");
                 Check(director.TrySchedule("AUTH", DuelVariant.CommandRace, 0f,
-                    "duplicate", out _), "duplicate case opens");
+                    "duplicate", out _, infectionChoice), "duplicate case opens");
                 var duplicate = new CommandRaceSession(new[] { "abc" }, new[] { "x" },
                     7, .1f, 0f, 0f, 0f);
                 DuelEncounter rejectedEncounter = director.Current;
                 duplicate.Advance(1f);
                 director.Resolve(duplicate);
                 Check(rejectedEncounter.InfectionApplied == false &&
-                    rejectedEncounter.ApplicationReason == "infection_already_active" &&
+                    rejectedEncounter.LossExecution.Components[0].Reason ==
+                        "infection_already_active" &&
                     host.Infections.Count == 1, "duplicate application rejected honestly");
                 host.ResetSimulation();
             }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    public enum ConditionKind { PortScanned, ScanJammed, Backdoor }
+    public enum ConditionKind { PortScanned, ScanJammed, Backdoor, CleanLocked }
 
     [Serializable]
     public sealed class ConditionPayload

@@ -81,11 +81,10 @@ namespace Uptime.Connections
             string node = encounter.Target.View.NodeId;
             if (encounter.PlayerWon == true)
                 AppendText("DUEL WON  " + node + "  /  intrusion prevented", normalColor);
-            else if (encounter.InfectionApplied == true)
+            else if (encounter.LossExecution?.AnySucceeded == true)
                 AppendText("DUEL LOST  " + node + "  /  intrusion succeeded", errorColor);
             else
-                AppendText("DUEL LOST  " + node + "  /  infection rejected (" +
-                    encounter.ApplicationReason + ")", errorColor);
+                AppendText("DUEL LOST  " + node + "  /  attack blocked", errorColor);
         }
 
         // Command handlers mark rejection explicitly; asynchronous rows use AppendText.
@@ -499,23 +498,29 @@ namespace Uptime.Connections
                     break;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 case "duel":
-                    if (tokens.Length < 2 || tokens.Length > 3 ||
-                        tokens.Length == 3 &&
+                    if (tokens.Length < 2 || tokens.Length > 4 ||
+                        tokens.Length >= 3 &&
                         (!float.TryParse(tokens[2], NumberStyles.Float,
                             CultureInfo.InvariantCulture, out float parsedWarning) ||
                          float.IsNaN(parsedWarning) || float.IsInfinity(parsedWarning) ||
-                         parsedWarning < 0f))
-                        AppendText("USAGE  duel <nodeId> [warningSeconds>=0]", CommandFailureColor());
+                         parsedWarning < 0f) ||
+                        tokens.Length == 4 && !TryParseDuelChoice(tokens[3], out _))
+                        AppendText("USAGE  duel <nodeId> [warningSeconds] [default|infection|breach|worm|burst|pool:infection=1,breach=2,...]",
+                            CommandFailureColor());
                     else
                     {
                         ConnectionsDuelDirector duels = simulationHost != null ?
                             simulationHost.GetComponent<ConnectionsDuelDirector>() : null;
-                        float warning = tokens.Length == 3 ?
+                        float warning = tokens.Length >= 3 ?
                             float.Parse(tokens[2], CultureInfo.InvariantCulture) :
                             duels?.DefaultWarningSeconds ?? 0f;
                         string duelReason = "duel_unavailable";
+                        ConsequenceConfiguration choice = tokens.Length == 4 &&
+                            TryParseDuelChoice(tokens[3], out ConsequenceConfiguration selected) ?
+                            selected : null;
                         bool scheduled = duels != null && duels.TrySchedule(tokens[1],
-                            DuelVariant.CommandRace, warning, "developer_command", out duelReason);
+                            DuelVariant.CommandRace, warning, "developer_command",
+                            out duelReason, choice);
                         recorder?.RecordPlayerAction(command, null, scheduled, tokens[1],
                             scheduled ? null : duels == null ? "duel_unavailable" : duelReason);
                         AppendText(scheduled ? "INTRUSION SCHEDULED  " +
@@ -754,7 +759,7 @@ namespace Uptime.Connections
                     AppendText("DEV  notifytest im|system|burst [delay=1..30]  // authored samples", mutedColor);
                     AppendText("DEV  calltest [delay=1..30]  // sample call; not a network event", mutedColor);
                     AppendText("DEV  portscan <nodeId> | recon <nodeId>", mutedColor);
-                    AppendText("DEV  duel <nodeId> [warningSeconds]  // Command Race", mutedColor);
+                    AppendText("DEV  duel <nodeId> [warningSeconds] [infection|breach|worm|burst|pool:...]", mutedColor);
                     AppendText("DEV  spawn duel-auth  // completion schedules AUTH Duel", mutedColor);
                     AppendText("DEV  payload <targetNodeId> [steady|variable]", mutedColor);
                     AppendText("DEV  worm <originNodeId> scan-jammed|port-scanned|backdoor", mutedColor);
@@ -867,6 +872,62 @@ namespace Uptime.Connections
             return true;
         }
 
+        private static bool TryParseDuelChoice(string text,
+            out ConsequenceConfiguration config)
+        {
+            config = null;
+            if (string.Equals(text, "default", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (string.Equals(text, "infection", StringComparison.OrdinalIgnoreCase))
+            {
+                config = ConsequenceConfiguration.Explicit(
+                    ConsequenceCandidate.Atomic("infection", new ConsequenceEffectSpec
+                    { kind = ConsequenceKind.Infection, infectionKind = InfectionKind.PhantomLoad,
+                        parameter = 3f }));
+                return true;
+            }
+            ConsequenceTactic tactic;
+            if (string.Equals(text, "breach", StringComparison.OrdinalIgnoreCase))
+                tactic = ConsequenceTactic.BreachLockdown;
+            else if (string.Equals(text, "worm", StringComparison.OrdinalIgnoreCase))
+                tactic = ConsequenceTactic.ConditionWormOutbreak;
+            else if (string.Equals(text, "burst", StringComparison.OrdinalIgnoreCase))
+                tactic = ConsequenceTactic.PayloadBurst;
+            else if (text != null && text.StartsWith("pool:", StringComparison.OrdinalIgnoreCase))
+            {
+                var entries = new List<ConsequenceCandidate>();
+                foreach (string part in text.Substring(5).Split(','))
+                {
+                    string[] pair = part.Split('=');
+                    if (pair.Length != 2 || !float.TryParse(pair[1], NumberStyles.Float,
+                        CultureInfo.InvariantCulture, out float weight) ||
+                        weight < 0f || float.IsNaN(weight) || float.IsInfinity(weight))
+                        return false;
+                    ConsequenceCandidate candidate = null;
+                    foreach (ConsequenceCandidate option in ConsequencePlanner.StandardPool())
+                        if (string.Equals(pair[0], option.id, StringComparison.OrdinalIgnoreCase) ||
+                            pair[0].Equals("infection", StringComparison.OrdinalIgnoreCase) &&
+                            option.id == "phantom-load" ||
+                            pair[0].Equals("breach", StringComparison.OrdinalIgnoreCase) &&
+                            option.id == "breach-lockdown" ||
+                            pair[0].Equals("worm", StringComparison.OrdinalIgnoreCase) &&
+                            option.id == "condition-worm" ||
+                            pair[0].Equals("burst", StringComparison.OrdinalIgnoreCase) &&
+                            option.id == "payload-burst")
+                        { candidate = option.Copy(); break; }
+                    if (candidate == null) return false;
+                    candidate.weight = weight;
+                    entries.Add(candidate);
+                }
+                config = ConsequenceConfiguration.Custom(true, entries.ToArray());
+                return entries.Count > 0;
+            }
+            else return false;
+            config = ConsequenceConfiguration.Explicit(
+                ConsequenceCandidate.Tactic(tactic.ToString(), tactic));
+            return true;
+        }
+
         public static bool TryParseWormEffect(string text, out WormEffect effect)
         {
             if (string.Equals(text, "scan-jammed", System.StringComparison.OrdinalIgnoreCase))
@@ -942,6 +1003,8 @@ namespace Uptime.Connections
                 }
                 else AppendText(result == CleanStartResult.AlreadyActive ?
                     "CLEAN FAILED  SESSION ALREADY ACTIVE" :
+                    result == CleanStartResult.Locked ?
+                    "CLEAN LOCKED  " + nodeId :
                     "CLEAN FAILED  UNKNOWN NODE " + nodeId, CommandFailureColor());
             }
         }

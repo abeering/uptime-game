@@ -50,6 +50,7 @@ namespace Uptime.Connections
         private readonly List<NodeCondition> conditions = new List<NodeCondition>();
         private System.Random payloadSpawnerRandom;
         private float simulationTimeSeconds;
+        private int simulationGeneration;
         private NetworkHealth health;
         private CleanSession activeClean;
         private int nextCleanSessionId;
@@ -68,6 +69,7 @@ namespace Uptime.Connections
         public LogicalConnectionDefinition[] Definitions => connections;
         public IReadOnlyList<LogicalConnectionState> RuntimeConnections => runtimeConnections;
         public float SimulationTimeSeconds => simulationTimeSeconds;
+        public int SimulationGeneration => simulationGeneration;
         public NetworkHealthSnapshot Health => health?.Snapshot;
         public ConnectionRunMode RunMode => runMode;
         public ConnectionsRunRecorder Recorder => recorder;
@@ -684,7 +686,13 @@ namespace Uptime.Connections
 
         public bool TryApplyDuelInfection(NodeResources target, InfectionKind kind,
             float parameter, int duelId, out string error)
+            => TryApplyConsequenceInfection(target?.View?.NodeId, kind, parameter,
+                "duel:" + duelId, out error);
+
+        public bool TryApplyConsequenceInfection(string targetNodeId, InfectionKind kind,
+            float parameter, string source, out string error)
         {
+            NodeResources target = FindNodeResources(targetNodeId);
             if (target == null || Array.IndexOf(nodes, target) < 0)
             { error = "unknown_node"; return false; }
             bool usesParameter = kind == InfectionKind.PhantomLoad ||
@@ -692,12 +700,12 @@ namespace Uptime.Connections
             if (!Enum.IsDefined(typeof(InfectionKind), kind) ||
                 float.IsNaN(parameter) || float.IsInfinity(parameter) ||
                 usesParameter && parameter <= 0f || !usesParameter && parameter != 0f)
-            { error = "invalid_duel_infection"; return false; }
+            { error = "invalid_consequence_infection"; return false; }
             bool applied = ApplyInfection(target,
                 new InfectionPayload(kind,
                     kind == InfectionKind.PhantomLoad ? parameter : 0f,
                     kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner ?
-                        parameter : 0f), "duel:" + duelId, -1);
+                        parameter : 0f), source, -1);
             if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
             error = applied ? null : "infection_already_active";
             return applied;
@@ -722,6 +730,12 @@ namespace Uptime.Connections
                 recorder?.RecordPlayerAction(command, null, false, target.View.NodeId,
                     "clean_already_active");
                 return CleanStartResult.AlreadyActive;
+            }
+            if (ConditionFor(target.View, ConditionKind.CleanLocked) != null)
+            {
+                recorder?.RecordPlayerAction(command, null, false, target.View.NodeId,
+                    "clean_locked");
+                return CleanStartResult.Locked;
             }
             var captured = infections.FindAll(infection => infection.Target == target).ToArray();
             int actionSequence = recorder != null ? recorder.RecordPlayerAction(command,
@@ -1094,6 +1108,7 @@ namespace Uptime.Connections
 
         public void ResetSimulation()
         {
+            simulationGeneration++;
             ClearProbe();
             ClearOverclock();
             activeClean = null;

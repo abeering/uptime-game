@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Uptime.Connections
 {
-    public enum CleanStartResult { Started, UnknownNode, AlreadyActive }
+    public enum CleanStartResult { Started, UnknownNode, AlreadyActive, Locked }
     public enum CleanSelectionResult { InvalidPid, Success, InnocentProcess, NoSession }
 
     public sealed class CleanProcess

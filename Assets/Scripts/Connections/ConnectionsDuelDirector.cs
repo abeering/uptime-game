@@ -18,6 +18,8 @@ namespace Uptime.Connections
         public float WarningSeconds => LaunchAt - ScheduledAt;
         public InfectionKind LossInfection { get; internal set; }
         public float LossParameter { get; internal set; }
+        public ConsequencePlan LossPlan { get; internal set; }
+        public ConsequenceExecution LossExecution { get; internal set; }
         public bool? PlayerWon { get; internal set; }
         public bool? InfectionApplied { get; internal set; }
         public string ApplicationReason { get; internal set; }
@@ -32,6 +34,7 @@ namespace Uptime.Connections
         [SerializeField] private bool continueSimulationDuringDuel = true;
         [SerializeField] private InfectionKind lossInfection = InfectionKind.PhantomLoad;
         [SerializeField, Min(0f)] private float lossParameter = 3f;
+        [SerializeField] private ConsequenceCandidate[] defaultConsequencePool;
         [SerializeField] private string[] playerCommands =
         { "ss -tnp | grep :22", "tail -f /var/log/auth.log", "grep denied auth.log", "sudo service ssh restart" };
         [SerializeField] private string[] hackerCommands =
@@ -73,7 +76,7 @@ namespace Uptime.Connections
         }
 
         public bool TrySchedule(string targetNodeId, DuelVariant variant, float warningSeconds,
-            string source, out string reason)
+            string source, out string reason, ConsequenceConfiguration consequences = null)
         {
             if (current != null)
                 reason = "duel_slot_occupied_by_" + current.Lifecycle.ToString().ToLowerInvariant();
@@ -95,6 +98,20 @@ namespace Uptime.Connections
                 return false;
             }
             float now = host.SimulationTimeSeconds;
+            int encounterId = nextId + 1;
+            int seed = unchecked((host.GetComponent<ConnectionTrafficDirector>()?.Seed ?? 1701) ^
+                encounterId * 61463 ^ (int)0x45A189D1);
+            ConsequenceCandidate[] defaults = defaultConsequencePool != null &&
+                defaultConsequencePool.Length > 0 ? defaultConsequencePool :
+                ConsequencePlanner.StandardPool(lossInfection, lossParameter);
+            if (!ConsequencePlanner.TryPlan(host, "duel-" + encounterId,
+                source ?? "director", targetNodeId, defaults, consequences,
+                seed, out ConsequencePlan lossPlan, out reason))
+            {
+                host.Recorder?.RecordDuel("duel_rejected", null, now,
+                    source, targetNodeId, reason);
+                return false;
+            }
             current = new DuelEncounter
             {
                 Id = ++nextId,
@@ -105,8 +122,10 @@ namespace Uptime.Connections
                 ScheduledAt = now,
                 LaunchAt = now + warningSeconds,
                 LossInfection = lossInfection,
-                LossParameter = lossParameter
+                LossParameter = lossParameter,
+                LossPlan = lossPlan
             };
+            host.Recorder?.RecordConsequencePlan(lossPlan);
             host.Recorder?.RecordDuel("duel_scheduled", current, now);
             Changed?.Invoke(current);
             if (warningSeconds == 0f) Launch();
@@ -152,11 +171,16 @@ namespace Uptime.Connections
             current.PlayerWon = race.PlayerWon;
             if (race.PlayerWon == false)
             {
-                current.InfectionApplied = host.TryApplyDuelInfection(current.Target,
-                    current.LossInfection, current.LossParameter, current.Id,
-                    out string error);
-                current.ApplicationReason = error;
+                current.LossExecution = ConsequenceExecutor.Execute(host, current.LossPlan);
+                current.InfectionApplied = false;
+                foreach (ConsequenceComponentResult part in current.LossExecution.Components)
+                    if (part.Effect.Kind == ConsequenceKind.Infection && part.Succeeded)
+                        current.InfectionApplied = true;
+                current.ApplicationReason = current.LossExecution.AnySucceeded ? null :
+                    "no_effect_applied";
             }
+            else host.Recorder?.RecordConsequencePrevented(current.LossPlan,
+                host.SimulationTimeSeconds);
             host.Recorder?.RecordDuel("duel_resolved", current, host.SimulationTimeSeconds,
                 null, null, current.ApplicationReason, race);
             Changed?.Invoke(current);

@@ -117,6 +117,8 @@ namespace Uptime.Connections
                     host.SimulationTimeSeconds);
                 state.SetBackdoor(host.ConditionFor(card, ConditionKind.Backdoor),
                     host.SimulationTimeSeconds);
+                state.SetCleanLocked(host.ConditionFor(card, ConditionKind.CleanLocked),
+                    host.SimulationTimeSeconds);
                 state.SetIsolation(host.Worms?.IsolationAt(card), host.SimulationTimeSeconds);
                 state.SetInterceptor(host.Payloads?.InterceptorAt(card),
                     host.SimulationTimeSeconds);
@@ -236,6 +238,7 @@ namespace Uptime.Connections
         private void OnConditionApplied(NodeCondition condition)
         {
             if (condition == null) return;
+            if (condition.Kind == ConditionKind.CleanLocked) return;
             PlayStamp(condition.Target?.View, condition.Kind == ConditionKind.ScanJammed ?
                 NodeEventStamp.EventKind.ScanJammed : condition.Kind == ConditionKind.Backdoor ?
                 NodeEventStamp.EventKind.Backdoor : NodeEventStamp.EventKind.PortScanned);

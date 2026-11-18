@@ -189,6 +189,16 @@ namespace Uptime.Connections
         public int duelHackerCorrections;
         public string duelOutcome;
         public bool duelInfectionApplied;
+        public string consequencePlanId;
+        public string consequenceMode;
+        public int consequenceSeed;
+        public float consequenceRoll;
+        public string consequenceSelected;
+        public float consequenceScheduledAtSeconds;
+        public ConsequenceCandidateRecord[] consequenceCandidates;
+        public ConsequenceEffectRecord[] consequenceEffects;
+        public int consequenceEffectIndex;
+        public string consequenceEffectResult;
         public string connectionId;
         public string advertisedIdentity;
         public string previousIdentity;
@@ -223,6 +233,8 @@ namespace Uptime.Connections
         public float payloadActivityWeight;
         public float wormActivityWeight;
         public float payloadLauncherActivityWeight;
+        public float directDuelActivityWeight;
+        public float connectionDuelActivityWeight;
         public float hostileActivityRoll;
         public string activityOriginNodeId;
         public string targetNodeId;
@@ -318,6 +330,11 @@ namespace Uptime.Connections
         public int wormClaimedNodes;
         public int wormMaximumNodes;
         public float wormPropagationProbability;
+        public float wormEstablishSeconds;
+        public float wormTravelSeconds;
+        public float wormActionSeconds;
+        public float wormConditionSeconds;
+        public float wormBackdoorConditionSeconds;
         public float wormPropagationRoll;
         public bool wormPropagationSelected;
         public float wormEstablishSeconds;
@@ -331,6 +348,29 @@ namespace Uptime.Connections
         public float isolationCooldownUntilSeconds;
         public int wormsKilled;
         public int connectionsCanceled;
+    }
+
+    [Serializable] public sealed class ConsequenceCandidateRecord
+    {
+        public string id;
+        public float weight;
+        public bool eligible;
+        public string ineligibilityReason;
+    }
+
+    [Serializable] public sealed class ConsequenceEffectRecord
+    {
+        public string kind;
+        public string targetNodeId;
+        public string originNodeId;
+        public string infectionKind;
+        public float parameter;
+        public string conditionKind;
+        public float durationSeconds;
+        public string wormEffect;
+        public string payloadProfile;
+        public int wormMaximumNodes;
+        public float wormPropagationProbability;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
@@ -737,6 +777,8 @@ namespace Uptime.Connections
             entry.payloadActivityWeight = director.PayloadWeight;
             entry.wormActivityWeight = director.WormWeight;
             entry.payloadLauncherActivityWeight = director.PayloadLauncherWeight;
+            entry.directDuelActivityWeight = director.DirectDuelWeight;
+            entry.connectionDuelActivityWeight = director.ConnectionDuelWeight;
             entry.hostileActivityRoll = result.SelectionRoll;
             entry.source = "ambient";
             CopyHostileResult(entry, result);
@@ -759,6 +801,7 @@ namespace Uptime.Connections
             entry.hostileEventId = result.EventId;
             entry.payloadId = result.PayloadId;
             entry.wormOutbreakId = result.WormOutbreakId;
+            entry.duelId = result.DuelId;
             entry.activityOriginNodeId = result.OriginNodeId;
             entry.targetNodeId = result.TargetNodeId;
             entry.payloadProfile = result.PayloadProfile;
@@ -1176,6 +1219,8 @@ namespace Uptime.Connections
             entry.duelOutcome = encounter?.PlayerWon == true ? "won" :
                 encounter?.PlayerWon == false ? "lost" : null;
             entry.duelInfectionApplied = encounter?.InfectionApplied == true;
+            entry.consequencePlanId = encounter?.LossPlan?.Id;
+            entry.consequenceSelected = encounter?.LossPlan?.SelectedCandidateId;
             if (race == null) return;
             entry.duelPlayerCompleted = race.PlayerCompletedAt.HasValue;
             entry.duelHackerCompleted = race.HackerCompletedAt.HasValue;
@@ -1185,6 +1230,97 @@ namespace Uptime.Connections
             entry.duelPlayerCorrections = race.Player.Corrections;
             entry.duelHackerMistakes = race.Hacker.Mistakes;
             entry.duelHackerCorrections = race.Hacker.Corrections;
+        }
+
+        public void RecordConsequencePlan(ConsequencePlan plan)
+        {
+            if (!IsRecording || plan == null) return;
+            RunEvent entry = NewEvent("consequence_planned", plan.ScheduledAtSeconds);
+            entry.consequencePlanId = plan.Id;
+            entry.source = plan.Source;
+            entry.targetNodeId = plan.TargetNodeId;
+            entry.consequenceMode = plan.Mode.ToString();
+            entry.consequenceSeed = plan.Seed;
+            entry.consequenceRoll = plan.SelectionRoll;
+            entry.consequenceSelected = plan.SelectedCandidateId;
+            entry.consequenceScheduledAtSeconds = plan.ScheduledAtSeconds;
+            entry.consequenceCandidates = new ConsequenceCandidateRecord[plan.Candidates.Count];
+            for (int i = 0; i < entry.consequenceCandidates.Length; i++)
+                entry.consequenceCandidates[i] = new ConsequenceCandidateRecord
+                { id = plan.Candidates[i].id, weight = plan.Candidates[i].weight,
+                    eligible = plan.CandidateReasons[i] == null,
+                    ineligibilityReason = plan.CandidateReasons[i] };
+            entry.consequenceEffects = new ConsequenceEffectRecord[plan.Effects.Count];
+            for (int i = 0; i < entry.consequenceEffects.Length; i++)
+            {
+                ConsequenceEffect effect = plan.Effects[i];
+                WormTuning tuning = effect.WormTuning;
+                entry.consequenceEffects[i] = new ConsequenceEffectRecord
+                {
+                    kind = effect.Kind.ToString(), targetNodeId = effect.TargetNodeId,
+                    originNodeId = effect.OriginNodeId,
+                    infectionKind = effect.Kind == ConsequenceKind.Infection ?
+                        effect.InfectionKind.ToString() : null,
+                    parameter = effect.Parameter,
+                    conditionKind = effect.Kind == ConsequenceKind.Condition ?
+                        effect.ConditionKind.ToString() : null,
+                    durationSeconds = effect.DurationSeconds,
+                    wormEffect = effect.Kind == ConsequenceKind.WormOutbreak ?
+                        effect.WormEffect.ToString() : null,
+                    payloadProfile = effect.Kind == ConsequenceKind.Payload ?
+                        effect.PayloadProfile.ToString() : null,
+                    wormMaximumNodes = tuning?.maximumNodes ?? 0,
+                    wormPropagationProbability = tuning?.propagationProbability ?? 0f,
+                    wormEstablishSeconds = tuning?.establishSeconds ?? 0f,
+                    wormTravelSeconds = tuning?.travelSeconds ?? 0f,
+                    wormActionSeconds = tuning?.actionSeconds ?? 0f,
+                    wormConditionSeconds = tuning?.conditionSeconds ?? 0f,
+                    wormBackdoorConditionSeconds = tuning?.backdoorConditionSeconds ?? 0f
+                };
+            }
+        }
+
+        public void RecordConsequenceComponent(ConsequencePlan plan,
+            ConsequenceComponentResult result, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("consequence_component_result", time);
+            entry.consequencePlanId = plan.Id;
+            entry.consequenceEffectIndex = result.Index;
+            entry.effectType = result.Effect.Kind.ToString();
+            entry.targetNodeId = result.Effect.TargetNodeId;
+            entry.activityOriginNodeId = result.Effect.OriginNodeId;
+            entry.success = result.Succeeded;
+            entry.reason = result.Reason;
+            entry.consequenceEffectResult = result.CreatedId;
+            if (result.Effect.Kind == ConsequenceKind.WormOutbreak)
+                entry.wormOutbreakId = result.CreatedId;
+            if (result.Effect.Kind == ConsequenceKind.Payload)
+                entry.payloadId = result.CreatedId;
+        }
+
+        public void RecordConsequenceExecution(ConsequencePlan plan,
+            ConsequenceExecution execution)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("consequence_executed", execution.ExecutedAtSeconds);
+            entry.consequencePlanId = plan.Id;
+            entry.consequenceSelected = plan.SelectedCandidateId;
+            entry.targetNodeId = plan.TargetNodeId;
+            entry.source = plan.Source;
+            entry.success = execution.AnySucceeded;
+            entry.consequenceScheduledAtSeconds = plan.ScheduledAtSeconds;
+        }
+
+        public void RecordConsequencePrevented(ConsequencePlan plan, float time)
+        {
+            if (!IsRecording || plan == null) return;
+            RunEvent entry = NewEvent("consequence_prevented", time);
+            entry.consequencePlanId = plan.Id;
+            entry.consequenceSelected = plan.SelectedCandidateId;
+            entry.targetNodeId = plan.TargetNodeId;
+            entry.source = plan.Source;
+            entry.consequenceScheduledAtSeconds = plan.ScheduledAtSeconds;
         }
 
         public void RecordProbe(string type, string linkId, float time,

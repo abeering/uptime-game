@@ -150,7 +150,8 @@ namespace Uptime.Connections
             if (subscribedKeyboard != null) subscribedKeyboard.onTextInput -= OnTextInput;
             subscribedKeyboard = null;
             resultText.text = encounter.PlayerWon == true ? "DUEL WON  /  INTRUSION STOPPED" :
-                encounter.InfectionApplied == true ? "DUEL LOST  /  INTRUSION SUCCEEDED" :
+                encounter.LossExecution?.AnySucceeded == true ?
+                    "DUEL LOST  /  INTRUSION SUCCEEDED" :
                 "DUEL LOST  /  INTRUSION BLOCKED";
             resultText.gameObject.SetActive(true);
             terminal?.DuelReceipt(encounter);
