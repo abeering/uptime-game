@@ -1,0 +1,79 @@
+Maximum Pressure V0 validation — November 19, 2026
+Base main: d43dab45eba5a848011d3039d3e29f9b46942aee
+Unity 6000.3.11f1. Isolated worktree; original Living Shift workspace untouched.
+Measurement, regression, and real Play Mode capture processes all exited 0.
+Final compilation included both new Editor helpers. No runtime code changes.
+
+Final measurement output:
+PRESSURE EVIDENCE baseline-1701-unattended min=99.73769 final=100
+PRESSURE EVIDENCE baseline-1701-limited min=99.73769 final=100
+PRESSURE EVIDENCE baseline-1702-unattended min=97.85706 final=97.85706
+PRESSURE EVIDENCE baseline-1702-limited min=99.16332 final=100
+PRESSURE EVIDENCE baseline-3141-unattended min=100 final=100
+PRESSURE EVIDENCE baseline-3141-limited min=100 final=100
+PRESSURE EVIDENCE baseline-9001-unattended min=76.08698 final=76.08698
+PRESSURE EVIDENCE baseline-9001-limited min=95.92423 final=100
+PRESSURE EVIDENCE pressure-1701-unattended min=39.75084 final=49.2288
+PRESSURE EVIDENCE pressure-1701-limited min=67.9588 final=83.16399
+PRESSURE EVIDENCE pressure-1702-unattended min=96.12054 final=96.12054
+PRESSURE EVIDENCE pressure-1702-limited min=99.69034 final=100
+PRESSURE EVIDENCE pressure-3141-unattended min=38.4431 final=38.4431
+PRESSURE EVIDENCE pressure-3141-limited min=99.55663 final=99.55663
+PRESSURE EVIDENCE pressure-9001-unattended min=39.45626 final=39.45626
+PRESSURE EVIDENCE pressure-9001-limited min=69.20056 final=69.20056
+MaximumPressureWitness PASS: isolated scene bindings/tuning, sixteen 180-second comparisons and four seeded replays.
+
+Existing regression witness output:
+TrafficWitness PASS
+AmbientHostileActivityWitness PASS: selection, zero weights, routes, replay, toggles, exhaustion, coarse stepping, and four 600-second runs.
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness bar presentation PASS: layout, eased and repeated penalties, sustained drain, critical priority, recovery, configurable threshold, frame subdivision, and reset.
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+DuelWitness PASS: race state, immutable typing reference, token/character/error highlights, pending/active exclusivity, connection effect, status countdown, outcomes, infection rejection, pause policy, reset, and both authored scene bindings.
+ConsequenceWitness PASS: selection modes, repeatability, independent execution, timed lock, Worm and Payload tactics, ambient direct and carrier Duel routes, recorder evidence.
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-maximum-pressure/Logs/UptimeRuns/uptime_20261119_161114_seed-01701_d5f711a2.json
+PayloadWitness PASS: both scenes, identity, hop lifecycle, defense, all-Payload and targeted commands, repeated catches, shared lanes, expiry, cooldown, delivery, wrong matches, congestion, WORK/Health, recorder and reset.
+WormWitness PASS: phase timing, thread/body, effects, branch coverage, replay, containment, service cost, status and reset.
+AmbientPayloadThreatWitness PASS: both scene weights, Launcher lineage/kill, INFECTOR cadence, CLEAN independence, Spawner exclusion, toggles, replay, and four 600-second Advanced simulations.
+Maximum Pressure regression suite PASS (10 existing witnesses).
+
+Real 1x Play Mode capture output:
+PRESSURE CAPTURE sim=90.45684 health=99.88385 liveConnections=10
+PRESSURE CAPTURE sim=150.1952 health=77.1897 liveConnections=14
+PRESSURE CAPTURE sim=175.2003 health=48.29562 liveConnections=16
+MaximumPressureCapture PASS: six natural seeded Play Mode frames, both 16:9 sizes.
+Tooling caveat: UnityEditor.Search startup indexing ArgumentOutOfRangeException.
+It did not prevent Play Mode or capture completion. No clean-Console claim.
+All six images were visually inspected. Two orange Payload bodies are close at 150 s.
+Physical keyboard/IME delivery, human urgency, and listening were not tested.
+
+Original scene SHA-256 (identical to base):
+Assets/Scenes/ConnectionsAdvanced.unity: 415459d8a446b15ef782ccb85e3972440f2a030ffd0d462f7287cbfb907d573a
+Assets/Scenes/Connections.unity: 9872e63b8fce15c5a0ae1875f99816eb6ba018f2e68f714a529157f6e968d780
+Assets/Scenes/GameScene.unity: a6e3806fe1019bc8da6c1601e3d5199b0ffa377d2a4c19292d3ced1fa3d68830
+Assets/Scenes/ABScene.unity: 5f5d0fbdcae69a8b3f0bf2ee84f80b94e47e7fc868291bfa97a16e92aa77811e
+All gameplay runtime code, existing prefabs, ProjectSettings and Packages identical to base.
+Pressure scene equivalence (all bindings/overrides except four tuning values): PASS in Unity.
+New scene GUID differs from Advanced: PASS in Unity.
+
+PNG header dimensions:
+seed9001-150s-1280x720.png: 1280x720
+seed9001-150s-1920x1080.png: 1920x1080
+seed9001-175s-1280x720.png: 1280x720
+seed9001-175s-1920x1080.png: 1920x1080
+seed9001-90s-1280x720.png: 1280x720
+seed9001-90s-1920x1080.png: 1920x1080
+
+Evidence integrity: 16 gzip recorder JSON documents parsed; all have completed-run metadata.
+Each run has exactly 180 samples with fixed-step running Health minimum.
+Live capture recording parsed: seed 9001, three capture markers, endedUtc present.
+python3 scripts/build_uptime_project_core.py --check: PASS
+git diff --check: PASS
+
+Manual review: follow README.md; compare Advanced and Pressure for three minutes each,
+repeat fixed seeds, test 16:9 labels/status/inspect/history/prompt, CLEAN/Duel interruption
+and restored focus, actual prioritization, deterioration and recovery.
