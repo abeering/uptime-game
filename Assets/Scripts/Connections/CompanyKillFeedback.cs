@@ -57,6 +57,8 @@ namespace Uptime.Connections
                 company == null || textCommunications == null || simulationHost == null)
                 return;
 
+            if (simulationHost.LivingShift != null &&
+                simulationHost.LivingShift.Owns(state.ConnectionId)) return;
             float now = simulationHost.SimulationTimeSeconds;
             if (pending || now < nextAllowedAt) return;
             pendingOrderSubmit = string.Equals(state.Definition.ProfileId, "order-submit",
@@ -74,6 +76,7 @@ namespace Uptime.Connections
         // Explicit simulation-time seam for deterministic Editor witnesses.
         public void DeliverDue(float simulationSeconds)
         {
+            if (simulationHost != null && simulationHost.GameplayStopped) { pending = false; return; }
             if (!pending || simulationSeconds < dueAt || company == null ||
                 textCommunications == null) return;
             CompanySpeaker speaker = pendingOrderSubmit ? company.CustomerSupport : company.Operations;

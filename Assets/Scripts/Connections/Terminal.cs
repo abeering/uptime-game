@@ -360,7 +360,7 @@ namespace Uptime.Connections
 
         private void HandleSubmit(string raw)
         {
-            if (keyboardSuspended) return;
+            if (keyboardSuspended || simulationHost != null && simulationHost.GameplayStopped) return;
             if (commandInput == null || string.IsNullOrWhiteSpace(raw))
             {
                 StartCoroutine(FocusInputNextFrame());
@@ -1377,10 +1377,24 @@ namespace Uptime.Connections
             bottomScrollRoutine = null;
         }
 
+        public void SetShiftFinished(bool finished)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (delayedCall != null) StopCoroutine(delayedCall);
+            delayedCall = null;
+            CancelNotificationTest();
+#endif
+            if (commandInput == null) return;
+            commandInput.interactable = !finished;
+            if (finished) commandInput.DeactivateInputField();
+            else StartCoroutine(FocusInputNextFrame());
+        }
+
         private IEnumerator FocusInputNextFrame()
         {
             yield return null;
             if (commandInput == null || keyboardSuspended ||
+                simulationHost != null && simulationHost.GameplayStopped ||
                 cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
                 yield break;
             commandInput.ActivateInputField();
