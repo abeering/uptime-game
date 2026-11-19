@@ -330,11 +330,6 @@ namespace Uptime.Connections
         public int wormClaimedNodes;
         public int wormMaximumNodes;
         public float wormPropagationProbability;
-        public float wormEstablishSeconds;
-        public float wormTravelSeconds;
-        public float wormActionSeconds;
-        public float wormConditionSeconds;
-        public float wormBackdoorConditionSeconds;
         public float wormPropagationRoll;
         public bool wormPropagationSelected;
         public float wormEstablishSeconds;
@@ -371,6 +366,11 @@ namespace Uptime.Connections
         public string payloadProfile;
         public int wormMaximumNodes;
         public float wormPropagationProbability;
+        public float wormEstablishSeconds;
+        public float wormTravelSeconds;
+        public float wormActionSeconds;
+        public float wormConditionSeconds;
+        public float wormBackdoorConditionSeconds;
     }
 
     [Serializable] public sealed class ConnectionDefinitionRecord
