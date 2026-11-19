@@ -210,6 +210,8 @@ namespace Uptime.Connections
             Close();
         }
 
+        public void AbortForShiftEnd() => Close();
+
         private void Close(string message = null, bool success = false)
         {
             escapeCoordinator.Unregister(this);

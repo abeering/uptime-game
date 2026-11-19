@@ -37,6 +37,8 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene(Scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            // This witness isolates the existing endless sandbox mechanics.
+            if (host.LivingShift != null) host.LivingShift.enabled = false;
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
             var presenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();

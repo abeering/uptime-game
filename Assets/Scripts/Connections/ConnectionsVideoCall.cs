@@ -34,6 +34,7 @@ namespace Uptime.Connections
         private bool active;
 
         public bool IsActive => active && isActiveAndEnabled;
+        public ConnectionsVideoCallData CurrentCall { get; private set; }
         public bool IsTyping { get; private set; }
         public bool CanDismissWithEscape => IsActive;
         public event Action CallOpened;
@@ -46,6 +47,7 @@ namespace Uptime.Connections
                 escapeCoordinator == null || !escapeCoordinator.isActiveAndEnabled || placement == null)
                 return false;
             active = true;
+            CurrentCall = data;
             callerText.text = "CALL / " + (string.IsNullOrWhiteSpace(data.CallerName) ?
                 "UNKNOWN CALLER" : data.CallerName);
             portraitImage.sprite = data.Portrait;
@@ -97,6 +99,7 @@ namespace Uptime.Connections
         private void StopCall()
         {
             active = false;
+            CurrentCall = null;
             if (escapeCoordinator != null) escapeCoordinator.Unregister(this);
             if (typeRoutine != null) StopCoroutine(typeRoutine);
             typeRoutine = null;

@@ -1,0 +1,17 @@
+seed,policy,credited,eligible,lost,health,result,targetMetAt
+1701,no-input,1724.29,4264.42,2540.14,68.80,failed,-1.00
+1701,diagnostic-intervention,3292.08,4219.04,0.00,21.95,complete,323.01
+23,no-input,2220.36,3771.31,0.00,0.00,failed,-1.00
+23,diagnostic-intervention,3682.90,3771.31,0.00,17.67,complete,303.41
+42,no-input,895.02,3374.30,1369.95,0.00,failed,-1.00
+42,diagnostic-intervention,3243.85,3449.33,0.00,82.71,complete,330.31
+99,no-input,959.41,3793.43,2834.02,5.35,failed,-1.00
+99,diagnostic-intervention,3793.43,3793.43,0.00,100.00,complete,258.31
+4109,no-input,2229.21,3280.51,50.89,64.11,failed,-1.00
+4109,diagnostic-intervention,2437.09,3363.21,0.00,100.00,failed,-1.00
+8102,no-input,1428.55,3076.35,0.00,0.00,failed,-1.00
+8102,diagnostic-intervention,3076.35,3076.35,0.00,100.00,complete,332.21
+777,no-input,2463.63,3203.19,0.00,0.00,failed,-1.00
+777,diagnostic-intervention,2936.52,3203.19,0.00,99.59,complete,347.01
+2026,no-input,2934.19,3757.52,761.00,79.79,complete,334.91
+2026,diagnostic-intervention,3616.46,3911.70,0.00,71.32,complete,323.41

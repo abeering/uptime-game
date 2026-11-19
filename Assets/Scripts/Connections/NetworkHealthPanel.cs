@@ -56,7 +56,10 @@ namespace Uptime.Connections
         {
             if (host == null) return;
             float clockMinutes = shiftStartHour * 60f + shiftStartMinute +
-                host.SimulationTimeSeconds * Mathf.Max(0.001f, clockMinutesPerSimulationSecond);
+                (host.LivingShift != null && host.LivingShift.IsEnabled ?
+                    Mathf.Lerp(0f, (ShiftEndMinuteOfDay - (shiftStartHour * 60 + shiftStartMinute) + 1440) % 1440,
+                        Mathf.Clamp01(host.SimulationTimeSeconds / LivingShiftDirector.Duration)) :
+                    host.SimulationTimeSeconds * Mathf.Max(0.001f, clockMinutesPerSimulationSecond));
             int minuteOfDay = Mathf.FloorToInt(clockMinutes) % 1440;
             if (clockText != null) clockText.text = $"{minuteOfDay / 60:00}:{minuteOfDay % 60:00}";
             RenderTools();

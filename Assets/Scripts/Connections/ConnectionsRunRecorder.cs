@@ -174,6 +174,7 @@ namespace Uptime.Connections
         public int sequence;
         public float timeSeconds;
         public string type;
+        public LivingShiftRecord shift;
         public int duelId;
         public string duelVariant;
         public string duelLifecycle;
@@ -1201,6 +1202,11 @@ namespace Uptime.Connections
             entry.reason = reason;
             entry.probeLinkId = probeLinkId;
             return entry.sequence;
+        }
+
+        public void RecordShift(string type, float time, LivingShiftRecord data)
+        {
+            if (IsRecording) NewEvent(type, time).shift = data;
         }
 
         public void RecordDuel(string type, DuelEncounter encounter, float time,

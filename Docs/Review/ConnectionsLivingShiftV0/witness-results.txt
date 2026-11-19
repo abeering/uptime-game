@@ -1,0 +1,122 @@
+Unity 6000.3.11f1; isolated project copy; November 18, 2026 (America/Los_Angeles).
+Base main: d43dab45eba5a848011d3039d3e29f9b46942aee.
+Selected actual log lines; full stack traces and repeated Unity startup diagnostics omitted.
+
+Living Shift deterministic and 1080p Play Mode
+SHIFT CHECK: Advanced enables authored Living Shift
+SHIFT CHECK: authored panel binding director
+SHIFT CHECK: authored panel binding objectiveRoot
+SHIFT CHECK: authored panel binding objectiveText
+SHIFT CHECK: authored panel binding paceText
+SHIFT CHECK: authored panel binding progressFill
+SHIFT CHECK: authored panel binding resultRoot
+SHIFT CHECK: authored panel binding resultText
+SHIFT CHECK: authored panel binding summaryText
+SHIFT CHECK: authored panel binding restartButton
+SHIFT CHECK: fixed measured target is 2800 WORK
+SHIFT CHECK: same seed repeats selected activities/timing/count/intensity
+SHIFT CHECK: main, distinct secondary and two later activities planned
+SHIFT CHECK: real legitimate activity plans queued through existing pipeline
+SHIFT CHECK: opening content comes from main activity
+SHIFT CHECK: interruption cites real owned ID
+SHIFT CHECK: lost opportunity recorded
+SHIFT CHECK: only completed benign operation credited; hostile excluded
+SHIFT CHECK: earlier credit retained, partial killed operation receives zero
+SHIFT CHECK: duplicate completion identity cannot double credit
+SHIFT CHECK: serious service cue requires actual deteriorating work
+SHIFT CHECK: recovery cue follows genuine cleared degradation and Health recovery
+SHIFT CHECK: successful batch acknowledgment matches every actual owned resolution
+SHIFT CHECK: reset clears totals and identities
+SHIFT CHECK: fixed target produces actual deadline failure at 360
+SHIFT CHECK: terminal result freezes simulation and new traffic
+SHIFT CHECK: one final result receipt
+SHIFT CHECK: batch result based on authoritative resolutions
+SHIFT CHECK: coarse steps visit activity schedules and clamp at the deadline with ambient off
+SHIFT CHECK: switch restores endless sandbox cadence and progression
+SHIFT CHECK: fresh reset restarts shift
+SHIFT CHECK: four-node scene has no experiment enabled
+LivingShiftWitness PASS
+SHIFT PLAY CHECK: opening call and real messages preserve terminal draft/focus
+SHIFT PLAY CHECK: authored opening actually delivered
+SHIFT PLAY CHECK: Duel opened over CLEAN/call at boundary
+SHIFT PLAY CHECK: fixed-target failed ending
+SHIFT PLAY CHECK: all gameplay overlays canceled at deadline
+SHIFT PLAY CHECK: result gives keyboard focus to restart
+SHIFT PLAY CHECK: simulation remains frozen behind result
+SHIFT PLAY CHECK: same seed, unchanged target, intervention produces success
+SHIFT PLAY CHECK: restart selects new seed, clears work and restores input
+LivingShiftCapture PLAY PASS 1920x1080
+
+Regression and visible-information policy
+TrafficWitness PASS
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-living-shift/Logs/UptimeRuns/uptime_20261119_040559_seed-01701_1fbc4636.json
+NetworkHealthWitness compact layout PASS: ConnectionsAdvanced
+NetworkHealthWitness compact layout PASS: Connections
+NetworkHealthWitness PASS: ordinary, contention, independent target, overdue escalation, exclusive recovery, observable hostile conditions, kills, reset, and operation arc.
+ConsequenceWitness PASS: selection modes, repeatability, independent execution, timed lock, Worm and Payload tactics, ambient direct and carrier Duel routes, recorder evidence.
+AmbientHostileActivityWitness PASS: selection, zero weights, routes, replay, toggles, exhaustion, coarse stepping, and four 600-second runs.
+AdvancedSceneWitness PASS: authored scene, three deterministic real-traffic runs, Blackout cancellation and Spawner routing.
+SHIFT OPERATOR: 1701,scan-clean-overclock,2024.79,4535.07,2194.25,25.77,failed,-1.00
+SHIFT OPERATOR: 23,scan-clean-overclock,3682.90,3771.31,0.00,19.77,complete,298.50
+SHIFT OPERATOR: 42,scan-clean-overclock,3243.85,3374.30,0.00,0.13,complete,333.61
+SHIFT OPERATOR: 99,scan-clean-overclock,3671.03,4263.23,267.49,5.35,complete,274.00
+SHIFT OPERATOR: 4109,scan-clean-overclock,2311.92,3363.21,50.89,99.58,failed,-1.00
+SHIFT OPERATOR: 8102,scan-clean-overclock,2886.92,3318.86,0.00,96.87,complete,343.31
+SHIFT OPERATOR: 777,scan-clean-overclock,2936.52,3203.19,0.00,94.88,complete,346.11
+SHIFT OPERATOR: 2026,scan-clean-overclock,3036.41,3911.70,600.94,95.73,complete,327.01
+LivingShift Operator Measure PASS
+
+Eight-seed no-input and diagnostic measurements
+SHIFT CHECK: Advanced enables authored Living Shift
+SHIFT CHECK: same seed repeats selected activities/timing/count/intensity
+SHIFT CHECK: main, distinct secondary and two later activities planned
+SHIFT CHECK: real legitimate activity plans queued through existing pipeline
+SHIFT CHECK: opening content comes from main activity
+SHIFT CHECK: interruption cites real owned ID
+SHIFT CHECK: lost opportunity recorded
+SHIFT CHECK: only completed benign operation credited; hostile excluded
+SHIFT CHECK: earlier credit retained, partial killed operation receives zero
+SHIFT CHECK: duplicate completion identity cannot double credit
+SHIFT CHECK: reset clears totals and identities
+SHIFT CHECK: fixed target produces actual deadline failure at 360
+SHIFT CHECK: terminal result freezes simulation and new traffic
+SHIFT CHECK: one final result receipt
+SHIFT CHECK: batch result based on authoritative resolutions
+SHIFT CHECK: switch restores endless sandbox cadence and progression
+SHIFT CHECK: fresh reset restarts shift
+SHIFT CHECK: four-node scene has no experiment enabled
+LivingShiftWitness PASS
+SHIFT MEASURE: 1701,no-input,1724.29,4264.42,2540.14,68.80,failed,-1.00
+SHIFT MEASURE: 1701,diagnostic-intervention,3292.08,4219.04,0.00,21.95,complete,323.01
+SHIFT MEASURE: 23,no-input,2220.36,3771.31,0.00,0.00,failed,-1.00
+SHIFT MEASURE: 23,diagnostic-intervention,3682.90,3771.31,0.00,17.67,complete,303.41
+SHIFT MEASURE: 42,no-input,895.02,3374.30,1369.95,0.00,failed,-1.00
+SHIFT MEASURE: 42,diagnostic-intervention,3243.85,3449.33,0.00,82.71,complete,330.31
+SHIFT MEASURE: 99,no-input,959.41,3793.43,2834.02,5.35,failed,-1.00
+SHIFT MEASURE: 99,diagnostic-intervention,3793.43,3793.43,0.00,100.00,complete,258.31
+SHIFT MEASURE: 4109,no-input,2229.21,3280.51,50.89,64.11,failed,-1.00
+SHIFT MEASURE: 4109,diagnostic-intervention,2437.09,3363.21,0.00,100.00,failed,-1.00
+SHIFT MEASURE: 8102,no-input,1428.55,3076.35,0.00,0.00,failed,-1.00
+SHIFT MEASURE: 8102,diagnostic-intervention,3076.35,3076.35,0.00,100.00,complete,332.21
+SHIFT MEASURE: 777,no-input,2463.63,3203.19,0.00,0.00,failed,-1.00
+SHIFT MEASURE: 777,diagnostic-intervention,2936.52,3203.19,0.00,99.59,complete,347.01
+SHIFT MEASURE: 2026,no-input,2934.19,3757.52,761.00,79.79,complete,334.91
+SHIFT MEASURE: 2026,diagnostic-intervention,3616.46,3911.70,0.00,71.32,complete,323.41
+LivingShift Measure PASS /private/tmp/living-shift-measurements.csv
+
+Known baseline failure (also reproduced in a separate unchanged-main project):
+ResourceWitness failed: inspect header pill keeps authored large geometry and identity color
+ResourceWitness.CheckHeader at Assets/Editor/ResourceWitness.cs:383; CheckPresentation at :198; Run at :77.
+No physical keyboard/IME playtest performed.
+
+Final 720p Play Mode pass:
+SHIFT PLAY CHECK: opening call and real messages preserve terminal draft/focus
+SHIFT PLAY CHECK: authored opening actually delivered
+SHIFT PLAY CHECK: Duel opened over CLEAN/call at boundary
+SHIFT PLAY CHECK: fixed-target failed ending
+SHIFT PLAY CHECK: all gameplay overlays canceled at deadline
+SHIFT PLAY CHECK: result gives keyboard focus to restart
+SHIFT PLAY CHECK: simulation remains frozen behind result
+SHIFT PLAY CHECK: same seed, unchanged target, intervention produces success
+SHIFT PLAY CHECK: restart selects new seed, clears work and restores input
+LivingShiftCapture PLAY PASS 1280x720

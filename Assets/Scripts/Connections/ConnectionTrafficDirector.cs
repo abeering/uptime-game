@@ -450,6 +450,7 @@ namespace Uptime.Connections
 
         public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
         {
+            if (host.GameplayStopped) throw new InvalidOperationException("Shift finished.");
             if (plan == null || string.IsNullOrWhiteSpace(plan.ConnectionId) ||
                 !reservedIds.Add(plan.ConnectionId))
                 throw new InvalidOperationException("Spawn plans require a unique, nonempty connection ID.");
@@ -461,6 +462,7 @@ namespace Uptime.Connections
 
         public void Tick(float simulationTime, bool allowAmbient)
         {
+            if (host.GameplayStopped) return;
             if (random == null) ResetDirector();
             int blackoutCount = 0;
             foreach (NodeInfection infection in host.Infections)
@@ -902,6 +904,25 @@ namespace Uptime.Connections
                 return GenerateWeightedPurposePlan(atTime, true);
             }
             finally { random = ambientRandom; }
+        }
+
+        // Event-owned benign work uses normal recipes and queueing, with a caller-owned RNG.
+        // IDs remain globally reserved by this director; other plan RNG streams are untouched.
+        public ConnectionSpawnPlan GenerateActivityPlan(string purposeId, float atTime,
+            System.Random activityRandom, string targetId = null)
+        {
+            if (random == null) ResetDirector();
+            ConnectionTrafficProfile profile = Array.Find(profiles,
+                p => p != null && p.purposeTemplate && p.id == purposeId);
+            if (profile == null || activityRandom == null)
+                throw new ArgumentException("Activity requires a canonical purpose and RNG.");
+            NodeView target = targetId == null ? null : FindNode(targetId);
+            if (targetId != null && (target == null || !IsInternalNode(target)))
+                throw new ArgumentException("Activity requires an internal target.");
+            System.Random previous = random;
+            random = activityRandom;
+            try { return BuildPlan(profile, atTime, true, targetOverride: target, forceBenign: true); }
+            finally { random = previous; }
         }
 
         // Uses the purpose recipe with a separate random stream. The child is queued now and

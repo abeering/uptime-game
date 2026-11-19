@@ -1,0 +1,9 @@
+seed,policy,credited,eligible,lost,health,result,targetMetAt
+1701,scan-clean-overclock,2024.79,4535.07,2194.25,25.77,failed,-1.00
+23,scan-clean-overclock,3682.90,3771.31,0.00,19.77,complete,298.50
+42,scan-clean-overclock,3243.85,3374.30,0.00,0.13,complete,333.61
+99,scan-clean-overclock,3671.03,4263.23,267.49,5.35,complete,274.00
+4109,scan-clean-overclock,2311.92,3363.21,50.89,99.58,failed,-1.00
+8102,scan-clean-overclock,2886.92,3318.86,0.00,96.87,complete,343.31
+777,scan-clean-overclock,2936.52,3203.19,0.00,94.88,complete,346.11
+2026,scan-clean-overclock,3036.41,3911.70,600.94,95.73,complete,327.01

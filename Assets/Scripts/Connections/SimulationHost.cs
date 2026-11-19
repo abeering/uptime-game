@@ -63,6 +63,9 @@ namespace Uptime.Connections
         private float overclockExpiresAtSeconds;
         private float overclockReadyAtSeconds;
         private ConnectionsDuelDirector duelDirector;
+        [SerializeField] private LivingShiftDirector livingShift;
+        public LivingShiftDirector LivingShift => livingShift;
+        public bool GameplayStopped => livingShift != null && livingShift.IsEnabled && livingShift.IsFinished;
 
         public NodeResources[] Nodes => nodes;
         public PhysicalLinkReference[] PhysicalLinks => physicalLinks;
@@ -120,6 +123,7 @@ namespace Uptime.Connections
         // Raised once for each successful application or refresh, not each render frame.
         public event Action<NodeCondition> ConditionApplied;
         public event Action SimulationReset;
+        public event Action<LogicalConnectionState, int, float> OperationCompleted;
         public event Action<string> ProbeExpired;
         public bool HasEverUsedId(string id) => usedIds.Contains(id) ||
             payloadDirector != null && payloadDirector.HasEverUsedId(id) ||
@@ -258,6 +262,9 @@ namespace Uptime.Connections
         {
             if (deltaSeconds <= 0f || float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds))
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
+            if (GameplayStopped) return;
+            if (livingShift != null && livingShift.IsEnabled && livingShift.IsRunning)
+                deltaSeconds = Mathf.Min(deltaSeconds, livingShift.TimeRemaining);
             // A Payload launch or Payload Spawner installation must take effect at
             // its fixed-step completion, even in a coarse witness interval.
             float fixedStep = Mathf.Max(.000001f, Time.fixedDeltaTime);
@@ -275,9 +282,9 @@ namespace Uptime.Connections
             // Ambient opportunities are scheduled on the simulation clock. A coarse
             // witness step must visit that clock, so new Payloads and Worms move from
             // their actual opportunity time rather than all appearing at the end.
-            if (deltaSeconds > 1f && runMode == ConnectionRunMode.Generated &&
-                trafficDirector != null && trafficDirector.AutoGenerationEnabled &&
-                trafficDirector.HostileGenerationEnabled)
+            if (deltaSeconds > 1f && (livingShift != null && livingShift.IsRunning ||
+                runMode == ConnectionRunMode.Generated && trafficDirector != null &&
+                trafficDirector.AutoGenerationEnabled && trafficDirector.HostileGenerationEnabled))
             {
                 float remainingCoarse = deltaSeconds;
                 while (remainingCoarse > 0.000001f)
@@ -289,9 +296,14 @@ namespace Uptime.Connections
                 return;
             }
             if (runtimeConnections == null)
+            {
                 ResetSimulation();
+                StepSimulation(deltaSeconds);
+                return;
+            }
             if (duelDirector == null) duelDirector = GetComponent<ConnectionsDuelDirector>();
 
+            livingShift?.Advance();
             trafficDirector?.Tick(simulationTimeSeconds, runMode == ConnectionRunMode.Generated);
             float remaining = deltaSeconds;
             var completedThisStep = new HashSet<LogicalConnectionState>();
@@ -362,6 +374,7 @@ namespace Uptime.Connections
             WithdrawDueLoaders();
             BeginDueConnections();
             StepSpawners();
+            livingShift?.Advance();
             recorder?.CaptureDueSnapshot(simulationTimeSeconds);
             RefreshDisplays();
         }
@@ -411,6 +424,7 @@ namespace Uptime.Connections
                 recorder?.RecordOperationCompleted(completion.State, completion.Index,
                     completion.CompletedWork, completion.RequiredWork,
                     completion.DesiredLoad, simulationTimeSeconds);
+                OperationCompleted?.Invoke(completion.State, completion.Index, completion.CompletedWork);
                 ConnectionEffectOccurrence occurrence = completion.State.OnWorkCompleted(
                     completion.Index, simulationTimeSeconds);
                 if (occurrence != null)
@@ -541,6 +555,7 @@ namespace Uptime.Connections
 
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
         {
+            if (GameplayStopped) throw new InvalidOperationException("Shift finished.");
             if (runtimeConnections == null) ResetSimulation();
             LogicalConnectionState state = BuildState(definition);
             if (HasEverUsedId(state.ConnectionId) || IsLiveAlias(state.ConnectionId) ||
@@ -836,6 +851,13 @@ namespace Uptime.Connections
             return CleanSelectionResult.Success;
         }
 
+        internal void EndShiftSessions()
+        {
+            CancelClean();
+            activeScan?.Reset(simulationTimeSeconds);
+            activeScan = null;
+        }
+
         public bool CancelClean()
         {
             if (activeClean == null) return false;
@@ -1108,6 +1130,7 @@ namespace Uptime.Connections
 
         public void ResetSimulation()
         {
+            livingShift?.PrepareReset();
             simulationGeneration++;
             ClearProbe();
             ClearOverclock();
@@ -1163,6 +1186,7 @@ namespace Uptime.Connections
             }
             if (Application.isPlaying && pathPresenter != null)
                 pathPresenter.Bind(runtimeConnections);
+            livingShift?.BeginShift();
             RefreshDisplays();
         }
 

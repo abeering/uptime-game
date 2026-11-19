@@ -27,6 +27,8 @@ namespace Uptime.Connections.EditorTools
                 "four-node ordinary ambient baseline is retained");
             EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsAdvanced.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            // This witness isolates the existing endless sandbox mechanics.
+            if (host.LivingShift != null) host.LivingShift.enabled = false;
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var activities = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();

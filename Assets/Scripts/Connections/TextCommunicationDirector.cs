@@ -32,6 +32,7 @@ namespace Uptime.Connections
             if (message == null || !isActiveAndEnabled || entriesRoot == null || entryPrefab == null ||
                 (message.Type != TextCommunicationType.InstantMessage && message.Type != TextCommunicationType.SystemNotification))
                 return false;
+            if (message.Timestamp == null) workstationClock?.Render();
             Canvas.ForceUpdateCanvases();
             var entry = Instantiate(entryPrefab, entriesRoot);
             entry.gameObject.SetActive(true);

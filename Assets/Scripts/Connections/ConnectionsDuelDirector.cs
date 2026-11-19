@@ -78,7 +78,8 @@ namespace Uptime.Connections
         public bool TrySchedule(string targetNodeId, DuelVariant variant, float warningSeconds,
             string source, out string reason, ConsequenceConfiguration consequences = null)
         {
-            if (current != null)
+            if (host != null && host.GameplayStopped) reason = "shift_finished";
+            else if (current != null)
                 reason = "duel_slot_occupied_by_" + current.Lifecycle.ToString().ToLowerInvariant();
             else if (host == null || overlay == null)
                 reason = "duel_unavailable";
