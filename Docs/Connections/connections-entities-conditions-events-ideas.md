@@ -12,6 +12,10 @@ The early vocabulary here has become more concrete through BACKDOOR, Payload Lau
 
 The consolidated working direction and next milestones are in [Attack Pathways, Consequences & Surprise](connections-attack-pathways-and-surprise.md). **Next:** a bounded Duel consequence experiment, then an authored progression/shift vertical slice. The full Level Director, generic packages, infection-spreading Worms, on-clean reactions, and attacker personalities remain deferred.
 
+## Further network-view surfaces and counterplay (November 2026 brainstorm)
+
+The [Attack Surfaces, Counterplay & Behavioral Anomalies brainstorm](connections-attack-surface-and-anomaly-brainstorm.md) extends the entity-motion discussion into possible **edge, node-port, trust, queue, geometric, region, and identity** surfaces. It also preserves step-dependent counterplay (for example, expose a shield before killing a Connection) and anomalous **existing-entity behavior** (for example, Connections interacting with transit nodes or Payloads reversing direction). This is an idea catalogue, **not** a revision of the implemented entity/Condition model or a new generalized framework.
+
 ## Central design realization
 
 **Entity behavior and what an entity does are not one-to-one.** We can dramatically expand Uptime's hostile vocabulary by changing either dimension, then composing existing pieces into events. The most valuable distinction between entities is often the **kind of network motion, timing, evidence, and counterplay** they create — not a hardcoded attack attached to each entity class.
