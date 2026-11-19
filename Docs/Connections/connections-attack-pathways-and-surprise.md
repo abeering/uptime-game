@@ -24,6 +24,10 @@ These are **design distinctions, not five required managers or a universal objec
 
 An event need not die when its initiating entity dies. Conversely, killing a carrier **before** its operation completes can still prevent the package from being scheduled. Specify that causal boundary per event rather than assuming one universal cancel policy.
 
+## Separate brainstorm: interaction surfaces and anomalous behavior
+
+The [Attack Surfaces, Counterplay & Behavioral Anomalies brainstorm](connections-attack-surface-and-anomaly-brainstorm.md) preserves additional **ways a hostile presence can occupy the network** (edge attachments, access leases, circuits, sieges, and more), **multi-step player interactions**, and **keyword-style changes to the behavior of existing Connections and Payloads**. These are speculative surfaces/counterplay ideas, **not new consequences, mandatory threat genera, event packages, or selected implementation scope**. This document remains the authority for the separation of triggers, delivery, effects, and selection.
+
 ## The player's experience: surprise with understandable rules
 
 - **Unknown intention, stable mechanics.** A Worm still traverses physical links and admits isolation counterplay; a Payload still has its visible approach/interception window; a Duel still imposes a timed race. Its *outcome or follow-up* can vary.
