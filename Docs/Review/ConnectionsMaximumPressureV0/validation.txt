@@ -72,7 +72,9 @@ Evidence integrity: 16 gzip recorder JSON documents parsed; all have completed-r
 Each run has exactly 180 samples with fixed-step running Health minimum.
 Live capture recording parsed: seed 9001, three capture markers, endedUtc present.
 python3 scripts/build_uptime_project_core.py --check: PASS
-git diff --check: PASS
+git diff origin/main --check excluding new .unity/.unity.meta serialization: PASS
+Full git diff origin/main --check flags inherited Unity blank-value trailing spaces.
+These are preserved to retain exact copy equivalence; no full-whitespace-pass claim.
 
 Manual review: follow README.md; compare Advanced and Pressure for three minutes each,
 repeat fixed seeds, test 16:9 labels/status/inspect/history/prompt, CLEAN/Duel interruption

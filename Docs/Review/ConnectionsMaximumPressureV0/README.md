@@ -51,7 +51,7 @@ Unity **6000.3.11f1** compiled the independent project and passed:
 
 - Maximum Pressure Witness: scene GUID, exact four-setting copy equivalence, loaded topology/tuning, no missing scripts, CLEAN/call bindings, normal generated benign/hostile traffic and recording, sixteen comparisons, four exact seeded event/snapshot/sample replays.
 - Existing **Traffic, Ambient Hostile Activity, Network Health, Duel, Consequence, Advanced Scene, Recorder, Payload, Worm, and Ambient Payload Threat** witnesses. The latter exercises INFECTOR/launcher/CLEAN and propagation lineage. Existing witnesses retain their original coverage; they are not extended claims about physical keyboard delivery in the new scene.
-- Source/derived-doc check, whitespace checks and original-scene/runtime/prefab equality against the base are recorded in [validation.txt](validation.txt).
+- Source/derived-doc check, scoped code/docs whitespace check and original-scene/runtime/prefab equality against the base are recorded in [validation.txt](validation.txt). The full whitespace check flags the copied Unity scene’s existing blank-value spacing; the exact serialized copy is intentionally retained.
 
 The batch commands are:
 
