@@ -18,14 +18,14 @@ namespace Uptime.Connections.EditorTools
             var fourNode = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();
             var fourTraffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             Check(fourNode != null && fourTraffic != null &&
-                fourNode.PayloadWeight == 0f && fourNode.WormWeight == 0f &&
-                fourNode.DirectDuelWeight == 0f &&
-                fourNode.ConnectionDuelWeight == 0f &&
-                fourNode.PayloadLauncherWeight == 0f &&
-                fourTraffic.PayloadSpawnerWeight == 0f &&
+                fourNode.PayloadWeight > 0f && fourNode.WormWeight > 0f &&
+                fourNode.ReconnaissanceWeight > 0f && fourNode.DirectDuelWeight > 0f &&
+                fourNode.ConnectionDuelWeight > 0f &&
+                fourNode.PayloadLauncherWeight > 0f &&
+                fourTraffic.PayloadSpawnerWeight > 0f && fourTraffic.BackdoorWeight > 0f &&
                 fourTraffic.HostileMeanIntervalSeconds == 54f,
-                "four-node ordinary ambient baseline is retained");
-            EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsAdvanced.unity");
+                "canonical Small enables every family at its lower-pressure interval");
+            MaximumPressureWitness.OpenHistoricalBaseline();
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var activities = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();

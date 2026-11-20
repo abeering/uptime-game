@@ -1,0 +1,52 @@
+PASS Connections terminal input focused after scan
+PASS Connections 01-neutral-hidden placement/capture viewport 1920x1080
+PASS Connections 01-neutral-hidden placement/capture viewport 1280x720
+PASS Connections PID CLEAN overlay takes input focus
+PASS Connections 02-clean-orange-and-isolated-red placement/capture viewport 1920x1080
+PASS Connections 02-clean-orange-and-isolated-red ConnectionsCleanOverlay fully inside network viewport
+PASS Connections 02-clean-orange-and-isolated-red placement/capture viewport 1280x720
+PASS Connections 02-clean-orange-and-isolated-red ConnectionsCleanOverlay fully inside network viewport
+PASS Connections CLEAN removes DB infection and preserves compromised card
+PASS Connections 03-crowded-inspect placement/capture viewport 1920x1080
+PASS Connections 03-crowded-inspect placement/capture viewport 1280x720
+PASS Connections 04-overload placement/capture viewport 1920x1080
+PASS Connections 04-overload placement/capture viewport 1280x720
+PASS Connections actual severe-load countdown presented
+PASS Connections 05-duel-overlay placement/capture viewport 1920x1080
+PASS Connections 05-duel-overlay ConnectionsDuelOverlay fully inside network viewport
+PASS Connections 05-duel-overlay placement/capture viewport 1280x720
+PASS Connections 05-duel-overlay ConnectionsDuelOverlay fully inside network viewport
+PASS Connections Duel overlay over live network
+PASS Connections CORE ending closes overlays and restores terminal focus
+PASS Connections 06-core-breached placement/capture viewport 1920x1080
+PASS Connections 06-core-breached placement/capture viewport 1280x720
+PASS Connections loss freezes authoritative simulation
+PASS Connections terminal restart restores clean two-point state and focus
+PASS Connections 07-restart placement/capture viewport 1920x1080
+PASS Connections 07-restart placement/capture viewport 1280x720
+PASS ConnectionsAdvanced terminal input focused after scan
+PASS ConnectionsAdvanced 01-neutral-hidden placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 01-neutral-hidden placement/capture viewport 1280x720
+PASS ConnectionsAdvanced PID CLEAN overlay takes input focus
+PASS ConnectionsAdvanced 02-clean-orange-and-isolated-red placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 02-clean-orange-and-isolated-red ConnectionsCleanOverlay fully inside network viewport
+PASS ConnectionsAdvanced 02-clean-orange-and-isolated-red placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 02-clean-orange-and-isolated-red ConnectionsCleanOverlay fully inside network viewport
+PASS ConnectionsAdvanced CLEAN removes DB infection and preserves compromised card
+PASS ConnectionsAdvanced 03-crowded-inspect placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 03-crowded-inspect placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 04-overload placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 04-overload placement/capture viewport 1280x720
+PASS ConnectionsAdvanced actual severe-load countdown presented
+PASS ConnectionsAdvanced 05-duel-overlay placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 05-duel-overlay ConnectionsDuelOverlay fully inside network viewport
+PASS ConnectionsAdvanced 05-duel-overlay placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 05-duel-overlay ConnectionsDuelOverlay fully inside network viewport
+PASS ConnectionsAdvanced Duel overlay over live network
+PASS ConnectionsAdvanced CORE ending closes overlays and restores terminal focus
+PASS ConnectionsAdvanced 06-core-breached placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 06-core-breached placement/capture viewport 1280x720
+PASS ConnectionsAdvanced loss freezes authoritative simulation
+PASS ConnectionsAdvanced terminal restart restores clean two-point state and focus
+PASS ConnectionsAdvanced 07-restart placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 07-restart placement/capture viewport 1280x720

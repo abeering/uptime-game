@@ -29,6 +29,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene(path);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host, originalStatusPrefab: true);
             var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             Check(host != null && presenter != null && host.Nodes.Length == nodeCount,
                 path + " services and node count");
@@ -224,6 +225,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host, originalStatusPrefab: true);
             var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             director.AutoGenerationEnabled = false;
@@ -310,6 +312,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene(path);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host, originalStatusPrefab: true);
             var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             traffic.AutoGenerationEnabled = false;

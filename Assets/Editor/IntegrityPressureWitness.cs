@@ -41,9 +41,9 @@ namespace Uptime.Connections.EditorTools
             Debug.Log("IntegrityPressureWitness PASS: twelve natural 600s-or-loss runs and three exact seeded replays.");
         }
         public static string Observe(int seed, string policy, bool save, out Result result,
-            Action<SimulationHost> configure = null, string evidenceDirectory = null)
+            Action<SimulationHost> configure = null, string evidenceDirectory = null, string scene = null)
         {
-            var host = IntegrityWitness.Open(true, seed, configure);
+            var host = IntegrityWitness.Open(true, seed, configure, scene);
             var duels = host.GetComponent<ConnectionsDuelDirector>();
             var overlay = UnityEngine.Object.FindFirstObjectByType<ConnectionsDuelOverlay>(FindObjectsInactive.Include);
             var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();

@@ -1,0 +1,30 @@
+Baseline e551207c30236cfeb0dd95e7a5a6ce5ab0eb52df; existing integration branch feat/connections-canonical-scene-parity-v0.
+Unity 6000.3.11f1; isolated project /private/tmp/uptime-integrity-validation. Working Editor left open.
+
+Executed methods / outcomes (Unity -batchmode -projectPath <copy>, -nographics -quit except graphical):
+CanonicalSceneAuthoring.Promote; /tmp/uptime-canonical-authoring.log
+  Exit 0 after correcting read-only tuning assignment to use serialized fields. Shared authoring promoted both existing scene assets; no fixture rebuild.
+CanonicalSceneWitness.Run; /tmp/uptime-canonical-parity.log
+  Exit 0; initial 877 serialized/functional assertions.
+CanonicalSceneWitness.Natural; /tmp/uptime-canonical-natural.log
+  Exit 0; sixteen fixed-seed600s-or-loss mixed runs; four exact event/snapshot/graph replays.
+CanonicalSceneWitness.Regressions; /tmp/uptime-canonical-initial-regressions.log
+  Exit 1; initial 5 pass / 15 fail before reconciling superseded scene assumptions, recorded separately.
+CanonicalSceneWitness.Regressions; /tmp/uptime-canonical-regressions.log
+  Exit 1 ; 18 pass / 2 inherited UI failures. All functional assertions retained; explicit legacy fixture isolation and approved scene-contract updates described in README. Maximum Pressure includes sixteen 180s runs/four replays.
+CanonicalSceneWitness.Run; /tmp/uptime-canonical-final-parity.log
+  Exit 0; final 881 checks, including raw serialized defaults and expanded status bindings before witness overrides.
+CanonicalSceneCapture.Run; /tmp/uptime-canonical-graphical.log
+  Initial capture completed; discarded because its temporary viewport was not held before window placement.
+CanonicalSceneCapture.Run; /tmp/uptime-canonical-graphical-final.log
+  Exit 0; fixed 16:9 viewport before placement; both actual Play Mode scenes ; 28 final frames at1920x1080/1280x720 and 52 checks. CLEAN/Duel bounds, input focus, knowledge/overload, CORE freeze and terminal restart verified. Known Unity Search startup indexing ArgumentOutOfRangeException recurs; no game exception prevented completion.
+
+python3 Docs/Review/ConnectionsCanonicalSceneParityV0/summarize.py
+  PASS 16 runs; each scene naturally produces all seven families; every internal node observed as benign destination; all natural connection routes legal. Exact topology/GUID and 69/121 original RectTransform geometries preserved. Six fixture/Packet scene assets and GUIDs, all runtime scripts/prefabs unchanged.
+python3 scripts/build_uptime_project_core.py
+python3 scripts/build_uptime_project_core.py --check
+  Regenerated Core after Current_State; freshness passes.
+git diff --check (and staged/full diff before delivery)
+  Pass after normalizing only added Unity blank-string trailing whitespace.
+
+No standalone player build or human physical-keyboard playtest. No Living Shift code, WORK/titlebar redesign, concession, shift ending or broad balance changes. Inherited Resource pill geometry/color and Advanced Overclock row-width assertions remain unchanged failures. See README manual review steps.

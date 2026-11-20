@@ -16,6 +16,7 @@ namespace Uptime.Connections.EditorTools
             CheckScene("Assets/Scenes/ConnectionsAdvanced.unity", 8);
             EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsAdvanced.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host);
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
             var status = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
@@ -416,6 +417,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene(scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host);
             var presenter = UnityEngine.Object.FindFirstObjectByType<PayloadPresenter>();
             Check(host != null && host.Nodes.Length == nodeCount && host.Payloads != null &&
                 presenter != null, scene + " Payload services");

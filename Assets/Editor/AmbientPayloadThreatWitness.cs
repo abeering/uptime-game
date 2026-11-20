@@ -16,10 +16,10 @@ namespace Uptime.Connections.EditorTools
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var smallActivity = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();
             var smallTraffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
-            Check(smallActivity.PayloadLauncherWeight == 0f &&
-                smallTraffic.PayloadSpawnerWeight == 0f, "four-node ambient exclusions");
+            Check(smallActivity.PayloadLauncherWeight > 0f &&
+                smallTraffic.PayloadSpawnerWeight > 0f, "canonical four-node launcher/Spawner availability");
 
-            EditorSceneManager.OpenScene("Assets/Scenes/ConnectionsAdvanced.unity");
+            MaximumPressureWitness.OpenHistoricalBaseline();
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var activity = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();

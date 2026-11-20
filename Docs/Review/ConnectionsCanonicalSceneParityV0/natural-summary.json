@@ -1,0 +1,3449 @@
+{
+    "runs": [
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "SPREAD",
+            "difficulty": "authored",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 308.2784729003906,
+                "lossTime": 308.2784729003906,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "i0/op:1/Backdoor",
+                        "time": 156.19654846191407,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "m1/op:0/Backdoor",
+                        "time": 226.67160034179688,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "g4/op:0/PayloadSpawner",
+                        "time": 281.7637023925781,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 308.2784729003906,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2"
+                        ],
+                        "time": 308.2784729003906,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "infection",
+                            "cause": "x1/op:-1/PhantomLoad",
+                            "time": 308.2784729003906,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "SPREAD",
+            "difficulty": "authored",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 599.963134765625,
+                "lossTime": -1.0,
+                "commands": 0,
+                "closestAdditionalCompromises": 1,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 160.01736450195313,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 254.33750915527345,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 400.8584289550781,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 407.89837646484377,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [],
+                    "breach": {
+                        "criticalNode": "",
+                        "path": [],
+                        "links": [],
+                        "time": 0.0,
+                        "trigger": {
+                            "type": "",
+                            "target": "",
+                            "source": "",
+                            "cause": "",
+                            "time": 0.0,
+                            "before": 0,
+                            "after": 0,
+                            "visible": false,
+                            "revealed": false
+                        }
+                    },
+                    "breached": false
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "SPREAD",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 126.05087280273438,
+                "lossTime": 126.05087280273438,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 81.33836364746094,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 82.29654693603516,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "m1/op:0/Blackout",
+                        "time": 89.57698822021485,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 92.2965316772461,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "i0/op:1/Backdoor",
+                        "time": 126.05087280273438,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2"
+                        ],
+                        "time": 126.05087280273438,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "infection",
+                            "cause": "i0/op:1/Backdoor",
+                            "time": 126.05087280273438,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "SPREAD",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 174.2404022216797,
+                "lossTime": 174.2404022216797,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 52.60101318359375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 85.97758483886719,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 107.15074157714844,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 129.77471923828126,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 174.2404022216797,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 174.2404022216797,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "AUTH",
+                            "source": "duel",
+                            "cause": "duel:3",
+                            "time": 174.2404022216797,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "BREACH",
+            "difficulty": "authored",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 376.6916198730469,
+                "lossTime": 376.6916198730469,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "i0/op:1/Backdoor",
+                        "time": 156.7966766357422,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "m1/op:0/Backdoor",
+                        "time": 226.67160034179688,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "g4/op:0/PayloadSpawner",
+                        "time": 307.7094421386719,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 334.2242126464844,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 354.0696105957031,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 376.6916198730469,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2"
+                        ],
+                        "time": 376.6916198730469,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "duel",
+                            "cause": "duel:1",
+                            "time": 376.6916198730469,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "BREACH",
+            "difficulty": "authored",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 407.8113098144531,
+                "lossTime": 407.8113098144531,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 159.97735595703126,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 254.33750915527345,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 400.8584289550781,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 407.8113098144531,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 407.8113098144531,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "AUTH",
+                            "source": "infection",
+                            "cause": "x1/op:-1/PhantomLoad",
+                            "time": 407.8113098144531,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "BREACH",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 134.93203735351563,
+                "lossTime": 134.93203735351563,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 60.92120361328125,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 70.92011260986328,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 82.25655364990235,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 119.21202087402344,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x3/op:-1/PhantomLoad",
+                        "time": 122.01313018798828,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 134.93203735351563,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2"
+                        ],
+                        "time": 134.93203735351563,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "duel",
+                            "cause": "duel:2",
+                            "time": 134.93203735351563,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/Connections.unity",
+            "directive": "BREACH",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 185.042724609375,
+                "lossTime": 185.042724609375,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 52.561012268066409,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 85.97758483886719,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 107.15074157714844,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 174.24041748046876,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 185.042724609375,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "API",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2"
+                        ],
+                        "time": 185.042724609375,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "DB",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 185.042724609375,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "SPREAD",
+            "difficulty": "authored",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 274.9074401855469,
+                "lossTime": 274.9074401855469,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "infection",
+                        "cause": "i0/op:1/Backdoor",
+                        "time": 134.1918487548828,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "infection",
+                        "cause": "j8/op:1/PayloadSpawner",
+                        "time": 169.019287109375,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 195.5390167236328,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 222.63072204589845,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "g4/op:0/PayloadSpawner",
+                        "time": 266.2322082519531,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x5/op:-1/PhantomLoad",
+                        "time": 270.1922607421875,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 274.9074401855469,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": true
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E4",
+                        "E6",
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT2",
+                            "JOBS",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E7",
+                            "E6",
+                            "E4"
+                        ],
+                        "time": 274.9074401855469,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 274.9074401855469,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "SPREAD",
+            "difficulty": "authored",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 599.9624633789063,
+                "lossTime": -1.0,
+                "commands": 0,
+                "closestAdditionalCompromises": 1,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 103.99456024169922,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 155.23634338378907,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 323.9971008300781,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 481.791259765625,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 565.6093139648438,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x5/op:-1/PhantomLoad",
+                        "time": 571.8770751953125,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "x6/op:-1/PhantomLoad",
+                        "time": 583.0623779296875,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": true,
+                            "integrity": 1,
+                            "overloadElapsed": 2.079998731613159,
+                            "overloadRemaining": 7.920001029968262
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": false
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "",
+                        "path": [],
+                        "links": [],
+                        "time": 0.0,
+                        "trigger": {
+                            "type": "",
+                            "target": "",
+                            "source": "",
+                            "cause": "",
+                            "time": 0.0,
+                            "before": 0,
+                            "after": 0,
+                            "visible": false,
+                            "revealed": false
+                        }
+                    },
+                    "breached": false
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "SPREAD",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 176.44081115722657,
+                "lossTime": 176.44081115722657,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 81.37835693359375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 82.85645294189453,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 109.31367492675781,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 119.31200408935547,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 136.7724151611328,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 166.43869018554688,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "RPT",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 168.45912170410157,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "RPT",
+                        "source": "infection",
+                        "cause": "j4/op:1/PhantomLoad",
+                        "time": 172.84005737304688,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 173.84027099609376,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 176.44081115722657,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": true
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": true
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E4",
+                        "E5",
+                        "E6",
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT2",
+                            "JOBS",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E7",
+                            "E6",
+                            "E4"
+                        ],
+                        "time": 176.44081115722657,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 176.44081115722657,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "SPREAD",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 257.77008056640627,
+                "lossTime": 257.77008056640627,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 52.60101318359375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 107.75064086914063,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 152.59336853027345,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 173.6002655029297,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x4/op:-1/PhantomLoad",
+                        "time": 191.81907653808595,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "x6/op:-1/PhantomLoad",
+                        "time": 226.92251586914063,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 257.77008056640627,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "infection",
+                        "cause": "m5/op:1/Spawner",
+                        "time": 257.77008056640627,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 257.77008056640627,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": false
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3",
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "WEB",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 257.77008056640627,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "AUTH",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 257.77008056640627,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "BREACH",
+            "difficulty": "authored",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 285.7814636230469,
+                "lossTime": 285.7814636230469,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "infection",
+                        "cause": "i0/op:1/Backdoor",
+                        "time": 127.2906494140625,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "j4/op:1/PayloadSpawner",
+                        "time": 148.71495056152345,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 175.23468017578126,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 195.07997131347657,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 222.5906982421875,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x5/op:-1/PhantomLoad",
+                        "time": 246.157958984375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 285.7814636230469,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": false
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "WEB",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 285.7814636230469,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "AUTH",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 285.7814636230469,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "BREACH",
+            "difficulty": "authored",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 573.687744140625,
+                "lossTime": 573.687744140625,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 103.99456024169922,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 155.1963348388672,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 318.3601989746094,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 458.9900207519531,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:3",
+                        "time": 565.689453125,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x4/op:-1/PhantomLoad",
+                        "time": 573.687744140625,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": false
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": false
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "WEB",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 573.687744140625,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "AUTH",
+                            "source": "infection",
+                            "cause": "x4/op:-1/PhantomLoad",
+                            "time": 573.687744140625,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "BREACH",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 1701,
+                "policy": "unattended",
+                "observedSeconds": 136.13229370117188,
+                "lossTime": 136.13229370117188,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 81.37835693359375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 82.85645294189453,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 87.8372802734375,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 106.27418518066406,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 116.27251434326172,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "x3/op:-1/PhantomLoad",
+                        "time": 122.01313018798828,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 136.13229370117188,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": false
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": true
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": false
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": false
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E3",
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "AUTH",
+                        "path": [
+                            "EXT1",
+                            "WEB",
+                            "AUTH"
+                        ],
+                        "links": [
+                            "E1",
+                            "E3"
+                        ],
+                        "time": 136.13229370117188,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "WEB",
+                            "source": "duel",
+                            "cause": "duel:2",
+                            "time": 136.13229370117188,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        },
+        {
+            "scene": "Assets/Scenes/ConnectionsAdvanced.unity",
+            "directive": "BREACH",
+            "difficulty": "high8s",
+            "result": {
+                "seed": 3141,
+                "policy": "unattended",
+                "observedSeconds": 276.2724609375,
+                "lossTime": 276.2724609375,
+                "commands": 0,
+                "closestAdditionalCompromises": 0,
+                "damage": [
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "duel",
+                        "cause": "duel:1",
+                        "time": 52.60101318359375,
+                        "before": 2,
+                        "after": 1,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "infection",
+                        "cause": "x1/op:-1/PhantomLoad",
+                        "time": 107.75064086914063,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "infection",
+                        "cause": "x2/op:-1/PhantomLoad",
+                        "time": 152.59336853027345,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "DB",
+                        "source": "duel",
+                        "cause": "duel:2",
+                        "time": 173.6002655029297,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "infection",
+                        "cause": "x6/op:-1/PhantomLoad",
+                        "time": 226.92251586914063,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "AUTH",
+                        "source": "infection",
+                        "cause": "x7/op:-1/PhantomLoad",
+                        "time": 245.3594970703125,
+                        "before": 2,
+                        "after": 1,
+                        "visible": false,
+                        "revealed": false
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "JOBS",
+                        "source": "infection",
+                        "cause": "w9/op:1/Blackout",
+                        "time": 257.77008056640627,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "WEB",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 262.7798767089844,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    },
+                    {
+                        "type": "integrity_damage",
+                        "target": "API",
+                        "source": "overload",
+                        "cause": "sustained_severe_load",
+                        "time": 276.2724609375,
+                        "before": 1,
+                        "after": 0,
+                        "visible": true,
+                        "revealed": true
+                    }
+                ],
+                "finalGraph": {
+                    "nodes": [
+                        {
+                            "id": "API",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "AUTH",
+                            "external": false,
+                            "critical": true,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "DB",
+                            "external": false,
+                            "critical": true,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT1",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "EXT2",
+                            "external": true,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": -1,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "JOBS",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "RPT",
+                            "external": false,
+                            "critical": false,
+                            "revealed": false,
+                            "connected": false,
+                            "overloaded": false,
+                            "integrity": 2,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        },
+                        {
+                            "id": "WEB",
+                            "external": false,
+                            "critical": false,
+                            "revealed": true,
+                            "connected": true,
+                            "overloaded": false,
+                            "integrity": 0,
+                            "overloadElapsed": 0.0,
+                            "overloadRemaining": 0.0
+                        }
+                    ],
+                    "links": [
+                        {
+                            "id": "E1",
+                            "nodeA": "EXT1",
+                            "nodeB": "WEB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E2",
+                            "nodeA": "WEB",
+                            "nodeB": "API",
+                            "connected": true
+                        },
+                        {
+                            "id": "E3",
+                            "nodeA": "WEB",
+                            "nodeB": "AUTH",
+                            "connected": false
+                        },
+                        {
+                            "id": "E4",
+                            "nodeA": "API",
+                            "nodeB": "DB",
+                            "connected": true
+                        },
+                        {
+                            "id": "E5",
+                            "nodeA": "DB",
+                            "nodeB": "RPT",
+                            "connected": false
+                        },
+                        {
+                            "id": "E6",
+                            "nodeA": "API",
+                            "nodeB": "JOBS",
+                            "connected": true
+                        },
+                        {
+                            "id": "E7",
+                            "nodeA": "JOBS",
+                            "nodeB": "EXT2",
+                            "connected": true
+                        }
+                    ],
+                    "connectedLinks": [
+                        "E1",
+                        "E2",
+                        "E4",
+                        "E6",
+                        "E7"
+                    ],
+                    "breach": {
+                        "criticalNode": "DB",
+                        "path": [
+                            "EXT1",
+                            "WEB",
+                            "API",
+                            "DB"
+                        ],
+                        "links": [
+                            "E1",
+                            "E2",
+                            "E4"
+                        ],
+                        "time": 276.2724609375,
+                        "trigger": {
+                            "type": "integrity_damage",
+                            "target": "API",
+                            "source": "overload",
+                            "cause": "sustained_severe_load",
+                            "time": 276.2724609375,
+                            "before": 1,
+                            "after": 0,
+                            "visible": true,
+                            "revealed": true
+                        }
+                    },
+                    "breached": true
+                }
+            }
+        }
+    ]
+}

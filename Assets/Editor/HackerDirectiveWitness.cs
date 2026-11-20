@@ -236,7 +236,8 @@ namespace Uptime.Connections.EditorTools
             foreach (string scene in new[] { "Connections", "ConnectionsAdvanced", "ConnectionsAdvancedPressure" })
             {
                 EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
-                Check(UnityEngine.Object.FindFirstObjectByType<HackerDirectives>() == null, scene + " has no directive component");
+                Check((UnityEngine.Object.FindFirstObjectByType<HackerDirectives>() != null) == (scene != "ConnectionsAdvancedPressure"),
+                    scene + " canonical directive availability / historical Pressure opt-out");
             }
         }
         private static void Check(bool value, string label)
