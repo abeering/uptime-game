@@ -14405,6 +14405,77 @@ MonoBehaviour:
       - workFraction: 0.9
         activity: summary.close
         result: OK
+  - id: storefront-page
+    claimedPurpose: Storefront Page Requests
+    eligibleTargetIds:
+    - WEB
+    ambientWeight: 1
+    purposeTemplate: 1
+    isHostile: 0
+    connectionBehaviors: []
+    operations:
+    - operation: 0
+      activityDescription: Retrieving storefront page resources
+      minimumLoad: 0.5
+      maximumLoad: 1.1
+      minimumDuration: 40
+      maximumDuration: 75
+      meanWork: 24
+      completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: storefront.page.request
+        result: OK
+      - workFraction: 0.12
+        activity: storefront.resource.read
+        result: HIT
+      - workFraction: 0.28
+        activity: storefront.resource.read
+        result: MISS
+      - workFraction: 0.45
+        activity: storefront.resource.retry
+        result: OK
+      - workFraction: 0.73
+        activity: storefront.page.request
+        result: OK
+      - workFraction: 0.94
+        activity: storefront.resource.read
+        result: HIT
+    - operation: 2
+      activityDescription: Rendering and serving storefront content
+      minimumLoad: 0.8
+      maximumLoad: 1.6
+      minimumDuration: 40
+      maximumDuration: 75
+      meanWork: 36
+      completionEffect: 0
+      launchSpec:
+        destinationNodeId:
+        motionProfile: 0
+      behaviors: []
+      logs:
+      - workFraction: 0.03
+        activity: storefront.template.render
+        result: START
+      - workFraction: 0.14
+        activity: storefront.content.compose
+        result: OK
+      - workFraction: 0.29
+        activity: storefront.page.serve
+        result: OK
+      - workFraction: 0.45
+        activity: storefront.template.render
+        result: START
+      - workFraction: 0.74
+        activity: storefront.content.compose
+        result: OK
+      - workFraction: 0.94
+        activity: storefront.page.serve
+        result: OK
   - id: logs-checkout-evidence
     claimedPurpose: Customer Checkouts
     eligibleTargetIds:

@@ -1,0 +1,5952 @@
+[
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "m7",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.5554617047309875,
+        "totalWork": 20.635845184326172,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4726598262786865,
+        "totalWork": 42.870845794677734,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.5554617047309875,
+        "totalWork": 20.635845184326172,
+        "nominalDurationSeconds": 37.15079879760742
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.4726598262786865,
+        "totalWork": 42.870845794677734,
+        "nominalDurationSeconds": 29.11116600036621
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.5902447700500488,
+    "maximum_sampled_work": 41.729530334472656,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "j4",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.9951693415641785,
+        "totalWork": 26.448097229003906,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.2275761365890503,
+        "totalWork": 38.598541259765625,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 9.37482738494873,
+        "totalWork": 26.448097229003906,
+        "nominalDurationSeconds": 2.8211822509765625
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 0,
+      "pattern": 0,
+      "attackOperationIndex": 0,
+      "targetCapacity": 10.0,
+      "normalLoad": 0.9951693415641785,
+      "attackLoad": 9.37482738494873,
+      "onsetSeconds": 0.0,
+      "spikeQuietSeconds": 0.0,
+      "spikeElevatedSeconds": 0.0,
+      "durationSeconds": 58.99793243408203
+    },
+    "maximum_sampled_request": 10.123920440673828,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": true,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "w3",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7253034710884094,
+        "totalWork": 19.113296508789062,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.8628150224685669,
+        "totalWork": 35.19514083862305,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 10.020526885986328,
+        "totalWork": 35.19514083862305,
+        "nominalDurationSeconds": 3.5123043060302734
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 0,
+      "pattern": 0,
+      "attackOperationIndex": 0,
+      "targetCapacity": 10.0,
+      "normalLoad": 0.8628150224685669,
+      "attackLoad": 10.020526885986328,
+      "onsetSeconds": 0.0,
+      "spikeQuietSeconds": 0.0,
+      "spikeElevatedSeconds": 0.0,
+      "durationSeconds": 43.15742874145508
+    },
+    "maximum_sampled_request": 10.705583572387695,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": true,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "r0",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.9887965321540833,
+        "totalWork": 23.118242263793945,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.3935753107070923,
+        "totalWork": 41.15217971801758,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9887965321540833,
+        "totalWork": 23.118242263793945,
+        "nominalDurationSeconds": 23.38018226623535
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.3935753107070923,
+        "totalWork": 41.15217971801758,
+        "nominalDurationSeconds": 29.52992820739746
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.4855239391326904,
+    "maximum_sampled_work": 40.31639099121094,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "n7",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.6673998832702637,
+        "totalWork": 25.60532569885254,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4568049907684326,
+        "totalWork": 44.35543441772461,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.6673998832702637,
+        "totalWork": 94.32815551757812,
+        "nominalDurationSeconds": 141.3367919921875
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "PayloadSpawner",
+        "infectionLoad": 0.0,
+        "infectionCadence": 20.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.4568049907684326,
+        "totalWork": 44.35543441772461,
+        "nominalDurationSeconds": 30.447063446044922
+      }
+    ],
+    "anomalies": [
+      "work-deviation"
+    ],
+    "infector": {
+      "structure": "STANDARD",
+      "primarySignature": "work-deviation",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 1,
+      "normalNominalDeliverySeconds": 68.81285858154297,
+      "composedNominalDeliverySeconds": 171.7838592529297,
+      "finalNominalDeliverySeconds": 171.7838592529297,
+      "finalOperationNominalSeconds": 30.447063446044922,
+      "composedConservativeDeliverySeconds": 171.7838592529297,
+      "finalConservativeDeliverySeconds": 171.7838592529297,
+      "finalOperationConservativeSeconds": 30.447063446044922,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.7210479378700256,
+    "maximum_sampled_work": 45.906654357910156,
+    "operations_completed": 0,
+    "logs_emitted": 4,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "a5",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "recon_followup",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.9748130440711975,
+        "totalWork": 23.87513542175293,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.8284889459609985,
+        "totalWork": 44.83523941040039,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9748130440711975,
+        "totalWork": 23.87513542175293,
+        "nominalDurationSeconds": 24.492013931274414
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8284889459609985,
+        "totalWork": 44.83523941040039,
+        "nominalDurationSeconds": 54.11688232421875
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "PhantomLoad",
+        "infectionLoad": 8.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "WAVING",
+            "kind": "Waving",
+            "startAfterSeconds": 2.5651824474334717,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": -0.4027665853500366,
+            "maximumLoadOffset": 0.5368043184280396,
+            "wavePeriodSeconds": 27.673173904418945,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 1.0
+          }
+        ],
+        "desiredLoad": 0.8284889459609985,
+        "totalWork": 44.83523941040039,
+        "nominalDurationSeconds": 54.11688232421875
+      }
+    ],
+    "anomalies": [
+      "waving"
+    ],
+    "infector": {
+      "structure": "DELAYED",
+      "primarySignature": "waving",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 2,
+      "normalNominalDeliverySeconds": 78.60889434814453,
+      "composedNominalDeliverySeconds": 132.7257843017578,
+      "finalNominalDeliverySeconds": 132.7257843017578,
+      "finalOperationNominalSeconds": 54.11688232421875,
+      "composedConservativeDeliverySeconds": 102.42315673828125,
+      "finalConservativeDeliverySeconds": 102.42315673828125,
+      "finalOperationConservativeSeconds": 30.96052360534668,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 1.0661654472351074,
+    "maximum_sampled_work": 14.19802188873291,
+    "operations_completed": 0,
+    "logs_emitted": 4,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1701,
+    "id": "z2",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.5101495385169983,
+        "totalWork": 25.504074096679688,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4288179874420166,
+        "totalWork": 31.544479370117188,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_SPIKING",
+            "kind": "Spiking",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 5.0,
+            "elevatedIntervalSeconds": 2.0,
+            "spikeInitialDelaySeconds": 12.684895515441895,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 7.440128326416016,
+            "workRateMultiplier": 1.0
+          },
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 12.684895515441895,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 1.4288179874420166,
+        "totalWork": 31.544479370117188,
+        "nominalDurationSeconds": 22.07732582092285
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 0,
+      "pattern": 2,
+      "attackOperationIndex": 0,
+      "targetCapacity": 10.0,
+      "normalLoad": 1.4288179874420166,
+      "attackLoad": 8.868946075439453,
+      "onsetSeconds": 12.684895515441895,
+      "spikeQuietSeconds": 5.0,
+      "spikeElevatedSeconds": 2.0,
+      "durationSeconds": 39.19164276123047
+    },
+    "maximum_sampled_request": 8.842474937438965,
+    "maximum_sampled_work": 16.11893653869629,
+    "operations_completed": 0,
+    "logs_emitted": 4,
+    "loader_activated": true,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1702,
+    "id": "z9",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8867815732955933,
+        "totalWork": 27.20751190185547,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.3538737297058105,
+        "totalWork": 37.80683898925781,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8867815732955933,
+        "totalWork": 27.20751190185547,
+        "nominalDurationSeconds": 30.681188583374023
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.3538737297058105,
+        "totalWork": 37.80683898925781,
+        "nominalDurationSeconds": 27.924938201904297
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 10.13364315032959,
+        "totalWork": 37.80683898925781,
+        "nominalDurationSeconds": 3.7308239936828613
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 1,
+      "pattern": 0,
+      "attackOperationIndex": 2,
+      "targetCapacity": 10.0,
+      "normalLoad": 1.3538737297058105,
+      "attackLoad": 10.13364315032959,
+      "onsetSeconds": 0.0,
+      "spikeQuietSeconds": 0.0,
+      "spikeElevatedSeconds": 0.0,
+      "durationSeconds": 46.707584381103516
+    },
+    "maximum_sampled_request": 0.8867815732955933,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1702,
+    "id": "i6",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.9787830114364624,
+        "totalWork": 28.424240112304688,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.2652207612991333,
+        "totalWork": 35.609256744384766,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9787830114364624,
+        "totalWork": 28.424240112304688,
+        "nominalDurationSeconds": 29.040390014648438
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.2652207612991333,
+        "totalWork": 35.609256744384766,
+        "nominalDurationSeconds": 28.144699096679688
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 0.9787830114364624,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 1702,
+    "id": "p8",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "recon_followup",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7354122400283813,
+        "totalWork": 28.5292911529541,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.0649921894073486,
+        "totalWork": 37.85786437988281,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Processing request",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.7354122400283813,
+        "totalWork": 28.5292911529541,
+        "nominalDurationSeconds": 38.79360580444336
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Backdoor",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.0649921894073486,
+        "totalWork": 37.85786437988281,
+        "nominalDurationSeconds": 35.547550201416016
+      }
+    ],
+    "anomalies": [
+      "operation-deviation"
+    ],
+    "infector": {
+      "structure": "STANDARD",
+      "primarySignature": "operation-deviation",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 1,
+      "normalNominalDeliverySeconds": 74.34115600585938,
+      "composedNominalDeliverySeconds": 74.34115600585938,
+      "finalNominalDeliverySeconds": 74.34115600585938,
+      "finalOperationNominalSeconds": 35.547550201416016,
+      "composedConservativeDeliverySeconds": 74.34115600585938,
+      "finalConservativeDeliverySeconds": 74.34115600585938,
+      "finalOperationConservativeSeconds": 35.547550201416016,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 1.1601970195770264,
+    "maximum_sampled_work": 27.601428985595703,
+    "operations_completed": 1,
+    "logs_emitted": 10,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "g4",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.942190945148468,
+        "totalWork": 21.75326919555664,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.9117929339408875,
+        "totalWork": 42.770538330078125,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.942190945148468,
+        "totalWork": 21.75326919555664,
+        "nominalDurationSeconds": 23.087963104248047
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9117929339408875,
+        "totalWork": 42.770538330078125,
+        "nominalDurationSeconds": 46.90816879272461
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.0176466703414917,
+    "maximum_sampled_work": 42.34494400024414,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "t1",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.07704496383667,
+        "totalWork": 19.110092163085938,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.940278172492981,
+        "totalWork": 43.18760681152344,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.07704496383667,
+        "totalWork": 19.110092163085938,
+        "nominalDurationSeconds": 17.743078231811523
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.940278172492981,
+        "totalWork": 43.18760681152344,
+        "nominalDurationSeconds": 45.93067169189453
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.169448733329773,
+    "maximum_sampled_work": 43.158992767333984,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "h2",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.6935864090919495,
+        "totalWork": 18.099937438964844,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.2380168437957764,
+        "totalWork": 39.02647399902344,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.6935864090919495,
+        "totalWork": 18.099937438964844,
+        "nominalDurationSeconds": 26.096153259277344
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.2380168437957764,
+        "totalWork": 39.02647399902344,
+        "nominalDurationSeconds": 31.523378372192383
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.276435375213623,
+    "maximum_sampled_work": 38.2570686340332,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "m0",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7441045641899109,
+        "totalWork": 20.477617263793945,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.0454052686691284,
+        "totalWork": 31.45075035095215,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.7441045641899109,
+        "totalWork": 20.477617263793945,
+        "nominalDurationSeconds": 27.519811630249023
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.0454052686691284,
+        "totalWork": 31.45075035095215,
+        "nominalDurationSeconds": 30.08474349975586
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.143805742263794,
+    "maximum_sampled_work": 31.088830947875977,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "g3",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.0559872388839722,
+        "totalWork": 20.495094299316406,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4232248067855835,
+        "totalWork": 34.6276741027832,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.0559872388839722,
+        "totalWork": 20.495094299316406,
+        "nominalDurationSeconds": 19.40846824645996
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.4232248067855835,
+        "totalWork": 34.6276741027832,
+        "nominalDurationSeconds": 24.33043098449707
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.559896469116211,
+    "maximum_sampled_work": 34.07668685913086,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "p6",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_OUTLIER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8988103270530701,
+        "totalWork": 25.963253021240234,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.234845519065857,
+        "totalWork": 36.19425582885742,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "OVERLOAD",
+            "kind": "Overload",
+            "startAfterSeconds": 5.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 5.0,
+            "workRateMultiplier": 1.0
+          }
+        ],
+        "desiredLoad": 0.8988103270530701,
+        "totalWork": 25.963253021240234,
+        "nominalDurationSeconds": 28.886241912841797
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.234845519065857,
+        "totalWork": 36.19425582885742,
+        "nominalDurationSeconds": 29.31075668334961
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 5.961384296417236,
+    "maximum_sampled_work": 35.6892204284668,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 3141,
+    "id": "z7",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8733801245689392,
+        "totalWork": 25.909870147705078,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.424691081047058,
+        "totalWork": 36.598026275634766,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8733801245689392,
+        "totalWork": 25.909870147705078,
+        "nominalDurationSeconds": 29.666200637817383
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.424691081047058,
+        "totalWork": 36.598026275634766,
+        "nominalDurationSeconds": 25.68839454650879
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 0.8835673928260803,
+    "maximum_sampled_work": 1.2629456520080566,
+    "operations_completed": 0,
+    "logs_emitted": 1,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 9001,
+    "id": "a8",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.057586908340454,
+        "totalWork": 22.263147354125977,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.35850191116333,
+        "totalWork": 43.3496208190918,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.057586908340454,
+        "totalWork": 22.263147354125977,
+        "nominalDurationSeconds": 21.050891876220703
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.35850191116333,
+        "totalWork": 43.3496208190918,
+        "nominalDurationSeconds": 31.909870147705078
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.4667818546295166,
+    "maximum_sampled_work": 39.68182373046875,
+    "operations_completed": 1,
+    "logs_emitted": 11,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 9001,
+    "id": "p9",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8482780456542969,
+        "totalWork": 22.085464477539062,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.5699964761734009,
+        "totalWork": 41.89887619018555,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8482780456542969,
+        "totalWork": 22.085464477539062,
+        "nominalDurationSeconds": 26.035642623901367
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.5699964761734009,
+        "totalWork": 41.89887619018555,
+        "nominalDurationSeconds": 26.68724250793457
+      },
+      {
+        "kind": "Write",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Blackout",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Writing records",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 4.733645439147949,
+        "totalWork": 126.32794189453125,
+        "nominalDurationSeconds": 26.68724250793457
+      }
+    ],
+    "anomalies": [
+      "high-load"
+    ],
+    "infector": {
+      "structure": "DELAYED",
+      "primarySignature": "high-load",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 2,
+      "normalNominalDeliverySeconds": 52.72288513183594,
+      "composedNominalDeliverySeconds": 79.41012573242188,
+      "finalNominalDeliverySeconds": 79.41012573242188,
+      "finalOperationNominalSeconds": 26.68724250793457,
+      "composedConservativeDeliverySeconds": 79.41012573242188,
+      "finalConservativeDeliverySeconds": 79.41012573242188,
+      "finalOperationConservativeSeconds": 26.68724250793457,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.9119638204574585,
+    "maximum_sampled_work": 18.756052017211914,
+    "operations_completed": 0,
+    "logs_emitted": 5,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "SPREAD",
+    "seed": 9001,
+    "id": "t7",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.6282727122306824,
+        "totalWork": 24.973087310791016,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.9496924877166748,
+        "totalWork": 38.63985061645508,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.6282727122306824,
+        "totalWork": 24.973087310791016,
+        "nominalDurationSeconds": 39.748802185058594
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9496924877166748,
+        "totalWork": 38.63985061645508,
+        "nominalDurationSeconds": 40.68669891357422
+      },
+      {
+        "kind": "Write",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Blackout",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Writing records",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.45159223675727844,
+        "totalWork": 38.63985061645508,
+        "nominalDurationSeconds": 85.56358337402344
+      }
+    ],
+    "anomalies": [
+      "low-load"
+    ],
+    "infector": {
+      "structure": "DELAYED",
+      "primarySignature": "low-load",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 2,
+      "normalNominalDeliverySeconds": 80.43550109863281,
+      "composedNominalDeliverySeconds": 165.99908447265625,
+      "finalNominalDeliverySeconds": 165.99908447265625,
+      "finalOperationNominalSeconds": 85.56358337402344,
+      "composedConservativeDeliverySeconds": 165.99908447265625,
+      "finalConservativeDeliverySeconds": 165.99908447265625,
+      "finalOperationConservativeSeconds": 85.56358337402344,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.6282727122306824,
+    "maximum_sampled_work": 8.98903751373291,
+    "operations_completed": 0,
+    "logs_emitted": 3,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 1701,
+    "id": "m7",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.5554617047309875,
+        "totalWork": 20.635845184326172,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4726598262786865,
+        "totalWork": 42.870845794677734,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.5554617047309875,
+        "totalWork": 20.635845184326172,
+        "nominalDurationSeconds": 37.15079879760742
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.4726598262786865,
+        "totalWork": 42.870845794677734,
+        "nominalDurationSeconds": 29.11116600036621
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.5902447700500488,
+    "maximum_sampled_work": 41.84872817993164,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 1701,
+    "id": "j4",
+    "target": "AUTH",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.9951693415641785,
+        "totalWork": 26.448097229003906,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.2275761365890503,
+        "totalWork": 38.598541259765625,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 9.37482738494873,
+        "totalWork": 26.448097229003906,
+        "nominalDurationSeconds": 2.8211822509765625
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 0,
+      "pattern": 0,
+      "attackOperationIndex": 0,
+      "targetCapacity": 10.0,
+      "normalLoad": 0.9951693415641785,
+      "attackLoad": 9.37482738494873,
+      "onsetSeconds": 0.0,
+      "spikeQuietSeconds": 0.0,
+      "spikeElevatedSeconds": 0.0,
+      "durationSeconds": 58.99793243408203
+    },
+    "maximum_sampled_request": 10.167155265808105,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": true,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 1701,
+    "id": "z0",
+    "target": "AUTH",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7253034710884094,
+        "totalWork": 19.113296508789062,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.8628150224685669,
+        "totalWork": 35.19514083862305,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 10.020526885986328,
+        "totalWork": 35.19514083862305,
+        "nominalDurationSeconds": 3.5123043060302734
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 0,
+      "pattern": 0,
+      "attackOperationIndex": 0,
+      "targetCapacity": 10.0,
+      "normalLoad": 0.8628150224685669,
+      "attackLoad": 10.020526885986328,
+      "onsetSeconds": 0.0,
+      "spikeQuietSeconds": 0.0,
+      "spikeElevatedSeconds": 0.0,
+      "durationSeconds": 43.15742874145508
+    },
+    "maximum_sampled_request": 10.307496070861816,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": true,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "g4",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.942190945148468,
+        "totalWork": 21.75326919555664,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.9117929339408875,
+        "totalWork": 42.770538330078125,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.942190945148468,
+        "totalWork": 21.75326919555664,
+        "nominalDurationSeconds": 23.087963104248047
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9117929339408875,
+        "totalWork": 42.770538330078125,
+        "nominalDurationSeconds": 46.90816879272461
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.0176466703414917,
+    "maximum_sampled_work": 42.34494400024414,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "t1",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.07704496383667,
+        "totalWork": 19.110092163085938,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.940278172492981,
+        "totalWork": 43.18760681152344,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.07704496383667,
+        "totalWork": 19.110092163085938,
+        "nominalDurationSeconds": 17.743078231811523
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.940278172492981,
+        "totalWork": 43.18760681152344,
+        "nominalDurationSeconds": 45.93067169189453
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.169448733329773,
+    "maximum_sampled_work": 43.158992767333984,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "h2",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.6935864090919495,
+        "totalWork": 18.099937438964844,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.2380168437957764,
+        "totalWork": 39.02647399902344,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.6935864090919495,
+        "totalWork": 18.099937438964844,
+        "nominalDurationSeconds": 26.096153259277344
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.2380168437957764,
+        "totalWork": 39.02647399902344,
+        "nominalDurationSeconds": 31.523378372192383
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.2920334339141846,
+    "maximum_sampled_work": 38.32420349121094,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "m0",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7441045641899109,
+        "totalWork": 20.477617263793945,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.0454052686691284,
+        "totalWork": 31.45075035095215,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.7441045641899109,
+        "totalWork": 20.477617263793945,
+        "nominalDurationSeconds": 27.519811630249023
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.0454052686691284,
+        "totalWork": 31.45075035095215,
+        "nominalDurationSeconds": 30.08474349975586
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.143805742263794,
+    "maximum_sampled_work": 31.256959915161133,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "r9",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "recon_followup",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_SUBTLE",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.073182225227356,
+        "totalWork": 28.617664337158203,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.5778974294662476,
+        "totalWork": 38.9481201171875,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.073182225227356,
+        "totalWork": 28.617664337158203,
+        "nominalDurationSeconds": 26.666173934936523
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Blackout",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.5778974294662476,
+        "totalWork": 38.9481201171875,
+        "nominalDurationSeconds": 24.683555603027344
+      }
+    ],
+    "anomalies": [],
+    "infector": {
+      "structure": "STANDARD",
+      "primarySignature": "none",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 1,
+      "normalNominalDeliverySeconds": 51.3497314453125,
+      "composedNominalDeliverySeconds": 51.3497314453125,
+      "finalNominalDeliverySeconds": 51.3497314453125,
+      "finalOperationNominalSeconds": 24.683555603027344,
+      "composedConservativeDeliverySeconds": 51.3497314453125,
+      "finalConservativeDeliverySeconds": 51.3497314453125,
+      "finalOperationConservativeSeconds": 24.683555603027344,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 1.5786993503570557,
+    "maximum_sampled_work": 35.822166442871094,
+    "operations_completed": 2,
+    "logs_emitted": 12,
+    "loader_activated": false,
+    "infection_applied": true,
+    "delivery_attempts": 1
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "p9",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.0559872388839722,
+        "totalWork": 20.495094299316406,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.4232248067855835,
+        "totalWork": 34.6276741027832,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.0559872388839722,
+        "totalWork": 20.495094299316406,
+        "nominalDurationSeconds": 19.40846824645996
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.4232248067855835,
+        "totalWork": 34.6276741027832,
+        "nominalDurationSeconds": 24.33043098449707
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.0559872388839722,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "e5",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_OUTLIER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8988103270530701,
+        "totalWork": 25.963253021240234,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.234845519065857,
+        "totalWork": 36.19425582885742,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "OVERLOAD",
+            "kind": "Overload",
+            "startAfterSeconds": 5.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 5.0,
+            "workRateMultiplier": 1.0
+          }
+        ],
+        "desiredLoad": 0.8988103270530701,
+        "totalWork": 25.963253021240234,
+        "nominalDurationSeconds": 28.886241912841797
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.234845519065857,
+        "totalWork": 36.19425582885742,
+        "nominalDurationSeconds": 29.31075668334961
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 0.8988103270530701,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "d2",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8733801245689392,
+        "totalWork": 25.909870147705078,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.424691081047058,
+        "totalWork": 36.598026275634766,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8733801245689392,
+        "totalWork": 25.909870147705078,
+        "nominalDurationSeconds": 29.666200637817383
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.424691081047058,
+        "totalWork": 36.598026275634766,
+        "nominalDurationSeconds": 25.68839454650879
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 0.8733801245689392,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "g9",
+    "target": "AUTH",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "LOADER",
+    "decision": "LOADER",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.5280433893203735,
+        "totalWork": 26.87563705444336,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.1682953834533691,
+        "totalWork": 39.42319869995117,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.5280433893203735,
+        "totalWork": 26.87563705444336,
+        "nominalDurationSeconds": 50.896644592285156
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.1682953834533691,
+        "totalWork": 39.42319869995117,
+        "nominalDurationSeconds": 33.744205474853516
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [
+          {
+            "id": "LOADER_SPIKING",
+            "kind": "Spiking",
+            "startAfterSeconds": 0.0,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 5.0,
+            "elevatedIntervalSeconds": 2.0,
+            "spikeInitialDelaySeconds": 8.3965482711792,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 9.747154235839844,
+            "workRateMultiplier": 1.0
+          },
+          {
+            "id": "LOADER_ACTIVE",
+            "kind": "TimedAdjustment",
+            "startAfterSeconds": 8.3965482711792,
+            "stopAfterSeconds": 0.0,
+            "normalIntervalSeconds": 0.0,
+            "elevatedIntervalSeconds": 0.0,
+            "spikeInitialDelaySeconds": 0.0,
+            "minimumLoadOffset": 0.0,
+            "maximumLoadOffset": 0.0,
+            "wavePeriodSeconds": 0.0,
+            "workDelta": 0.0,
+            "loadDelta": 0.0,
+            "workRateMultiplier": 0.0
+          }
+        ],
+        "desiredLoad": 1.1682953834533691,
+        "totalWork": 39.42319869995117,
+        "nominalDurationSeconds": 33.744205474853516
+      }
+    ],
+    "anomalies": [
+      "loader-capacity-demand"
+    ],
+    "infector": null,
+    "loader": {
+      "structure": 1,
+      "pattern": 2,
+      "attackOperationIndex": 2,
+      "targetCapacity": 10.0,
+      "normalLoad": 1.1682953834533691,
+      "attackLoad": 10.915450096130371,
+      "onsetSeconds": 8.3965482711792,
+      "spikeQuietSeconds": 5.0,
+      "spikeElevatedSeconds": 2.0,
+      "durationSeconds": 56.4654541015625
+    },
+    "maximum_sampled_request": 0.5280433893203735,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 3141,
+    "id": "y1",
+    "target": "AUTH",
+    "origin": "EXT1",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.7864171266555786,
+        "totalWork": 24.975067138671875,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.8645474314689636,
+        "totalWork": 41.93355178833008,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.7864171266555786,
+        "totalWork": 24.975067138671875,
+        "nominalDurationSeconds": 31.758041381835938
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Spawner",
+        "infectionLoad": 0.0,
+        "infectionCadence": 20.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 7.540737152099609,
+        "totalWork": 365.7519226074219,
+        "nominalDurationSeconds": 48.50347137451172
+      }
+    ],
+    "anomalies": [
+      "high-load",
+      "high-load"
+    ],
+    "infector": {
+      "structure": "STANDARD",
+      "primarySignature": "high-load",
+      "secondarySignature": "high-load",
+      "deliveryOperationIndex": 1,
+      "normalNominalDeliverySeconds": 80.26151275634766,
+      "composedNominalDeliverySeconds": 80.26151275634766,
+      "finalNominalDeliverySeconds": 80.26151275634766,
+      "finalOperationNominalSeconds": 48.50347137451172,
+      "composedConservativeDeliverySeconds": 80.26151275634766,
+      "finalConservativeDeliverySeconds": 80.26151275634766,
+      "finalOperationConservativeSeconds": 48.50347137451172,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.7864171266555786,
+    "maximum_sampled_work": 0.0,
+    "operations_completed": 0,
+    "logs_emitted": 0,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 9001,
+    "id": "l4",
+    "target": "WEB",
+    "origin": "EXT1",
+    "source": "recon_followup",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.82744300365448,
+        "totalWork": 27.415470123291016,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.8989331722259521,
+        "totalWork": 30.708005905151367,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.82744300365448,
+        "totalWork": 27.415470123291016,
+        "nominalDurationSeconds": 33.13275909423828
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "PayloadSpawner",
+        "infectionLoad": 0.0,
+        "infectionCadence": 20.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8989331722259521,
+        "totalWork": 109.2508316040039,
+        "nominalDurationSeconds": 121.53387451171875
+      }
+    ],
+    "anomalies": [
+      "work-deviation"
+    ],
+    "infector": {
+      "structure": "STANDARD",
+      "primarySignature": "work-deviation",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 1,
+      "normalNominalDeliverySeconds": 67.29325866699219,
+      "composedNominalDeliverySeconds": 154.66664123535156,
+      "finalNominalDeliverySeconds": 154.66664123535156,
+      "finalOperationNominalSeconds": 121.53387451171875,
+      "composedConservativeDeliverySeconds": 154.66664123535156,
+      "finalConservativeDeliverySeconds": 154.66664123535156,
+      "finalOperationConservativeSeconds": 121.53387451171875,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.9781419634819031,
+    "maximum_sampled_work": 61.94774627685547,
+    "operations_completed": 1,
+    "logs_emitted": 10,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 9001,
+    "id": "a8",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_benign",
+    "objective": "NONE",
+    "decision": "BENIGN_NORMAL",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 1.057586908340454,
+        "totalWork": 22.263147354125977,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.35850191116333,
+        "totalWork": 43.3496208190918,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.057586908340454,
+        "totalWork": 22.263147354125977,
+        "nominalDurationSeconds": 21.050891876220703
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.35850191116333,
+        "totalWork": 43.3496208190918,
+        "nominalDurationSeconds": 31.909870147705078
+      }
+    ],
+    "anomalies": [],
+    "infector": null,
+    "loader": null,
+    "maximum_sampled_request": 1.4672815799713135,
+    "maximum_sampled_work": 21.759347915649414,
+    "operations_completed": 1,
+    "logs_emitted": 9,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 9001,
+    "id": "p9",
+    "target": "AUTH",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.8482780456542969,
+        "totalWork": 22.085464477539062,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 1.5699964761734009,
+        "totalWork": 41.89887619018555,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.8482780456542969,
+        "totalWork": 22.085464477539062,
+        "nominalDurationSeconds": 26.035642623901367
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 1.5699964761734009,
+        "totalWork": 41.89887619018555,
+        "nominalDurationSeconds": 26.68724250793457
+      },
+      {
+        "kind": "Write",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Blackout",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Writing records",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 4.733645439147949,
+        "totalWork": 126.32794189453125,
+        "nominalDurationSeconds": 26.68724250793457
+      }
+    ],
+    "anomalies": [
+      "high-load"
+    ],
+    "infector": {
+      "structure": "DELAYED",
+      "primarySignature": "high-load",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 2,
+      "normalNominalDeliverySeconds": 52.72288513183594,
+      "composedNominalDeliverySeconds": 79.41012573242188,
+      "finalNominalDeliverySeconds": 79.41012573242188,
+      "finalOperationNominalSeconds": 26.68724250793457,
+      "composedConservativeDeliverySeconds": 79.41012573242188,
+      "finalConservativeDeliverySeconds": 79.41012573242188,
+      "finalOperationConservativeSeconds": 26.68724250793457,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.9120326638221741,
+    "maximum_sampled_work": 15.370659828186035,
+    "operations_completed": 0,
+    "logs_emitted": 4,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  },
+  {
+    "directive": "BREACH",
+    "seed": 9001,
+    "id": "t7",
+    "target": "WEB",
+    "origin": "EXT2",
+    "source": "ambient_hostile",
+    "objective": "DELIVERY",
+    "decision": "DELIVERY_ANOMALOUS",
+    "normal": [
+      {
+        "kind": "Read",
+        "desiredLoad": 0.6282727122306824,
+        "totalWork": 24.973087310791016,
+        "completionEffect": "None",
+        "behaviorIds": []
+      },
+      {
+        "kind": "Execute",
+        "desiredLoad": 0.9496924877166748,
+        "totalWork": 38.63985061645508,
+        "completionEffect": "None",
+        "behaviorIds": []
+      }
+    ],
+    "final": [
+      {
+        "kind": "Read",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Retrieving storefront page resources",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.11999999731779099,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.2800000011920929,
+            "activity": "storefront.resource.read",
+            "result": "MISS"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.resource.retry",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7300000190734863,
+            "activity": "storefront.page.request",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.resource.read",
+            "result": "HIT"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.6282727122306824,
+        "totalWork": 24.973087310791016,
+        "nominalDurationSeconds": 39.748802185058594
+      },
+      {
+        "kind": "Execute",
+        "completionEffect": "None",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Rendering and serving storefront content",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.9496924877166748,
+        "totalWork": 38.63985061645508,
+        "nominalDurationSeconds": 40.68669891357422
+      },
+      {
+        "kind": "Write",
+        "completionEffect": "InfectionDelivery",
+        "launchDestinationNodeId": "",
+        "launchMotionProfile": "",
+        "conditionKind": "",
+        "conditionDurationSeconds": 0.0,
+        "infectionKind": "Blackout",
+        "infectionLoad": 0.0,
+        "infectionCadence": 0.0,
+        "activityDescription": "Writing records",
+        "plannedLogs": [
+          {
+            "authoredIndex": 0,
+            "workFraction": 0.029999999329447746,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 1,
+            "workFraction": 0.14000000059604645,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 2,
+            "workFraction": 0.28999999165534973,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 3,
+            "workFraction": 0.44999998807907104,
+            "activity": "storefront.template.render",
+            "result": "START"
+          },
+          {
+            "authoredIndex": 4,
+            "workFraction": 0.7400000095367432,
+            "activity": "storefront.content.compose",
+            "result": "OK"
+          },
+          {
+            "authoredIndex": 5,
+            "workFraction": 0.9399999976158142,
+            "activity": "storefront.page.serve",
+            "result": "OK"
+          }
+        ],
+        "behaviors": [],
+        "desiredLoad": 0.45159223675727844,
+        "totalWork": 38.63985061645508,
+        "nominalDurationSeconds": 85.56358337402344
+      }
+    ],
+    "anomalies": [
+      "low-load"
+    ],
+    "infector": {
+      "structure": "DELAYED",
+      "primarySignature": "low-load",
+      "secondarySignature": "none",
+      "deliveryOperationIndex": 2,
+      "normalNominalDeliverySeconds": 80.43550109863281,
+      "composedNominalDeliverySeconds": 165.99908447265625,
+      "finalNominalDeliverySeconds": 165.99908447265625,
+      "finalOperationNominalSeconds": 85.56358337402344,
+      "composedConservativeDeliverySeconds": 165.99908447265625,
+      "finalConservativeDeliverySeconds": 165.99908447265625,
+      "finalOperationConservativeSeconds": 85.56358337402344,
+      "deliveryWindowWorkAdded": 0.0,
+      "deliveryWindowCorrectionReason": "none"
+    },
+    "loader": null,
+    "maximum_sampled_request": 0.6282727122306824,
+    "maximum_sampled_work": 3.489518404006958,
+    "operations_completed": 0,
+    "logs_emitted": 2,
+    "loader_activated": false,
+    "infection_applied": false,
+    "delivery_attempts": 0
+  }
+]

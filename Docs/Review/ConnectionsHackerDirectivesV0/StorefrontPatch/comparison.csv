@@ -1,0 +1,9 @@
+directive,seed,before_seconds,after_seconds,common_seconds,before_benign,before_benign_common_window,before_hostile,before_hostile_common_window,before_storefront_NONE,before_storefront_LOADER,before_storefront_DELIVERY,after_benign,after_benign_common_window,after_hostile,after_hostile_common_window,after_storefront_NONE,after_storefront_LOADER,after_storefront_DELIVERY
+SPREAD,1701,403.517,209.068,209.068,0,0,2,1,0,0,0,2,2,6,6,2,3,2
+SPREAD,1702,205.117,451.021,205.117,0,0,1,1,0,0,0,1,0,4,0,1,1,1
+SPREAD,3141,331.157,327.819,327.819,0,0,0,0,0,0,0,7,7,0,0,7,0,0
+SPREAD,9001,133.352,106.814,106.814,0,0,1,1,0,0,0,1,1,4,4,1,0,2
+BREACH,1701,244.535,109.194,109.194,0,0,2,2,0,0,0,1,1,2,2,1,0,0
+BREACH,1702,119.532,110.753,110.753,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+BREACH,3141,314.945,599.963,314.945,0,0,4,4,0,0,0,7,5,4,4,7,0,1
+BREACH,9001,122.351,106.814,106.814,0,0,6,6,0,0,0,1,1,7,7,1,0,2

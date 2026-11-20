@@ -1,0 +1,2 @@
+PASS actual Play Mode: BREACH 45s fixed-step generation; active node/connection inspect text contains no directive intent; terminal restart clears offensive and Integrity; exact seeded offensive/target-event replay.
+Human keyboard focus and layout review not automated.

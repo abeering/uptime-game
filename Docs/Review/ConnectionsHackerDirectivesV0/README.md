@@ -1,8 +1,10 @@
 # Hacker Directives V0 — review guide
 
+**Storefront follow-up:** The same PR now adds a scene-only legitimate `storefront-page` template. See the [patch review and before/after traffic evidence](StorefrontPatch/README.md). The 24 runs and WEB-tell measurements below are the preserved **pre-storefront baseline**, not results for the updated seven-template scene. SPREAD still uses unchanged ambient selection, but the new catalog intentionally changes its seeded recipe/outcome sequence relative to the six-template parent.
+
 Connections implementation experiment, November 20, 2026. Branch `feat/connections-hacker-directives-v0`, based on Integrity PR #117 at `0c1fd9ab4ae8e7a9094623052ecaab23261003ad`; PR target is `feat/connections-integrity-core-breach-v0`. Maximum Pressure #116 is inherited; Living Shift #115 is excluded. No branches are merged.
 
-The [contract](../../Connections/connections-hacker-directives-v0.md) describes the selector and generation seams. The [manifest](FILES_CHANGED.txt) lists every changed file. The only scene change is one Inspector component on SimulationHost in `ConnectionsAdvancedIntegrity.unity`, authored as SPREAD / 60 seconds / 70%. All other scene and prefab assets remain byte-identical to the parent. There is no presentation change, new player command, attack type, damage source or pressure tuning.
+The [contract](../../Connections/connections-hacker-directives-v0.md) describes the selector and generation seams. The [manifest](FILES_CHANGED.txt) lists every changed file. The original scene change added one Inspector component on SimulationHost in `ConnectionsAdvancedIntegrity.unity`, authored as SPREAD / 60 seconds / 70%; the follow-up adds a serialized storefront PURPOSE template there. All other scene and prefab assets remain byte-identical to the parent. There is no presentation hierarchy change, new player command, attack type, damage source or pressure tuning.
 
 ## What the natural experiment shows
 
@@ -35,7 +37,7 @@ Four fixed paired seeds provide encouraging evidence for the target-selection hy
 
 Natural runs use seeds 1701, 1702, 3141 and 9001, fixed `.02`-second host steps, and up to 30,000 steps or CORE BREACHED (approximately 599.963–600 seconds due to float accumulation). They call the parent's existing `IntegrityPressureWitness.Observe` with a development configuration callback and separate evidence output path; policies and threat settings are unchanged. No forced damage or hidden-state decisions are added. The limited policy checks every six seconds, intercepts visible final-hop Payloads or overclocks the most overloaded visible node. Kill-all checks once per second when not blocked by an existing Duel/result; normal Duel races receive no player typing. Both policies remain unaware of hacker intent.
 
-## WEB targeting tell
+## WEB targeting tell (pre-storefront baseline)
 
 [transit-target-tell.csv](transit-target-tell.csv) audits canonical destinations and queued definitions, separating target from transit. The authored benign targets are API, AUTH, DB, JOBS and RPT. **WEB is the only internal node absent from all eligible ambient benign destinations.** Its mere inclusion in a route is common for benign traffic and proves nothing.
 

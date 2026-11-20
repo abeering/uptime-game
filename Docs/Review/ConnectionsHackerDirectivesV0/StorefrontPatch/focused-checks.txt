@@ -1,0 +1,177 @@
+PASS one ordinary weighted PURPOSE template serves WEB; shared benign/hostile construction
+PASS READ/EXECUTE baseline 24/36 mean WORK
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=t6
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=h3
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=b1
+PASS existing hostile composition/effects retained seed=1 id=b1
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=j0
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=s9
+PASS existing hostile composition/effects retained seed=1 id=s9
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=s1
+PASS existing hostile composition/effects retained seed=1 id=s1
+PASS normal independently sampled LOAD/WORK ranges seed=1 id=c8
+PASS existing hostile composition/effects retained seed=1 id=c8
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=i4
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=d1
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=b6
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=q3
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=h5
+PASS existing hostile composition/effects retained seed=2 id=h5
+PASS normal independently sampled LOAD/WORK ranges seed=2 id=a5
+PASS existing hostile composition/effects retained seed=2 id=a5
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=e6
+PASS existing hostile composition/effects retained seed=3 id=e6
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=b1
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=z8
+PASS existing hostile composition/effects retained seed=3 id=z8
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=v1
+PASS existing hostile composition/effects retained seed=3 id=v1
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=g1
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=z1
+PASS existing hostile composition/effects retained seed=3 id=z1
+PASS normal independently sampled LOAD/WORK ranges seed=3 id=p9
+PASS existing hostile composition/effects retained seed=3 id=p9
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=c0
+PASS existing hostile composition/effects retained seed=4 id=c0
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=f5
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=k4
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=a2
+PASS existing hostile composition/effects retained seed=4 id=a2
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=l5
+PASS existing hostile composition/effects retained seed=4 id=l5
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=l3
+PASS existing hostile composition/effects retained seed=4 id=l3
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=i6
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=u4
+PASS existing hostile composition/effects retained seed=4 id=u4
+PASS normal independently sampled LOAD/WORK ranges seed=4 id=p4
+PASS existing hostile composition/effects retained seed=4 id=p4
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=w5
+PASS existing hostile composition/effects retained seed=5 id=w5
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=a6
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=z9
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=k6
+PASS existing hostile composition/effects retained seed=5 id=k6
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=i9
+PASS existing hostile composition/effects retained seed=5 id=i9
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=y8
+PASS normal independently sampled LOAD/WORK ranges seed=5 id=f2
+PASS existing hostile composition/effects retained seed=5 id=f2
+PASS normal independently sampled LOAD/WORK ranges seed=6 id=y8
+PASS normal independently sampled LOAD/WORK ranges seed=6 id=y7
+PASS normal independently sampled LOAD/WORK ranges seed=6 id=j0
+PASS existing hostile composition/effects retained seed=6 id=j0
+PASS normal independently sampled LOAD/WORK ranges seed=6 id=l8
+PASS normal independently sampled LOAD/WORK ranges seed=6 id=m4
+PASS existing hostile composition/effects retained seed=6 id=m4
+PASS normal independently sampled LOAD/WORK ranges seed=7 id=o7
+PASS existing hostile composition/effects retained seed=7 id=o7
+PASS normal independently sampled LOAD/WORK ranges seed=7 id=v6
+PASS existing hostile composition/effects retained seed=7 id=v6
+PASS normal independently sampled LOAD/WORK ranges seed=7 id=l4
+PASS normal independently sampled LOAD/WORK ranges seed=8 id=l3
+PASS existing hostile composition/effects retained seed=8 id=l3
+PASS normal independently sampled LOAD/WORK ranges seed=8 id=l1
+PASS normal independently sampled LOAD/WORK ranges seed=8 id=u0
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=q0
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=s5
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=r8
+PASS existing hostile composition/effects retained seed=9 id=r8
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=q6
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=z7
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=g2
+PASS existing hostile composition/effects retained seed=9 id=g2
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=c5
+PASS existing hostile composition/effects retained seed=9 id=c5
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=z6
+PASS normal independently sampled LOAD/WORK ranges seed=9 id=l1
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=s2
+PASS existing hostile composition/effects retained seed=10 id=s2
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=o4
+PASS existing hostile composition/effects retained seed=10 id=o4
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=o7
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=j1
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=w4
+PASS existing hostile composition/effects retained seed=10 id=w4
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=a5
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=h8
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=a3
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=s9
+PASS normal independently sampled LOAD/WORK ranges seed=10 id=p4
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=w2
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=r2
+PASS existing hostile composition/effects retained seed=11 id=r2
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=t6
+PASS existing hostile composition/effects retained seed=11 id=t6
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=z1
+PASS existing hostile composition/effects retained seed=11 id=z1
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=m1
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=j5
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=u3
+PASS existing hostile composition/effects retained seed=11 id=u3
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=s3
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=f6
+PASS existing hostile composition/effects retained seed=11 id=f6
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=a2
+PASS existing hostile composition/effects retained seed=11 id=a2
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=x4
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=e2
+PASS existing hostile composition/effects retained seed=11 id=e2
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=m4
+PASS normal independently sampled LOAD/WORK ranges seed=11 id=q3
+PASS normal independently sampled LOAD/WORK ranges seed=12 id=e7
+PASS existing hostile composition/effects retained seed=12 id=e7
+PASS normal independently sampled LOAD/WORK ranges seed=12 id=k7
+PASS normal independently sampled LOAD/WORK ranges seed=12 id=x4
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=u1
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=o6
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=m2
+PASS existing hostile composition/effects retained seed=13 id=m2
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=j2
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=e6
+PASS existing hostile composition/effects retained seed=13 id=e6
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=x2
+PASS existing hostile composition/effects retained seed=13 id=x2
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=r7
+PASS existing hostile composition/effects retained seed=13 id=r7
+PASS normal independently sampled LOAD/WORK ranges seed=13 id=j9
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=v0
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=x6
+PASS existing hostile composition/effects retained seed=14 id=x6
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=d3
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=s7
+PASS existing hostile composition/effects retained seed=14 id=s7
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=s1
+PASS existing hostile composition/effects retained seed=14 id=s1
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=q1
+PASS normal independently sampled LOAD/WORK ranges seed=14 id=x8
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=j6
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=a2
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=n9
+PASS existing hostile composition/effects retained seed=15 id=n9
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=e7
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=j0
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=r7
+PASS existing hostile composition/effects retained seed=15 id=r7
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=a1
+PASS existing hostile composition/effects retained seed=15 id=a1
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=t8
+PASS normal independently sampled LOAD/WORK ranges seed=15 id=s4
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=a6
+PASS existing hostile composition/effects retained seed=16 id=a6
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=r4
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=s7
+PASS existing hostile composition/effects retained seed=16 id=s7
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=j2
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=a1
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=j0
+PASS existing hostile composition/effects retained seed=16 id=j0
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=a4
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=t5
+PASS existing hostile composition/effects retained seed=16 id=t5
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=h4
+PASS normal independently sampled LOAD/WORK ranges seed=16 id=g6
+PASS weighted generation produces benign, LOADER, INFECTOR and matching-purpose BREACH WEB selections
+PASS Connections catalog unchanged
+PASS ConnectionsAdvanced catalog unchanged
+PASS ConnectionsAdvancedPressure catalog unchanged
