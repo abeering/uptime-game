@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:ff9f9cafd568c7b86cb8e5e07e496ae23731839af3886dc40e80037fa8659797`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:dbd683c0cb8baeea7a996951652377fd78dff10ffef80a04111dd8f5c2738931`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Integrity & CORE Breach V0 (experimental implementation branch, November 19, 2026):** `ConnectionsAdvancedIntegrity.unity` adds opt-in, permanent two-point internal-node Integrity to Maximum Pressure, with infection, sustained severe-overload and lost-Duel strikes. Hidden condition remains separate from actual damage; scan/CLEAN reveal totals, and zero is always visible. Default cards cover unrevealed/known-2 nodes, known-1 is orange, and compromised cards are red without badges. Physical links show externally reachable compromised regions; reaching a compromised DB or AUTH ends and freezes the run with a recorded winning path and `restart`. Critical IDs are configurable. Provisional overload tuning is requested LOAD above 150% of effective capacity for ten simulation seconds, with full reset on relief. Health internals remain but its survival gauge is hidden only here. Existing scenes remain opt-out. See the [implementation contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-integrity-core-breach-v0.md) and [review evidence](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsIntegrityV0/README.md). This experiment excludes Living Shift PR #115 and does not establish final balance.
 
 **Maximum Pressure V0 (independent experiment branch, November 19, 2026):** `ConnectionsAdvancedPressure.unity` copies current-main Advanced with an 8-second mean hostile opportunity interval and ordinary/recon/Payload/Worm/launcher/direct-Duel/carrier-Duel weights of 6/2/2/2/2/1/1. The 3-second opening grace and 1→4 benign coverage ramp remain. Existing Advanced, the four-node scene, Packet, all runtime systems and prefabs are unchanged. Four fixed seeds over 180 simulation seconds show substantially worse unattended Health in three seeds, a quieter fourth, and measurable benefit from a limited visible-Payload/intercept and overloaded-node/overclock policy. Selection, actual production, hidden activity, concurrency and quiet intervals are retained separately. There is no shift-ending system or balance/fun verdict. See the [review guide, seeded evidence and Play Mode captures](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsMaximumPressureV0/README.md); human keyboard comparison remains required. This branch excludes unmerged Living Shift PR #115.
 
