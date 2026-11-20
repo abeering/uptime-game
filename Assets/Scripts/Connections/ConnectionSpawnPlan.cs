@@ -92,6 +92,13 @@ namespace Uptime.Connections
                 ConnectionIdentityMode.ContinuousHopping : identityMode;
         }
 
+        // Only the traffic generator exposes retargeting; its validation preserves legal hostile routes.
+        internal ConnectionSpawnPlan WithHostileRoute(NodeView[] route) => new ConnectionSpawnPlan(
+            ScheduledSpawnTime, ConnectionId, route, ProfileId, ClaimedPurpose, Operations,
+            IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId, ParentConnectionId,
+            ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise, NaturalLoadSeed,
+            HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode);
+
         public ConnectionSpawnPlan ForEvent(string eventId) => new ConnectionSpawnPlan(
             ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose,
             Operations, IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId,

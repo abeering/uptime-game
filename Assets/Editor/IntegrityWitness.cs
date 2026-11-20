@@ -61,7 +61,7 @@ namespace Uptime.Connections.EditorTools
             File.WriteAllLines(Evidence + "/deterministic-checks.txt", results);
             Debug.Log("IntegrityWitness PASS: " + results.Count + " deterministic assertions.");
         }
-        public static SimulationHost Open(bool trafficEnabled = false, int seed = 1701)
+        public static SimulationHost Open(bool trafficEnabled = false, int seed = 1701, Action<SimulationHost> configure = null)
         {
             EditorSceneManager.OpenScene(IntegritySceneAuthoring.Scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
@@ -69,6 +69,7 @@ namespace Uptime.Connections.EditorTools
             traffic.RandomizeSeed = false; traffic.Seed = seed;
             traffic.AutoGenerationEnabled = trafficEnabled;
             typeof(ConnectionsDuelDirector).GetMethod("OnEnable", Private).Invoke(host.GetComponent<ConnectionsDuelDirector>(), null);
+            configure?.Invoke(host);
             host.ResetSimulation();
             host.Recorder.BeginRun();
             return host;

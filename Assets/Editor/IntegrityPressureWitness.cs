@@ -40,9 +40,10 @@ namespace Uptime.Connections.EditorTools
             File.WriteAllText(IntegrityWitness.Evidence + "/pressure-summary.json", JsonUtility.ToJson(new Results { runs = results.ToArray() }, true));
             Debug.Log("IntegrityPressureWitness PASS: twelve natural 600s-or-loss runs and three exact seeded replays.");
         }
-        private static string Observe(int seed, string policy, bool save, out Result result)
+        public static string Observe(int seed, string policy, bool save, out Result result,
+            Action<SimulationHost> configure = null, string evidenceDirectory = null)
         {
-            var host = IntegrityWitness.Open(true, seed);
+            var host = IntegrityWitness.Open(true, seed, configure);
             var duels = host.GetComponent<ConnectionsDuelDirector>();
             var overlay = UnityEngine.Object.FindFirstObjectByType<ConnectionsDuelOverlay>(FindObjectsInactive.Include);
             var terminal = UnityEngine.Object.FindFirstObjectByType<Terminal>();
@@ -120,7 +121,8 @@ namespace Uptime.Connections.EditorTools
             host.Recorder.EndRun();
             if (save)
             {
-                string path = IntegrityWitness.Evidence + "/Runs/" + seed + "-" + policy;
+                string path = (evidenceDirectory ?? IntegrityWitness.Evidence) + "/Runs/" + seed + "-" + policy;
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
                 File.WriteAllText(path + ".csv", samples.ToString());
                 using (var file = File.Create(path + ".json.gz"))
                 using (var gzip = new GZipStream(file, System.IO.Compression.CompressionLevel.Optimal))

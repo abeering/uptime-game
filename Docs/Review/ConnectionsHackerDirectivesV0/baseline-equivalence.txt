@@ -1,0 +1,12 @@
+PASS 1701-unattended: exact 1262 gameplay events, 405 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 1701-visible-defense: exact 1174 gameplay events, 404 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 1701-kill-all: exact 2258 gameplay events, 849 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 1702-unattended: exact 908 gameplay events, 207 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 1702-visible-defense: exact 2450 gameplay events, 600 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 1702-kill-all: exact 2361 gameplay events, 847 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 3141-unattended: exact 892 gameplay events, 333 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 3141-visible-defense: exact 2797 gameplay events, 600 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 3141-kill-all: exact 2218 gameplay events, 851 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 9001-unattended: exact 756 gameplay events, 135 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 9001-visible-defense: exact 1777 gameplay events, 349 snapshots and configuration; added telemetry removed and sequence/action references normalized.
+PASS 9001-kill-all: exact 2348 gameplay events, 846 snapshots and configuration; added telemetry removed and sequence/action references normalized.

@@ -25,6 +25,8 @@ namespace Uptime.Connections
         public string startedUtc;
         public string endedUtc;
         public string lastSavedUtc;
+        public string hackerDirective;
+        public float hackerCommitmentSeconds, hackerPreferenceProbability;
         public string unityVersion;
         public string sceneName;
         public string mode;
@@ -175,6 +177,8 @@ namespace Uptime.Connections
     [Serializable] public sealed class RunEvent
     {
         public IntegrityEvent integrity;
+        public HackerOffensive hackerOffensive;
+        public HackerTargetDecision hackerTarget;
         public int sequence;
         public float timeSeconds;
         public string type;
@@ -426,6 +430,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class NetworkSnapshot
     {
         public IntegritySnapshot integrity;
+        public HackerDirectiveSnapshot hackerDirective;
         public float timeSeconds;
         public int activeConnections;
         public int establishedBenign;
@@ -606,6 +611,13 @@ namespace Uptime.Connections
                 started.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) +
                 "_seed-" + seed.ToString("00000", CultureInfo.InvariantCulture) + "_" + runId + ".json");
             log = new ConnectionsRunLog { run = BuildMetadata(runId, started, seed) };
+            var directives = host.GetComponent<HackerDirectives>();
+            if (directives != null && directives.isActiveAndEnabled && host.IntegrityEnabled)
+            {
+                log.run.hackerDirective = directives.Directive.ToString();
+                log.run.hackerCommitmentSeconds = directives.CommitmentSeconds;
+                log.run.hackerPreferenceProbability = directives.PreferenceProbability;
+            }
             log.run.integrityEnabled = host.IntegrityEnabled;
             if (host.Integrity != null)
             {
@@ -1398,6 +1410,22 @@ namespace Uptime.Connections
             entry.healthAfter = resultingHealth;
         }
 
+        public void RecordHackerOffensive(HackerOffensive offensive)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("hacker_offensive_selected", offensive.selectedAt);
+            entry.hackerOffensive = offensive;
+        }
+        public void RecordHackerTarget(HackerTargetDecision decision)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("hacker_target_decision", decision.time);
+            entry.hackerTarget = decision;
+            entry.connectionId = decision.connectionId;
+            entry.targetNodeId = decision.finalTarget;
+            entry.reason = decision.reason;
+        }
+
         public void RecordIntegrity(IntegrityEvent occurrence)
         {
             if (!IsRecording) return;
@@ -1423,6 +1451,9 @@ namespace Uptime.Connections
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.integrity = host.Integrity?.Snapshot();
+            var directives = host.GetComponent<HackerDirectives>();
+            if (directives != null && directives.isActiveAndEnabled && host.IntegrityEnabled)
+                snapshot.hackerDirective = directives.Snapshot;
             NetworkHealthSnapshot health = host.Health;
             if (health != null)
                 snapshot.health = new HealthSnapshotRecord { value = health.Value,

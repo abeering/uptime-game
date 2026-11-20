@@ -21,6 +21,7 @@ namespace Uptime.Connections
         public string WormEffect { get; internal set; }
         public int DuelId { get; internal set; }
         public string Reason { get; internal set; }
+        internal HackerTargetDecision DirectiveDecision { get; set; }
         public bool Succeeded => ConnectionId != null || PayloadId != null ||
             WormOutbreakId != null || DuelId > 0;
     }
@@ -61,6 +62,7 @@ namespace Uptime.Connections
 
         private readonly List<ReconEvent> events = new();
         private System.Random random;
+        private HackerDirectives directives;
         private int nextEventId;
         private bool visitingEvents;
 
@@ -96,6 +98,8 @@ namespace Uptime.Connections
                 host.ConnectionResolved += OnConnectionResolved;
             }
             random = new System.Random(unchecked(seed ^ (int)0x7265636f));
+            directives = GetComponent<HackerDirectives>();
+            directives?.ResetDirective(seed);
             events.Clear();
             visitingEvents = false;
             nextEventId = 0;
@@ -134,27 +138,28 @@ namespace Uptime.Connections
                     switch (result.Activity)
                     {
                         case "ordinary":
-                            result.ConnectionPlan = traffic.GenerateHostilePlan(atTime);
+                            result.ConnectionPlan = PreferPlan(traffic.GenerateHostilePlan(atTime), result, atTime);
                             if (result.ConnectionPlan != null)
                                 traffic.QueueSpawnPlan(result.ConnectionPlan, "ambient_hostile");
                             else result.Reason = traffic.ConnectionIdsExhausted ?
                                 "ids_exhausted" : "no_weighted_purpose";
                             break;
                         case "reconnaissance":
-                            result.ConnectionPlan = QueueReconnaissance(null, atTime);
+                            result.ConnectionPlan = QueueReconnaissance(null, atTime, result);
                             if (result.ConnectionPlan == null)
                                 result.Reason = traffic.ConnectionIdsExhausted ?
                                     "ids_exhausted" : "no_scan_plan";
                             break;
                         case "payload":
-                            SpawnAmbientPayload(result);
+                            SpawnAmbientPayload(result, atTime);
                             break;
                         case "worm":
                             SpawnAmbientWorm(result);
+                            result.DirectiveDecision = directives?.Prefer(result.Activity, atTime, null, null, "propagating_worm");
                             break;
                         case "payload_launcher":
                             ConnectionSpawnPlan launcherPlan =
-                                traffic.GeneratePayloadLauncherPlan(atTime);
+                                PreferPlan(traffic.GeneratePayloadLauncherPlan(atTime), result, atTime, "fixed_launcher_destination");
                             if (launcherPlan != null)
                             {
                                 traffic.QueueSpawnPlan(launcherPlan, "ambient_payload_launcher");
@@ -163,10 +168,10 @@ namespace Uptime.Connections
                             else result.Reason = "ids_exhausted";
                             break;
                         case "direct_duel":
-                            SpawnDirectDuel(result);
+                            SpawnDirectDuel(result, atTime);
                             break;
                         case "connection_duel":
-                            result.ConnectionPlan = traffic.GenerateDuelCarrierPlan(atTime);
+                            result.ConnectionPlan = PreferPlan(traffic.GenerateDuelCarrierPlan(atTime), result, atTime);
                             if (result.ConnectionPlan != null)
                                 traffic.QueueSpawnPlan(result.ConnectionPlan,
                                     "ambient_duel_carrier");
@@ -184,12 +189,34 @@ namespace Uptime.Connections
                     result.TargetNodeId = result.ConnectionPlan.Target.NodeId;
                 }
             }
+            if (result.DirectiveDecision == null)
+                result.DirectiveDecision = directives?.Prefer(result.Activity, atTime,
+                    host.FindNodeResources(result.TargetNodeId)?.View, null, result.Reason ?? "activity_unavailable");
             host.Recorder?.RecordHostileActivity(host.SimulationTimeSeconds, atTime,
                 result, this);
             return result;
         }
 
-        private void SpawnDirectDuel(AmbientHostileActivityResult result)
+        private ConnectionSpawnPlan PreferPlan(ConnectionSpawnPlan plan, AmbientHostileActivityResult result,
+            float atTime, string unsupported = null)
+        {
+            if (directives == null) return plan;
+            result.DirectiveDecision = directives.Prefer(result.Activity, atTime, plan?.Target,
+                traffic.EligibleDirectiveTargets(plan), plan == null ? "no_plan" : unsupported,
+                plan?.ConnectionId);
+            return result.DirectiveDecision?.influenced == true ?
+                traffic.RetargetHostilePlan(plan, result.DirectiveDecision.finalTarget) : plan;
+        }
+
+        private NodeView PreferNode(AmbientHostileActivityResult result, float atTime,
+            NodeView ambient, List<NodeView> legal)
+        {
+            result.DirectiveDecision = directives?.Prefer(result.Activity, atTime, ambient, legal);
+            return result.DirectiveDecision?.influenced == true ?
+                host.FindNodeResources(result.DirectiveDecision.finalTarget).View : ambient;
+        }
+
+        private void SpawnDirectDuel(AmbientHostileActivityResult result, float atTime)
         {
             ConnectionsDuelDirector duels = host.GetComponent<ConnectionsDuelDirector>();
             if (duels == null)
@@ -201,7 +228,7 @@ namespace Uptime.Connections
             if (targets.Count == 0)
             { result.Reason = "no_internal_target"; return; }
             targets.Sort((a, b) => StringComparer.Ordinal.Compare(a.NodeId, b.NodeId));
-            NodeView target = targets[random.Next(targets.Count)];
+            NodeView target = PreferNode(result, atTime, targets[random.Next(targets.Count)], targets);
             result.TargetNodeId = target.NodeId;
             if (duels.TrySchedule(target.NodeId, DuelVariant.CommandRace,
                 duels.DefaultWarningSeconds, "ambient_direct_duel", out string reason))
@@ -217,7 +244,7 @@ namespace Uptime.Connections
             return false;
         }
 
-        private void SpawnAmbientPayload(AmbientHostileActivityResult result)
+        private void SpawnAmbientPayload(AmbientHostileActivityResult result, float atTime)
         {
             if (host.Payloads == null)
             { result.Reason = "payload_director_unavailable"; return; }
@@ -226,7 +253,7 @@ namespace Uptime.Connections
             { result.Reason = "no_reachable_internal_target"; return; }
             NodeView origin = ChooseOrigin(origins);
             var targets = ReachableInternalTargets(origin);
-            NodeView target = targets[random.Next(targets.Count)];
+            NodeView target = PreferNode(result, atTime, targets[random.Next(targets.Count)], targets);
             PayloadMotionProfile profile = random.NextDouble() < variablePayloadChance ?
                 PayloadMotionProfile.Variable : PayloadMotionProfile.Steady;
             result.OriginNodeId = origin.NodeId;
@@ -319,12 +346,13 @@ namespace Uptime.Connections
         }
 
         public ConnectionSpawnPlan QueueReconnaissance(string targetNodeId,
-            float? atTime = null)
+            float? atTime = null, AmbientHostileActivityResult ambientResult = null)
         {
             if (random == null) ResetActivity(traffic.Seed);
             float scheduled = atTime ?? host.SimulationTimeSeconds;
             ConnectionSpawnPlan scan = traffic.GeneratePortScanPlan(scheduled,
                 portScanLoad, portScanWork, portScannedSeconds, targetNodeId);
+            if (ambientResult != null) scan = PreferPlan(scan, ambientResult, scheduled);
             if (scan == null) return null;
             var item = new ReconEvent
             {

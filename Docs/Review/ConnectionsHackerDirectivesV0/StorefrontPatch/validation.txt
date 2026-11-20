@@ -1,0 +1,21 @@
+Unity 6000.3.11f1, isolated project /private/tmp/uptime-integrity-validation.
+Base for this content follow-up: 0cd62515f0f26726038083b867bf6055f034f100.
+
+Commands actually run:
+Unity -batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.StorefrontTrafficWitness.Natural -quit -logFile /tmp/uptime-storefront-natural.log
+  Exit 0; compiled; 177 focused checks, eight unforced unattended natural runs, two exact event/snapshot/graph replays.
+Unity -batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.StorefrontTrafficWitness.Regressions -quit -logFile /tmp/uptime-storefront-regressions.log
+  Exit 0; 375 directive assertions, 327 Integrity assertions, Traffic and AmbientHostileActivity witnesses pass.
+Unity -batchmode -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectivePlayWitness.Run -logFile /tmp/uptime-storefront-play.log
+  Exit 0; actual graphical Play Mode, fixed-step BREACH generation, active inspect-text privacy, actual terminal restart and exact seeded intent replay. Known Unity Search startup indexing exception logged; witness completed.
+python3 Docs/Review/ConnectionsHackerDirectivesV0/StorefrontPatch/compare.py
+  Exit 0; eight baseline comparisons, all existing profile/destination/traffic-setting preservation checks and hostile timing/category/roll prefixes match; 37 natural storefront plans, 32 targeting WEB. Actual benign completion, LOADER activation and INFECTOR infection installation observed.
+python3 scripts/build_uptime_project_core.py
+python3 scripts/build_uptime_project_core.py --check
+  Generated Core refreshed from source; freshness check passes.
+git diff --check (and staged/full-PR whitespace checks before delivery)
+  Pass.
+Scene byte comparison against 0cd6251 after removing the new storefront profile block:
+  Exactly equal. No runtime script/prefab/other-scene changes in this follow-up.
+
+No new forced-outcome traffic, pressure tuning, full 24-run defensive-policy rerun, standalone build, human keyboard test or new screenshot/layout review. The original broader regression suite's two inherited UI assertion failures remain documented in the pre-patch evidence; that aggregate suite was not rerun for this content patch. Manual longer-claim and 16:9 review steps are in README.md.

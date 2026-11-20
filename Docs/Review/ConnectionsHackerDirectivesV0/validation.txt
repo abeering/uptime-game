@@ -1,0 +1,24 @@
+Unity version: 6000.3.11f1
+Project: /private/tmp/uptime-integrity-validation (isolated copy; original Editor left open)
+Base: 0c1fd9ab4ae8e7a9094623052ecaab23261003ad, latest Integrity #117 HEAD rechecked before delivery.
+
+Commands actually run (Unity executable /Applications/Unity/Hub/Editor/6000.3.11f1/Unity.app/Contents/MacOS/Unity):
+-batchmode -nographics -projectPath <copy> -quit -logFile /tmp/uptime-directives-compile.log
+  Exit 0; runtime compiled.
+-batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectiveWitness.ConfigureAndRun -quit -logFile /tmp/uptime-directives-witness.log
+  Exit 0; authored component and 375 assertions passed. Only the saved Integrity scene was copied back.
+-batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectivePressureWitness.Run -quit -logFile /tmp/uptime-directives-pressure.log
+  Exit 0; 24 natural runs, six exact seeded replays.
+-batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectivePressureWitness.Regressions -quit -logFile /tmp/uptime-directives-regressions.log
+  Exit 1; 327 Integrity assertions passed; 14 regression witnesses passed; two inherited UI assertions failed (Overclock Advanced tool row; Resource inspect pill). Parent evidence documents identical failures on untouched e8a2f77.
+-batchmode -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectivePlayWitness.Run -logFile /tmp/uptime-directives-play.log
+  Exit 0; actual graphical Play Mode, 45s fixed-step BREACH, active inspection-text check, actual terminal restart and exact intent replay. Existing Unity Search startup indexing exception logged; witness completed.
+-batchmode -nographics -projectPath <copy> -executeMethod Uptime.Connections.EditorTools.HackerDirectiveWitness.Run -quit -logFile /tmp/uptime-directives-final-focused.log
+  Exit 0; final focused rerun, 375 assertions passed; result recorded in deterministic-checks.txt.
+
+python3 Docs/Review/ConnectionsHackerDirectivesV0/analyze.py
+  PASS 24 runs, 12 exact parent gameplay/configuration comparisons, 158 damage receipts.
+python3 scripts/build_uptime_project_core.py
+  Regenerated after Connections Current_State update. Freshness checked separately with --check.
+
+No human physical-keyboard playtest, standalone player build, or new screenshot review was performed. See README manual steps. The only serialized scene change is an added Inspector component; other scenes/prefabs and existing parent review evidence are preserved.

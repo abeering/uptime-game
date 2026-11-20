@@ -662,6 +662,32 @@ namespace Uptime.Connections
                 roll);
         }
 
+        // Retarget a fully sampled hostile recipe without resampling objective, potency, noise or identity.
+        // Benign catalog destinations and fixed Payload launch effects remain authoritative.
+        public NodeView[] EligibleDirectiveTargets(ConnectionSpawnPlan plan)
+        {
+            var result = new List<NodeView>();
+            if (plan == null || !plan.IsHostile || Array.Exists(plan.Operations,
+                op => op.EffectOnCompletion == CompletionEffect.PayloadLaunch)) return result.ToArray();
+            foreach (NodeResources node in host.Nodes)
+            {
+                if (!IsInternalNode(node.View) || node.View == plan.Origin) continue;
+                try { FindRoute(plan.Origin, node.View); result.Add(node.View); }
+                catch (InvalidOperationException) { }
+            }
+            return result.ToArray();
+        }
+
+        public ConnectionSpawnPlan RetargetHostilePlan(ConnectionSpawnPlan plan, string targetId)
+        {
+            NodeView target = FindNode(targetId);
+            if (!Array.Exists(EligibleDirectiveTargets(plan), n => n == target))
+                throw new InvalidOperationException("Directive target is not legal for this hostile recipe.");
+            ConnectionSpawnPlan redirected = plan.WithHostileRoute(FindRoute(plan.Origin, target));
+            host.ValidatePlan(redirected);
+            return redirected;
+        }
+
         // Ambient selection uses the authored launcher profile at the opportunity time.
         // Queueing and recording are owned by HostileActivityDirector.
         public ConnectionSpawnPlan GeneratePayloadLauncherPlan(float atTime)
