@@ -144,6 +144,7 @@ namespace Uptime.Connections
         public void NotifyFailedIdentityAddress(string attemptedId, string command,
             int actionSequence = 0)
         {
+            if (RunEnded) return;
             if (runtimeConnections == null || string.IsNullOrEmpty(attemptedId)) return;
             foreach (LogicalConnectionState state in runtimeConnections)
             {

@@ -48,7 +48,7 @@ Docs/Review/ConnectionsIntegrityV0/Captures/06-core-breached-frozen-1280x720.png
 Docs/Review/ConnectionsIntegrityV0/Captures/06-core-breached-frozen-1920x1080.png
 Docs/Review/ConnectionsIntegrityV0/Captures/07-restart-1280x720.png
 Docs/Review/ConnectionsIntegrityV0/Captures/07-restart-1920x1080.png
-Docs/Review/ConnectionsIntegrityV0/Captures/development-fixture.json
+Docs/Review/ConnectionsIntegrityV0/Captures/development-fixture.json.gz
 Docs/Review/ConnectionsIntegrityV0/FILES_CHANGED.txt
 Docs/Review/ConnectionsIntegrityV0/README.md
 Docs/Review/ConnectionsIntegrityV0/RESULTS.md

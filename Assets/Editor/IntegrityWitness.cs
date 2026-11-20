@@ -232,6 +232,16 @@ namespace Uptime.Connections.EditorTools
             Check(host.Recorder.CurrentLog.events.Count(e => e.type == "integrity_damage") == 1, "repeated Duel resolution cannot duplicate its strike");
             host.TryInjectInfection("WEB", InfectionKind.Backdoor, 0, out _);
             Check(host.Integrity.For(host.FindNodeResources("WEB")).Value == 0, "later independent infection still strikes normally");
+            var route = new[] { "EXT1", "WEB", "API", "DB" }.Select(id => host.FindNodeResources(id).View).ToArray();
+            host.GetComponent<ConnectionTrafficDirector>().QueueSpawnPlan(new ConnectionSpawnPlan(
+                host.SimulationTimeSeconds, "r1", route, "integrity-freeze-witness", "Long-running service",
+                new[] { new OperationStage(OperationKind.Write, 1000f, 1f, "Service") }, true,
+                identitySeed: 91, identityMode: ConnectionIdentityMode.ReactiveMisdirection));
+            host.StepSimulation(.02f);
+            var reactive = host.FindConnection("r1");
+            string firstAlias = reactive.Identity.AliasIdentity;
+            host.NotifyFailedIdentityAddress(firstAlias, "inspect " + firstAlias);
+            Check(reactive.Identity.AliasIdentity != firstAlias, "live failed inspection still triggers existing reactive identity behavior");
             host.StartScan("DB", "scan DB", out _);
             host.TryInjectInfection("DB", InfectionKind.PhantomLoad, 1, out _);
             host.StartClean("DB", "clean DB", out var clean);
@@ -242,6 +252,9 @@ namespace Uptime.Connections.EditorTools
             Check(host.RunEnded && host.Integrity.Breach.criticalNode == "AUTH", "authoritative breach latches at damaged critical");
             float time = host.SimulationTimeSeconds; int events = host.Recorder.CurrentLog.events.Count;
             host.StepSimulation(100);
+            string frozenAlias = reactive.Identity.AliasIdentity;
+            host.NotifyFailedIdentityAddress(frozenAlias, "inspect " + frozenAlias);
+            Check(reactive.Identity.AliasIdentity == frozenAlias, "read-only inspection after breach cannot mutate frozen reactive identities");
             frozenRace.Advance(1000);
             director.Resolve(frozenRace);
             Check(!host.TryInjectInfection("RPT", InfectionKind.Blackout, 0, out _) &&

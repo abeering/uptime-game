@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using TMPro;
 using UnityEditor;
@@ -112,7 +113,10 @@ namespace Uptime.Connections.EditorTools
             if (!host.RunEnded || host.SimulationTimeSeconds != time)
                 throw new InvalidOperationException("Visual witness did not freeze.");
             host.Recorder.Save(false);
-            File.Copy(host.Recorder.OutputPath, IntegrityWitness.Evidence + "/Captures/development-fixture.json", true);
+            using (var source = File.OpenRead(host.Recorder.OutputPath))
+            using (var file = File.Create(IntegrityWitness.Evidence + "/Captures/development-fixture.json.gz"))
+            using (var gzip = new GZipStream(file, System.IO.Compression.CompressionLevel.Optimal))
+                source.CopyTo(gzip);
             Submit("restart");
             yield return null;
             if (host.RunEnded) throw new InvalidOperationException("Restart command failed.");

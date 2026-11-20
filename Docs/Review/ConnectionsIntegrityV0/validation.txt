@@ -1,8 +1,8 @@
 Unity 6000.3.11f1; isolated project /tmp/uptime-integrity-validation.
 Parent baseline archive: e8a2f77066f4bff08baffe4020639c536c1279c8; working project already open, so no second Editor used it.
-Implementation commit: 06b2c15c83243fffc4a3aa2e6818631798302582
+Initial implementation commit: 06b2c15c83243fffc4a3aa2e6818631798302582
 
-PASS compile and IntegrityWitness.Run: 325 deterministic assertions (including authored bindings).
+PASS compile and IntegrityWitness.Run: 327 deterministic assertions (including authored bindings).
 PASS IntegrityPressureWitness.Run: twelve 600-second-or-loss natural runs; three exact event/snapshot/sample replays.
 PASS IntegrityCapture.Run: fourteen actual scripted Play Mode frames at 1920x1080 / 1280x720; freeze and terminal restart.
 Capture tooling caveat: UnityEditor.Search.SearchDatabase startup indexing ArgumentOutOfRangeException; captures completed.
@@ -47,3 +47,6 @@ IntegrityCapture.Run (graphics-enabled batch Editor; actual Play Mode fixtures).
 
 Outstanding: human keyboard/focus, natural-pressure readability and gameplay assessment; Packet Play Mode not run.
 Pre-existing scene/prefab assets and historical/review documents on the working branch remain unchanged.
+
+Final freeze/package audit: Unity compiled and IntegrityWitness.Run passed327 assertions, including live reactive identity behavior and no identity reaction after breach.
+Capture recorder output is gzip-compressed; exact decompression was verified against the original saved recording.
