@@ -1,5 +1,7 @@
 # Connections Integrity & CORE Breach V0 review
 
+**Historical fixture:** Small/Advanced are now the supported gameplay scenes under [Canonical Scenes V0](../../Connections/connections-canonical-scenes-v0.md). This original Integrity fixture and its evidence remain unchanged regression material.
+
 Experimental Connections implementation, November 19, 2026, stacked on `feat/connections-maximum-pressure-v0` / PR #116 at `e8a2f77066f4bff08baffe4020639c536c1279c8`. Living Shift PR #115 is excluded. Open **`Assets/Scenes/ConnectionsAdvancedIntegrity.unity`**.
 
 The [changed-file manifest](FILES_CHANGED.txt) lists the implementation and evidence files. The [implementation contract](../../Connections/connections-integrity-core-breach-v0.md) describes the two-point model, hidden knowledge, damage attribution, graph traversal and agreed presentation. The new scene alone enables Integrity and hides Health's value/bar/rate. Other scene assets, original prefabs, traffic tuning and Packet are unchanged.

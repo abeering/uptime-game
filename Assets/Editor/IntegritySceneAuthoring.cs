@@ -16,7 +16,18 @@ namespace Uptime.Connections.EditorTools
         public static void Build()
         {
             EditorSceneManager.OpenScene(MaximumPressureWitness.Pressure);
+            ApplyToLoadedScene(true);
+            EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(), Scene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Integrity authored scene and seven-row status prefab saved.");
+        }
+
+        // Shared Editor authoring path for both canonical topologies; runtime UI stays serialized.
+        public static void ApplyToLoadedScene(bool rebuildStatusPrefab = false)
+        {
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            if (host.GetComponent<IntegrityPresenter>() != null)
+                throw new InvalidOperationException("Loaded scene already has Integrity presentation.");
             var settings = new SerializedObject(host);
             settings.FindProperty("integrityTuning.enabled").boolValue = true;
             settings.ApplyModifiedPropertiesWithoutUndo();
@@ -94,15 +105,12 @@ namespace Uptime.Connections.EditorTools
             foreach (string name in new[] { "valueText", "rateText" })
                 ((Component)stripFields.FindProperty(name).objectReferenceValue).gameObject.SetActive(false);
             ((Component)stripFields.FindProperty("healthFill").objectReferenceValue).transform.parent.gameObject.SetActive(false);
-            BuildStatusPrefab();
+            if (rebuildStatusPrefab) BuildStatusPrefab();
             var status = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             var statusFields = new SerializedObject(status);
             statusFields.FindProperty("statusPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<NodeStatusView>(StatusPrefab);
             statusFields.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(host.gameObject.scene);
-            EditorSceneManager.SaveScene(host.gameObject.scene, Scene);
-            AssetDatabase.SaveAssets();
-            Debug.Log("Integrity authored scene and seven-row status prefab saved.");
         }
 
         private static void BuildStatusPrefab()

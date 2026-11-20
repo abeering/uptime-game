@@ -61,9 +61,9 @@ namespace Uptime.Connections.EditorTools
             File.WriteAllLines(Evidence + "/deterministic-checks.txt", results);
             Debug.Log("IntegrityWitness PASS: " + results.Count + " deterministic assertions.");
         }
-        public static SimulationHost Open(bool trafficEnabled = false, int seed = 1701, Action<SimulationHost> configure = null)
+        public static SimulationHost Open(bool trafficEnabled = false, int seed = 1701, Action<SimulationHost> configure = null, string scene = null)
         {
-            EditorSceneManager.OpenScene(IntegritySceneAuthoring.Scene);
+            EditorSceneManager.OpenScene(scene ?? IntegritySceneAuthoring.Scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             traffic.RandomizeSeed = false; traffic.Seed = seed;
@@ -303,8 +303,10 @@ namespace Uptime.Connections.EditorTools
             {
                 EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
                 host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>(); host.ResetSimulation();
-                Check(!host.IntegrityEnabled && host.Integrity == null && !host.RunEnded &&
-                    UnityEngine.Object.FindFirstObjectByType<IntegrityPresenter>() == null, scene + ": Integrity disabled, original behavior retained");
+                bool canonical = scene != "ConnectionsAdvancedPressure";
+                Check(host.IntegrityEnabled == canonical && (host.Integrity != null) == canonical && !host.RunEnded &&
+                    (UnityEngine.Object.FindFirstObjectByType<IntegrityPresenter>() != null) == canonical,
+                    scene + ": canonical Integrity promotion / historical Pressure opt-out");
             }
         }
         public static object Field(object owner, string name) => owner.GetType().GetField(name, Private).GetValue(owner);

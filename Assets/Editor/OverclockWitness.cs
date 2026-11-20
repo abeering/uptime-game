@@ -25,6 +25,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host, originalStatusPrefab: true);
             var panel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
             var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();

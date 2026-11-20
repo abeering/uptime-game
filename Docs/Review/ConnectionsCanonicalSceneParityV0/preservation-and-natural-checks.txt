@@ -1,0 +1,27 @@
+PASS legal natural plan routes: Connections/SPREAD/authored/1701 (17 plans)
+PASS legal natural plan routes: Connections/SPREAD/authored/3141 (27 plans)
+PASS legal natural plan routes: Connections/SPREAD/high8s/1701 (17 plans)
+PASS legal natural plan routes: Connections/SPREAD/high8s/3141 (11 plans)
+PASS legal natural plan routes: Connections/BREACH/authored/1701 (22 plans)
+PASS legal natural plan routes: Connections/BREACH/authored/3141 (19 plans)
+PASS legal natural plan routes: Connections/BREACH/high8s/1701 (19 plans)
+PASS legal natural plan routes: Connections/BREACH/high8s/3141 (12 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/SPREAD/authored/1701 (25 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/SPREAD/authored/3141 (34 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/SPREAD/high8s/1701 (31 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/SPREAD/high8s/3141 (22 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/BREACH/authored/1701 (27 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/BREACH/authored/3141 (31 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/BREACH/high8s/1701 (22 plans)
+PASS legal natural plan routes: ConnectionsAdvanced/BREACH/high8s/3141 (24 plans)
+PASS Connections: every activity family actually produced in natural mixed runs; every internal node observed as benign destination.
+PASS Connections: scene GUID, exact topology and all 69 original RectTransform geometries preserved.
+PASS ConnectionsAdvanced: every activity family actually produced in natural mixed runs; every internal node observed as benign destination.
+PASS ConnectionsAdvanced: scene GUID, exact topology and all 121 original RectTransform geometries preserved.
+PASS unchanged fixture/Packet asset and GUID: ConnectionsAdvancedPressure
+PASS unchanged fixture/Packet asset and GUID: ConnectionsAdvancedIntegrity
+PASS unchanged fixture/Packet asset and GUID: ConnectionsStatusLab
+PASS unchanged fixture/Packet asset and GUID: ConnectionsTopologyStress
+PASS unchanged fixture/Packet asset and GUID: GameScene
+PASS unchanged fixture/Packet asset and GUID: ABScene
+PASS runtime scripts and all prefab assets unchanged from integration base.

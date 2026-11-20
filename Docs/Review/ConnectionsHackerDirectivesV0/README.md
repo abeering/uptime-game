@@ -1,5 +1,7 @@
 # Hacker Directives V0 — review guide
 
+**Canonical promotion:** Small/Advanced now share these mechanics under [Canonical Scenes V0](../../Connections/connections-canonical-scenes-v0.md). The Integrity scene and original directive/storefront evidence below remain historical fixtures, not gameplay-scene authority.
+
 **Storefront follow-up:** The same PR now adds a scene-only legitimate `storefront-page` template. See the [patch review and before/after traffic evidence](StorefrontPatch/README.md). The 24 runs and WEB-tell measurements below are the preserved **pre-storefront baseline**, not results for the updated seven-template scene. SPREAD still uses unchanged ambient selection, but the new catalog intentionally changes its seeded recipe/outcome sequence relative to the six-template parent.
 
 Connections implementation experiment, November 20, 2026. Branch `feat/connections-hacker-directives-v0`, based on Integrity PR #117 at `0c1fd9ab4ae8e7a9094623052ecaab23261003ad`; PR target is `feat/connections-integrity-core-breach-v0`. Maximum Pressure #116 is inherited; Living Shift #115 is excluded. No branches are merged.

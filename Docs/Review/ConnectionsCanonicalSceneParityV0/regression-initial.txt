@@ -1,0 +1,20 @@
+FAIL Traffic: TrafficWitness failed: independent ambient streams respect grace and retain correct attribution
+FAIL AmbientHostileActivity: AmbientHostileActivityWitness: four-node ordinary ambient baseline is retained
+FAIL NetworkHealth: NetworkHealthWitness: deadline is not late at exact boundary
+PASS Duel
+PASS Consequence
+FAIL AdvancedScene: AdvancedSceneWitness failed: visible node ID, role and LOAD bar EXT1
+FAIL Recorder: RecorderWitness failed: WORK completion records effect before final resolution at one step time
+FAIL Payload: PayloadWitness: Assets/Scenes/Connections.unity orange arrival begins next hop without delivery
+PASS Worm
+FAIL AmbientPayloadThreat: AmbientPayloadThreatWitness: four-node ambient exclusions
+PASS Scan
+FAIL Infection: InfectionWitness: natural DELIVERY plans select all three kinds; other plans do not deliver
+FAIL Overclock: OverclockWitness FAILED: Connections infection, awareness and condition coexist
+FAIL NodeStatus: NodeStatusWitness: Assets/Scenes/Connections.unity authored three-row panel and seconds timers
+PASS Geometry
+FAIL Resource: ResourceWitness failed: inspect header pill keeps authored large geometry and identity color
+FAIL Integrity: IntegrityWitness FAIL: Connections: Integrity disabled, original behavior retained
+FAIL HackerDirective: HackerDirectiveWitness FAIL: Connections has no directive component
+FAIL Storefront: StorefrontTrafficWitness FAIL: ConnectionsAdvanced catalog unchanged
+FAIL MaximumPressure: MaximumPressureWitness: only intended tuning differs from Advanced

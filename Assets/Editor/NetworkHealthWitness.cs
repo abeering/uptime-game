@@ -19,6 +19,7 @@ namespace Uptime.Connections.EditorTools
             {
                 EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
                 var sceneHost = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+                LegacyMechanicWitness.Configure(sceneHost);
                 sceneHost.ResetSimulation();
                 CheckPanelBindings(sceneHost);
                 var scenePanel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();

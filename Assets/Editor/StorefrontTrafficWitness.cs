@@ -62,7 +62,8 @@ namespace Uptime.Connections.EditorTools
                 EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
                 host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
                 host.ResetSimulation();
-                Check(host.GetComponent<ConnectionTrafficDirector>().Profiles.All(p => p.id != "storefront-page"), scene + " catalog unchanged");
+                Check(host.GetComponent<ConnectionTrafficDirector>().Profiles.Any(p => p.id == "storefront-page") == (scene == "ConnectionsAdvanced"),
+                    scene + " canonical Advanced storefront / Small and historical Pressure catalogs retained");
             }
             File.WriteAllLines(Evidence + "/focused-checks.txt", checks);
             Debug.Log("StorefrontTrafficWitness PASS: " + checks.Count + " checks.");

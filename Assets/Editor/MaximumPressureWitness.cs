@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -18,6 +19,17 @@ namespace Uptime.Connections.EditorTools
         public const string Evidence = "Docs/Review/ConnectionsMaximumPressureV0";
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private const float Step = .02f;
+
+        // Reconstruct the original Advanced control from the preserved Pressure fixture in memory.
+        // Canonical Advanced is now a different gameplay contract; no asset is rewritten here.
+        public static void OpenHistoricalBaseline()
+        {
+            EditorSceneManager.OpenScene(Pressure);
+            var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
+            IntegrityWitness.Set(traffic, "hostileMeanIntervalSeconds", 30f);
+            var activity = UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>();
+            activity.OrdinaryWeight = 4; activity.WormWeight = 1; activity.PayloadLauncherWeight = 1;
+        }
 
         public static void RunRegressions()
         {
@@ -39,12 +51,15 @@ namespace Uptime.Connections.EditorTools
         {
             // Byte-for-byte equivalence except the four intentional serialized settings
             // protects every authored binding, prefab override and ordinary game system.
-            Check(File.ReadAllText(Pressure) == File.ReadAllText(Baseline)
-                .Replace("  hostileMeanIntervalSeconds: 30\n", "  hostileMeanIntervalSeconds: 8\n")
-                .Replace("  ordinaryWeight: 4\n", "  ordinaryWeight: 6\n")
-                .Replace("  wormWeight: 1\n", "  wormWeight: 2\n")
-                .Replace("  payloadLauncherWeight: 1\n", "  payloadLauncherWeight: 2\n"),
-                "only intended tuning differs from Advanced");
+            string reconstructed = File.ReadAllText(Pressure)
+                .Replace("  hostileMeanIntervalSeconds: 8\n", "  hostileMeanIntervalSeconds: 30\n")
+                .Replace("  ordinaryWeight: 6\n", "  ordinaryWeight: 4\n")
+                .Replace("  wormWeight: 2\n", "  wormWeight: 1\n")
+                .Replace("  payloadLauncherWeight: 2\n", "  payloadLauncherWeight: 1\n");
+            using (var sha = SHA256.Create())
+                Check(BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(reconstructed))).Replace("-", "").ToLowerInvariant() ==
+                    "415459d8a446b15ef782ccb85e3972440f2a030ffd0d462f7287cbfb907d573a",
+                    "Pressure reconstructs original e551207 Advanced byte-for-byte with only four tuning changes");
             Check(AssetDatabase.AssetPathToGUID(Pressure) != AssetDatabase.AssetPathToGUID(Baseline),
                 "scene has its own GUID");
             EditorSceneManager.OpenScene(Pressure);
@@ -84,7 +99,8 @@ namespace Uptime.Connections.EditorTools
 
         private static string Observe(string scene, int seed, bool intervention, bool save)
         {
-            EditorSceneManager.OpenScene(scene);
+            if (scene == Baseline) OpenHistoricalBaseline();
+            else EditorSceneManager.OpenScene(scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             var recorder = host.GetComponent<ConnectionsRunRecorder>();

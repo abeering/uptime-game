@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:5d40f3b59da394667beaa1bbf3e59d22f07e752bf0177d835e4c9990154a86f7`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:0969517d3d492238bc356ac987d02156dd97c6be0eccd9511755f07d70211b4c`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,10 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Canonical Scenes V0 (integration branch, November 20, 2026):** Develop/test gameplay in **Small `Connections.unity`** and **Advanced `ConnectionsAdvanced.unity`**. Both enable generated PURPOSE/LOADER/INFECTOR/anomaly/log systems, all seven ambient hostile families, all five infection kinds, defenses, async scan/CLEAN, Duels/Surprise, two-point Integrity/knowledge/severe-overload rules, physical compromise presentation, CORE loss/restart and Inspector SPREAD/BREACH. Small serializes its six legal existing PURPOSEs for API/DB/AUTH; Advanced gains complete storefront WEB content while retaining original destinations/dual ingress. Every internal node has legitimate destination cover. Defaults remain Small 54s/goal3 and Advanced 30s/goal4, with positive 4/2/2/1/1/1/1 activity weights. GUIDs/topologies/layouts remain. Shared Integrity presentation/status prefab, clock/tools are visible; Health value/bar/rate are hidden while internals remain. No WORK/titlebar/shift or Living Shift #115 integration. Pressure/Integrity are historical fixtures; Status Lab/Topology Stress remain specialized. See [contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-canonical-scenes-v0.md), [pre-edit matrix](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsCanonicalSceneParityV0/PARITY_AUDIT.md), [validation/review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsCanonicalSceneParityV0/README.md). Stacked on #118; tracks #119; unmerged.
+
+The dated checkpoints below preserve original phase scope/evidence. Their scene-exclusion statements describe those checkpoints; the canonical contract above supersedes current availability and presentation.
 
 **Legitimate WEB traffic follow-up (same Hacker Directives branch/PR, November 20, 2026):** Only the Integrity scene adds the weighted canonical-style `storefront-page` / Storefront Page Requests template targeting WEB: READ [LOAD 0.5–1.1, mean WORK 24] → EXECUTE [0.8–1.6, 36], weight 1.0. The existing pipeline generates benign WORK and ordinary LOADER/INFECTOR cover from the same template; BREACH can retain it when choosing WEB. The six existing recipes/destinations, clocks, coverage settings, origins, mechanics and other scenes remain unchanged. This redistributes weighted traffic, addressing the pre-patch WEB-only hostile tell without adding a producer. Catalog changes intentionally change seeded recipes/outcomes; old directive evidence remains the six-template baseline. See [patch evidence and review steps](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsHackerDirectivesV0/StorefrontPatch/README.md).
 

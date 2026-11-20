@@ -10,7 +10,8 @@ using UnityEngine.UI;
 
 namespace Uptime.Connections.EditorTools
 {
-    // Checks the serialized playable scene, then exercises its real director and host.
+    // Preserves the original Advanced scenario assertions in the unchanged historical fixture.
+    // CanonicalSceneWitness verifies the promoted gameplay assets.
     public static class AdvancedSceneWitness
     {
         private const string Scene = "Assets/Scenes/ConnectionsAdvanced.unity";
@@ -35,7 +36,7 @@ namespace Uptime.Connections.EditorTools
         [MenuItem("Tools/Connections/Run Advanced Scene Witness")]
         public static void Run()
         {
-            EditorSceneManager.OpenScene(Scene);
+            MaximumPressureWitness.OpenHistoricalBaseline();
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();

@@ -1,0 +1,881 @@
+PASS Assets/Scenes/Connections.unity actual authored generation/catalog/directive defaults before witness overrides
+PASS Assets/Scenes/Connections.unity authored topology counts
+PASS Assets/Scenes/Connections.unity two-point Integrity enabled
+PASS Assets/Scenes/Connections.unity shared severe-load rule
+PASS Assets/Scenes/Connections.unity explicit legal canonical catalog
+PASS Assets/Scenes/Connections.unity generated scenario pressure/goal retained (seed fixed only by witness)
+PASS Assets/Scenes/Connections.unity every ambient activity/infection family enabled
+PASS Assets/Scenes/Connections.unity every internal node has legitimate canonical destination cover
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: product-lookup
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: customer-login
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: cart-pricing
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: order-submit
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: inventory-sync
+PASS Assets/Scenes/Connections.unity valid PURPOSE/log/WORK content: sales-export
+PASS Assets/Scenes/Connections.unity no missing script: Game Camera
+PASS Assets/Scenes/Connections.unity no missing script: EventSystem
+PASS Assets/Scenes/Connections.unity no missing script: GameCanvas
+PASS Assets/Scenes/Connections.unity no missing script: Screen
+PASS Assets/Scenes/Connections.unity no missing script: NetworkHealthPanel
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: Clock
+PASS Assets/Scenes/Connections.unity no missing script: HealthValue
+PASS Assets/Scenes/Connections.unity no missing script: HealthBar
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: SignedRate
+PASS Assets/Scenes/Connections.unity no missing script: ToolReadinessRow
+PASS Assets/Scenes/Connections.unity no missing script: ProbeGroup
+PASS Assets/Scenes/Connections.unity no missing script: Label
+PASS Assets/Scenes/Connections.unity no missing script: Slots
+PASS Assets/Scenes/Connections.unity no missing script: Status
+PASS Assets/Scenes/Connections.unity no missing script: Text
+PASS Assets/Scenes/Connections.unity no missing script: ScanGroup
+PASS Assets/Scenes/Connections.unity no missing script: Label
+PASS Assets/Scenes/Connections.unity no missing script: Slots
+PASS Assets/Scenes/Connections.unity no missing script: Status
+PASS Assets/Scenes/Connections.unity no missing script: Text
+PASS Assets/Scenes/Connections.unity no missing script: OverclockGroup
+PASS Assets/Scenes/Connections.unity no missing script: Label
+PASS Assets/Scenes/Connections.unity no missing script: Slots
+PASS Assets/Scenes/Connections.unity no missing script: Status
+PASS Assets/Scenes/Connections.unity no missing script: Text
+PASS Assets/Scenes/Connections.unity no missing script: TerminalPanel
+PASS Assets/Scenes/Connections.unity no missing script: TerminalHeader
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: TitlebarRule
+PASS Assets/Scenes/Connections.unity no missing script: Pinned
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: HistoryScroll
+PASS Assets/Scenes/Connections.unity no missing script: Viewport
+PASS Assets/Scenes/Connections.unity no missing script: HistoryContent
+PASS Assets/Scenes/Connections.unity no missing script: CommandPrompt
+PASS Assets/Scenes/Connections.unity no missing script: PromptGlyph
+PASS Assets/Scenes/Connections.unity no missing script: CommandInput
+PASS Assets/Scenes/Connections.unity no missing script: Text Area
+PASS Assets/Scenes/Connections.unity no missing script: Placeholder
+PASS Assets/Scenes/Connections.unity no missing script: InputText
+PASS Assets/Scenes/Connections.unity no missing script: DockedWindowFrame
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: NetworkPanel
+PASS Assets/Scenes/Connections.unity no missing script: NetworkHeader
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: TitlebarRule
+PASS Assets/Scenes/Connections.unity no missing script: Pinned
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: PhysicalTopology
+PASS Assets/Scenes/Connections.unity no missing script: LogicalPaths
+PASS Assets/Scenes/Connections.unity no missing script: PhysicalLinks
+PASS Assets/Scenes/Connections.unity no missing script: PhysicalLink E1
+PASS Assets/Scenes/Connections.unity no missing script: LinkLabel E1
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Values
+PASS Assets/Scenes/Connections.unity no missing script: PhysicalLink E2
+PASS Assets/Scenes/Connections.unity no missing script: LinkLabel E2
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Values
+PASS Assets/Scenes/Connections.unity no missing script: PhysicalLink E3
+PASS Assets/Scenes/Connections.unity no missing script: LinkLabel E3
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Values
+PASS Assets/Scenes/Connections.unity no missing script: Nodes
+PASS Assets/Scenes/Connections.unity no missing script: Node EXT1
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: NodeHeading
+PASS Assets/Scenes/Connections.unity no missing script: NodeId
+PASS Assets/Scenes/Connections.unity no missing script: NodeRole
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Load Track
+PASS Assets/Scenes/Connections.unity no missing script: Load Fill
+PASS Assets/Scenes/Connections.unity no missing script: Load Label
+PASS Assets/Scenes/Connections.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/Connections.unity no missing script: Node API
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: NodeHeading
+PASS Assets/Scenes/Connections.unity no missing script: NodeId
+PASS Assets/Scenes/Connections.unity no missing script: NodeRole
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Load Track
+PASS Assets/Scenes/Connections.unity no missing script: Load Fill
+PASS Assets/Scenes/Connections.unity no missing script: Load Label
+PASS Assets/Scenes/Connections.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/Connections.unity no missing script: Node DB
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: NodeHeading
+PASS Assets/Scenes/Connections.unity no missing script: NodeId
+PASS Assets/Scenes/Connections.unity no missing script: NodeRole
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Load Track
+PASS Assets/Scenes/Connections.unity no missing script: Load Fill
+PASS Assets/Scenes/Connections.unity no missing script: Load Label
+PASS Assets/Scenes/Connections.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/Connections.unity no missing script: Node AUTH
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: NodeHeading
+PASS Assets/Scenes/Connections.unity no missing script: NodeId
+PASS Assets/Scenes/Connections.unity no missing script: NodeRole
+PASS Assets/Scenes/Connections.unity no missing script: ResourceReadout
+PASS Assets/Scenes/Connections.unity no missing script: Load Track
+PASS Assets/Scenes/Connections.unity no missing script: Load Fill
+PASS Assets/Scenes/Connections.unity no missing script: Load Label
+PASS Assets/Scenes/Connections.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/Connections.unity no missing script: ConnectionDebugReadout
+PASS Assets/Scenes/Connections.unity no missing script: Status
+PASS Assets/Scenes/Connections.unity no missing script: NodeStatusLayer
+PASS Assets/Scenes/Connections.unity no missing script: IdentityOverlay
+PASS Assets/Scenes/Connections.unity no missing script: NodeStampLayer
+PASS Assets/Scenes/Connections.unity no missing script: CleanOverlay
+PASS Assets/Scenes/Connections.unity no missing script: MinigameBackground
+PASS Assets/Scenes/Connections.unity no missing script: CleanTitlebar
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: TitlebarRule
+PASS Assets/Scenes/Connections.unity no missing script: Pinned
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: CancelHint
+PASS Assets/Scenes/Connections.unity no missing script: MinigameText
+PASS Assets/Scenes/Connections.unity no missing script: MinigameInput
+PASS Assets/Scenes/Connections.unity no missing script: Text Area
+PASS Assets/Scenes/Connections.unity no missing script: Placeholder
+PASS Assets/Scenes/Connections.unity no missing script: Text
+PASS Assets/Scenes/Connections.unity no missing script: CleanWindowFrame
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: DuelOverlay
+PASS Assets/Scenes/Connections.unity no missing script: MinigameBackground
+PASS Assets/Scenes/Connections.unity no missing script: CleanTitlebar
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: TitlebarRule
+PASS Assets/Scenes/Connections.unity no missing script: Pinned
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: CancelHint
+PASS Assets/Scenes/Connections.unity no missing script: CleanWindowFrame
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: YouPane
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: Identity
+PASS Assets/Scenes/Connections.unity no missing script: ProgressTrack
+PASS Assets/Scenes/Connections.unity no missing script: ProgressFill
+PASS Assets/Scenes/Connections.unity no missing script: Commands
+PASS Assets/Scenes/Connections.unity no missing script: HackerPane
+PASS Assets/Scenes/Connections.unity no missing script: Accent
+PASS Assets/Scenes/Connections.unity no missing script: Identity
+PASS Assets/Scenes/Connections.unity no missing script: ProgressTrack
+PASS Assets/Scenes/Connections.unity no missing script: ProgressFill
+PASS Assets/Scenes/Connections.unity no missing script: Commands
+PASS Assets/Scenes/Connections.unity no missing script: DuelResult
+PASS Assets/Scenes/Connections.unity no missing script: DuelSplash
+PASS Assets/Scenes/Connections.unity no missing script: DockedWindowFrame
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: VideoCall
+PASS Assets/Scenes/Connections.unity no missing script: Background
+PASS Assets/Scenes/Connections.unity no missing script: CallTitlebar
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: TitlebarRule
+PASS Assets/Scenes/Connections.unity no missing script: Pinned
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: Fill
+PASS Assets/Scenes/Connections.unity no missing script: HangUpHint
+PASS Assets/Scenes/Connections.unity no missing script: VideoFeed
+PASS Assets/Scenes/Connections.unity no missing script: StaticFeed
+PASS Assets/Scenes/Connections.unity no missing script: CallerSprite
+PASS Assets/Scenes/Connections.unity no missing script: SubtitleOverlay
+PASS Assets/Scenes/Connections.unity no missing script: Subtitles
+PASS Assets/Scenes/Connections.unity no missing script: ControlStrip
+PASS Assets/Scenes/Connections.unity no missing script: HangUpControl
+PASS Assets/Scenes/Connections.unity no missing script: Circle
+PASS Assets/Scenes/Connections.unity no missing script: Handset
+PASS Assets/Scenes/Connections.unity no missing script: EscapeKeycap
+PASS Assets/Scenes/Connections.unity no missing script: CallWindowFrame
+PASS Assets/Scenes/Connections.unity no missing script: Top
+PASS Assets/Scenes/Connections.unity no missing script: Bottom
+PASS Assets/Scenes/Connections.unity no missing script: Left
+PASS Assets/Scenes/Connections.unity no missing script: Right
+PASS Assets/Scenes/Connections.unity no missing script: TextCommunications
+PASS Assets/Scenes/Connections.unity no missing script: Core breach result
+PASS Assets/Scenes/Connections.unity no missing script: Title
+PASS Assets/Scenes/Connections.unity no missing script: Winning path
+PASS Assets/Scenes/Connections.unity no missing script: SimulationHost
+PASS IntegrityPresenter.host serialized binding
+PASS IntegrityPresenter.terminal serialized binding
+PASS IntegrityPresenter.duelOverlay serialized binding
+PASS IntegrityPresenter.cleanOverlay serialized binding
+PASS IntegrityPresenter.breachPanel serialized binding
+PASS IntegrityPresenter.breachPath serialized binding
+PASS Assets/Scenes/Connections.unity full nodes binding array
+PASS Assets/Scenes/Connections.unity nodes0.node
+PASS Assets/Scenes/Connections.unity nodes1.node
+PASS Assets/Scenes/Connections.unity nodes2.node
+PASS Assets/Scenes/Connections.unity nodes3.node
+PASS Assets/Scenes/Connections.unity nodes0.background
+PASS Assets/Scenes/Connections.unity nodes1.background
+PASS Assets/Scenes/Connections.unity nodes2.background
+PASS Assets/Scenes/Connections.unity nodes3.background
+PASS Assets/Scenes/Connections.unity nodes0.border
+PASS Assets/Scenes/Connections.unity nodes1.border
+PASS Assets/Scenes/Connections.unity nodes2.border
+PASS Assets/Scenes/Connections.unity nodes3.border
+PASS Assets/Scenes/Connections.unity nodes0.accent
+PASS Assets/Scenes/Connections.unity nodes1.accent
+PASS Assets/Scenes/Connections.unity nodes2.accent
+PASS Assets/Scenes/Connections.unity nodes3.accent
+PASS Assets/Scenes/Connections.unity nodes0.marker
+PASS Assets/Scenes/Connections.unity nodes1.marker
+PASS Assets/Scenes/Connections.unity nodes2.marker
+PASS Assets/Scenes/Connections.unity nodes3.marker
+PASS Assets/Scenes/Connections.unity full links binding array
+PASS Assets/Scenes/Connections.unity links0.link
+PASS Assets/Scenes/Connections.unity links1.link
+PASS Assets/Scenes/Connections.unity links2.link
+PASS Assets/Scenes/Connections.unity links0.line
+PASS Assets/Scenes/Connections.unity links1.line
+PASS Assets/Scenes/Connections.unity links2.line
+PASS Assets/Scenes/Connections.unity links0.label
+PASS Assets/Scenes/Connections.unity links1.label
+PASS Assets/Scenes/Connections.unity links2.label
+PASS HackerDirectives.host serialized binding
+PASS NodeStatusPresenter.host serialized binding
+PASS NodeStatusPresenter.duelDirector serialized binding
+PASS NodeStatusPresenter.networkArea serialized binding
+PASS NodeStatusPresenter.statusLayer serialized binding
+PASS NodeStatusPresenter.statusPrefab serialized binding
+PASS NodeStatusPresenter.stampLayer serialized binding
+PASS NodeStatusPresenter.stampPrefab serialized binding
+PASS Assets/Scenes/Connections.unity shared seven-row Integrity status prefab
+PASS Assets/Scenes/Connections.unity actual expanded status label/timer bindings
+PASS Terminal.commandInput serialized binding
+PASS Terminal.historyScroll serialized binding
+PASS Terminal.historyContent serialized binding
+PASS Terminal.inspectPrefab serialized binding
+PASS Terminal.scanPrefab serialized binding
+PASS Terminal.simulationHost serialized binding
+PASS Terminal.trafficDirector serialized binding
+PASS Terminal.cleanOverlay serialized binding
+PASS Assets/Scenes/Connections.unity clock/tools retained and Health survival gauge hidden
+PASS Assets/Scenes/Connections.unity/SPREAD/54/ordinary existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/ordinary legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/54/ordinary directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/reconnaissance legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/54/reconnaissance directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/worm existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/worm directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload_launcher legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload_launcher directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/direct_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/54/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/Connections.unity/SPREAD/54/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/54/connection_duel legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/54/connection_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/54/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/ordinary existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/ordinary legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/8/ordinary directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/reconnaissance legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/8/reconnaissance directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/worm existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/worm directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload_launcher legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload_launcher directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/direct_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/SPREAD/8/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/Connections.unity/SPREAD/8/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/SPREAD/8/connection_duel legal real-node route
+PASS Assets/Scenes/Connections.unity/SPREAD/8/connection_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/SPREAD/8/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/ordinary existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/ordinary legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/54/ordinary directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/reconnaissance legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/54/reconnaissance directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/worm existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/worm directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload_launcher legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload_launcher directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/direct_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/54/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/Connections.unity/BREACH/54/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/54/connection_duel legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/54/connection_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/54/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/ordinary existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/ordinary legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/8/ordinary directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/reconnaissance legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/8/reconnaissance directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/worm existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/worm directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload_launcher legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload_launcher directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/direct_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity/BREACH/8/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/Connections.unity/BREACH/8/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/Connections.unity/BREACH/8/connection_duel legal real-node route
+PASS Assets/Scenes/Connections.unity/BREACH/8/connection_duel directive/intent active
+PASS Assets/Scenes/Connections.unity/BREACH/8/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/Connections.unity accepted covert infection leaves hidden one-point damage
+PASS Assets/Scenes/Connections.unity async scan starts promptly
+PASS Assets/Scenes/Connections.unity scan has not prematurely revealed condition
+PASS Assets/Scenes/Connections.unity real scan completion reveals Integrity
+PASS Assets/Scenes/Connections.unity PID CLEAN removes infection without repairing Integrity
+PASS Assets/Scenes/Connections.unity PROBE operates
+PASS Assets/Scenes/Connections.unity interception/isolation operate
+PASS Assets/Scenes/Connections.unity actual topology establishes CORE breach
+PASS Assets/Scenes/Connections.unity exact-once loss freezes simulation
+PASS Assets/Scenes/Connections.unity real terminal restart clears loss/knowledge/offensive
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual authored generation/catalog/directive defaults before witness overrides
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored topology counts
+PASS Assets/Scenes/ConnectionsAdvanced.unity two-point Integrity enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity shared severe-load rule
+PASS Assets/Scenes/ConnectionsAdvanced.unity explicit legal canonical catalog
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated scenario pressure/goal retained (seed fixed only by witness)
+PASS Assets/Scenes/ConnectionsAdvanced.unity every ambient activity/infection family enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity every internal node has legitimate canonical destination cover
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: product-lookup
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: customer-login
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: cart-pricing
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: order-submit
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: inventory-sync
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: sales-export
+PASS Assets/Scenes/ConnectionsAdvanced.unity valid PURPOSE/log/WORK content: storefront-page
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Game Camera
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: EventSystem
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: GameCanvas
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Screen
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NetworkHealthPanel
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Clock
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HealthValue
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HealthBar
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: SignedRate
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ToolReadinessRow
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ProbeGroup
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Slots
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Status
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ScanGroup
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Slots
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Status
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: OverclockGroup
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Slots
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Status
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TerminalPanel
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TerminalHeader
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TitlebarRule
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Pinned
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HistoryScroll
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Viewport
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HistoryContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CommandPrompt
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PromptGlyph
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CommandInput
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text Area
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Placeholder
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: InputText
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: DockedWindowFrame
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NetworkPanel
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NetworkHeader
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TitlebarRule
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Pinned
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalTopology
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LogicalPaths
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLinks
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E7
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E6
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E5
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E4
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E3
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E2
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: PhysicalLink E1
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E1
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E2
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E3
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E4
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E5
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E6
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: LinkLabel E7
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Values
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Nodes
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node EXT1
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node API
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node DB
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node AUTH
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node WEB
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node RPT
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node JOBS
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Node EXT2
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeHeading
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeId
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeRole
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ResourceReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Track
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Load Label
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Infrastructure identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ConnectionDebugReadout
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Status
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeStatusLayer
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: NodeStampLayer
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CleanOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: MinigameBackground
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CleanTitlebar
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TitlebarRule
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Pinned
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CancelHint
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: MinigameText
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: MinigameInput
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text Area
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Placeholder
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Text
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CleanWindowFrame
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: DuelOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: MinigameBackground
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CleanTitlebar
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TitlebarRule
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Pinned
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CancelHint
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CleanWindowFrame
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: YouPane
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ProgressTrack
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ProgressFill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Commands
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HackerPane
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ProgressTrack
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ProgressFill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Commands
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: DuelResult
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: DuelSplash
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: DockedWindowFrame
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: VideoCall
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Background
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CallTitlebar
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TitlebarRule
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Pinned
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Fill
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HangUpHint
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: VideoFeed
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: StaticFeed
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CallerSprite
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: SubtitleOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Subtitles
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: ControlStrip
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: HangUpControl
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Circle
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Handset
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: EscapeKeycap
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: CallWindowFrame
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Top
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Bottom
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Left
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Right
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: TextCommunications
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Core breach result
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Title
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: Winning path
+PASS Assets/Scenes/ConnectionsAdvanced.unity no missing script: SimulationHost
+PASS IntegrityPresenter.host serialized binding
+PASS IntegrityPresenter.terminal serialized binding
+PASS IntegrityPresenter.duelOverlay serialized binding
+PASS IntegrityPresenter.cleanOverlay serialized binding
+PASS IntegrityPresenter.breachPanel serialized binding
+PASS IntegrityPresenter.breachPath serialized binding
+PASS Assets/Scenes/ConnectionsAdvanced.unity full nodes binding array
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes0.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes1.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes2.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes3.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes4.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes5.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes6.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes7.node
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes0.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes1.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes2.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes3.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes4.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes5.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes6.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes7.background
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes0.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes1.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes2.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes3.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes4.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes5.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes6.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes7.border
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes0.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes1.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes2.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes3.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes4.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes5.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes6.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes7.accent
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes0.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes1.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes2.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes3.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes4.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes5.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes6.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity nodes7.marker
+PASS Assets/Scenes/ConnectionsAdvanced.unity full links binding array
+PASS Assets/Scenes/ConnectionsAdvanced.unity links0.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links1.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links2.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links3.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links4.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links5.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links6.link
+PASS Assets/Scenes/ConnectionsAdvanced.unity links0.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links1.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links2.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links3.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links4.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links5.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links6.line
+PASS Assets/Scenes/ConnectionsAdvanced.unity links0.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links1.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links2.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links3.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links4.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links5.label
+PASS Assets/Scenes/ConnectionsAdvanced.unity links6.label
+PASS HackerDirectives.host serialized binding
+PASS NodeStatusPresenter.host serialized binding
+PASS NodeStatusPresenter.duelDirector serialized binding
+PASS NodeStatusPresenter.networkArea serialized binding
+PASS NodeStatusPresenter.statusLayer serialized binding
+PASS NodeStatusPresenter.statusPrefab serialized binding
+PASS NodeStatusPresenter.stampLayer serialized binding
+PASS NodeStatusPresenter.stampPrefab serialized binding
+PASS Assets/Scenes/ConnectionsAdvanced.unity shared seven-row Integrity status prefab
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual expanded status label/timer bindings
+PASS Terminal.commandInput serialized binding
+PASS Terminal.historyScroll serialized binding
+PASS Terminal.historyContent serialized binding
+PASS Terminal.inspectPrefab serialized binding
+PASS Terminal.scanPrefab serialized binding
+PASS Terminal.simulationHost serialized binding
+PASS Terminal.trafficDirector serialized binding
+PASS Terminal.cleanOverlay serialized binding
+PASS Assets/Scenes/ConnectionsAdvanced.unity clock/tools retained and Health survival gauge hidden
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/ordinary existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/ordinary legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/ordinary directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/reconnaissance legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/reconnaissance directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/worm existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/worm directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload_launcher legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload_launcher directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/direct_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/connection_duel legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/connection_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/54/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/ordinary existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/ordinary legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/ordinary directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/reconnaissance legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/reconnaissance directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/worm existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/worm directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload_launcher legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload_launcher directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/direct_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/connection_duel legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/connection_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/SPREAD/8/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/ordinary existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/ordinary legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/ordinary directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/reconnaissance legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/reconnaissance directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/worm existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/worm directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload_launcher legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload_launcher directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/direct_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/connection_duel legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/connection_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/54/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/ordinary existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/ordinary legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/ordinary directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/ordinary preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/reconnaissance existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/reconnaissance legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/reconnaissance directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/reconnaissance preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/worm existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/worm directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/worm preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload_launcher existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload_launcher legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload_launcher directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/payload_launcher preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/direct_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/direct_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/direct_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/direct_duel frozen Surprise consequence plan
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/connection_duel existing generator constructs selected family
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/connection_duel legal real-node route
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/connection_duel directive/intent active
+PASS Assets/Scenes/ConnectionsAdvanced.unity/BREACH/8/connection_duel preference/construction does not cause direct damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity accepted covert infection leaves hidden one-point damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity async scan starts promptly
+PASS Assets/Scenes/ConnectionsAdvanced.unity scan has not prematurely revealed condition
+PASS Assets/Scenes/ConnectionsAdvanced.unity real scan completion reveals Integrity
+PASS Assets/Scenes/ConnectionsAdvanced.unity PID CLEAN removes infection without repairing Integrity
+PASS Assets/Scenes/ConnectionsAdvanced.unity PROBE operates
+PASS Assets/Scenes/ConnectionsAdvanced.unity interception/isolation operate
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual topology establishes CORE breach
+PASS Assets/Scenes/ConnectionsAdvanced.unity exact-once loss freezes simulation
+PASS Assets/Scenes/ConnectionsAdvanced.unity real terminal restart clears loss/knowledge/offensive
