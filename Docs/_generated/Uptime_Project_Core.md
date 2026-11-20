@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:fa743ec20f131e84a812abaeaa0a026d98ada39662e02b345c719bdae95c6ca4`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:ff9f9cafd568c7b86cb8e5e07e496ae23731839af3886dc40e80037fa8659797`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,8 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Maximum Pressure V0 (independent experiment branch, November 19, 2026):** `ConnectionsAdvancedPressure.unity` copies current-main Advanced with an 8-second mean hostile opportunity interval and ordinary/recon/Payload/Worm/launcher/direct-Duel/carrier-Duel weights of 6/2/2/2/2/1/1. The 3-second opening grace and 1→4 benign coverage ramp remain. Existing Advanced, the four-node scene, Packet, all runtime systems and prefabs are unchanged. Four fixed seeds over 180 simulation seconds show substantially worse unattended Health in three seeds, a quieter fourth, and measurable benefit from a limited visible-Payload/intercept and overloaded-node/overclock policy. Selection, actual production, hidden activity, concurrency and quiet intervals are retained separately. There is no shift-ending system or balance/fun verdict. See the [review guide, seeded evidence and Play Mode captures](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsMaximumPressureV0/README.md); human keyboard comparison remains required. This branch excludes unmerged Living Shift PR #115.
 
 **Surprise V0 (implementation branch, November 13, 2026):** Duel now stores a concrete loss plan at scheduling. A threat-neutral planner selects once from mixed weighted atomic effects and compound Tactics, or expands an explicit together-list; custom configuration can replace or override defaults by candidate ID, including weight zero. Its executor attempts each stored component through the existing infection, Condition, Worm, and Payload systems and records partial failures without substitution. The current default pool mixes Phantom LOAD, Breach & Lockdown (infection plus a 15-second CLEAN LOCKED Condition), Condition Worm outbreak (SCAN JAMMED or BACKDOOR), and a two-to-three Payload burst from the Duel target to distinct reachable internal nodes. Player victory prevents the stored plan. New CLEAN attempts on locked nodes are rejected, while a CLEAN already in progress survives. Advanced gives direct and connection-delivered Duels modest weights in the existing hostile opportunity mix; the four-node scene keeps both at zero. Developer `duel` choices and the independent planner witness exercise each outcome. This is a bounded Connections implementation, not the larger Event or Level Director system. See [Surprise V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-surprise-v0.md) for configuration, recorder evidence, and review steps. Human Play Mode review remains required.
 
