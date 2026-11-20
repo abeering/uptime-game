@@ -45,6 +45,20 @@ Each business defines:
 
 ---
 
+# COMPANY TRAFFIC RHYTHM / CONNECTION SHAPE (EXPLORATORY)
+
+Companies can feel different because their **normal connections behave differently**, not just because they have different stakes, threats, or failure conditions. In Connections, the shape and rhythm of everyday traffic could be a major part of company identity.
+
+Possible examples (not fixed rules):
+- **E-commerce:** A varied but relatively straightforward mix of connections and operation arcs, like the current prototype baseline.
+- **Financial system:** Lots of short-lived connections and rapid turnover, creating a different tempo for observation and response.
+- **Data processing / enterprise workflows:** Fewer, longer-lived connections with many sequential operations per connection.
+- **Media streaming:** Long-lived connections with sustained LOAD, where keeping flows running matters more than managing constant arrivals.
+
+Knobs to explore include connection arrival rate and burstiness, lifetime, number and mix of operations, and LOAD / WORK patterns. The goal is for each company's network to have a distinct **visual and gameplay feel even before attacks begin**. These are examples to revisit, not settled archetypes or implementation requirements.
+
+---
+
 # BUSINESS CONCEPTS
 
 ## 1. High-Frequency Trading Firm
