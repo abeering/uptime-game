@@ -13268,6 +13268,7 @@ GameObject:
   - component: {fileID: 1996901040}
   - component: {fileID: 1996901041}
   - component: {fileID: 1996901042}
+  - component: {fileID: 1996901043}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -14841,6 +14842,22 @@ MonoBehaviour:
     label: {fileID: 798972720}
   breachPanel: {fileID: 1078812878}
   breachPath: {fileID: 369731316}
+--- !u!114 &1996901043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7db3c3977d54080b3a811613f5f6778, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.HackerDirectives
+  host: {fileID: 1996901015}
+  directive: 0
+  commitmentSeconds: 60
+  preferenceProbability: 0.7
 --- !u!114 &2031600210
 MonoBehaviour:
   m_ObjectHideFlags: 0
