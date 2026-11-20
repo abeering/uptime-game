@@ -1,0 +1,375 @@
+PASS expected=observed: remaining damage: expected outside-b/service-b/core-b cost2 versus other cost4; observed exact
+PASS expected=observed: offensive uses actual hidden damage without revealing it
+PASS expected=observed: commitment retains cost2 objective despite alternative cost1 before60s
+PASS expected=observed: at60s reevaluate; expected core-a cost1, observed exact
+PASS expected=observed: preferred targets exclude already compromised core
+PASS expected=observed: completed offensive reevaluates before commitment expires
+PASS expected=observed: removed physical edge invalidates objective and selects reachable alternative
+PASS expected=observed: multiple roots/criticals and zero-cost cycle terminate with valid cost1 simple path
+PASS expected=observed: disconnected topology falls back without creating an attack or damage
+PASS expected=observed: seeded reset replay seed=1 choice=0
+PASS expected=observed: seeded reset replay seed=1 choice=1
+PASS expected=observed: seeded reset replay seed=1 choice=2
+PASS expected=observed: seeded reset replay seed=1 choice=3
+PASS expected=observed: seeded reset replay seed=1 choice=4
+PASS expected=observed: seeded reset replay seed=1 choice=5
+PASS expected=observed: seeded reset replay seed=1 choice=6
+PASS expected=observed: seeded reset replay seed=1 choice=7
+PASS expected=observed: seeded reset replay seed=1 choice=8
+PASS expected=observed: seeded reset replay seed=1 choice=9
+PASS expected=observed: seeded reset replay seed=2 choice=0
+PASS expected=observed: seeded reset replay seed=2 choice=1
+PASS expected=observed: seeded reset replay seed=2 choice=2
+PASS expected=observed: seeded reset replay seed=2 choice=3
+PASS expected=observed: seeded reset replay seed=2 choice=4
+PASS expected=observed: seeded reset replay seed=2 choice=5
+PASS expected=observed: seeded reset replay seed=2 choice=6
+PASS expected=observed: seeded reset replay seed=2 choice=7
+PASS expected=observed: seeded reset replay seed=2 choice=8
+PASS expected=observed: seeded reset replay seed=2 choice=9
+PASS expected=observed: seeded reset replay seed=3 choice=0
+PASS expected=observed: seeded reset replay seed=3 choice=1
+PASS expected=observed: seeded reset replay seed=3 choice=2
+PASS expected=observed: seeded reset replay seed=3 choice=3
+PASS expected=observed: seeded reset replay seed=3 choice=4
+PASS expected=observed: seeded reset replay seed=3 choice=5
+PASS expected=observed: seeded reset replay seed=3 choice=6
+PASS expected=observed: seeded reset replay seed=3 choice=7
+PASS expected=observed: seeded reset replay seed=3 choice=8
+PASS expected=observed: seeded reset replay seed=3 choice=9
+PASS expected=observed: seeded reset replay seed=4 choice=0
+PASS expected=observed: seeded reset replay seed=4 choice=1
+PASS expected=observed: seeded reset replay seed=4 choice=2
+PASS expected=observed: seeded reset replay seed=4 choice=3
+PASS expected=observed: seeded reset replay seed=4 choice=4
+PASS expected=observed: seeded reset replay seed=4 choice=5
+PASS expected=observed: seeded reset replay seed=4 choice=6
+PASS expected=observed: seeded reset replay seed=4 choice=7
+PASS expected=observed: seeded reset replay seed=4 choice=8
+PASS expected=observed: seeded reset replay seed=4 choice=9
+PASS expected=observed: seeded reset replay seed=5 choice=0
+PASS expected=observed: seeded reset replay seed=5 choice=1
+PASS expected=observed: seeded reset replay seed=5 choice=2
+PASS expected=observed: seeded reset replay seed=5 choice=3
+PASS expected=observed: seeded reset replay seed=5 choice=4
+PASS expected=observed: seeded reset replay seed=5 choice=5
+PASS expected=observed: seeded reset replay seed=5 choice=6
+PASS expected=observed: seeded reset replay seed=5 choice=7
+PASS expected=observed: seeded reset replay seed=5 choice=8
+PASS expected=observed: seeded reset replay seed=5 choice=9
+PASS expected=observed: seeded reset replay seed=6 choice=0
+PASS expected=observed: seeded reset replay seed=6 choice=1
+PASS expected=observed: seeded reset replay seed=6 choice=2
+PASS expected=observed: seeded reset replay seed=6 choice=3
+PASS expected=observed: seeded reset replay seed=6 choice=4
+PASS expected=observed: seeded reset replay seed=6 choice=5
+PASS expected=observed: seeded reset replay seed=6 choice=6
+PASS expected=observed: seeded reset replay seed=6 choice=7
+PASS expected=observed: seeded reset replay seed=6 choice=8
+PASS expected=observed: seeded reset replay seed=6 choice=9
+PASS expected=observed: seeded reset replay seed=7 choice=0
+PASS expected=observed: seeded reset replay seed=7 choice=1
+PASS expected=observed: seeded reset replay seed=7 choice=2
+PASS expected=observed: seeded reset replay seed=7 choice=3
+PASS expected=observed: seeded reset replay seed=7 choice=4
+PASS expected=observed: seeded reset replay seed=7 choice=5
+PASS expected=observed: seeded reset replay seed=7 choice=6
+PASS expected=observed: seeded reset replay seed=7 choice=7
+PASS expected=observed: seeded reset replay seed=7 choice=8
+PASS expected=observed: seeded reset replay seed=7 choice=9
+PASS expected=observed: seeded reset replay seed=8 choice=0
+PASS expected=observed: seeded reset replay seed=8 choice=1
+PASS expected=observed: seeded reset replay seed=8 choice=2
+PASS expected=observed: seeded reset replay seed=8 choice=3
+PASS expected=observed: seeded reset replay seed=8 choice=4
+PASS expected=observed: seeded reset replay seed=8 choice=5
+PASS expected=observed: seeded reset replay seed=8 choice=6
+PASS expected=observed: seeded reset replay seed=8 choice=7
+PASS expected=observed: seeded reset replay seed=8 choice=8
+PASS expected=observed: seeded reset replay seed=8 choice=9
+PASS expected=observed: seeded reset replay seed=9 choice=0
+PASS expected=observed: seeded reset replay seed=9 choice=1
+PASS expected=observed: seeded reset replay seed=9 choice=2
+PASS expected=observed: seeded reset replay seed=9 choice=3
+PASS expected=observed: seeded reset replay seed=9 choice=4
+PASS expected=observed: seeded reset replay seed=9 choice=5
+PASS expected=observed: seeded reset replay seed=9 choice=6
+PASS expected=observed: seeded reset replay seed=9 choice=7
+PASS expected=observed: seeded reset replay seed=9 choice=8
+PASS expected=observed: seeded reset replay seed=9 choice=9
+PASS expected=observed: seeded reset replay seed=10 choice=0
+PASS expected=observed: seeded reset replay seed=10 choice=1
+PASS expected=observed: seeded reset replay seed=10 choice=2
+PASS expected=observed: seeded reset replay seed=10 choice=3
+PASS expected=observed: seeded reset replay seed=10 choice=4
+PASS expected=observed: seeded reset replay seed=10 choice=5
+PASS expected=observed: seeded reset replay seed=10 choice=6
+PASS expected=observed: seeded reset replay seed=10 choice=7
+PASS expected=observed: seeded reset replay seed=10 choice=8
+PASS expected=observed: seeded reset replay seed=10 choice=9
+PASS expected=observed: seeded reset replay seed=11 choice=0
+PASS expected=observed: seeded reset replay seed=11 choice=1
+PASS expected=observed: seeded reset replay seed=11 choice=2
+PASS expected=observed: seeded reset replay seed=11 choice=3
+PASS expected=observed: seeded reset replay seed=11 choice=4
+PASS expected=observed: seeded reset replay seed=11 choice=5
+PASS expected=observed: seeded reset replay seed=11 choice=6
+PASS expected=observed: seeded reset replay seed=11 choice=7
+PASS expected=observed: seeded reset replay seed=11 choice=8
+PASS expected=observed: seeded reset replay seed=11 choice=9
+PASS expected=observed: seeded reset replay seed=12 choice=0
+PASS expected=observed: seeded reset replay seed=12 choice=1
+PASS expected=observed: seeded reset replay seed=12 choice=2
+PASS expected=observed: seeded reset replay seed=12 choice=3
+PASS expected=observed: seeded reset replay seed=12 choice=4
+PASS expected=observed: seeded reset replay seed=12 choice=5
+PASS expected=observed: seeded reset replay seed=12 choice=6
+PASS expected=observed: seeded reset replay seed=12 choice=7
+PASS expected=observed: seeded reset replay seed=12 choice=8
+PASS expected=observed: seeded reset replay seed=12 choice=9
+PASS expected=observed: seeded reset replay seed=13 choice=0
+PASS expected=observed: seeded reset replay seed=13 choice=1
+PASS expected=observed: seeded reset replay seed=13 choice=2
+PASS expected=observed: seeded reset replay seed=13 choice=3
+PASS expected=observed: seeded reset replay seed=13 choice=4
+PASS expected=observed: seeded reset replay seed=13 choice=5
+PASS expected=observed: seeded reset replay seed=13 choice=6
+PASS expected=observed: seeded reset replay seed=13 choice=7
+PASS expected=observed: seeded reset replay seed=13 choice=8
+PASS expected=observed: seeded reset replay seed=13 choice=9
+PASS expected=observed: seeded reset replay seed=14 choice=0
+PASS expected=observed: seeded reset replay seed=14 choice=1
+PASS expected=observed: seeded reset replay seed=14 choice=2
+PASS expected=observed: seeded reset replay seed=14 choice=3
+PASS expected=observed: seeded reset replay seed=14 choice=4
+PASS expected=observed: seeded reset replay seed=14 choice=5
+PASS expected=observed: seeded reset replay seed=14 choice=6
+PASS expected=observed: seeded reset replay seed=14 choice=7
+PASS expected=observed: seeded reset replay seed=14 choice=8
+PASS expected=observed: seeded reset replay seed=14 choice=9
+PASS expected=observed: seeded reset replay seed=15 choice=0
+PASS expected=observed: seeded reset replay seed=15 choice=1
+PASS expected=observed: seeded reset replay seed=15 choice=2
+PASS expected=observed: seeded reset replay seed=15 choice=3
+PASS expected=observed: seeded reset replay seed=15 choice=4
+PASS expected=observed: seeded reset replay seed=15 choice=5
+PASS expected=observed: seeded reset replay seed=15 choice=6
+PASS expected=observed: seeded reset replay seed=15 choice=7
+PASS expected=observed: seeded reset replay seed=15 choice=8
+PASS expected=observed: seeded reset replay seed=15 choice=9
+PASS expected=observed: seeded reset replay seed=16 choice=0
+PASS expected=observed: seeded reset replay seed=16 choice=1
+PASS expected=observed: seeded reset replay seed=16 choice=2
+PASS expected=observed: seeded reset replay seed=16 choice=3
+PASS expected=observed: seeded reset replay seed=16 choice=4
+PASS expected=observed: seeded reset replay seed=16 choice=5
+PASS expected=observed: seeded reset replay seed=16 choice=6
+PASS expected=observed: seeded reset replay seed=16 choice=7
+PASS expected=observed: seeded reset replay seed=16 choice=8
+PASS expected=observed: seeded reset replay seed=16 choice=9
+PASS expected=observed: seeded reset replay seed=17 choice=0
+PASS expected=observed: seeded reset replay seed=17 choice=1
+PASS expected=observed: seeded reset replay seed=17 choice=2
+PASS expected=observed: seeded reset replay seed=17 choice=3
+PASS expected=observed: seeded reset replay seed=17 choice=4
+PASS expected=observed: seeded reset replay seed=17 choice=5
+PASS expected=observed: seeded reset replay seed=17 choice=6
+PASS expected=observed: seeded reset replay seed=17 choice=7
+PASS expected=observed: seeded reset replay seed=17 choice=8
+PASS expected=observed: seeded reset replay seed=17 choice=9
+PASS expected=observed: seeded reset replay seed=18 choice=0
+PASS expected=observed: seeded reset replay seed=18 choice=1
+PASS expected=observed: seeded reset replay seed=18 choice=2
+PASS expected=observed: seeded reset replay seed=18 choice=3
+PASS expected=observed: seeded reset replay seed=18 choice=4
+PASS expected=observed: seeded reset replay seed=18 choice=5
+PASS expected=observed: seeded reset replay seed=18 choice=6
+PASS expected=observed: seeded reset replay seed=18 choice=7
+PASS expected=observed: seeded reset replay seed=18 choice=8
+PASS expected=observed: seeded reset replay seed=18 choice=9
+PASS expected=observed: seeded reset replay seed=19 choice=0
+PASS expected=observed: seeded reset replay seed=19 choice=1
+PASS expected=observed: seeded reset replay seed=19 choice=2
+PASS expected=observed: seeded reset replay seed=19 choice=3
+PASS expected=observed: seeded reset replay seed=19 choice=4
+PASS expected=observed: seeded reset replay seed=19 choice=5
+PASS expected=observed: seeded reset replay seed=19 choice=6
+PASS expected=observed: seeded reset replay seed=19 choice=7
+PASS expected=observed: seeded reset replay seed=19 choice=8
+PASS expected=observed: seeded reset replay seed=19 choice=9
+PASS expected=observed: seeded reset replay seed=20 choice=0
+PASS expected=observed: seeded reset replay seed=20 choice=1
+PASS expected=observed: seeded reset replay seed=20 choice=2
+PASS expected=observed: seeded reset replay seed=20 choice=3
+PASS expected=observed: seeded reset replay seed=20 choice=4
+PASS expected=observed: seeded reset replay seed=20 choice=5
+PASS expected=observed: seeded reset replay seed=20 choice=6
+PASS expected=observed: seeded reset replay seed=20 choice=7
+PASS expected=observed: seeded reset replay seed=20 choice=8
+PASS expected=observed: seeded reset replay seed=20 choice=9
+PASS expected=observed: seeded reset replay seed=21 choice=0
+PASS expected=observed: seeded reset replay seed=21 choice=1
+PASS expected=observed: seeded reset replay seed=21 choice=2
+PASS expected=observed: seeded reset replay seed=21 choice=3
+PASS expected=observed: seeded reset replay seed=21 choice=4
+PASS expected=observed: seeded reset replay seed=21 choice=5
+PASS expected=observed: seeded reset replay seed=21 choice=6
+PASS expected=observed: seeded reset replay seed=21 choice=7
+PASS expected=observed: seeded reset replay seed=21 choice=8
+PASS expected=observed: seeded reset replay seed=21 choice=9
+PASS expected=observed: seeded reset replay seed=22 choice=0
+PASS expected=observed: seeded reset replay seed=22 choice=1
+PASS expected=observed: seeded reset replay seed=22 choice=2
+PASS expected=observed: seeded reset replay seed=22 choice=3
+PASS expected=observed: seeded reset replay seed=22 choice=4
+PASS expected=observed: seeded reset replay seed=22 choice=5
+PASS expected=observed: seeded reset replay seed=22 choice=6
+PASS expected=observed: seeded reset replay seed=22 choice=7
+PASS expected=observed: seeded reset replay seed=22 choice=8
+PASS expected=observed: seeded reset replay seed=22 choice=9
+PASS expected=observed: seeded reset replay seed=23 choice=0
+PASS expected=observed: seeded reset replay seed=23 choice=1
+PASS expected=observed: seeded reset replay seed=23 choice=2
+PASS expected=observed: seeded reset replay seed=23 choice=3
+PASS expected=observed: seeded reset replay seed=23 choice=4
+PASS expected=observed: seeded reset replay seed=23 choice=5
+PASS expected=observed: seeded reset replay seed=23 choice=6
+PASS expected=observed: seeded reset replay seed=23 choice=7
+PASS expected=observed: seeded reset replay seed=23 choice=8
+PASS expected=observed: seeded reset replay seed=23 choice=9
+PASS expected=observed: seeded reset replay seed=24 choice=0
+PASS expected=observed: seeded reset replay seed=24 choice=1
+PASS expected=observed: seeded reset replay seed=24 choice=2
+PASS expected=observed: seeded reset replay seed=24 choice=3
+PASS expected=observed: seeded reset replay seed=24 choice=4
+PASS expected=observed: seeded reset replay seed=24 choice=5
+PASS expected=observed: seeded reset replay seed=24 choice=6
+PASS expected=observed: seeded reset replay seed=24 choice=7
+PASS expected=observed: seeded reset replay seed=24 choice=8
+PASS expected=observed: seeded reset replay seed=24 choice=9
+PASS expected=observed: seeded reset replay seed=25 choice=0
+PASS expected=observed: seeded reset replay seed=25 choice=1
+PASS expected=observed: seeded reset replay seed=25 choice=2
+PASS expected=observed: seeded reset replay seed=25 choice=3
+PASS expected=observed: seeded reset replay seed=25 choice=4
+PASS expected=observed: seeded reset replay seed=25 choice=5
+PASS expected=observed: seeded reset replay seed=25 choice=6
+PASS expected=observed: seeded reset replay seed=25 choice=7
+PASS expected=observed: seeded reset replay seed=25 choice=8
+PASS expected=observed: seeded reset replay seed=25 choice=9
+PASS expected=observed: seeded reset replay seed=26 choice=0
+PASS expected=observed: seeded reset replay seed=26 choice=1
+PASS expected=observed: seeded reset replay seed=26 choice=2
+PASS expected=observed: seeded reset replay seed=26 choice=3
+PASS expected=observed: seeded reset replay seed=26 choice=4
+PASS expected=observed: seeded reset replay seed=26 choice=5
+PASS expected=observed: seeded reset replay seed=26 choice=6
+PASS expected=observed: seeded reset replay seed=26 choice=7
+PASS expected=observed: seeded reset replay seed=26 choice=8
+PASS expected=observed: seeded reset replay seed=26 choice=9
+PASS expected=observed: seeded reset replay seed=27 choice=0
+PASS expected=observed: seeded reset replay seed=27 choice=1
+PASS expected=observed: seeded reset replay seed=27 choice=2
+PASS expected=observed: seeded reset replay seed=27 choice=3
+PASS expected=observed: seeded reset replay seed=27 choice=4
+PASS expected=observed: seeded reset replay seed=27 choice=5
+PASS expected=observed: seeded reset replay seed=27 choice=6
+PASS expected=observed: seeded reset replay seed=27 choice=7
+PASS expected=observed: seeded reset replay seed=27 choice=8
+PASS expected=observed: seeded reset replay seed=27 choice=9
+PASS expected=observed: seeded reset replay seed=28 choice=0
+PASS expected=observed: seeded reset replay seed=28 choice=1
+PASS expected=observed: seeded reset replay seed=28 choice=2
+PASS expected=observed: seeded reset replay seed=28 choice=3
+PASS expected=observed: seeded reset replay seed=28 choice=4
+PASS expected=observed: seeded reset replay seed=28 choice=5
+PASS expected=observed: seeded reset replay seed=28 choice=6
+PASS expected=observed: seeded reset replay seed=28 choice=7
+PASS expected=observed: seeded reset replay seed=28 choice=8
+PASS expected=observed: seeded reset replay seed=28 choice=9
+PASS expected=observed: seeded reset replay seed=29 choice=0
+PASS expected=observed: seeded reset replay seed=29 choice=1
+PASS expected=observed: seeded reset replay seed=29 choice=2
+PASS expected=observed: seeded reset replay seed=29 choice=3
+PASS expected=observed: seeded reset replay seed=29 choice=4
+PASS expected=observed: seeded reset replay seed=29 choice=5
+PASS expected=observed: seeded reset replay seed=29 choice=6
+PASS expected=observed: seeded reset replay seed=29 choice=7
+PASS expected=observed: seeded reset replay seed=29 choice=8
+PASS expected=observed: seeded reset replay seed=29 choice=9
+PASS expected=observed: seeded reset replay seed=30 choice=0
+PASS expected=observed: seeded reset replay seed=30 choice=1
+PASS expected=observed: seeded reset replay seed=30 choice=2
+PASS expected=observed: seeded reset replay seed=30 choice=3
+PASS expected=observed: seeded reset replay seed=30 choice=4
+PASS expected=observed: seeded reset replay seed=30 choice=5
+PASS expected=observed: seeded reset replay seed=30 choice=6
+PASS expected=observed: seeded reset replay seed=30 choice=7
+PASS expected=observed: seeded reset replay seed=30 choice=8
+PASS expected=observed: seeded reset replay seed=30 choice=9
+PASS expected=observed: seeded reset replay seed=31 choice=0
+PASS expected=observed: seeded reset replay seed=31 choice=1
+PASS expected=observed: seeded reset replay seed=31 choice=2
+PASS expected=observed: seeded reset replay seed=31 choice=3
+PASS expected=observed: seeded reset replay seed=31 choice=4
+PASS expected=observed: seeded reset replay seed=31 choice=5
+PASS expected=observed: seeded reset replay seed=31 choice=6
+PASS expected=observed: seeded reset replay seed=31 choice=7
+PASS expected=observed: seeded reset replay seed=31 choice=8
+PASS expected=observed: seeded reset replay seed=31 choice=9
+PASS expected=observed: seeded reset replay seed=32 choice=0
+PASS expected=observed: seeded reset replay seed=32 choice=1
+PASS expected=observed: seeded reset replay seed=32 choice=2
+PASS expected=observed: seeded reset replay seed=32 choice=3
+PASS expected=observed: seeded reset replay seed=32 choice=4
+PASS expected=observed: seeded reset replay seed=32 choice=5
+PASS expected=observed: seeded reset replay seed=32 choice=6
+PASS expected=observed: seeded reset replay seed=32 choice=7
+PASS expected=observed: seeded reset replay seed=32 choice=8
+PASS expected=observed: seeded reset replay seed=32 choice=9
+PASS expected=observed: seeded tie-breaking represents both equal-cost critical objectives
+PASS expected=observed: SPREAD returns ambient target without constructing an offensive
+PASS expected=observed: preference0 preserves normal ambient branch
+PASS expected=observed: propagation is not given an artificial target
+PASS expected=observed: inverse-Integrity weighting expects roughly2:1 without guarantee; observed 2771:1325
+PASS expected=observed: targeted hostile recipe retains sampled objective/payload/WORK/LOAD/noise/identity deliveryChance=0
+PASS expected=observed: redirected route uses actual legal physical adjacency
+PASS expected=observed: retarget consumes no existing recipe random draws
+PASS expected=observed: launcher retains fixed destination semantics
+PASS expected=observed: fixed launcher cannot be silently redirected
+PASS expected=observed: canonical benign recipe remains fixed at its legitimate destination
+PASS expected=observed: external ingress is not a legal direct damage target
+PASS expected=observed: targeted hostile recipe retains sampled objective/payload/WORK/LOAD/noise/identity deliveryChance=1
+PASS expected=observed: redirected route uses actual legal physical adjacency
+PASS expected=observed: retarget consumes no existing recipe random draws
+PASS expected=observed: launcher retains fixed destination semantics
+PASS expected=observed: fixed launcher cannot be silently redirected
+PASS expected=observed: canonical benign recipe remains fixed at its legitimate destination
+PASS expected=observed: external ingress is not a legal direct damage target
+PASS expected=observed: existing activity category generates normally: ordinary
+PASS expected=observed: eligible offensive target applied through existing generator: ordinary
+PASS expected=observed: target selection causes no direct damage: ordinary
+PASS expected=observed: existing activity category generates normally: reconnaissance
+PASS expected=observed: eligible offensive target applied through existing generator: reconnaissance
+PASS expected=observed: target selection causes no direct damage: reconnaissance
+PASS expected=observed: existing activity category generates normally: payload
+PASS expected=observed: eligible offensive target applied through existing generator: payload
+PASS expected=observed: target selection causes no direct damage: payload
+PASS expected=observed: existing activity category generates normally: worm
+PASS expected=observed: explicit unsupported activity fallback: worm
+PASS expected=observed: target selection causes no direct damage: worm
+PASS expected=observed: existing activity category generates normally: payload_launcher
+PASS expected=observed: explicit unsupported activity fallback: payload_launcher
+PASS expected=observed: target selection causes no direct damage: payload_launcher
+PASS expected=observed: existing activity category generates normally: direct_duel
+PASS expected=observed: eligible offensive target applied through existing generator: direct_duel
+PASS expected=observed: target selection causes no direct damage: direct_duel
+PASS expected=observed: existing activity category generates normally: connection_duel
+PASS expected=observed: eligible offensive target applied through existing generator: connection_duel
+PASS expected=observed: target selection causes no direct damage: connection_duel
+PASS expected=observed: delayed reconnaissance follow-up keeps original selected target across directive switch
+PASS expected=observed: SPREAD enabled/disabled retains identical opportunity timing, category and category roll
+PASS expected=observed: BREACH target RNG does not advance opportunity/category streams
+PASS expected=observed: Connections has no directive component
+PASS expected=observed: ConnectionsAdvanced has no directive component
+PASS expected=observed: ConnectionsAdvancedPressure has no directive component
