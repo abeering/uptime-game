@@ -1,5 +1,7 @@
 # Connections — Hacker Directives V0
 
+**Canonical promotion:** [Canonical Scenes V0](connections-canonical-scenes-v0.md) now enables these same directives in Small/Advanced; Advanced gains the complete storefront recipe. Original scene-only statements below retain their checkpoint provenance; the Integrity fixture/evidence stay intact.
+
 Experimental Connections implementation, November 20, 2026. Stacked on Integrity PR #117 (`0c1fd9ab4ae8e7a9094623052ecaab23261003ad`), which is stacked on Maximum Pressure PR #116. Living Shift #115 is excluded. This contract concerns the Integrity scene only; Packet and the other Connections scenes retain their behavior.
 
 ## Control and objective

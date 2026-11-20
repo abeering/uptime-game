@@ -1,5 +1,7 @@
 # Connections — Maximum Pressure V0 review
 
+**Historical fixture:** Canonical gameplay now lives in Small/Advanced under [Canonical Scenes V0](../../Connections/connections-canonical-scenes-v0.md). Pressure and the evidence below remain regression material, not canonical difficulty/presentation authority.
+
 Connections implementation experiment, November 19, 2026. Independent branch from `main` at `d43dab45eba5a848011d3039d3e29f9b46942aee`; Living Shift PR #115 is excluded and remains unmerged.
 
 Open **`Assets/Scenes/ConnectionsAdvancedPressure.unity`**. This is a full authored copy of Advanced with a unique scene GUID and exactly four serialized changes:
