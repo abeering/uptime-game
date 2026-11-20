@@ -81,6 +81,9 @@ namespace Uptime.Connections
             string node = encounter.Target.View.NodeId;
             if (encounter.PlayerWon == true)
                 AppendText("DUEL WON  " + node + "  /  intrusion prevented", normalColor);
+            else if (encounter.IntegrityDamaged)
+                AppendText("DUEL LOST  " + node + "  /  INTEGRITY DAMAGED" +
+                    simulationHost.IntegrityReceipt(encounter.Target), errorColor);
             else if (encounter.LossExecution?.AnySucceeded == true)
                 AppendText("DUEL LOST  " + node + "  /  intrusion succeeded", errorColor);
             else
@@ -233,7 +236,8 @@ namespace Uptime.Connections
         private void OnScanCompleted(NodeScanSession session)
         {
             AppendText("SCAN COMPLETE  " + session.NodeId + "  /  " +
-                (session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN"),
+                (session.Result == NodeScanResult.Infected ? "INFECTED" : "CLEAN") +
+                simulationHost.IntegrityReceipt(simulationHost.FindNodeResources(session.NodeId)),
                 session.Result == NodeScanResult.Infected ? errorColor : normalColor);
         }
 
@@ -374,6 +378,34 @@ namespace Uptime.Connections
             AppendText($"> {command}", normalColor);
 
             string[] tokens = command.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
+            string verb = tokens[0].ToLowerInvariant();
+            if (simulationHost != null && simulationHost.IntegrityEnabled && verb == "restart")
+            {
+                simulationHost.ResetSimulation();
+                AppendText("INTEGRITY RUN RESTARTED", normalColor);
+                StartCoroutine(FocusInputNextFrame());
+                return;
+            }
+            if (simulationHost != null && simulationHost.RunEnded &&
+                verb != "inspect" && verb != "i" && verb != "logs" && verb != "work" &&
+                verb != "load" && verb != "log" && verb != "mark" && verb != "help")
+            {
+                AppendText("CORE BREACHED  /  type restart", CommandFailureColor());
+                StartCoroutine(FocusInputNextFrame());
+                return;
+            }
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (verb == "integrityhit")
+            {
+                NodeResources target = tokens.Length == 2 ? simulationHost?.FindNodeResources(tokens[1]) : null;
+                bool applied = target != null && simulationHost.DamageIntegrity(target, "development", "integrityhit");
+                AppendText(applied ? "DEVELOPMENT INTEGRITY STRIKE  " + target.View.NodeId :
+                    "USAGE  integrityhit <internal-node>  /  Integrity scene only; positive Integrity required",
+                    applied ? normalColor : CommandFailureColor());
+                StartCoroutine(FocusInputNextFrame());
+                return;
+            }
+#endif
             switch (tokens[0].ToLowerInvariant())
             {
                 case "test":

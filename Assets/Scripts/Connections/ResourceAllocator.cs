@@ -29,7 +29,7 @@ namespace Uptime.Connections
             Func<LogicalConnectionState, bool> mayStartTransition = null,
             Func<NodeView, float> defensiveDemand = null,
             float stepEndTimeSeconds = 0f,
-            Action<EmittedConnectionLog> onLogEmitted = null)
+            Action<EmittedConnectionLog> onLogEmitted = null, Action afterDemandPublished = null)
         {
             if (deltaSeconds <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
@@ -46,6 +46,11 @@ namespace Uptime.Connections
             }
             Allocate(nodes, ordered, infections, defensiveDemand);
             afterAllocation?.Invoke(ordered);
+            if (afterDemandPublished != null)
+            {
+                Publish(nodes, ordered);
+                afterDemandPublished();
+            }
             foreach (LogicalConnectionState connection in ordered)
             {
                 if (!connection.IsDemanding) continue;

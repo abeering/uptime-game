@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,11 +27,16 @@ namespace Uptime.Connections
             float? thirdRemainingSeconds = null, string fourth = null,
             float? fourthRemainingSeconds = null)
         {
-            rowCount = !string.IsNullOrEmpty(fourth) ? 4 : string.IsNullOrEmpty(third) ?
+            int count = !string.IsNullOrEmpty(fourth) ? 4 : string.IsNullOrEmpty(third) ?
                 string.IsNullOrEmpty(second) ? 1 : 2 : 3;
-            string[] text = { first, second, third, fourth };
-            float?[] remaining = { firstRemainingSeconds, secondRemainingSeconds,
-                thirdRemainingSeconds, fourthRemainingSeconds };
+            SetAllRows(new[] { first, second, third, fourth },
+                new float?[] { firstRemainingSeconds, secondRemainingSeconds, thirdRemainingSeconds, fourthRemainingSeconds }, accent, count);
+        }
+
+        public void SetAllRows(IReadOnlyList<string> text, IReadOnlyList<float?> remaining,
+            Color accent, int count = -1)
+        {
+            rowCount = Mathf.Min(count < 0 ? text.Count : count, labels.Length);
             for (int i = 0; i < labels.Length; i++)
             {
                 bool visible = i < rowCount;

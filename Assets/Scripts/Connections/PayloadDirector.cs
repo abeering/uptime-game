@@ -116,6 +116,7 @@ namespace Uptime.Connections
         public PayloadState Spawn(string targetId, PayloadMotionProfile profile,
             string originId = null, float[] witnessTravelSeconds = null)
         {
+            if (host != null && host.RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
             if (!Enum.IsDefined(typeof(PayloadMotionProfile), profile))
                 throw new InvalidOperationException("Unknown Payload movement profile.");
             if (host == null || host.RuntimeConnections == null)
@@ -196,6 +197,7 @@ namespace Uptime.Connections
         public bool TryIntercept(string payloadId, string nodeId, out string error,
             string command = null)
         {
+            if (host != null && host.RunEnded) { error = "core_breached"; return false; }
             PayloadState payload = payloadId == null ? null : FindActive(payloadId);
             if (payloadId != null && payload == null)
             { error = "Unknown or resolved Payload ID."; return false; }
@@ -236,6 +238,7 @@ namespace Uptime.Connections
         // Arrival wins at the exact expiry timestamp; expiry is processed afterward.
         public void Advance(float deltaSeconds, float now, int payloadsBeforeSegment)
         {
+            if (host != null && host.RunEnded) return;
             // A Payload created by an operation completing at this segment's end
             // starts with zero elapsed time; earlier Payloads still advance.
             for (int i = 0; i < payloadsBeforeSegment; i++)

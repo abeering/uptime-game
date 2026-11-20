@@ -45,6 +45,9 @@ namespace Uptime.Connections
         public float naturalLoadNoiseMaxPeriodSeconds;
         public NodeConfiguration[] nodes;
         public TrafficConfiguration traffic;
+        public bool integrityEnabled;
+        public int maximumIntegrity;
+        public float integritySevereLoadRatio, integrityWarningSeconds;
     }
 
     [Serializable] public sealed class NodeConfiguration
@@ -171,6 +174,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public IntegrityEvent integrity;
         public int sequence;
         public float timeSeconds;
         public string type;
@@ -189,6 +193,7 @@ namespace Uptime.Connections
         public int duelHackerCorrections;
         public string duelOutcome;
         public bool duelInfectionApplied;
+        public bool duelIntegrityDamaged;
         public string consequencePlanId;
         public string consequenceMode;
         public int consequenceSeed;
@@ -420,6 +425,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public IntegritySnapshot integrity;
         public float timeSeconds;
         public int activeConnections;
         public int establishedBenign;
@@ -600,6 +606,13 @@ namespace Uptime.Connections
                 started.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) +
                 "_seed-" + seed.ToString("00000", CultureInfo.InvariantCulture) + "_" + runId + ".json");
             log = new ConnectionsRunLog { run = BuildMetadata(runId, started, seed) };
+            log.run.integrityEnabled = host.IntegrityEnabled;
+            if (host.Integrity != null)
+            {
+                log.run.maximumIntegrity = IntegrityState.Maximum;
+                log.run.integritySevereLoadRatio = host.Integrity.SevereLoadRatio;
+                log.run.integrityWarningSeconds = host.Integrity.WarningSeconds;
+            }
             nextSnapshotAt = Mathf.Max(0.1f, snapshotIntervalSeconds);
             nextAutosaveAt = Time.realtimeSinceStartupAsDouble + Mathf.Max(1f, autosaveIntervalSeconds);
             Save(false); // Establish the file immediately, even before the first connection arrives.
@@ -1219,6 +1232,7 @@ namespace Uptime.Connections
             entry.duelOutcome = encounter?.PlayerWon == true ? "won" :
                 encounter?.PlayerWon == false ? "lost" : null;
             entry.duelInfectionApplied = encounter?.InfectionApplied == true;
+            entry.duelIntegrityDamaged = encounter?.IntegrityDamaged == true;
             entry.consequencePlanId = encounter?.LossPlan?.Id;
             entry.consequenceSelected = encounter?.LossPlan?.SelectedCandidateId;
             if (race == null) return;
@@ -1384,6 +1398,16 @@ namespace Uptime.Connections
             entry.healthAfter = resultingHealth;
         }
 
+        public void RecordIntegrity(IntegrityEvent occurrence)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent(occurrence.type, occurrence.time);
+            entry.targetNodeId = occurrence.target;
+            entry.source = occurrence.source;
+            entry.reason = occurrence.cause;
+            entry.integrity = occurrence;
+        }
+
         public void CaptureDueSnapshot(float simulationTime)
         {
             if (!IsRecording || simulationTime + 0.00001f < nextSnapshotAt) return;
@@ -1398,6 +1422,7 @@ namespace Uptime.Connections
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
+            snapshot.integrity = host.Integrity?.Snapshot();
             NetworkHealthSnapshot health = host.Health;
             if (health != null)
                 snapshot.health = new HealthSnapshotRecord { value = health.Value,

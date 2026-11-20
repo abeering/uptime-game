@@ -69,6 +69,7 @@ namespace Uptime.Connections
         {
             if (escapeCoordinator != null) escapeCoordinator.Unregister(this);
             if (session == null) return;
+            if (host != null && host.RunEnded) { Close(); return; }
             if (!showingResult && host != null && host.ActiveClean == session) host.CancelClean();
             string message = "CLEAN SESSION ENDED  " + session.NodeId;
             session = null;
@@ -107,6 +108,11 @@ namespace Uptime.Connections
             escapeCoordinator.Register(this);
             pidInput.gameObject.SetActive(false);
             sequence = StartCoroutine(Splash());
+        }
+
+        public void AbortForBreach()
+        {
+            if (session != null) Close();
         }
 
         private void Update()
@@ -179,7 +185,7 @@ namespace Uptime.Connections
                 "INNOCENT PROCESS TERMINATED  /  CLEAN FAILED";
             body.text = feedback;
             string terminalMessage = success ?
-                "CLEAN COMPLETE  " + session.NodeId + "  /  " + removed + " infection(s) removed" :
+                "CLEAN COMPLETE  " + session.NodeId + "  /  " + removed + " infection(s) removed" + host.IntegrityReceipt(session.Target) :
                 "CLEAN FAILED  " + session.NodeId + "  /  innocent process terminated";
             if (terminal != null && terminal.isActiveAndEnabled)
                 terminal.FinishClean(terminalMessage, success);
