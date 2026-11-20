@@ -1,0 +1,52 @@
+Unity 6000.3.11f1; isolated project /tmp/uptime-integrity-validation.
+Parent baseline archive: e8a2f77066f4bff08baffe4020639c536c1279c8; working project already open, so no second Editor used it.
+Initial implementation commit: 06b2c15c83243fffc4a3aa2e6818631798302582
+
+PASS compile and IntegrityWitness.Run: 327 deterministic assertions (including authored bindings).
+PASS IntegrityPressureWitness.Run: twelve 600-second-or-loss natural runs; three exact event/snapshot/sample replays.
+PASS IntegrityCapture.Run: fourteen actual scripted Play Mode frames at 1920x1080 / 1280x720; freeze and terminal restart.
+Capture tooling caveat: UnityEditor.Search.SearchDatabase startup indexing ArgumentOutOfRangeException; captures completed.
+PASS all 85 pre-existing scene/prefab files match the parent revision byte-for-byte.
+PASS Packages and ProjectSettings unchanged relative to parent.
+PASS source/derived Core check: python scripts/build_uptime_project_core.py --check.
+PASS scoped whitespace checks: git diff --cached --check -- Assets/Scripts Assets/Editor Docs.
+Unity serialized scene/prefab blank-scalar spacing is excluded from scoped whitespace checks, as in the parent experiment.
+PASS fourteen PNG signatures/dimensions and final development fixture explicit breach flag.
+
+Existing regression outcomes (runner executes all16 and exits1 for retained failures):
+PASS Traffic
+PASS AmbientHostileActivity
+PASS NetworkHealth
+PASS Duel
+PASS Consequence
+PASS AdvancedScene
+PASS Recorder
+PASS Payload
+PASS Worm
+PASS AmbientPayloadThreat
+PASS Scan
+PASS Infection
+FAIL Overclock: OverclockWitness FAILED: ConnectionsAdvanced compact three-tool row
+PASS NodeStatus
+PASS Geometry
+FAIL Resource: ResourceWitness failed: inspect header pill keeps authored large geometry and identity color
+
+Parent reproduction, unmodified git archive of e8a2f77066f4bff08baffe4020639c536c1279c8:
+Unity -batchmode -nographics -projectPath /tmp/uptime-integrity-baseline -executeMethod Uptime.Connections.EditorTools.ResourceWitness.Run -quit
+FAIL Resource: inspect header pill keeps authored large geometry and identity color (same assertion as feature).
+An external temporary Editor wrapper then independently ran OverclockWitness, NodeStatusWitness and GeometryWitness on that archive:
+FAIL Overclock: ConnectionsAdvanced compact three-tool row (same assertion as feature).
+PASS NodeStatus; PASS Geometry.
+
+Commands actually run against isolated feature copy:
+IntegrityWitness.BuildAndRun / RunFinalChecks (authoring + focused checks; early combined run stopped on baseline Overclock assertion).
+IntegrityWitness.Run (focused checks and allocation examples).
+IntegrityWitness.RunRegressions (all16 collected; exit1 due two parent-reproduced UI assertions).
+IntegrityPressureWitness.Run (also invokes focused witness; final12 runs and three replays saved).
+IntegrityCapture.Run (graphics-enabled batch Editor; actual Play Mode fixtures).
+
+Outstanding: human keyboard/focus, natural-pressure readability and gameplay assessment; Packet Play Mode not run.
+Pre-existing scene/prefab assets and historical/review documents on the working branch remain unchanged.
+
+Final freeze/package audit: Unity compiled and IntegrityWitness.Run passed327 assertions, including live reactive identity behavior and no identity reaction after breach.
+Capture recorder output is gzip-compressed; exact decompression was verified against the original saved recording.

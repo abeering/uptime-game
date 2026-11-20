@@ -146,10 +146,13 @@ namespace Uptime.Connections
         private void Complete()
         {
             if (encounter == null || encounter.Lifecycle != DuelLifecycle.Active) return;
+            var host = director.GetComponent<SimulationHost>();
             director.Resolve(race);
+            if (host.RunEnded) { Abort(); return; }
             if (subscribedKeyboard != null) subscribedKeyboard.onTextInput -= OnTextInput;
             subscribedKeyboard = null;
             resultText.text = encounter.PlayerWon == true ? "DUEL WON  /  INTRUSION STOPPED" :
+                encounter.IntegrityDamaged ? "DUEL LOST  /  INTEGRITY DAMAGED" :
                 encounter.LossExecution?.AnySucceeded == true ?
                     "DUEL LOST  /  INTRUSION SUCCEEDED" :
                 "DUEL LOST  /  INTRUSION BLOCKED";

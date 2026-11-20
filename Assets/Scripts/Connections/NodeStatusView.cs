@@ -57,7 +57,7 @@ namespace Uptime.Connections
 
         public void Render(NodeStatusState state, float realTime, float deltaSeconds)
         {
-            bool pain = state.Offline || state.IntrusionPending || state.KnownInfected ||
+            bool pain = state.Overloaded || state.Offline || state.IntrusionPending || state.KnownInfected ||
                 state.ScanJammed || state.Backdoor || state.CleanLocked;
             bool awareness = state.AwarenessPreview || state.PortScanned;
             bool clean = state.CleanVisible(realTime);
@@ -96,6 +96,8 @@ namespace Uptime.Connections
             {
                 var rows = new List<string>();
                 var timers = new List<float?>();
+                if (state.Overloaded)
+                { rows.Add("OVERLOADED"); timers.Add(state.OverloadRemainingSeconds); }
                 if (state.IntrusionPending)
                 { rows.Add("INTRUSION"); timers.Add(state.IntrusionRemainingSeconds); }
                 if (state.CleanLocked)
@@ -146,12 +148,7 @@ namespace Uptime.Connections
         private static void SetRows(NodeStatusPanel panel, List<string> rows,
             List<float?> timers, Color color)
         {
-            panel.SetRows(rows[0], rows.Count > 1 ? rows[1] : null,
-                rows.Count > 2 ? rows[2] : null, color,
-                timers[0], rows.Count > 1 ? timers[1] : null,
-                rows.Count > 2 ? timers[2] : null,
-                rows.Count > 3 ? rows[3] : null,
-                rows.Count > 3 ? timers[3] : null);
+            panel.SetAllRows(rows, timers, color);
         }
 
         public void ClearVisuals()

@@ -426,9 +426,10 @@ namespace Uptime.Connections
 
     public static class ConsequenceExecutor
     {
-        public static ConsequenceExecution Execute(SimulationHost host, ConsequencePlan plan)
+        public static ConsequenceExecution Execute(SimulationHost host, ConsequencePlan plan,
+            bool suppressInfectionIntegrityDamage = false)
         {
-            if (host == null || plan == null || plan.Executed ||
+            if (host == null || host.RunEnded || plan == null || plan.Executed ||
                 plan.Host != host || plan.SimulationGeneration != host.SimulationGeneration)
                 throw new InvalidOperationException("Consequence plan unavailable, stale, or already executed.");
             plan.Executed = true;
@@ -443,7 +444,7 @@ namespace Uptime.Connections
                     if (effect.Kind == ConsequenceKind.Infection)
                         result.Succeeded = host.TryApplyConsequenceInfection(
                             effect.TargetNodeId, effect.InfectionKind, effect.Parameter,
-                            "consequence:" + plan.Id, out reason);
+                            "consequence:" + plan.Id, out reason, suppressInfectionIntegrityDamage);
                     else if (effect.Kind == ConsequenceKind.Condition)
                     {
                         host.ApplyCondition(host.FindNodeResources(effect.TargetNodeId),

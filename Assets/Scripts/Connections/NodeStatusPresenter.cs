@@ -108,6 +108,10 @@ namespace Uptime.Connections
                     continue;
                 NodeView card = node.View;
                 NodeStatusState state = states[card];
+                IntegrityNode integrity = host.Integrity?.For(node);
+                state.Overloaded = integrity?.Overloaded == true;
+                state.OverloadRemainingSeconds = state.Overloaded ?
+                    Mathf.Max(0f, host.Integrity.WarningSeconds - integrity.OverloadElapsed) : 0f;
                 state.SetOffline(host.IsNodeOffline(card));
                 state.SetIntrusion(duelDirector != null ?
                     duelDirector.RemainingFor(card) : -1f);

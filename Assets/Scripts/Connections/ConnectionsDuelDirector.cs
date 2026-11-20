@@ -22,6 +22,7 @@ namespace Uptime.Connections
         public ConsequenceExecution LossExecution { get; internal set; }
         public bool? PlayerWon { get; internal set; }
         public bool? InfectionApplied { get; internal set; }
+        public bool IntegrityDamaged { get; internal set; }
         public string ApplicationReason { get; internal set; }
     }
 
@@ -78,7 +79,9 @@ namespace Uptime.Connections
         public bool TrySchedule(string targetNodeId, DuelVariant variant, float warningSeconds,
             string source, out string reason, ConsequenceConfiguration consequences = null)
         {
-            if (current != null)
+            if (host != null && host.RunEnded)
+                reason = "core_breached";
+            else if (current != null)
                 reason = "duel_slot_occupied_by_" + current.Lifecycle.ToString().ToLowerInvariant();
             else if (host == null || overlay == null)
                 reason = "duel_unavailable";
@@ -146,6 +149,7 @@ namespace Uptime.Connections
 
         public void Advance(float now)
         {
+            if (host.RunEnded) return;
             if (current != null && current.Lifecycle == DuelLifecycle.Pending &&
                 now + .00001f >= current.LaunchAt) Launch();
         }
@@ -165,13 +169,14 @@ namespace Uptime.Connections
 
         public void Resolve(CommandRaceSession race)
         {
-            if (current == null || current.Lifecycle != DuelLifecycle.Active ||
+            if (host.RunEnded || current == null || current.Lifecycle != DuelLifecycle.Active ||
                 race == null || !race.PlayerWon.HasValue) return;
             current.Lifecycle = DuelLifecycle.Result;
             current.PlayerWon = race.PlayerWon;
             if (race.PlayerWon == false)
             {
-                current.LossExecution = ConsequenceExecutor.Execute(host, current.LossPlan);
+                current.LossExecution = ConsequenceExecutor.Execute(host, current.LossPlan, true);
+                current.IntegrityDamaged = host.DamageIntegrity(current.Target, "duel", "duel:" + current.Id, true, false);
                 current.InfectionApplied = false;
                 foreach (ConsequenceComponentResult part in current.LossExecution.Components)
                     if (part.Effect.Kind == ConsequenceKind.Infection && part.Succeeded)
@@ -188,6 +193,7 @@ namespace Uptime.Connections
                 host.SimulationTimeSeconds);
             current = null;
             Changed?.Invoke(null);
+            host.CompleteIntegrityBoundary();
         }
 
         public void FinishResult()

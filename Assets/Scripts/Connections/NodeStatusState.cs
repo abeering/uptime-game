@@ -5,6 +5,8 @@ namespace Uptime.Connections
     // Player-visible diagnostic knowledge, independent of the host's infection list.
     public sealed class NodeStatusState
     {
+        public bool Overloaded { get; set; }
+        public float OverloadRemainingSeconds { get; set; }
         private float cleanUntil = -1f;
 
         public bool Offline { get; private set; }

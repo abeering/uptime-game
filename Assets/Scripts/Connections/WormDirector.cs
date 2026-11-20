@@ -134,6 +134,7 @@ namespace Uptime.Connections
         public WormOutbreak Spawn(string originId, WormEffect effect,
             WormTuning witnessTuning = null)
         {
+            if (host != null && host.RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
             if (!Enum.IsDefined(typeof(WormEffect), effect))
                 throw new InvalidOperationException("Unknown Worm effect.");
             if (host == null || host.RuntimeConnections == null)
@@ -215,6 +216,7 @@ namespace Uptime.Connections
 
         public void Advance(float deltaSeconds, float now)
         {
+            if (host != null && host.RunEnded) return;
             var expired = new List<NodeView>();
             foreach (var pair in isolations)
                 if (now + .00001f >= pair.Value.ExpiresAt) expired.Add(pair.Key);
@@ -330,6 +332,7 @@ namespace Uptime.Connections
 
         public bool TryIsolate(string nodeId, string command, out string error)
         {
+            if (host != null && host.RunEnded) { error = "core_breached"; return false; }
             NodeResources node = host?.FindNodeResources(nodeId);
             if (node == null) { error = "Unknown node: " + nodeId; return false; }
             float now = host.SimulationTimeSeconds;
