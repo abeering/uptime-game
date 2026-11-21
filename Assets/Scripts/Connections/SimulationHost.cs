@@ -263,10 +263,15 @@ namespace Uptime.Connections
             // A Payload launch or Payload Spawner installation must take effect at
             // its fixed-step completion, even in a coarse witness interval.
             float fixedStep = Mathf.Max(.000001f, Time.fixedDeltaTime);
-            if (deltaSeconds > fixedStep + .000001f && (IntegrityEnabled || HasPendingPayloadSource()))
+            if (shiftEnabled)
+            {
+                if (simulationTimeSeconds >= shiftDurationSeconds) { CompleteIntegrityBoundary(); return; }
+                deltaSeconds = Mathf.Min(deltaSeconds, shiftDurationSeconds - simulationTimeSeconds);
+            }
+            if (deltaSeconds > fixedStep + .000001f && (shiftEnabled || IntegrityEnabled || HasPendingPayloadSource()))
             {
                 float remainingLaunch = deltaSeconds;
-                while (remainingLaunch > .000001f && !RunEnded)
+                while (remainingLaunch > (shiftEnabled ? 0f : .000001f) && !RunEnded)
                 {
                     float piece = Mathf.Min(fixedStep, remainingLaunch);
                     StepSimulation(piece);
@@ -294,11 +299,12 @@ namespace Uptime.Connections
                 ResetSimulation();
             if (duelDirector == null) duelDirector = GetComponent<ConnectionsDuelDirector>();
 
+            float intendedStepEnd = simulationTimeSeconds + deltaSeconds;
             steppingIntegrity = true;
             trafficDirector?.Tick(simulationTimeSeconds, runMode == ConnectionRunMode.Generated);
             float remaining = deltaSeconds;
             var completedThisStep = new HashSet<LogicalConnectionState>();
-            while (remaining > 0.000001f)
+            while (remaining > (shiftEnabled ? 0f : .000001f))
             {
                 BeginDueConnections();
                 WithdrawDueLoaders();
@@ -346,7 +352,8 @@ namespace Uptime.Connections
                         wormDirector.TimeToNextBoundary(simulationTimeSeconds));
                 segment = Mathf.Min(segment, TimeToNextPayloadSpawnerBoundary());
                 int payloadsBeforeSegment = payloadDirector?.Payloads.Count ?? 0;
-                StepSegment(segment, completedThisStep);
+                float boundaryTime = shiftEnabled && segment == remaining ? intendedStepEnd : simulationTimeSeconds + segment;
+                StepSegment(segment, completedThisStep, boundaryTime);
                 AdvanceConnecting(segment);
                 payloadDirector?.Advance(segment, simulationTimeSeconds, payloadsBeforeSegment);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
@@ -388,7 +395,7 @@ namespace Uptime.Connections
         }
 
         private void StepSegment(float deltaSeconds,
-            HashSet<LogicalConnectionState> completedThisStep)
+            HashSet<LogicalConnectionState> completedThisStep, float boundaryTime)
         {
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
@@ -409,14 +416,19 @@ namespace Uptime.Connections
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
                     connection => !completedThisStep.Contains(connection),
                     payloadDirector != null ? payloadDirector.DemandAt : null,
-                    simulationTimeSeconds + deltaSeconds,
+                    boundaryTime,
                     emitted => recorder?.RecordConnectionLog(emitted),
                     integrity == null ? null : () => integrity.AdvanceOverload(deltaSeconds,
-                        simulationTimeSeconds + deltaSeconds));
-            simulationTimeSeconds += deltaSeconds;
+                        boundaryTime));
+            simulationTimeSeconds = boundaryTime;
             var newlyBlackout = new List<NodeResources>();
             foreach (ResourceAllocator.OperationCompletion completion in completed)
             {
+                // FinishOperation snaps the allocator completion tolerance to the effective
+                // requirement. Credit that same completed amount, including any prior excess.
+                float confirmedWork = Mathf.Max(completion.CompletedWork, completion.RequiredWork);
+                CreditCompletedOperation(completion.State, completion.Index, confirmedWork);
+                OperationCompleted?.Invoke(completion.State, completion.Index, confirmedWork);
                 recorder?.RecordOperationCompleted(completion.State, completion.Index,
                     completion.CompletedWork, completion.RequiredWork,
                     completion.DesiredLoad, simulationTimeSeconds);
@@ -550,7 +562,7 @@ namespace Uptime.Connections
 
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
         {
-            if (RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (RunEnded) throw new InvalidOperationException(RunEndedMessage);
             if (runtimeConnections == null) ResetSimulation();
             LogicalConnectionState state = BuildState(definition);
             if (HasEverUsedId(state.ConnectionId) || IsLiveAlias(state.ConnectionId) ||
@@ -584,7 +596,7 @@ namespace Uptime.Connections
             string sourceConnectionId = null, int sourceOperationIndex = -1,
             string sourceWormBranchId = null)
         {
-            if (RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (RunEnded) throw new InvalidOperationException(RunEndedMessage);
             if (target == null || payload == null || !payload.IsValid ||
                 Array.IndexOf(nodes, target) < 0)
                 throw new InvalidOperationException("Condition needs a configured target and valid payload.");
@@ -1136,6 +1148,7 @@ namespace Uptime.Connections
         {
             steppingIntegrity = false;
             simulationGeneration++;
+            ResetShift();
             ClearProbe();
             ClearOverclock();
             activeClean = null;
@@ -1196,7 +1209,7 @@ namespace Uptime.Connections
 
         public bool TryActivateProbe(string linkId, string command, out string result)
         {
-            if (RunEnded) { result = "CORE BREACHED: restart the run."; return false; }
+            if (RunEnded) { result = RunEndedMessage; return false; }
             PhysicalLinkReference selected = null;
             if (!string.IsNullOrWhiteSpace(linkId) && physicalLinks != null)
                 foreach (PhysicalLinkReference link in physicalLinks)
@@ -1262,7 +1275,7 @@ namespace Uptime.Connections
 
         public bool TryActivateOverclock(string nodeId, string command, out string result)
         {
-            if (RunEnded) { result = "CORE BREACHED: restart the run."; return false; }
+            if (RunEnded) { result = RunEndedMessage; return false; }
             NodeResources target = FindNodeResources(nodeId);
             string reason = target == null ? "unknown_node" :
                 overclockedNode != null ? "busy" :

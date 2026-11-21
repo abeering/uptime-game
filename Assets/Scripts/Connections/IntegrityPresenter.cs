@@ -32,6 +32,7 @@ namespace Uptime.Connections
         [SerializeField] private LinkBinding[] links;
         [SerializeField] private GameObject breachPanel;
         [SerializeField] private TMP_Text breachPath;
+        [SerializeField] private TMP_Text resultTitle;
         private bool ended;
         private static readonly Color Orange = new Color(1f, .63f, .25f);
         private static readonly Color Red = new Color(1f, .25f, .30f);
@@ -46,9 +47,9 @@ namespace Uptime.Connections
             }
             foreach (var binding in links)
             { binding.originalLine = binding.line.color; binding.originalLabel = binding.label.color; }
-            if (host != null) host.IntegrityOccurred += OnIntegrity;
+            if (host != null) { host.IntegrityOccurred += OnIntegrity; host.RunFinished += RenderNow; }
         }
-        private void OnDisable() { if (host != null) host.IntegrityOccurred -= OnIntegrity; }
+        private void OnDisable() { if (host != null) { host.IntegrityOccurred -= OnIntegrity; host.RunFinished -= RenderNow; } }
         private void OnIntegrity(IntegrityEvent entry)
         {
             if (entry.type != "integrity_damage" || !entry.visible) return;
@@ -84,15 +85,30 @@ namespace Uptime.Connections
             if (host.RunEnded)
             {
                 breachPanel.transform.SetAsLastSibling();
-                breachPath.text = host.Integrity.Breach.criticalNode + "  /  CRITICAL NODE BREACHED\n\n" +
-                    string.Join(" → ", host.Integrity.Breach.path) + "\n\nSIMULATION FROZEN  /  TYPE restart";
+                if (resultTitle != null)
+                {
+                    bool success = host.Ending == RunEnding.WorkComplete;
+                    resultTitle.text = host.EndingTitle;
+                    resultTitle.color = success ? new Color(.52f, .84f, .72f) : Red;
+                    breachPanel.GetComponent<Image>().color = success ? new Color(.025f, .10f, .075f, .97f) : new Color(.10f, .025f, .04f, .97f);
+                    breachPanel.GetComponent<Outline>().effectColor = resultTitle.color;
+                }
+                string cause = host.Ending == RunEnding.CoreBreached ?
+                    string.Join(" → ", host.Integrity.Breach.path) : host.Ending == RunEnding.WorkComplete ?
+                    "REQUIRED WORK CONFIRMED" : "DEADLINE REACHED BEFORE REQUIRED WORK WAS CONFIRMED";
+                string totals = host.ShiftEnabled ? "UPTIME " + SimulationHost.FormatUptime(host.SimulationTimeSeconds) +
+                    $"   /   WORK {System.Math.Floor(host.CreditedWork):0} / {host.ShiftWorkTarget:0.##}\n\n" : "";
+                breachPath.text = totals + cause + "\n\nSIMULATION FROZEN  /  TYPE restart";
                 if (!ended)
                 {
                     duelOverlay?.Abort();
                     cleanOverlay?.AbortForBreach();
-                    terminal?.SuspendKeyboard(false);
-                    terminal?.AppendText("CORE BREACHED  " + string.Join(" → ", host.Integrity.Breach.path) +
-                        "  /  type restart", Red);
+                    terminal?.SuspendKeyboard(false, true);
+                    Color resultColor = host.Ending == RunEnding.WorkComplete ? new Color(.52f, .84f, .72f) : Red;
+                    terminal?.AppendText(host.EndingTitle, resultColor);
+                    if (host.ShiftEnabled) terminal?.AppendText(totals.Trim(), resultColor);
+                    if (host.Ending == RunEnding.CoreBreached) terminal?.AppendText("PATH  " + cause, Red);
+                    terminal?.AppendText("SIMULATION FROZEN  /  type restart", resultColor);
                     terminal?.RestoreKeyboardFocus();
                 }
             }

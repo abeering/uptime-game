@@ -1,0 +1,1446 @@
+{
+    "runs": [
+        {
+            "scene": "Connections",
+            "policy": "unattended",
+            "ending": "WorkComplete",
+            "signature": "901DFB8EC5DBD3FA6DD94FB44F2E78E5FED69F26F5F4F6FF1C0516C0EBE1A563",
+            "seed": 1701,
+            "commands": 0,
+            "time": 254.23748779296876,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 254.23748779296876,
+                "target": 900.0,
+                "credited": 947.655101776123,
+                "eligible": 1172.3954582214355,
+                "lost": 0.0,
+                "unfinished": 224.7403564453125,
+                "ending": "WorkComplete"
+            },
+            "work180": 348.6853790283203,
+            "work270": 947.655101776123,
+            "work360": 947.655101776123,
+            "credits": [
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.20075225830078,
+                    "completedWork": 63.69744873046875,
+                    "creditedWork": 63.69744873046875
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 47.26089096069336,
+                    "completedWork": 36.21004104614258,
+                    "creditedWork": 99.90748977661133
+                },
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 1,
+                    "timeSeconds": 116.59244537353516,
+                    "completedWork": 152.1536102294922,
+                    "creditedWork": 252.06110000610352
+                },
+                {
+                    "connectionId": "d5",
+                    "operationIndex": 0,
+                    "timeSeconds": 155.17633056640626,
+                    "completedWork": 48.47294998168945,
+                    "creditedWork": 300.53404998779299
+                },
+                {
+                    "connectionId": "v3",
+                    "operationIndex": 0,
+                    "timeSeconds": 164.97842407226563,
+                    "completedWork": 48.151329040527347,
+                    "creditedWork": 348.6853790283203
+                },
+                {
+                    "connectionId": "g5",
+                    "operationIndex": 0,
+                    "timeSeconds": 195.60496520996095,
+                    "completedWork": 331.1304931640625,
+                    "creditedWork": 679.8158721923828
+                },
+                {
+                    "connectionId": "j4",
+                    "operationIndex": 0,
+                    "timeSeconds": 227.87185668945313,
+                    "completedWork": 110.54685974121094,
+                    "creditedWork": 790.3627319335938
+                },
+                {
+                    "connectionId": "i4",
+                    "operationIndex": 0,
+                    "timeSeconds": 233.59307861328126,
+                    "completedWork": 46.23648452758789,
+                    "creditedWork": 836.5992164611816
+                },
+                {
+                    "connectionId": "j8",
+                    "operationIndex": 0,
+                    "timeSeconds": 254.23748779296876,
+                    "completedWork": 111.0558853149414,
+                    "creditedWork": 947.655101776123
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "visible-defense",
+            "ending": "WorkComplete",
+            "signature": "901DFB8EC5DBD3FA6DD94FB44F2E78E5FED69F26F5F4F6FF1C0516C0EBE1A563",
+            "seed": 1701,
+            "commands": 0,
+            "time": 254.23748779296876,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 254.23748779296876,
+                "target": 900.0,
+                "credited": 947.655101776123,
+                "eligible": 1172.3954582214355,
+                "lost": 0.0,
+                "unfinished": 224.7403564453125,
+                "ending": "WorkComplete"
+            },
+            "work180": 348.6853790283203,
+            "work270": 947.655101776123,
+            "work360": 947.655101776123,
+            "credits": [
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.20075225830078,
+                    "completedWork": 63.69744873046875,
+                    "creditedWork": 63.69744873046875
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 47.26089096069336,
+                    "completedWork": 36.21004104614258,
+                    "creditedWork": 99.90748977661133
+                },
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 1,
+                    "timeSeconds": 116.59244537353516,
+                    "completedWork": 152.1536102294922,
+                    "creditedWork": 252.06110000610352
+                },
+                {
+                    "connectionId": "d5",
+                    "operationIndex": 0,
+                    "timeSeconds": 155.17633056640626,
+                    "completedWork": 48.47294998168945,
+                    "creditedWork": 300.53404998779299
+                },
+                {
+                    "connectionId": "v3",
+                    "operationIndex": 0,
+                    "timeSeconds": 164.97842407226563,
+                    "completedWork": 48.151329040527347,
+                    "creditedWork": 348.6853790283203
+                },
+                {
+                    "connectionId": "g5",
+                    "operationIndex": 0,
+                    "timeSeconds": 195.60496520996095,
+                    "completedWork": 331.1304931640625,
+                    "creditedWork": 679.8158721923828
+                },
+                {
+                    "connectionId": "j4",
+                    "operationIndex": 0,
+                    "timeSeconds": 227.87185668945313,
+                    "completedWork": 110.54685974121094,
+                    "creditedWork": 790.3627319335938
+                },
+                {
+                    "connectionId": "i4",
+                    "operationIndex": 0,
+                    "timeSeconds": 233.59307861328126,
+                    "completedWork": 46.23648452758789,
+                    "creditedWork": 836.5992164611816
+                },
+                {
+                    "connectionId": "j8",
+                    "operationIndex": 0,
+                    "timeSeconds": 254.23748779296876,
+                    "completedWork": 111.0558853149414,
+                    "creditedWork": 947.655101776123
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "A248DE3E77C6BAF73CFAD44588800C9A9D2B0A49029E25BE24B02305D372B132",
+            "seed": 1701,
+            "commands": 97,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 0.0,
+                "eligible": 10676.081005096436,
+                "lost": 10391.566204071045,
+                "unfinished": 284.5148010253906,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        },
+        {
+            "scene": "Connections",
+            "policy": "unattended",
+            "ending": "InsufficientWork",
+            "signature": "AE92BA6B049A25718EB6AA484F9A28F488DE6DE4B9E6EDC677FE81E841B7C3D2",
+            "seed": 9001,
+            "commands": 0,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 220.6449089050293,
+                "eligible": 901.9656295776367,
+                "lost": 681.3207206726074,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 220.6449089050293,
+            "work270": 220.6449089050293,
+            "work360": 220.6449089050293,
+            "credits": [
+                {
+                    "connectionId": "n7",
+                    "operationIndex": 0,
+                    "timeSeconds": 50.38096237182617,
+                    "completedWork": 43.39143371582031,
+                    "creditedWork": 43.39143371582031
+                },
+                {
+                    "connectionId": "o5",
+                    "operationIndex": 0,
+                    "timeSeconds": 100.95507049560547,
+                    "completedWork": 51.52467727661133,
+                    "creditedWork": 94.91611099243164
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 0,
+                    "timeSeconds": 105.77426147460938,
+                    "completedWork": 84.83430480957031,
+                    "creditedWork": 179.75041580200196
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 107.57395935058594,
+                    "completedWork": 40.894493103027347,
+                    "creditedWork": 220.6449089050293
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "visible-defense",
+            "ending": "InsufficientWork",
+            "signature": "6A2A94C0FB6768C027EC92DF2FD5C7E3945916A08AB19A5A674DE05306E51469",
+            "seed": 9001,
+            "commands": 3,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 220.6449089050293,
+                "eligible": 901.9656295776367,
+                "lost": 681.3207206726074,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 220.6449089050293,
+            "work270": 220.6449089050293,
+            "work360": 220.6449089050293,
+            "credits": [
+                {
+                    "connectionId": "n7",
+                    "operationIndex": 0,
+                    "timeSeconds": 50.38096237182617,
+                    "completedWork": 43.39143371582031,
+                    "creditedWork": 43.39143371582031
+                },
+                {
+                    "connectionId": "o5",
+                    "operationIndex": 0,
+                    "timeSeconds": 100.95507049560547,
+                    "completedWork": 51.52467727661133,
+                    "creditedWork": 94.91611099243164
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 0,
+                    "timeSeconds": 105.77426147460938,
+                    "completedWork": 84.83430480957031,
+                    "creditedWork": 179.75041580200196
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 107.57395935058594,
+                    "completedWork": 40.894493103027347,
+                    "creditedWork": 220.6449089050293
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "101AACAB989CBCF2D70FD38B9FA60DF02B68540BB53BC4AA17D514EC87E2FA31",
+            "seed": 9001,
+            "commands": 64,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 0.0,
+                "eligible": 7523.2702713012695,
+                "lost": 7523.2702713012695,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        },
+        {
+            "scene": "Connections",
+            "policy": "unattended",
+            "ending": "InsufficientWork",
+            "signature": "6EBA080DFDA6C85FF2C17D67C9665F8A4E2FCB1A1040A944C83C4720B892AF81",
+            "seed": 31146359,
+            "commands": 0,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 697.4603137969971,
+                "eligible": 1034.0808200836182,
+                "lost": 0.0,
+                "unfinished": 336.6205062866211,
+                "ending": "InsufficientWork"
+            },
+            "work180": 430.5864143371582,
+            "work270": 646.237627029419,
+            "work360": 697.4603137969971,
+            "credits": [
+                {
+                    "connectionId": "x0",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.82076644897461,
+                    "completedWork": 50.01668930053711,
+                    "creditedWork": 50.01668930053711
+                },
+                {
+                    "connectionId": "c4",
+                    "operationIndex": 0,
+                    "timeSeconds": 45.300846099853519,
+                    "completedWork": 39.733612060546878,
+                    "creditedWork": 89.75030136108399
+                },
+                {
+                    "connectionId": "d4",
+                    "operationIndex": 0,
+                    "timeSeconds": 101.29501342773438,
+                    "completedWork": 129.7831268310547,
+                    "creditedWork": 219.53342819213868
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 122.09152221679688,
+                    "completedWork": 94.1880111694336,
+                    "creditedWork": 313.72143936157229
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 0,
+                    "timeSeconds": 161.65771484375,
+                    "completedWork": 116.86497497558594,
+                    "creditedWork": 430.5864143371582
+                },
+                {
+                    "connectionId": "d4",
+                    "operationIndex": 1,
+                    "timeSeconds": 190.32383728027345,
+                    "completedWork": 27.44508934020996,
+                    "creditedWork": 458.03150367736819
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 1,
+                    "timeSeconds": 195.1648712158203,
+                    "completedWork": 107.8192367553711,
+                    "creditedWork": 565.8507404327393
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 1,
+                    "timeSeconds": 246.5358428955078,
+                    "completedWork": 40.94790267944336,
+                    "creditedWork": 606.7986431121826
+                },
+                {
+                    "connectionId": "r9",
+                    "operationIndex": 0,
+                    "timeSeconds": 248.95635986328126,
+                    "completedWork": 39.43898391723633,
+                    "creditedWork": 646.237627029419
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 278.2856140136719,
+                    "completedWork": 51.222686767578128,
+                    "creditedWork": 697.4603137969971
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "visible-defense",
+            "ending": "WorkComplete",
+            "signature": "2EBCA947085293C22CAE4A187752519129B148CD4F319C8DCE1251C05A1CE3FB",
+            "seed": 31146359,
+            "commands": 5,
+            "time": 314.1658935546875,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 314.1658935546875,
+                "target": 900.0,
+                "credited": 959.7235126495361,
+                "eligible": 1306.6473484039307,
+                "lost": 0.0,
+                "unfinished": 346.92383575439455,
+                "ending": "WorkComplete"
+            },
+            "work180": 606.7986431121826,
+            "work270": 799.3593311309814,
+            "work360": 959.7235126495361,
+            "credits": [
+                {
+                    "connectionId": "x0",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.82076644897461,
+                    "completedWork": 50.01668930053711,
+                    "creditedWork": 50.01668930053711
+                },
+                {
+                    "connectionId": "c4",
+                    "operationIndex": 0,
+                    "timeSeconds": 45.300846099853519,
+                    "completedWork": 39.733612060546878,
+                    "creditedWork": 89.75030136108399
+                },
+                {
+                    "connectionId": "d4",
+                    "operationIndex": 0,
+                    "timeSeconds": 79.73863220214844,
+                    "completedWork": 129.7831268310547,
+                    "creditedWork": 219.53342819213868
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 0,
+                    "timeSeconds": 103.37466430664063,
+                    "completedWork": 116.86497497558594,
+                    "creditedWork": 336.3984031677246
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 119.57194519042969,
+                    "completedWork": 94.1880111694336,
+                    "creditedWork": 430.5864143371582
+                },
+                {
+                    "connectionId": "d4",
+                    "operationIndex": 1,
+                    "timeSeconds": 121.07169342041016,
+                    "completedWork": 27.44508934020996,
+                    "creditedWork": 458.03150367736819
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 1,
+                    "timeSeconds": 167.4789581298828,
+                    "completedWork": 40.94790267944336,
+                    "creditedWork": 498.9794063568115
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 1,
+                    "timeSeconds": 176.26083374023438,
+                    "completedWork": 107.8192367553711,
+                    "creditedWork": 606.7986431121826
+                },
+                {
+                    "connectionId": "c5",
+                    "operationIndex": 0,
+                    "timeSeconds": 187.88331604003907,
+                    "completedWork": 39.43898391723633,
+                    "creditedWork": 646.237627029419
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 225.5713653564453,
+                    "completedWork": 51.222686767578128,
+                    "creditedWork": 697.4603137969971
+                },
+                {
+                    "connectionId": "s8",
+                    "operationIndex": 0,
+                    "timeSeconds": 256.6974792480469,
+                    "completedWork": 61.10301971435547,
+                    "creditedWork": 758.5633335113525
+                },
+                {
+                    "connectionId": "t5",
+                    "operationIndex": 0,
+                    "timeSeconds": 262.3743591308594,
+                    "completedWork": 40.795997619628909,
+                    "creditedWork": 799.3593311309814
+                },
+                {
+                    "connectionId": "m0",
+                    "operationIndex": 0,
+                    "timeSeconds": 295.9359130859375,
+                    "completedWork": 78.02649688720703,
+                    "creditedWork": 877.3858280181885
+                },
+                {
+                    "connectionId": "c7",
+                    "operationIndex": 0,
+                    "timeSeconds": 314.1658935546875,
+                    "completedWork": 82.33768463134766,
+                    "creditedWork": 959.7235126495361
+                }
+            ]
+        },
+        {
+            "scene": "Connections",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "044A10F6DB6A48C4E50FEFF08D9BE6D080BABBA2AA3BA8C253DF08B5E1421A86",
+            "seed": 31146359,
+            "commands": 113,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 900.0,
+                "credited": 0.0,
+                "eligible": 13654.499319076538,
+                "lost": 13654.499319076538,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "unattended",
+            "ending": "CoreBreached",
+            "signature": "100AA46CC689E0E9A816170301B7EACF10A11A245353F16EC19E98358E87BB34",
+            "seed": 1701,
+            "commands": 0,
+            "time": 274.907470703125,
+            "coreBreachTime": 274.907470703125,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 274.907470703125,
+                "target": 1200.0,
+                "credited": 911.2994384765625,
+                "eligible": 1298.4755001068115,
+                "lost": 0.0,
+                "unfinished": 387.176061630249,
+                "ending": "CoreBreached"
+            },
+            "work180": 434.53103828430178,
+            "work270": 880.4976348876953,
+            "work360": 911.2994384765625,
+            "credits": [
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 0,
+                    "timeSeconds": 40.380733489990237,
+                    "completedWork": 20.635845184326173,
+                    "creditedWork": 20.635845184326173
+                },
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 1,
+                    "timeSeconds": 69.80030059814453,
+                    "completedWork": 42.870845794677737,
+                    "creditedWork": 63.506690979003909
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 85.17771911621094,
+                    "completedWork": 59.92156982421875,
+                    "creditedWork": 123.42826080322266
+                },
+                {
+                    "connectionId": "v3",
+                    "operationIndex": 0,
+                    "timeSeconds": 109.95355987548828,
+                    "completedWork": 69.17793273925781,
+                    "creditedWork": 192.60619354248048
+                },
+                {
+                    "connectionId": "d5",
+                    "operationIndex": 0,
+                    "timeSeconds": 110.15352630615235,
+                    "completedWork": 64.48566436767578,
+                    "creditedWork": 257.09185791015627
+                },
+                {
+                    "connectionId": "j4",
+                    "operationIndex": 0,
+                    "timeSeconds": 127.15067291259766,
+                    "completedWork": 23.118242263793947,
+                    "creditedWork": 280.2101001739502
+                },
+                {
+                    "connectionId": "g5",
+                    "operationIndex": 0,
+                    "timeSeconds": 133.2316436767578,
+                    "completedWork": 45.38581466674805,
+                    "creditedWork": 325.59591484069827
+                },
+                {
+                    "connectionId": "m1",
+                    "operationIndex": 0,
+                    "timeSeconds": 144.17398071289063,
+                    "completedWork": 67.78294372558594,
+                    "creditedWork": 393.3788585662842
+                },
+                {
+                    "connectionId": "j4",
+                    "operationIndex": 1,
+                    "timeSeconds": 157.31678771972657,
+                    "completedWork": 41.15217971801758,
+                    "creditedWork": 434.53103828430178
+                },
+                {
+                    "connectionId": "a0",
+                    "operationIndex": 0,
+                    "timeSeconds": 200.74606323242188,
+                    "completedWork": 146.8894805908203,
+                    "creditedWork": 581.4205188751221
+                },
+                {
+                    "connectionId": "p4",
+                    "operationIndex": 0,
+                    "timeSeconds": 201.4062042236328,
+                    "completedWork": 43.04082107543945,
+                    "creditedWork": 624.4613399505615
+                },
+                {
+                    "connectionId": "m1",
+                    "operationIndex": 1,
+                    "timeSeconds": 205.7671356201172,
+                    "completedWork": 127.4964599609375,
+                    "creditedWork": 751.957799911499
+                },
+                {
+                    "connectionId": "z0",
+                    "operationIndex": 0,
+                    "timeSeconds": 214.8890838623047,
+                    "completedWork": 27.862987518310548,
+                    "creditedWork": 779.8207874298096
+                },
+                {
+                    "connectionId": "r0",
+                    "operationIndex": 0,
+                    "timeSeconds": 234.83334350585938,
+                    "completedWork": 26.801685333251954,
+                    "creditedWork": 806.6224727630615
+                },
+                {
+                    "connectionId": "z0",
+                    "operationIndex": 1,
+                    "timeSeconds": 241.85484313964845,
+                    "completedWork": 30.838945388793947,
+                    "creditedWork": 837.4614181518555
+                },
+                {
+                    "connectionId": "z3",
+                    "operationIndex": 0,
+                    "timeSeconds": 250.5767059326172,
+                    "completedWork": 43.036216735839847,
+                    "creditedWork": 880.4976348876953
+                },
+                {
+                    "connectionId": "r0",
+                    "operationIndex": 1,
+                    "timeSeconds": 270.6098327636719,
+                    "completedWork": 30.801803588867189,
+                    "creditedWork": 911.2994384765625
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "visible-defense",
+            "ending": "CoreBreached",
+            "signature": "AB3079A21351194230D5AD418B12C1A6D850CF12F0BD01188331D20E282B2F47",
+            "seed": 1701,
+            "commands": 7,
+            "time": 266.23223876953127,
+            "coreBreachTime": 266.23223876953127,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 266.23223876953127,
+                "target": 1200.0,
+                "credited": 913.6113166809082,
+                "eligible": 1336.1730632781982,
+                "lost": 0.0,
+                "unfinished": 422.56174659729006,
+                "ending": "CoreBreached"
+            },
+            "work180": 434.53103828430178,
+            "work270": 913.6113166809082,
+            "work360": 913.6113166809082,
+            "credits": [
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 0,
+                    "timeSeconds": 40.380733489990237,
+                    "completedWork": 20.635845184326173,
+                    "creditedWork": 20.635845184326173
+                },
+                {
+                    "connectionId": "m7",
+                    "operationIndex": 1,
+                    "timeSeconds": 69.80030059814453,
+                    "completedWork": 42.870845794677737,
+                    "creditedWork": 63.506690979003909
+                },
+                {
+                    "connectionId": "f3",
+                    "operationIndex": 0,
+                    "timeSeconds": 85.17771911621094,
+                    "completedWork": 59.92156982421875,
+                    "creditedWork": 123.42826080322266
+                },
+                {
+                    "connectionId": "v3",
+                    "operationIndex": 0,
+                    "timeSeconds": 109.95355987548828,
+                    "completedWork": 69.17793273925781,
+                    "creditedWork": 192.60619354248048
+                },
+                {
+                    "connectionId": "d5",
+                    "operationIndex": 0,
+                    "timeSeconds": 110.15352630615235,
+                    "completedWork": 64.48566436767578,
+                    "creditedWork": 257.09185791015627
+                },
+                {
+                    "connectionId": "j8",
+                    "operationIndex": 0,
+                    "timeSeconds": 126.59076690673828,
+                    "completedWork": 23.118242263793947,
+                    "creditedWork": 280.2101001739502
+                },
+                {
+                    "connectionId": "g5",
+                    "operationIndex": 0,
+                    "timeSeconds": 133.2316436767578,
+                    "completedWork": 45.38581466674805,
+                    "creditedWork": 325.59591484069827
+                },
+                {
+                    "connectionId": "m1",
+                    "operationIndex": 0,
+                    "timeSeconds": 140.9132843017578,
+                    "completedWork": 67.78294372558594,
+                    "creditedWork": 393.3788585662842
+                },
+                {
+                    "connectionId": "j8",
+                    "operationIndex": 1,
+                    "timeSeconds": 156.0565185546875,
+                    "completedWork": 41.15217971801758,
+                    "creditedWork": 434.53103828430178
+                },
+                {
+                    "connectionId": "a0",
+                    "operationIndex": 0,
+                    "timeSeconds": 197.5653839111328,
+                    "completedWork": 146.8894805908203,
+                    "creditedWork": 581.4205188751221
+                },
+                {
+                    "connectionId": "m1",
+                    "operationIndex": 1,
+                    "timeSeconds": 199.9058837890625,
+                    "completedWork": 127.4964599609375,
+                    "creditedWork": 708.9169788360596
+                },
+                {
+                    "connectionId": "p4",
+                    "operationIndex": 0,
+                    "timeSeconds": 201.4062042236328,
+                    "completedWork": 43.04082107543945,
+                    "creditedWork": 751.957799911499
+                },
+                {
+                    "connectionId": "z0",
+                    "operationIndex": 0,
+                    "timeSeconds": 214.8890838623047,
+                    "completedWork": 27.862987518310548,
+                    "creditedWork": 779.8207874298096
+                },
+                {
+                    "connectionId": "r0",
+                    "operationIndex": 0,
+                    "timeSeconds": 234.83334350585938,
+                    "completedWork": 26.801685333251954,
+                    "creditedWork": 806.6224727630615
+                },
+                {
+                    "connectionId": "z0",
+                    "operationIndex": 1,
+                    "timeSeconds": 241.85484313964845,
+                    "completedWork": 30.838945388793947,
+                    "creditedWork": 837.4614181518555
+                },
+                {
+                    "connectionId": "a0",
+                    "operationIndex": 1,
+                    "timeSeconds": 243.1751251220703,
+                    "completedWork": 33.11368179321289,
+                    "creditedWork": 870.5750999450684
+                },
+                {
+                    "connectionId": "z3",
+                    "operationIndex": 0,
+                    "timeSeconds": 244.7154541015625,
+                    "completedWork": 43.036216735839847,
+                    "creditedWork": 913.6113166809082
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "1C6BEF7BFA1FC18F1A866AE6356DE4611CD691306715343777552F64D5701145",
+            "seed": 1701,
+            "commands": 110,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 1200.0,
+                "credited": 0.0,
+                "eligible": 10990.452680587769,
+                "lost": 10990.452680587769,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "unattended",
+            "ending": "CoreBreached",
+            "signature": "1A3D13C37A91326ABD4A679CE9607B44A5FB26C17C2D38A9F66BABBB73AEE599",
+            "seed": 9001,
+            "commands": 0,
+            "time": 267.3008728027344,
+            "coreBreachTime": 267.3008728027344,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 267.3008728027344,
+                "target": 1200.0,
+                "credited": 882.6051044464111,
+                "eligible": 1478.2845859527588,
+                "lost": 0.0,
+                "unfinished": 595.6794815063477,
+                "ending": "CoreBreached"
+            },
+            "work180": 495.1878604888916,
+            "work270": 882.6051044464111,
+            "work360": 882.6051044464111,
+            "credits": [
+                {
+                    "connectionId": "q3",
+                    "operationIndex": 0,
+                    "timeSeconds": 47.70090103149414,
+                    "completedWork": 44.94617462158203,
+                    "creditedWork": 44.94617462158203
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 0,
+                    "timeSeconds": 71.6399917602539,
+                    "completedWork": 22.263147354125978,
+                    "creditedWork": 67.20932197570801
+                },
+                {
+                    "connectionId": "n7",
+                    "operationIndex": 0,
+                    "timeSeconds": 78.9587631225586,
+                    "completedWork": 49.58373260498047,
+                    "creditedWork": 116.79305458068848
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 1,
+                    "timeSeconds": 103.17469787597656,
+                    "completedWork": 43.3496208190918,
+                    "creditedWork": 160.14267539978028
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 105.59429168701172,
+                    "completedWork": 52.1136589050293,
+                    "creditedWork": 212.25633430480958
+                },
+                {
+                    "connectionId": "y1",
+                    "operationIndex": 0,
+                    "timeSeconds": 124.27115631103516,
+                    "completedWork": 55.388580322265628,
+                    "creditedWork": 267.6449146270752
+                },
+                {
+                    "connectionId": "y4",
+                    "operationIndex": 0,
+                    "timeSeconds": 139.9530792236328,
+                    "completedWork": 85.00994110107422,
+                    "creditedWork": 352.6548557281494
+                },
+                {
+                    "connectionId": "f6",
+                    "operationIndex": 0,
+                    "timeSeconds": 150.47532653808595,
+                    "completedWork": 72.55865478515625,
+                    "creditedWork": 425.21351051330569
+                },
+                {
+                    "connectionId": "g2",
+                    "operationIndex": 0,
+                    "timeSeconds": 169.0792999267578,
+                    "completedWork": 69.97434997558594,
+                    "creditedWork": 495.1878604888916
+                },
+                {
+                    "connectionId": "q8",
+                    "operationIndex": 0,
+                    "timeSeconds": 211.46835327148438,
+                    "completedWork": 67.77571868896485,
+                    "creditedWork": 562.9635791778564
+                },
+                {
+                    "connectionId": "p9",
+                    "operationIndex": 0,
+                    "timeSeconds": 211.66839599609376,
+                    "completedWork": 77.48591613769531,
+                    "creditedWork": 640.4494953155518
+                },
+                {
+                    "connectionId": "g2",
+                    "operationIndex": 1,
+                    "timeSeconds": 217.10955810546876,
+                    "completedWork": 102.83036804199219,
+                    "creditedWork": 743.279863357544
+                },
+                {
+                    "connectionId": "a7",
+                    "operationIndex": 0,
+                    "timeSeconds": 228.21192932128907,
+                    "completedWork": 64.96723937988281,
+                    "creditedWork": 808.2471027374268
+                },
+                {
+                    "connectionId": "t7",
+                    "operationIndex": 0,
+                    "timeSeconds": 233.31301879882813,
+                    "completedWork": 56.087459564208987,
+                    "creditedWork": 864.3345623016357
+                },
+                {
+                    "connectionId": "x9",
+                    "operationIndex": 0,
+                    "timeSeconds": 246.8959197998047,
+                    "completedWork": 18.27054214477539,
+                    "creditedWork": 882.6051044464111
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "visible-defense",
+            "ending": "WorkComplete",
+            "signature": "CD56F6FDA396959F6A199CF412BB91D5940D16CA65690691AF060329685BD956",
+            "seed": 9001,
+            "commands": 11,
+            "time": 296.4756164550781,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 296.4756164550781,
+                "target": 1200.0,
+                "credited": 1276.616849899292,
+                "eligible": 1713.506929397583,
+                "lost": 0.0,
+                "unfinished": 436.890079498291,
+                "ending": "WorkComplete"
+            },
+            "work180": 495.1878604888916,
+            "work270": 882.6051044464111,
+            "work360": 1276.616849899292,
+            "credits": [
+                {
+                    "connectionId": "q3",
+                    "operationIndex": 0,
+                    "timeSeconds": 47.70090103149414,
+                    "completedWork": 44.94617462158203,
+                    "creditedWork": 44.94617462158203
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 0,
+                    "timeSeconds": 71.6399917602539,
+                    "completedWork": 22.263147354125978,
+                    "creditedWork": 67.20932197570801
+                },
+                {
+                    "connectionId": "n7",
+                    "operationIndex": 0,
+                    "timeSeconds": 78.9587631225586,
+                    "completedWork": 49.58373260498047,
+                    "creditedWork": 116.79305458068848
+                },
+                {
+                    "connectionId": "b0",
+                    "operationIndex": 1,
+                    "timeSeconds": 103.17469787597656,
+                    "completedWork": 43.3496208190918,
+                    "creditedWork": 160.14267539978028
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 105.59429168701172,
+                    "completedWork": 52.1136589050293,
+                    "creditedWork": 212.25633430480958
+                },
+                {
+                    "connectionId": "y1",
+                    "operationIndex": 0,
+                    "timeSeconds": 124.27115631103516,
+                    "completedWork": 55.388580322265628,
+                    "creditedWork": 267.6449146270752
+                },
+                {
+                    "connectionId": "y4",
+                    "operationIndex": 0,
+                    "timeSeconds": 138.95286560058595,
+                    "completedWork": 85.00994110107422,
+                    "creditedWork": 352.6548557281494
+                },
+                {
+                    "connectionId": "f6",
+                    "operationIndex": 0,
+                    "timeSeconds": 150.47532653808595,
+                    "completedWork": 72.55865478515625,
+                    "creditedWork": 425.21351051330569
+                },
+                {
+                    "connectionId": "g2",
+                    "operationIndex": 0,
+                    "timeSeconds": 169.0792999267578,
+                    "completedWork": 69.97434997558594,
+                    "creditedWork": 495.1878604888916
+                },
+                {
+                    "connectionId": "p9",
+                    "operationIndex": 0,
+                    "timeSeconds": 205.0269775390625,
+                    "completedWork": 77.48591613769531,
+                    "creditedWork": 572.6737766265869
+                },
+                {
+                    "connectionId": "q8",
+                    "operationIndex": 0,
+                    "timeSeconds": 211.46835327148438,
+                    "completedWork": 67.77571868896485,
+                    "creditedWork": 640.4494953155518
+                },
+                {
+                    "connectionId": "g2",
+                    "operationIndex": 1,
+                    "timeSeconds": 217.10955810546876,
+                    "completedWork": 102.83036804199219,
+                    "creditedWork": 743.279863357544
+                },
+                {
+                    "connectionId": "a7",
+                    "operationIndex": 0,
+                    "timeSeconds": 228.21192932128907,
+                    "completedWork": 64.96723937988281,
+                    "creditedWork": 808.2471027374268
+                },
+                {
+                    "connectionId": "t7",
+                    "operationIndex": 0,
+                    "timeSeconds": 233.31301879882813,
+                    "completedWork": 56.087459564208987,
+                    "creditedWork": 864.3345623016357
+                },
+                {
+                    "connectionId": "x9",
+                    "operationIndex": 0,
+                    "timeSeconds": 246.8959197998047,
+                    "completedWork": 18.27054214477539,
+                    "creditedWork": 882.6051044464111
+                },
+                {
+                    "connectionId": "q8",
+                    "operationIndex": 1,
+                    "timeSeconds": 270.0501403808594,
+                    "completedWork": 144.67547607421876,
+                    "creditedWork": 1027.2805805206299
+                },
+                {
+                    "connectionId": "x9",
+                    "operationIndex": 1,
+                    "timeSeconds": 274.6476135253906,
+                    "completedWork": 30.80936050415039,
+                    "creditedWork": 1058.0899410247803
+                },
+                {
+                    "connectionId": "m5",
+                    "operationIndex": 0,
+                    "timeSeconds": 290.4189453125,
+                    "completedWork": 123.25829315185547,
+                    "creditedWork": 1181.3482341766357
+                },
+                {
+                    "connectionId": "n6",
+                    "operationIndex": 0,
+                    "timeSeconds": 296.4756164550781,
+                    "completedWork": 95.26861572265625,
+                    "creditedWork": 1276.616849899292
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "95FE55010597C977A91EDADA588B4B07BB42117870EFA3BB06D2B942244A5336",
+            "seed": 9001,
+            "commands": 113,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 1200.0,
+                "credited": 0.0,
+                "eligible": 12683.98324584961,
+                "lost": 12509.132946014404,
+                "unfinished": 174.85029983520509,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "unattended",
+            "ending": "InsufficientWork",
+            "signature": "AF34495439830F0006B98D9CEEA68520ADF76670BE022329629D73F32D97017C",
+            "seed": 31146359,
+            "commands": 0,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 1200.0,
+                "credited": 534.8033294677734,
+                "eligible": 878.0090675354004,
+                "lost": 343.20573806762698,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 333.4771041870117,
+            "work270": 497.01973724365237,
+            "work360": 534.8033294677734,
+            "credits": [
+                {
+                    "connectionId": "x0",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.52075958251953,
+                    "completedWork": 44.511329650878909,
+                    "creditedWork": 44.511329650878909
+                },
+                {
+                    "connectionId": "s3",
+                    "operationIndex": 0,
+                    "timeSeconds": 49.94095230102539,
+                    "completedWork": 36.59345245361328,
+                    "creditedWork": 81.10478210449219
+                },
+                {
+                    "connectionId": "c4",
+                    "operationIndex": 0,
+                    "timeSeconds": 88.75711822509766,
+                    "completedWork": 37.26567459106445,
+                    "creditedWork": 118.37045669555664
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 0,
+                    "timeSeconds": 93.49632263183594,
+                    "completedWork": 26.478408813476564,
+                    "creditedWork": 144.8488655090332
+                },
+                {
+                    "connectionId": "v7",
+                    "operationIndex": 0,
+                    "timeSeconds": 101.21502685546875,
+                    "completedWork": 49.651920318603519,
+                    "creditedWork": 194.50078582763673
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 1,
+                    "timeSeconds": 124.61109924316406,
+                    "completedWork": 43.816314697265628,
+                    "creditedWork": 238.31710052490235
+                },
+                {
+                    "connectionId": "c5",
+                    "operationIndex": 0,
+                    "timeSeconds": 136.61236572265626,
+                    "completedWork": 40.819969177246097,
+                    "creditedWork": 279.13706970214846
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 148.7949676513672,
+                    "completedWork": 54.34003448486328,
+                    "creditedWork": 333.4771041870117
+                },
+                {
+                    "connectionId": "m0",
+                    "operationIndex": 0,
+                    "timeSeconds": 197.185302734375,
+                    "completedWork": 51.24370574951172,
+                    "creditedWork": 384.72080993652346
+                },
+                {
+                    "connectionId": "s8",
+                    "operationIndex": 0,
+                    "timeSeconds": 223.5309295654297,
+                    "completedWork": 61.10301971435547,
+                    "creditedWork": 445.8238296508789
+                },
+                {
+                    "connectionId": "t5",
+                    "operationIndex": 0,
+                    "timeSeconds": 224.21107482910157,
+                    "completedWork": 51.19590759277344,
+                    "creditedWork": 497.01973724365237
+                },
+                {
+                    "connectionId": "o4",
+                    "operationIndex": 0,
+                    "timeSeconds": 285.42169189453127,
+                    "completedWork": 37.783592224121097,
+                    "creditedWork": 534.8033294677734
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "visible-defense",
+            "ending": "InsufficientWork",
+            "signature": "708E5E64AFB8925865668238EC1369DCD0F1E2C4A2A78B004F539DA597B9CA62",
+            "seed": 31146359,
+            "commands": 4,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 1200.0,
+                "credited": 445.8238296508789,
+                "eligible": 1031.2212562561035,
+                "lost": 585.3974266052246,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 394.5801239013672,
+            "work270": 445.8238296508789,
+            "work360": 445.8238296508789,
+            "credits": [
+                {
+                    "connectionId": "x0",
+                    "operationIndex": 0,
+                    "timeSeconds": 41.52075958251953,
+                    "completedWork": 44.511329650878909,
+                    "creditedWork": 44.511329650878909
+                },
+                {
+                    "connectionId": "s3",
+                    "operationIndex": 0,
+                    "timeSeconds": 49.94095230102539,
+                    "completedWork": 36.59345245361328,
+                    "creditedWork": 81.10478210449219
+                },
+                {
+                    "connectionId": "c4",
+                    "operationIndex": 0,
+                    "timeSeconds": 88.75711822509766,
+                    "completedWork": 37.26567459106445,
+                    "creditedWork": 118.37045669555664
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 0,
+                    "timeSeconds": 93.49632263183594,
+                    "completedWork": 26.478408813476564,
+                    "creditedWork": 144.8488655090332
+                },
+                {
+                    "connectionId": "v7",
+                    "operationIndex": 0,
+                    "timeSeconds": 101.21502685546875,
+                    "completedWork": 49.651920318603519,
+                    "creditedWork": 194.50078582763673
+                },
+                {
+                    "connectionId": "t1",
+                    "operationIndex": 1,
+                    "timeSeconds": 124.61109924316406,
+                    "completedWork": 43.816314697265628,
+                    "creditedWork": 238.31710052490235
+                },
+                {
+                    "connectionId": "c5",
+                    "operationIndex": 0,
+                    "timeSeconds": 136.61236572265626,
+                    "completedWork": 40.819969177246097,
+                    "creditedWork": 279.13706970214846
+                },
+                {
+                    "connectionId": "l4",
+                    "operationIndex": 0,
+                    "timeSeconds": 148.7949676513672,
+                    "completedWork": 54.34003448486328,
+                    "creditedWork": 333.4771041870117
+                },
+                {
+                    "connectionId": "s8",
+                    "operationIndex": 0,
+                    "timeSeconds": 169.63941955566407,
+                    "completedWork": 61.10301971435547,
+                    "creditedWork": 394.5801239013672
+                },
+                {
+                    "connectionId": "m0",
+                    "operationIndex": 0,
+                    "timeSeconds": 197.185302734375,
+                    "completedWork": 51.24370574951172,
+                    "creditedWork": 445.8238296508789
+                }
+            ]
+        },
+        {
+            "scene": "ConnectionsAdvanced",
+            "policy": "kill-all",
+            "ending": "InsufficientWork",
+            "signature": "68364D3190F592B6BD3E985953529B76B7B46E45339975FE1D37F389A7D59BFA",
+            "seed": 31146359,
+            "commands": 128,
+            "time": 360.0,
+            "coreBreachTime": -1.0,
+            "final": {
+                "enabled": true,
+                "durationSeconds": 360.0,
+                "timeSeconds": 360.0,
+                "target": 1200.0,
+                "credited": 0.0,
+                "eligible": 14323.197185516357,
+                "lost": 14323.197185516357,
+                "unfinished": 0.0,
+                "ending": "InsufficientWork"
+            },
+            "work180": 0.0,
+            "work270": 0.0,
+            "work360": 0.0,
+            "credits": []
+        }
+    ]
+}
