@@ -10,7 +10,6 @@ namespace Uptime.Connections
         private IntegrityState integrity;
         private bool steppingIntegrity;
         public IntegrityState Integrity => integrity;
-        public bool RunEnded => integrity?.Breach != null;
         public bool IntegrityEnabled => integrityTuning != null && integrityTuning.enabled;
         public event Action<IntegrityEvent> IntegrityOccurred;
         public event Action CoreBreached;
@@ -29,6 +28,7 @@ namespace Uptime.Connections
         public bool DamageIntegrity(NodeResources target, string source, string cause,
             bool overt = true, bool completeBoundary = true)
         {
+            if (RunEnded) return false;
             bool changed = integrity?.Damage(target, source, cause, simulationTimeSeconds, overt) == true;
             if (completeBoundary && !steppingIntegrity) CompleteIntegrityBoundary();
             return changed;
@@ -36,14 +36,16 @@ namespace Uptime.Connections
 
         public void CompleteIntegrityBoundary()
         {
-            if (integrity?.LatchBreach(simulationTimeSeconds) != true) return;
-            recorder?.RecordIntegrity(new IntegrityEvent { type = "core_breached", time = simulationTimeSeconds,
-                target = integrity.Breach.criticalNode, source = integrity.Breach.trigger.source,
-                cause = integrity.Breach.trigger.cause, visible = true, revealed = true });
-            // Preserve frozen sessions/entities for telemetry. All mutating entry points reject the terminal state.
-            recorder?.CaptureSnapshot(simulationTimeSeconds);
-            recorder?.Save(false);
-            CoreBreached?.Invoke();
+            if (RunEnded) return;
+            if (integrity?.LatchBreach(simulationTimeSeconds) == true)
+            {
+                recorder?.RecordIntegrity(new IntegrityEvent { type = "core_breached", time = simulationTimeSeconds,
+                    target = integrity.Breach.criticalNode, source = integrity.Breach.trigger.source,
+                    cause = integrity.Breach.trigger.cause, visible = true, revealed = true });
+                FinishRun(RunEnding.CoreBreached);
+                CoreBreached?.Invoke();
+            }
+            else CompleteShiftBoundary();
         }
 
         public string IntegrityReceipt(NodeResources target)

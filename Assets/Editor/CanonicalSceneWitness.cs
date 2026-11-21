@@ -68,7 +68,8 @@ namespace Uptime.Connections.EditorTools
             Check(authored.AutoGenerationEnabled && authored.HostileGenerationEnabled && authored.RandomizeSeed &&
                 new SerializedObject(authored).FindProperty("profiles").arraySize > 0 &&
                 authoredDirective.Directive == HackerDirective.SPREAD && authoredDirective.CommitmentSeconds == 60 &&
-                authoredDirective.PreferenceProbability == .7f, scene + " actual authored generation/catalog/directive defaults before witness overrides");
+                authoredDirective.PreferenceProbability == .7f && authored.GetComponent<SimulationHost>().ShiftEnabled &&
+                authored.GetComponent<SimulationHost>().ShiftDurationSeconds == 360, scene + " actual authored generation/catalog/directive defaults before witness overrides");
             var host = Open(scene, auto: true); bool small = scene == CanonicalSceneAuthoring.Scenes[0];
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             var activity = host.GetComponent<HostileActivityDirector>();
@@ -115,10 +116,10 @@ namespace Uptime.Connections.EditorTools
             InfectionWitness.CheckCleanOverlayBindings(); EscapeVideoCallWitness.CheckBindings();
             var strip = new SerializedObject(UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>());
             Check(((TMP_Text)strip.FindProperty("clockText").objectReferenceValue).gameObject.activeInHierarchy &&
-                !((TMP_Text)strip.FindProperty("valueText").objectReferenceValue).gameObject.activeInHierarchy &&
-                !((TMP_Text)strip.FindProperty("rateText").objectReferenceValue).gameObject.activeInHierarchy &&
-                !((Image)strip.FindProperty("healthFill").objectReferenceValue).transform.parent.gameObject.activeInHierarchy,
-                scene + " clock/tools retained and Health survival gauge hidden");
+                ((TMP_Text)strip.FindProperty("valueText").objectReferenceValue).gameObject.activeInHierarchy &&
+                ((TMP_Text)strip.FindProperty("rateText").objectReferenceValue).gameObject.activeInHierarchy &&
+                ((Image)strip.FindProperty("healthFill").objectReferenceValue).transform.parent.gameObject.activeInHierarchy,
+                scene + " authored status elements available for WORK objective, clock and tools");
         }
         private static void Activity(string scene, HackerDirective mode, float interval, string family)
         {

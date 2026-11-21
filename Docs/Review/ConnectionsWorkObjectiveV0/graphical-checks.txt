@@ -1,0 +1,156 @@
+PASS Connections 01-start actual viewport 1920x1080
+PASS Connections 01-start/1920 readable Clock
+PASS Connections 01-start/1920 readable HealthValue
+PASS Connections 01-start/1920 readable SignedRate
+PASS Connections 01-start/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 01-start/1920 objective clears tool indicators
+PASS Connections 01-start actual viewport 1280x720
+PASS Connections 01-start/1280 readable Clock
+PASS Connections 01-start/1280 readable HealthValue
+PASS Connections 01-start/1280 readable SignedRate
+PASS Connections 01-start/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 01-start/1280 objective clears tool indicators
+PASS Connections inspect returns terminal focus with crowded network
+PASS Connections 02-work-and-inspect actual viewport 1920x1080
+PASS Connections 02-work-and-inspect/1920 readable Clock
+PASS Connections 02-work-and-inspect/1920 readable HealthValue
+PASS Connections 02-work-and-inspect/1920 readable SignedRate
+PASS Connections 02-work-and-inspect/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 02-work-and-inspect/1920 objective clears tool indicators
+PASS Connections 02-work-and-inspect actual viewport 1280x720
+PASS Connections 02-work-and-inspect/1280 readable Clock
+PASS Connections 02-work-and-inspect/1280 readable HealthValue
+PASS Connections 02-work-and-inspect/1280 readable SignedRate
+PASS Connections 02-work-and-inspect/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 02-work-and-inspect/1280 objective clears tool indicators
+PASS Connections CLEAN owns input before ending
+PASS Connections WORK success aborts active Duel/CLEAN without concession and restores input
+PASS Connections 03-complete actual viewport 1920x1080
+PASS Connections 03-complete/1920 readable Clock
+PASS Connections 03-complete/1920 readable HealthValue
+PASS Connections 03-complete/1920 readable SignedRate
+PASS Connections 03-complete/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 03-complete/1920 objective clears tool indicators
+PASS Connections 03-complete actual viewport 1280x720
+PASS Connections 03-complete/1280 readable Clock
+PASS Connections 03-complete/1280 readable HealthValue
+PASS Connections 03-complete/1280 readable SignedRate
+PASS Connections 03-complete/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 03-complete/1280 objective clears tool indicators
+PASS Connections terminal restart clears WORK/ending and retains seed/focus
+PASS Connections 04-restart actual viewport 1920x1080
+PASS Connections 04-restart/1920 readable Clock
+PASS Connections 04-restart/1920 readable HealthValue
+PASS Connections 04-restart/1920 readable SignedRate
+PASS Connections 04-restart/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 04-restart/1920 objective clears tool indicators
+PASS Connections 04-restart actual viewport 1280x720
+PASS Connections 04-restart/1280 readable Clock
+PASS Connections 04-restart/1280 readable HealthValue
+PASS Connections 04-restart/1280 readable SignedRate
+PASS Connections 04-restart/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 04-restart/1280 objective clears tool indicators
+PASS Connections timeout freezes scan and restores result/restart input
+PASS Connections 05-insufficient actual viewport 1920x1080
+PASS Connections 05-insufficient/1920 readable Clock
+PASS Connections 05-insufficient/1920 readable HealthValue
+PASS Connections 05-insufficient/1920 readable SignedRate
+PASS Connections 05-insufficient/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 05-insufficient/1920 objective clears tool indicators
+PASS Connections 05-insufficient actual viewport 1280x720
+PASS Connections 05-insufficient/1280 readable Clock
+PASS Connections 05-insufficient/1280 readable HealthValue
+PASS Connections 05-insufficient/1280 readable SignedRate
+PASS Connections 05-insufficient/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 05-insufficient/1280 objective clears tool indicators
+PASS Connections CORE uses same result/restart interface
+PASS Connections 06-core actual viewport 1920x1080
+PASS Connections 06-core/1920 readable Clock
+PASS Connections 06-core/1920 readable HealthValue
+PASS Connections 06-core/1920 readable SignedRate
+PASS Connections 06-core/1920 clock, WORK, bar and delta have separate bounds
+PASS Connections 06-core/1920 objective clears tool indicators
+PASS Connections 06-core actual viewport 1280x720
+PASS Connections 06-core/1280 readable Clock
+PASS Connections 06-core/1280 readable HealthValue
+PASS Connections 06-core/1280 readable SignedRate
+PASS Connections 06-core/1280 clock, WORK, bar and delta have separate bounds
+PASS Connections 06-core/1280 objective clears tool indicators
+PASS ConnectionsAdvanced 01-start actual viewport 1920x1080
+PASS ConnectionsAdvanced 01-start/1920 readable Clock
+PASS ConnectionsAdvanced 01-start/1920 readable HealthValue
+PASS ConnectionsAdvanced 01-start/1920 readable SignedRate
+PASS ConnectionsAdvanced 01-start/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 01-start/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 01-start actual viewport 1280x720
+PASS ConnectionsAdvanced 01-start/1280 readable Clock
+PASS ConnectionsAdvanced 01-start/1280 readable HealthValue
+PASS ConnectionsAdvanced 01-start/1280 readable SignedRate
+PASS ConnectionsAdvanced 01-start/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 01-start/1280 objective clears tool indicators
+PASS ConnectionsAdvanced inspect returns terminal focus with crowded network
+PASS ConnectionsAdvanced 02-work-and-inspect actual viewport 1920x1080
+PASS ConnectionsAdvanced 02-work-and-inspect/1920 readable Clock
+PASS ConnectionsAdvanced 02-work-and-inspect/1920 readable HealthValue
+PASS ConnectionsAdvanced 02-work-and-inspect/1920 readable SignedRate
+PASS ConnectionsAdvanced 02-work-and-inspect/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 02-work-and-inspect/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 02-work-and-inspect actual viewport 1280x720
+PASS ConnectionsAdvanced 02-work-and-inspect/1280 readable Clock
+PASS ConnectionsAdvanced 02-work-and-inspect/1280 readable HealthValue
+PASS ConnectionsAdvanced 02-work-and-inspect/1280 readable SignedRate
+PASS ConnectionsAdvanced 02-work-and-inspect/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 02-work-and-inspect/1280 objective clears tool indicators
+PASS ConnectionsAdvanced CLEAN owns input before ending
+PASS ConnectionsAdvanced WORK success aborts active Duel/CLEAN without concession and restores input
+PASS ConnectionsAdvanced 03-complete actual viewport 1920x1080
+PASS ConnectionsAdvanced 03-complete/1920 readable Clock
+PASS ConnectionsAdvanced 03-complete/1920 readable HealthValue
+PASS ConnectionsAdvanced 03-complete/1920 readable SignedRate
+PASS ConnectionsAdvanced 03-complete/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 03-complete/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 03-complete actual viewport 1280x720
+PASS ConnectionsAdvanced 03-complete/1280 readable Clock
+PASS ConnectionsAdvanced 03-complete/1280 readable HealthValue
+PASS ConnectionsAdvanced 03-complete/1280 readable SignedRate
+PASS ConnectionsAdvanced 03-complete/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 03-complete/1280 objective clears tool indicators
+PASS ConnectionsAdvanced terminal restart clears WORK/ending and retains seed/focus
+PASS ConnectionsAdvanced 04-restart actual viewport 1920x1080
+PASS ConnectionsAdvanced 04-restart/1920 readable Clock
+PASS ConnectionsAdvanced 04-restart/1920 readable HealthValue
+PASS ConnectionsAdvanced 04-restart/1920 readable SignedRate
+PASS ConnectionsAdvanced 04-restart/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 04-restart/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 04-restart actual viewport 1280x720
+PASS ConnectionsAdvanced 04-restart/1280 readable Clock
+PASS ConnectionsAdvanced 04-restart/1280 readable HealthValue
+PASS ConnectionsAdvanced 04-restart/1280 readable SignedRate
+PASS ConnectionsAdvanced 04-restart/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 04-restart/1280 objective clears tool indicators
+PASS ConnectionsAdvanced timeout freezes scan and restores result/restart input
+PASS ConnectionsAdvanced 05-insufficient actual viewport 1920x1080
+PASS ConnectionsAdvanced 05-insufficient/1920 readable Clock
+PASS ConnectionsAdvanced 05-insufficient/1920 readable HealthValue
+PASS ConnectionsAdvanced 05-insufficient/1920 readable SignedRate
+PASS ConnectionsAdvanced 05-insufficient/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 05-insufficient/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 05-insufficient actual viewport 1280x720
+PASS ConnectionsAdvanced 05-insufficient/1280 readable Clock
+PASS ConnectionsAdvanced 05-insufficient/1280 readable HealthValue
+PASS ConnectionsAdvanced 05-insufficient/1280 readable SignedRate
+PASS ConnectionsAdvanced 05-insufficient/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 05-insufficient/1280 objective clears tool indicators
+PASS ConnectionsAdvanced CORE uses same result/restart interface
+PASS ConnectionsAdvanced 06-core actual viewport 1920x1080
+PASS ConnectionsAdvanced 06-core/1920 readable Clock
+PASS ConnectionsAdvanced 06-core/1920 readable HealthValue
+PASS ConnectionsAdvanced 06-core/1920 readable SignedRate
+PASS ConnectionsAdvanced 06-core/1920 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 06-core/1920 objective clears tool indicators
+PASS ConnectionsAdvanced 06-core actual viewport 1280x720
+PASS ConnectionsAdvanced 06-core/1280 readable Clock
+PASS ConnectionsAdvanced 06-core/1280 readable HealthValue
+PASS ConnectionsAdvanced 06-core/1280 readable SignedRate
+PASS ConnectionsAdvanced 06-core/1280 clock, WORK, bar and delta have separate bounds
+PASS ConnectionsAdvanced 06-core/1280 objective clears tool indicators

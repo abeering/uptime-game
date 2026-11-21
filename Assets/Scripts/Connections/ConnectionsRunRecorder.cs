@@ -21,6 +21,9 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunMetadata
     {
+        public bool shiftEnabled;
+        public float shiftDurationSeconds, shiftWorkTarget;
+        public ShiftSnapshot finalShift;
         public string runId;
         public string startedUtc;
         public string endedUtc;
@@ -176,6 +179,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public ShiftSnapshot shift;
+        public double creditedWork;
         public IntegrityEvent integrity;
         public HackerOffensive hackerOffensive;
         public HackerTargetDecision hackerTarget;
@@ -432,6 +437,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public ShiftSnapshot shift;
         public IntegritySnapshot integrity;
         public HackerDirectiveSnapshot hackerDirective;
         public float timeSeconds;
@@ -621,6 +627,9 @@ namespace Uptime.Connections
                 log.run.hackerCommitmentSeconds = directives.CommitmentSeconds;
                 log.run.hackerPreferenceProbability = directives.PreferenceProbability;
             }
+            log.run.shiftEnabled = host.ShiftEnabled;
+            log.run.shiftDurationSeconds = host.ShiftDurationSeconds;
+            log.run.shiftWorkTarget = host.ShiftWorkTarget;
             log.run.integrityEnabled = host.IntegrityEnabled;
             if (host.Integrity != null)
             {
@@ -1431,6 +1440,25 @@ namespace Uptime.Connections
             entry.reason = decision.reason;
         }
 
+        public void RecordWorkCredit(LogicalConnectionState state, int index, float work, double total, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("shift_work_credit", time);
+            entry.connectionId = state.ConnectionId;
+            entry.operationIndex = index;
+            entry.completedWork = work;
+            entry.creditedWork = total;
+        }
+
+        public void RecordShiftEnded(ShiftSnapshot state)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("shift_ended", state.timeSeconds);
+            entry.shift = state;
+            entry.reason = state.ending;
+            log.run.finalShift = state;
+        }
+
         public void RecordIntegrity(IntegrityEvent occurrence)
         {
             if (!IsRecording) return;
@@ -1455,6 +1483,7 @@ namespace Uptime.Connections
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
+            snapshot.shift = host.Shift;
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
             if (directives != null && directives.isActiveAndEnabled && host.IntegrityEnabled)
