@@ -17,6 +17,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private Terminal terminal;
         [SerializeField] private TMP_Text title;
+        [SerializeField] private GameObject concedeHint;
         [SerializeField] private TMP_Text splashText;
         [SerializeField] private TMP_Text playerCommands;
         [SerializeField] private TMP_Text hackerCommands;
@@ -40,8 +41,19 @@ namespace Uptime.Connections
         public bool IsOpen => encounter != null && gameObject.activeInHierarchy;
         public bool IsRacing => IsOpen && racing;
         public bool CanDismissWithEscape => IsOpen;
-        public void SetEscapeTarget(bool targeted) { }
-        public void DismissFromEscape() { } // Consumed; a Duel has no dismissal action.
+        public void SetEscapeTarget(bool targeted) => concedeHint.SetActive(targeted &&
+            encounter?.Lifecycle == DuelLifecycle.Active);
+
+        public void DismissFromEscape()
+        {
+            if (!IsOpen || encounter.Lifecycle != DuelLifecycle.Active) return;
+            // Keep a local reference: CORE breach presentation can abort the overlay
+            // reentrantly during authoritative resolution.
+            DuelEncounter conceded = encounter;
+            if (director == null || !director.Concede(conceded, race)) return;
+            terminal?.DuelReceipt(conceded);
+            CloseWindow(true);
+        }
 
         public void Open(DuelEncounter encounter, CommandRaceSession race,
             ConnectionsDuelDirector director)
@@ -148,6 +160,7 @@ namespace Uptime.Connections
             if (encounter == null || encounter.Lifecycle != DuelLifecycle.Active) return;
             var host = director.GetComponent<SimulationHost>();
             director.Resolve(race);
+            concedeHint.SetActive(false);
             if (host.RunEnded) { Abort(); return; }
             if (subscribedKeyboard != null) subscribedKeyboard.onTextInput -= OnTextInput;
             subscribedKeyboard = null;
@@ -178,7 +191,7 @@ namespace Uptime.Connections
             CloseWindow();
         }
 
-        private void CloseWindow()
+        private void CloseWindow(bool guardHeldKeys = false)
         {
             if (splashRoutine != null) StopCoroutine(splashRoutine);
             splashRoutine = null;
@@ -192,8 +205,8 @@ namespace Uptime.Connections
             director = null;
             racing = false;
             gameObject.SetActive(false);
-            cleanOverlay?.SuspendKeyboard(false);
-            terminal?.SuspendKeyboard(false);
+            cleanOverlay?.SuspendKeyboard(false, guardHeldKeys);
+            terminal?.SuspendKeyboard(false, guardHeldKeys);
             if (cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
                 cleanOverlay.RestoreKeyboardFocus();
             else terminal?.RestoreKeyboardFocus();

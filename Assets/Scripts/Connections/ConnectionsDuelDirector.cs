@@ -5,6 +5,7 @@ namespace Uptime.Connections
 {
     public enum DuelVariant { CommandRace }
     public enum DuelLifecycle { Pending, Active, Result }
+    public enum DuelOutcome { Won, Lost, Conceded }
 
     public sealed class DuelEncounter
     {
@@ -21,6 +22,7 @@ namespace Uptime.Connections
         public ConsequencePlan LossPlan { get; internal set; }
         public ConsequenceExecution LossExecution { get; internal set; }
         public bool? PlayerWon { get; internal set; }
+        public DuelOutcome? Outcome { get; internal set; }
         public bool? InfectionApplied { get; internal set; }
         public bool IntegrityDamaged { get; internal set; }
         public string ApplicationReason { get; internal set; }
@@ -171,28 +173,48 @@ namespace Uptime.Connections
         {
             if (host.RunEnded || current == null || current.Lifecycle != DuelLifecycle.Active ||
                 race == null || !race.PlayerWon.HasValue) return;
-            current.Lifecycle = DuelLifecycle.Result;
-            current.PlayerWon = race.PlayerWon;
-            if (race.PlayerWon == false)
+            ResolveOutcome(current, race, race.PlayerWon == true ? DuelOutcome.Won : DuelOutcome.Lost);
+        }
+
+        public bool Concede(DuelEncounter encounter, CommandRaceSession race)
+        {
+            if (host.RunEnded || encounter == null || !ReferenceEquals(current, encounter) ||
+                encounter.Lifecycle != DuelLifecycle.Active || race == null ||
+                race.PlayerWon.HasValue) return false;
+            ResolveOutcome(encounter, race, DuelOutcome.Conceded);
+            return true;
+        }
+
+        private void ResolveOutcome(DuelEncounter resolved, CommandRaceSession race, DuelOutcome outcome)
+        {
+            // Claim resolution before consequences/callbacks can reenter. Concession leaves
+            // the race unfinished; only the encounter has an authoritative outcome.
+            resolved.Lifecycle = DuelLifecycle.Result;
+            resolved.Outcome = outcome;
+            resolved.PlayerWon = race.PlayerWon;
+            if (outcome != DuelOutcome.Won)
             {
-                current.LossExecution = ConsequenceExecutor.Execute(host, current.LossPlan, true);
-                current.IntegrityDamaged = host.DamageIntegrity(current.Target, "duel", "duel:" + current.Id, true, false);
-                current.InfectionApplied = false;
-                foreach (ConsequenceComponentResult part in current.LossExecution.Components)
+                resolved.LossExecution = ConsequenceExecutor.Execute(host, resolved.LossPlan, true);
+                resolved.IntegrityDamaged = host.DamageIntegrity(resolved.Target, "duel", "duel:" + resolved.Id, true, false);
+                resolved.InfectionApplied = false;
+                foreach (ConsequenceComponentResult part in resolved.LossExecution.Components)
                     if (part.Effect.Kind == ConsequenceKind.Infection && part.Succeeded)
-                        current.InfectionApplied = true;
-                current.ApplicationReason = current.LossExecution.AnySucceeded ? null :
+                        resolved.InfectionApplied = true;
+                resolved.ApplicationReason = resolved.LossExecution.AnySucceeded ? null :
                     "no_effect_applied";
             }
-            else host.Recorder?.RecordConsequencePrevented(current.LossPlan,
+            else host.Recorder?.RecordConsequencePrevented(resolved.LossPlan,
                 host.SimulationTimeSeconds);
-            host.Recorder?.RecordDuel("duel_resolved", current, host.SimulationTimeSeconds,
-                null, null, current.ApplicationReason, race);
-            Changed?.Invoke(current);
-            host.Recorder?.RecordDuel("duel_slot_released", current,
+            host.Recorder?.RecordDuel("duel_resolved", resolved, host.SimulationTimeSeconds,
+                null, null, resolved.ApplicationReason, race);
+            Changed?.Invoke(resolved);
+            host.Recorder?.RecordDuel("duel_slot_released", resolved,
                 host.SimulationTimeSeconds);
-            current = null;
-            Changed?.Invoke(null);
+            if (ReferenceEquals(current, resolved))
+            {
+                current = null;
+                Changed?.Invoke(null);
+            }
             host.CompleteIntegrityBoundary();
         }
 

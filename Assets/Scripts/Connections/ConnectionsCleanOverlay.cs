@@ -34,7 +34,7 @@ namespace Uptime.Connections
         // The completed result can remain visible after typing returns to the terminal.
         public bool WantsKeyboardFocus => IsOpen && !showingResult;
 
-        public void SuspendKeyboard(bool suspended)
+        public void SuspendKeyboard(bool suspended, bool guardHeldKeys = false)
         {
             keyboardSuspended = suspended;
             if (pidInput == null) return;
@@ -46,6 +46,8 @@ namespace Uptime.Connections
                 pidInput.DeactivateInputField();
             }
             pidInput.interactable = !suspended;
+            if (guardHeldKeys && pidInput is EscapeSafeInputField safe)
+                safe.SuppressInputUntilRelease();
         }
 
         public void RestoreKeyboardFocus()
@@ -201,10 +203,14 @@ namespace Uptime.Connections
             {
                 pidInput.ActivateInputField();
                 pidInput.Select();
-                if (wasPidFocused)
+                // TMP activates in LateUpdate and may select all there. Restore
+                // the captured selection after activation, while retaining focus.
+                yield return null;
+                if (wasPidFocused && acceptingPid && !keyboardSuspended && pidInput.isFocused)
                 {
                     pidInput.selectionStringAnchorPosition = pidAnchor;
                     pidInput.selectionStringFocusPosition = pidFocus;
+                    pidInput.ForceLabelUpdate();
                 }
                 wasPidFocused = false;
             }
