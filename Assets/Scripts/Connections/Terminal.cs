@@ -389,10 +389,10 @@ namespace Uptime.Connections
 
             string[] tokens = command.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
             string verb = tokens[0].ToLowerInvariant();
-            if (simulationHost != null && (simulationHost.IntegrityEnabled || simulationHost.ShiftEnabled) && verb == "restart")
+            if (simulationHost != null && simulationHost.IntegrityEnabled && verb == "restart")
             {
                 simulationHost.ResetSimulation();
-                AppendText(simulationHost.ShiftEnabled ? "SHIFT RESTARTED" : "INTEGRITY RUN RESTARTED", normalColor);
+                AppendText("INTEGRITY RUN RESTARTED", normalColor);
                 StartCoroutine(FocusInputNextFrame());
                 return;
             }
@@ -400,7 +400,7 @@ namespace Uptime.Connections
                 verb != "inspect" && verb != "i" && verb != "logs" && verb != "work" &&
                 verb != "load" && verb != "log" && verb != "mark" && verb != "help")
             {
-                AppendText(simulationHost.RunEndedMessage, CommandFailureColor());
+                AppendText("CORE BREACHED  /  type restart", CommandFailureColor());
                 StartCoroutine(FocusInputNextFrame());
                 return;
             }

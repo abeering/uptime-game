@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:680b0bc0fd756c09b77859a3dc5f13e43d122469afac3ec23e2ea212476c23ac`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:46a563111f9366ccc2baef151e2687bbc137c71219ad1dc5da72a6ba002cdeef`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,8 +216,6 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
-
-**WORK Objective & Shift V0 (implementation branch, November 20, 2026):** Both canonical scenes gain a configurable six-minute shift and cumulative confirmed benign-operation WORK quota (provisional Small900 / Advanced1,200). Completing the quota immediately succeeds; CORE breach takes precedence over same-boundary success, and the final deadline boundary credits genuine completions before evaluating shortfall. One simulation-owned ledger and ending state freeze progression/generation and reject mutation after any result. The existing authored strip shows elapsed/limit UPTIME, credited/required WORK, progress, completion deltas and retained tools; the existing result panel handles all three endings and same-seed restart. Health stays internal. Recorder configuration, credit events, final totals/cause and snapshots preserve accounting evidence. See the [contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-work-objective-v0.md) and [calibration/validation/manual review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsWorkObjectiveV0/README.md). Living Shift #115 stays separate; no narrative traffic, pressure retuning, progression, or Packet changes. Tracks #119; unmerged.
 
 **Duel Concession V0 (implementation branch, November 20, 2026):** In both canonical scenes, a fresh coordinated Escape during the active Duel startup or race intentionally concedes, executes the already frozen loss plan and usual single overt Duel Integrity strike, releases the global slot, and closes immediately. Immediate infection components retain the same damage suppression as ordinary losses; independent secondary attacks still strike normally. Pending countdowns and resolved results cannot concede. Reset/disable/CORE ending still abort presentation. `ESC — CONCEDE` uses the authored titlebar hint. The terminal reports `DUEL CONCEDED`; recorder outcomes distinguish `won`/`lost`/`conceded` and preserve real race elapsed time, partial progress, completion flags and correction counts. Race completion is never fabricated. CLEAN or terminal focus/drafts resume with held-key protection; normal win/loss result holds remain. See [review and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDuelConcessionV0/README.md). Tracks #119; unmerged.
 

@@ -17,8 +17,6 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
-            // This presentation witness retains its pre-shift timing assumptions.
-            IntegrityWitness.Set(host, "shiftEnabled", false);
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var prefab = AssetDatabase.LoadAssetAtPath<InspectOutput>(
                 "Assets/Prefabs/Connections/InspectOutput.prefab");

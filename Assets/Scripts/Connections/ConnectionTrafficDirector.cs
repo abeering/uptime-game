@@ -450,7 +450,6 @@ namespace Uptime.Connections
 
         public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
         {
-            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (plan == null || string.IsNullOrWhiteSpace(plan.ConnectionId) ||
                 !reservedIds.Add(plan.ConnectionId))
                 throw new InvalidOperationException("Spawn plans require a unique, nonempty connection ID.");
@@ -462,7 +461,6 @@ namespace Uptime.Connections
 
         public void Tick(float simulationTime, bool allowAmbient)
         {
-            if (host != null && host.RunEnded) return;
             if (random == null) ResetDirector();
             int blackoutCount = 0;
             foreach (NodeInfection infection in host.Infections)
