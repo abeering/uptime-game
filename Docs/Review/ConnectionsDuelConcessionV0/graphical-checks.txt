@@ -105,4 +105,3 @@ CONCESSION PLAY CHECK: simultaneous CORE loss closes overlay and settles exactly
 CONCESSION PLAY CHECK: CORE ending leaves terminal ready for restart
 DuelConcessionCapture PASS: ConnectionsAdvanced 1920x1080
 DuelCapture PASS: ConnectionsAdvanced 1920x1080 scripted Play Mode frames in Docs/Review/ConnectionsDuelConcessionV0/Captures/ConnectionsAdvanced
-

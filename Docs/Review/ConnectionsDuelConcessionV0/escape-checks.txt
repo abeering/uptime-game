@@ -222,4 +222,3 @@ ESC/CALL CHECK: typing focus, draft and selection survive unrelated Escape owner
 ESC/CALL CHECK: all call exit paths stop subtitle playback
 ESC/CALL CHECK: call/CLEAN lifecycles preserve network geometry and node positions
 EscapeVideoCallWitness PLAY PASS: ConnectionsAdvanced
-
