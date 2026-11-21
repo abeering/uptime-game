@@ -279,6 +279,8 @@ LOADER and INFECTOR are the first two *genera*, not a complete hostile taxonomy.
 
 Coordinated or multi-surface campaigns belong to future Level Director design. They should be able to reuse genus-specific connection composition without making the ambient Traffic Director “smart.”
 
+A separate [attack-surface and anomaly brainstorm](connections-attack-surface-and-anomaly-brainstorm.md) collects possible new **network objects, interaction requirements, and behavioral keywords**, including LINK PARASITES, ACCESS LEASES, CIRCUITS, SIEGES, PASS-THROUGH, and REVERSING. These are not automatically additional LOADER/INFECTOR genera or ambient hostile-generation recipes; they remain unselected design exploration.
+
 ## Related sources
 
 - [Connections Current State](Current_State.md) — working baseline and code authority.

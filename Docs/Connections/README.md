@@ -38,6 +38,7 @@ Connections is Uptime's active gameplay prototype, separate from the retained Pa
 
 ## Working designs, not implemented contracts
 
+- [Attack surfaces, counterplay & behavioral anomalies — brainstorm](connections-attack-surface-and-anomaly-brainstorm.md) — preserves fourteen speculative network-view surface concepts, multi-step interaction patterns, and nine keyword-style behavior ideas. **Idea catalogue only; no approved mechanics or implementation scope.**
 - [Attack pathways, consequences & surprise](connections-attack-pathways-and-surprise.md) — November 2026 design synthesis separating triggers, delivery surfaces, consequences, and selection policy; bounded Surprise V0 followed by an authored progression slice. **Future direction, not an implemented event framework.**
 - [Hacker challenges, command races & skill rewards](connections-hacker-command-races.md) — November 1 historical design with a November 13 implementation reconciliation; Duel V0 is merged, while variable consequences, positive rewards, event cards, and upgrade ideas remain proposals.
 - [Windowed workspace, Escape & communications V0](connections-windowed-workspace-comms-v0.md) — original October 30 direction, reconciled with implemented desktop/CLEAN/calls/Escape/text messaging (#69–#74) and still-open menu, pause, narrative and density questions. **Partially implemented; use current contracts for executable behavior.**
