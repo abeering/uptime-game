@@ -1,0 +1,30 @@
+Unity 6000.3.11f1 on macOS, November 20, 2026.
+Branch: feat/connections-work-objective-v0.
+Base main: bfbb19d5cd3b5f6682845ff838f4f3bca7b19a6a.
+Disposable copies: /private/tmp/uptime-work-objective, /private/tmp/uptime-work-graphical, /private/tmp/uptime-work-regressions.
+
+PASS Editor C# compilation.
+PASS WorkShiftWitness.Run: 52 focused assertions, both canonical scenes.
+PASS Calibrate: 48 natural scene/seed/policy runs + six exact event/snapshot replays.
+PASS VerifyTargets: 18 actual quota-enabled runs match predicted result, exact crossing time and credit prefix.
+PASS graphics-enabled WorkShiftCapture: 156 assertions and 24 real Play Mode captures at 1920x1080/1280x720.
+PASS canonical parity and gameplay/terminal suites listed in canonical-regressions.txt and terminal-regressions.txt.
+PASS additional InspectV2Witness.Run with only shift disabled (preserved Integrity configuration).
+FAIL inherited Overclock: ConnectionsAdvanced compact three-tool row.
+FAIL inherited Resource: inspect header pill keeps authored large geometry and identity color.
+  Unchanged assertions; existing parent reproduction: ../ConnectionsIntegrityV0/validation.txt.
+  DuelConcessionWitness.Regressions exits 1 for these retained failures.
+PASS python3 scripts/build_uptime_project_core.py regeneration and --check.
+PASS git diff --check.
+
+Final focused log: /private/tmp/uptime-work-focused-final.log.
+Calibration log: /private/tmp/uptime-work-calibration.log.
+Actual target log: /private/tmp/uptime-work-targets.log.
+Final graphical log: /private/tmp/uptime-work-graphical-final.log.
+Final aggregate regression log: /private/tmp/uptime-work-regressions-final.log.
+Narrow historical Inspect log: /private/tmp/uptime-work-inspect-final.log.
+
+Human keyboard/IME and full-shift enjoyment/balance remain manual. Packet Play Mode was not run.
+First graphical review caught delta/bar overlap and clipped terminal result text. Final captures show corrections.
+An earlier graphical startup emitted existing Unity Search indexing ArgumentOutOfRangeException; final graphical checks pass.
+No claim that this small calibration sample guarantees feasible/fair shifts for all seeds or strategies.

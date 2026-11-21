@@ -40,6 +40,8 @@ namespace Uptime.Connections
         [SerializeField, Min(0.001f)] private float clockMinutesPerSimulationSecond = 1f;
         private float displayedHealth = float.NaN;
         private float lastSimulationTime;
+        private int creditRevision, displayedGeneration = -1;
+        private double creditVisibleUntil;
 
         public string ClockText => clockText != null ? clockText.text : null;
         public int ShiftEndMinuteOfDay => shiftEndHour * 60 + shiftEndMinute;
@@ -55,6 +57,7 @@ namespace Uptime.Connections
         public void Render()
         {
             if (host == null) return;
+            if (host.ShiftEnabled) { RenderShift(); RenderTools(); return; }
             float clockMinutes = shiftStartHour * 60f + shiftStartMinute +
                 host.SimulationTimeSeconds * Mathf.Max(0.001f, clockMinutesPerSimulationSecond);
             int minuteOfDay = Mathf.FloorToInt(clockMinutes) % 1440;
@@ -73,6 +76,35 @@ namespace Uptime.Connections
             {
                 rateText.text = $"{displayRate:+0.00;-0.00;0.00}/s";
                 rateText.color = rateColor;
+            }
+        }
+
+        private void RenderShift()
+        {
+            if (clockText != null) clockText.text = "UPTIME " + SimulationHost.FormatUptime(host.SimulationTimeSeconds) +
+                " / " + SimulationHost.FormatUptime(host.ShiftDurationSeconds);
+            if (valueText != null) valueText.text = $"WORK {System.Math.Floor(host.CreditedWork):0} / {host.ShiftWorkTarget:0.##}";
+            if (healthFill != null)
+            {
+                RectTransform fill = healthFill.rectTransform;
+                fill.anchorMax = new Vector2(Mathf.Clamp01((float)(host.CreditedWork / host.ShiftWorkTarget)), fill.anchorMax.y);
+                healthFill.color = healthyBarColor;
+            }
+            if (displayedGeneration != host.SimulationGeneration)
+            {
+                displayedGeneration = host.SimulationGeneration;
+                creditRevision = 0;
+                creditVisibleUntil = 0;
+            }
+            if (creditRevision != host.WorkCreditRevision)
+            {
+                creditRevision = host.WorkCreditRevision;
+                creditVisibleUntil = Time.unscaledTimeAsDouble + 2;
+            }
+            if (rateText != null)
+            {
+                rateText.text = Time.unscaledTimeAsDouble < creditVisibleUntil ? $"+{host.LastWorkCredit:0.##} WORK" : "";
+                rateText.color = recoveringColor;
             }
         }
 

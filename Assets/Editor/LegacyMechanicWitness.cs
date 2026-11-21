@@ -11,6 +11,7 @@ namespace Uptime.Connections.EditorTools
         public static void Configure(SimulationHost host, bool originalStatusPrefab = false)
         {
             var fields = new SerializedObject(host);
+            fields.FindProperty("shiftEnabled").boolValue = false;
             fields.FindProperty("integrityTuning.enabled").boolValue = false;
             fields.ApplyModifiedPropertiesWithoutUndo();
             if (host.GetComponent<IntegrityPresenter>() is { } presenter) presenter.enabled = false;
