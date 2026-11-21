@@ -736,7 +736,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '[ESC] CANCEL'
+  m_text: 'ESC — CONCEDE'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
   m_sharedMaterial: {fileID: -8438774539887213103, guid: f69c0d3dbe476c84ba6caa7c0cfd1bb3, type: 2}
@@ -1250,6 +1250,7 @@ MonoBehaviour:
   cleanOverlay: {fileID: 0}
   terminal: {fileID: 0}
   title: {fileID: 5720829533310210449}
+  concedeHint: {fileID: 5212321392272535952}
   splashText: {fileID: 9000000000000000004}
   playerCommands: {fileID: 4588914233045388995}
   hackerCommands: {fileID: 2286662309116809192}

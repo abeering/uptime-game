@@ -1,0 +1,269 @@
+{
+  "description": "Extracts of actual saved scripted Play Mode recordings; not natural-play evidence. Other RunEvent fields omitted.",
+  "scenes": [
+    {
+      "scene": "Connections",
+      "outcomes": [
+        {
+          "sourceRecording": "uptime_20261120_235536_seed-158282442_717fc443.json",
+          "event": {
+            "sequence": 5,
+            "timeSeconds": 6.299996852874756,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "AUTH",
+            "duelSource": "scripted_capture",
+            "duelOutcome": "won",
+            "duelElapsedSeconds": 5.721072196960449,
+            "duelPlayerProgress": 1.0,
+            "duelHackerProgress": 0.28985506296157837,
+            "duelPlayerSeconds": 5.721072196960449,
+            "duelHackerSeconds": -1.0,
+            "duelPlayerCompleted": true,
+            "duelHackerCompleted": false,
+            "duelPlayerMistakes": 3,
+            "duelPlayerCorrections": 3,
+            "duelHackerMistakes": 0,
+            "duelHackerCorrections": 0,
+            "duelIntegrityDamaged": false,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "breach-lockdown"
+          },
+          "integrityDamage": []
+        },
+        {
+          "sourceRecording": "uptime_20261120_235542_seed-158282442_5db06e8c.json",
+          "event": {
+            "sequence": 14,
+            "timeSeconds": 0.0,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "API",
+            "duelSource": "scripted_capture",
+            "duelOutcome": "lost",
+            "duelElapsedSeconds": 103.00969696044922,
+            "duelPlayerProgress": 0.08045977354049683,
+            "duelHackerProgress": 1.0,
+            "duelPlayerSeconds": -1.0,
+            "duelHackerSeconds": 19.045190811157227,
+            "duelPlayerCompleted": false,
+            "duelHackerCompleted": true,
+            "duelPlayerMistakes": 0,
+            "duelPlayerCorrections": 0,
+            "duelHackerMistakes": 3,
+            "duelHackerCorrections": 3,
+            "duelIntegrityDamaged": true,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "breach-lockdown"
+          },
+          "integrityDamage": [
+            {
+              "type": "integrity_damage",
+              "target": "DB",
+              "source": "infection",
+              "cause": "debug/op:-1/PhantomLoad",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": false,
+              "revealed": false
+            },
+            {
+              "type": "integrity_damage",
+              "target": "API",
+              "source": "duel",
+              "cause": "duel:1",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": true,
+              "revealed": true
+            }
+          ]
+        },
+        {
+          "sourceRecording": "uptime_20261120_235549_seed-158282442_422324c0.json",
+          "event": {
+            "sequence": 12,
+            "timeSeconds": 0.0,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "API",
+            "duelSource": "typing-concession",
+            "duelOutcome": "conceded",
+            "duelElapsedSeconds": 0.0038025935646146536,
+            "duelPlayerProgress": 0.01149425283074379,
+            "duelHackerProgress": 0.0,
+            "duelPlayerSeconds": -1.0,
+            "duelHackerSeconds": -1.0,
+            "duelPlayerCompleted": false,
+            "duelHackerCompleted": false,
+            "duelPlayerMistakes": 2,
+            "duelPlayerCorrections": 1,
+            "duelHackerMistakes": 0,
+            "duelHackerCorrections": 0,
+            "duelIntegrityDamaged": true,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "infection"
+          },
+          "integrityDamage": [
+            {
+              "type": "integrity_damage",
+              "target": "DB",
+              "source": "infection",
+              "cause": "debug/op:-1/PhantomLoad",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": false,
+              "revealed": false
+            },
+            {
+              "type": "integrity_damage",
+              "target": "API",
+              "source": "duel",
+              "cause": "duel:1",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": true,
+              "revealed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scene": "ConnectionsAdvanced",
+      "outcomes": [
+        {
+          "sourceRecording": "uptime_20261120_235524_seed-2120976941_bd7617e9.json",
+          "event": {
+            "sequence": 5,
+            "timeSeconds": 6.179996967315674,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "AUTH",
+            "duelSource": "scripted_capture",
+            "duelOutcome": "won",
+            "duelElapsedSeconds": 5.696739673614502,
+            "duelPlayerProgress": 1.0,
+            "duelHackerProgress": 0.3188405930995941,
+            "duelPlayerSeconds": 5.696739673614502,
+            "duelHackerSeconds": -1.0,
+            "duelPlayerCompleted": true,
+            "duelHackerCompleted": false,
+            "duelPlayerMistakes": 3,
+            "duelPlayerCorrections": 3,
+            "duelHackerMistakes": 1,
+            "duelHackerCorrections": 1,
+            "duelIntegrityDamaged": false,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "phantom-load"
+          },
+          "integrityDamage": []
+        },
+        {
+          "sourceRecording": "uptime_20261120_235529_seed-2120976941_4e5751ce.json",
+          "event": {
+            "sequence": 12,
+            "timeSeconds": 0.0,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "API",
+            "duelSource": "scripted_capture",
+            "duelOutcome": "lost",
+            "duelElapsedSeconds": 103.00452423095703,
+            "duelPlayerProgress": 0.08045977354049683,
+            "duelHackerProgress": 1.0,
+            "duelPlayerSeconds": -1.0,
+            "duelHackerSeconds": 18.256322860717773,
+            "duelPlayerCompleted": false,
+            "duelHackerCompleted": true,
+            "duelPlayerMistakes": 0,
+            "duelPlayerCorrections": 0,
+            "duelHackerMistakes": 3,
+            "duelHackerCorrections": 3,
+            "duelIntegrityDamaged": true,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "phantom-load"
+          },
+          "integrityDamage": [
+            {
+              "type": "integrity_damage",
+              "target": "DB",
+              "source": "infection",
+              "cause": "debug/op:-1/PhantomLoad",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": false,
+              "revealed": false
+            },
+            {
+              "type": "integrity_damage",
+              "target": "API",
+              "source": "duel",
+              "cause": "duel:1",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": true,
+              "revealed": true
+            }
+          ]
+        },
+        {
+          "sourceRecording": "uptime_20261120_235536_seed-2120976941_cba3787d.json",
+          "event": {
+            "sequence": 12,
+            "timeSeconds": 0.0,
+            "type": "duel_resolved",
+            "duelId": 1,
+            "targetNodeId": "API",
+            "duelSource": "typing-concession",
+            "duelOutcome": "conceded",
+            "duelElapsedSeconds": 0.0,
+            "duelPlayerProgress": 0.01149425283074379,
+            "duelHackerProgress": 0.0,
+            "duelPlayerSeconds": -1.0,
+            "duelHackerSeconds": -1.0,
+            "duelPlayerCompleted": false,
+            "duelHackerCompleted": false,
+            "duelPlayerMistakes": 2,
+            "duelPlayerCorrections": 1,
+            "duelHackerMistakes": 0,
+            "duelHackerCorrections": 0,
+            "duelIntegrityDamaged": true,
+            "consequencePlanId": "duel-1",
+            "consequenceSelected": "infection"
+          },
+          "integrityDamage": [
+            {
+              "type": "integrity_damage",
+              "target": "DB",
+              "source": "infection",
+              "cause": "debug/op:-1/PhantomLoad",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": false,
+              "revealed": false
+            },
+            {
+              "type": "integrity_damage",
+              "target": "API",
+              "source": "duel",
+              "cause": "duel:1",
+              "time": 0.0,
+              "before": 2,
+              "after": 1,
+              "visible": true,
+              "revealed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

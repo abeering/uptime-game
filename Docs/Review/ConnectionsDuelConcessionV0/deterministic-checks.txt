@@ -1,0 +1,71 @@
+CanonicalSceneWitness PASS: 881 serialized/functional checks.
+CONCESSION CHECK: pending cannot concede
+CONCESSION CHECK: Escape before overlay preserves pending encounter
+CONCESSION CHECK: reentrant concession rejected
+CONCESSION CHECK: loss/concession: frozen plan executes, expected one infection and overt Integrity 1/2
+CONCESSION CHECK: exactly one consequence execution, Duel-attributed strike and slot release
+CONCESSION CHECK: JSON outcome, elapsed, partial progress, mistakes/corrections and completion remain truthful
+CONCESSION CHECK: repeat concession rejected
+CONCESSION CHECK: resolved Escape/repeated resolution cannot add loss
+CONCESSION CHECK: released global slot immediately accepts another encounter
+CONCESSION CHECK: later independent infection retains normal Integrity strike
+CONCESSION CHECK: reentrant concession rejected
+CONCESSION CHECK: unfinished race concedes
+CONCESSION CHECK: loss/concession: frozen plan executes, expected one infection and overt Integrity 1/2
+CONCESSION CHECK: exactly one consequence execution, Duel-attributed strike and slot release
+CONCESSION CHECK: JSON outcome, elapsed, partial progress, mistakes/corrections and completion remain truthful
+CONCESSION CHECK: repeat concession rejected
+CONCESSION CHECK: resolved Escape/repeated resolution cannot add loss
+CONCESSION CHECK: released global slot immediately accepts another encounter
+CONCESSION CHECK: later independent infection retains normal Integrity strike
+CONCESSION CHECK: duplicate infection rejection still receives one direct strike
+CONCESSION CHECK: concession launches normal independent Payload burst
+CONCESSION CHECK: later real Payload deliveries retain independent infection damage
+CONCESSION CHECK: ordinary win still prevents consequences and records won
+CONCESSION CHECK: resolved result consumes Escape without another loss
+CONCESSION CHECK: reset aborts presentation, releases slot and invalidates old concession
+CONCESSION CHECK: stale overlay cannot concede a replacement encounter
+CONCESSION CHECK: director disable aborts without consequences
+CONCESSION CHECK: CORE callback cannot reapply concession
+CONCESSION CHECK: concession settles and releases slot before terminal CORE boundary
+CONCESSION CHECK: reentrant CORE ending retains exactly one complete resolution
+DuelConcessionWitness PASS: Assets/Scenes/Connections.unity
+CONCESSION CHECK: pending cannot concede
+CONCESSION CHECK: Escape before overlay preserves pending encounter
+CONCESSION CHECK: reentrant concession rejected
+CONCESSION CHECK: loss/concession: frozen plan executes, expected one infection and overt Integrity 1/2
+CONCESSION CHECK: exactly one consequence execution, Duel-attributed strike and slot release
+CONCESSION CHECK: JSON outcome, elapsed, partial progress, mistakes/corrections and completion remain truthful
+CONCESSION CHECK: repeat concession rejected
+CONCESSION CHECK: resolved Escape/repeated resolution cannot add loss
+CONCESSION CHECK: released global slot immediately accepts another encounter
+CONCESSION CHECK: later independent infection retains normal Integrity strike
+CONCESSION CHECK: reentrant concession rejected
+CONCESSION CHECK: unfinished race concedes
+CONCESSION CHECK: loss/concession: frozen plan executes, expected one infection and overt Integrity 1/2
+CONCESSION CHECK: exactly one consequence execution, Duel-attributed strike and slot release
+CONCESSION CHECK: JSON outcome, elapsed, partial progress, mistakes/corrections and completion remain truthful
+CONCESSION CHECK: repeat concession rejected
+CONCESSION CHECK: resolved Escape/repeated resolution cannot add loss
+CONCESSION CHECK: released global slot immediately accepts another encounter
+CONCESSION CHECK: later independent infection retains normal Integrity strike
+CONCESSION CHECK: duplicate infection rejection still receives one direct strike
+CONCESSION CHECK: concession launches normal independent Payload burst
+CONCESSION CHECK: later real Payload deliveries retain independent infection damage
+CONCESSION CHECK: ordinary win still prevents consequences and records won
+CONCESSION CHECK: resolved result consumes Escape without another loss
+CONCESSION CHECK: reset aborts presentation, releases slot and invalidates old concession
+CONCESSION CHECK: stale overlay cannot concede a replacement encounter
+CONCESSION CHECK: director disable aborts without consequences
+CONCESSION CHECK: CORE callback cannot reapply concession
+CONCESSION CHECK: concession settles and releases slot before terminal CORE boundary
+CONCESSION CHECK: reentrant CORE ending retains exactly one complete resolution
+DuelConcessionWitness PASS: Assets/Scenes/ConnectionsAdvanced.unity
+CONCESSION REGRESSION FAIL CanonicalRegressions: Canonical regression failures; see report, including inherited/obsolete scene assumptions.
+CONCESSION REGRESSION PASS CanonicalParity
+CONCESSION REGRESSION PASS DuelConcession
+CONCESSION REGRESSION PASS InspectV2
+CONCESSION REGRESSION PASS ResolvedInspect
+CONCESSION REGRESSION PASS LoadOutput
+CONCESSION REGRESSION PASS WorkOutput
+CONCESSION REGRESSION PASS LogsOutput

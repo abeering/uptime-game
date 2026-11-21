@@ -187,6 +187,9 @@ namespace Uptime.Connections
         public string duelLifecycle;
         public string duelSource;
         public float duelWarningSeconds;
+        public float duelElapsedSeconds;
+        public float duelPlayerProgress;
+        public float duelHackerProgress;
         public float duelPlayerSeconds;
         public float duelHackerSeconds;
         public bool duelPlayerCompleted;
@@ -1241,13 +1244,15 @@ namespace Uptime.Connections
             entry.targetNodeId = attemptedTarget ?? encounter?.Target?.View?.NodeId;
             entry.duelWarningSeconds = encounter?.WarningSeconds ?? 0f;
             entry.reason = reason;
-            entry.duelOutcome = encounter?.PlayerWon == true ? "won" :
-                encounter?.PlayerWon == false ? "lost" : null;
+            entry.duelOutcome = encounter?.Outcome?.ToString().ToLowerInvariant();
             entry.duelInfectionApplied = encounter?.InfectionApplied == true;
             entry.duelIntegrityDamaged = encounter?.IntegrityDamaged == true;
             entry.consequencePlanId = encounter?.LossPlan?.Id;
             entry.consequenceSelected = encounter?.LossPlan?.SelectedCandidateId;
             if (race == null) return;
+            entry.duelElapsedSeconds = race.ElapsedSeconds;
+            entry.duelPlayerProgress = race.Player.Progress;
+            entry.duelHackerProgress = race.Hacker.Progress;
             entry.duelPlayerCompleted = race.PlayerCompletedAt.HasValue;
             entry.duelHackerCompleted = race.HackerCompletedAt.HasValue;
             entry.duelPlayerSeconds = race.PlayerCompletedAt ?? -1f;

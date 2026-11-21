@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Uptime.Connections
 {
@@ -10,6 +11,15 @@ namespace Uptime.Connections
     {
         private readonly Event inputEvent = new();
         private bool wasComposing;
+        private bool suppressUntilRelease;
+
+        public void SuppressInputUntilRelease() => suppressUntilRelease = true;
+
+        public override void OnSubmit(BaseEventData eventData)
+        {
+            if (suppressUntilRelease) { eventData.Use(); return; }
+            base.OnSubmit(eventData);
+        }
 
         // InputSystemUIInputModule also dispatches ICancelHandler independently
         // of the native event queue; that path must not cancel editing either.
@@ -18,6 +28,15 @@ namespace Uptime.Connections
         public override void OnUpdateSelected(BaseEventData eventData)
         {
             if (!isFocused) return;
+            if (suppressUntilRelease)
+            {
+                // Drain native repeats, including the release frame. Keep focus and
+                // selection while requiring a fresh key for the resumed owner.
+                while (Event.PopEvent(inputEvent)) { }
+                suppressUntilRelease = Keyboard.current != null && Keyboard.current.anyKey.isPressed;
+                eventData.Use();
+                return;
+            }
             bool consumed = false;
             BaseInput input = EventSystem.current?.currentInputModule?.input;
             bool composing = !readOnly && !string.IsNullOrEmpty(input != null ?

@@ -55,7 +55,7 @@ namespace Uptime.Connections
         private bool restoreSelection;
         public event Action CommandFailed;
 
-        public void SuspendKeyboard(bool suspended)
+        public void SuspendKeyboard(bool suspended, bool guardHeldKeys = false)
         {
             keyboardSuspended = suspended;
             if (commandInput == null) return;
@@ -67,6 +67,8 @@ namespace Uptime.Connections
                 commandInput.DeactivateInputField();
             }
             commandInput.interactable = !suspended;
+            if (guardHeldKeys && commandInput is EscapeSafeInputField safe)
+                safe.SuppressInputUntilRelease();
         }
 
         public void RestoreKeyboardFocus()
@@ -81,6 +83,14 @@ namespace Uptime.Connections
             string node = encounter.Target.View.NodeId;
             if (encounter.PlayerWon == true)
                 AppendText("DUEL WON  " + node + "  /  intrusion prevented", normalColor);
+            else if (encounter.Outcome == DuelOutcome.Conceded)
+            {
+                AppendText("DUEL CONCEDED  " + node +
+                    (encounter.IntegrityDamaged ? "  /  DAMAGED" : string.Empty) +
+                    simulationHost.IntegrityReceipt(encounter.Target), errorColor);
+                AppendText("DUEL EFFECTS  " + node + "  /  " +
+                    (encounter.LossExecution?.AnySucceeded == true ? "intrusion succeeded" : "attack blocked"), errorColor);
+            }
             else if (encounter.IntegrityDamaged)
                 AppendText("DUEL LOST  " + node + "  /  INTEGRITY DAMAGED" +
                     simulationHost.IntegrityReceipt(encounter.Target), errorColor);
@@ -1417,10 +1427,14 @@ namespace Uptime.Connections
                 yield break;
             commandInput.ActivateInputField();
             commandInput.Select();
-            if (restoreSelection)
+            // TMP may select all during deferred activation in LateUpdate.
+            yield return null;
+            if (restoreSelection && !keyboardSuspended && commandInput.isFocused &&
+                (cleanOverlay == null || !cleanOverlay.WantsKeyboardFocus))
             {
                 commandInput.selectionStringAnchorPosition = suspendedAnchor;
                 commandInput.selectionStringFocusPosition = suspendedFocus;
+                commandInput.ForceLabelUpdate();
                 restoreSelection = false;
             }
         }

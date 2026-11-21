@@ -1,0 +1,49 @@
+Unity 6000.3.11f1 on macOS, November 20, 2026.
+Baseline: main at 5174f9400270ee951d3031827c37327e3c3b7f3e.
+Branch: feat/connections-duel-concede-v0. Draft PR, unmerged, references #119 step B.
+Disposable validation copies: /private/tmp/uptime-integrity-validation and /private/tmp/uptime-concession-play.
+
+PASS Unity Editor C# compilation.
+PASS DuelConcessionWitness.Run: 60 assertions across canonical Small and Advanced.
+  Ordinary loss/concession: expected one infection, one overt Duel-attributed strike, Integrity 1/2; observed exactly.
+  Exact-once execution/slot release, repeated/reentrant rejection, duplicate infection, independent real Payload damage,
+  truthful JSON outcomes/progress/timing/corrections, unchanged win, pending/stale rejection, reset/disable and CORE boundary.
+PASS CanonicalSceneWitness.Run: 881 serialized/functional assertions.
+PASS existing Duel, Consequence (Surprise), Integrity, Recorder, Traffic, AmbientHostileActivity, NetworkHealth,
+  AdvancedScene, Payload, Worm, AmbientPayloadThreat, Scan, Infection, NodeStatus, Geometry,
+  HackerDirective, Storefront and MaximumPressure witnesses.
+PASS InspectV2, ResolvedInspect, LoadOutput, WorkOutput and LogsOutput terminal witnesses.
+FAIL inherited Overclock: ConnectionsAdvanced compact three-tool row.
+FAIL inherited Resource: inspect header pill keeps authored large geometry and identity color.
+  Assertions and thresholds unchanged; parent reproduction is preserved in ../ConnectionsIntegrityV0/validation.txt.
+  DuelConcessionWitness.Regressions executes all cases and exits 1 for these retained failures.
+
+PASS actual graphics-enabled scripted Play Mode in Connections and ConnectionsAdvanced at 1280x720 and 1920x1080.
+  Both normal Duel presentation and concession cases execute in every capture run.
+  92 concession assertions pass across four final graphical runs.
+  Final frames 14-18 (20 PNGs) are committed; other normal-race frames stay in the disposable copies.
+  See graphical-checks.txt for individual concession assertions and escape-checks.txt for 219 existing Escape checks.
+  Includes startup, active typing, resolved Escape, held-before-opening, held keys through handoff,
+  no cascade, native TMP editing, draft/selection restoration, CLEAN invalidation, reset, disable, and CORE ending.
+  Receipt rows are asserted to fit without text overflow at both sizes.
+  Recorder extracts in recorder-outcomes.json come from actual saved scripted Play Mode logs; not natural-play evidence.
+
+Graphical checks exposed deferred TMP activation selecting all after restoration. Restored selection now waits
+for activation and repaints; native Backspace verifies the resumed CLEAN selection. Receipt text was shortened
+into two rows after 720p review exposed clipping. The final graphical checks exercise these corrections.
+The full regression suite was rerun after terminal selection/receipt changes; final label repaint calls are also
+covered by the final graphical/native-editing pass.
+
+Known tooling caveat: graphics-enabled Unity startup emits an inherited UnityEditor.Search.SearchDatabase
+ArgumentOutOfRangeException in startup indexing. All final scripted checks still complete with exit 0.
+No Search suppression or other workaround is added to the repository.
+
+PASS git diff --check -- Assets/Scripts Assets/Editor Docs.
+PASS python3 scripts/build_uptime_project_core.py --check (Core regenerated from current-state source).
+PASS all scenes, Packages, ProjectSettings and Packet files unchanged.
+PASS validation-copy source comparison of 161 Connections runtime/Editor/canonical-scene/Duel-prefab files.
+PASS 20 PNG signatures and expected 1280x720 / 1920x1080 dimensions.
+
+Not run: physical-keyboard/human gameplay or Packet Play Mode. Follow README.md in each canonical scene;
+review crowded labels, inspect/history/input focus, held Enter and IME/native behavior manually.
+No merge, WORK, shift, balance or new consequence changes.

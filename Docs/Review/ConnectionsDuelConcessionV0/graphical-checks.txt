@@ -1,0 +1,107 @@
+Connections 720p
+CONCESSION PLAY CHECK: Escape held before Duel opens cannot manufacture a concession
+CONCESSION PLAY CHECK: release and fresh Escape concede after held-key opening
+CONCESSION PLAY CHECK: concede hint visible during splash
+CONCESSION PLAY CHECK: Escape during splash immediately concedes, with unfinished zero-time race and one strike
+CONCESSION PLAY CHECK: terminal focus, draft and selection restored while keys held: focused=True draft=inspect db selection=2/7
+CONCESSION PLAY CHECK: held character cannot edit resumed terminal
+CONCESSION PLAY CHECK: fresh character edits resumed terminal after release
+CONCESSION PLAY CHECK: truthful concession receipt visible
+CONCESSION PLAY CHECK: concession, Integrity and effect receipts fit without clipping
+CONCESSION PLAY CHECK: canceled splash never resumes and retired race never advances
+CONCESSION PLAY CHECK: active race retains visible concede hint
+CONCESSION PLAY CHECK: active typing concedes without fabricating completion or losing correction data
+CONCESSION PLAY CHECK: CLEAN resumes original session, focus, draft and selection while Escape held: open=True session=True focused=True draft=123 selection=1/2 selected=MinigameInput
+CONCESSION PLAY CHECK: held Backspace cannot edit resumed CLEAN
+CONCESSION PLAY CHECK: held Escape cannot cascade into CLEAN
+CONCESSION PLAY CHECK: fresh CLEAN Backspace edits the restored selection after release
+CONCESSION PLAY CHECK: next fresh Escape cancels CLEAN through exclusive coordinator
+CONCESSION PLAY CHECK: repeated Escape cannot reapply conceded outcome
+CONCESSION PLAY CHECK: CLEAN ended under Duel: concession restores terminal instead
+CONCESSION PLAY CHECK: reset cancels splash coroutine and input subscription without conceding
+CONCESSION PLAY CHECK: external presentation disable aborts without concession
+CONCESSION PLAY CHECK: simultaneous CORE loss closes overlay and settles exactly once
+CONCESSION PLAY CHECK: CORE ending leaves terminal ready for restart
+DuelConcessionCapture PASS: Connections 1280x720
+DuelCapture PASS: Connections 1280x720 scripted Play Mode frames in Docs/Review/ConnectionsDuelConcessionV0/Captures/Connections
+
+Connections 1080p
+CONCESSION PLAY CHECK: Escape held before Duel opens cannot manufacture a concession
+CONCESSION PLAY CHECK: release and fresh Escape concede after held-key opening
+CONCESSION PLAY CHECK: concede hint visible during splash
+CONCESSION PLAY CHECK: Escape during splash immediately concedes, with unfinished zero-time race and one strike
+CONCESSION PLAY CHECK: terminal focus, draft and selection restored while keys held: focused=True draft=inspect db selection=2/7
+CONCESSION PLAY CHECK: held character cannot edit resumed terminal
+CONCESSION PLAY CHECK: fresh character edits resumed terminal after release
+CONCESSION PLAY CHECK: truthful concession receipt visible
+CONCESSION PLAY CHECK: concession, Integrity and effect receipts fit without clipping
+CONCESSION PLAY CHECK: canceled splash never resumes and retired race never advances
+CONCESSION PLAY CHECK: active race retains visible concede hint
+CONCESSION PLAY CHECK: active typing concedes without fabricating completion or losing correction data
+CONCESSION PLAY CHECK: CLEAN resumes original session, focus, draft and selection while Escape held: open=True session=True focused=True draft=123 selection=1/2 selected=MinigameInput
+CONCESSION PLAY CHECK: held Backspace cannot edit resumed CLEAN
+CONCESSION PLAY CHECK: held Escape cannot cascade into CLEAN
+CONCESSION PLAY CHECK: fresh CLEAN Backspace edits the restored selection after release
+CONCESSION PLAY CHECK: next fresh Escape cancels CLEAN through exclusive coordinator
+CONCESSION PLAY CHECK: repeated Escape cannot reapply conceded outcome
+CONCESSION PLAY CHECK: CLEAN ended under Duel: concession restores terminal instead
+CONCESSION PLAY CHECK: reset cancels splash coroutine and input subscription without conceding
+CONCESSION PLAY CHECK: external presentation disable aborts without concession
+CONCESSION PLAY CHECK: simultaneous CORE loss closes overlay and settles exactly once
+CONCESSION PLAY CHECK: CORE ending leaves terminal ready for restart
+DuelConcessionCapture PASS: Connections 1920x1080
+DuelCapture PASS: Connections 1920x1080 scripted Play Mode frames in Docs/Review/ConnectionsDuelConcessionV0/Captures/Connections
+
+ConnectionsAdvanced 720p
+CONCESSION PLAY CHECK: Escape held before Duel opens cannot manufacture a concession
+CONCESSION PLAY CHECK: release and fresh Escape concede after held-key opening
+CONCESSION PLAY CHECK: concede hint visible during splash
+CONCESSION PLAY CHECK: Escape during splash immediately concedes, with unfinished zero-time race and one strike
+CONCESSION PLAY CHECK: terminal focus, draft and selection restored while keys held: focused=True draft=inspect db selection=2/7
+CONCESSION PLAY CHECK: held character cannot edit resumed terminal
+CONCESSION PLAY CHECK: fresh character edits resumed terminal after release
+CONCESSION PLAY CHECK: truthful concession receipt visible
+CONCESSION PLAY CHECK: concession, Integrity and effect receipts fit without clipping
+CONCESSION PLAY CHECK: canceled splash never resumes and retired race never advances
+CONCESSION PLAY CHECK: active race retains visible concede hint
+CONCESSION PLAY CHECK: active typing concedes without fabricating completion or losing correction data
+CONCESSION PLAY CHECK: CLEAN resumes original session, focus, draft and selection while Escape held: open=True session=True focused=True draft=123 selection=1/2 selected=MinigameInput
+CONCESSION PLAY CHECK: held Backspace cannot edit resumed CLEAN
+CONCESSION PLAY CHECK: held Escape cannot cascade into CLEAN
+CONCESSION PLAY CHECK: fresh CLEAN Backspace edits the restored selection after release
+CONCESSION PLAY CHECK: next fresh Escape cancels CLEAN through exclusive coordinator
+CONCESSION PLAY CHECK: repeated Escape cannot reapply conceded outcome
+CONCESSION PLAY CHECK: CLEAN ended under Duel: concession restores terminal instead
+CONCESSION PLAY CHECK: reset cancels splash coroutine and input subscription without conceding
+CONCESSION PLAY CHECK: external presentation disable aborts without concession
+CONCESSION PLAY CHECK: simultaneous CORE loss closes overlay and settles exactly once
+CONCESSION PLAY CHECK: CORE ending leaves terminal ready for restart
+DuelConcessionCapture PASS: ConnectionsAdvanced 1280x720
+DuelCapture PASS: ConnectionsAdvanced 1280x720 scripted Play Mode frames in Docs/Review/ConnectionsDuelConcessionV0/Captures/ConnectionsAdvanced
+
+ConnectionsAdvanced 1080p
+CONCESSION PLAY CHECK: Escape held before Duel opens cannot manufacture a concession
+CONCESSION PLAY CHECK: release and fresh Escape concede after held-key opening
+CONCESSION PLAY CHECK: concede hint visible during splash
+CONCESSION PLAY CHECK: Escape during splash immediately concedes, with unfinished zero-time race and one strike
+CONCESSION PLAY CHECK: terminal focus, draft and selection restored while keys held: focused=True draft=inspect db selection=2/7
+CONCESSION PLAY CHECK: held character cannot edit resumed terminal
+CONCESSION PLAY CHECK: fresh character edits resumed terminal after release
+CONCESSION PLAY CHECK: truthful concession receipt visible
+CONCESSION PLAY CHECK: concession, Integrity and effect receipts fit without clipping
+CONCESSION PLAY CHECK: canceled splash never resumes and retired race never advances
+CONCESSION PLAY CHECK: active race retains visible concede hint
+CONCESSION PLAY CHECK: active typing concedes without fabricating completion or losing correction data
+CONCESSION PLAY CHECK: CLEAN resumes original session, focus, draft and selection while Escape held: open=True session=True focused=True draft=123 selection=1/2 selected=MinigameInput
+CONCESSION PLAY CHECK: held Backspace cannot edit resumed CLEAN
+CONCESSION PLAY CHECK: held Escape cannot cascade into CLEAN
+CONCESSION PLAY CHECK: fresh CLEAN Backspace edits the restored selection after release
+CONCESSION PLAY CHECK: next fresh Escape cancels CLEAN through exclusive coordinator
+CONCESSION PLAY CHECK: repeated Escape cannot reapply conceded outcome
+CONCESSION PLAY CHECK: CLEAN ended under Duel: concession restores terminal instead
+CONCESSION PLAY CHECK: reset cancels splash coroutine and input subscription without conceding
+CONCESSION PLAY CHECK: external presentation disable aborts without concession
+CONCESSION PLAY CHECK: simultaneous CORE loss closes overlay and settles exactly once
+CONCESSION PLAY CHECK: CORE ending leaves terminal ready for restart
+DuelConcessionCapture PASS: ConnectionsAdvanced 1920x1080
+DuelCapture PASS: ConnectionsAdvanced 1920x1080 scripted Play Mode frames in Docs/Review/ConnectionsDuelConcessionV0/Captures/ConnectionsAdvanced
