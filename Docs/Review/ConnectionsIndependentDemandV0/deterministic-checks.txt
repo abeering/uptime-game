@@ -1,0 +1,32 @@
+PASS Assets/Scenes/Connections.unity canonical default remains population-responsive
+PASS Assets/Scenes/Connections.unity controlled LOADER does not reroll demand times, IDs, plans or natural-noise seeds
+PASS Assets/Scenes/Connections.unity exact seeded events/snapshots replay
+PASS Assets/Scenes/Connections.unity every independent request follows existing queue/registration, no occupancy admission limit
+PASS Assets/Scenes/Connections.unity real LOADER is killed after ten active seconds, not ten seconds from spawn
+PASS Assets/Scenes/Connections.unity reset clears counters and replays schedule/recipe streams
+PASS reset admission accounting
+PASS saved recorder configuration and separate demand/admission events
+PASS seeded positive exponential intervals
+PASS disabled generation creates no demand
+PASS resume has a fresh wait instead of an invented catch-up backlog
+PASS authored mode suppresses ambient independent demand
+PASS coarse scheduler calls retain all scheduled arrivals
+PASS Blackout cancellation pressure does not suppress or reschedule independent demand
+PASS existing finite ID pool is an explicit recorded failure, never silently suppressed demand or a fictional waiting queue
+PASS shift ending freezes demand creation/admission
+PASS Assets/Scenes/ConnectionsAdvanced.unity canonical default remains population-responsive
+PASS Assets/Scenes/ConnectionsAdvanced.unity controlled LOADER does not reroll demand times, IDs, plans or natural-noise seeds
+PASS Assets/Scenes/ConnectionsAdvanced.unity exact seeded events/snapshots replay
+PASS Assets/Scenes/ConnectionsAdvanced.unity every independent request follows existing queue/registration, no occupancy admission limit
+PASS Assets/Scenes/ConnectionsAdvanced.unity real LOADER is killed after ten active seconds, not ten seconds from spawn
+PASS Assets/Scenes/ConnectionsAdvanced.unity reset clears counters and replays schedule/recipe streams
+PASS reset admission accounting
+PASS saved recorder configuration and separate demand/admission events
+PASS seeded positive exponential intervals
+PASS disabled generation creates no demand
+PASS resume has a fresh wait instead of an invented catch-up backlog
+PASS authored mode suppresses ambient independent demand
+PASS coarse scheduler calls retain all scheduled arrivals
+PASS Blackout cancellation pressure does not suppress or reschedule independent demand
+PASS existing finite ID pool is an explicit recorded failure, never silently suppressed demand or a fictional waiting queue
+PASS shift ending freezes demand creation/admission
