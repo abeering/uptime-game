@@ -1,0 +1,2 @@
+IndependentDemandWitness PASS: 32 assertions.
+Independent demand controlled measurement PASS: 192 real Unity runs; paired demand/recipes identical through common CORE-censored prefix; no unadmitted demand.

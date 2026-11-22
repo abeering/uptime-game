@@ -64,6 +64,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class TrafficConfiguration
     {
+        public string benignArrivalPolicy;
+        public float independentBenignMeanSeconds;
         public bool autoGenerationEnabled;
         public string ambientOriginId;
         public AmbientOriginRecord[] ambientOrigins;
@@ -310,6 +312,9 @@ namespace Uptime.Connections
         public int snapshotIndex = -1;
         public int establishedBenign;
         public int anticipatedBenign;
+        public int benignDemandSequence;
+        public double demandScheduledAtSeconds, nextDemandIntervalSeconds, nextDemandAtSeconds;
+        public float demandMeanSeconds;
         public int recentCanceledBenign;
         public float effectiveCoverageGoal;
         public float coverageSpawnChance;
@@ -437,6 +442,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public BenignDemandSnapshot benignDemand;
         public ShiftSnapshot shift;
         public IntegritySnapshot integrity;
         public HackerDirectiveSnapshot hackerDirective;
@@ -767,6 +773,29 @@ namespace Uptime.Connections
             entry.parentInfectionAppliedAtSeconds = plan.ParentInfectionAppliedAtSeconds;
             // A queued plan is complete evidence even if the connection never spawns.
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public void RecordDemandArrival(int sequence, float observedAt, double scheduledAt,
+            float mean, double interval, double nextAt, string connectionId, string reason)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("benign_demand_arrived", observedAt);
+            entry.benignDemandSequence = sequence;
+            entry.demandScheduledAtSeconds = scheduledAt;
+            entry.demandMeanSeconds = mean;
+            entry.nextDemandIntervalSeconds = interval;
+            entry.nextDemandAtSeconds = nextAt;
+            entry.connectionId = connectionId;
+            entry.reason = reason;
+        }
+
+        public void RecordDemandAdmission(int sequence, ConnectionSpawnPlan plan, float time)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("benign_demand_admitted", time);
+            entry.benignDemandSequence = sequence;
+            entry.demandScheduledAtSeconds = plan.ScheduledSpawnTime;
+            entry.connectionId = plan.ConnectionId;
         }
 
         public void RecordCoverageOpportunity(float time, int establishedBenign,
@@ -1483,6 +1512,7 @@ namespace Uptime.Connections
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
+            snapshot.benignDemand = trafficDirector?.Demand;
             snapshot.shift = host.Shift;
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
@@ -1650,7 +1680,9 @@ namespace Uptime.Connections
             }
             if (trafficDirector == null) return metadata;
             IReadOnlyList<ConnectionTrafficProfile> configuredProfiles = trafficDirector.Profiles;
-            var traffic = new TrafficConfiguration { autoGenerationEnabled = trafficDirector.AutoGenerationEnabled,
+            var traffic = new TrafficConfiguration { benignArrivalPolicy = trafficDirector.BenignPolicy.ToString(),
+                independentBenignMeanSeconds = trafficDirector.IndependentBenignMeanSeconds,
+                autoGenerationEnabled = trafficDirector.AutoGenerationEnabled,
                 ambientOriginId = trafficDirector.AmbientOriginId,
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
                 hostileGenerationEnabled = trafficDirector.HostileGenerationEnabled,

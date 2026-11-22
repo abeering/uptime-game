@@ -54,6 +54,15 @@ namespace Uptime.Connections
         public string[] eligibleTargetIds;
     }
 
+    // Temporary comparison seam: both policies feed the existing concrete-plan queue.
+    public enum BenignArrivalPolicy { PopulationResponsive, IndependentDemand }
+
+    [Serializable] public sealed class BenignDemandSnapshot
+    {
+        public int arrived, admitted, waiting, unadmitted;
+        public double nextArrivalAtSeconds;
+    }
+
     // Owns only generation and scheduling. SimulationHost owns every live connection.
     public sealed class ConnectionTrafficDirector : MonoBehaviour
     {
@@ -63,7 +72,10 @@ namespace Uptime.Connections
         [SerializeField] private int seed = 1701;
         [SerializeField] private bool randomizeSeed = true;
         [SerializeField, Min(0f)] private float initialGraceSeconds = 3f;
-        [Header("Benign population (soft coverage)")]
+        [Header("Benign arrival experiment (restart after changing policy)")]
+        [SerializeField] private BenignArrivalPolicy benignArrivalPolicy;
+        [SerializeField, Min(.1f)] private float independentBenignMeanSeconds = 8f;
+        [Header("Benign population (temporary comparison baseline)")]
         [SerializeField, Min(0f)] private float benignPopulationGoal = 3f;
         [SerializeField, Min(0f)] private float coverageStartupGoal = 1f;
         [SerializeField, Min(0.01f)] private float coverageRampSeconds = 75f;
@@ -140,6 +152,11 @@ namespace Uptime.Connections
         private System.Random random;
         private System.Random spawnerRandom;
         private System.Random coverageRandom;
+        private System.Random independentDemandRandom;
+        private double nextIndependentDemandAt;
+        private bool independentClockPaused;
+        private int independentArrivals, independentAdmissions;
+        private readonly Dictionary<string, int> pendingIndependentDemand = new Dictionary<string, int>();
         private System.Random benignPlanRandom;
         private System.Random hostileScheduleRandom;
         private System.Random identitySelectionRandom;
@@ -170,6 +187,15 @@ namespace Uptime.Connections
                 return false;
             }
         }
+        public BenignArrivalPolicy BenignPolicy => benignArrivalPolicy;
+        public float IndependentBenignMeanSeconds => independentBenignMeanSeconds;
+        public BenignDemandSnapshot Demand => new BenignDemandSnapshot
+        {
+            arrived = independentArrivals, admitted = independentAdmissions,
+            waiting = pendingIndependentDemand.Count,
+            unadmitted = independentArrivals - independentAdmissions - pendingIndependentDemand.Count,
+            nextArrivalAtSeconds = nextIndependentDemandAt
+        };
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
         public bool ConnectionIdsExhausted => idsExhausted;
@@ -266,6 +292,14 @@ namespace Uptime.Connections
                 host.ConnectionResolved -= OnConnectionResolved;
                 host.ConnectionResolved += OnConnectionResolved;
             }
+            if (!Enum.IsDefined(typeof(BenignArrivalPolicy), benignArrivalPolicy) ||
+                !float.IsFinite(independentBenignMeanSeconds) || independentBenignMeanSeconds <= 0)
+                throw new InvalidOperationException("Benign demand needs a valid policy and finite positive mean interval.");
+            independentDemandRandom = new System.Random(unchecked(seed ^ (int)0x1B3D4A7));
+            nextIndependentDemandAt = initialGraceSeconds + IndependentDemandDelay();
+            independentClockPaused = false;
+            independentArrivals = independentAdmissions = 0;
+            pendingIndependentDemand.Clear();
             random = new System.Random(seed);
             spawnerRandom = new System.Random(unchecked(seed ^ (int)0x53A7B10));
             coverageRandom = new System.Random(unchecked(seed ^ (int)0xC0B3A63));
@@ -475,6 +509,14 @@ namespace Uptime.Connections
                 nextCoverageAt = Mathf.Min(nextCoverageAt, simulationTime + 1f);
             }
             lastBlackoutCount = blackoutCount;
+            if (!allowAmbient || !autoGenerationEnabled) independentClockPaused = true;
+            else if (benignArrivalPolicy == BenignArrivalPolicy.IndependentDemand && independentClockPaused)
+            {
+                // Disabled generation creates no demand. Resume from a fresh seeded wait,
+                // just like the existing hostile clock, instead of inventing missed jobs.
+                nextIndependentDemandAt = simulationTime + IndependentDemandDelay();
+                independentClockPaused = false;
+            }
             bool hostileActive = allowAmbient && autoGenerationEnabled && hostileGenerationEnabled;
             if (!hostileActive) hostileClockPaused = true;
             else if (hostileClockPaused)
@@ -513,8 +555,10 @@ namespace Uptime.Connections
                             hostileMeanIntervalSeconds, interval, nextHostileAt, result);
                     }
                 }
-                // One stochastic opportunity per step prevents catch-up bursts after long steps.
-                if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
+                if (benignArrivalPolicy == BenignArrivalPolicy.IndependentDemand)
+                    CreateIndependentDemand(simulationTime);
+                // The population baseline retains one stochastic opportunity per step.
+                else if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
                 {
                     int established, anticipated;
                     CountBenignPopulation(simulationTime, out established, out anticipated);
@@ -557,6 +601,12 @@ namespace Uptime.Connections
                 ConnectionSpawnPlan plan = queue[0].Plan;
                 queue.RemoveAt(0);
                 host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
+                if (pendingIndependentDemand.TryGetValue(plan.ConnectionId, out int demandSequence))
+                {
+                    pendingIndependentDemand.Remove(plan.ConnectionId);
+                    independentAdmissions++;
+                    host.Recorder?.RecordDemandAdmission(demandSequence, plan, simulationTime);
+                }
             }
         }
 
@@ -911,6 +961,29 @@ namespace Uptime.Connections
             // response changes their mean, without a hard floor or population cap.
             return Mathf.Max(0.1f, (float)(-Math.Log(1d - coverageRandom.NextDouble()) *
                 CoverageMean(coveragePressure, goal)));
+        }
+
+        private double IndependentDemandDelay() => Math.Max(.000001d,
+            -Math.Log(1d - independentDemandRandom.NextDouble()) * independentBenignMeanSeconds);
+
+        private void CreateIndependentDemand(float now)
+        {
+            // No occupancy, cancellation, outage or LOAD inputs. Catch-up preserves each
+            // scheduled request; presentation capacity cannot silently suppress demand.
+            while (nextIndependentDemandAt <= now)
+            {
+                double due = nextIndependentDemandAt;
+                double interval = IndependentDemandDelay();
+                nextIndependentDemandAt = due + interval;
+                int sequence = ++independentArrivals;
+                ConnectionSpawnPlan plan = idsExhausted ? null : GenerateBenignPlan((float)due);
+                host.Recorder?.RecordDemandArrival(sequence, now, due, independentBenignMeanSeconds,
+                    interval, nextIndependentDemandAt, plan?.ConnectionId,
+                    plan != null ? null : idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
+                if (plan == null) continue; // Explicit unadmitted count/event, never a hidden occupancy skip.
+                QueueSpawnPlan(plan, "independent_benign");
+                pendingIndependentDemand.Add(plan.ConnectionId, sequence);
+            }
         }
 
         private float HostileDelay()
