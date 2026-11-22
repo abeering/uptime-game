@@ -1,0 +1,52 @@
+PASS Assets/Scenes/Connections.unity first operation expected credit1, incomplete second0
+PASS partial kill retains1, lost2, unfinished0, eligible3
+PASS multi-operation benign adds5; hostile arc adds0
+PASS duplicate completion, recorder and renders cannot duplicate credit
+PASS reset clears accounting and retained history
+PASS same ID credits normally after restart
+PASS actual effective requirement5 credited instead of authored base2
+PASS requirement reduction preserves actual accomplished WORK above final requirement2
+PASS quota immediately ends shift before deadline
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS operation completing on final boundary credited before deadline success: {"enabled":true,"durationSeconds":0.125,"timeSeconds":0.125,"target":0.625,"credited":0.625,"eligible":0.625,"lost":0.0,"unfinished":0.0,"ending":"WorkComplete"}
+PASS precise quota comparison: .625 credit cannot satisfy .626
+PASS deadline: partial progress grants0; entire uncredited operation remains unfinished5
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS simultaneous boundary retains credit but CORE breach wins
+PASS one CORE event and one terminal result
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS ending preserves diagnostic CLEAN/Duel, rejects concession and late PID without penalties
+PASS active Duel abort recorded once without invented outcome
+PASS ending freezes incomplete scan
+PASS Assets/Scenes/ConnectionsAdvanced.unity first operation expected credit1, incomplete second0
+PASS partial kill retains1, lost2, unfinished0, eligible3
+PASS multi-operation benign adds5; hostile arc adds0
+PASS duplicate completion, recorder and renders cannot duplicate credit
+PASS reset clears accounting and retained history
+PASS same ID credits normally after restart
+PASS actual effective requirement5 credited instead of authored base2
+PASS requirement reduction preserves actual accomplished WORK above final requirement2
+PASS quota immediately ends shift before deadline
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS operation completing on final boundary credited before deadline success: {"enabled":true,"durationSeconds":0.125,"timeSeconds":0.125,"target":0.625,"credited":0.625,"eligible":0.625,"lost":0.0,"unfinished":0.0,"ending":"WorkComplete"}
+PASS precise quota comparison: .625 credit cannot satisfy .626
+PASS deadline: partial progress grants0; entire uncredited operation remains unfinished5
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS simultaneous boundary retains credit but CORE breach wins
+PASS one CORE event and one terminal result
+PASS ending freezes time/generation/accounting and finalizes recorder once
+PASS post-ending mutations rejected
+PASS recorder JSON has initial config, cause and exact final snapshot
+PASS ending preserves diagnostic CLEAN/Duel, rejects concession and late PID without penalties
+PASS active Duel abort recorded once without invented outcome
+PASS ending freezes incomplete scan

@@ -47,16 +47,25 @@ namespace Uptime.Connections.EditorTools
             public float postRemovalContentionSeconds, peakBenignShortfall, completedMeanDelay, coreBreachAt = -1;
             public float normalCapacityRecoveryDelay = -1;
             public bool recoveryCensored;
+            public int fixtureCount, legitimateKills;
+            public float fixtureLoad, fixtureSurvivalSeconds, fixtureOverlapOffset;
+            public string fixtureTargetId;
             public ShiftSnapshot work;
             public NodeMeasure[] nodes;
             public Sample[] samples;
             public OperationMeasure[] operations;
         }
         [Serializable] public sealed class Results { public Measurement[] runs; }
+        public sealed class DisruptionTrial
+        {
+            public float load = 12, survivalSeconds = 10, overlapOffset = -1;
+            public bool overclock, killOneLegitimate;
+            public string targetNodeId = "DB";
+        }
         private static void Check(bool condition, string text)
         { if (!condition) throw new InvalidOperationException("IndependentDemand FAIL: " + text); checks.Add("PASS " + text); }
         public static SimulationHost Open(string scene, BenignArrivalPolicy policy, float mean = 8, int seed = 1701,
-            bool mixed = false, bool quota = false, float horizon = 360)
+            bool mixed = false, bool quota = false, float horizon = 360, Action<SimulationHost> configure = null)
         {
             return IntegrityWitness.Open(true, seed, host =>
             {
@@ -70,20 +79,21 @@ namespace Uptime.Connections.EditorTools
                 traffic.HostileGenerationEnabled = mixed;
                 IntegrityWitness.Set(traffic, "benignArrivalPolicy", policy);
                 IntegrityWitness.Set(traffic, "independentBenignMeanSeconds", mean);
+                configure?.Invoke(host);
             }, scene);
         }
-        public static LogicalConnectionState AddLoader(SimulationHost host, string id = LoaderId)
+        public static LogicalConnectionState AddLoader(SimulationHost host, string id = LoaderId, float load = 12, float duration = 30, string targetNodeId = "DB")
         {
             // A controlled ordinary LOADER: real proportional LOAD sharing and the
             // existing zero-WORK-rate/withdrawal lifecycle. No generator IDs/RNG consumed.
-            var stages = new[] { new OperationStage(OperationKind.Read, 1000, 12, "Reading records",
+            var stages = new[] { new OperationStage(OperationKind.Read, 1000, load, "Reading records",
                 behaviors: new[] { TimedModifierBehaviorDefinition.Rate("LOADER_ACTIVE", 0, 0, 0) }) };
             var plan = new ConnectionSpawnPlan(host.SimulationTimeSeconds, id,
                 (NodeView[])typeof(ConnectionTrafficDirector).GetMethod("FindRoute", Private).Invoke(host.GetComponent<ConnectionTrafficDirector>(),
-                    new object[] { host.FindNodeResources("EXT1").View, host.FindNodeResources("DB").View }),
+                    new object[] { host.FindNodeResources("EXT1").View, host.FindNodeResources(targetNodeId).View }),
                 "controlled-loader", "Product Detail Lookups", stages, true,
                 loaderAttack: new LoaderAttackPlan { structure = LoaderStructure.Single, pattern = LoaderPattern.Immediate,
-                    attackOperationIndex = 0, targetCapacity = 10, normalLoad = 1, attackLoad = 12, durationSeconds = 30 });
+                    attackOperationIndex = 0, targetCapacity = 10, normalLoad = 1, attackLoad = load, durationSeconds = duration });
             return host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
         }
         public static string Hash(string value)
@@ -155,7 +165,7 @@ namespace Uptime.Connections.EditorTools
             Debug.Log("IndependentDemandWitness PASS: " + checks.Count + " assertions.");
         }
         private static string DemandPlans(SimulationHost host) => string.Join("\n", host.Recorder.CurrentLog.events
-            .Where(e => e.type == "plan_queued" && (e.source == "independent_benign" || e.source == "ambient_benign"))
+            .Where(e => e.type == "plan_queued" && (e.source == "independent_benign" || e.source == "ambient_benign" || e.source == "nominal_benign"))
             .Select(e => JsonUtility.ToJson(e.definition)));
         private static string[] PrefixHashes(IEnumerable<string> rows)
         {
@@ -163,20 +173,21 @@ namespace Uptime.Connections.EditorTools
             foreach (string row in rows) { text.Append(row).Append('\n'); hashes.Add(Hash(text.ToString())); }
             return hashes.ToArray();
         }
-        private static bool SameDemandPrefix(Measurement healthy, Measurement other)
+        public static bool SameDemandPrefix(Measurement healthy, Measurement other, bool allowQuotaCensoring = false)
         {
             if (healthy.demandSignature == other.demandSignature && healthy.planSignature == other.planSignature) return true;
             // A real CORE breach freezes the simulation. Compare all requests in the
             // shorter run, rather than demanding arrivals after that run has ended.
             int common = Math.Min(healthy.arrived, other.arrived);
-            return common > 0 && (healthy.coreBreachAt >= 0 || other.coreBreachAt >= 0) &&
+            return common > 0 && (healthy.coreBreachAt >= 0 || other.coreBreachAt >= 0 ||
+                allowQuotaCensoring && (healthy.ending == "WorkComplete" || other.ending == "WorkComplete")) &&
                 healthy.demandPrefixSignatures[common - 1] == other.demandPrefixSignatures[common - 1] &&
                 healthy.planPrefixSignatures[common - 1] == other.planPrefixSignatures[common - 1];
         }
         public static Measurement Observe(string scene, BenignArrivalPolicy policy, float mean, int seed, string scenario,
-            bool mixed = false, bool quota = false, float horizon = 360)
+            bool mixed = false, bool quota = false, float horizon = 360, Action<SimulationHost> configure = null, DisruptionTrial trial = null)
         {
-            var host = Open(scene, policy, mean, seed, mixed, quota, horizon);
+            var host = Open(scene, policy, mean, seed, mixed, quota, horizon, configure);
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             var duels = host.GetComponent<ConnectionsDuelDirector>();
             var overlay = UnityEngine.Object.FindFirstObjectByType<ConnectionsDuelOverlay>(FindObjectsInactive.Include);
@@ -198,13 +209,37 @@ namespace Uptime.Connections.EditorTools
             int admittedBenign = 0;
             host.ConnectionRegistered += state => { if (!state.IsHostile) admittedBenign++; };
             LogicalConnectionState loader = null;
+            var sources = new List<LogicalConnectionState>(); bool trialIntervened = false;
+            if (trial != null)
+            { result.fixtureLoad = trial.load; result.fixtureSurvivalSeconds = trial.survivalSeconds; result.fixtureOverlapOffset = trial.overlapOffset; result.fixtureTargetId = trial.targetNodeId; }
             double activeIntegral = 0; float quiet = 0, normalQuiet = 0, nextDecision = 6, splash = 0, blockedUntil = 0;
             int encounter = -1, lastSecond = -1;
             for (int tick = 0; tick < Mathf.CeilToInt(horizon / .02f) + 2 && !host.RunEnded; tick++)
             {
                 float before = host.SimulationTimeSeconds;
-                if (!mixed && scenario != "healthy" && loader == null && before >= 90) loader = AddLoader(host);
-                if (loader?.LoaderActivatedAtSeconds >= 0)
+                if (!mixed && scenario != "healthy" && loader == null && before >= 90)
+                { loader = AddLoader(host, load: trial?.load ?? 12, targetNodeId: trial?.targetNodeId ?? "DB"); sources.Add(loader); }
+                if (trial != null && loader?.LoaderActivatedAtSeconds >= 0)
+                {
+                    result.loaderActivatedAt = loader.LoaderActivatedAtSeconds;
+                    if (trial.overlapOffset >= 0 && sources.Count == 1 && before >= loader.LoaderActivatedAtSeconds + trial.overlapOffset)
+                        sources.Add(AddLoader(host, LoaderId + "-2", trial.load, targetNodeId: trial.targetNodeId));
+                    foreach (var source in sources)
+                        if (source.LoaderActivatedAtSeconds >= 0 && source.IsActive && before >= source.LoaderActivatedAtSeconds + trial.survivalSeconds)
+                        { host.KillConnection(source.ConnectionId); result.commands++; }
+                    if (!trialIntervened && sources.Count == (trial.overlapOffset >= 0 ? 2 : 1) && sources.All(s => s.Resolution.HasValue))
+                    {
+                        trialIntervened = true;
+                        if (trial.overclock) { host.TryActivateOverclock(trial.targetNodeId, "overclock " + trial.targetNodeId, out _); result.commands++; }
+                        if (trial.killOneLegitimate)
+                        {
+                            var victim = host.RuntimeConnections.Where(c => !c.IsHostile && c.IsDemanding && c.TargetNode.NodeId == trial.targetNodeId)
+                                .OrderByDescending(c => c.DesiredLoad).ThenBy(c => c.CompletedWork / c.CurrentTotalWork).ThenBy(c => c.ConnectionId).FirstOrDefault();
+                            if (victim != null) { host.KillConnection(victim.ConnectionId); result.commands++; result.legitimateKills++; }
+                        }
+                    }
+                }
+                else if (trial == null && loader?.LoaderActivatedAtSeconds >= 0)
                 {
                     result.loaderActivatedAt = loader.LoaderActivatedAtSeconds;
                     if (scenario.StartsWith("kill", StringComparison.Ordinal) && loader.IsActive &&
@@ -218,7 +253,9 @@ namespace Uptime.Connections.EditorTools
                 bool boostedBeforeStep = host.OverclockedNode != null;
                 host.StepSimulation(.02f);
                 float now = host.SimulationTimeSeconds, dt = now - before;
-                if (loader?.Resolution.HasValue == true && result.removedAt < 0) result.removedAt = loader.ResolvedAtSeconds;
+                if (trial == null && loader?.Resolution.HasValue == true && result.removedAt < 0) result.removedAt = loader.ResolvedAtSeconds;
+                else if (trial != null && sources.Count == (trial.overlapOffset >= 0 ? 2 : 1) && sources.All(s => s.Resolution.HasValue) && result.removedAt < 0)
+                    result.removedAt = sources.Max(s => s.ResolvedAtSeconds);
                 if (mixed && duels.Current?.Lifecycle == DuelLifecycle.Active && !host.RunEnded)
                 {
                     if (encounter != duels.Current.Id)
@@ -283,8 +320,8 @@ namespace Uptime.Connections.EditorTools
                 {
                     lastSecond = Mathf.FloorToInt(now);
                     samples.Add(new Sample { time = now, active = active, connecting = connecting, credited = host.CreditedWork,
-                        arrived = policy == BenignArrivalPolicy.IndependentDemand ? traffic.Demand.arrived : admittedBenign,
-                        admitted = policy == BenignArrivalPolicy.IndependentDemand ? traffic.Demand.admitted : admittedBenign, waiting = traffic.Demand.waiting,
+                        arrived = policy != BenignArrivalPolicy.PopulationResponsive ? traffic.Demand.arrived : admittedBenign,
+                        admitted = policy != BenignArrivalPolicy.PopulationResponsive ? traffic.Demand.admitted : admittedBenign, waiting = traffic.Demand.waiting,
                         outstandingWork = benign.Where(c => !c.IsComplete).Sum(c => (double)c.RemainingWork +
                             Enumerable.Range(c.CurrentOperationIndex + 1, c.OperationCount - c.CurrentOperationIndex - 1).Sum(i => (double)c.Definition.WorkAt(i))),
                         unadmitted = traffic.Demand.unadmitted, requested = nodes.Select(n => n.RequestedLoad).ToArray(),
@@ -300,9 +337,10 @@ namespace Uptime.Connections.EditorTools
             result.coreBreachAt = host.Integrity.Breach?.time ?? -1;
             result.integrityStrikes = host.Recorder.CurrentLog.events.Count(e => e.type == "integrity_damage");
             result.compromisedNodes = host.Integrity.Nodes.Count(n => n.Compromised);
-            result.arrived = policy == BenignArrivalPolicy.IndependentDemand ? traffic.Demand.arrived :
+            result.fixtureCount = sources.Count;
+            result.arrived = policy != BenignArrivalPolicy.PopulationResponsive ? traffic.Demand.arrived :
                 host.Recorder.CurrentLog.events.Count(e => e.type == "plan_queued" && e.source == "ambient_benign");
-            result.admitted = policy == BenignArrivalPolicy.IndependentDemand ? traffic.Demand.admitted : admittedBenign;
+            result.admitted = policy != BenignArrivalPolicy.PopulationResponsive ? traffic.Demand.admitted : admittedBenign;
             result.waiting = traffic.Demand.waiting; result.unadmitted = traffic.Demand.unadmitted;
             result.recoveryCensored = result.removedAt >= 0 && result.recoveryAt < 0;
             result.demandSignature = Hash(string.Join("\n", host.Recorder.CurrentLog.events.Where(e => e.type == "benign_demand_arrived")
@@ -311,7 +349,7 @@ namespace Uptime.Connections.EditorTools
             result.demandPrefixSignatures = PrefixHashes(host.Recorder.CurrentLog.events.Where(e => e.type == "benign_demand_arrived")
                 .Select(e => e.demandScheduledAtSeconds.ToString("R", System.Globalization.CultureInfo.InvariantCulture)));
             result.planPrefixSignatures = PrefixHashes(host.Recorder.CurrentLog.events
-                .Where(e => e.type == "plan_queued" && e.source == "independent_benign").Select(e => JsonUtility.ToJson(e.definition)));
+                .Where(e => e.type == "plan_queued" && (e.source == "independent_benign" || e.source == "nominal_benign")).Select(e => JsonUtility.ToJson(e.definition)));
             result.gameplaySignature = Hash(string.Join("\n", host.Recorder.CurrentLog.events.Select(JsonUtility.ToJson)) +
                 string.Join("\n", host.Recorder.CurrentLog.snapshots.Select(JsonUtility.ToJson)));
             host.Recorder.EndRun(); typeof(ConnectionsDuelDirector).GetMethod("OnDisable", Private).Invoke(duels, null);
@@ -363,7 +401,7 @@ namespace Uptime.Connections.EditorTools
             var runs = new List<Measurement>();
             foreach (string scene in CanonicalSceneAuthoring.Scenes)
                 foreach (int seed in Seeds.Concat(new[] { 42, 99 }))
-                    foreach (BenignArrivalPolicy policy in Enum.GetValues(typeof(BenignArrivalPolicy)))
+                    foreach (BenignArrivalPolicy policy in new[] { BenignArrivalPolicy.PopulationResponsive, BenignArrivalPolicy.IndependentDemand })
                         foreach (string scenario in new[] { "unattended", "visible-defense" })
                             runs.Add(Observe(scene, policy, scene == CanonicalSceneAuthoring.Scenes[0] ? 8 : 6, seed, scenario, true, true));
             Save(runs, "natural");

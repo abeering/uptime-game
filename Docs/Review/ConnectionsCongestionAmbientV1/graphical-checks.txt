@@ -1,0 +1,58 @@
+PASS Connections 01-healthy real viewport 1920x1080
+PASS Connections 01-healthy diagnostic quota does not conceal recovery tail
+OBSERVED Connections/01-healthy/1920 time88.02 policyNominalOccupancy loadScale2 admitted4 visible3 DB_LOAD11.18
+PASS Connections 01-healthy real viewport 1280x720
+PASS Connections 01-healthy diagnostic quota does not conceal recovery tail
+OBSERVED Connections/01-healthy/1280 time88.02 policyNominalOccupancy loadScale2 admitted4 visible3 DB_LOAD11.18
+PASS Connections real active LOADER contributes target LOAD
+PASS Connections 02-loader real viewport 1920x1080
+PASS Connections 02-loader diagnostic quota does not conceal recovery tail
+OBSERVED Connections/02-loader/1920 time100.02 policyNominalOccupancy loadScale2 admitted4 visible4 DB_LOAD18.33
+PASS Connections 02-loader real viewport 1280x720
+PASS Connections 02-loader diagnostic quota does not conceal recovery tail
+OBSERVED Connections/02-loader/1280 time100.02 policyNominalOccupancy loadScale2 admitted4 visible4 DB_LOAD18.33
+PASS Connections active legitimate demand available for inspect
+PASS Connections source killed; inspect returns terminal focus
+PASS Connections 03-after-kill real viewport 1920x1080
+PASS Connections 03-after-kill diagnostic quota does not conceal recovery tail
+OBSERVED Connections/03-after-kill/1920 time116.01 policyNominalOccupancy loadScale2 admitted5 visible4 DB_LOAD10.39
+PASS Connections 03-after-kill real viewport 1280x720
+PASS Connections 03-after-kill diagnostic quota does not conceal recovery tail
+OBSERVED Connections/03-after-kill/1280 time116.01 policyNominalOccupancy loadScale2 admitted5 visible4 DB_LOAD10.39
+PASS Connections Overclock intervention expired naturally before recovery capture
+PASS Connections paired graphical cases preserve exact demand plans and admit every request
+PASS Connections 04-after-kill-overclock real viewport 1920x1080
+PASS Connections 04-after-kill-overclock diagnostic quota does not conceal recovery tail
+OBSERVED Connections/04-after-kill-overclock/1920 time132.01 policyNominalOccupancy loadScale2 admitted5 visible3 DB_LOAD7.21
+PASS Connections 04-after-kill-overclock real viewport 1280x720
+PASS Connections 04-after-kill-overclock diagnostic quota does not conceal recovery tail
+OBSERVED Connections/04-after-kill-overclock/1280 time132.01 policyNominalOccupancy loadScale2 admitted5 visible3 DB_LOAD7.21
+PASS ConnectionsAdvanced 01-healthy real viewport 1920x1080
+PASS ConnectionsAdvanced 01-healthy diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/01-healthy/1920 time88.02 policyNominalOccupancy loadScale2 admitted6 visible4 DB_LOAD1.24
+PASS ConnectionsAdvanced 01-healthy real viewport 1280x720
+PASS ConnectionsAdvanced 01-healthy diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/01-healthy/1280 time88.02 policyNominalOccupancy loadScale2 admitted6 visible4 DB_LOAD1.24
+PASS ConnectionsAdvanced real active LOADER contributes target LOAD
+PASS ConnectionsAdvanced 02-loader real viewport 1920x1080
+PASS ConnectionsAdvanced 02-loader diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/02-loader/1920 time100.02 policyNominalOccupancy loadScale2 admitted6 visible5 DB_LOAD9.4
+PASS ConnectionsAdvanced 02-loader real viewport 1280x720
+PASS ConnectionsAdvanced 02-loader diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/02-loader/1280 time100.02 policyNominalOccupancy loadScale2 admitted6 visible5 DB_LOAD9.4
+PASS ConnectionsAdvanced active legitimate demand available for inspect
+PASS ConnectionsAdvanced source killed; inspect returns terminal focus
+PASS ConnectionsAdvanced 03-after-kill real viewport 1920x1080
+PASS ConnectionsAdvanced 03-after-kill diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/03-after-kill/1920 time116.01 policyNominalOccupancy loadScale2 admitted7 visible3 DB_LOAD1.24
+PASS ConnectionsAdvanced 03-after-kill real viewport 1280x720
+PASS ConnectionsAdvanced 03-after-kill diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/03-after-kill/1280 time116.01 policyNominalOccupancy loadScale2 admitted7 visible3 DB_LOAD1.24
+PASS ConnectionsAdvanced Overclock intervention expired naturally before recovery capture
+PASS ConnectionsAdvanced paired graphical cases preserve exact demand plans and admit every request
+PASS ConnectionsAdvanced 04-after-kill-overclock real viewport 1920x1080
+PASS ConnectionsAdvanced 04-after-kill-overclock diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/04-after-kill-overclock/1920 time132.01 policyNominalOccupancy loadScale2 admitted8 visible4 DB_LOAD1.39
+PASS ConnectionsAdvanced 04-after-kill-overclock real viewport 1280x720
+PASS ConnectionsAdvanced 04-after-kill-overclock diagnostic quota does not conceal recovery tail
+OBSERVED ConnectionsAdvanced/04-after-kill-overclock/1280 time132.01 policyNominalOccupancy loadScale2 admitted8 visible4 DB_LOAD1.39

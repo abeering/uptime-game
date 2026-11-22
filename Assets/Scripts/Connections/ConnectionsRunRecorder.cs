@@ -66,6 +66,7 @@ namespace Uptime.Connections
     {
         public string benignArrivalPolicy;
         public float independentBenignMeanSeconds;
+        public float experimentalBenignLoadMultiplier;
         public bool autoGenerationEnabled;
         public string ambientOriginId;
         public AmbientOriginRecord[] ambientOrigins;
@@ -143,6 +144,7 @@ namespace Uptime.Connections
         public string[] eligibleTargetIds;
         public string[] authoredEligibleTargetIds;
         public float ambientWeight;
+        public float benignAmbientWeight;
         public BehaviorRecord[] connectionBehaviors;
         public OperationRange[] operations;
     }
@@ -313,6 +315,8 @@ namespace Uptime.Connections
         public int establishedBenign;
         public int anticipatedBenign;
         public int benignDemandSequence;
+        public int nominalPopulationBefore, nominalPopulationAfter;
+        public float nominalLifetimeSeconds;
         public double demandScheduledAtSeconds, nextDemandIntervalSeconds, nextDemandAtSeconds;
         public float demandMeanSeconds;
         public int recentCanceledBenign;
@@ -796,6 +800,20 @@ namespace Uptime.Connections
             entry.benignDemandSequence = sequence;
             entry.demandScheduledAtSeconds = plan.ScheduledSpawnTime;
             entry.connectionId = plan.ConnectionId;
+        }
+
+        public void RecordNominalOpportunity(float time, float due, int before, float goal,
+            float chance, float roll, int after, float mean, float interval, float nextAt,
+            float lifetime, string connectionId, string reason)
+        {
+            if (!IsRecording) return;
+            RunEvent entry = NewEvent("nominal_coverage_opportunity", time);
+            entry.scheduledSpawnTime = due;
+            entry.nominalPopulationBefore = before; entry.nominalPopulationAfter = after;
+            entry.nominalLifetimeSeconds = lifetime; entry.connectionId = connectionId;
+            entry.effectiveCoverageGoal = goal; entry.coverageSpawnChance = chance; entry.coverageRoll = roll;
+            entry.nextCoveragePressure = after; entry.nextCoverageMeanSeconds = mean;
+            entry.nextCoverageIntervalSeconds = interval; entry.nextCoverageAtSeconds = nextAt; entry.reason = reason;
         }
 
         public void RecordCoverageOpportunity(float time, int establishedBenign,
@@ -1682,6 +1700,7 @@ namespace Uptime.Connections
             IReadOnlyList<ConnectionTrafficProfile> configuredProfiles = trafficDirector.Profiles;
             var traffic = new TrafficConfiguration { benignArrivalPolicy = trafficDirector.BenignPolicy.ToString(),
                 independentBenignMeanSeconds = trafficDirector.IndependentBenignMeanSeconds,
+                experimentalBenignLoadMultiplier = trafficDirector.ExperimentalBenignLoadMultiplier,
                 autoGenerationEnabled = trafficDirector.AutoGenerationEnabled,
                 ambientOriginId = trafficDirector.AmbientOriginId,
                 openingGraceSeconds = trafficDirector.InitialGraceSeconds,
@@ -1762,6 +1781,7 @@ namespace Uptime.Connections
                     purposeTemplate = source.purposeTemplate,
                     claimedPurpose = source.claimedPurpose,
                     ambientWeight = trafficDirector.EffectiveAmbientWeight(source.id),
+                    benignAmbientWeight = trafficDirector.EffectiveBenignWeight(source.id),
                     eligibleTargetIds = (string[])trafficDirector.EffectiveTargetIds(source).Clone(),
                     authoredEligibleTargetIds = (string[])source.eligibleTargetIds.Clone(),
                     connectionBehaviors = Behaviors(source.connectionBehaviors),
