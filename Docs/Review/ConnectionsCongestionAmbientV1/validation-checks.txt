@@ -1,0 +1,6 @@
+PASS V1Nominal
+PASS ScreeningReplay
+PASS V0Independent
+PASS ParentWork
+PASS ParentQuotas
+FAIL CanonicalGameplayAndTerminal: Concession regression failures; inspect canonical and focused reports.

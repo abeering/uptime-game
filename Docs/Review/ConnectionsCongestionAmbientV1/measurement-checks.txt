@@ -1,0 +1,15 @@
+Actual Unity 6000.3.11f1 measurement suites; counts verified from saved traces.
+PASS advanced-natural: 4 runs
+PASS advanced-quotas: 6 runs
+PASS advanced-target: 40 runs
+PASS comparisons: 48 runs
+PASS concentration: 32 runs
+PASS full: 80 runs
+PASS headroom: 16 runs
+PASS natural: 32 runs
+PASS nominal-first: 24 runs
+PASS quotas: 24 runs
+PASS variations: 32 runs
+PASS total: 338 retained actual Unity runs
+PASS summarize.py: 232 nominal/independent healthy demand/recipe prefix comparisons, no measured admission loss
+Mixed-threat shifts are outcome samples, not paired demand comparisons.

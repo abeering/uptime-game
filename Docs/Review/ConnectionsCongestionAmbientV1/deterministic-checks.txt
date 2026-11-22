@@ -1,0 +1,30 @@
+PASS Assets/Scenes/Connections.unity nominal demand and complete recipes ignore real LOADER delay/kill
+PASS Assets/Scenes/Connections.unity nominal gameplay exactly replays by seed
+PASS Assets/Scenes/Connections.unity selected nominal requests are admitted and accounted
+PASS Assets/Scenes/Connections.unity legitimate kill does not replenish or change nominal requests
+PASS Assets/Scenes/Connections.unity Blackout cancellations and cleaning do not change nominal demand
+PASS Assets/Scenes/Connections.unity nominal reset restores ledger, counters and seeded opportunities
+PASS Assets/Scenes/Connections.unity coarse scheduling preserves every nominal opportunity and expiry
+PASS Assets/Scenes/Connections.unity recorder distinguishes nominal occupancy/lifetime from actual active states
+PASS Assets/Scenes/Connections.unity ambient LOAD/WORK scaling preserves normal nominal operation durations
+PASS Assets/Scenes/Connections.unity ambient benign scaling leaves manual and hostile recipes unchanged
+PASS Assets/Scenes/Connections.unity recorder stores research policy and LOAD multiplier
+PASS Assets/Scenes/Connections.unity experimental benign PURPOSE weights leave hostile selection/recipes unchanged
+PASS Assets/Scenes/Connections.unity explicit pause creates no demand and resumes with a fresh opportunity wait
+PASS Assets/Scenes/Connections.unity Authored Witness mode suppresses nominal ambient demand
+PASS Assets/Scenes/Connections.unity nominal selected requests remain explicitly counted after finite ID exhaustion
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal demand and complete recipes ignore real LOADER delay/kill
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal gameplay exactly replays by seed
+PASS Assets/Scenes/ConnectionsAdvanced.unity selected nominal requests are admitted and accounted
+PASS Assets/Scenes/ConnectionsAdvanced.unity legitimate kill does not replenish or change nominal requests
+PASS Assets/Scenes/ConnectionsAdvanced.unity Blackout cancellations and cleaning do not change nominal demand
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal reset restores ledger, counters and seeded opportunities
+PASS Assets/Scenes/ConnectionsAdvanced.unity coarse scheduling preserves every nominal opportunity and expiry
+PASS Assets/Scenes/ConnectionsAdvanced.unity recorder distinguishes nominal occupancy/lifetime from actual active states
+PASS Assets/Scenes/ConnectionsAdvanced.unity ambient LOAD/WORK scaling preserves normal nominal operation durations
+PASS Assets/Scenes/ConnectionsAdvanced.unity ambient benign scaling leaves manual and hostile recipes unchanged
+PASS Assets/Scenes/ConnectionsAdvanced.unity recorder stores research policy and LOAD multiplier
+PASS Assets/Scenes/ConnectionsAdvanced.unity experimental benign PURPOSE weights leave hostile selection/recipes unchanged
+PASS Assets/Scenes/ConnectionsAdvanced.unity explicit pause creates no demand and resumes with a fresh opportunity wait
+PASS Assets/Scenes/ConnectionsAdvanced.unity Authored Witness mode suppresses nominal ambient demand
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal selected requests remain explicitly counted after finite ID exhaustion

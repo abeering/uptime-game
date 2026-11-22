@@ -55,12 +55,13 @@ namespace Uptime.Connections
     }
 
     // Temporary comparison seam: both policies feed the existing concrete-plan queue.
-    public enum BenignArrivalPolicy { PopulationResponsive, IndependentDemand }
+    public enum BenignArrivalPolicy { PopulationResponsive, IndependentDemand, NominalOccupancy }
 
     [Serializable] public sealed class BenignDemandSnapshot
     {
         public int arrived, admitted, waiting, unadmitted;
         public double nextArrivalAtSeconds;
+        public int nominalPopulation;
     }
 
     // Owns only generation and scheduling. SimulationHost owns every live connection.
@@ -75,6 +76,10 @@ namespace Uptime.Connections
         [Header("Benign arrival experiment (restart after changing policy)")]
         [SerializeField] private BenignArrivalPolicy benignArrivalPolicy;
         [SerializeField, Min(.1f)] private float independentBenignMeanSeconds = 8f;
+        [Tooltip("Research only: scales ambient benign normal LOAD and WORK together, preserving authored nominal duration. Manual and hostile recipes are unchanged.")]
+        [SerializeField, Min(.1f)] private float experimentalBenignLoadMultiplier = 1f;
+        [Tooltip("Research-only sparse PURPOSE weights for ambient legitimate requests. Manual and hostile selection retain the existing weights.")]
+        [SerializeField] private AmbientWeightOverride[] experimentalBenignPurposeWeights;
         [Header("Benign population (temporary comparison baseline)")]
         [SerializeField, Min(0f)] private float benignPopulationGoal = 3f;
         [SerializeField, Min(0f)] private float coverageStartupGoal = 1f;
@@ -155,8 +160,11 @@ namespace Uptime.Connections
         private System.Random independentDemandRandom;
         private double nextIndependentDemandAt;
         private bool independentClockPaused;
-        private int independentArrivals, independentAdmissions;
-        private readonly Dictionary<string, int> pendingIndependentDemand = new Dictionary<string, int>();
+        private int demandArrivals, demandAdmissions;
+        private readonly Dictionary<string, int> pendingDemand = new Dictionary<string, int>();
+        private readonly List<float> nominalDepartures = new List<float>();
+        private float nextNominalCoverageAt;
+        private bool nominalClockPaused;
         private System.Random benignPlanRandom;
         private System.Random hostileScheduleRandom;
         private System.Random identitySelectionRandom;
@@ -189,12 +197,14 @@ namespace Uptime.Connections
         }
         public BenignArrivalPolicy BenignPolicy => benignArrivalPolicy;
         public float IndependentBenignMeanSeconds => independentBenignMeanSeconds;
+        public float ExperimentalBenignLoadMultiplier => experimentalBenignLoadMultiplier;
         public BenignDemandSnapshot Demand => new BenignDemandSnapshot
         {
-            arrived = independentArrivals, admitted = independentAdmissions,
-            waiting = pendingIndependentDemand.Count,
-            unadmitted = independentArrivals - independentAdmissions - pendingIndependentDemand.Count,
-            nextArrivalAtSeconds = nextIndependentDemandAt
+            arrived = demandArrivals, admitted = demandAdmissions,
+            waiting = pendingDemand.Count,
+            unadmitted = demandArrivals - demandAdmissions - pendingDemand.Count,
+            nextArrivalAtSeconds = benignArrivalPolicy == BenignArrivalPolicy.NominalOccupancy ? nextNominalCoverageAt : nextIndependentDemandAt,
+            nominalPopulation = nominalDepartures.Count
         };
         public float InitialGraceSeconds => initialGraceSeconds;
         public bool HostileGenerationEnabled { get => hostileGenerationEnabled; set => hostileGenerationEnabled = value; }
@@ -293,13 +303,14 @@ namespace Uptime.Connections
                 host.ConnectionResolved += OnConnectionResolved;
             }
             if (!Enum.IsDefined(typeof(BenignArrivalPolicy), benignArrivalPolicy) ||
-                !float.IsFinite(independentBenignMeanSeconds) || independentBenignMeanSeconds <= 0)
-                throw new InvalidOperationException("Benign demand needs a valid policy and finite positive mean interval.");
+                !float.IsFinite(independentBenignMeanSeconds) || independentBenignMeanSeconds <= 0 ||
+                !float.IsFinite(experimentalBenignLoadMultiplier) || experimentalBenignLoadMultiplier <= 0)
+                throw new InvalidOperationException("Benign demand needs a valid policy and finite positive mean interval / LOAD multiplier.");
             independentDemandRandom = new System.Random(unchecked(seed ^ (int)0x1B3D4A7));
             nextIndependentDemandAt = initialGraceSeconds + IndependentDemandDelay();
             independentClockPaused = false;
-            independentArrivals = independentAdmissions = 0;
-            pendingIndependentDemand.Clear();
+            demandArrivals = demandAdmissions = 0;
+            pendingDemand.Clear();
             random = new System.Random(seed);
             spawnerRandom = new System.Random(unchecked(seed ^ (int)0x53A7B10));
             coverageRandom = new System.Random(unchecked(seed ^ (int)0xC0B3A63));
@@ -326,11 +337,22 @@ namespace Uptime.Connections
             nextHostileAt = initialGraceSeconds + HostileDelay();
             nextCoverageAt = initialGraceSeconds + CoverageDelay(0,
                 EffectiveCoverageGoal(initialGraceSeconds));
+            nextNominalCoverageAt = nextCoverageAt;
+            nominalDepartures.Clear();
+            nominalClockPaused = false;
             hostileClockPaused = false;
             lastBlackoutCount = 0;
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
+            if (experimentalBenignPurposeWeights != null)
+            {
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (AmbientWeightOverride entry in experimentalBenignPurposeWeights)
+                    if (entry == null || !effectiveWeights.ContainsKey(entry.profileId ?? "") || !seen.Add(entry.profileId) ||
+                        !float.IsFinite(entry.weight) || entry.weight < 0)
+                        throw new InvalidOperationException("Experimental benign weights need unique known IDs and finite nonnegative weights.");
+            }
             RebuildAdvancedRouting();
             if (hostileActivities == null) hostileActivities = GetComponent<HostileActivityDirector>();
             hostileActivities?.ResetActivity(seed);
@@ -501,7 +523,7 @@ namespace Uptime.Connections
             int blackoutCount = 0;
             foreach (NodeInfection infection in host.Infections)
                 if (infection.Payload.Kind == InfectionKind.Blackout) blackoutCount++;
-            if (blackoutCount < lastBlackoutCount)
+            if (benignArrivalPolicy == BenignArrivalPolicy.PopulationResponsive && blackoutCount < lastBlackoutCount)
             {
                 if (blackoutCount == 0) recentBenignCancellations.Clear();
                 // Cleaning restores a viable route; don't retain a long delay sampled
@@ -509,6 +531,16 @@ namespace Uptime.Connections
                 nextCoverageAt = Mathf.Min(nextCoverageAt, simulationTime + 1f);
             }
             lastBlackoutCount = blackoutCount;
+            if (!allowAmbient || !autoGenerationEnabled)
+            {
+                nominalDepartures.RemoveAll(at => at <= simulationTime);
+                nominalClockPaused = true;
+            }
+            else if (benignArrivalPolicy == BenignArrivalPolicy.NominalOccupancy && nominalClockPaused)
+            {
+                nextNominalCoverageAt = simulationTime + CoverageDelay(nominalDepartures.Count, EffectiveCoverageGoal(simulationTime));
+                nominalClockPaused = false;
+            }
             if (!allowAmbient || !autoGenerationEnabled) independentClockPaused = true;
             else if (benignArrivalPolicy == BenignArrivalPolicy.IndependentDemand && independentClockPaused)
             {
@@ -557,6 +589,8 @@ namespace Uptime.Connections
                 }
                 if (benignArrivalPolicy == BenignArrivalPolicy.IndependentDemand)
                     CreateIndependentDemand(simulationTime);
+                else if (benignArrivalPolicy == BenignArrivalPolicy.NominalOccupancy)
+                    CreateNominalDemand(simulationTime);
                 // The population baseline retains one stochastic opportunity per step.
                 else if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
                 {
@@ -601,10 +635,10 @@ namespace Uptime.Connections
                 ConnectionSpawnPlan plan = queue[0].Plan;
                 queue.RemoveAt(0);
                 host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
-                if (pendingIndependentDemand.TryGetValue(plan.ConnectionId, out int demandSequence))
+                if (pendingDemand.TryGetValue(plan.ConnectionId, out int demandSequence))
                 {
-                    pendingIndependentDemand.Remove(plan.ConnectionId);
-                    independentAdmissions++;
+                    pendingDemand.Remove(plan.ConnectionId);
+                    demandAdmissions++;
                     host.Recorder?.RecordDemandAdmission(demandSequence, plan, simulationTime);
                 }
             }
@@ -892,19 +926,20 @@ namespace Uptime.Connections
             InfectorStructure? infectorStructure = null, InfectorSignature? infectorPrimary = null,
             InfectorSignature? infectorSecondary = null, InfectionKind? selectedInfectionKind = null)
         {
+            float Weight(ConnectionTrafficProfile profile) => benign ? EffectiveBenignWeight(profile.id) : EffectiveAmbientWeight(profile.id);
             float total = 0f;
             foreach (ConnectionTrafficProfile profile in profiles)
                 if (profile != null && profile.purposeTemplate && Compatible(profile, objective))
-                    total += Mathf.Max(0f, EffectiveAmbientWeight(profile.id));
+                    total += Mathf.Max(0f, Weight(profile));
             if (total <= 0f) return null;
             float choice = (float)random.NextDouble() * total;
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
             {
                 if (profile == null || !profile.purposeTemplate || !Compatible(profile, objective) ||
-                    EffectiveAmbientWeight(profile.id) <= 0f) continue;
+                    Weight(profile) <= 0f) continue;
                 selected = profile;
-                choice -= EffectiveAmbientWeight(profile.id);
+                choice -= Weight(profile);
                 if (choice < 0f) break;
             }
             return BuildPlan(selected, atTime, true, forceBenign: benign,
@@ -917,6 +952,14 @@ namespace Uptime.Connections
         private static bool Compatible(ConnectionTrafficProfile purpose, string objective) =>
             purpose.purposeTemplate && (objective == null || objective == "LOADER" ||
                 objective == "DELIVERY"); // The six current PURPOSES support both genera.
+
+        public float EffectiveBenignWeight(string profileId)
+        {
+            if (experimentalBenignPurposeWeights != null)
+                foreach (AmbientWeightOverride entry in experimentalBenignPurposeWeights)
+                    if (string.Equals(entry.profileId, profileId, StringComparison.OrdinalIgnoreCase)) return entry.weight;
+            return EffectiveAmbientWeight(profileId);
+        }
 
         private void CountBenignPopulation(float now, out int established, out int anticipated)
         {
@@ -966,6 +1009,53 @@ namespace Uptime.Connections
         private double IndependentDemandDelay() => Math.Max(.000001d,
             -Math.Log(1d - independentDemandRandom.NextDouble()) * independentBenignMeanSeconds);
 
+        private void CreateNominalDemand(float now)
+        {
+            // Research-only alternative input to the existing coverage response. Its
+            // ledger observes generated plans, never actual lifecycle or node health.
+            while (nextNominalCoverageAt <= now)
+            {
+                float due = nextNominalCoverageAt;
+                nominalDepartures.RemoveAll(at => at <= due);
+                int expected = nominalDepartures.Count;
+                float goal = EffectiveCoverageGoal(due);
+                float chance = Mathf.Lerp(coverageAtGoalChance, 1f, Mathf.Clamp01((goal - expected) / 1.5f));
+                float roll = (float)coverageRandom.NextDouble();
+                bool selected = roll < chance;
+                ConnectionSpawnPlan plan = selected && !idsExhausted ? GenerateBenignPlan(due) : null;
+                float nominalSeconds = 0;
+                if (plan != null)
+                {
+                    nominalSeconds = (plan.Route.Length - 1) * host.ConnectionTravelSecondsPerLink;
+                    foreach (OperationStage stage in plan.Operations) nominalSeconds += stage.TotalWork / stage.DesiredLoad;
+                    // Operation changes take the next simulation step. This small fixed
+                    // estimate is not recalculated from actual execution or modifiers.
+                    nominalSeconds += Mathf.Max(0, plan.Operations.Length - 1) * .02f;
+                    nominalDepartures.Add(due + nominalSeconds);
+                    QueueSpawnPlan(plan, "nominal_benign");
+                }
+                float mean = CoverageMean(nominalDepartures.Count, goal);
+                float interval = CoverageDelay(nominalDepartures.Count, goal);
+                nextNominalCoverageAt = due + interval;
+                if (selected)
+                {
+                    int sequence = ++demandArrivals;
+                    if (plan != null) pendingDemand.Add(plan.ConnectionId, sequence);
+                    // Zero constant mean: this is selected coverage demand, not a
+                    // homogeneous Poisson request stream. The opportunity records
+                    // carry its actual response mean and probability.
+                    host.Recorder?.RecordDemandArrival(sequence, now, due, 0, interval,
+                        nextNominalCoverageAt, plan?.ConnectionId,
+                        plan != null ? null : idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
+                }
+                host.Recorder?.RecordNominalOpportunity(now, due, expected, goal, chance, roll,
+                    nominalDepartures.Count, mean, interval, nextNominalCoverageAt, nominalSeconds,
+                    plan?.ConnectionId, plan != null ? null : !selected ? "probability_skip" :
+                        idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
+            }
+            nominalDepartures.RemoveAll(at => at <= now);
+        }
+
         private void CreateIndependentDemand(float now)
         {
             // No occupancy, cancellation, outage or LOAD inputs. Catch-up preserves each
@@ -975,14 +1065,14 @@ namespace Uptime.Connections
                 double due = nextIndependentDemandAt;
                 double interval = IndependentDemandDelay();
                 nextIndependentDemandAt = due + interval;
-                int sequence = ++independentArrivals;
+                int sequence = ++demandArrivals;
                 ConnectionSpawnPlan plan = idsExhausted ? null : GenerateBenignPlan((float)due);
                 host.Recorder?.RecordDemandArrival(sequence, now, due, independentBenignMeanSeconds,
                     interval, nextIndependentDemandAt, plan?.ConnectionId,
                     plan != null ? null : idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
                 if (plan == null) continue; // Explicit unadmitted count/event, never a hidden occupancy skip.
                 QueueSpawnPlan(plan, "independent_benign");
-                pendingIndependentDemand.Add(plan.ConnectionId, sequence);
+                pendingDemand.Add(plan.ConnectionId, sequence);
             }
         }
 
@@ -1085,6 +1175,11 @@ namespace Uptime.Connections
                 float work = selected.purposeTemplate
                     ? spec.meanWork * Range(1f - normalWorkSpread, 1f + normalWorkSpread)
                     : load * Range(spec.minimumDuration, spec.maximumDuration);
+                if (forceBenign)
+                {
+                    load *= experimentalBenignLoadMultiplier;
+                    work *= experimentalBenignLoadMultiplier;
+                }
                 stages[i] = new OperationStage(spec.operation, work, load,
                     spec.activityDescription, spec.completionEffect, spec.behaviors,
                     spec.completionEffect == CompletionEffect.InfectionDelivery ?

@@ -1,5 +1,7 @@
 # Connections — Independent Benign Demand Experiment V0
 
+**V1 follow-up (separate experimental branch):** [Congestion & Ambient Traffic V1](connections-congestion-ambient-v1.md) adds nominal-occupancy research and scoped workload probes to this same seam. The original V0 measurements and conclusions below remain historical evidence; no policy is automatically promoted.
+
 Experimental implementation, November 22, 2026, based on PR [#124](https://github.com/abeering/uptime-game/pull/124) at `7cec0ae7e2c0b363fa07613c99cc4b3e2898dcf3`. This is an unmerged comparison, not a canonical traffic-model decision. PR #124, PR #115 and main are not modified by this branch.
 
 ## One director, one downstream pipeline
