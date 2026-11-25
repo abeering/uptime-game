@@ -90,6 +90,8 @@ Established intentions for that separate phase:
 
 None of this redesign or dynamic routing belongs in Fragility V0. Its danger text/countdown and failure count are temporary review surfaces. Failure allowances, firing, weighted importance, WORK progression, final ambient demand and shift/run policy remain open; unmerged experiments #115/#124/#125/#126 remain evidence rather than current gameplay.
 
+**Accepted visual reference (#130, November 25):** [Display Lab V0](../Connections/connections-display-lab-v0.md) establishes the shared stepped/eased heartbeat, continuous established rails at every performance/danger state, disrupted activity for slowdown/stall, and interior current-operation WORK fill as the leading integration candidate. The perimeter rack remains a reference. This accepted lab does not itself integrate gameplay, priority or dynamic routing.
+
 ## Active working designs and unresolved details
 
 **Run framing.** Overarching run and progression design belongs to Uptime as a whole. “Run = job” and “level = day/shift” is the working shared frame: the operator works for a company through a series of increasingly difficult shifts; survival and performance may be judged separately. Exact number and length of days, failure thresholds, advancement, difficulty selection, and reward schedule remain flexible. Prototype-specific progression mechanics do not transfer automatically between Packet and Connections. [level-and-run-structure.md](level-and-run-structure.md) contains the full proposal, including Packet-shaped examples; [levels-phase1.md](../historical/levels-phase1.md) and the [illustrative first prototype level](../research/first-prototype-level.md) preserve other level-thinking and implementation hypotheses.

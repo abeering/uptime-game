@@ -1,0 +1,21 @@
+Connection Display Lab V0: second visual pass, November 25, 2026.
+Unity 6000.3.11f1; isolated project copy (the original Editor was already open and left running).
+Final C# compile and actual shader/scene rendering: PASS. Tested source and scene match the working branch.
+ConnectionDisplayLabWitness: PASS 498 focused assertions, including 320 continuous-rail coverage cases and 26 primary interior-fill checks.
+Negative control: the new opaque-border coverage assertion fails against the old dashed renderer at speed 0.65, before passing against continuous rails.
+ConnectionDisplayLabCapture: PASS 222 scripted actual Play Mode assertions at 1920x1080 and 1280x720.
+Evidence: six updated PNG overviews; 432 Unity-rendered motion frames at 24fps.
+Encoded full evidence: H.264 MP4, 1280x720, 24fps, 18 seconds, 432 frames.
+Encoded comparison: first-pass B/D left, second-pass B/D right; synchronized raw Unity frames 0-8s, H.264 1216x594, 24fps, 192 frames.
+Motion preservation: 25 activity-center strips x 100 pixels x 432 frames; 3240000 RGB bytes match exactly (0 differences), covering operation/LOAD, slowdown/stall, danger and transition/departure samples. Rails and pill interiors are excluded from this equality check.
+Screenshot/frame inspection: identity text remains legible over 0/25/50/75/99% interior rack and 100% completion fill; actual gameplay readability remains open.
+Hierarchy: 334 authored GameObjects under Canvas; Camera/EventSystem are additional roots. No new objects, prefabs, materials, style or shader assets.
+Motion capture peak total path vertices: 3912 (first-pass recorded peak: 5672).
+1000 warmed binding calls: 0 managed bytes allocated; no animation-created GameObjects or route-array rebuilds.
+Existing Geometry witness: PASS.
+Existing CanonicalSceneWitness: PASS 881 serialized/functional checks.
+All 806 Assets files present on main 802a98e remain byte-identical. Heartbeat, style/colors/departures, sample phases, progress shader and all three lab prefabs also remain byte-identical to first pass; see isolation-checks.txt.
+Project Core regeneration and --check: PASS.
+Graphical startup: nonfatal Unity QuickSearch indexing ArgumentOutOfRangeException; all final checks completed successfully.
+No second-pass physical-input/human aesthetic/native Game-view or standalone performance playtest was performed.
+No gameplay integration, actual priority, new authoritative risk mapping, congestion tuning, or dynamic routing.

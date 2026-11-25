@@ -1,0 +1,4 @@
+PASS 25 straight-path activity-center strips, each 100 x 1 pixels, compared across all 432 synchronized raw Unity PNG frames.
+PASS 3240000 RGB bytes compared; 0 differences. The sampled activity/body pixels are identical between first and second passes.
+Coverage: A1-A6 (READ/WRITE/EXECUTE and LOAD), B1-B5 (speed/missed beats/stall), C1-C7 (danger/normal-budget separation), D1-D7 (transitions and departures).
+This samples centerlines to exclude intentionally changed rail borders and pill interiors; it is not a whole-image equality claim or a human motion/readability judgment. Bent rail coverage is checked by the deterministic mesh witness.
