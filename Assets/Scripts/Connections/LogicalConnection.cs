@@ -369,8 +369,8 @@ namespace Uptime.Connections
         Complete
     }
 
-    public enum ConnectionResolution { Completed, Killed, Canceled, Withdrawn }
-    public enum ConnectionTerminationCause { None, Player, Blackout, Isolation, AttackerWithdrawal }
+    public enum ConnectionResolution { Completed, Killed, Canceled, Withdrawn, TimedOut }
+    public enum ConnectionTerminationCause { None, Player, Blackout, Isolation, AttackerWithdrawal, ServiceTimeout }
 
     public enum LoadPerformance
     {
@@ -526,6 +526,38 @@ namespace Uptime.Connections
         public bool HealthWasSubstantiallySlowed { get; internal set; }
         public bool HealthBecameLate { get; internal set; }
 
+        public bool HasServiceTarget { get; internal set; }
+        public float ServiceNominalDurationSeconds { get; internal set; }
+        public float ServiceBudgetSeconds { get; internal set; }
+        public float ServiceDeadlineSeconds { get; internal set; }
+        public float ServiceRemainingSeconds { get; private set; }
+        public float ProjectedServiceSeconds { get; private set; }
+        public bool AtRisk { get; internal set; }
+        public int CompletedOperationCount { get; private set; }
+        public float TerminationRequiredWork { get; internal set; }
+        public string ServiceExplanation => !HasEstablished ? "SERVICE starts on establishment" :
+            $"SERVICE {ServiceRemainingSeconds:0.0}s left / {ServiceBudgetSeconds:0.0}s budget\n" +
+            (float.IsPositiveInfinity(ProjectedServiceSeconds) ? "Projection: no productive rate" :
+                $"Est. {ProjectedServiceSeconds:0.0}s (rate + nominal future)");
+
+        internal void UpdateServiceDanger(float time)
+        {
+            if (!HasServiceTarget || !IsActive) { AtRisk = false; return; }
+            ServiceRemainingSeconds = Mathf.Max(0f, ServiceDeadlineSeconds - time);
+            // A held transition has not started the next operation: estimate it nominally.
+            float projected = IsTransitioning ?
+                NominalOperationSeconds(CurrentOperationIndex) : RemainingWork <= .0001f ? 0f :
+                ActualWorkRate > 0f ? RemainingWork / ActualWorkRate : float.PositiveInfinity;
+            for (int i = CurrentOperationIndex + 1; i < OperationCount; i++)
+                projected += NominalOperationSeconds(i);
+            ProjectedServiceSeconds = projected;
+            AtRisk = projected > ServiceRemainingSeconds + .0001f;
+        }
+
+        private float NominalOperationSeconds(int index) => Definition.LoadAt(index) > 0f ?
+            Definition.WorkAt(index) / Definition.LoadAt(index) :
+            Definition.WorkAt(index) > 0f ? float.PositiveInfinity : 0f;
+
         internal ConnectionEffectOccurrence OnWorkCompleted(int operationIndex, float timeSeconds)
         {
             CompletionEffect effect = Definition.EffectAt(operationIndex);
@@ -538,6 +570,7 @@ namespace Uptime.Connections
 
         internal void FinishOperation()
         {
+            CompletedOperationCount++;
             CompletedWork = Mathf.Max(CompletedWork, CurrentTotalWork);
             AllocatedLoad = 0f;
             if (CurrentOperationIndex + 1 == OperationCount)

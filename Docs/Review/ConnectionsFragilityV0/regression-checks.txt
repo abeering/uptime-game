@@ -1,0 +1,14 @@
+FAIL CanonicalRegressions: Canonical regression failures; see report, including inherited/obsolete scene assumptions.
+PASS CanonicalParity
+PASS Lifecycle
+PASS Behavior
+PASS NaturalLoadNoise
+PASS Backdoor
+PASS Loader
+PASS Infector
+PASS InspectV2
+PASS ResolvedInspect
+PASS DuelConcession
+PASS LoadOutput
+PASS WorkOutput
+PASS LogsOutput

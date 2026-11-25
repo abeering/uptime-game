@@ -98,9 +98,7 @@ namespace Uptime.Connections
 
         public void Activate(LogicalConnectionState connection, float timeSeconds)
         {
-            float nominalSeconds = 0f;
-            for (int i = 0; i < connection.OperationCount; i++)
-                nominalSeconds += connection.Definition.WorkAt(i) / connection.Definition.LoadAt(i);
+            float nominalSeconds = SimulationHost.NominalServiceDuration(connection.Definition);
             connection.HealthNominalDurationSeconds = nominalSeconds;
             connection.HealthDeadlineSeconds = timeSeconds + nominalSeconds *
                 Mathf.Max(0f, tuning.deadlineTolerance);

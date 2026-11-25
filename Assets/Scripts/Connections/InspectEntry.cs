@@ -23,6 +23,8 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text throughput;
         [SerializeField] private TMP_Text bottleneck;
         [SerializeField] private TMP_Text eta;
+        [SerializeField] private TMP_Text service;
+        private bool showService;
         [SerializeField] private Image progressFill;
         [SerializeField] private Image stateTag;
         [SerializeField] private Image panelBackground;
@@ -47,7 +49,8 @@ namespace Uptime.Connections
         private bool summaryTransition;
 
         public float ExtraHeight => (!resolvedSummary && stackedUpper ? 52f : 0f) -
-            (condensedVerbose && !resolvedSummary ? 28f : 0f);
+            (condensedVerbose && !resolvedSummary ? 28f : 0f) +
+            (showService && !resolvedSummary ? 66f : 0f);
         public bool IsResolvedSummary => resolvedSummary;
         public bool IsSummaryTransitioning => summaryTransition;
 
@@ -181,6 +184,12 @@ namespace Uptime.Connections
             if (bottleneck != null)
                 bottleneck.rectTransform.anchoredPosition = new Vector2(contentInset,
                     -166f - detailOffset + (condensedVerbose ? 28f : 0f));
+            if (service != null)
+            {
+                service.rectTransform.anchoredPosition = new Vector2(contentInset,
+                    -198f - detailOffset + (condensedVerbose ? 28f : 0f));
+                SetTextWidth(service, contentWidth);
+            }
             if (eta != null)
             {
                 RectTransform rect = eta.rectTransform;
@@ -203,6 +212,12 @@ namespace Uptime.Connections
             InspectPresentationMode mode = InspectPresentationMode.Compact)
         {
             bool verbose = mode == InspectPresentationMode.Verbose;
+            showService = verbose && (state.HasServiceTarget || !state.HasEstablished) && !state.IsComplete;
+            if (service != null)
+            {
+                service.gameObject.SetActive(showService);
+                Set(service, state.ServiceExplanation);
+            }
             Color accent = identityAccent ?? activeColor;
             Set(identity, string.Empty);
             Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
@@ -235,7 +250,8 @@ namespace Uptime.Connections
             if (loadBadge != null)
                 loadBadge.ShowLoad(state.IsDemanding ? state.DesiredLoad : 0f, badgeColor);
             NodeResources target = state.TargetResources;
-            string status = state.Resolution == ConnectionResolution.Canceled ? "CANCELED" :
+            string status = state.Resolution == ConnectionResolution.TimedOut ? "TIMED OUT" :
+                state.Resolution == ConnectionResolution.Canceled ? "CANCELED" :
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.Resolution == ConnectionResolution.Withdrawn ? "WITHDRAWN" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
@@ -252,7 +268,7 @@ namespace Uptime.Connections
             string rateNote = workPaused ? " · WORK PAUSED" :
                 state.IsDemanding && state.EffectiveWorkRateMultiplier != 1f ?
                     $" · WORK ×{state.EffectiveWorkRateMultiplier:G3}" : string.Empty;
-            Set(throughput, status + reason + rateNote);
+            Set(throughput, status + reason + rateNote + (state.AtRisk ? " · AT RISK" : ""));
             if (throughput != null) throughput.color = tint;
             float fraction = CurrentWorkFraction(state);
             Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
@@ -278,7 +294,7 @@ namespace Uptime.Connections
         }
 
         public static bool ShowsVerboseStatus(LogicalConnectionState state) =>
-            !state.IsDemanding || state.Performance != LoadPerformance.AtSpeed ||
+            state.AtRisk || !state.IsDemanding || state.Performance != LoadPerformance.AtSpeed ||
             state.EffectiveWorkRateMultiplier != 1f;
 
         private void RebuildOperations(LogicalConnectionState state, Color tint)

@@ -18,6 +18,8 @@ This is the **foundation for building cohesive, intentional levels**.
 
 ---
 
+> **2026-11-24 exploration note:** The fixed-duration shift success rule, historical packet-oriented timing, and score treatment below are earlier design proposals, **not locked Connections rules**. The next proposed Connections milestone explores legitimate connection timeouts, weighted company reliability failures, player-configurable network behavior, and completed WORK as progress toward breaks/advancement. Whether failure allowance is per shift or cumulative over the run (and how the overall run ends) remains unresolved. See [Uptime Living Game Design](Uptime_Design.md), “Proposed next milestone.”
+
 # CORE FRAMING
 
 ## Run = Job

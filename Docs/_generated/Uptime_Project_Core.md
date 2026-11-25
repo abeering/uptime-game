@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:dcb01d173e3910951b0c0bcf69ffec9b514515572a3a42e79353193fe98cf020`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:c5f7e59ab72a0adebe10d6cea724e948d56478d8905392171951c0d13fd4c85b`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -152,6 +152,76 @@ The broadest earlier working statement is preserved in [game.md](https://github.
 
 These are game-design intentions, not an assertion that every listed system is built. Future work can revise them when human play and prototype evidence warrant it.
 
+## Proposed next milestone — Connections: business operations and reliability (2026-11-24)
+
+**Status:** Exploratory design / sprint guidance, **not** an implementation contract or a fixed feature backlog. The active Connections game is already compelling as real-time investigation and threat response. This direction aims to make ordinary company traffic a game in its own right, without losing the fast, arcade-first, typing-focused experience. Older run, scoring, and pacing proposals remain useful context; this milestone does not silently resolve them.
+
+### North star: configure the system, investigate connections, handle threats
+
+- **Configure the system:** Make a few persistent, understandable decisions on nodes that affect whole *classes* of connections, rather than continually micromanaging individual connections. Prefer small `ssh <nodeId>` management consoles (arrows/Space/Enter; Escape returns to the main terminal) to a growing list of global verbs.
+- **Investigate connections:** Understand PURPOSE, expected operations, anomalies, routing, and whether the network behaves as configured.
+- **Handle threats:** Kill hostile connections, intercept attacks, clean infections, and deal with the operational consequences. Hackers should complicate the company-operations game, not be the only reason it exists.
+
+**Target experience:** Mid-run, the operator has configured API for the current demand, selected CACHE purposes, traced and blocked two hostile sources in FIREWALL, and has IDS coverage. Attacks bounce off the firewall; multiple legitimate connections rapidly complete through CACHE; LOAD is below 50% everywhere. The player takes their hands off the keyboard and enjoys a network that is working *because of their choices*. A new business circumstance or attack eventually makes those choices worth reconsidering. Earned calm is a payoff, not an automatic director lull.
+
+### 1. Legitimate connection fragility and company failure (foundation)
+
+- **Connections need to fail naturally**, not just become slower. Explore timeouts under sustained LOAD contention, plus interruption (e.g., BLACKOUT, restart, mistaken kill) and rejection/unavailability as distinct causes of the same outcome: *legitimate business failed*.
+- Determine a sensible starting timeout relative to expected lifetime/purpose; give enough warning and recovery opportunity for real triage. Show impending failure clearly on the network (tag/state/visual cue) and in inspect (time remaining, progress, projected completion/at-risk state). A connection may become unsalvageable; killing it early can free resources but must not erase its failure.
+- **Business importance:** Some legitimate connections are specially marked as priority by company events/circumstances; losing them may cost more against a reliability/failure allowance. Ordinary connections still count. **Company-assigned importance** is separate from **operator-configured network priority**; the network does not automatically favor important work.
+- The working fantasy is **“lose too much legitimate business and you get fired.”** Critical/core compromise may separately end a run. Whether failure tolerance is per shift, cumulative over the run, weighted, partially refreshed, or an evolving company-operation measure remains *open*. Do not reintroduce a hidden global WORK-by-time impossibility as the default solution.
+- Completed legitimate **WORK remains useful as a measure of productivity and progress toward breaks, upgrades, and run advancement**, without requiring a hard completion deadline. Its relationship to score and varying operation costs (including CACHE) still needs definition.
+
+**Core test:** Can the Small scene, with **no hacker**, produce readable, recoverable connection failures under legitimate congestion—and can an operator's decisions save those connections?
+
+### 2. Node configuration can change passing traffic
+
+A node may **perform WORK when targeted** and **modify traffic passing through it**. Avoid a rigid WORK-node-versus-transit-node taxonomy; API, for example, can do both and still be a legitimate infection target. Node identity, topology/path, and visible connection behavior should communicate what a policy affects. Today, intermediate nodes are primarily route geometry in the Connections LOAD model; applying policies to transiting connections would be new behavior, not a description of current implementation.
+
+- **API first candidate — purpose priority:** In `ssh api`, select from observed/known PURPOSES to favor. Matching connections traversing API receive a greater share of downstream processing capacity, while other work is comparatively slower. This changes allocation, not total capacity. Start simple; exact weighting, slot limits, and operation-level scope are playtest questions.
+- **CACHE second candidate — purpose selection:** An addable/upgradable node offers a limited number of observed PURPOSE slots. Eligible READ operations for selected purposes use CACHE (possibly all of a pure-read connection or only part of a mixed connection), reducing the LOAD/processing WORK needed. Preserve the distinction between *cheaper execution* and *less business delivered* when measuring company success. CACHE has capacity and can be infected or manipulated; unexpected purposes routed through it can become an investigation clue.
+- **FIREWALL, IDS, load balancers, etc.** remain future node-management opportunities, not prerequisites for the first test. A traced source becoming a firewall-blocklist entry is a promising illustration of persistent preparation.
+
+### 3. Routine node operations: conditions, maintenance windows, and scheduled jobs
+
+This is **not** a timer saying “do maintenance in 30 seconds or lose score.” A node can show `<!> REQUIREMENT`; `ssh <nodeId>` reveals a very small menu of **what is needed, what it costs, what improves, and what is currently going wrong if deferred**. The operator chooses when there is room to act. For example:
+
+    > ssh db
+      [a] System maintenance — uses 10 LOAD for 15s; restores lost efficiency
+      [b] Security update — restart for 10s; interrupts active connections
+      [Esc] Leave for later
+      Current effect: reduced effective capacity until maintenance completes
+
+- **Maintenance** may restore a node's reduced efficiency or remove a vulnerability; doing it during heavy traffic might consume LOAD or interrupt/drop work, while deferring it leaves a concrete, visible disadvantage. An occasional explicitly time-critical request is possible, but countdown penalties are not the default foundation.
+- **Scheduled/background jobs** were raised alongside maintenance and must not get lost: backups, reports, syncs, migrations, etc. occupy a node's job queue and compete for the same LOAD as connections. Explore a simple pause/resume or a cap/ratio for **connections vs. jobs**. The jobs represent real company obligations; delaying them can affect later circumstances without merely subtracting arbitrary score.
+- **Company messages** forecast demand and obligations (e.g., a sale, tax reports, maintenance) and give the player an opportunity to preconfigure API/CACHE or find a maintenance window. Messages can be explicit and funny. The challenge is limited attention and overlapping requests—not requiring the player to solve an obscure riddle or watch a long story.
+
+### Sprint questions / boundaries
+
+1. Prove **timeout danger** from legitimate traffic alone, with observable warnings and actual failures.
+2. Prove that **one small persistent node setting** (API purpose priority is the leading candidate) can prevent or cause those failures; its consequences should be apparent in network and inspect views.
+3. Explore **node maintenance and background jobs** as competing, player-timed obligations with concrete efficiency/availability effects, rather than arbitrary score deadlines.
+4. Preserve CACHE, firewall/IDS, and broader topology as coherent follow-on design opportunities, **not** a demand to build all node types in one sprint.
+5. Defer final decisions on duration/shift rhythm, cumulative versus shift-scoped failure budgets, precise priority weights, WORK progression thresholds, and hacker encounter/endgame structure until gameplay evidence exists.
+
+The aim is **changing business demand → player-controlled network behavior → visible connection success or failure**. Configuration, investigation, and threat handling should reinforce one another; no extra management screen is worthwhile unless it changes what happens on the existing network.
+
+## Connections reliability milestone — next visual phase (2026-11-25)
+
+The proposed [Business Operations & Reliability milestone (#128)](https://github.com/abeering/uptime-game/pull/128) remains design provenance, not a claim that its broader configuration, priority, maintenance or background-job systems are implemented. [Connection Fragility V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-fragility-v0.md) is its first foundational implementation slice. Immediately after fragility playtesting, **Connection Visual Language is the next major implementation phase**. Deferral is intentional and temporary: improve rapid information parsing and give the network a substantially stronger aesthetic identity.
+
+Established intentions for that separate phase:
+
+- **Network heartbeat:** a shared visual rhythm; blips advance in rhythmic steps with smooth lerped/eased movement, then settle. Coordinated motion should feel distinctive, rather than generic continuous particle scrolling. The rhythm need not carry gameplay meaning.
+- **Persistent connection rails:** retain the rectangular line body/boundaries as a persistent visible element and primary color/state carrier. Do not place all information in traveling blips. Explore greys for ordinary business traffic, blues for priority traffic, and distinct slowed, near-timeout, timeout and killed treatments. Company-assigned business importance remains distinct from operator-configured processing priority.
+- **Activity blips:** explore requested LOAD through density/spacing, operation kind through direction/shape/pattern, and slowdown through cadence, distance or another treatment compatible with the heartbeat.
+- **Identity pill:** explore interior or perimeter/radial fill for current-operation progress. Exact progress and timing semantics remain a visual-design question.
+- **Future dynamic operation routing:** account for operations within one connection targeting different nodes, especially CACHE. Persistent identity, route redrawing, shared route segments, target changes, transition animation and whether rerouting consumes simulation time require a separate design and implementation pass.
+
+None of this redesign or dynamic routing belongs in Fragility V0. Its danger text/countdown and failure count are temporary review surfaces. Failure allowances, firing, weighted importance, WORK progression, final ambient demand and shift/run policy remain open; unmerged experiments #115/#124/#125/#126 remain evidence rather than current gameplay.
+
+**Accepted visual reference (#130, November 25):** [Display Lab V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-display-lab-v0.md) establishes the shared stepped/eased heartbeat, continuous established rails at every performance/danger state, disrupted activity for slowdown/stall, and interior current-operation WORK fill as the leading integration candidate. The perimeter rack remains a reference. This accepted lab does not itself integrate gameplay, priority or dynamic routing.
+
 ## Active working designs and unresolved details
 
 **Run framing.** Overarching run and progression design belongs to Uptime as a whole. “Run = job” and “level = day/shift” is the working shared frame: the operator works for a company through a series of increasingly difficult shifts; survival and performance may be judged separately. Exact number and length of days, failure thresholds, advancement, difficulty selection, and reward schedule remain flexible. Prototype-specific progression mechanics do not transfer automatically between Packet and Connections. [level-and-run-structure.md](https://github.com/abeering/uptime-game/blob/main/Docs/Design/level-and-run-structure.md) contains the full proposal, including Packet-shaped examples; [levels-phase1.md](https://github.com/abeering/uptime-game/blob/main/Docs/historical/levels-phase1.md) and the [illustrative first prototype level](https://github.com/abeering/uptime-game/blob/main/Docs/research/first-prototype-level.md) preserve other level-thinking and implementation hypotheses.
@@ -217,7 +287,9 @@ Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeerin
 
 # Connections — Current State
 
-**Connection Display Lab V0 (implementation branch, November 25, 2026):** `ConnectionsDisplayLab.unity` is a standalone synthetic presentation scene with 26 path examples and paired interior/perimeter WORK-progress comparisons. A shared configurable 120-BPM heartbeat drives eased steps and visible holds; requested LOAD controls density, productive speed controls disrupted cadence, and independently authored severity controls rail warnings. Second visual pass: every established connection retains continuous rails, including slowdown/stall and bent variable-width routes; disrupted activity carries performance feedback. Interior fill leads the production candidates and is used by every primary animated example; the paired static rack and perimeter implementation remain. Existing geometry/lane solvers, gameplay renderers, allocator, lifecycle and canonical scenes remain unchanged. The reusable state/view/mesh/style assets are candidates for later integration, not an adopted gameplay visual redesign. At task start accepted Fragility V0 #129 and milestone #128 remained unmerged; this lab is independent from current main and imports neither implementation. See [contract and mappings](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-display-lab-v0.md) and [review, screenshots and motion](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDisplayLabV0/README.md). Unmerged.
+**Connection Display Lab V0 (accepted PR #130, November 25, 2026):** `ConnectionsDisplayLab.unity` is a standalone synthetic presentation scene with 26 path examples and paired interior/perimeter WORK-progress comparisons. A shared configurable 120-BPM heartbeat drives eased steps and visible holds; requested LOAD controls density, productive speed controls disrupted cadence, and independently authored severity controls rail warnings. Second visual pass: every established connection retains continuous rails, including slowdown/stall and bent variable-width routes; disrupted activity carries performance feedback. Interior fill leads the production candidates and is used by every primary animated example; the paired static rack and perimeter implementation remain. Existing geometry/lane solvers, gameplay renderers, allocator, lifecycle and canonical scenes remain unchanged. The reusable state/view/mesh/style assets are candidates for later integration, not an adopted gameplay visual redesign. At task start accepted Fragility V0 #129 and milestone #128 remained unmerged; this lab is independent from current main and imports neither implementation. See [contract and mappings](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-display-lab-v0.md) and [review, screenshots and motion](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDisplayLabV0/README.md).
+
+**Connection Fragility V0 (merged PR #129, November 25, 2026):** Both canonical scenes enable a fixed connection service budget of 1.5× summed authored WORK/LOAD, starting at destination establishment. Legitimate unfinished service resolves `TimedOut`; final completion on the deadline succeeds. Host-owned exact-once business failure receipts count timeout, kill and interruption independently of recording, Health and Integrity. Current-rate plus nominal-future projection drives temporary `AT RISK` identity text and verbose service timing; history includes `TIMED OUT`, and the strip shows cumulative business failures. Hostiles receive the same service-target presentation while retaining existing lifetimes/attack timing. Ambient scheduling/tuning and allocator are unchanged. The opt-in Play Mode fixture tests real benign PURPOSE demand, rescue and sacrifice without a scheduler import. No quota, new ending or visual redesign. See [mechanical contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-fragility-v0.md) and [validation/review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsFragilityV0/README.md). Next major implementation phase: Connection Visual Language.
 
 
 **Duel Concession V0 (implementation branch, November 20, 2026):** In both canonical scenes, a fresh coordinated Escape during the active Duel startup or race intentionally concedes, executes the already frozen loss plan and usual single overt Duel Integrity strike, releases the global slot, and closes immediately. Immediate infection components retain the same damage suppression as ordinary losses; independent secondary attacks still strike normally. Pending countdowns and resolved results cannot concede. Reset/disable/CORE ending still abort presentation. `ESC — CONCEDE` uses the authored titlebar hint. The terminal reports `DUEL CONCEDED`; recorder outcomes distinguish `won`/`lost`/`conceded` and preserve real race elapsed time, partial progress, completion flags and correction counts. Race completion is never fabricated. CLEAN or terminal focus/drafts resume with held-key protection; normal win/loss result holds remain. See [review and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDuelConcessionV0/README.md). Tracks #119; unmerged.

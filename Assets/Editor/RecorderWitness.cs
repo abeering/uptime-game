@@ -42,7 +42,7 @@ namespace Uptime.Connections.EditorTools
                     Path.GetFileName(firstPath).Contains("_seed-" + director.Seed.ToString("00000") + "_"),
                     "stable timestamped seed filename");
                 ConnectionsRunLog initial = Read(firstPath);
-                Check(initial.schemaVersion == 2 && !string.IsNullOrEmpty(initial.run.runId) &&
+                Check(initial.schemaVersion == 3 && !string.IsNullOrEmpty(initial.run.runId) &&
                     !string.IsNullOrEmpty(initial.run.startedUtc) &&
                     initial.run.seed == director.Seed && initial.run.mode == "Generated" &&
                     initial.run.nodes.Length == 4 && initial.run.traffic.profiles.Length == 21 &&
