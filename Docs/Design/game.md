@@ -126,6 +126,8 @@ Between levels:
 
 # EMOTIONAL LOOP (CRITICAL)
 
+> **2026-11-24 exploration note:** The “no comfort plateau” line below is an earlier pacing hypothesis. The current Connections design exploration explicitly wants **earned periods of calm**: the player configures nodes (e.g., API priority, CACHE, firewall/IDS), watches legitimate traffic succeed and hostile traffic get rejected automatically, and can briefly take their hands off the keyboard. Pressure should return when circumstances change, not erase the satisfaction of a working setup. See [Uptime Living Game Design](Uptime_Design.md), “Proposed next milestone.”
+
 Each level should follow:
 
 1. Rising pressure
