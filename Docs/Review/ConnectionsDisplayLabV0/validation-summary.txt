@@ -1,0 +1,16 @@
+Unity 6000.3.11f1; isolated project copy (the original Editor was already open).
+Final C# compile, shader import/render, explicit authoring: PASS.
+ConnectionDisplayLabWitness: PASS 152 focused assertions.
+ConnectionDisplayLabCapture: PASS 222 scripted actual Play Mode assertions.
+Evidence: six PNG overviews at 1920x1080 / 1280x720; 432 Unity-rendered motion frames.
+Encoded evidence: H.264 MP4, 1280x720, 24fps, 18 seconds, 432 frames.
+Hierarchy: 334 authored GameObjects under Canvas; Camera/EventSystem are additional roots.
+Motion capture peak total path vertices: 5684.
+1000 warmed binding calls: 0 managed bytes allocated; no animation-created GameObjects or route-array rebuilds.
+Existing Geometry witness: PASS.
+Existing CanonicalSceneWitness: PASS 881 serialized/functional checks.
+Previously tracked Assets content and critical scene/runtime/rendering SHA256 comparisons: PASS (isolation-checks.txt).
+Project Core regeneration and --check: PASS.
+Graphical startup: nonfatal Unity QuickSearch indexing ArgumentOutOfRangeException; final checks completed successfully.
+No physical-input/human aesthetic/native Game-view or standalone performance playtest was performed.
+No gameplay integration, actual priority, new authoritative risk mapping, congestion tuning, or dynamic routing.

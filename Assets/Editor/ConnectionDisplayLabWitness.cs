@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using TMPro;
+using Uptime.Connections.Display;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Uptime.Connections.EditorTools
+{
+    public static class ConnectionDisplayLabWitness
+    {
+        public const string Evidence = "Docs/Review/ConnectionsDisplayLabV0";
+        private static readonly List<string> checks = new();
+        private static void Check(bool value, string label)
+        { checks.Add((value ? "PASS " : "FAIL ") + label); if (!value) throw new Exception("DisplayLab: " + label); }
+        private static void Near(double value, double expected, string label) => Check(Math.Abs(value - expected) < .0001,
+            label + ": expected " + expected + ", observed " + value);
+        public static void BuildAndCheck() { ConnectionDisplayLabAuthoring.Build(); Run(); }
+        [MenuItem("Tools/Connections/Run Connection Display Lab Witness")]
+        public static void Run()
+        {
+            checks.Clear(); Directory.CreateDirectory(Evidence);
+            try
+            {
+                EditorSceneManager.OpenScene(ConnectionDisplayLabAuthoring.ScenePath);
+                var lab = UnityEngine.Object.FindFirstObjectByType<ConnectionDisplayLab>();
+                Check(lab != null && lab.heartbeat != null && lab.style != null, "authored lab, heartbeat and style references");
+                Check(lab.SampleCount == 26 && lab.progressComparisons.Length == 10, "26 path examples plus ten static pill comparisons");
+                Check(UnityEngine.Object.FindFirstObjectByType<SimulationHost>() == null &&
+                    UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>() == null &&
+                    UnityEngine.Object.FindFirstObjectByType<HostileActivityDirector>() == null,
+                    "no simulation, traffic director or hacker components");
+                foreach (var sample in lab.samples)
+                {
+                    Check(sample.phases.Length > 0 && sample.view.path != null && sample.view.pill != null && sample.view.terminalMarker != null,
+                        "authored bindings: " + sample.name);
+                    Check(sample.view.path.GetComponent<CanvasRenderer>() != null && sample.view.pill.GetComponent<CanvasRenderer>() != null,
+                        "authored CanvasRenderer components: " + sample.name);
+                    Check(PrefabUtility.GetCorrespondingObjectFromSource(sample.view) != null, "linked reusable display prefab: " + sample.name);
+                    Check(sample.view.subdivision == 1 && sample.view.phaseBeats == 0, "coherent default phase/subdivision: " + sample.name);
+                }
+                var clock = lab.heartbeat; Near(clock.bpm, 120, "default BPM");
+                Near(clock.Travel(0, 1), 0, "beat begins at prior settled position");
+                Near(clock.Travel(.29, 1), 9, "smooth halfway movement");
+                Near(clock.Travel(.58, 1), 18, "moving fraction reaches next discrete position");
+                Near(clock.Travel(.99, 1), 18, "clear hold before next beat");
+                Near(clock.Travel(1, 1), 18, "beat boundary has no teleport");
+                Near(clock.Travel(1.29, 1), 27, "next eased advance");
+                Near(clock.Travel(2, .65f), 23.4, "moderate slowdown skips a beat with honest average travel");
+                Near(clock.Travel(4, .22f), 15.84, "heavy slowdown skips three beats");
+                Near(clock.Travel(100, 0), 0, "stall remains still");
+                clock.Replay(); clock.Advance(1); Near(clock.Beats, 2, "shared unscaled clock");
+                clock.bpm = 60; clock.Advance(1); Near(clock.Beats, 3, "tempo change preserves accumulated phase");
+                clock.paused = true; clock.Advance(100); Near(clock.Beats, 3, "pause freezes visual time");
+                clock.Replay(); Near(clock.Beats, 0, "replay resets phase"); Near(clock.ElapsedSeconds, 0, "replay resets transitions");
+                clock.paused = false; clock.bpm = 120;
+                Check(lab.style.Spacing(8) < lab.style.Spacing(1), "LOAD controls density independently of speed");
+                Check(LogicalPathView.DirectionFor(OperationKind.Read) == -1 && LogicalPathView.DirectionFor(OperationKind.Write) == 1 &&
+                    LogicalPathView.DirectionFor(OperationKind.Execute) == 0, "existing operation directions reused");
+                clock.SetReviewTime(3.25); lab.RenderNow();
+                var safe = lab.samples.Single(s => s.Current.identity == "c1");
+                var danger = lab.samples.Single(s => s.Current.identity == "c3");
+                Near(safe.view.path.ActivityTravel, danger.view.path.ActivityTravel, "full-speed danger does not slow activity");
+                Check(lab.style.Rail(safe.Current, clock.Beats) != lab.style.Rail(danger.Current, clock.Beats), "same speed, independent warning rail");
+                float originalBudget = safe.phases[0].serviceRemaining;
+                safe.phases[0].serviceRemaining = 41.5f; safe.Render(clock.ElapsedSeconds, clock);
+                Check(safe.phaseLabel.text.Contains("41.5"), "synthetic timing diagnostics reflect live Inspector input");
+                safe.phases[0].serviceRemaining = originalBudget;
+                var slowSafe = lab.samples.Single(s => s.Current.identity == "b3");
+                Check(slowSafe.Current.dangerSeverity == 0 && slowSafe.Current.productiveSpeed < .4f, "heavy slowdown can remain safe");
+                var denseHealthy = lab.samples.Single(s => s.Current.identity == "b1");
+                Near(denseHealthy.view.path.ActivitySpacing, slowSafe.view.path.ActivitySpacing, "dense slowed traffic retains requested LOAD density");
+                clock.SetReviewTime(2); lab.RenderNow();
+                var changed = denseHealthy.Current; double continuous = denseHealthy.view.path.ActivityTravel;
+                changed.productiveSpeed = .22f; changed.operation = OperationKind.Read;
+                denseHealthy.view.Render(changed, clock);
+                Near(denseHealthy.view.path.ActivityTravel, continuous, "speed/direction change preserves activity position");
+                changed.productiveSpeed = 0; denseHealthy.view.Render(changed, clock);
+                clock.Advance(2); denseHealthy.view.Render(changed, clock);
+                Near(denseHealthy.view.path.ActivityTravel, continuous, "stall holds accumulated activity position");
+                changed.productiveSpeed = 1; denseHealthy.view.Render(changed, clock);
+                Near(denseHealthy.view.path.ActivityTravel, continuous, "recovery resumes without teleporting activity");
+                var normalLate = lab.samples.Single(s => s.Current.identity == "c7");
+                Check(normalLate.Current.exceedsNormalBudget && normalLate.Current.productiveSpeed == 1, "normal-rate budget failure independent of current speed");
+                float[] work = { 0, .25f, .5f, .75f, .99f };
+                foreach (PillProgressTreatment mode in Enum.GetValues(typeof(PillProgressTreatment)))
+                {
+                    var pills = lab.progressComparisons.Where(p => p.treatment == mode).OrderBy(p => p.progress).ToArray();
+                    Check(pills.Length == 5 && pills.Select(p => p.progress).SequenceEqual(work), mode + " exact 0/25/50/75/99 WORK samples");
+                    Check(pills.All(p => p.GetComponentInChildren<TMP_Text>().color.r > .9f), mode + " independent high-contrast identity text");
+                }
+                var bend = lab.samples.Single(s => s.Current.identity == "b6");
+                Check(bend.view.path.SegmentCount == 3 && bend.view.path.PathLength > 380, "joined multi-segment variable-width route");
+                var begin = bend.view.path.PointAt(0); var end = bend.view.path.PointAt(1);
+                Check(begin == new Vector2(-190, -15) && end == new Vector2(185, 22), "existing path endpoints preserved");
+                using (var helper = new VertexHelper())
+                {
+                    typeof(ConnectionDisplayGraphic).GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(VertexHelper) }, null)
+                        .Invoke(bend.view.path, new object[] { helper });
+                    Check(helper.currentVertCount > 40, "bent route emits rails and activity into a shared mesh");
+                    int activityVertices = 0;
+                    var vertex = new UIVertex(); bool inside = true;
+                    for (int i = 0; i < helper.currentVertCount; i++)
+                    {
+                        helper.PopulateUIVertex(ref vertex, i);
+                        if (vertex.color.r < 200 || vertex.color.b < 200) continue;
+                        activityVertices++;
+                        inside &= vertex.position.x >= begin.x - .001f && vertex.position.x <= end.x + .001f;
+                    }
+                    Check(inside, "all " + activityVertices + " activity vertices clipped inside route endpoint extent");
+                    Check(activityVertices > 8 && lab.style.blipWidthFraction + .12f < 1, "activity width and feather remain inside rail body");
+                }
+                clock.SetReviewTime(11.99); lab.RenderNow(); float beforeReset = bend.Current.workProgress;
+                clock.SetReviewTime(12.01); lab.RenderNow();
+                Check(beforeReset > .99f && bend.Current.workProgress < .01f && bend.Current.operation == OperationKind.Write,
+                    "new operation resets WORK and reverses direction without rerouting");
+                var recover = lab.samples.Single(s => s.phases[0].state.identity == "d3");
+                clock.SetReviewTime(2); lab.RenderNow(); Check(recover.Current.productiveSpeed < 1 && recover.Current.dangerSeverity > .5f, "recovery sequence starts slow and endangered");
+                clock.SetReviewTime(8); lab.RenderNow(); Check(recover.Current.productiveSpeed == 1 && recover.Current.dangerSeverity > .5f, "full speed remains endangered");
+                clock.SetReviewTime(14); lab.RenderNow(); Check(recover.Current.productiveSpeed == 1 && recover.Current.dangerSeverity == 0, "scripted danger recovery clears rail warning");
+                var seen = new HashSet<DisplayResolution>();
+                for (float t = 0; t < 25; t += .1f)
+                { clock.SetReviewTime(t); lab.RenderNow(); foreach (var s in lab.samples) seen.Add(s.Current.resolution); }
+                Check(seen.Count == 4, "active/completed/killed/timed-out outcomes replay without destroying views");
+                lab.Replay(); Check(lab.samples.All(s => s.PhaseIndex == 0), "global replay restarts every transition");
+                int objects = lab.GetComponentsInChildren<Transform>(true).Length;
+                Check(objects < 450, "compact authored hierarchy: " + objects + " objects for 26 paths and ten comparisons");
+                int revision = bend.view.path.GeometryRevision;
+                // Warm every phase and TMP numeric buffers before measuring binding allocations.
+                for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .037); lab.RenderNow(); }
+                long bytes = GC.GetAllocatedBytesForCurrentThread();
+                for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .021); lab.RenderNow(); }
+                long allocated = GC.GetAllocatedBytesForCurrentThread() - bytes;
+                Check(allocated == 0, "1000 warmed presentation binding updates allocate " + allocated + " managed bytes");
+                Check(lab.GetComponentsInChildren<Transform>(true).Length == objects && bend.view.path.GeometryRevision == revision,
+                    "animation creates no GameObjects and does not rebuild cached route arrays");
+                Check(!ShaderUtil.ShaderHasError(lab.samples[0].view.pill.material.shader), "progress shader imported without reported errors");
+                lab.Replay();
+                Debug.Log("ConnectionDisplayLabWitness PASS: " + checks.Count + " assertions; hierarchy=" + objects + "; binding GC=" + allocated);
+            }
+            finally { File.WriteAllLines(Evidence + "/deterministic-checks.txt", checks); }
+        }
+        public static void Regressions()
+        {
+            Directory.CreateDirectory(Evidence); var report = new List<string>();
+            foreach (var test in new (string name, Action run)[] { ("Geometry", GeometryWitness.Run), ("CanonicalScenes", CanonicalSceneWitness.Run) })
+            { try { test.run(); report.Add("PASS " + test.name); } catch (Exception e) { report.Add("FAIL " + test.name + ": " + e.Message); } }
+            File.WriteAllLines(Evidence + "/regression-checks.txt", report);
+            if (report.Any(r => r.StartsWith("FAIL"))) throw new Exception("Display-lab regression failures; see report.");
+        }
+    }
+}

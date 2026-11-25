@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a22a056d863f24385a0a99b4492fc25c, type: 3}
+  m_Name: DisplayStyle
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionDisplayStyle
+  ordinaryRail: {r: 0.57, g: 0.64, b: 0.69, a: 1}
+  ordinaryBody: {r: 0.15, g: 0.19, b: 0.22, a: 1}
+  priorityRail: {r: 0.24, g: 0.63, b: 0.94, a: 1}
+  priorityBody: {r: 0.045, g: 0.17, b: 0.27, a: 1}
+  ordinaryActivity: {r: 0.83, g: 0.88, b: 0.9, a: 1}
+  priorityActivity: {r: 0.63, g: 0.85, b: 1, a: 1}
+  behind: {r: 0.94, g: 0.69, b: 0.25, a: 1}
+  endangered: {r: 1, g: 0.34, b: 0.18, a: 1}
+  critical: {r: 1, g: 0.12, b: 0.25, a: 1}
+  exceedsNormal: {r: 1, g: 0.28, b: 0.57, a: 1}
+  warningPulseDepth: 0.32
+  railThickness: 1.7
+  spacingAtOneLoad: 78
+  densityPerLoad: 0.22
+  minimumSpacing: 22
+  blipLength: 9
+  blipWidthFraction: 0.5
+  completionFadeSeconds: 0.8
+  killFlashHalfCycle: 0.12
+  timeoutFadeSeconds: 1.1

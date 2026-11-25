@@ -1,0 +1,152 @@
+PASS authored lab, heartbeat and style references
+PASS 26 path examples plus ten static pill comparisons
+PASS no simulation, traffic director or hacker components
+PASS authored bindings: READ / LOW LOAD
+PASS authored CanvasRenderer components: READ / LOW LOAD
+PASS linked reusable display prefab: READ / LOW LOAD
+PASS coherent default phase/subdivision: READ / LOW LOAD
+PASS authored bindings: READ / HIGH LOAD
+PASS authored CanvasRenderer components: READ / HIGH LOAD
+PASS linked reusable display prefab: READ / HIGH LOAD
+PASS coherent default phase/subdivision: READ / HIGH LOAD
+PASS authored bindings: WRITE / MEDIUM LOAD
+PASS authored CanvasRenderer components: WRITE / MEDIUM LOAD
+PASS linked reusable display prefab: WRITE / MEDIUM LOAD
+PASS coherent default phase/subdivision: WRITE / MEDIUM LOAD
+PASS authored bindings: EXECUTE / LOCAL ACTIVITY
+PASS authored CanvasRenderer components: EXECUTE / LOCAL ACTIVITY
+PASS linked reusable display prefab: EXECUTE / LOCAL ACTIVITY
+PASS coherent default phase/subdivision: EXECUTE / LOCAL ACTIVITY
+PASS authored bindings: PRIORITY / READ
+PASS authored CanvasRenderer components: PRIORITY / READ
+PASS linked reusable display prefab: PRIORITY / READ
+PASS coherent default phase/subdivision: PRIORITY / READ
+PASS authored bindings: PRIORITY / WRITE
+PASS authored CanvasRenderer components: PRIORITY / WRITE
+PASS linked reusable display prefab: PRIORITY / WRITE
+PASS coherent default phase/subdivision: PRIORITY / WRITE
+PASS authored bindings: AT SPEED / SAFE
+PASS authored CanvasRenderer components: AT SPEED / SAFE
+PASS linked reusable display prefab: AT SPEED / SAFE
+PASS coherent default phase/subdivision: AT SPEED / SAFE
+PASS authored bindings: MODERATE / SAFE
+PASS authored CanvasRenderer components: MODERATE / SAFE
+PASS linked reusable display prefab: MODERATE / SAFE
+PASS coherent default phase/subdivision: MODERATE / SAFE
+PASS authored bindings: HEAVY SLOWDOWN / SAFE
+PASS authored CanvasRenderer components: HEAVY SLOWDOWN / SAFE
+PASS linked reusable display prefab: HEAVY SLOWDOWN / SAFE
+PASS coherent default phase/subdivision: HEAVY SLOWDOWN / SAFE
+PASS authored bindings: STALLED / SAFE FOR NOW
+PASS authored CanvasRenderer components: STALLED / SAFE FOR NOW
+PASS linked reusable display prefab: STALLED / SAFE FOR NOW
+PASS coherent default phase/subdivision: STALLED / SAFE FOR NOW
+PASS authored bindings: PRIORITY / SLOWED
+PASS authored CanvasRenderer components: PRIORITY / SLOWED
+PASS linked reusable display prefab: PRIORITY / SLOWED
+PASS coherent default phase/subdivision: PRIORITY / SLOWED
+PASS authored bindings: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS authored CanvasRenderer components: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS linked reusable display prefab: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS coherent default phase/subdivision: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS authored bindings: AT SPEED / SAFE
+PASS authored CanvasRenderer components: AT SPEED / SAFE
+PASS linked reusable display prefab: AT SPEED / SAFE
+PASS coherent default phase/subdivision: AT SPEED / SAFE
+PASS authored bindings: AT SPEED / BEHIND, RECOVERABLE
+PASS authored CanvasRenderer components: AT SPEED / BEHIND, RECOVERABLE
+PASS linked reusable display prefab: AT SPEED / BEHIND, RECOVERABLE
+PASS coherent default phase/subdivision: AT SPEED / BEHIND, RECOVERABLE
+PASS authored bindings: AT SPEED / SEVERELY ENDANGERED
+PASS authored CanvasRenderer components: AT SPEED / SEVERELY ENDANGERED
+PASS linked reusable display prefab: AT SPEED / SEVERELY ENDANGERED
+PASS coherent default phase/subdivision: AT SPEED / SEVERELY ENDANGERED
+PASS authored bindings: SLOWED / BEHIND, RECOVERABLE
+PASS authored CanvasRenderer components: SLOWED / BEHIND, RECOVERABLE
+PASS linked reusable display prefab: SLOWED / BEHIND, RECOVERABLE
+PASS coherent default phase/subdivision: SLOWED / BEHIND, RECOVERABLE
+PASS authored bindings: SLOWED / SEVERELY ENDANGERED
+PASS authored CanvasRenderer components: SLOWED / SEVERELY ENDANGERED
+PASS linked reusable display prefab: SLOWED / SEVERELY ENDANGERED
+PASS coherent default phase/subdivision: SLOWED / SEVERELY ENDANGERED
+PASS authored bindings: STALLED / IMMINENT TIMEOUT
+PASS authored CanvasRenderer components: STALLED / IMMINENT TIMEOUT
+PASS linked reusable display prefab: STALLED / IMMINENT TIMEOUT
+PASS coherent default phase/subdivision: STALLED / IMMINENT TIMEOUT
+PASS authored bindings: EXCEEDS NORMAL-RATE BUDGET
+PASS authored CanvasRenderer components: EXCEEDS NORMAL-RATE BUDGET
+PASS linked reusable display prefab: EXCEEDS NORMAL-RATE BUDGET
+PASS coherent default phase/subdivision: EXCEEDS NORMAL-RATE BUDGET
+PASS authored bindings: HEALTHY > SLOWED > HEALTHY
+PASS authored CanvasRenderer components: HEALTHY > SLOWED > HEALTHY
+PASS linked reusable display prefab: HEALTHY > SLOWED > HEALTHY
+PASS coherent default phase/subdivision: HEALTHY > SLOWED > HEALTHY
+PASS authored bindings: SAFE > BEHIND > TIMEOUT
+PASS authored CanvasRenderer components: SAFE > BEHIND > TIMEOUT
+PASS linked reusable display prefab: SAFE > BEHIND > TIMEOUT
+PASS coherent default phase/subdivision: SAFE > BEHIND > TIMEOUT
+PASS authored bindings: SLOWED > FULL SPEED > SAFE
+PASS authored CanvasRenderer components: SLOWED > FULL SPEED > SAFE
+PASS linked reusable display prefab: SLOWED > FULL SPEED > SAFE
+PASS coherent default phase/subdivision: SLOWED > FULL SPEED > SAFE
+PASS authored bindings: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS authored CanvasRenderer components: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS linked reusable display prefab: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS coherent default phase/subdivision: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS authored bindings: KILLED / TWO FLASHES + CUT
+PASS authored CanvasRenderer components: KILLED / TWO FLASHES + CUT
+PASS linked reusable display prefab: KILLED / TWO FLASHES + CUT
+PASS coherent default phase/subdivision: KILLED / TWO FLASHES + CUT
+PASS authored bindings: TIMED OUT / HEAT + FADE
+PASS authored CanvasRenderer components: TIMED OUT / HEAT + FADE
+PASS linked reusable display prefab: TIMED OUT / HEAT + FADE
+PASS coherent default phase/subdivision: TIMED OUT / HEAT + FADE
+PASS authored bindings: NATURAL COMPLETION / FADE
+PASS authored CanvasRenderer components: NATURAL COMPLETION / FADE
+PASS linked reusable display prefab: NATURAL COMPLETION / FADE
+PASS coherent default phase/subdivision: NATURAL COMPLETION / FADE
+PASS default BPM: expected 120, observed 120
+PASS beat begins at prior settled position: expected 0, observed 0
+PASS smooth halfway movement: expected 9, observed 9
+PASS moving fraction reaches next discrete position: expected 18, observed 18
+PASS clear hold before next beat: expected 18, observed 18
+PASS beat boundary has no teleport: expected 18, observed 18
+PASS next eased advance: expected 27, observed 27
+PASS moderate slowdown skips a beat with honest average travel: expected 23.4, observed 23.3999991416931
+PASS heavy slowdown skips three beats: expected 15.84, observed 15.8399999141693
+PASS stall remains still: expected 0, observed 0
+PASS shared unscaled clock: expected 2, observed 2
+PASS tempo change preserves accumulated phase: expected 3, observed 3
+PASS pause freezes visual time: expected 3, observed 3
+PASS replay resets phase: expected 0, observed 0
+PASS replay resets transitions: expected 0, observed 0
+PASS LOAD controls density independently of speed
+PASS existing operation directions reused
+PASS full-speed danger does not slow activity: expected -125.067121267319, observed -125.067121267319
+PASS same speed, independent warning rail
+PASS synthetic timing diagnostics reflect live Inspector input
+PASS heavy slowdown can remain safe
+PASS dense slowed traffic retains requested LOAD density: expected 37.1428565979004, observed 37.1428565979004
+PASS speed/direction change preserves activity position: expected 72, observed 72
+PASS stall holds accumulated activity position: expected 72, observed 72
+PASS recovery resumes without teleporting activity: expected 72, observed 72
+PASS normal-rate budget failure independent of current speed
+PASS Interior exact 0/25/50/75/99 WORK samples
+PASS Interior independent high-contrast identity text
+PASS Perimeter exact 0/25/50/75/99 WORK samples
+PASS Perimeter independent high-contrast identity text
+PASS joined multi-segment variable-width route
+PASS existing path endpoints preserved
+PASS bent route emits rails and activity into a shared mesh
+PASS all 144 activity vertices clipped inside route endpoint extent
+PASS activity width and feather remain inside rail body
+PASS new operation resets WORK and reverses direction without rerouting
+PASS recovery sequence starts slow and endangered
+PASS full speed remains endangered
+PASS scripted danger recovery clears rail warning
+PASS active/completed/killed/timed-out outcomes replay without destroying views
+PASS global replay restarts every transition
+PASS compact authored hierarchy: 334 objects for 26 paths and ten comparisons
+PASS 1000 warmed presentation binding updates allocate 0 managed bytes
+PASS animation creates no GameObjects and does not rebuild cached route arrays
+PASS progress shader imported without reported errors

@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:46a563111f9366ccc2baef151e2687bbc137c71219ad1dc5da72a6ba002cdeef`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:8c24b4d9b8b72afc4e4510fa7d86006c2ede643dddf3e6ed628c0b811c313bd6`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -216,6 +216,9 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Connection Display Lab V0 (implementation branch, November 25, 2026):** `ConnectionsDisplayLab.unity` is a standalone synthetic presentation scene with 26 path examples and paired interior/perimeter WORK-progress comparisons. A shared configurable 120-BPM heartbeat drives eased steps and visible holds; requested LOAD controls density, productive speed controls disrupted cadence, and independently authored severity controls rail warnings. Existing geometry/lane solvers, gameplay renderers, allocator, lifecycle and canonical scenes remain unchanged. The reusable state/view/mesh/style assets are candidates for later integration, not an adopted gameplay visual redesign. At task start accepted Fragility V0 #129 and milestone #128 remained unmerged; this lab is independent from current main and imports neither implementation. See [contract and mappings](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-display-lab-v0.md) and [review, screenshots and motion](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDisplayLabV0/README.md). Unmerged.
+
 
 **Duel Concession V0 (implementation branch, November 20, 2026):** In both canonical scenes, a fresh coordinated Escape during the active Duel startup or race intentionally concedes, executes the already frozen loss plan and usual single overt Duel Integrity strike, releases the global slot, and closes immediately. Immediate infection components retain the same damage suppression as ordinary losses; independent secondary attacks still strike normally. Pending countdowns and resolved results cannot concede. Reset/disable/CORE ending still abort presentation. `ESC — CONCEDE` uses the authored titlebar hint. The terminal reports `DUEL CONCEDED`; recorder outcomes distinguish `won`/`lost`/`conceded` and preserve real race elapsed time, partial progress, completion flags and correction counts. Race completion is never fabricated. CLEAN or terminal focus/drafts resume with held-key protection; normal win/loss result holds remain. See [review and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDuelConcessionV0/README.md). Tracks #119; unmerged.
 
