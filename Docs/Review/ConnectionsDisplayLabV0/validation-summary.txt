@@ -1,21 +1,15 @@
-Connection Display Lab V0: second visual pass, November 25, 2026.
-Unity 6000.3.11f1; isolated project copy (the original Editor was already open and left running).
-Final C# compile and actual shader/scene rendering: PASS. Tested source and scene match the working branch.
-ConnectionDisplayLabWitness: PASS 498 focused assertions, including 320 continuous-rail coverage cases and 26 primary interior-fill checks.
-Negative control: the new opaque-border coverage assertion fails against the old dashed renderer at speed 0.65, before passing against continuous rails.
-ConnectionDisplayLabCapture: PASS 222 scripted actual Play Mode assertions at 1920x1080 and 1280x720.
-Evidence: six updated PNG overviews; 432 Unity-rendered motion frames at 24fps.
-Encoded full evidence: H.264 MP4, 1280x720, 24fps, 18 seconds, 432 frames.
-Encoded comparison: first-pass B/D left, second-pass B/D right; synchronized raw Unity frames 0-8s, H.264 1216x594, 24fps, 192 frames.
-Motion preservation: 25 activity-center strips x 100 pixels x 432 frames; 3240000 RGB bytes match exactly (0 differences), covering operation/LOAD, slowdown/stall, danger and transition/departure samples. Rails and pill interiors are excluded from this equality check.
-Screenshot/frame inspection: identity text remains legible over 0/25/50/75/99% interior rack and 100% completion fill; actual gameplay readability remains open.
-Hierarchy: 334 authored GameObjects under Canvas; Camera/EventSystem are additional roots. No new objects, prefabs, materials, style or shader assets.
-Motion capture peak total path vertices: 3912 (first-pass recorded peak: 5672).
-1000 warmed binding calls: 0 managed bytes allocated; no animation-created GameObjects or route-array rebuilds.
-Existing Geometry witness: PASS.
-Existing CanonicalSceneWitness: PASS 881 serialized/functional checks.
-All 806 Assets files present on main 802a98e remain byte-identical. Heartbeat, style/colors/departures, sample phases, progress shader and all three lab prefabs also remain byte-identical to first pass; see isolation-checks.txt.
-Project Core regeneration and --check: PASS.
-Graphical startup: nonfatal Unity QuickSearch indexing ArgumentOutOfRangeException; all final checks completed successfully.
-No second-pass physical-input/human aesthetic/native Game-view or standalone performance playtest was performed.
-No gameplay integration, actual priority, new authoritative risk mapping, congestion tuning, or dynamic routing.
+Connection Display Lab V0: shared gameplay-integration regression, November 25, 2026.
+Unity 6000.3.11f1; isolated project copy. Original Editor left running.
+Final source compilation and actual shader/scene rendering: PASS; all 26 changed/new integration Assets files match the tested copy byte-for-byte.
+ConnectionDisplayLabWitness: 497 PASS assertions, including 320 continuous-rail cases and 26 primary interior-fill checks; 1 allocation measurement UNAVAILABLE after sentinel calibration fails.
+ConnectionDisplayLabCapture: 223 PASS scripted actual Play Mode assertions at 1920x1080 and 1280x720.
+Evidence: six updated PNG overviews, shared-style propagation proof, and 432 Unity-rendered motion frames at 24fps (18-second H.264 reel).
+Hierarchy remains 334 Canvas GameObjects; motion creates no additional presentation GameObjects. Peak total path vertices: 3912.
+Rail continuity, heartbeat/default timing, missed beats/stalls, requested-LOAD density, directions and interior/perimeter racks retain focused coverage.
+Identity text checks span 0/25/50/75/99% interior rack and 100% completion fill. Human gameplay readability review remains open.
+The prior claim of zero bytes for 1000 binding calls is withdrawn: this Editor's thread allocation API returns zero even for an explicit allocation. Current scoped GC.Alloc instrumentation also fails sentinel calibration; no zero-allocation claim is made.
+Lab authoring now regenerates fixtures only. Guarded migration plus nine shared/canonical asset hashes and regenerated lab assertions pass (11 authoring-safety checks).
+Current integration shares exact rail, pill, style, shader and material assets with both canonical gameplay scenes. Earlier isolation-checks.txt and motion-preservation-checks.txt remain records of the accepted second visual pass, not current integration isolation claims.
+Updated gameplay isolation, regressions, profiling and 88 captures/two motion reels: ../ConnectionsVisualIntegrationV0/README.md.
+Project Core regeneration/check: PASS. Known nonfatal Unity QuickSearch indexing exception appears during graphical startup.
+No physical-input/IME, human aesthetic acceptance or standalone/GPU performance verdict is claimed.

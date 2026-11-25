@@ -1,8 +1,10 @@
 # Connections — Connection Display Lab V0
 
-**Scope:** an isolated presentation lab and reusable renderer candidate. Open `Assets/Scenes/ConnectionsDisplayLab.unity`. The canonical gameplay scenes and their rendering/simulation code are unchanged. This does not adopt the new visuals into gameplay or settle final art direction.
+**Current integration:** [Connection Visual Integration V0](connections-visual-integration-v0.md) now uses these same authored graphics, identity prefab, style and shader in both canonical gameplay scenes. The lab remains independent from simulation and is the permanent synthetic development environment.
 
-**Repository posture:** built independently from main `802a98e25209ef4c81e6ac90ef329a5382f1f6bc`. The user has accepted Fragility V0 mechanically, with natural congestion tuning deferred. At task start [#129](https://github.com/abeering/uptime-game/pull/129) remained open/unmerged, as did the broader milestone proposal [#128](https://github.com/abeering/uptime-game/pull/128). Neither PR was changed or merged. The lab has no runtime dependency on #129: all render inputs are synthetic. An eventual gameplay adapter must use the then-current accepted lifecycle/performance/service state and receive separate approval for integration.
+**Original V0 scope:** an isolated presentation lab and reusable renderer candidate. Open `Assets/Scenes/ConnectionsDisplayLab.unity`. The original lab PR left gameplay rendering/simulation unchanged and did not settle final art direction.
+
+**Original lab repository posture (#130 creation):** built independently from main `802a98e25209ef4c81e6ac90ef329a5382f1f6bc`. The user has accepted Fragility V0 mechanically, with natural congestion tuning deferred. At task start [#129](https://github.com/abeering/uptime-game/pull/129) remained open/unmerged, as did the broader milestone proposal [#128](https://github.com/abeering/uptime-game/pull/128). Neither PR was changed or merged. The lab has no runtime dependency on #129: all render inputs are synthetic. At that checkpoint, an eventual gameplay adapter needed to use the then-current accepted lifecycle/performance/service state and receive separate approval for integration.
 
 ## Scene and controls
 
@@ -59,7 +61,7 @@ The authored Canvas hierarchy contains 334 GameObjects for 26 path examples, ten
 
 `ConnectionDisplayState` keeps identity, class, operation, requested LOAD, normalized productive speed, current-operation WORK, danger severity, normal-budget flag and resolution/age separate. `ConnectionDisplayView.Render` binds it. `ConnectionDisplayGraphic.SetGeometry` accepts segment starts/ends/widths in its local coordinate system—the same array contract used by `PathGraphic` and existing packing outputs. Connected segments share bounded miter joins; gaps remain gaps. Activity uses one arc-length phase across all segments and is clipped at segment ends/corners rather than restarting its phase at every bend. Geometry arrays resize only when topology size changes and are cached between animation frames.
 
-This keeps the renderer reusable without changing existing route/lane solvers. Later gameplay integration still needs an adapter, coordinate/identity placement decisions, an agreed danger mapping, appropriate per-connection clock/step semantics during changing rates, and production profiling. The lab does not replace `LogicalPathPresenter`, `IdentityPresenter`, lane packing, physical links or any gameplay prefab. Dynamic target/routing changes are deferred; `SetGeometry` is a rendering seam, not a new routing or lifecycle policy.
+Integration V0 adds the read-only gameplay adapter, clock/pause semantics and initial cosmetic danger mapping while retaining existing route/lane and identity-placement owners. Gameplay instantiates the exact rail component from `ConnectionDisplay.prefab` and the same `DisplayIdentityPill.prefab`, rather than a production copy. Dynamic target/routing changes remain deferred; `SetGeometry` is a rendering seam, not a new routing or lifecycle policy.
 
 ## Validation and limitations
 
@@ -69,4 +71,4 @@ The binding-loop allocation measurement excludes Unity internals and PNG/video c
 
 The renderer accumulates signed travel across productive-speed, cadence and operation changes, preserving activity positions while the new motion follows the common heartbeat. Seeking backwards or replaying resets that motion. Inputs are assumed to change when delivered to the view; the exact activity-pattern phase during scripted transitions can depend on sampling cadence. This is cosmetic state and never affects WORK or resource allocation.
 
-To regenerate deliberately: **Tools → Connections → Author Connection Display Lab** outside Play Mode. This overwrites only the lab's own scene/prefabs/style/material paths; do not use it to preserve hand-authored edits to those lab assets. Normal review does not run the authoring command.
+To regenerate fixtures deliberately: **Tools → Connections → Author Connection Display Lab** outside Play Mode. This rebuilds only the lab scene from existing shared prefabs/style/material and refuses missing shared assets. It never regenerates shared assets or saves unrelated dirty assets. Preserve manual lab-scene edits before rebuilding; ordinary review just opens the saved scene. Shared production styling/prefab changes should be made on the assets themselves.

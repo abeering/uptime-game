@@ -24,6 +24,7 @@ MonoBehaviour:
   exceedsNormal: {r: 1, g: 0.28, b: 0.57, a: 1}
   warningPulseDepth: 0.32
   railThickness: 1.7
+  minimumRailFeatherPixels: 0.75
   spacingAtOneLoad: 78
   densityPerLoad: 0.22
   minimumSpacing: 22
@@ -32,3 +33,7 @@ MonoBehaviour:
   completionFadeSeconds: 0.8
   killFlashHalfCycle: 0.12
   timeoutFadeSeconds: 1.1
+  riskFloor: 0.3
+  rescueHeadroomFraction: 0.5
+  riskSoftBandFraction: 0.05
+  riskSoftBandSeconds: 0.75

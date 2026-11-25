@@ -1,0 +1,13 @@
+PASS Existing Assets changes are restricted to the 18 explicitly scoped presentation/authoring/scene files.
+PASS No simulation, allocator, behavior, traffic, threat, Packet or historical scene asset is changed.
+PASS Connections: only three existing serialized blocks change (two presenter references and host component list); two new clock/adapter blocks. No topology/layout/traffic/resource fields change.
+PASS ConnectionsAdvanced: only three existing serialized blocks change (two presenter references and host component list); two new clock/adapter blocks. No topology/layout/traffic/resource fields change.
+PASS SHA256 03ab588f925160849e0f656bd3943bb5504c21cf6536110664efbb4dcc5c5c9e Assets/Scripts/Connections/SimulationHost.cs
+PASS SHA256 ed72944902c2ea120bc37789ffc1ba0cd44e814a1f41b1a4649e0b80239e1ea6 Assets/Scripts/Connections/SimulationHost.Service.cs
+PASS SHA256 e9e01b60e1a89cecedd4b8d13aff265cebfdb86a7f98adb2ef21dd9e8d963a1c Assets/Scripts/Connections/SimulationHost.Integrity.cs
+PASS SHA256 d45bbae308fbb8839aebcdc9beadec65751f1fea5c5c1dd3b4e20423e4eaeaf3 Assets/Scripts/Connections/ResourceAllocator.cs
+PASS SHA256 babfa24c3205bab976f27ec21bc29f57abdf22d215be431bc051c10f3daa700f Assets/Scripts/Connections/LogicalConnection.cs
+PASS SHA256 c5d881e9c702915807562db96a2aefe425e59ac5de20e01dff7a5562a83796cf Assets/Scripts/Connections/ConnectionTrafficDirector.cs
+PASS SHA256 cf664103fc2d0f395bd8de1c840183c2222c31fd6480d36c75802d687b34071f Assets/Scripts/ConnectionView.cs
+PASS SHA256 a6e3806fe1019bc8da6c1601e3d5199b0ffa377d2a4c19292d3ced1fa3d68830 Assets/Scenes/GameScene.unity
+PASS SHA256 5f5d0fbdcae69a8b3f0bf2ee84f80b94e47e7fc868291bfa97a16e92aa77811e Assets/Scenes/ABScene.unity

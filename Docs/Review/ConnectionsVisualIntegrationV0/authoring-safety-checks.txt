@@ -1,0 +1,11 @@
+PASS repeated shared-asset migration refuses regeneration
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Prefabs/Connections/Display/ConnectionDisplay.prefab
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Prefabs/Connections/Display/DisplayIdentityPill.prefab
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Prefabs/Connections/Display/DisplayLabSample.prefab
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Prefabs/Connections/Display/DisplayStyle.asset
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Prefabs/Connections/Display/GameplayConnection.prefab
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.shader
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.mat
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Scenes/Connections.unity
+PASS fixture authoring leaves shared/canonical asset unchanged: Assets/Scenes/ConnectionsAdvanced.unity
+PASS regenerated fixtures retain all focused lab checks

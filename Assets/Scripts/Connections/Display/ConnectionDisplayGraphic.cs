@@ -18,6 +18,12 @@ namespace Uptime.Connections.Display
         private ConnectionDisplayStyle style;
         private double beats, travel;
         private float executePulse;
+        private float reveal = 1;
+        private float unitsPerPixel = 1;
+        private bool activityVisible = true;
+        private int probeSegment = -1;
+        private Vector2 probeCenter, probeAlong, probeHalfSize;
+        private Color probeTint;
         private bool motionReady;
         private double previousBeats;
         private float previousSpeed, previousPhase;
@@ -38,6 +44,11 @@ namespace Uptime.Connections.Display
         {
             if (starts == null || ends == null || widths == null || starts.Length != ends.Length || starts.Length != widths.Length)
                 throw new ArgumentException("Path segments need matching starts, ends and widths.");
+            bool changed = segmentStarts == null || segmentStarts.Length != starts.Length;
+            for (int i = 0; !changed && i < starts.Length; i++)
+                changed = (segmentStarts[i] - starts[i]).sqrMagnitude > .000001f ||
+                    (segmentEnds[i] - ends[i]).sqrMagnitude > .000001f || Mathf.Abs(segmentWidths[i] - widths[i]) > .0001f;
+            if (!changed) return;
             if (segmentStarts == null || segmentStarts.Length != starts.Length)
             { segmentStarts = new Vector2[starts.Length]; segmentEnds = new Vector2[starts.Length]; segmentWidths = new float[starts.Length]; }
             Array.Copy(starts, segmentStarts, starts.Length); Array.Copy(ends, segmentEnds, ends.Length);
@@ -55,7 +66,7 @@ namespace Uptime.Connections.Display
                 lengths[i] = Vector2.Distance(segmentStarts[i], segmentEnds[i]); PathLength += lengths[i];
                 Vector2 direction = (segmentEnds[i] - segmentStarts[i]).normalized;
                 Vector2 normal = new Vector2(-direction.y, direction.x);
-                startOffsets[i] = endOffsets[i] = normal * Mathf.Max(2, segmentWidths[i] * .5f);
+                startOffsets[i] = endOffsets[i] = normal * Mathf.Max(0, segmentWidths[i] * .5f);
             }
             for (int i = 1; i < n; i++)
             {
@@ -64,10 +75,22 @@ namespace Uptime.Connections.Display
                 float denominator = 1 + Vector2.Dot(a, b);
                 // Bound sharp miters; reversals use separate caps rather than exploding geometry.
                 if (denominator < .15f) continue;
-                Vector2 join = (a + b) / denominator * Mathf.Max(2, (segmentWidths[i - 1] + segmentWidths[i]) * .25f);
+                Vector2 join = (a + b) / denominator * Mathf.Max(0, (segmentWidths[i - 1] + segmentWidths[i]) * .25f);
                 endOffsets[i - 1] = startOffsets[i] = join;
             }
             GeometryRevision++; SetVerticesDirty();
+        }
+        public void SetVisibility(float fraction, bool showActivity)
+        {
+            fraction = Mathf.Clamp01(fraction);
+            if (Mathf.Abs(reveal - fraction) < .000001f && activityVisible == showActivity) return;
+            reveal = fraction; activityVisible = showActivity; SetVerticesDirty();
+        }
+        public void SetProbe(int segment, Vector2 center, Vector2 along, Vector2 halfSize, Color tint)
+        {
+            if (probeSegment == segment && probeCenter == center && probeAlong == along && probeHalfSize == halfSize && probeTint == tint) return;
+            probeSegment = segment; probeCenter = center; probeAlong = along;
+            probeHalfSize = halfSize; probeTint = tint; SetVerticesDirty();
         }
         public Vector2 PointAt(float fraction)
         {
@@ -103,7 +126,8 @@ namespace Uptime.Connections.Display
         protected override void OnPopulateMesh(VertexHelper mesh)
         {
             mesh.Clear();
-            if (style == null || lengths == null || PathLength <= 0) { LastVertexCount = 0; return; }
+            if (style == null || lengths == null || PathLength <= 0 || reveal <= 0) { LastVertexCount = 0; return; }
+            unitsPerPixel = 1 / Mathf.Max(.001f, canvas != null ? canvas.scaleFactor : 1);
             Color rail = style.Rail(state, beats), body = style.ClassBody(state.trafficClass);
             Strip(mesh, 0, PathLength, -1, 1, body, body);
             // One coherent full-route warning pulse; no spatial sweep suggests a bad physical segment.
@@ -117,7 +141,8 @@ namespace Uptime.Connections.Display
             Strip(mesh, 0, PathLength, 1, 1.12f, rail, transparent);
             // End caps keep the persistent rectangular body bounded even during stall.
             Strip(mesh, 0, 1.5f, -1, 1, rail, rail);
-            Strip(mesh, PathLength - 1.5f, PathLength, -1, 1, rail, rail);
+            Strip(mesh, PathLength * reveal - 1.5f, PathLength * reveal, -1, 1, rail, rail);
+            if (!activityVisible) { LastVertexCount = mesh.currentVertCount; return; }
             float spacing = style.Spacing(state.requestedLoad);
             int direction = LogicalPathView.DirectionFor(state.operation);
             double phase = travel;
@@ -143,25 +168,67 @@ namespace Uptime.Connections.Display
         }
         private void Strip(VertexHelper mesh, float from, float to, float lower, float upper, Color low, Color high)
         {
-            from = Mathf.Max(0, from); to = Mathf.Min(PathLength, to);
+            from = Mathf.Max(0, from); to = Mathf.Min(PathLength * reveal, to);
             if (to <= from) return;
             float before = 0;
             for (int i = 0; i < SegmentCount; i++)
             {
                 float length = lengths[i];
-                if (length > .001f && from < before + length && to > before)
+                if (length > .001f && segmentWidths[i] > 0 && from < before + length && to > before)
                 {
                     float t0 = Mathf.Clamp01((from - before) / length), t1 = Mathf.Clamp01((to - before) / length);
                     Vector2 p = Vector2.Lerp(segmentStarts[i], segmentEnds[i], t0), q = Vector2.Lerp(segmentStarts[i], segmentEnds[i], t1);
                     Vector2 a = Vector2.Lerp(startOffsets[i], endOffsets[i], t0), b = Vector2.Lerp(startOffsets[i], endOffsets[i], t1);
-                    int k = mesh.currentVertCount;
-                    mesh.AddVert(p + a * lower, low, Vector2.zero); mesh.AddVert(p + a * upper, high, Vector2.zero);
-                    mesh.AddVert(q + b * upper, high, Vector2.zero); mesh.AddVert(q + b * lower, low, Vector2.zero);
-                    mesh.AddTriangle(k, k + 1, k + 2); mesh.AddTriangle(k, k + 2, k + 3);
+                    float enter = 0, exit = 1;
+                    if (i == probeSegment && ClipProbe(p, q, ref enter, ref exit))
+                    {
+                        if (enter > 0) Quad(mesh, p, Vector2.Lerp(p, q, enter), a, Vector2.Lerp(a, b, enter), lower, upper, low, high);
+                        Color scanLow = probeTint, scanHigh = probeTint;
+                        scanLow.a *= low.a; scanHigh.a *= high.a;
+                        Quad(mesh, Vector2.Lerp(p, q, enter), Vector2.Lerp(p, q, exit),
+                            Vector2.Lerp(a, b, enter), Vector2.Lerp(a, b, exit), lower, upper, scanLow, scanHigh);
+                        if (exit < 1) Quad(mesh, Vector2.Lerp(p, q, exit), q, Vector2.Lerp(a, b, exit), b, lower, upper, low, high);
+                    }
+                    else Quad(mesh, p, q, a, b, lower, upper, low, high);
                 }
                 before += length;
                 if (before >= to) break;
             }
+        }
+        private void Quad(VertexHelper mesh, Vector2 p, Vector2 q, Vector2 a, Vector2 b,
+            float lower, float upper, Color low, Color high)
+        {
+            int k = mesh.currentVertCount;
+            mesh.AddVert(EdgePoint(p, a, lower), low, Vector2.zero); mesh.AddVert(EdgePoint(p, a, upper), high, Vector2.zero);
+            mesh.AddVert(EdgePoint(q, b, upper), high, Vector2.zero); mesh.AddVert(EdgePoint(q, b, lower), low, Vector2.zero);
+            mesh.AddTriangle(k, k + 1, k + 2); mesh.AddTriangle(k, k + 2, k + 3);
+        }
+        private Vector2 EdgePoint(Vector2 center, Vector2 offset, float fraction)
+        {
+            Vector2 point = center + offset * fraction;
+            if (Mathf.Abs(fraction) > 1)
+            {
+                // Only subpixel outer rails need extra AA support. Normal lab widths
+                // remain identical; core geometry, activity and packing widths never expand.
+                float halfWidth = offset.magnitude;
+                float extra = style.minimumRailFeatherPixels * unitsPerPixel - halfWidth * .5f -
+                    halfWidth * (Mathf.Abs(fraction) - 1);
+                if (extra > 0) point += offset.normalized * (Mathf.Sign(fraction) * extra);
+            }
+            return point;
+        }
+        private bool ClipProbe(Vector2 p, Vector2 q, ref float enter, ref float exit)
+        {
+            Vector2 across = new Vector2(-probeAlong.y, probeAlong.x), relative = p - probeCenter, delta = q - p;
+            return ClipAxis(Vector2.Dot(relative, probeAlong), Vector2.Dot(delta, probeAlong), probeHalfSize.x, ref enter, ref exit) &&
+                ClipAxis(Vector2.Dot(relative, across), Vector2.Dot(delta, across), probeHalfSize.y, ref enter, ref exit) && exit > enter;
+        }
+        private static bool ClipAxis(float origin, float delta, float extent, ref float enter, ref float exit)
+        {
+            if (Mathf.Abs(delta) < .000001f) return Mathf.Abs(origin) <= extent;
+            float a = (-extent - origin) / delta, b = (extent - origin) / delta;
+            if (a > b) (a, b) = (b, a);
+            enter = Mathf.Max(enter, a); exit = Mathf.Min(exit, b); return enter <= exit;
         }
     }
 }

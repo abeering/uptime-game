@@ -1,5 +1,8 @@
 # Connections Lifecycle V1 — establishment, cancellation, and Health
 
+**Visual Integration V0 follow-up (November 25, 2026):** Canonical presentation now uses shared style-owned departure curves: completion/withdrawal fade, kill/cancellation flashes then fade, timeout warning then fade. Resolved established activity stays stationary through departure; connecting failures show only the traveled prefix. Mechanical lifecycle, partial WORK, resource release and receipts remain unchanged. The original path-prefab timing descriptions below preserve their checkpoint; see [current visual integration](connections-visual-integration-v0.md).
+
+
 **Connection Fragility V0 update (November 25, 2026):** Both canonical scenes now enforce legitimate service timeouts independently of Network Health, retain `TimedOut` / `ServiceTimeout` receipts and count one business failure per legitimate interruption. Hostile timing remains unchanged with uniform service-target presentation. Recorder schema 3 retains service budgets/deadlines, partial failure progress, exact-once failure receipts and totals. See the [current fragility contract](connections-fragility-v0.md); older descriptions below preserve their phase scope.
 
 

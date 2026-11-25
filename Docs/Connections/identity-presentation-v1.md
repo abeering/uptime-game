@@ -1,5 +1,8 @@
 # Connections: connection identity presentation V1
 
+**Visual Integration V0 follow-up (November 25, 2026):** Canonical network rails and interior-progress pills now use the neutral shared [Display Lab implementation](connections-visual-integration-v0.md). Aliases, packing and cycling retain their owners; the palette remains available to inspection and historical scenes. The original color contract below records the earlier phase.
+
+
 This phase gives generated Connections traffic short randomized IDs and a restrained visual accent. It does not change Packet, the Connections allocator, route ordering, line packing, traffic profile selection, or simulation time.
 
 `ConnectionTrafficDirector` shuffles all 260 lowercase letter-digit IDs (`a-z` followed by `0-9`), matching Packet's ID shape, with a seed-derived random stream separate from its traffic stream. It walks that pool once per run, skipping any ID reserved by an explicit queued plan or already used by the host. The host retains IDs in its case-insensitive run history after completion or blocking. Generated IDs therefore do not repeat within a run, while authored witness IDs and explicit longer IDs keep working. Exhaustion stops ambient generation with a warning; a manual high-demand request reports the exhausted pool. Pills, Inspect cards, debug readouts, and terminal confirmations display IDs in lowercase; command lookup remains case-insensitive, and recorder data retains the canonical generated lowercase ID.

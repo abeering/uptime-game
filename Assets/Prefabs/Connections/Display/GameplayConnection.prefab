@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &697206745114277778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5011439801219287592}
+  - component: {fileID: 7125319285789586826}
+  - component: {fileID: 2899722546116956719}
+  - component: {fileID: 2859235610162838777}
+  m_Layer: 0
+  m_Name: GameplayConnection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5011439801219287592
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697206745114277778}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &7125319285789586826
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697206745114277778}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &2899722546116956719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697206745114277778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 843af8a55692d400fb8649edca7a6576, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionDisplayView
+  style: {fileID: 11400000, guid: 811b25c26eea8446a8879a256e8338d0, type: 2}
+  path: {fileID: 0}
+  pill: {fileID: 0}
+  identity: {fileID: 0}
+  terminalMarker: {fileID: 0}
+  displayGroup: {fileID: 7125319285789586826}
+  progressTreatment: 0
+  pillPosition: 0.5
+  phaseBeats: 0
+  subdivision: 1
+--- !u!114 &2859235610162838777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697206745114277778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 921db07e5da1412684a573373370683a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.LogicalPathView
+  path: {fileID: 0}
+  sharedDisplay: {fileID: 2899722546116956719}
+  sharedPathPrefab: {fileID: 8343343960862737129, guid: 9fd3d5008d15240c19b8a53cca97f4cc, type: 3}
+  terminalMarkerPrefab: {fileID: 2581615258774126695, guid: 9fd3d5008d15240c19b8a53cca97f4cc, type: 3}
+  departureSeconds: 0.45
+  failureFlashHalfCycleSeconds: 0.12
+  failureColor: {r: 1, g: 0.12, b: 0.12, a: 1}
+  relayoutSeconds: 0.3
+  healthyColor: {r: 0.36, g: 0.95, b: 0.74, a: 1}
+  constrainedColor: {r: 1, g: 0.69, b: 0.34, a: 1}
+  stalledColor: {r: 0.96, g: 0.29, b: 0.26, a: 1}
+  pulseSpacingAtOneLoad: 90
+  spacingReductionPerLoad: 0.32
+  pulseSpeedPixelsPerSecond: 90

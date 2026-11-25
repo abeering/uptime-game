@@ -1,0 +1,77 @@
+PASS same authored progress pill; temporary network danger text removed
+PASS Connections gameplay instantiates the lab's exact authored rail component and style
+PASS Connections same identity prefab, style, shader and material as lab
+PASS Connections accepted heartbeat defaults, controlled by gameplay clock
+PASS Connections effective requested LOAD: expected 5, observed 5
+PASS Connections actual productive slowdown: expected 0.6, observed 0.6
+PASS Connections current operation WORK fill: expected 0.05399996, observed 0.05399996
+PASS Connections current-rate failure with meaningful rescue headroom
+PASS Connections visible identity and neutral class; no invented priority
+PASS Connections shared path implementation; no parallel legacy renderer per connection
+PASS Connections established target sockets retained
+PASS Connections actual packed pills use interior fill
+PASS Connections presentation cannot advance simulation
+PASS Connections one live style edit propagates to gameplay and lab asset references
+UNAVAILABLE Connections allocation recorder failed sentinel calibration; no zero-allocation claim
+PASS Connections real Overclock rescue accepted
+PASS Connections rescue restores full productive activity: expected 1, observed 1
+PASS Connections authoritative recovery promptly clears danger
+PASS Connections restart resets shared visual phase
+PASS Connections slowed yet safe
+PASS ConnectionsAdvanced gameplay instantiates the lab's exact authored rail component and style
+PASS ConnectionsAdvanced same identity prefab, style, shader and material as lab
+PASS ConnectionsAdvanced accepted heartbeat defaults, controlled by gameplay clock
+PASS ConnectionsAdvanced effective requested LOAD: expected 5, observed 5
+PASS ConnectionsAdvanced actual productive slowdown: expected 0.6, observed 0.6
+PASS ConnectionsAdvanced current operation WORK fill: expected 0.03599998, observed 0.03599998
+PASS ConnectionsAdvanced current-rate failure with meaningful rescue headroom
+PASS ConnectionsAdvanced visible identity and neutral class; no invented priority
+PASS ConnectionsAdvanced shared path implementation; no parallel legacy renderer per connection
+PASS ConnectionsAdvanced established target sockets retained
+PASS ConnectionsAdvanced actual packed pills use interior fill
+PASS ConnectionsAdvanced presentation cannot advance simulation
+PASS ConnectionsAdvanced one live style edit propagates to gameplay and lab asset references
+UNAVAILABLE ConnectionsAdvanced allocation recorder failed sentinel calibration; no zero-allocation claim
+PASS ConnectionsAdvanced real Overclock rescue accepted
+PASS ConnectionsAdvanced rescue restores full productive activity: expected 1, observed 1
+PASS ConnectionsAdvanced authoritative recovery promptly clears danger
+PASS ConnectionsAdvanced restart resets shared visual phase
+PASS ConnectionsAdvanced slowed yet safe
+PASS full LOAD grant with zero WORK produces stationary dense activity
+PASS new stall can retain substantial normal-rate recovery opportunity
+PASS danger increases as normal-rate opportunity diminishes
+PASS timeout never fabricates completed WORK
+PASS at-speed but endangered after lost time retains full activity
+PASS next operation resets actual fill; transition makes no productive activity
+PASS next operation starts productive activity without moving the deadline
+PASS legitimate sacrifice resolves through existing host
+PASS resolved established paths retain stationary activity through shared departure
+PASS kill preserves partial WORK and one business failure
+PASS actual isolation accepted
+PASS isolation is failed partial service, not completion
+PASS Blackout cancellation retains failure departure and partial progress
+PASS productive speed preserves actual factors above 2x: expected 4, observed 4
+PASS identical benign/hostile service facts receive identical progress, activity and danger
+PASS actual LOADER withdrawal fades without fabricated operation completion
+PASS connecting/interrupted rails contain only the actually revealed prefix
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS Probe tint bounded by scanner rectangle
+PASS shared mesh retains Probe classification only inside scanner

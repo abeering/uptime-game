@@ -112,6 +112,16 @@ namespace Uptime.Connections.EditorTools
                     Save(ConnectionDisplayLabWitness.Evidence + "/overview-" + t.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "s-" + size.x + "x" + size.y + ".png");
                 }
             }
+            Color originalRail = lab.style.ordinaryRail;
+            try
+            {
+                lab.style.ordinaryRail = Color.white;
+                lab.heartbeat.SetReviewTime(0); lab.RenderNow(); Canvas.ForceUpdateCanvases();
+                SetViewport(1920, 1080);
+                Save(ConnectionDisplayLabWitness.Evidence + "/shared-style-proof.png");
+                Check(lab.samples[0].view.style == lab.style, "shared style proof uses the same asset in the lab");
+            }
+            finally { lab.style.ordinaryRail = originalRail; }
             // A reproducible real Unity rendering of an 18-second presentation timeline.
             // PNG encoding allocations are capture instrumentation, outside renderer measurements.
             string frames = "/tmp/uptime-display-lab-motion"; Directory.CreateDirectory(frames);

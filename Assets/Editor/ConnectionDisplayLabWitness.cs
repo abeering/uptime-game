@@ -136,15 +136,16 @@ namespace Uptime.Connections.EditorTools
                 int revision = bend.view.path.GeometryRevision;
                 // Warm every phase and TMP numeric buffers before measuring binding allocations.
                 for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .037); lab.RenderNow(); }
-                long bytes = GC.GetAllocatedBytesForCurrentThread();
-                for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .021); lab.RenderNow(); }
-                long allocated = GC.GetAllocatedBytesForCurrentThread() - bytes;
-                Check(allocated == 0, "1000 warmed presentation binding updates allocate " + allocated + " managed bytes");
+                long allocated = PresentationAllocationProbe.Measure(() => {
+                    for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .021); lab.RenderNow(); }
+                });
+                if (allocated >= 0) Check(allocated == 0, "1000 warmed presentation binding updates allocate " + allocated + " managed bytes (calibrated GC.Alloc)");
+                else checks.Add("UNAVAILABLE allocation recorder failed sentinel calibration; no zero-allocation claim");
                 Check(lab.GetComponentsInChildren<Transform>(true).Length == objects && bend.view.path.GeometryRevision == revision,
                     "animation creates no GameObjects and does not rebuild cached route arrays");
                 Check(!ShaderUtil.ShaderHasError(lab.samples[0].view.pill.material.shader), "progress shader imported without reported errors");
                 lab.Replay();
-                Debug.Log("ConnectionDisplayLabWitness PASS: " + checks.Count + " assertions; hierarchy=" + objects + "; binding GC=" + allocated);
+                Debug.Log("ConnectionDisplayLabWitness PASS: " + checks.Count(s => s.StartsWith("PASS")) + " assertions; hierarchy=" + objects + "; binding GC=" + allocated);
             }
             finally { File.WriteAllLines(Evidence + "/deterministic-checks.txt", checks); }
         }

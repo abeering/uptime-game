@@ -493,6 +493,6 @@ PASS scripted danger recovery clears rail warning
 PASS active/completed/killed/timed-out outcomes replay without destroying views
 PASS global replay restarts every transition
 PASS compact authored hierarchy: 334 objects for 26 paths and ten comparisons
-PASS 1000 warmed presentation binding updates allocate 0 managed bytes
+UNAVAILABLE allocation recorder failed sentinel calibration; no zero-allocation claim
 PASS animation creates no GameObjects and does not rebuild cached route arrays
 PASS progress shader imported without reported errors

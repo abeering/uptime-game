@@ -1,0 +1,9 @@
+PASS VisualIntegration
+PASS Fragility
+FAIL ExistingBroadRegressions: Regressions contain failures; inspect retained reports.
+PASS DisplayLab
+PASS IdHopping
+PASS ReactiveIdentity
+FAIL GeneratedIdentity: Generated Identity Witness: Connections hostile activity weights and arrival interval unchanged
+PASS Probe
+PASS ProbeSweep

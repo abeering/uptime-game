@@ -1,5 +1,8 @@
 # Connections Probe X-ray V0
 
+**Visual Integration V0 follow-up (November 25, 2026):** Canonical ordinary connections use the shared display mesh, including the existing rotated Probe clipping and identity revelation. Probe timing, classification, scanner bounds and separate attack presentation are unchanged. See [visual integration](connections-visual-integration-v0.md).
+
+
 **Scope:** Connections implementation. This is the first playable slice of the [Probe working design](connections-probe-xray-design.md). The working design still holds open questions and describes later ID hopping and Payload-route ideas; this slice implements neither.
 
 `probe <linkId>` immediately selects one physical link, matched without regard to letter case. The host allows one active Probe. Its serialized defaults are 10 simulation seconds active and 35 simulation seconds of cooldown measured from activation. Another deployment can begin at the cooldown deadline after the first has expired. Invalid links, a busy Probe, and cooldown attempts leave the current state unchanged. Reset and disable clear both timers and the selected link.
