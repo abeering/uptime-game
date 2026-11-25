@@ -17,6 +17,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host);
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
             Check(host != null && director != null && recorder != null, "scene bindings");

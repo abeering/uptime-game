@@ -13,7 +13,7 @@ namespace Uptime.Connections
 {
     [Serializable] public sealed class ConnectionsRunLog
     {
-        public int schemaVersion = 2;
+        public int schemaVersion = 3;
         public RunMetadata run;
         public List<RunEvent> events = new List<RunEvent>();
         public List<NetworkSnapshot> snapshots = new List<NetworkSnapshot>();
@@ -32,6 +32,8 @@ namespace Uptime.Connections
         public string mode;
         public int seed;
         public float fixedStepSeconds;
+        public bool serviceTimeoutsEnabled;
+        public float serviceTimeoutTolerance;
         public float defaultPhantomLoad;
         public float defaultSpawnerCadence;
         public float defaultPayloadSpawnerCadence;
@@ -176,6 +178,9 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public float serviceNominalDurationSeconds, serviceBudgetSeconds, serviceDeadlineSeconds;
+        public float terminationRequiredWork;
+        public int completedOperationCount, legitimateFailureTotal, businessFailureUnits;
         public IntegrityEvent integrity;
         public HackerOffensive hackerOffensive;
         public HackerTargetDecision hackerTarget;
@@ -436,6 +441,7 @@ namespace Uptime.Connections
         public HackerDirectiveSnapshot hackerDirective;
         public float timeSeconds;
         public int activeConnections;
+        public int legitimateFailureTotal;
         public int establishedBenign;
         public int establishedHostile;
         public int anticipatedBenign;
@@ -560,6 +566,8 @@ namespace Uptime.Connections
         public float loaderActivatedAtSeconds;
         public float loaderWithdrawAtSeconds;
         public string performance;
+        public float serviceDeadlineSeconds, serviceRemainingSeconds, projectedServiceSeconds;
+        public bool serviceAtRisk;
     }
 
     // Observes authoritative state and writes one replaceable JSON file per Play Mode run.
@@ -1161,6 +1169,12 @@ namespace Uptime.Connections
             RunEvent entry = NewEvent("connection_resolved", time);
             entry.connectionId = state.ConnectionId;
             entry.resolutionReason = reason.ToString();
+            entry.serviceNominalDurationSeconds = state.ServiceNominalDurationSeconds;
+            entry.serviceBudgetSeconds = state.ServiceBudgetSeconds;
+            entry.serviceDeadlineSeconds = state.ServiceDeadlineSeconds;
+            entry.terminationRequiredWork = state.TerminationRequiredWork;
+            entry.completedOperationCount = state.CompletedOperationCount;
+            entry.legitimateFailureTotal = host.LegitimateFailureCount;
             entry.resolutionCause = state.TerminationCause.ToString();
             entry.terminationPhase = state.TerminationPhase.ToString();
             entry.failureNodeId = state.FailureNodeId;
@@ -1177,6 +1191,20 @@ namespace Uptime.Connections
             entry.elapsedLifetimeSeconds = Mathf.Max(0f, time - state.SpawnedAtSeconds);
             entry.loaderActivatedAtSeconds = state.LoaderActivatedAtSeconds;
             entry.loaderWithdrawAtSeconds = state.LoaderWithdrawAtSeconds;
+        }
+
+        public void RecordBusinessFailure(BusinessFailure failure)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("business_failure", failure.TimeSeconds);
+            entry.connectionId = failure.ConnectionId;
+            entry.resolutionReason = failure.Resolution.ToString();
+            entry.resolutionCause = failure.Cause.ToString();
+            entry.businessFailureUnits = failure.Units;
+            entry.legitimateFailureTotal = failure.CumulativeTotal;
+            entry.operationIndex = failure.OperationIndex;
+            entry.completedWork = failure.CompletedWork;
+            entry.terminationRequiredWork = failure.RequiredWork;
         }
 
         public void RecordLoaderActivated(LogicalConnectionState state, float time)
@@ -1215,6 +1243,9 @@ namespace Uptime.Connections
             RunEvent entry = NewEvent("connection_established", time);
             entry.connectionId = state.ConnectionId;
             entry.establishedAtSeconds = time;
+            entry.serviceNominalDurationSeconds = state.ServiceNominalDurationSeconds;
+            entry.serviceBudgetSeconds = state.ServiceBudgetSeconds;
+            entry.serviceDeadlineSeconds = state.ServiceDeadlineSeconds;
         }
 
         public int RecordPlayerAction(string command, string connectionId, bool success,
@@ -1454,6 +1485,7 @@ namespace Uptime.Connections
         {
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
+                legitimateFailureTotal = host.LegitimateFailureCount,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
@@ -1563,6 +1595,10 @@ namespace Uptime.Connections
                 }
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
+                    serviceDeadlineSeconds = state.ServiceDeadlineSeconds,
+                    serviceRemainingSeconds = state.ServiceRemainingSeconds,
+                    projectedServiceSeconds = float.IsPositiveInfinity(state.ProjectedServiceSeconds) ? -1f : state.ProjectedServiceSeconds,
+                    serviceAtRisk = state.AtRisk,
                     lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
                     desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
@@ -1596,6 +1632,8 @@ namespace Uptime.Connections
                 sceneName = SceneManager.GetActiveScene().name,
                 mode = host.RunMode.ToString(), seed = seed,
                 fixedStepSeconds = Time.fixedDeltaTime,
+                serviceTimeoutsEnabled = host.ServiceTimeoutsEnabled,
+                serviceTimeoutTolerance = host.ServiceTimeoutTolerance,
                 defaultPhantomLoad = host.DefaultPhantomLoad,
                 defaultSpawnerCadence = host.DefaultSpawnerCadence,
                 defaultPayloadSpawnerCadence = host.DefaultPayloadSpawnerCadence,

@@ -15,6 +15,7 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host);
             var director = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();
             Check(host != null && director != null && recorder != null, "scene bindings");
@@ -276,7 +277,7 @@ namespace Uptime.Connections.EditorTools
                     .GetArrayElementAtIndex(0).objectReferenceValue;
                 var badge = (InspectOperationToken)new SerializedObject(card)
                     .FindProperty("loadBadge").objectReferenceValue;
-                Check(badge.Text == $"LOAD {a.DesiredLoad:0.#}",
+                Check(badge.Text == "LOAD " + a.DesiredLoad.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture),
                     "inspect LOAD pill displays authoritative requested LOAD");
             }
             finally { UnityEngine.Object.DestroyImmediate(output.gameObject); }

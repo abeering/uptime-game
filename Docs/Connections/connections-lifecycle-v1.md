@@ -1,5 +1,8 @@
 # Connections Lifecycle V1 — establishment, cancellation, and Health
 
+**Connection Fragility V0 update (November 25, 2026):** Both canonical scenes now enforce legitimate service timeouts independently of Network Health, retain `TimedOut` / `ServiceTimeout` receipts and count one business failure per legitimate interruption. Hostile timing remains unchanged with uniform service-target presentation. Recorder schema 3 retains service budgets/deadlines, partial failure progress, exact-once failure receipts and totals. See the [current fragility contract](connections-fragility-v0.md); older descriptions below preserve their phase scope.
+
+
 **Scope:** Connections implementation in the four-node scenario. Packet is independent. This supersedes the arrival rejection and direct outage Health rules described in the earlier Blackout and Spawner extension.
 
 A queued plan materializes as a **Connecting attempt** with an ID, route, purpose, internal classification, inspection history, and path lane. It traverses one physical route link every 0.6 simulation seconds by default. The host records intermediate and destination arrivals. Availability is checked at ingress and each reached node. A Blackout ahead does not reject a physically valid plan or cause rerouting; removal before arrival permits establishment. An offline origin produces a spawned attempt and immediate cancellation receipt. Spawner children use this same path even when their origin or route is offline. Only a physically impossible route or exhausted IDs prevents a plan from being constructed.

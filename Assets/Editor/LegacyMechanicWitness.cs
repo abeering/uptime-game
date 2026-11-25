@@ -12,6 +12,9 @@ namespace Uptime.Connections.EditorTools
         {
             var fields = new SerializedObject(host);
             fields.FindProperty("integrityTuning.enabled").boolValue = false;
+            // Preserve the historical overdue/behavior fixtures; canonical fragility is
+            // tested separately with the actual scene setting enabled.
+            fields.FindProperty("serviceTimeoutsEnabled").boolValue = false;
             fields.ApplyModifiedPropertiesWithoutUndo();
             if (host.GetComponent<IntegrityPresenter>() is { } presenter) presenter.enabled = false;
             if (host.GetComponent<HackerDirectives>() is { } directives) directives.enabled = false;

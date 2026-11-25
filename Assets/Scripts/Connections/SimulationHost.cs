@@ -302,6 +302,7 @@ namespace Uptime.Connections
             {
                 BeginDueConnections();
                 WithdrawDueLoaders();
+                ResolveDueTimeouts();
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
@@ -317,6 +318,10 @@ namespace Uptime.Connections
                             segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                                 connection.LoaderWithdrawAtSeconds - simulationTimeSeconds));
                     }
+                    if (serviceTimeoutsEnabled && connection.IsActive && !connection.IsHostile &&
+                        connection.HasServiceTarget)
+                        segment = Mathf.Min(segment, Mathf.Max(.000001f,
+                            connection.ServiceDeadlineSeconds - simulationTimeSeconds));
                     if (connection.IsConnecting)
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             connection.TravelSecondsPerLink - connection.LinkTravelElapsedSeconds));
@@ -347,6 +352,7 @@ namespace Uptime.Connections
                 segment = Mathf.Min(segment, TimeToNextPayloadSpawnerBoundary());
                 int payloadsBeforeSegment = payloadDirector?.Payloads.Count ?? 0;
                 StepSegment(segment, completedThisStep);
+                ResolveDueTimeouts();
                 AdvanceConnecting(segment);
                 payloadDirector?.Advance(segment, simulationTimeSeconds, payloadsBeforeSegment);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
@@ -369,6 +375,7 @@ namespace Uptime.Connections
             StepSpawners();
             steppingIntegrity = false;
             CompleteIntegrityBoundary();
+            RefreshServiceDanger();
             recorder?.CaptureDueSnapshot(simulationTimeSeconds);
             RefreshDisplays();
         }
@@ -476,6 +483,7 @@ namespace Uptime.Connections
                 }
                 runtimeConnections = remaining.ToArray();
             }
+            RefreshServiceDanger();
         }
 
         private bool HasPendingPayloadSource()
@@ -518,6 +526,7 @@ namespace Uptime.Connections
                 state.HasEstablished = true;
                 state.EstablishedAtSeconds = simulationTimeSeconds;
                 health.Activate(state, simulationTimeSeconds);
+                EstablishService(state);
                 state.Behaviors.StartConnection();
                 StartOperation(state);
                 recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
@@ -630,6 +639,7 @@ namespace Uptime.Connections
                     (state.IsActive || state.IsConnecting))
                 {
                     bool wasActive = state.IsActive;
+                    state.TerminationRequiredWork = state.CurrentTotalWork;
                     state.TerminationPhase = state.Lifecycle;
                     state.TerminationCause = ConnectionTerminationCause.Player;
                     state.Lifecycle = Lifecycle.Complete;
@@ -646,6 +656,7 @@ namespace Uptime.Connections
                     foreach (LogicalConnectionState live in runtimeConnections)
                         if (live.IsDemanding)
                             live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
+                    RefreshServiceDanger();
                     recorder?.CaptureSnapshot(simulationTimeSeconds);
                     RefreshDisplays();
                     return true;
@@ -658,6 +669,8 @@ namespace Uptime.Connections
             if (state.Resolution.HasValue) return;
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
+            state.AtRisk = false;
+            AccountBusinessFailure(state);
             NetworkHealthEvent penalty = health.Resolve(state, reason, simulationTimeSeconds);
             state.HealthPenaltyAmount = penalty?.Amount ?? 0f;
             if (penalty != null) recorder?.RecordHealthPenalty(penalty, health.Snapshot.Value);
@@ -960,6 +973,7 @@ namespace Uptime.Connections
             RefreshBackdoorRates();
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections,
                 payloadDirector != null ? payloadDirector.DemandAt : null);
+            RefreshServiceDanger();
             RefreshDisplays();
         }
 
@@ -1020,6 +1034,7 @@ namespace Uptime.Connections
         {
             if (state.Resolution.HasValue) return;
             bool wasActive = state.IsActive;
+            state.TerminationRequiredWork = state.CurrentTotalWork;
             state.TerminationPhase = state.Lifecycle;
             state.TerminationCause = cause;
             state.FailureNodeId = failureNodeId;
@@ -1147,6 +1162,10 @@ namespace Uptime.Connections
             simulationTimeSeconds = 0f;
             health = new NetworkHealth(healthTuning ?? new NetworkHealthTuning());
             history.Clear();
+            businessFailures.Clear();
+            if (float.IsNaN(serviceTimeoutTolerance) || float.IsInfinity(serviceTimeoutTolerance) ||
+                serviceTimeoutTolerance <= 0f)
+                throw new InvalidOperationException("Service timeout tolerance must be finite and positive.");
             usedIds.Clear();
             occurrences.Clear();
             infections.Clear();

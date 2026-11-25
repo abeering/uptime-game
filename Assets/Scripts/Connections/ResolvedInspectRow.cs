@@ -24,6 +24,7 @@ namespace Uptime.Connections
             connectionName.text = state.Definition.ClaimedPurpose ?? string.Empty;
             connectionName.color = tint;
             resolution.text = state.Resolution == ConnectionResolution.Completed ? "COMPLETE" :
+                state.Resolution == ConnectionResolution.TimedOut ? "TIMED OUT" :
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.Resolution == ConnectionResolution.Canceled ? "CANCELED" :
                 state.Resolution == ConnectionResolution.Withdrawn ? "WITHDRAWN" : "RESOLVED";

@@ -2,7 +2,7 @@
 
 > **GENERATED FILE — DO NOT EDIT DIRECTLY.** Run `python scripts/build_uptime_project_core.py` after changing an included source.
 >
-> **Source digest:** `sha256:3da157c057e7916c89782fff58f8f48dfd1b9d65be75335197dc965c41c71b04`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
+> **Source digest:** `sha256:c099ee407a777cfc614d8e3c1409e8e4fce66e79c6245fd843dbcd173c5482bb`. This hashes the ordered manifest paths and their LF-normalized UTF-8 contents. It does not depend on the clock or Git HEAD.
 >
 > **Snapshot:** This file is a cold-start Project Source, not a live GitHub feed. Repository links below target current `main`, which may be newer than this snapshot.
 
@@ -206,6 +206,20 @@ This is **not** a timer saying “do maintenance in 30 seconds or lose score.”
 
 The aim is **changing business demand → player-controlled network behavior → visible connection success or failure**. Configuration, investigation, and threat handling should reinforce one another; no extra management screen is worthwhile unless it changes what happens on the existing network.
 
+## Connections reliability milestone — next visual phase (2026-11-25)
+
+The proposed [Business Operations & Reliability milestone (#128)](https://github.com/abeering/uptime-game/pull/128) remains design provenance, not a claim that its broader configuration, priority, maintenance or background-job systems are implemented. [Connection Fragility V0](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-fragility-v0.md) is its first foundational implementation slice. Immediately after fragility playtesting, **Connection Visual Language is the next major implementation phase**. Deferral is intentional and temporary: improve rapid information parsing and give the network a substantially stronger aesthetic identity.
+
+Established intentions for that separate phase:
+
+- **Network heartbeat:** a shared visual rhythm; blips advance in rhythmic steps with smooth lerped/eased movement, then settle. Coordinated motion should feel distinctive, rather than generic continuous particle scrolling. The rhythm need not carry gameplay meaning.
+- **Persistent connection rails:** retain the rectangular line body/boundaries as a persistent visible element and primary color/state carrier. Do not place all information in traveling blips. Explore greys for ordinary business traffic, blues for priority traffic, and distinct slowed, near-timeout, timeout and killed treatments. Company-assigned business importance remains distinct from operator-configured processing priority.
+- **Activity blips:** explore requested LOAD through density/spacing, operation kind through direction/shape/pattern, and slowdown through cadence, distance or another treatment compatible with the heartbeat.
+- **Identity pill:** explore interior or perimeter/radial fill for current-operation progress. Exact progress and timing semantics remain a visual-design question.
+- **Future dynamic operation routing:** account for operations within one connection targeting different nodes, especially CACHE. Persistent identity, route redrawing, shared route segments, target changes, transition animation and whether rerouting consumes simulation time require a separate design and implementation pass.
+
+None of this redesign or dynamic routing belongs in Fragility V0. Its danger text/countdown and failure count are temporary review surfaces. Failure allowances, firing, weighted importance, WORK progression, final ambient demand and shift/run policy remain open; unmerged experiments #115/#124/#125/#126 remain evidence rather than current gameplay.
+
 ## Active working designs and unresolved details
 
 **Run framing.** Overarching run and progression design belongs to Uptime as a whole. “Run = job” and “level = day/shift” is the working shared frame: the operator works for a company through a series of increasingly difficult shifts; survival and performance may be judged separately. Exact number and length of days, failure thresholds, advancement, difficulty selection, and reward schedule remain flexible. Prototype-specific progression mechanics do not transfer automatically between Packet and Connections. [level-and-run-structure.md](https://github.com/abeering/uptime-game/blob/main/Docs/Design/level-and-run-structure.md) contains the full proposal, including Packet-shaped examples; [levels-phase1.md](https://github.com/abeering/uptime-game/blob/main/Docs/historical/levels-phase1.md) and the [illustrative first prototype level](https://github.com/abeering/uptime-game/blob/main/Docs/research/first-prototype-level.md) preserve other level-thinking and implementation hypotheses.
@@ -270,6 +284,9 @@ The integrated Connections branch was compiled and witnessed in Unity 6000.3.11f
 Canonical file: [`Docs/Connections/Current_State.md`](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/Current_State.md).
 
 # Connections — Current State
+
+**Connection Fragility V0 (implementation branch, November 25, 2026):** Both canonical scenes enable a fixed connection service budget of 1.5× summed authored WORK/LOAD, starting at destination establishment. Legitimate unfinished service resolves `TimedOut`; final completion on the deadline succeeds. Host-owned exact-once business failure receipts count timeout, kill and interruption independently of recording, Health and Integrity. Current-rate plus nominal-future projection drives temporary `AT RISK` identity text and verbose service timing; history includes `TIMED OUT`, and the strip shows cumulative business failures. Hostiles receive the same service-target presentation while retaining existing lifetimes/attack timing. Ambient scheduling/tuning and allocator are unchanged. The opt-in Play Mode fixture tests real benign PURPOSE demand, rescue and sacrifice without a scheduler import. No quota, new ending or visual redesign. See [mechanical contract](https://github.com/abeering/uptime-game/blob/main/Docs/Connections/connections-fragility-v0.md) and [validation/review](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsFragilityV0/README.md). Next major implementation phase: Connection Visual Language. Unmerged.
+
 
 **Duel Concession V0 (implementation branch, November 20, 2026):** In both canonical scenes, a fresh coordinated Escape during the active Duel startup or race intentionally concedes, executes the already frozen loss plan and usual single overt Duel Integrity strike, releases the global slot, and closes immediately. Immediate infection components retain the same damage suppression as ordinary losses; independent secondary attacks still strike normally. Pending countdowns and resolved results cannot concede. Reset/disable/CORE ending still abort presentation. `ESC — CONCEDE` uses the authored titlebar hint. The terminal reports `DUEL CONCEDED`; recorder outcomes distinguish `won`/`lost`/`conceded` and preserve real race elapsed time, partial progress, completion flags and correction counts. Race completion is never fabricated. CLEAN or terminal focus/drafts resume with held-key protection; normal win/loss result holds remain. See [review and validation](https://github.com/abeering/uptime-game/blob/main/Docs/Review/ConnectionsDuelConcessionV0/README.md). Tracks #119; unmerged.
 

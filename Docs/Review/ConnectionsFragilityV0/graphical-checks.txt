@@ -1,0 +1,54 @@
+PASS Connections healthy uncontended legitimate traffic
+PASS Connections 01-healthy placement/capture viewport 1920x1080
+PASS Connections 01-healthy placement/capture viewport 1280x720
+PASS Connections slowed service can be safe
+PASS Connections 02-slowed-safe placement/capture viewport 1920x1080
+PASS Connections 02-slowed-safe placement/capture viewport 1280x720
+PASS Connections danger visible with 22s remaining and command focus
+PASS Connections 03-at-risk placement/capture viewport 1920x1080
+PASS Connections 03-at-risk placement/capture viewport 1280x720
+PASS Connections authored AT RISK text visible inside packed identity pill
+PASS Connections terminal overclock clears projected danger
+PASS Connections 04-rescue placement/capture viewport 1920x1080
+PASS Connections 04-rescue placement/capture viewport 1280x720
+PASS Connections rescued connection completes without failure
+PASS Connections actual timeout and exact business count
+PASS Connections cumulative failure count visibly rendered
+PASS Connections 05-timeout-departure placement/capture viewport 1920x1080
+PASS Connections 05-timeout-departure placement/capture viewport 1280x720
+PASS Connections 06-timeout-history placement/capture viewport 1920x1080
+PASS Connections 06-timeout-history placement/capture viewport 1280x720
+PASS Connections collapsed history explicitly retains TIMED OUT
+PASS Connections 07-resolved-summary-and-prompt placement/capture viewport 1920x1080
+PASS Connections 07-resolved-summary-and-prompt placement/capture viewport 1280x720
+PASS Connections persistent prompt preserves partial command and focus
+PASS Connections legitimate sacrifice clears peer danger
+PASS Connections 08-sacrifice placement/capture viewport 1920x1080
+PASS Connections 08-sacrifice placement/capture viewport 1280x720
+PASS ConnectionsAdvanced healthy uncontended legitimate traffic
+PASS ConnectionsAdvanced 01-healthy placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 01-healthy placement/capture viewport 1280x720
+PASS ConnectionsAdvanced slowed service can be safe
+PASS ConnectionsAdvanced 02-slowed-safe placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 02-slowed-safe placement/capture viewport 1280x720
+PASS ConnectionsAdvanced danger visible with 22s remaining and command focus
+PASS ConnectionsAdvanced 03-at-risk placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 03-at-risk placement/capture viewport 1280x720
+PASS ConnectionsAdvanced authored AT RISK text visible inside packed identity pill
+PASS ConnectionsAdvanced terminal overclock clears projected danger
+PASS ConnectionsAdvanced 04-rescue placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 04-rescue placement/capture viewport 1280x720
+PASS ConnectionsAdvanced rescued connection completes without failure
+PASS ConnectionsAdvanced actual timeout and exact business count
+PASS ConnectionsAdvanced cumulative failure count visibly rendered
+PASS ConnectionsAdvanced 05-timeout-departure placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 05-timeout-departure placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 06-timeout-history placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 06-timeout-history placement/capture viewport 1280x720
+PASS ConnectionsAdvanced collapsed history explicitly retains TIMED OUT
+PASS ConnectionsAdvanced 07-resolved-summary-and-prompt placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 07-resolved-summary-and-prompt placement/capture viewport 1280x720
+PASS ConnectionsAdvanced persistent prompt preserves partial command and focus
+PASS ConnectionsAdvanced legitimate sacrifice clears peer danger
+PASS ConnectionsAdvanced 08-sacrifice placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 08-sacrifice placement/capture viewport 1280x720

@@ -1,0 +1,126 @@
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Pending excludes service budget
+PASS Connecting excludes service budget
+PASS destination establishment: expected 6.2, observed 6.2
+PASS nominal WORK/LOAD: expected 20, observed 20
+PASS independent tolerance 1.5: expected 30, observed 30
+PASS establishment plus budget: expected 36.2, observed 36.2
+PASS Health deadline independently tuned; does not enforce service: expected 186.2, observed 186.2
+PASS uncontended completion has no business failure
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS final completion exactly at deadline wins
+PASS exact boundary timestamp: expected 11.2, observed 11.2
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS coarse step crossing boundary yields distinct timeout
+PASS coarse timeout timestamp: expected 31.2, observed 31.2
+PASS partial WORK at timeout: expected 75, observed 75
+PASS timeout releases all LOAD: expected 0, observed 0
+PASS one receipt per canonical connection
+PASS resolved kill and subsequent stepping cannot double count or progress
+PASS recorder stores budgets, causes, receipts and totals
+PASS historical timeout state retained
+PASS verbose historical timeout label
+PASS collapsed timeout label
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS first operation completes and transition remains held
+PASS zero productive rate projects danger safely after transition
+PASS operation transition never resets deadline: expected 10.2, observed 10.2
+PASS later timeout preserves earlier completion, cleans behavior, prevents completion effects
+PASS multi-operation deadline spans connection: expected 10.2, observed 10.2
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Connecting kill exact once
+PASS Blackout interruption receipt
+PASS isolation interruption receipt
+PASS recording=True kill/Blackout/isolation parity; hostiles excluded
+PASS recording=True timeout accounting parity
+PASS reset clears receipts
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Connecting kill exact once
+PASS Blackout interruption receipt
+PASS isolation interruption receipt
+PASS recording=False kill/Blackout/isolation parity; hostiles excluded
+PASS recording=False timeout accounting parity
+PASS reset clears receipts
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS earlier timeout leaves longer peer unresolved
+PASS released LOAD reallocated to peer at timeout boundary: expected 5, observed 5
+PASS peer recovery published after release
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS budget sums whole authored arc: expected 30, observed 30
+PASS normal operation transition and final completion preserved
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS same service presentation for identical benign/hostile recipes
+PASS hostile lifetime preserved past service target
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity real legitimate PURPOSE queue
+PASS none initial projection
+PASS none never moves fixed service deadline: expected 31.1999989, observed 31.1999989
+PASS Assets/Scenes/Connections.unity none final outcome TimedOut
+PASS Assets/Scenes/Connections.unity none failures=2; no Integrity damage
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity real legitimate PURPOSE queue
+PASS overclock initial projection
+PASS overclock never moves fixed service deadline: expected 31.1999989, observed 31.1999989
+PASS overclock danger clears with useful intervention window remaining
+PASS Assets/Scenes/Connections.unity overclock final outcome Completed
+PASS Assets/Scenes/Connections.unity overclock failures=0; no Integrity damage
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity real legitimate PURPOSE queue
+PASS sacrifice initial projection
+PASS sacrifice never moves fixed service deadline: expected 31.1999989, observed 31.1999989
+PASS sacrifice danger clears with useful intervention window remaining
+PASS Assets/Scenes/Connections.unity sacrifice final outcome Completed
+PASS Assets/Scenes/Connections.unity sacrifice failures=1; no Integrity damage
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity real legitimate PURPOSE queue
+PASS safe initial projection
+PASS slowed can be safe
+PASS safe never moves fixed service deadline: expected 31.1999989, observed 31.1999989
+PASS Assets/Scenes/Connections.unity safe final outcome Completed
+PASS Assets/Scenes/Connections.unity safe failures=0; no Integrity damage
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity real legitimate PURPOSE queue
+PASS healthy initial projection
+PASS healthy never moves fixed service deadline: expected 31.1999989, observed 31.1999989
+PASS Assets/Scenes/Connections.unity healthy final outcome Completed
+PASS Assets/Scenes/Connections.unity healthy failures=0; no Integrity damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored service enforcement enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity real legitimate PURPOSE queue
+PASS none initial projection
+PASS none never moves fixed service deadline: expected 31.8, observed 31.8
+PASS Assets/Scenes/ConnectionsAdvanced.unity none final outcome TimedOut
+PASS Assets/Scenes/ConnectionsAdvanced.unity none failures=2; no Integrity damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored service enforcement enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity real legitimate PURPOSE queue
+PASS overclock initial projection
+PASS overclock never moves fixed service deadline: expected 31.8, observed 31.8
+PASS overclock danger clears with useful intervention window remaining
+PASS Assets/Scenes/ConnectionsAdvanced.unity overclock final outcome Completed
+PASS Assets/Scenes/ConnectionsAdvanced.unity overclock failures=0; no Integrity damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored service enforcement enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity real legitimate PURPOSE queue
+PASS sacrifice initial projection
+PASS sacrifice never moves fixed service deadline: expected 31.8, observed 31.8
+PASS sacrifice danger clears with useful intervention window remaining
+PASS Assets/Scenes/ConnectionsAdvanced.unity sacrifice final outcome Completed
+PASS Assets/Scenes/ConnectionsAdvanced.unity sacrifice failures=1; no Integrity damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored service enforcement enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity real legitimate PURPOSE queue
+PASS safe initial projection
+PASS slowed can be safe
+PASS safe never moves fixed service deadline: expected 31.8, observed 31.8
+PASS Assets/Scenes/ConnectionsAdvanced.unity safe final outcome Completed
+PASS Assets/Scenes/ConnectionsAdvanced.unity safe failures=0; no Integrity damage
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored service enforcement enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity real legitimate PURPOSE queue
+PASS healthy initial projection
+PASS healthy never moves fixed service deadline: expected 31.8, observed 31.8
+PASS Assets/Scenes/ConnectionsAdvanced.unity healthy final outcome Completed
+PASS Assets/Scenes/ConnectionsAdvanced.unity healthy failures=0; no Integrity damage
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS CORE freezes unresolved work without business failure
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS at-speed connection can remain endangered after earlier delay
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS Assets/Scenes/Connections.unity authored service enforcement enabled
+PASS reset seeded recipes and failure replay match exactly

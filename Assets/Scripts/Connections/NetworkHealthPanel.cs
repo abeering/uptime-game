@@ -9,6 +9,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private SimulationHost host;
         [SerializeField] private TMP_Text clockText;
+        [SerializeField] private TMP_Text businessFailureText;
         [SerializeField] private TMP_Text valueText;
         [SerializeField] private TMP_Text rateText;
         [SerializeField] private Image healthFill;
@@ -59,6 +60,8 @@ namespace Uptime.Connections
                 host.SimulationTimeSeconds * Mathf.Max(0.001f, clockMinutesPerSimulationSecond);
             int minuteOfDay = Mathf.FloorToInt(clockMinutes) % 1440;
             if (clockText != null) clockText.text = $"{minuteOfDay / 60:00}:{minuteOfDay % 60:00}";
+            if (businessFailureText != null)
+                businessFailureText.text = $"BUSINESS FAILURES {host.LegitimateFailureCount}";
             RenderTools();
             NetworkHealthSnapshot health = host.Health;
             if (health == null) return;

@@ -87,7 +87,7 @@ namespace Uptime.Connections.EditorTools
                     CheckCompact(compact, 0, "LOAD 2.0", 1);
                     CheckCompact(compact, 1, "LOAD 2.0", 1);
                     verbose.Bind(new[] { first }, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(verbose) == 188f && Entry(verbose, 0).rect.height == 176f,
+                    Check(Height(verbose) == 254f && Entry(verbose, 0).rect.height == 242f,
                         "normal verbose result closes the redundant status row");
                     LogicalConnectionState[] five = Enumerable.Range(1, 5)
                         .Select(i => host.FindConnection("iv" + i)).ToArray();
@@ -100,7 +100,7 @@ namespace Uptime.Connections.EditorTools
                     for (int i = 0; i < 5; i++)
                         CheckCompact(many, i, i < 2 ? "LOAD 2.0" : "LOAD 1.0", 1);
                     many.Bind(five, presentationMode: InspectPresentationMode.Verbose);
-                    Check(Height(many) == 940f && Enumerable.Range(0, 5).All(i =>
+                    Check(Height(many) == 1270f && Enumerable.Range(0, 5).All(i =>
                         ((TMP_Text)new SerializedObject(EntryComponent(many, i))
                             .FindProperty("throughput").objectReferenceValue).gameObject.activeSelf == false),
                         "five-ID normal verbose output omits redundant status lines");
@@ -129,7 +129,7 @@ namespace Uptime.Connections.EditorTools
                     Check(first.Performance != LoadPerformance.AtSpeed &&
                         exception.gameObject.activeSelf &&
                         (exception.text.StartsWith("SLOWED") || exception.text.StartsWith("STALLED")) &&
-                        Entry(verbose, 0).rect.height == 204f,
+                        Entry(verbose, 0).rect.height == 270f,
                         "contention keeps explicit status and its space");
                 }
                 finally

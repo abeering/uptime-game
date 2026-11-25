@@ -1,0 +1,11 @@
+scene,case,established,deadline,resolution,completedWork,failureUnits
+Connections,none,1.19999945,31.1999989,TimedOut,89.99801,2
+Connections,overclock,1.19999945,31.1999989,Completed,100,0
+Connections,sacrifice,1.19999945,31.1999989,Completed,100,1
+Connections,safe,1.19999945,31.1999989,Completed,100,0
+Connections,healthy,1.19999945,31.1999989,Completed,100,0
+ConnectionsAdvanced,none,1.79999888,31.8,TimedOut,89.99797,2
+ConnectionsAdvanced,overclock,1.79999888,31.8,Completed,100,0
+ConnectionsAdvanced,sacrifice,1.79999888,31.8,Completed,100,1
+ConnectionsAdvanced,safe,1.79999888,31.8,Completed,100,0
+ConnectionsAdvanced,healthy,1.79999888,31.8,Completed,100,0

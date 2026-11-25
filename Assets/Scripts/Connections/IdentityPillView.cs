@@ -7,6 +7,7 @@ namespace Uptime.Connections
     {
         [SerializeField] private PillGraphic plate;
         [SerializeField] private TMP_Text idText;
+        [SerializeField] private TMP_Text serviceDangerText;
         [SerializeField] private Vector2 dimensions = new Vector2(54f, 28f);
         [SerializeField, Min(8f)] private float fontSize = 16f;
         [SerializeField] private bool tintTextWithAccent;
@@ -28,6 +29,15 @@ namespace Uptime.Connections
             plate.raycastTarget = false;
             idText.raycastTarget = false;
             ApplySize();
+        }
+
+        // Temporary danger text stays inside the original packing bounds.
+        public void SetServiceDanger(bool danger)
+        {
+            if (serviceDangerText == null) return;
+            serviceDangerText.gameObject.SetActive(danger);
+            idText.rectTransform.anchoredPosition = new Vector2(0, danger ? 5 : 0);
+            idText.fontSize = danger ? 18 : Mathf.Max(8f, fontSize);
         }
 
         public void SetPose(Vector2 position, Vector2 direction)
