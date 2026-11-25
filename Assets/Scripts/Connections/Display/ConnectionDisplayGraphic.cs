@@ -108,18 +108,13 @@ namespace Uptime.Connections.Display
             Strip(mesh, 0, PathLength, -1, 1, body, body);
             // One coherent full-route warning pulse; no spatial sweep suggests a bad physical segment.
             float speed = state.productiveSpeed;
-            float dash = speed >= .98f ? PathLength : speed >= .4f ? 52 : speed > .0001f ? 25 : 13;
-            float gap = speed >= .98f ? 0 : speed >= .4f ? 6 : 11;
             float borderFraction = Mathf.Clamp(style.railThickness / Mathf.Max(2, segmentWidths[0] * .5f), .1f, .6f);
-            for (float s = 0; s < PathLength; s += dash + gap)
-            {
-                float end = Mathf.Min(PathLength, s + dash);
-                Strip(mesh, s, end, -1, -1 + borderFraction, rail, rail);
-                Strip(mesh, s, end, 1 - borderFraction, 1, rail, rail);
-                Color transparent = rail; transparent.a = 0;
-                Strip(mesh, s, end, -1.12f, -1, transparent, rail);
-                Strip(mesh, s, end, 1, 1.12f, rail, transparent);
-            }
+            // Established connections stay continuous; disrupted activity communicates performance.
+            Strip(mesh, 0, PathLength, -1, -1 + borderFraction, rail, rail);
+            Strip(mesh, 0, PathLength, 1 - borderFraction, 1, rail, rail);
+            Color transparent = rail; transparent.a = 0;
+            Strip(mesh, 0, PathLength, -1.12f, -1, transparent, rail);
+            Strip(mesh, 0, PathLength, 1, 1.12f, rail, transparent);
             // End caps keep the persistent rectangular body bounded even during stall.
             Strip(mesh, 0, 1.5f, -1, 1, rail, rail);
             Strip(mesh, PathLength - 1.5f, PathLength, -1, 1, rail, rail);

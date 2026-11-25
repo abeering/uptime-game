@@ -64,7 +64,6 @@ namespace Uptime.Connections.EditorTools
                 var sample = (ConnectionDisplayLabSample)PrefabUtility.InstantiatePrefab(rowPrefab, root);
                 sample.name = title; sample.title.text = title; sample.phases = phases;
                 sample.GetComponent<RectTransform>().anchoredPosition = new Vector2(42 + col * 464, -151 - row * 116);
-                if (col == 3) sample.view.progressTreatment = PillProgressTreatment.Perimeter;
                 samples.Add(sample); return sample;
             }
             Row(0, 0, "READ / LOW LOAD", P("a1", OperationKind.Read, 1, 1));
@@ -90,7 +89,7 @@ namespace Uptime.Connections.EditorTools
                 P("b6", OperationKind.Read, 6, 1, duration: 12, progress: 0, label: "READ / WORK resets at next operation"),
                 P("b6", OperationKind.Write, 6, 1, duration: 12, progress: 0, label: "WRITE / same geometry, new operation") };
             foreach (var phase in bend.phases) phase.nominalWorkSeconds = 12;
-            Label("Progress treatment note", root, "D: ANIMATED PERIMETER / A-C: INTERIOR", 13,
+            Label("Progress treatment note", root, "ANIMATED: INTERIOR / RACK: BOTH", 13,
                 new Vector2(444, 22), new Vector2(1434, -976), Muted);
             Label("Performance note", root, "SPEED != DANGER\nDense + slow stays dense.\nRails remain visible during stall.", 16, new Vector2(420, 70), new Vector2(516, -919), Muted);
             Row(2, 0, "AT SPEED / SAFE", Risk("c1", 1, 0, 40, 20, 20));

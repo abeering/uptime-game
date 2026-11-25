@@ -43,6 +43,7 @@ namespace Uptime.Connections.EditorTools
                         "authored CanvasRenderer components: " + sample.name);
                     Check(PrefabUtility.GetCorrespondingObjectFromSource(sample.view) != null, "linked reusable display prefab: " + sample.name);
                     Check(sample.view.subdivision == 1 && sample.view.phaseBeats == 0, "coherent default phase/subdivision: " + sample.name);
+                    Check(sample.view.progressTreatment == PillProgressTreatment.Interior, "primary animated interior fill: " + sample.name);
                 }
                 var clock = lab.heartbeat; Near(clock.bpm, 120, "default BPM");
                 Near(clock.Travel(0, 1), 0, "beat begins at prior settled position");
@@ -98,6 +99,8 @@ namespace Uptime.Connections.EditorTools
                 Check(bend.view.path.SegmentCount == 3 && bend.view.path.PathLength > 380, "joined multi-segment variable-width route");
                 var begin = bend.view.path.PointAt(0); var end = bend.view.path.PointAt(1);
                 Check(begin == new Vector2(-190, -15) && end == new Vector2(185, 22), "existing path endpoints preserved");
+                CheckContinuousRails(lab, denseHealthy.view.path, bend.view.path);
+                lab.RenderNow();
                 using (var helper = new VertexHelper())
                 {
                     typeof(ConnectionDisplayGraphic).GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(VertexHelper) }, null)
@@ -152,6 +155,55 @@ namespace Uptime.Connections.EditorTools
             { try { test.run(); report.Add("PASS " + test.name); } catch (Exception e) { report.Add("FAIL " + test.name + ": " + e.Message); } }
             File.WriteAllLines(Evidence + "/regression-checks.txt", report);
             if (report.Any(r => r.StartsWith("FAIL"))) throw new Exception("Display-lab regression failures; see report.");
+        }
+
+        private static void CheckContinuousRails(ConnectionDisplayLab lab, params ConnectionDisplayGraphic[] paths)
+        {
+            var populate = typeof(ConnectionDisplayGraphic).GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic,
+                null, new[] { typeof(VertexHelper) }, null);
+            foreach (var path in paths)
+            {
+                // Probe both opaque border interiors, including shared join endpoints.
+                // Filter by rail color so the continuous body cannot conceal a broken outline.
+                Vector2[] Vectors(string field) => (Vector2[])typeof(ConnectionDisplayGraphic)
+                    .GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(path);
+                var starts = Vectors("segmentStarts"); var ends = Vectors("segmentEnds");
+                var startOffsets = Vectors("startOffsets"); var endOffsets = Vectors("endOffsets");
+                foreach (float speed in new[] { 1f, .65f, .22f, 0f })
+                foreach (float severity in new[] { 0f, .3f, .8f, .98f, 1f })
+                foreach (DisplayTrafficClass traffic in Enum.GetValues(typeof(DisplayTrafficClass)))
+                foreach (bool deficit in new[] { false, true })
+                foreach (double seconds in new[] { .125, .375 })
+                {
+                    var state = path.State; state.productiveSpeed = speed; state.dangerSeverity = severity;
+                    state.trafficClass = traffic; state.exceedsNormalBudget = deficit; state.resolution = DisplayResolution.Active;
+                    lab.heartbeat.SetReviewTime(seconds); path.Render(state, lab.style, lab.heartbeat);
+                    using var mesh = new VertexHelper(); populate.Invoke(path, new object[] { mesh });
+                    var vertices = new List<UIVertex>(); mesh.GetUIVertexStream(vertices);
+                    Color32 rail = lab.style.Rail(state, lab.heartbeat.Beats);
+                    bool covered = true;
+                    for (int segment = 0; segment < starts.Length && covered; segment++)
+                    for (int step = 0; step <= 100 && covered; step++)
+                    foreach (float side in new[] { -.9f, .9f })
+                    {
+                        float t = step / 100f;
+                        Vector2 probe = Vector2.Lerp(starts[segment], ends[segment], t) +
+                            Vector2.Lerp(startOffsets[segment], endOffsets[segment], t) * side;
+                        bool found = false;
+                        for (int i = 0; i < vertices.Count && !found; i += 3)
+                            if (vertices[i].color.Equals(rail) && vertices[i + 1].color.Equals(rail) && vertices[i + 2].color.Equals(rail))
+                                found = InTriangle(probe, vertices[i].position, vertices[i + 1].position, vertices[i + 2].position);
+                        covered &= found;
+                    }
+                    Check(covered, $"continuous opaque rails: segments={starts.Length}, speed={speed}, danger={severity}, class={traffic}, normal deficit={deficit}, time={seconds}");
+                }
+            }
+        }
+        private static bool InTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+        {
+            float Cross(Vector2 u, Vector2 v) => u.x * v.y - u.y * v.x;
+            float x = Cross(b - a, p - a), y = Cross(c - b, p - b), z = Cross(a - c, p - c);
+            return (x >= -.001f && y >= -.001f && z >= -.001f) || (x <= .001f && y <= .001f && z <= .001f);
         }
     }
 }
