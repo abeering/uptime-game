@@ -22,6 +22,20 @@ The broadest earlier working statement is preserved in [game.md](game.md). Its e
 
 These are game-design intentions, not an assertion that every listed system is built. Future work can revise them when human play and prototype evidence warrant it.
 
+## Connections reliability milestone — next visual phase (2026-11-25)
+
+The proposed [Business Operations & Reliability milestone (#128)](https://github.com/abeering/uptime-game/pull/128) remains design provenance, not a claim that its broader configuration, priority, maintenance or background-job systems are implemented. [Connection Fragility V0](../Connections/connections-fragility-v0.md) is its first foundational implementation slice. Immediately after fragility playtesting, **Connection Visual Language is the next major implementation phase**. Deferral is intentional and temporary: improve rapid information parsing and give the network a substantially stronger aesthetic identity.
+
+Established intentions for that separate phase:
+
+- **Network heartbeat:** a shared visual rhythm; blips advance in rhythmic steps with smooth lerped/eased movement, then settle. Coordinated motion should feel distinctive, rather than generic continuous particle scrolling. The rhythm need not carry gameplay meaning.
+- **Persistent connection rails:** retain the rectangular line body/boundaries as a persistent visible element and primary color/state carrier. Do not place all information in traveling blips. Explore greys for ordinary business traffic, blues for priority traffic, and distinct slowed, near-timeout, timeout and killed treatments. Company-assigned business importance remains distinct from operator-configured processing priority.
+- **Activity blips:** explore requested LOAD through density/spacing, operation kind through direction/shape/pattern, and slowdown through cadence, distance or another treatment compatible with the heartbeat.
+- **Identity pill:** explore interior or perimeter/radial fill for current-operation progress. Exact progress and timing semantics remain a visual-design question.
+- **Future dynamic operation routing:** account for operations within one connection targeting different nodes, especially CACHE. Persistent identity, route redrawing, shared route segments, target changes, transition animation and whether rerouting consumes simulation time require a separate design and implementation pass.
+
+None of this redesign or dynamic routing belongs in Fragility V0. Its danger text/countdown and failure count are temporary review surfaces. Failure allowances, firing, weighted importance, WORK progression, final ambient demand and shift/run policy remain open; unmerged experiments #115/#124/#125/#126 remain evidence rather than current gameplay.
+
 ## Active working designs and unresolved details
 
 **Run framing.** Overarching run and progression design belongs to Uptime as a whole. “Run = job” and “level = day/shift” is the working shared frame: the operator works for a company through a series of increasingly difficult shifts; survival and performance may be judged separately. Exact number and length of days, failure thresholds, advancement, difficulty selection, and reward schedule remain flexible. Prototype-specific progression mechanics do not transfer automatically between Packet and Connections. [level-and-run-structure.md](level-and-run-structure.md) contains the full proposal, including Packet-shaped examples; [levels-phase1.md](../historical/levels-phase1.md) and the [illustrative first prototype level](../research/first-prototype-level.md) preserve other level-thinking and implementation hypotheses.

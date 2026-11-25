@@ -1,0 +1,6 @@
+FAIL Lifecycle: LifecycleWitness: same-step arrivals start service without advancing WORK
+FAIL Behavior: BehaviorWitness failed: operation modifier does not leak into third stage
+FAIL NaturalLoadNoise: NaturalLoadNoiseWitness failed: WORK uses authoritative allocated LOAD: expected 1.165, observed 1.167
+FAIL Backdoor: BackdoorWitness: Assets/Scenes/Connections.unity BACKDOOR tuning
+PASS InspectV2
+PASS ResolvedInspect

@@ -1,0 +1,13 @@
+Unity 6000.3.11f1, actual C# compilation and Editor witnesses.
+FragilityWitness.Run: PASS 126 assertions.
+CanonicalSceneWitness.Run: PASS 883 serialized/functional assertions.
+FragilityCapture.Run: PASS, exit 0; 54 scripted graphical Play Mode assertions; 32 PNG frames, 16 per resolution (1920x1080, 1280x720).
+FragilityWitness.Validate: exit 1, expected aggregate failure for the two retained UI assertions below.
+OverclockWitness: FAIL Advanced compact three-tool row; reproduced on pristine main 802a98e.
+ResourceWitness: FAIL inspect-header pill geometry/color; reproduced on pristine main 802a98e.
+All other final canonical and additional regression report entries pass.
+Pristine-main supplemental checks also exposed stale Lifecycle, Behavior, NaturalLoadNoise and Backdoor fixtures; their scoped test setup/assertion updates are explicit in this PR.
+Graphical initial layout emits two nonfatal no-full-size-pill warnings on E1/E2; settled frames show packed identity pills.
+Human keyboard/IME, sustained crowding, Packet Play Mode and natural ambient balance were not tested.
+Project Core generator and --check: PASS.
+git diff --check: PASS.

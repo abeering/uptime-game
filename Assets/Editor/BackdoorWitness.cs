@@ -13,10 +13,11 @@ namespace Uptime.Connections.EditorTools
         [MenuItem("Tools/Connections/Run Backdoor Witness")]
         public static void Run()
         {
-            CheckScene("Assets/Scenes/Connections.unity", 0f, 0f);
+            CheckScene("Assets/Scenes/Connections.unity", 1f, 0f);
             CheckScene("Assets/Scenes/ConnectionsAdvanced.unity", 1f, .25f);
             EditorSceneManager.OpenScene("Assets/Scenes/Connections.unity");
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
+            LegacyMechanicWitness.Configure(host);
             var traffic = UnityEngine.Object.FindFirstObjectByType<ConnectionTrafficDirector>();
             var presenter = UnityEngine.Object.FindFirstObjectByType<NodeStatusPresenter>();
             var recorder = UnityEngine.Object.FindFirstObjectByType<ConnectionsRunRecorder>();

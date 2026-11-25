@@ -112,7 +112,10 @@ namespace Uptime.Connections.EditorTools
             var pillPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/IdentityPill.prefab");
             Check(pillPrefab != null && pillPrefab.GetComponent<IdentityPillView>() != null &&
                 pillPrefab.GetComponent<PillGraphic>() != null &&
-                pillPrefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 1, "authored identity pill");
+                pillPrefab.GetComponentsInChildren<TMPro.TMP_Text>(true).Length == 2 &&
+                new SerializedObject(pillPrefab.GetComponent<IdentityPillView>())
+                    .FindProperty("serviceDangerText").objectReferenceValue != null,
+                "authored identity pill with temporary service danger label");
             Check(new SerializedObject(presenter).FindProperty("identityPresenter").objectReferenceValue == identity &&
                 new SerializedObject(preview).FindProperty("identityPresenter").objectReferenceValue == identity &&
                 new SerializedObject(UnityEngine.Object.FindFirstObjectByType<Terminal>())
