@@ -1,0 +1,14 @@
+Final socket refinement: Unity 6000.3.11f1 compilation PASS.
+Socket semantic checks: 52 PASS; both canonical scenes with 1/2/8/16 connections and mixed destinations.
+Existing integration: 81 PASS + 2 unavailable calibrated allocation probes; Geometry PASS; canonical 883 PASS; lab focused 512 PASS + 1 unavailable.
+Focused gameplay Play Mode: 204 PASS, 12 final full frames at 1920x1080 and 1280x720, ordinary/paired/crowded in both canonical scenes.
+Lab Play Mode: 225 PASS; current shared socket/controls/layout/hierarchy; current overview and palette plates retained in Lab/.
+Before/after: 12 a0ffc00 source frames and 24 native, unscaled DB-boundary crops; crop coordinates retained for reproduction.
+Socket: 32-unit backing, 28-unit ring, 3.5-unit ring weight, 7-unit opaque dot; dark backing RGB .006/.016/.021.
+Packing: actual visible boundary neighbors, 3-unit clearance, immediate contraction and eased expansion; unchanged endpoint formula/outset. Legacy prefab/settings remain unchanged.
+All 31 integration Assets files match the final tested copy byte-for-byte. Palette/style, heartbeat, danger mapping and simulation unchanged from a0ffc00.
+Broad regression suite not rerun; three inherited failures preserved from the preceding corrective run: Advanced Overclock compact-row UI, Resource inspect-header geometry/color, Generated Identity stale Small family weights/arrival. No claim those pass.
+Known nonfatal QuickSearch indexing exception remains. No human/native keyboard/standalone performance acceptance claimed.
+Project Core regenerated from reconciled sources and --check PASS; whitespace checks PASS. Draft PR #131 remains unmerged.
+Deferred only: narrower ordinary slate-grey family; inspect WORK-bar moving deadline checkpoint potentially replacing two SERVICE lines. Neither implemented.
+Compact ring weight is capped at 18% of ring diameter; full-size 3.5-unit weight remains.

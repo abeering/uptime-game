@@ -1,0 +1,546 @@
+PASS Connections ambient records actual rendered gameplay connections
+PASS Connections 00-generated-gameplay placement/capture viewport 1920x1080
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: m7
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: m7
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: f3
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: f3
+PASS Connections 00-generated-gameplay placement/capture viewport 1280x720
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: m7
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: m7
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: f3
+PASS Connections 00-generated-gameplay packed identity stays in network overlay: f3
+PASS Connections healthy uncontended legitimate traffic
+PASS Connections healthy network identity is actually visible
+PASS Connections 01-healthy placement/capture viewport 1920x1080
+PASS Connections 01-healthy packed identity stays in network overlay: m7
+PASS Connections 01-healthy packed identity stays in network overlay: m7
+PASS Connections 01-healthy placement/capture viewport 1280x720
+PASS Connections 01-healthy packed identity stays in network overlay: m7
+PASS Connections 01-healthy packed identity stays in network overlay: m7
+PASS Connections slowed service can be safe
+PASS Connections 02-slowed-safe placement/capture viewport 1920x1080
+PASS Connections 02-slowed-safe packed identity stays in network overlay: m7
+PASS Connections 02-slowed-safe packed identity stays in network overlay: m7
+PASS Connections 02-slowed-safe packed identity stays in network overlay: f3
+PASS Connections 02-slowed-safe packed identity stays in network overlay: f3
+PASS Connections 02-slowed-safe placement/capture viewport 1280x720
+PASS Connections 02-slowed-safe packed identity stays in network overlay: m7
+PASS Connections 02-slowed-safe packed identity stays in network overlay: m7
+PASS Connections 02-slowed-safe packed identity stays in network overlay: f3
+PASS Connections 02-slowed-safe packed identity stays in network overlay: f3
+PASS Connections danger visible with 22s remaining and command focus
+PASS Connections 03-at-risk placement/capture viewport 1920x1080
+PASS Connections 03-at-risk packed identity stays in network overlay: m7
+PASS Connections 03-at-risk packed identity stays in network overlay: m7
+PASS Connections 03-at-risk packed identity stays in network overlay: f3
+PASS Connections 03-at-risk packed identity stays in network overlay: f3
+PASS Connections 03-at-risk placement/capture viewport 1280x720
+PASS Connections 03-at-risk packed identity stays in network overlay: m7
+PASS Connections 03-at-risk packed identity stays in network overlay: m7
+PASS Connections 03-at-risk packed identity stays in network overlay: f3
+PASS Connections 03-at-risk packed identity stays in network overlay: f3
+PASS Connections continuous warning rails replace redundant network AT RISK text
+PASS Connections overclock-rescue records actual rendered gameplay connections
+PASS Connections terminal overclock clears projected danger
+PASS Connections 04-rescue placement/capture viewport 1920x1080
+PASS Connections 04-rescue packed identity stays in network overlay: m7
+PASS Connections 04-rescue packed identity stays in network overlay: m7
+PASS Connections 04-rescue packed identity stays in network overlay: f3
+PASS Connections 04-rescue packed identity stays in network overlay: f3
+PASS Connections 04-rescue placement/capture viewport 1280x720
+PASS Connections 04-rescue packed identity stays in network overlay: m7
+PASS Connections 04-rescue packed identity stays in network overlay: m7
+PASS Connections 04-rescue packed identity stays in network overlay: f3
+PASS Connections 04-rescue packed identity stays in network overlay: f3
+PASS Connections rescued connection completes without failure
+PASS Connections 05-timeout-departure placement/capture viewport 1920x1080
+PASS Connections 05-timeout-departure packed identity stays in network overlay: m7
+PASS Connections 05-timeout-departure packed identity stays in network overlay: m7
+PASS Connections 05-timeout-departure packed identity stays in network overlay: f3
+PASS Connections 05-timeout-departure packed identity stays in network overlay: f3
+PASS Connections 05-timeout-departure placement/capture viewport 1280x720
+PASS Connections 05-timeout-departure packed identity stays in network overlay: m7
+PASS Connections 05-timeout-departure packed identity stays in network overlay: m7
+PASS Connections 05-timeout-departure packed identity stays in network overlay: f3
+PASS Connections 05-timeout-departure packed identity stays in network overlay: f3
+PASS Connections timeout records actual rendered gameplay connections
+PASS Connections timed-out views, activity meshes and external markers retire after visual departure
+PASS Connections actual timeout and exact business count
+PASS Connections cumulative failure count visibly rendered
+PASS Connections 06-timeout-history placement/capture viewport 1920x1080
+PASS Connections 06-timeout-history placement/capture viewport 1280x720
+PASS Connections collapsed history explicitly retains TIMED OUT
+PASS Connections 07-resolved-summary-and-prompt placement/capture viewport 1920x1080
+PASS Connections 07-resolved-summary-and-prompt placement/capture viewport 1280x720
+PASS Connections persistent prompt preserves partial command and focus
+PASS Connections legitimate sacrifice clears peer danger
+PASS Connections 08-sacrifice placement/capture viewport 1920x1080
+PASS Connections 08-sacrifice packed identity stays in network overlay: m7
+PASS Connections 08-sacrifice packed identity stays in network overlay: m7
+PASS Connections 08-sacrifice packed identity stays in network overlay: f3
+PASS Connections 08-sacrifice packed identity stays in network overlay: f3
+PASS Connections 08-sacrifice placement/capture viewport 1280x720
+PASS Connections 08-sacrifice packed identity stays in network overlay: m7
+PASS Connections 08-sacrifice packed identity stays in network overlay: m7
+PASS Connections 08-sacrifice packed identity stays in network overlay: f3
+PASS Connections 08-sacrifice packed identity stays in network overlay: f3
+PASS Connections 09-connecting placement/capture viewport 1920x1080
+PASS Connections 09-connecting placement/capture viewport 1280x720
+PASS Connections connecting route has no premature destination marker
+PASS Connections 10-interrupted-establishment placement/capture viewport 1920x1080
+PASS Connections 10-interrupted-establishment placement/capture viewport 1280x720
+PASS Connections interrupted connecting departure preserves established prefix only
+PASS Connections 11-crowded-paths placement/capture viewport 1920x1080
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m7
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m7
+PASS Connections 11-crowded-paths packed identity stays in network overlay: f3
+PASS Connections 11-crowded-paths packed identity stays in network overlay: i0
+PASS Connections 11-crowded-paths packed identity stays in network overlay: i0
+PASS Connections 11-crowded-paths packed identity stays in network overlay: v3
+PASS Connections 11-crowded-paths packed identity stays in network overlay: d5
+PASS Connections 11-crowded-paths packed identity stays in network overlay: y6
+PASS Connections 11-crowded-paths packed identity stays in network overlay: y6
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m1
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m1
+PASS Connections 11-crowded-paths placement/capture viewport 1280x720
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m7
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m7
+PASS Connections 11-crowded-paths packed identity stays in network overlay: f3
+PASS Connections 11-crowded-paths packed identity stays in network overlay: i0
+PASS Connections 11-crowded-paths packed identity stays in network overlay: i0
+PASS Connections 11-crowded-paths packed identity stays in network overlay: v3
+PASS Connections 11-crowded-paths packed identity stays in network overlay: d5
+PASS Connections 11-crowded-paths packed identity stays in network overlay: y6
+PASS Connections 11-crowded-paths packed identity stays in network overlay: y6
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m1
+PASS Connections 11-crowded-paths packed identity stays in network overlay: m1
+PASS Connections crowded records actual rendered gameplay connections
+PASS Connections eight crowded logical paths use one shared mesh each
+PASS Connections 22-shared-and-diverging-routes placement/capture viewport 1920x1080
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS Connections 22-shared-and-diverging-routes placement/capture viewport 1280x720
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS Connections 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS Connections diverging records actual rendered gameplay connections
+PASS Connections real shared-link routes retain three distinct destinations and stable identity slots
+PASS Connections 23-pill-low-work placement/capture viewport 1920x1080
+PASS Connections 23-pill-low-work packed identity stays in network overlay: m7
+PASS Connections 23-pill-low-work packed identity stays in network overlay: m7
+PASS Connections 23-pill-low-work placement/capture viewport 1280x720
+PASS Connections 23-pill-low-work packed identity stays in network overlay: m7
+PASS Connections 23-pill-low-work packed identity stays in network overlay: m7
+PASS Connections 24-pill-medium-work placement/capture viewport 1920x1080
+PASS Connections 24-pill-medium-work packed identity stays in network overlay: m7
+PASS Connections 24-pill-medium-work packed identity stays in network overlay: m7
+PASS Connections 24-pill-medium-work placement/capture viewport 1280x720
+PASS Connections 24-pill-medium-work packed identity stays in network overlay: m7
+PASS Connections 24-pill-medium-work packed identity stays in network overlay: m7
+PASS Connections 25-pill-high-work placement/capture viewport 1920x1080
+PASS Connections 25-pill-high-work packed identity stays in network overlay: m7
+PASS Connections 25-pill-high-work packed identity stays in network overlay: m7
+PASS Connections 25-pill-high-work placement/capture viewport 1280x720
+PASS Connections 25-pill-high-work packed identity stays in network overlay: m7
+PASS Connections 25-pill-high-work packed identity stays in network overlay: m7
+PASS Connections actual high-WORK pill stays readable before completion; low and medium captures use the same identity
+PASS Connections full-speed endangered activity survives earlier lost time
+PASS Connections 17-at-speed-endangered placement/capture viewport 1920x1080
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS Connections 17-at-speed-endangered placement/capture viewport 1280x720
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS Connections 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS Connections fully allocated zero-WORK connection is stalled with recovery opportunity
+PASS Connections 18-zero-work-stall placement/capture viewport 1920x1080
+PASS Connections 18-zero-work-stall packed identity stays in network overlay: z0
+PASS Connections 18-zero-work-stall packed identity stays in network overlay: z0
+PASS Connections 18-zero-work-stall placement/capture viewport 1280x720
+PASS Connections 18-zero-work-stall packed identity stays in network overlay: z0
+PASS Connections 18-zero-work-stall packed identity stays in network overlay: z0
+PASS Connections stalled records actual rendered gameplay connections
+PASS Connections 19-operation-before placement/capture viewport 1920x1080
+PASS Connections 19-operation-before packed identity stays in network overlay: a0
+PASS Connections 19-operation-before packed identity stays in network overlay: a0
+PASS Connections 19-operation-before placement/capture viewport 1280x720
+PASS Connections 19-operation-before packed identity stays in network overlay: a0
+PASS Connections 19-operation-before packed identity stays in network overlay: a0
+PASS Connections actual operation transition resets interior WORK fill and changes direction
+PASS Connections 20-operation-reset placement/capture viewport 1920x1080
+PASS Connections 20-operation-reset packed identity stays in network overlay: a0
+PASS Connections 20-operation-reset packed identity stays in network overlay: a0
+PASS Connections 20-operation-reset placement/capture viewport 1280x720
+PASS Connections 20-operation-reset packed identity stays in network overlay: a0
+PASS Connections 20-operation-reset packed identity stays in network overlay: a0
+PASS Connections adapter displays hopping alias, never concealed canonical identity
+PASS Connections 12-hopping-alias placement/capture viewport 1920x1080
+PASS Connections 12-hopping-alias packed identity stays in network overlay: c8
+PASS Connections 12-hopping-alias packed identity stays in network overlay: c8
+PASS Connections 12-hopping-alias placement/capture viewport 1280x720
+PASS Connections 12-hopping-alias packed identity stays in network overlay: c8
+PASS Connections 12-hopping-alias packed identity stays in network overlay: c8
+PASS Connections existing Probe reveals command identity through the same adapter
+PASS Connections 13-probe-revelation placement/capture viewport 1920x1080
+PASS Connections 13-probe-revelation packed identity stays in network overlay: m7
+PASS Connections 13-probe-revelation packed identity stays in network overlay: m7
+PASS Connections 13-probe-revelation placement/capture viewport 1280x720
+PASS Connections 13-probe-revelation packed identity stays in network overlay: m7
+PASS Connections 13-probe-revelation packed identity stays in network overlay: m7
+PASS Connections Probe identity revelation preserves the existing connection color slot
+PASS Connections 14-existing-moving-attacks placement/capture viewport 1920x1080
+PASS Connections 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS Connections 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS Connections 14-existing-moving-attacks placement/capture viewport 1280x720
+PASS Connections 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS Connections 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS Connections Payload and Worm retain independent presentation beside shared logical paths
+PASS Connections disabled simulation host freezes cosmetic heartbeat
+PASS Connections gameplay timeScale pause freezes heartbeat
+PASS Connections ordinary simulation resumes shared heartbeat
+PASS Connections CLEAN overlay leaves gameplay heartbeat running
+PASS Connections configured Duel pause freezes heartbeat
+PASS Connections 15-duel-pause placement/capture viewport 1920x1080
+PASS Connections 15-duel-pause ConnectionsDuelOverlay fully inside network viewport
+PASS Connections 15-duel-pause packed identity stays in network overlay: m7
+PASS Connections 15-duel-pause packed identity stays in network overlay: m7
+PASS Connections 15-duel-pause placement/capture viewport 1280x720
+PASS Connections 15-duel-pause ConnectionsDuelOverlay fully inside network viewport
+PASS Connections 15-duel-pause packed identity stays in network overlay: m7
+PASS Connections 15-duel-pause packed identity stays in network overlay: m7
+PASS Connections actual Play Mode restart resets heartbeat
+PASS Connections CORE freezes unresolved work without inventing resolution or progress
+PASS Connections 16-core-frozen placement/capture viewport 1920x1080
+PASS Connections 16-core-frozen packed identity stays in network overlay: m7
+PASS Connections 16-core-frozen packed identity stays in network overlay: m7
+PASS Connections 16-core-frozen placement/capture viewport 1280x720
+PASS Connections 16-core-frozen packed identity stays in network overlay: m7
+PASS Connections 16-core-frozen packed identity stays in network overlay: m7
+PASS Connections prompt and draft remain available after overlay/reset review
+PASS Connections 21-shared-style-proof placement/capture viewport 1920x1080
+PASS Connections 21-shared-style-proof packed identity stays in network overlay: m7
+PASS Connections 21-shared-style-proof packed identity stays in network overlay: m7
+PASS Connections 21-shared-style-proof placement/capture viewport 1280x720
+PASS Connections 21-shared-style-proof packed identity stays in network overlay: m7
+PASS Connections 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced ambient records actual rendered gameplay connections
+PASS ConnectionsAdvanced 00-generated-gameplay placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 00-generated-gameplay placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 00-generated-gameplay packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced healthy uncontended legitimate traffic
+PASS ConnectionsAdvanced healthy network identity is actually visible
+PASS ConnectionsAdvanced 01-healthy placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 01-healthy placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 01-healthy packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced slowed service can be safe
+PASS ConnectionsAdvanced 02-slowed-safe placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 02-slowed-safe placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 02-slowed-safe packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced danger visible with 22s remaining and command focus
+PASS ConnectionsAdvanced 03-at-risk placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 03-at-risk placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 03-at-risk packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced continuous warning rails replace redundant network AT RISK text
+PASS ConnectionsAdvanced overclock-rescue records actual rendered gameplay connections
+PASS ConnectionsAdvanced terminal overclock clears projected danger
+PASS ConnectionsAdvanced 04-rescue placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 04-rescue placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 04-rescue packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced rescued connection completes without failure
+PASS ConnectionsAdvanced 05-timeout-departure placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 05-timeout-departure placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 05-timeout-departure packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced timeout records actual rendered gameplay connections
+PASS ConnectionsAdvanced timed-out views, activity meshes and external markers retire after visual departure
+PASS ConnectionsAdvanced actual timeout and exact business count
+PASS ConnectionsAdvanced cumulative failure count visibly rendered
+PASS ConnectionsAdvanced 06-timeout-history placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 06-timeout-history placement/capture viewport 1280x720
+PASS ConnectionsAdvanced collapsed history explicitly retains TIMED OUT
+PASS ConnectionsAdvanced 07-resolved-summary-and-prompt placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 07-resolved-summary-and-prompt placement/capture viewport 1280x720
+PASS ConnectionsAdvanced persistent prompt preserves partial command and focus
+PASS ConnectionsAdvanced legitimate sacrifice clears peer danger
+PASS ConnectionsAdvanced 08-sacrifice placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 08-sacrifice placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 08-sacrifice packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 09-connecting placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 09-connecting placement/capture viewport 1280x720
+PASS ConnectionsAdvanced connecting route has no premature destination marker
+PASS ConnectionsAdvanced 10-interrupted-establishment placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 10-interrupted-establishment placement/capture viewport 1280x720
+PASS ConnectionsAdvanced interrupted connecting departure preserves established prefix only
+PASS ConnectionsAdvanced 11-crowded-paths placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced 11-crowded-paths placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: i0
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: g5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: v3
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: d5
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: y6
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced 11-crowded-paths packed identity stays in network overlay: m1
+PASS ConnectionsAdvanced crowded records actual rendered gameplay connections
+PASS ConnectionsAdvanced eight crowded logical paths use one shared mesh each
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r0
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r1
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS ConnectionsAdvanced 22-shared-and-diverging-routes packed identity stays in network overlay: r2
+PASS ConnectionsAdvanced diverging records actual rendered gameplay connections
+PASS ConnectionsAdvanced real shared-link routes retain three distinct destinations and stable identity slots
+PASS ConnectionsAdvanced 23-pill-low-work placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 23-pill-low-work placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 23-pill-low-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 24-pill-medium-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 25-pill-high-work packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced actual high-WORK pill stays readable before completion; low and medium captures use the same identity
+PASS ConnectionsAdvanced full-speed endangered activity survives earlier lost time
+PASS ConnectionsAdvanced 17-at-speed-endangered placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 17-at-speed-endangered placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced 17-at-speed-endangered packed identity stays in network overlay: f3
+PASS ConnectionsAdvanced fully allocated zero-WORK connection is stalled with recovery opportunity
+PASS ConnectionsAdvanced 18-zero-work-stall placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced 18-zero-work-stall placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced 18-zero-work-stall packed identity stays in network overlay: z0
+PASS ConnectionsAdvanced stalled records actual rendered gameplay connections
+PASS ConnectionsAdvanced 19-operation-before placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 19-operation-before placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 19-operation-before packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced actual operation transition resets interior WORK fill and changes direction
+PASS ConnectionsAdvanced 20-operation-reset placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 20-operation-reset placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced 20-operation-reset packed identity stays in network overlay: a0
+PASS ConnectionsAdvanced adapter displays hopping alias, never concealed canonical identity
+PASS ConnectionsAdvanced 12-hopping-alias placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced 12-hopping-alias placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced 12-hopping-alias packed identity stays in network overlay: c8
+PASS ConnectionsAdvanced existing Probe reveals command identity through the same adapter
+PASS ConnectionsAdvanced 13-probe-revelation placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 13-probe-revelation placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 13-probe-revelation packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced Probe identity revelation preserves the existing connection color slot
+PASS ConnectionsAdvanced 14-existing-moving-attacks placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 14-existing-moving-attacks placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 14-existing-moving-attacks packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced Payload and Worm retain independent presentation beside shared logical paths
+PASS ConnectionsAdvanced disabled simulation host freezes cosmetic heartbeat
+PASS ConnectionsAdvanced gameplay timeScale pause freezes heartbeat
+PASS ConnectionsAdvanced ordinary simulation resumes shared heartbeat
+PASS ConnectionsAdvanced CLEAN overlay leaves gameplay heartbeat running
+PASS ConnectionsAdvanced configured Duel pause freezes heartbeat
+PASS ConnectionsAdvanced 15-duel-pause placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 15-duel-pause ConnectionsDuelOverlay fully inside network viewport
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 15-duel-pause placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 15-duel-pause ConnectionsDuelOverlay fully inside network viewport
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 15-duel-pause packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced actual Play Mode restart resets heartbeat
+PASS ConnectionsAdvanced CORE freezes unresolved work without inventing resolution or progress
+PASS ConnectionsAdvanced 16-core-frozen placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 16-core-frozen placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 16-core-frozen packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced prompt and draft remain available after overlay/reset review
+PASS ConnectionsAdvanced 21-shared-style-proof placement/capture viewport 1920x1080
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 21-shared-style-proof placement/capture viewport 1280x720
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7
+PASS ConnectionsAdvanced 21-shared-style-proof packed identity stays in network overlay: m7

@@ -1,0 +1,225 @@
+PASS real Play Mode opens useful authored lab immediately
+PASS actual Play Mode remains independent of simulation
+PASS unscaled heartbeat moves with gameplay timeScale zero
+PASS unobstructed pointer hit: PauseResume
+PASS pointer click pauses presentation clock
+PASS unobstructed pointer hit: Replay
+PASS pointer replay resets every transition while paused
+PASS unobstructed pointer hit: PauseResume
+PASS pointer resumes presentation animation
+PASS true capture viewport (1920, 1080)
+PASS (1920, 1080) sample bounds: READ / LOW LOAD
+PASS (1920, 1080) title fits: READ / LOW LOAD
+PASS (1920, 1080) diagnostic/phase labels fit: READ / LOW LOAD
+PASS (1920, 1080) rail/activity mesh rendered: READ / LOW LOAD
+PASS (1920, 1080) sample bounds: READ / HIGH LOAD
+PASS (1920, 1080) title fits: READ / HIGH LOAD
+PASS (1920, 1080) diagnostic/phase labels fit: READ / HIGH LOAD
+PASS (1920, 1080) rail/activity mesh rendered: READ / HIGH LOAD
+PASS (1920, 1080) sample bounds: WRITE / MEDIUM LOAD
+PASS (1920, 1080) title fits: WRITE / MEDIUM LOAD
+PASS (1920, 1080) diagnostic/phase labels fit: WRITE / MEDIUM LOAD
+PASS (1920, 1080) rail/activity mesh rendered: WRITE / MEDIUM LOAD
+PASS (1920, 1080) sample bounds: EXECUTE / LOCAL ACTIVITY
+PASS (1920, 1080) title fits: EXECUTE / LOCAL ACTIVITY
+PASS (1920, 1080) diagnostic/phase labels fit: EXECUTE / LOCAL ACTIVITY
+PASS (1920, 1080) rail/activity mesh rendered: EXECUTE / LOCAL ACTIVITY
+PASS (1920, 1080) sample bounds: PRIORITY / READ
+PASS (1920, 1080) title fits: PRIORITY / READ
+PASS (1920, 1080) diagnostic/phase labels fit: PRIORITY / READ
+PASS (1920, 1080) rail/activity mesh rendered: PRIORITY / READ
+PASS (1920, 1080) sample bounds: PRIORITY / WRITE
+PASS (1920, 1080) title fits: PRIORITY / WRITE
+PASS (1920, 1080) diagnostic/phase labels fit: PRIORITY / WRITE
+PASS (1920, 1080) rail/activity mesh rendered: PRIORITY / WRITE
+PASS (1920, 1080) sample bounds: AT SPEED / SAFE
+PASS (1920, 1080) title fits: AT SPEED / SAFE
+PASS (1920, 1080) diagnostic/phase labels fit: AT SPEED / SAFE
+PASS (1920, 1080) rail/activity mesh rendered: AT SPEED / SAFE
+PASS (1920, 1080) sample bounds: MODERATE / SAFE
+PASS (1920, 1080) title fits: MODERATE / SAFE
+PASS (1920, 1080) diagnostic/phase labels fit: MODERATE / SAFE
+PASS (1920, 1080) rail/activity mesh rendered: MODERATE / SAFE
+PASS (1920, 1080) sample bounds: HEAVY SLOWDOWN / SAFE
+PASS (1920, 1080) title fits: HEAVY SLOWDOWN / SAFE
+PASS (1920, 1080) diagnostic/phase labels fit: HEAVY SLOWDOWN / SAFE
+PASS (1920, 1080) rail/activity mesh rendered: HEAVY SLOWDOWN / SAFE
+PASS (1920, 1080) sample bounds: STALLED / SAFE FOR NOW
+PASS (1920, 1080) title fits: STALLED / SAFE FOR NOW
+PASS (1920, 1080) diagnostic/phase labels fit: STALLED / SAFE FOR NOW
+PASS (1920, 1080) rail/activity mesh rendered: STALLED / SAFE FOR NOW
+PASS (1920, 1080) sample bounds: PRIORITY / SLOWED
+PASS (1920, 1080) title fits: PRIORITY / SLOWED
+PASS (1920, 1080) diagnostic/phase labels fit: PRIORITY / SLOWED
+PASS (1920, 1080) rail/activity mesh rendered: PRIORITY / SLOWED
+PASS (1920, 1080) sample bounds: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1920, 1080) title fits: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1920, 1080) diagnostic/phase labels fit: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1920, 1080) rail/activity mesh rendered: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1920, 1080) sample bounds: AT SPEED / SAFE
+PASS (1920, 1080) title fits: AT SPEED / SAFE
+PASS (1920, 1080) diagnostic/phase labels fit: AT SPEED / SAFE
+PASS (1920, 1080) rail/activity mesh rendered: AT SPEED / SAFE
+PASS (1920, 1080) sample bounds: AT SPEED / BEHIND, RECOVERABLE
+PASS (1920, 1080) title fits: AT SPEED / BEHIND, RECOVERABLE
+PASS (1920, 1080) diagnostic/phase labels fit: AT SPEED / BEHIND, RECOVERABLE
+PASS (1920, 1080) rail/activity mesh rendered: AT SPEED / BEHIND, RECOVERABLE
+PASS (1920, 1080) sample bounds: AT SPEED / SEVERELY ENDANGERED
+PASS (1920, 1080) title fits: AT SPEED / SEVERELY ENDANGERED
+PASS (1920, 1080) diagnostic/phase labels fit: AT SPEED / SEVERELY ENDANGERED
+PASS (1920, 1080) rail/activity mesh rendered: AT SPEED / SEVERELY ENDANGERED
+PASS (1920, 1080) sample bounds: SLOWED / BEHIND, RECOVERABLE
+PASS (1920, 1080) title fits: SLOWED / BEHIND, RECOVERABLE
+PASS (1920, 1080) diagnostic/phase labels fit: SLOWED / BEHIND, RECOVERABLE
+PASS (1920, 1080) rail/activity mesh rendered: SLOWED / BEHIND, RECOVERABLE
+PASS (1920, 1080) sample bounds: SLOWED / SEVERELY ENDANGERED
+PASS (1920, 1080) title fits: SLOWED / SEVERELY ENDANGERED
+PASS (1920, 1080) diagnostic/phase labels fit: SLOWED / SEVERELY ENDANGERED
+PASS (1920, 1080) rail/activity mesh rendered: SLOWED / SEVERELY ENDANGERED
+PASS (1920, 1080) sample bounds: STALLED / IMMINENT TIMEOUT
+PASS (1920, 1080) title fits: STALLED / IMMINENT TIMEOUT
+PASS (1920, 1080) diagnostic/phase labels fit: STALLED / IMMINENT TIMEOUT
+PASS (1920, 1080) rail/activity mesh rendered: STALLED / IMMINENT TIMEOUT
+PASS (1920, 1080) sample bounds: EXCEEDS NORMAL-RATE BUDGET
+PASS (1920, 1080) title fits: EXCEEDS NORMAL-RATE BUDGET
+PASS (1920, 1080) diagnostic/phase labels fit: EXCEEDS NORMAL-RATE BUDGET
+PASS (1920, 1080) rail/activity mesh rendered: EXCEEDS NORMAL-RATE BUDGET
+PASS (1920, 1080) sample bounds: HEALTHY > SLOWED > HEALTHY
+PASS (1920, 1080) title fits: HEALTHY > SLOWED > HEALTHY
+PASS (1920, 1080) diagnostic/phase labels fit: HEALTHY > SLOWED > HEALTHY
+PASS (1920, 1080) rail/activity mesh rendered: HEALTHY > SLOWED > HEALTHY
+PASS (1920, 1080) sample bounds: SAFE > BEHIND > TIMEOUT
+PASS (1920, 1080) title fits: SAFE > BEHIND > TIMEOUT
+PASS (1920, 1080) diagnostic/phase labels fit: SAFE > BEHIND > TIMEOUT
+PASS (1920, 1080) rail/activity mesh rendered: SAFE > BEHIND > TIMEOUT
+PASS (1920, 1080) sample bounds: SLOWED > FULL SPEED > SAFE
+PASS (1920, 1080) title fits: SLOWED > FULL SPEED > SAFE
+PASS (1920, 1080) diagnostic/phase labels fit: SLOWED > FULL SPEED > SAFE
+PASS (1920, 1080) rail/activity mesh rendered: SLOWED > FULL SPEED > SAFE
+PASS (1920, 1080) sample bounds: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1920, 1080) title fits: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1920, 1080) diagnostic/phase labels fit: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1920, 1080) rail/activity mesh rendered: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1920, 1080) sample bounds: KILLED / TWO FLASHES + CUT
+PASS (1920, 1080) title fits: KILLED / TWO FLASHES + CUT
+PASS (1920, 1080) diagnostic/phase labels fit: KILLED / TWO FLASHES + CUT
+PASS (1920, 1080) rail/activity mesh rendered: KILLED / TWO FLASHES + CUT
+PASS (1920, 1080) sample bounds: TIMED OUT / HEAT + FADE
+PASS (1920, 1080) title fits: TIMED OUT / HEAT + FADE
+PASS (1920, 1080) diagnostic/phase labels fit: TIMED OUT / HEAT + FADE
+PASS (1920, 1080) rail/activity mesh rendered: TIMED OUT / HEAT + FADE
+PASS (1920, 1080) sample bounds: NATURAL COMPLETION / FADE
+PASS (1920, 1080) title fits: NATURAL COMPLETION / FADE
+PASS (1920, 1080) diagnostic/phase labels fit: NATURAL COMPLETION / FADE
+PASS (1920, 1080) rail/activity mesh rendered: NATURAL COMPLETION / FADE
+PASS true capture viewport (1280, 720)
+PASS (1280, 720) sample bounds: READ / LOW LOAD
+PASS (1280, 720) title fits: READ / LOW LOAD
+PASS (1280, 720) diagnostic/phase labels fit: READ / LOW LOAD
+PASS (1280, 720) rail/activity mesh rendered: READ / LOW LOAD
+PASS (1280, 720) sample bounds: READ / HIGH LOAD
+PASS (1280, 720) title fits: READ / HIGH LOAD
+PASS (1280, 720) diagnostic/phase labels fit: READ / HIGH LOAD
+PASS (1280, 720) rail/activity mesh rendered: READ / HIGH LOAD
+PASS (1280, 720) sample bounds: WRITE / MEDIUM LOAD
+PASS (1280, 720) title fits: WRITE / MEDIUM LOAD
+PASS (1280, 720) diagnostic/phase labels fit: WRITE / MEDIUM LOAD
+PASS (1280, 720) rail/activity mesh rendered: WRITE / MEDIUM LOAD
+PASS (1280, 720) sample bounds: EXECUTE / LOCAL ACTIVITY
+PASS (1280, 720) title fits: EXECUTE / LOCAL ACTIVITY
+PASS (1280, 720) diagnostic/phase labels fit: EXECUTE / LOCAL ACTIVITY
+PASS (1280, 720) rail/activity mesh rendered: EXECUTE / LOCAL ACTIVITY
+PASS (1280, 720) sample bounds: PRIORITY / READ
+PASS (1280, 720) title fits: PRIORITY / READ
+PASS (1280, 720) diagnostic/phase labels fit: PRIORITY / READ
+PASS (1280, 720) rail/activity mesh rendered: PRIORITY / READ
+PASS (1280, 720) sample bounds: PRIORITY / WRITE
+PASS (1280, 720) title fits: PRIORITY / WRITE
+PASS (1280, 720) diagnostic/phase labels fit: PRIORITY / WRITE
+PASS (1280, 720) rail/activity mesh rendered: PRIORITY / WRITE
+PASS (1280, 720) sample bounds: AT SPEED / SAFE
+PASS (1280, 720) title fits: AT SPEED / SAFE
+PASS (1280, 720) diagnostic/phase labels fit: AT SPEED / SAFE
+PASS (1280, 720) rail/activity mesh rendered: AT SPEED / SAFE
+PASS (1280, 720) sample bounds: MODERATE / SAFE
+PASS (1280, 720) title fits: MODERATE / SAFE
+PASS (1280, 720) diagnostic/phase labels fit: MODERATE / SAFE
+PASS (1280, 720) rail/activity mesh rendered: MODERATE / SAFE
+PASS (1280, 720) sample bounds: HEAVY SLOWDOWN / SAFE
+PASS (1280, 720) title fits: HEAVY SLOWDOWN / SAFE
+PASS (1280, 720) diagnostic/phase labels fit: HEAVY SLOWDOWN / SAFE
+PASS (1280, 720) rail/activity mesh rendered: HEAVY SLOWDOWN / SAFE
+PASS (1280, 720) sample bounds: STALLED / SAFE FOR NOW
+PASS (1280, 720) title fits: STALLED / SAFE FOR NOW
+PASS (1280, 720) diagnostic/phase labels fit: STALLED / SAFE FOR NOW
+PASS (1280, 720) rail/activity mesh rendered: STALLED / SAFE FOR NOW
+PASS (1280, 720) sample bounds: PRIORITY / SLOWED
+PASS (1280, 720) title fits: PRIORITY / SLOWED
+PASS (1280, 720) diagnostic/phase labels fit: PRIORITY / SLOWED
+PASS (1280, 720) rail/activity mesh rendered: PRIORITY / SLOWED
+PASS (1280, 720) sample bounds: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1280, 720) title fits: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1280, 720) diagnostic/phase labels fit: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1280, 720) rail/activity mesh rendered: BENT ROUTE / WIDTH 10 > 16 > 10
+PASS (1280, 720) sample bounds: AT SPEED / SAFE
+PASS (1280, 720) title fits: AT SPEED / SAFE
+PASS (1280, 720) diagnostic/phase labels fit: AT SPEED / SAFE
+PASS (1280, 720) rail/activity mesh rendered: AT SPEED / SAFE
+PASS (1280, 720) sample bounds: AT SPEED / BEHIND, RECOVERABLE
+PASS (1280, 720) title fits: AT SPEED / BEHIND, RECOVERABLE
+PASS (1280, 720) diagnostic/phase labels fit: AT SPEED / BEHIND, RECOVERABLE
+PASS (1280, 720) rail/activity mesh rendered: AT SPEED / BEHIND, RECOVERABLE
+PASS (1280, 720) sample bounds: AT SPEED / SEVERELY ENDANGERED
+PASS (1280, 720) title fits: AT SPEED / SEVERELY ENDANGERED
+PASS (1280, 720) diagnostic/phase labels fit: AT SPEED / SEVERELY ENDANGERED
+PASS (1280, 720) rail/activity mesh rendered: AT SPEED / SEVERELY ENDANGERED
+PASS (1280, 720) sample bounds: SLOWED / BEHIND, RECOVERABLE
+PASS (1280, 720) title fits: SLOWED / BEHIND, RECOVERABLE
+PASS (1280, 720) diagnostic/phase labels fit: SLOWED / BEHIND, RECOVERABLE
+PASS (1280, 720) rail/activity mesh rendered: SLOWED / BEHIND, RECOVERABLE
+PASS (1280, 720) sample bounds: SLOWED / SEVERELY ENDANGERED
+PASS (1280, 720) title fits: SLOWED / SEVERELY ENDANGERED
+PASS (1280, 720) diagnostic/phase labels fit: SLOWED / SEVERELY ENDANGERED
+PASS (1280, 720) rail/activity mesh rendered: SLOWED / SEVERELY ENDANGERED
+PASS (1280, 720) sample bounds: STALLED / IMMINENT TIMEOUT
+PASS (1280, 720) title fits: STALLED / IMMINENT TIMEOUT
+PASS (1280, 720) diagnostic/phase labels fit: STALLED / IMMINENT TIMEOUT
+PASS (1280, 720) rail/activity mesh rendered: STALLED / IMMINENT TIMEOUT
+PASS (1280, 720) sample bounds: EXCEEDS NORMAL-RATE BUDGET
+PASS (1280, 720) title fits: EXCEEDS NORMAL-RATE BUDGET
+PASS (1280, 720) diagnostic/phase labels fit: EXCEEDS NORMAL-RATE BUDGET
+PASS (1280, 720) rail/activity mesh rendered: EXCEEDS NORMAL-RATE BUDGET
+PASS (1280, 720) sample bounds: HEALTHY > SLOWED > HEALTHY
+PASS (1280, 720) title fits: HEALTHY > SLOWED > HEALTHY
+PASS (1280, 720) diagnostic/phase labels fit: HEALTHY > SLOWED > HEALTHY
+PASS (1280, 720) rail/activity mesh rendered: HEALTHY > SLOWED > HEALTHY
+PASS (1280, 720) sample bounds: SAFE > BEHIND > TIMEOUT
+PASS (1280, 720) title fits: SAFE > BEHIND > TIMEOUT
+PASS (1280, 720) diagnostic/phase labels fit: SAFE > BEHIND > TIMEOUT
+PASS (1280, 720) rail/activity mesh rendered: SAFE > BEHIND > TIMEOUT
+PASS (1280, 720) sample bounds: SLOWED > FULL SPEED > SAFE
+PASS (1280, 720) title fits: SLOWED > FULL SPEED > SAFE
+PASS (1280, 720) diagnostic/phase labels fit: SLOWED > FULL SPEED > SAFE
+PASS (1280, 720) rail/activity mesh rendered: SLOWED > FULL SPEED > SAFE
+PASS (1280, 720) sample bounds: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1280, 720) title fits: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1280, 720) diagnostic/phase labels fit: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1280, 720) rail/activity mesh rendered: FULL SPEED / CANNOT RECOVER NORMALLY
+PASS (1280, 720) sample bounds: KILLED / TWO FLASHES + CUT
+PASS (1280, 720) title fits: KILLED / TWO FLASHES + CUT
+PASS (1280, 720) diagnostic/phase labels fit: KILLED / TWO FLASHES + CUT
+PASS (1280, 720) rail/activity mesh rendered: KILLED / TWO FLASHES + CUT
+PASS (1280, 720) sample bounds: TIMED OUT / HEAT + FADE
+PASS (1280, 720) title fits: TIMED OUT / HEAT + FADE
+PASS (1280, 720) diagnostic/phase labels fit: TIMED OUT / HEAT + FADE
+PASS (1280, 720) rail/activity mesh rendered: TIMED OUT / HEAT + FADE
+PASS (1280, 720) sample bounds: NATURAL COMPLETION / FADE
+PASS (1280, 720) title fits: NATURAL COMPLETION / FADE
+PASS (1280, 720) diagnostic/phase labels fit: NATURAL COMPLETION / FADE
+PASS (1280, 720) rail/activity mesh rendered: NATURAL COMPLETION / FADE
+PASS Ordinary palette comparison uses six stable shared identity colors
+PASS Priority palette comparison uses six stable shared identity colors
+PASS shared style proof uses the same asset in the lab
+PASS 432 motion frames create no presentation GameObjects; hierarchy=334
+PASS shared path meshes remain bounded; peak path vertices=3912
+PASS full-speed endangered comparison remains present throughout motion capture

@@ -1,0 +1,24 @@
+Checkpoint a0ffc00: preceding identity-ribbon corrective pass. Final socket refinement evidence is in SocketRefinement/README.md.
+Connection Visual Integration V0 — November 25, 2026.
+Integrated baseline: 8391df0a5da5901c15571faffc5ca1ff92a84344, after normal GitHub merges #128, #129, #130 in that order.
+Source documents reconciled, preserving both accepted design sections and implementation records; Project Core regenerated from sources.
+Unity 6000.3.11f1 compiled and ran in isolated /tmp/uptime-display-lab-v0; original Editor untouched. All 29 changed/new integration Assets files are byte-identical to the final tested copy.
+Focused integration: 81 PASS; 2 scoped allocation measurements UNAVAILABLE after failed sentinel calibration.
+Fragility: 126 PASS. CanonicalSceneWitness: 883 checks PASS; final canonical regression report byte-identical to integrated baseline.
+Display Lab: 512 PASS, 1 scoped allocation measurement UNAVAILABLE; 320 continuous-rail and 26 interior-fill checks retained.
+Gameplay graphical: 546 PASS across Small/Advanced at 1920x1080 and 1280x720; 104 screenshots and two 447-frame, 24fps, 18.625-second H.264 review reels.
+Display Lab graphical: 225 PASS, six overview screenshots plus shared-style proof and 432-frame, 24fps, 18-second reel.
+Initial-integration Fragility graphical runner: 54 PASS (retained historical evidence; not rerun in corrective pass) across both scenes and resolutions.
+Authoring safety: 11 PASS; repeated migration refuses rebuilding, fixture regeneration leaves shared/canonical assets unchanged.
+Broad regression command exits 1, preserving three underlying inherited failures:
+- OverclockWitness: ConnectionsAdvanced compact three-tool row.
+- ResourceWitness: inspect header pill keeps authored large geometry and identity color.
+- GeneratedIdentityWitness: Connections hostile activity weights and arrival interval unchanged. Independently reproduced using exact pristine integrated-baseline Assets; later cases in this witness are not reached.
+Nested regression reports repeat some failures; these are the same three underlying failures, not additional regressions. Separate hopping/reactive identity, Probe/sweep and all other recorded broad suites pass. Raw reports preserve exact results.
+Crowded sampled presentation mean: Small 2.980ms / Advanced 3.518ms (two layout passes, path updates, forced Canvas work; excludes host stepping/PNG/GPU). Peak path vertices: 1632 / 2716.
+30 ordinary PlayerLoop frames without PNG capture: calibrated whole Editor/engine/UI/simulation GC Allocated In Frame mean 82428 / 115020 bytes. Not attributable solely to renderer. No scoped or whole-engine zero-allocation claim.
+No per-blip GameObjects/material clones. No changes to authoritative allocation, progression, Fragility, threats, traffic tuning, Packet or historical scenes (see isolation proof).
+Thin diagonal rails and crowded Advanced status labels retain readability caveats. Physical keyboard/IME, human aesthetics and standalone/GPU profiling remain human review.
+Known nonfatal QuickSearch indexing exception appears at graphical startup; completed assertions and exit outcomes are retained.
+Project Core generation/check and whitespace checks PASS. New feature PR remains unmerged; experimental PRs #115/#124/#125/#126 untouched.
+Corrective pass: lifetime six-slot ordinary identity palettes, previous blue/teal synthetic priority family, resolved-color body alpha 0.34, activity alpha 0.60 / stall multiplier 0.70. Same prefabs, shader, geometry, heartbeat and danger mapping. Added three real branching destinations, actual low/medium/high WORK and Probe color-stability captures. New 10-second gameplay and 8-second lab before/after comparisons use committed 1a72a6e footage as the baseline. See CorrectivePass.md.

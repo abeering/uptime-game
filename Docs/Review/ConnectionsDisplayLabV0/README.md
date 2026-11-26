@@ -1,16 +1,34 @@
 # Connection Display Lab V0 — review
 
-Open **Assets/Scenes/ConnectionsDisplayLab.unity** in Unity 6000.3.11f1 and enter Play Mode. This is an independent visual lab from main `802a98e`, with no gameplay simulation or ambient traffic. Accepted Fragility V0 #129 remained unmerged at task start; the lab does not import its implementation or change #128/#129.
+Open **Assets/Scenes/ConnectionsDisplayLab.unity** in Unity 6000.3.11f1 and enter Play Mode. It remains an independent synthetic lab. [Visual Integration V0](../ConnectionsVisualIntegrationV0/README.md) now uses the same authored assets and rendering in both canonical gameplay scenes. The original lab began independently from main `802a98e` before #128/#129 merged; those isolation statements are historical checkpoint evidence.
 
 [Implementation, mappings, asset inventory and integration seams](../../Connections/connections-display-lab-v0.md).
 
-## Second visual pass
+
+## Final socket refinement
+
+The shared socket now uses a 32-unit backing, 28-unit heavier ring and stronger dot/backing contrast in gameplay and the lab. [Current lab evidence and focused gameplay before/after](../ConnectionsVisualIntegrationV0/SocketRefinement/README.md) records this final refinement. The overview/palette PNGs and motion below retain the preceding `a0ffc00` checkpoint; current lab screenshots/checks are linked from that folder. Palette and heartbeat are unchanged.
+
+## Current corrective pass (#131)
+
+Human gameplay feedback asked for connection ribbons as the primary visual carrier. Shared tuning now restores a visible body at 0.34 opacity, six muted ordinary identity colors, the previous six blue/teal accents for synthetic priority, and quieter activity at 0.60 opacity (stationary multiplier 0.70). Shapes, heartbeat, density/direction and danger mapping remain. [Selected values and assignment](../../Connections/connections-visual-integration-v0.md#corrective-visual-pass--identity-ribbons).
+
+Column A in these disposable Play Mode comparison plates uses all six slots from one family, with the same authored renderer and operations:
+
+| Family | 1920×1080 | 1280×720 |
+|---|---|---|
+| Muted ordinary | [Palette](palette-ordinary-1920x1080.png) | [Palette](palette-ordinary-1280x720.png) |
+| Blue/teal priority | [Palette](palette-priority-1920x1080.png) | [Palette](palette-priority-1280x720.png) |
+
+[Corrective before/after motion](ribbon-before-after.mp4): previous #131 rendering on the left, corrective rendering on the right, matching presentation timestamps, 8 seconds at 24fps. Both panels are actual Unity footage. The left panel comes from the committed baseline reel at `1a72a6e`; compression is retained, so this is a visual comparison, not a pixel-equality test. The permanent authored samples also use explicit identity slots without adding hierarchy.
+
+## Original second visual pass (#130)
 
 Human feedback approved the existing heartbeat and missed-beat slowdown. This pass makes established rails continuous at every performance/danger state and promotes interior fill to the leading production candidate. Colors, danger pulses, beat defaults, activity density/direction and departure timing are preserved. No GameObjects, decorative assets, gameplay mechanics or new rendering abstractions are added.
 
 ## What to watch
 
-- A: grey/blue traffic class, READ/WRITE direction, local EXECUTE rhythm, low/high LOAD density.
+- A: stable tinted ordinary identities and stronger blue/teal priority examples, READ/WRITE direction, local EXECUTE rhythm, low/high LOAD density.
 - B: missed beats at moderate/severe slowdown, unchanged density, stationary stalled activity, and a bent variable-width route. The bent example changes operation at 12 seconds and resets WORK without changing geometry.
 - C: full-speed danger beside full-speed safety; slowed safety separately in B; normal-rate budget deficit separately labeled. All severity/estimate/budget inputs are synthetic.
 - D: repeating recovery, deterioration and three different departures. Full speed does not automatically clear danger. All primary animated examples, including D, use interior WORK fill. The static comparison rack retains both treatments.
@@ -39,16 +57,16 @@ The full matrix remains visible in every frame of the 18-second recording. Small
 All checks ran in an isolated project copy because the original Editor already had the repository open. The original Editor session was left running.
 
 - Unity 6000.3.11f1 compiled the new C# and imported/rendered the new shader.
-- [498 deterministic assertions](deterministic-checks.txt) passed: authored prefab/CanvasRenderer bindings, independent inputs, exact eased movement and holds, beat continuity, missed beats/stall, density, existing operation direction semantics, full-speed danger, clipped bent-path activity, fixed progress racks, operation reset, replay, all outcomes and allocation checks. The added 320 opaque-rail coverage cases test both sides along straight and three-segment variable-width paths across four speeds, five severity levels, both traffic classes, both normal-budget flags and both extremes of the warning pulse. All 26 animated examples assert interior fill.
-- [222 actual Play Mode assertions](play-mode-checks.txt) passed: timeScale-zero heartbeat, pointer raycasts and controls, both viewport sizes, every sample's bounds/title/mesh, stable hierarchy across 432 motion frames, and retained full-speed severe-danger comparison.
-- [Existing regression witnesses](regression-checks.txt) passed: Geometry and 881 canonical-scene serialized/functional checks on current main's unchanged gameplay assets. The lab does not claim to validate unmerged Fragility runtime in this branch.
-- [Motion preservation](motion-preservation-checks.txt): 25 activity-center strips across all 432 frames compare exactly (3,240,000 RGB bytes, zero differences), covering operation rhythms, slowdown/stall, danger independence, transitions and departures. This excludes the deliberately changed rails and pill interiors.
-- All non-lab Assets files, including canonical/Packet/historical scenes and simulation/threat/rendering code, remain byte-identical to main `802a98e`. Only the existing lab renderer, scene and Editor authoring/witness are changed by this pass. See [isolation check](isolation-checks.txt).
+- [512 deterministic assertions](deterministic-checks.txt) passed: authored prefab/CanvasRenderer bindings, independent inputs, exact eased movement and holds, beat continuity, missed beats/stall, density, existing operation direction semantics, full-speed danger, clipped bent-path activity, fixed progress racks, operation reset, replay, all outcomes and geometry-cache checks. The scoped allocation probe is now marked unavailable after failing sentinel calibration; earlier zero readings from the thread API cannot establish zero allocations. The 320 mesh-coverage cases now test continuous opaque rails **and status-colored translucent interior coverage**, including joined variable widths. They cover both sides along straight and three-segment variable-width paths across four speeds, five severity levels, both traffic classes, both normal-budget flags and both extremes of the warning pulse. All 26 animated examples assert interior fill.
+- [225 actual Play Mode assertions](play-mode-checks.txt) passed: timeScale-zero heartbeat, pointer raycasts and controls, both viewport sizes, every sample's bounds/title/mesh, stable hierarchy across 432 motion frames, and retained full-speed severe-danger comparison.
+- [Existing regression witnesses](regression-checks.txt) passed: Geometry and 883 canonical-scene serialized/functional checks on the integrated baseline. Full integration regressions and inherited failures are documented in the integration review.
+- Historical #130 [motion preservation](motion-preservation-checks.txt): 25 activity-center strips across all 432 frames compare exactly (3,240,000 RGB bytes, zero differences), covering operation rhythms, slowdown/stall, danger independence, transitions and departures. That original comparison excludes the deliberately changed rails and pill interiors. The corrective pass intentionally changes activity salience; this historical pixel-equality result does not describe current colors.
+- The [original lab isolation check](isolation-checks.txt) records the independent #130 checkpoint. The [current integration isolation check](../ConnectionsVisualIntegrationV0/isolation-checks.txt) records the now-shared presentation and preserved authoritative simulation/Packet/historical scenes.
 - Project Core generation/check and staged diff whitespace checks passed.
 
-Screenshot inspection at both sizes found the independent IDs legible over the 0/25/50/75/99% interior rack and animated fills; the completion frames also retain the ID at 100% before fading. Crowded production gameplay readability is still untested.
+Screenshot inspection at both sizes found the independent IDs legible over the 0/25/50/75/99% interior rack and animated fills; the completion frames also retain the ID at 100% before fading. Crowded production gameplay is now captured in the integration review; human readability acceptance remains open.
 
-Measured: 334 authored GameObjects under the Canvas, plus authored Camera/EventSystem roots. There are 26 path graphics and 36 progress-pill graphics, with no individual blip objects. The motion capture's peak total path mesh count was 3,912 vertices. After warming all phases, 1,000 presentation-binding calls allocated 0 managed bytes, and animation did not rebuild cached route arrays. That measurement excludes Unity's internal frame work and PNG/video encoding; it is not a whole-engine zero-allocation or standalone performance claim.
+Measured: 334 authored GameObjects under the Canvas, plus authored Camera/EventSystem roots. There are 26 path graphics and 36 progress-pill graphics, with no individual blip objects. The motion capture's peak total path mesh count was 3,912 vertices. Animation does not rebuild unchanged cached route arrays. The earlier thread-counter zero-allocation reading is superseded: this Editor reports zero even for an explicit allocation, and the scoped GC.Alloc recorder fails calibration. No binding-loop zero-allocation claim is retained. The integration review reports separately calibrated whole-frame Editor measurements and their limits.
 
 The graphical Editor startup emitted a nonfatal Unity QuickSearch indexing `ArgumentOutOfRangeException`; the complete assertions/captures still passed. The new opaque-rail coverage check first failed against the first-pass dashed renderer at speed 0.65, demonstrating that the continuous body cannot mask a broken rail. The retained reports above are final successful runs.
 
@@ -63,13 +81,15 @@ The graphical Editor startup emitted a nonfatal Unity QuickSearch indexing `Argu
 7. Observe B6 across 12 seconds: READ becomes WRITE on the same bent route and current-operation WORK resets. This is an operation switch, not dynamic routing. Confirm blips continue around the joins and variable widths, the identity stays placed, and the endpoint marker remains visible.
 8. Compare the interior versus perimeter treatment visually. The border uses an angular sweep from 12 o'clock; it does not traverse equal physical border length per percentage. Neither fill is service-time consumption. Interior is the leading integration candidate; actual gameplay readability still needs review.
 
-Stop Play Mode to discard Inspector experimentation unless intentionally authoring the lab. **Tools → Connections → Author Connection Display Lab** rebuilds the lab's own assets; do not run it to preserve manual edits to those assets.
+Stop Play Mode to discard Inspector experimentation unless intentionally authoring the lab. **Tools → Connections → Author Connection Display Lab** rebuilds only lab scene fixtures from existing shared assets; it never regenerates shared production assets or saves unrelated dirty assets. Preserve manual lab-scene edits before rebuilding.
 
 ## Reproduction
 
 - Deterministic checks on the saved scene: `Uptime.Connections.EditorTools.ConnectionDisplayLabWitness.Run` with Unity batchmode/nographics/quit.
 - Existing geometry/canonical checks: `Uptime.Connections.EditorTools.ConnectionDisplayLabWitness.Regressions` with batchmode/nographics/quit.
-- Actual graphical evidence: `Uptime.Connections.EditorTools.ConnectionDisplayLabCapture.Run` with graphical batchmode; omit nographics/quit because the runner enters Play and exits itself. Six PNGs/reports go here; 432 temporary motion frames go to `/tmp/uptime-display-lab-motion`.
+- Actual graphical evidence: `Uptime.Connections.EditorTools.ConnectionDisplayLabCapture.Run` with graphical batchmode; omit nographics/quit because the runner enters Play and exits itself. Six overview PNGs, four six-color palette plates and a shared-style proof/report go here; 432 temporary motion frames go to `/tmp/uptime-display-lab-motion`.
 - Encode: `ffmpeg -framerate 24 -i /tmp/uptime-display-lab-motion/frame-%04d.png -c:v libx264 -crf 18 -pix_fmt yuv420p -movflags +faststart display-lab-play-mode.mp4`.
 
-No production adapter, actual priority policy, authoritative danger gradient, natural congestion tuning, dynamic routing, new threat or gameplay command is implemented. Runtime integration and final art direction require another review. Existing gameplay scenes remain the current implementation.
+The gameplay adapter and initial cosmetic danger mapping are now in Visual Integration V0; review its separate evidence. Actual priority, authoritative danger changes, natural congestion tuning, dynamic routing, new threats and final art decisions remain outside this work.
+
+[Shared-style edit proof](shared-style-proof.png): the same six-slot ordinary identity family was temporarily changed to white in the shared asset and restored, matching the gameplay proof captures. Both compositions now use the same pill-state binding; authored RectTransform/TMP edits control size and typography.

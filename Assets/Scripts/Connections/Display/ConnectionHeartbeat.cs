@@ -13,9 +13,10 @@ namespace Uptime.Connections.Display
         [Range(.1f, .9f)] public float movingFraction = .58f;
         public HeartbeatEasing easing = HeartbeatEasing.SmoothStep;
         public bool paused;
+        public bool externallyDriven;
         public double Beats { get; private set; }
         public double ElapsedSeconds { get; private set; }
-        private void Update() => Advance(Time.unscaledDeltaTime);
+        private void Update() { if (!externallyDriven) Advance(Time.unscaledDeltaTime); }
         public void Advance(double seconds)
         {
             if (paused || seconds <= 0) return;

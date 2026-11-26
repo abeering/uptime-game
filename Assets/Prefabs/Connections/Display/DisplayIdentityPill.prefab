@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 7590808112861988985}
   - component: {fileID: 6446392787013342970}
   - component: {fileID: 650419051410190348}
+  - component: {fileID: 1335281973101258846}
   m_Layer: 0
   m_Name: DisplayIdentityPill
   m_TagString: Untagged
@@ -207,3 +208,25 @@ MonoBehaviour:
   treatment: 0
   radius: 7
   border: 2
+--- !u!114 &1335281973101258846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8324869750453159725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4138de8691134e4786ae9d65ea7d4be0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.IdentityPillView
+  plate: {fileID: 0}
+  progressPlate: {fileID: 650419051410190348}
+  displayStyle: {fileID: 11400000, guid: 811b25c26eea8446a8879a256e8338d0, type: 2}
+  idText: {fileID: 7832240878736519643}
+  serviceDangerText: {fileID: 0}
+  dimensions: {x: 62, y: 32}
+  fontSize: 20
+  tintTextWithAccent: 0
+  identityChangeEmphasisSeconds: 0.22
+  identityChangeWhiteMix: 0.24

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Uptime.Connections.Display;
 
 namespace Uptime.Connections
 {
@@ -20,14 +21,16 @@ namespace Uptime.Connections
             public float Width;
             public bool HasPill;
             public bool ServiceDanger;
+            public ConnectionDisplayState DisplayState;
 
             public LiveLine(string id, Vector2 targetStart, Vector2 targetEnd,
                 Vector2 visualStart, Vector2 visualEnd, Color accent, float visibleFraction,
-                float width, bool hasPill = true, string displayId = null, bool serviceDanger = false)
+                float width, bool hasPill = true, string displayId = null, bool serviceDanger = false, ConnectionDisplayState displayState = default)
             {
                 Id = id;
                 DisplayId = displayId ?? id;
                 ServiceDanger = serviceDanger;
+                DisplayState = displayState;
                 TargetStart = targetStart;
                 TargetEnd = targetEnd;
                 VisualStart = visualStart;
@@ -292,6 +295,7 @@ namespace Uptime.Connections
             {
                 state.Pills[i]?.SetDisplayedId(state.Lines[i].DisplayId);
                 state.Pills[i]?.SetServiceDanger(state.Lines[i].ServiceDanger);
+                state.Pills[i]?.SetDisplayState(state.Lines[i].DisplayState);
             }
             Apply(state);
         }

@@ -112,6 +112,44 @@ namespace Uptime.Connections.EditorTools
                     Save(ConnectionDisplayLabWitness.Evidence + "/overview-" + t.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "s-" + size.x + "x" + size.y + ".png");
                 }
             }
+            // Disposable comparisons use the same six authored rows and shared renderer.
+            var paletteRows = lab.samples.Where(s => s.phases[0].state.identity.StartsWith("a")).ToArray();
+            var states = paletteRows.Select(s => s.phases[0].state).ToArray();
+            var titles = paletteRows.Select(s => s.title.text).ToArray();
+            try
+            {
+                foreach (DisplayTrafficClass family in Enum.GetValues(typeof(DisplayTrafficClass)))
+                {
+                    for (int i = 0; i < paletteRows.Length; i++)
+                    {
+                        var state = states[i]; state.trafficClass = family; state.identitySlot = i;
+                        paletteRows[i].phases[0].state = state;
+                        paletteRows[i].title.SetText(family.ToString().ToUpperInvariant() + " " + (i + 1) + " / " + state.operation.ToString().ToUpperInvariant());
+                    }
+                    foreach (var size in new[] { new Vector2Int(1920, 1080), new Vector2Int(1280, 720) })
+                    {
+                        SetViewport(size.x, size.y); lab.heartbeat.SetReviewTime(0); lab.RenderNow(); Canvas.ForceUpdateCanvases();
+                        Save(ConnectionDisplayLabWitness.Evidence + "/palette-" + family.ToString().ToLowerInvariant() + "-" + size.x + "x" + size.y + ".png");
+                    }
+                    Check(paletteRows.Select(s => s.Current.identitySlot).Distinct().Count() == 6,
+                        family + " palette comparison uses six stable shared identity colors");
+                }
+            }
+            finally
+            {
+                for (int i = 0; i < paletteRows.Length; i++)
+                { paletteRows[i].phases[0].state = states[i]; paletteRows[i].title.SetText(titles[i]); }
+            }
+            Color[] originalRail = lab.style.ordinaryIdentityColors;
+            try
+            {
+                lab.style.ordinaryIdentityColors = Enumerable.Repeat(Color.white, 6).ToArray();
+                lab.heartbeat.SetReviewTime(0); lab.RenderNow(); Canvas.ForceUpdateCanvases();
+                SetViewport(1920, 1080);
+                Save(ConnectionDisplayLabWitness.Evidence + "/shared-style-proof.png");
+                Check(lab.samples[0].view.style == lab.style, "shared style proof uses the same asset in the lab");
+            }
+            finally { lab.style.ordinaryIdentityColors = originalRail; }
             // A reproducible real Unity rendering of an 18-second presentation timeline.
             // PNG encoding allocations are capture instrumentation, outside renderer measurements.
             string frames = "/tmp/uptime-display-lab-motion"; Directory.CreateDirectory(frames);

@@ -1,0 +1,4 @@
+Integrated main 8391df0a5da5901c15571faffc5ca1ff92a84344, exact git archive Assets in isolated Unity copy.
+Unity 6000.3.11f1 compiled. GeneratedIdentityWitness.Run exits 1:
+FAIL Generated Identity Witness: Connections hostile activity weights and arrival interval unchanged
+The witness expects Small recon/payload/worm weights 0; canonical main enables these families. This stale tuning assertion is inherited and intentionally unchanged. Later checks in that witness are not reached.

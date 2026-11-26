@@ -1,11 +1,35 @@
 using System;
 using UnityEngine;
+using Uptime.Connections.Display;
 
 namespace Uptime.Connections
 {
     public sealed class LogicalPathView : MonoBehaviour
     {
         [SerializeField] private PathGraphic path;
+        [SerializeField] private ConnectionDisplayView sharedDisplay;
+        [SerializeField] private ConnectionDisplayGraphic sharedPathPrefab;
+        public ConnectionDisplayGraphic SharedPathPrefab => sharedPathPrefab;
+        private ConnectionGameplayDisplay gameplayDisplay;
+        public bool UsesSharedDisplay => sharedDisplay != null;
+        public ConnectionDisplayView SharedDisplay => sharedDisplay;
+        private int identitySlot;
+        public void SetIdentitySlot(int slot) => identitySlot = slot;
+        private double resolutionBegan = double.NaN;
+        public ConnectionDisplayState DisplayState
+        {
+            get
+            {
+                if (state.IsComplete && gameplayDisplay != null)
+                {
+                    double now = gameplayDisplay.heartbeat.ElapsedSeconds;
+                    if (double.IsNaN(resolutionBegan)) resolutionBegan = now;
+                    departureElapsed = (float)Math.Max(0, now - resolutionBegan);
+                }
+                var display = ConnectionGameplayDisplay.Map(state, sharedDisplay.style, departureElapsed);
+                display.identitySlot = identitySlot; return display;
+            }
+        }
         [SerializeField] private TerminalMarkerStyle terminalMarkerPrefab;
         [SerializeField, Range(0.1f, 2f)] private float departureSeconds = 0.45f;
         [SerializeField, Range(0.05f, 1f)] private float failureFlashHalfCycleSeconds = 0.12f;
@@ -50,12 +74,13 @@ namespace Uptime.Connections
         public TerminalMarkerStyle TerminalMarker => terminalMarker;
         public int VisualSegmentCount => starts?.Length ?? 0;
         public float RelayoutSeconds => relayoutSeconds;
-        public Color DisplayAccent => state != null && state.IsComplete &&
+        public Color DisplayAccent => UsesSharedDisplay && state != null ?
+            sharedDisplay.style.Rail(DisplayState, gameplayDisplay != null ? gameplayDisplay.heartbeat.Beats : 0) : state != null && state.IsComplete &&
             !state.IsNormalDeparture &&
             Mathf.FloorToInt(failureElapsed / failureFlashHalfCycleSeconds) % 2 == 0 ?
             failureColor : identityColor;
 
-        public float PulseSpacingFor(float requestedLoad) =>
+        public float PulseSpacingFor(float requestedLoad) => UsesSharedDisplay ? sharedDisplay.style.Spacing(requestedLoad) :
             Mathf.Max(18f, pulseSpacingAtOneLoad /
                 (1f + spacingReductionPerLoad * Mathf.Max(0f, requestedLoad - 1f)));
         public static int DirectionFor(OperationKind operation) =>
@@ -75,24 +100,37 @@ namespace Uptime.Connections
             probeAlong = along;
             probeHalfSize = halfSize;
             probeTint = tint;
-            if (path != null)
+            if (UsesSharedDisplay) sharedDisplay.path.SetProbe(segment, center, along, halfSize, tint);
+            else if (path != null)
                 path.SetProbe(segment, center, along, halfSize, tint);
         }
 
-        public Color BeamColorFor(LoadPerformance performance) =>
+        public Color BeamColorFor(LoadPerformance performance) => UsesSharedDisplay ? DisplayAccent :
             performance == LoadPerformance.AtSpeed ?
                 (hasIdentityColor ? identityColor : healthyColor) :
             performance == LoadPerformance.Slowed ? constrainedColor : stalledColor;
 
-        public void Bind(LogicalConnectionState connection, RectTransform area, RectTransform markerLayer)
+        public void Bind(LogicalConnectionState connection, RectTransform area, RectTransform markerLayer, ConnectionGameplayDisplay display = null)
         {
             state = connection;
+            gameplayDisplay = display;
+            resolutionBegan = double.NaN; departureElapsed = failureElapsed = 0;
             networkArea = area;
             int count = connection.RouteLinks.Length;
             starts = new Vector2[count];
             ends = new Vector2[count];
-            path.raycastTarget = false;
-            path.SetPath(starts, ends, new float[count], 0f);
+            if (UsesSharedDisplay)
+            {
+                if (sharedDisplay.path == null)
+                    sharedDisplay.path = Instantiate(sharedPathPrefab, transform, false);
+                sharedDisplay.path.SetGeometry(starts, ends, new float[count]);
+                sharedDisplay.path.SetVisibility(0, false);
+            }
+            else
+            {
+                path.raycastTarget = false;
+                path.SetPath(starts, ends, new float[count], 0f);
+            }
             if (terminalMarkerPrefab != null && markerLayer != null && connection.TargetNode != null)
             {
                 terminalMarker = Instantiate(terminalMarkerPrefab, markerLayer, false);
@@ -146,7 +184,7 @@ namespace Uptime.Connections
         {
             start = end = Vector2.zero;
             visibleFraction = 0f;
-            lineColor = path != null ? path.color : Color.white;
+            lineColor = UsesSharedDisplay ? DisplayAccent : path != null ? path.color : Color.white;
             lineWidth = 0f;
             if (!establishedVisual || segment < 0 || segment >= starts.Length)
                 return false;
@@ -194,7 +232,7 @@ namespace Uptime.Connections
         public void SetLayout(float[] nextStarts, float[] nextEnds, float[] widths,
             float maximumSocketDiameter = float.PositiveInfinity)
         {
-            if (terminalMarker != null)
+            if (terminalMarker != null && !terminalMarker.FitsSocketNeighbors)
                 terminalMarker.SetMaximumDiameter(maximumSocketDiameter, relayoutSeconds);
             if (targetStartOffsets == null)
             {
@@ -224,12 +262,12 @@ namespace Uptime.Connections
             relayoutElapsed = 0f;
         }
 
-        private void LateUpdate() => AdvanceVisual(Time.deltaTime);
+        private void LateUpdate() => AdvanceVisual(UsesSharedDisplay && gameplayDisplay != null ? gameplayDisplay.FrameDelta : Time.deltaTime);
 
         // Shared by Play Mode and the deterministic geometry witness.
         public void AdvanceVisual(float deltaSeconds)
         {
-            if (state == null || networkArea == null || path == null || state.IsPending || startOffsets == null)
+            if (state == null || networkArea == null || (!UsesSharedDisplay && path == null) || state.IsPending || startOffsets == null)
                 return;
 
             if (terminalMarker != null)
@@ -254,11 +292,12 @@ namespace Uptime.Connections
 
             if (state.IsComplete)
             {
-                departureElapsed += deltaSeconds;
+                if (UsesSharedDisplay) _ = DisplayState;
+                else departureElapsed += deltaSeconds;
                 bool failure = !state.IsNormalDeparture;
                 if (failure) failureElapsed += deltaSeconds;
-                if (failure ? failureElapsed >= failureFlashHalfCycleSeconds * 4f :
-                    departureElapsed >= departureSeconds)
+                if (UsesSharedDisplay ? departureElapsed >= sharedDisplay.style.DepartureDuration(DisplayState.resolution) :
+                    failure ? failureElapsed >= failureFlashHalfCycleSeconds * 4f : departureElapsed >= departureSeconds)
                 {
                     if (terminalMarker != null)
                         terminalMarker.gameObject.SetActive(false);
@@ -266,16 +305,6 @@ namespace Uptime.Connections
                     return;
                 }
             }
-            float reveal = CurrentReveal();
-            float fade = state.IsComplete && state.IsNormalDeparture ?
-                1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
-            LoadPerformance performance = state.Performance;
-            Color tint = state.IsComplete && !state.IsNormalDeparture ?
-                DisplayAccent : state.IsConnecting ? identityColor : BeamColorFor(performance);
-            tint.a *= fade;
-            if (path.color != tint)
-                path.color = tint;
-
             for (int i = 0; i < starts.Length; i++)
             {
                 Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
@@ -286,8 +315,28 @@ namespace Uptime.Connections
                 ends[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i + 1].Node,
                     networkArea, -direction, -endOffsets[i], lineWidths[i]);
             }
-            path.SetPath(starts, ends, lineWidths, reveal);
-            path.SetProbe(probeSegment, probeCenter, probeAlong, probeHalfSize, probeTint);
+            float reveal = CurrentReveal();
+            float fade = state.IsComplete && state.IsNormalDeparture ?
+                1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
+            LoadPerformance performance = state.Performance;
+            if (UsesSharedDisplay)
+            {
+                if (gameplayDisplay == null) return;
+                sharedDisplay.path.SetGeometry(starts, ends, lineWidths);
+                sharedDisplay.path.SetVisibility(reveal, state.IsDemanding || state.IsComplete && state.TerminationPhase == Lifecycle.Active);
+                sharedDisplay.path.SetProbe(probeSegment, probeCenter, probeAlong, probeHalfSize, probeTint);
+                sharedDisplay.Render(DisplayState, gameplayDisplay.heartbeat);
+                fade = sharedDisplay.style.Opacity(DisplayState);
+            }
+            else
+            {
+                Color tint = state.IsComplete && !state.IsNormalDeparture ?
+                    DisplayAccent : state.IsConnecting ? identityColor : BeamColorFor(performance);
+                tint.a *= fade;
+                if (path.color != tint) path.color = tint;
+                path.SetPath(starts, ends, lineWidths, reveal);
+                path.SetProbe(probeSegment, probeCenter, probeAlong, probeHalfSize, probeTint);
+            }
             if (terminalMarker != null)
             {
                 bool reachedTarget = reveal >= 1f;
@@ -304,12 +353,13 @@ namespace Uptime.Connections
                         networkArea), towardSource, -endOffsets[last],
                         terminalMarker.BorderOutset);
                     terminalMarker.rectTransform.position = networkArea.TransformPoint(socket);
-                    Color markerColor = state.IsComplete && !state.IsNormalDeparture ?
+                    Color markerColor = UsesSharedDisplay ? DisplayAccent : state.IsComplete && !state.IsNormalDeparture ?
                         DisplayAccent : hasIdentityColor ? identityColor : healthyColor;
                     markerColor.a *= fade;
                     terminalMarker.SetAccent(markerColor);
                 }
             }
+            if (UsesSharedDisplay) return;
             float spacing = state.IsActive && !state.IsTransitioning ?
                 PulseSpacingFor(state.DesiredLoad) : 0f;
             bool interrupted = performance == LoadPerformance.Slowed &&

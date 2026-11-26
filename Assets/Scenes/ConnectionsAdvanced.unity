@@ -6773,7 +6773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.IdentityPresenter
   networkArea: {fileID: 772389560}
   pillLayer: {fileID: 901162629}
-  pillPrefab: {fileID: 8025527490866664778, guid: 3b613de177b2977418658a5f6a9bb7fc, type: 3}
+  pillPrefab: {fileID: 1335281973101258846, guid: 00853e528fac4463c8b1638ec6338fcd, type: 3}
   minimumPillGap: 6
   staggerStep: 20
   endInset: 12
@@ -7911,7 +7911,9 @@ MonoBehaviour:
   networkArea: {fileID: 772389560}
   pathLayer: {fileID: 1033840603}
   markerLayer: {fileID: 901162629}
-  pathPrefab: {fileID: 1946401160761542816, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
+  pathPrefab: {fileID: 2859235610162838777, guid: f039cf471b4bc4bb2bb2b4227808a09a, type: 3}
+  connectionDisplay: {fileID: 1996901044}
+  geometryPreviewPathPrefab: {fileID: 8284974062488692513, guid: 6f9f78d815127474692fc9383595f3c4, type: 3}
   probeRegionPrefab: {fileID: 2200942498571120334, guid: b5c10182d9e19cd498b043683f6bebad, type: 3}
   probeHostileColor: {r: 1, g: 0.11, b: 0.16, a: 1}
   probeBenignColor: {r: 0.55, g: 0.62, b: 0.65, a: 1}
@@ -13139,6 +13141,8 @@ GameObject:
   - component: {fileID: 1996901041}
   - component: {fileID: 1996901043}
   - component: {fileID: 1996901042}
+  - component: {fileID: 1996901045}
+  - component: {fileID: 1996901044}
   m_Layer: 0
   m_Name: SimulationHost
   m_TagString: Untagged
@@ -15932,3 +15936,37 @@ RectTransform:
   m_AnchoredPosition: {x: 225, y: 0}
   m_SizeDelta: {x: 310, y: 40}
   m_Pivot: {x: 0, y: 0.5}
+--- !u!114 &1996901044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07797083851144bbb42c484ed5747d86, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionGameplayDisplay
+  host: {fileID: 1996901015}
+  heartbeat: {fileID: 1996901045}
+  style: {fileID: 11400000, guid: 811b25c26eea8446a8879a256e8338d0, type: 2}
+  duel: {fileID: 1996901041}
+--- !u!114 &1996901045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1996901014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e9fda100e2474f37b84991c0202d3d6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionHeartbeat
+  bpm: 120
+  stepDistance: 18
+  movingFraction: 0.58
+  easing: 1
+  paused: 0
+  externallyDriven: 1

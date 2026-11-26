@@ -19,7 +19,6 @@ namespace Uptime.Connections.EditorTools
         public const string StylePath = PrefabFolder + "DisplayStyle.asset";
         private static TMP_FontAsset font;
         private static ConnectionDisplayStyle style;
-        private static Material pillMaterial;
         private static ConnectionDisplayView displayPrefab;
         private static ConnectionDisplayLabSample rowPrefab;
         private static readonly Color Text = new(.78f, .84f, .88f);
@@ -31,12 +30,10 @@ namespace Uptime.Connections.EditorTools
             if (Application.isPlaying) throw new System.InvalidOperationException("Author outside Play Mode.");
             font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/Fonts/JetBrainsMono-Regular SDF.asset");
             style = AssetDatabase.LoadAssetAtPath<ConnectionDisplayStyle>(StylePath);
-            if (style == null) { style = ScriptableObject.CreateInstance<ConnectionDisplayStyle>(); AssetDatabase.CreateAsset(style, StylePath); }
-            string materialPath = "Assets/Shaders/ConnectionsDisplay/ProgressPill.mat";
-            pillMaterial = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-            if (pillMaterial == null)
-            { pillMaterial = new Material(Shader.Find("Uptime/Connections/DisplayProgressPill")); AssetDatabase.CreateAsset(pillMaterial, materialPath); }
-            BuildPrefabs();
+            displayPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabFolder + "ConnectionDisplay.prefab")?.GetComponent<ConnectionDisplayView>();
+            rowPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabFolder + "DisplayLabSample.prefab")?.GetComponent<ConnectionDisplayLabSample>();
+            if (style == null || displayPrefab == null || rowPrefab == null)
+                throw new System.InvalidOperationException("Shared display assets must already exist. Lab authoring only rebuilds fixtures; it never creates or overwrites production assets.");
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var canvasObject = new GameObject("Connection Display Lab", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -51,12 +48,12 @@ namespace Uptime.Connections.EditorTools
             var lab = canvasObject.AddComponent<ConnectionDisplayLab>();
             lab.heartbeat = canvasObject.AddComponent<ConnectionHeartbeat>(); lab.style = style;
             Label("Title", root, "CONNECTION DISPLAY LAB / V0", 30, new Vector2(1400, 42), new Vector2(42, -25), Text);
-            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  grey ordinary + blue priority  /  gameplay scenes unchanged", 17,
+            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal priority  /  shared gameplay assets", 17,
                 new Vector2(1750, 24), new Vector2(42, -72), Muted);
             lab.clockLabel = Label("Clock", root, "120 BPM", 16, new Vector2(550, 26), new Vector2(1085, -32), Muted);
             Button(root, "PauseResume", "PAUSE / RESUME", new Vector2(1560, -30), lab.TogglePause);
             Button(root, "Replay", "REPLAY", new Vector2(1755, -30), lab.Replay, 125);
-            string[] headings = { "A  OPERATION / LOAD", "B  PERFORMANCE", "C  DEADLINE RISK", "D  TRANSITIONS / OUTCOMES" };
+            string[] headings = { "A  IDENTITY / OPERATION", "B  PERFORMANCE", "C  DEADLINE RISK", "D  TRANSITIONS / OUTCOMES" };
             for (int col = 0; col < 4; col++) Label("Group " + col, root, headings[col], 22, new Vector2(444, 30), new Vector2(42 + col * 464, -111), Text);
             var samples = new List<ConnectionDisplayLabSample>();
             ConnectionDisplayLabSample Row(int col, int row, string title, params DisplayLabPhase[] phases)
@@ -134,12 +131,11 @@ namespace Uptime.Connections.EditorTools
             camera.cullingMask = 0;
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             EditorSceneManager.SaveScene(canvasObject.scene, ScenePath);
-            AssetDatabase.SaveAssets();
             Debug.Log("Display lab authored: " + samples.Count + " path samples; ten pill comparisons; isolated synthetic driver.");
         }
         private static DisplayLabPhase P(string id, OperationKind op, float load, float speed, float severity = 0,
             bool priority = false, float duration = 24, float progress = .25f, string label = "SHARED BEAT / current-operation WORK") => new()
-        { label = label, duration = duration, state = new ConnectionDisplayState { identity = id, operation = op,
+        { label = label, duration = duration, state = new ConnectionDisplayState { identity = id, identitySlot = (id[id.Length - 1] - '1') % ConnectionIdentityPalette.SlotCount, operation = op,
             requestedLoad = load, productiveSpeed = speed, workProgress = progress, dangerSeverity = severity,
             trafficClass = priority ? DisplayTrafficClass.Priority : DisplayTrafficClass.Ordinary } };
         private static DisplayLabPhase Risk(string id, float speed, float severity, float remaining, float current, float normal, bool exceeds = false)
@@ -156,37 +152,6 @@ namespace Uptime.Connections.EditorTools
         { var p = P(id, OperationKind.Read, 5, 0, duration: 1.5f, progress: progress, label: outcome.ToString().ToUpperInvariant());
             p.state.resolution = outcome; p.advanceWork = false; return p; }
 
-        private static void BuildPrefabs()
-        {
-            var pillRoot = UI("DisplayIdentityPill", null, new Vector2(62, 32), Vector2.zero);
-            pillRoot.pivot = new Vector2(.5f, .5f);
-            var pill = pillRoot.gameObject.AddComponent<ConnectionProgressPillGraphic>(); pill.material = pillMaterial; pill.color = style.ordinaryRail; pill.raycastTarget = false;
-            var id = Label("Identity", pillRoot, "c1", 20, new Vector2(60, 30), Vector2.zero, new Color(.94f, .96f, .98f));
-            id.alignment = TextAlignmentOptions.Center; id.rectTransform.anchorMin = id.rectTransform.anchorMax = new Vector2(.5f, .5f); id.rectTransform.pivot = new Vector2(.5f, .5f);
-            var pillPrefab = PrefabUtility.SaveAsPrefabAsset(pillRoot.gameObject, PrefabFolder + "DisplayIdentityPill.prefab"); Object.DestroyImmediate(pillRoot.gameObject);
-            var display = UI("ConnectionDisplay", null, new Vector2(408, 60), Vector2.zero); display.pivot = new Vector2(.5f, .5f);
-            var view = display.gameObject.AddComponent<ConnectionDisplayView>(); view.style = style; view.displayGroup = display.gameObject.AddComponent<CanvasGroup>();
-            var path = UI("RailsAndActivity", display, new Vector2(408, 60), Vector2.zero);
-            path.anchorMin = path.anchorMax = new Vector2(.5f, .5f); path.pivot = new Vector2(.5f, .5f);
-            view.path = path.gameObject.AddComponent<ConnectionDisplayGraphic>(); view.path.raycastTarget = false;
-            var pillInstance = (GameObject)PrefabUtility.InstantiatePrefab(pillPrefab, display);
-            var rect = pillInstance.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-            view.pill = pillInstance.GetComponent<ConnectionProgressPillGraphic>(); view.identity = pillInstance.GetComponentInChildren<TMP_Text>();
-            var markerPrefab = AssetDatabase.LoadAssetAtPath<TerminalMarkerStyle>("Assets/Prefabs/Connections/TerminalMarker.prefab");
-            view.terminalMarker = (TerminalMarkerStyle)PrefabUtility.InstantiatePrefab(markerPrefab, display);
-            view.terminalMarker.rectTransform.anchorMin = view.terminalMarker.rectTransform.anchorMax = new Vector2(.5f, .5f);
-            view.terminalMarker.SetMaximumDiameter(18, .1f);
-            displayPrefab = PrefabUtility.SaveAsPrefabAsset(display.gameObject, PrefabFolder + "ConnectionDisplay.prefab").GetComponent<ConnectionDisplayView>(); Object.DestroyImmediate(display.gameObject);
-            var row = UI("DisplayLabSample", null, new Vector2(444, 110), Vector2.zero);
-            var panel = row.gameObject.AddComponent<Image>(); panel.color = new Color(.055f, .083f, .107f); panel.raycastTarget = false;
-            var sample = row.gameObject.AddComponent<ConnectionDisplayLabSample>();
-            sample.title = Label("Title", row, "SAMPLE", 17, new Vector2(426, 23), new Vector2(10, -5), Text);
-            sample.diagnostic = Label("Diagnostic", row, "LOAD / RATE / WORK / SEV", 12, new Vector2(426, 18), new Vector2(10, -74), Muted);
-            sample.phaseLabel = Label("Phase", row, "SYNTHETIC", 12, new Vector2(426, 18), new Vector2(10, -91), Muted);
-            sample.view = (ConnectionDisplayView)PrefabUtility.InstantiatePrefab(displayPrefab, row);
-            var v = sample.view.GetComponent<RectTransform>(); v.anchorMin = v.anchorMax = new Vector2(0, 1); v.anchoredPosition = new Vector2(222, -48);
-            rowPrefab = PrefabUtility.SaveAsPrefabAsset(row.gameObject, PrefabFolder + "DisplayLabSample.prefab").GetComponent<ConnectionDisplayLabSample>(); Object.DestroyImmediate(row.gameObject);
-        }
         private static void ProgressRack(RectTransform parent, string title, float y, PillProgressTreatment treatment)
         {
             Label(title, parent, title, 16, new Vector2(444, 22), new Vector2(52, y + 18), Text);
@@ -196,7 +161,7 @@ namespace Uptime.Connections.EditorTools
             {
                 var item = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent); item.name = treatment + " " + values[i];
                 var rect = item.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = new Vector2(0, 1); rect.anchoredPosition = new Vector2(88 + i * 82, y - 24);
-                item.GetComponent<ConnectionProgressPillGraphic>().Render(values[i], treatment, style.ordinaryRail);
+                item.GetComponent<ConnectionProgressPillGraphic>().Render(values[i], treatment, style.IdentityColor(DisplayTrafficClass.Ordinary, i));
                 item.GetComponentInChildren<TMP_Text>().text = "p" + i;
                 var caption = Label("Progress " + i, parent, (values[i] * 100).ToString("0") + "%", 12, new Vector2(62, 18), new Vector2(57 + i * 82, y - 42), Muted); caption.alignment = TextAlignmentOptions.Center;
             }

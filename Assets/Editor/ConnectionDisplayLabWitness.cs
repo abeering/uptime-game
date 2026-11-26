@@ -45,6 +45,22 @@ namespace Uptime.Connections.EditorTools
                     Check(sample.view.subdivision == 1 && sample.view.phaseBeats == 0, "coherent default phase/subdivision: " + sample.name);
                     Check(sample.view.progressTreatment == PillProgressTreatment.Interior, "primary animated interior fill: " + sample.name);
                 }
+                Check(lab.style.ordinaryIdentityColors.Length == 6 && lab.style.priorityIdentityColors.Length == 6,
+                    "two shared six-slot identity families");
+                var oldPalette = new ConnectionIdentityPalette();
+                for (int slot = 0; slot < 6; slot++)
+                {
+                    Check(lab.style.IdentityColor(DisplayTrafficClass.Priority, slot) == oldPalette.ColorAt(slot),
+                        "priority slot " + slot + " restores previous blue/teal accent");
+                    Check(lab.style.ordinaryIdentityColors.Distinct().Count() == 6 &&
+                        lab.style.IdentityColor(DisplayTrafficClass.Ordinary, slot).grayscale > .6f,
+                        "ordinary slot " + slot + " is differentiated and readable");
+                }
+                Check(lab.samples.SelectMany(s => s.phases).Select(p => p.state.identitySlot).Distinct().Count() == 6,
+                    "authored lab demonstrates all ordinary identity slots without new hierarchy");
+                Check(lab.style.bodyFillOpacity >= .3f && lab.style.bodyFillOpacity < .5f &&
+                    lab.style.Activity(DisplayTrafficClass.Ordinary).a < .7f,
+                    "meaningful translucent body and quieter activity defaults");
                 var clock = lab.heartbeat; Near(clock.bpm, 120, "default BPM");
                 Near(clock.Travel(0, 1), 0, "beat begins at prior settled position");
                 Near(clock.Travel(.29, 1), 9, "smooth halfway movement");
@@ -111,7 +127,7 @@ namespace Uptime.Connections.EditorTools
                     for (int i = 0; i < helper.currentVertCount; i++)
                     {
                         helper.PopulateUIVertex(ref vertex, i);
-                        if (vertex.color.r < 200 || vertex.color.b < 200) continue;
+                        if (!vertex.color.Equals((Color32)lab.style.Activity(bend.Current.trafficClass))) continue;
                         activityVertices++;
                         inside &= vertex.position.x >= begin.x - .001f && vertex.position.x <= end.x + .001f;
                     }
@@ -136,15 +152,16 @@ namespace Uptime.Connections.EditorTools
                 int revision = bend.view.path.GeometryRevision;
                 // Warm every phase and TMP numeric buffers before measuring binding allocations.
                 for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .037); lab.RenderNow(); }
-                long bytes = GC.GetAllocatedBytesForCurrentThread();
-                for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .021); lab.RenderNow(); }
-                long allocated = GC.GetAllocatedBytesForCurrentThread() - bytes;
-                Check(allocated == 0, "1000 warmed presentation binding updates allocate " + allocated + " managed bytes");
+                long allocated = PresentationAllocationProbe.Measure(() => {
+                    for (int i = 0; i < 1000; i++) { clock.SetReviewTime(i * .021); lab.RenderNow(); }
+                });
+                if (allocated >= 0) Check(allocated == 0, "1000 warmed presentation binding updates allocate " + allocated + " managed bytes (calibrated GC.Alloc)");
+                else checks.Add("UNAVAILABLE allocation recorder failed sentinel calibration; no zero-allocation claim");
                 Check(lab.GetComponentsInChildren<Transform>(true).Length == objects && bend.view.path.GeometryRevision == revision,
                     "animation creates no GameObjects and does not rebuild cached route arrays");
                 Check(!ShaderUtil.ShaderHasError(lab.samples[0].view.pill.material.shader), "progress shader imported without reported errors");
                 lab.Replay();
-                Debug.Log("ConnectionDisplayLabWitness PASS: " + checks.Count + " assertions; hierarchy=" + objects + "; binding GC=" + allocated);
+                Debug.Log("ConnectionDisplayLabWitness PASS: " + checks.Count(s => s.StartsWith("PASS")) + " assertions; hierarchy=" + objects + "; binding GC=" + allocated);
             }
             finally { File.WriteAllLines(Evidence + "/deterministic-checks.txt", checks); }
         }
@@ -195,7 +212,23 @@ namespace Uptime.Connections.EditorTools
                                 found = InTriangle(probe, vertices[i].position, vertices[i + 1].position, vertices[i + 2].position);
                         covered &= found;
                     }
-                    Check(covered, $"continuous opaque rails: segments={starts.Length}, speed={speed}, danger={severity}, class={traffic}, normal deficit={deficit}, time={seconds}");
+                    Color32 body = lab.style.Body(state, lab.heartbeat.Beats);
+                    bool ribbon = true;
+                    for (int segment = 0; segment < starts.Length && ribbon; segment++)
+                    for (int step = 0; step <= 20 && ribbon; step++)
+                    foreach (float side in new[] { -.5f, 0f, .5f })
+                    {
+                        float t = step / 20f;
+                        Vector2 probe = Vector2.Lerp(starts[segment], ends[segment], t) +
+                            Vector2.Lerp(startOffsets[segment], endOffsets[segment], t) * side;
+                        bool found = false;
+                        for (int i = 0; i < vertices.Count && !found; i += 3)
+                            if (vertices[i].color.Equals(body) && vertices[i + 1].color.Equals(body) && vertices[i + 2].color.Equals(body))
+                                found = InTriangle(probe, vertices[i].position, vertices[i + 1].position, vertices[i + 2].position);
+                        ribbon &= found;
+                    }
+                    Check(covered && ribbon && body.a > 0 && body.a < 255 && body.r == rail.r && body.g == rail.g && body.b == rail.b,
+                        $"continuous opaque rails and status-colored translucent body: segments={starts.Length}, speed={speed}, danger={severity}, class={traffic}, normal deficit={deficit}, time={seconds}");
                 }
             }
         }

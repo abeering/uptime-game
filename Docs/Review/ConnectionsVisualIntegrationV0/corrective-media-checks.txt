@@ -1,0 +1,9 @@
+PASS continuous-rails-comparison.mp4 {"width": 1216, "height": 594, "r_frame_rate": "24/1", "duration": "8.000000", "nb_frames": "192"}
+PASS display-lab-play-mode.mp4 {"width": 1280, "height": 720, "r_frame_rate": "24/1", "duration": "18.000000", "nb_frames": "432"}
+PASS ribbon-before-after.mp4 {"width": 2560, "height": 720, "r_frame_rate": "24/1", "duration": "8.000000", "nb_frames": "192"}
+PASS Connections-before-after.mp4 {"width": 2560, "height": 720, "r_frame_rate": "24/1", "duration": "10.000000", "nb_frames": "240"}
+PASS Connections-gameplay-review.mp4 {"width": 1280, "height": 720, "r_frame_rate": "24/1", "duration": "18.625000", "nb_frames": "447"}
+PASS Connections-routes-and-stall.mp4 {"width": 1280, "height": 720, "r_frame_rate": "24/1", "duration": "5.000000", "nb_frames": "120"}
+PASS ConnectionsAdvanced-before-after.mp4 {"width": 2560, "height": 720, "r_frame_rate": "24/1", "duration": "10.000000", "nb_frames": "240"}
+PASS ConnectionsAdvanced-gameplay-review.mp4 {"width": 1280, "height": 720, "r_frame_rate": "24/1", "duration": "18.625000", "nb_frames": "447"}
+PASS ConnectionsAdvanced-routes-and-stall.mp4 {"width": 1280, "height": 720, "r_frame_rate": "24/1", "duration": "5.000000", "nb_frames": "120"}

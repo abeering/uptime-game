@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Uptime.Connections.Display;
 
 namespace Uptime.Connections
 {
@@ -11,6 +12,8 @@ namespace Uptime.Connections
         [SerializeField] private RectTransform pathLayer;
         [SerializeField] private RectTransform markerLayer;
         [SerializeField] private LogicalPathView pathPrefab;
+        [SerializeField] private ConnectionGameplayDisplay connectionDisplay;
+        [SerializeField] private PathGraphic geometryPreviewPathPrefab;
         [SerializeField] private RectTransform probeRegionPrefab;
         [SerializeField] private Color probeHostileColor = new Color(1f, 0.11f, 0.16f, 1f);
         [SerializeField] private Color probeBenignColor = new Color(0.55f, 0.62f, 0.65f, 1f);
@@ -41,7 +44,8 @@ namespace Uptime.Connections
         public RectTransform NetworkArea => networkArea;
         public RectTransform PathLayer => pathLayer;
         public RectTransform MarkerLayer => markerLayer;
-        public PathGraphic PathGraphicPrefab => pathPrefab != null ? pathPrefab.GetComponent<PathGraphic>() : null;
+        // Legacy template for geometry-only preview/study tools, not the gameplay renderer.
+        public PathGraphic PathGraphicPrefab => geometryPreviewPathPrefab != null ? geometryPreviewPathPrefab : pathPrefab != null ? pathPrefab.GetComponent<PathGraphic>() : null;
         public float MaxLineWidth => Mathf.Max(0.1f, maxLineWidth);
         public float MinLineGap => Mathf.Max(0f, minLineGap);
         public float MinLineWidth => Mathf.Max(0.1f, minLineWidth);
@@ -123,7 +127,7 @@ namespace Uptime.Connections
             {
                 LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
                 view.name = "Logical path " + connection.ConnectionId;
-                view.Bind(connection, networkArea, markerLayer);
+                view.Bind(connection, networkArea, markerLayer, connectionDisplay);
                 view.Destroyed += OnPathDestroyed;
                 view.SetPresentationActive(!previewMode);
                 views.Add(connection, view);
@@ -139,7 +143,7 @@ namespace Uptime.Connections
             if (networkArea == null || pathLayer == null || pathPrefab == null) return;
             LogicalPathView view = Instantiate(pathPrefab, pathLayer, false);
             view.name = "Logical path " + state.ConnectionId;
-            view.Bind(state, networkArea, markerLayer);
+            view.Bind(state, networkArea, markerLayer, connectionDisplay);
             view.Destroyed += OnPathDestroyed;
             view.SetPresentationActive(!previewMode);
             views.Add(state, view);
@@ -149,8 +153,8 @@ namespace Uptime.Connections
         public void Retire(LogicalConnectionState state)
         {
             if (connections == null) return;
-            if (!state.IsNormalDeparture && views.ContainsKey(state))
-                return; // Keep the lane and ID visible through both failure flashes.
+            if (views.TryGetValue(state, out var retiring) && (retiring.UsesSharedDisplay || !state.IsNormalDeparture))
+                return; // Retired models stay complete; reserve visual lanes/IDs only until the departure ends.
             var next = new List<LogicalConnectionState>(connections);
             next.Remove(state);
             connections = next.ToArray();
@@ -181,16 +185,17 @@ namespace Uptime.Connections
         // Recompute from active presentation state. Pending and departing paths hold no lane.
         private void UpdateLayouts()
         {
-            if (previewMode)
+            if (previewMode || connections == null)
                 return;
             var routes = new List<RouteLaneOrder.Route>();
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive && !connection.IsConnecting &&
-                    !(connection.IsComplete && !connection.IsNormalDeparture))
+                    !(connection.IsComplete && (!connection.IsNormalDeparture || views[connection].UsesSharedDisplay)))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
+                views[connection].SetIdentitySlot(identityPalette.AssignSlot(connection));
                 var nodes = new NodeView[connection.Definition.Route.Length];
                 var links = new PhysicalLinkView[connection.RouteLinks.Length];
                 for (int i = 0; i < nodes.Length; i++)
@@ -277,7 +282,7 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState connection in connections)
             {
                 if (!connection.IsActive && !connection.IsConnecting &&
-                    !(connection.IsComplete && !connection.IsNormalDeparture))
+                    !(connection.IsComplete && (!connection.IsNormalDeparture || views[connection].UsesSharedDisplay)))
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 float[] starts = new float[connection.RouteLinks.Length];
@@ -332,7 +337,8 @@ namespace Uptime.Connections
                         lines.Add(new IdentityPresenter.LiveLine(connection.ConnectionId,
                             targetStart, targetEnd, visualStart, visualEnd,
                             views[connection].DisplayAccent, visibleFraction,
-                            width, displayId: connection.KnownIdentity, serviceDanger: connection.AtRisk));
+                            width, displayId: connection.KnownIdentity, serviceDanger: connection.AtRisk,
+                            displayState: views[connection].UsesSharedDisplay ? views[connection].DisplayState : default));
                     }
                     if (width < minLineWidth)
                     {
@@ -516,8 +522,34 @@ namespace Uptime.Connections
             }
         }
 
+        private void OnEnable() => Canvas.preWillRenderCanvases += RefreshSocketSizes;
+
+        // Paths keep their existing endpoint/relayout ownership. Measure after all
+        // LateUpdates, before Canvas geometry, so only actual visible sockets compete.
+        public void RefreshSocketSizes()
+        {
+            if (previewMode || networkArea == null) return;
+            foreach (var view in views.Values)
+            {
+                var marker = view != null ? view.TerminalMarker : null;
+                if (marker == null || !marker.FitsSocketNeighbors || !marker.gameObject.activeInHierarchy) continue;
+                float maximum = marker.PreferredDiameter;
+                Vector2 center = networkArea.InverseTransformPoint(marker.rectTransform.position);
+                foreach (var otherView in views.Values)
+                {
+                    var other = otherView != null ? otherView.TerminalMarker : null;
+                    if (other == null || other == marker || !other.gameObject.activeInHierarchy) continue;
+                    Vector2 otherCenter = networkArea.InverseTransformPoint(other.rectTransform.position);
+                    float clearance = Mathf.Max(marker.SocketClearance, other.SocketClearance);
+                    maximum = Mathf.Min(maximum, Mathf.Max(0, Vector2.Distance(center, otherCenter) - clearance));
+                }
+                marker.SetMaximumDiameter(maximum, view.RelayoutSeconds);
+            }
+        }
+
         private void OnDisable()
         {
+            Canvas.preWillRenderCanvases -= RefreshSocketSizes;
             SetProbe(null);
             ClearPhysicalPositions();
         }

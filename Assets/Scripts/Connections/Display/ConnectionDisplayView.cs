@@ -16,13 +16,25 @@ namespace Uptime.Connections.Display
         [Range(0, 1)] public float pillPosition = .5f;
         [Range(0, 1)] public float phaseBeats;
         [Range(1, 4)] public int subdivision = 1;
+        private IdentityPillView pillBinding;
+        private bool pillBound;
         public void Render(ConnectionDisplayState state, ConnectionHeartbeat clock)
         {
             if (style == null || path == null || clock == null) return;
             path.Render(state, style, clock, phaseBeats, subdivision);
-            pill.Render(state.workProgress, progressTreatment, style.ClassRail(state.trafficClass));
-            if (identity.text != state.identity) identity.SetText(state.identity);
-            ((RectTransform)pill.transform).anchoredPosition = path.PointAt(pillPosition);
+            if (pill != null)
+            {
+                if (pillBinding == null) pillBinding = pill.GetComponent<IdentityPillView>();
+                if (pillBinding != null)
+                {
+                    if (!pillBound) { pillBinding.Bind(state.identity, style.IdentityColor(state)); pillBound = true; }
+                    else pillBinding.SetDisplayedId(state.identity);
+                    pillBinding.SetDisplayState(state, progressTreatment, displayGroup == null);
+                }
+                else pill.Render(state.workProgress, progressTreatment, style.IdentityColor(state));
+                ((RectTransform)pill.transform).anchoredPosition = path.PointAt(pillPosition);
+            }
+            if (identity != null && identity.text != state.identity) identity.SetText(state.identity);
             if (terminalMarker != null)
             {
                 terminalMarker.rectTransform.anchoredPosition = path.PointAt(1);

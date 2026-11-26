@@ -217,6 +217,9 @@ PASS (1280, 720) sample bounds: NATURAL COMPLETION / FADE
 PASS (1280, 720) title fits: NATURAL COMPLETION / FADE
 PASS (1280, 720) diagnostic/phase labels fit: NATURAL COMPLETION / FADE
 PASS (1280, 720) rail/activity mesh rendered: NATURAL COMPLETION / FADE
+PASS Ordinary palette comparison uses six stable shared identity colors
+PASS Priority palette comparison uses six stable shared identity colors
+PASS shared style proof uses the same asset in the lab
 PASS 432 motion frames create no presentation GameObjects; hierarchy=334
 PASS shared path meshes remain bounded; peak path vertices=3912
 PASS full-speed endangered comparison remains present throughout motion capture

@@ -1,5 +1,8 @@
 # Connections — Connection Fragility V0
 
+**Visual Integration V0 follow-up (November 25, 2026):** The canonical network pill's temporary AT RISK text is replaced by shared rail danger and interior operation-WORK fill. Verbose service explanations, timeout history and business-failure count remain. The [cosmetic integration mapping](connections-visual-integration-v0.md) consumes these timing/projection facts without changing this service contract or reading hidden hostility. The temporary-presentation wording below records the original Fragility phase.
+
+
 Implementation branch, November 25, 2026, based on main `802a98e`. Scope: Connections Small and Advanced. This is the first mechanical slice of the proposed [Business Operations & Reliability milestone, PR #128](https://github.com/abeering/uptime-game/pull/128), not that entire milestone.
 
 ## Service contract
