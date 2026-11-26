@@ -48,12 +48,12 @@ namespace Uptime.Connections.EditorTools
             var lab = canvasObject.AddComponent<ConnectionDisplayLab>();
             lab.heartbeat = canvasObject.AddComponent<ConnectionHeartbeat>(); lab.style = style;
             Label("Title", root, "CONNECTION DISPLAY LAB / V0", 30, new Vector2(1400, 42), new Vector2(42, -25), Text);
-            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  grey ordinary + blue priority  /  gameplay scenes unchanged", 17,
+            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal priority  /  shared gameplay assets", 17,
                 new Vector2(1750, 24), new Vector2(42, -72), Muted);
             lab.clockLabel = Label("Clock", root, "120 BPM", 16, new Vector2(550, 26), new Vector2(1085, -32), Muted);
             Button(root, "PauseResume", "PAUSE / RESUME", new Vector2(1560, -30), lab.TogglePause);
             Button(root, "Replay", "REPLAY", new Vector2(1755, -30), lab.Replay, 125);
-            string[] headings = { "A  OPERATION / LOAD", "B  PERFORMANCE", "C  DEADLINE RISK", "D  TRANSITIONS / OUTCOMES" };
+            string[] headings = { "A  IDENTITY / OPERATION", "B  PERFORMANCE", "C  DEADLINE RISK", "D  TRANSITIONS / OUTCOMES" };
             for (int col = 0; col < 4; col++) Label("Group " + col, root, headings[col], 22, new Vector2(444, 30), new Vector2(42 + col * 464, -111), Text);
             var samples = new List<ConnectionDisplayLabSample>();
             ConnectionDisplayLabSample Row(int col, int row, string title, params DisplayLabPhase[] phases)
@@ -135,7 +135,7 @@ namespace Uptime.Connections.EditorTools
         }
         private static DisplayLabPhase P(string id, OperationKind op, float load, float speed, float severity = 0,
             bool priority = false, float duration = 24, float progress = .25f, string label = "SHARED BEAT / current-operation WORK") => new()
-        { label = label, duration = duration, state = new ConnectionDisplayState { identity = id, operation = op,
+        { label = label, duration = duration, state = new ConnectionDisplayState { identity = id, identitySlot = (id[id.Length - 1] - '1') % ConnectionIdentityPalette.SlotCount, operation = op,
             requestedLoad = load, productiveSpeed = speed, workProgress = progress, dangerSeverity = severity,
             trafficClass = priority ? DisplayTrafficClass.Priority : DisplayTrafficClass.Ordinary } };
         private static DisplayLabPhase Risk(string id, float speed, float severity, float remaining, float current, float normal, bool exceeds = false)
@@ -161,7 +161,7 @@ namespace Uptime.Connections.EditorTools
             {
                 var item = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent); item.name = treatment + " " + values[i];
                 var rect = item.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = new Vector2(0, 1); rect.anchoredPosition = new Vector2(88 + i * 82, y - 24);
-                item.GetComponent<ConnectionProgressPillGraphic>().Render(values[i], treatment, style.ordinaryRail);
+                item.GetComponent<ConnectionProgressPillGraphic>().Render(values[i], treatment, style.IdentityColor(DisplayTrafficClass.Ordinary, i));
                 item.GetComponentInChildren<TMP_Text>().text = "p" + i;
                 var caption = Label("Progress " + i, parent, (values[i] * 100).ToString("0") + "%", 12, new Vector2(62, 18), new Vector2(57 + i * 82, y - 42), Muted); caption.alignment = TextAlignmentOptions.Center;
             }

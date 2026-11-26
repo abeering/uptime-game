@@ -20,12 +20,15 @@ namespace Uptime.Connections
 
         public const int SlotCount = 6;
 
-        public Color Assign(LogicalConnectionState connection)
+        public Color Assign(LogicalConnectionState connection) => ColorAt(AssignSlot(connection));
+
+        // Shared display families reuse the same lifetime slot ownership, independent of aliases.
+        public int AssignSlot(LogicalConnectionState connection)
         {
             if (slots == null)
                 slots = new Dictionary<LogicalConnectionState, int>();
             if (slots.TryGetValue(connection, out int existing))
-                return ColorAt(existing);
+                return existing;
 
             var occupied = new bool[SlotCount];
             foreach (int slot in slots.Values)
@@ -40,7 +43,7 @@ namespace Uptime.Connections
             }
             slots.Add(connection, chosen);
             nextSlot = (chosen + 1) % SlotCount;
-            return ColorAt(chosen);
+            return chosen;
         }
 
         public bool TryGet(LogicalConnectionState connection, out Color color)

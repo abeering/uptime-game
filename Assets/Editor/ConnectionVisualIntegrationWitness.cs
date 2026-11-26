@@ -69,22 +69,31 @@ namespace Uptime.Connections.EditorTools
                     var paths = UnityEngine.Object.FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None);
                     Check(paths.Length == 2 && paths.All(v => v.UsesSharedDisplay && v.GetComponent<PathGraphic>() == null),
                         scene + " shared path implementation; no parallel legacy renderer per connection");
+                    Check(paths.Select(v => v.DisplayState.identitySlot).Distinct().Count() == 2,
+                        scene + " existing lifetime slot allocator differentiates adjacent connection ribbons");
+                    foreach (var view in paths)
+                    {
+                        var display = view.DisplayState;
+                        Check(adapter.style.IdentityColor(display) == adapter.style.ordinaryIdentityColors[display.identitySlot] &&
+                            view.TerminalMarker.color == view.DisplayAccent,
+                            scene + " every route segment and terminal socket shares its lifetime identity/status");
+                    }
                     Check(paths.All(v => v.TerminalMarker != null && v.TerminalMarker.gameObject.activeSelf), scene + " established target sockets retained");
                     var pills = packing.GetComponentsInChildren<IdentityPillView>(true).Where(p => p.UsesSharedDisplay).ToArray();
                     Check(pills.Length >= 2 && pills.All(p => p.ProgressPlate.treatment == PillProgressTreatment.Interior), scene + " actual packed pills use interior fill");
                     float work = c.CompletedWork, time = host.SimulationTimeSeconds;
                     adapter.heartbeat.SetReviewTime(3.25); Refresh();
                     Check(c.CompletedWork == work && host.SimulationTimeSeconds == time, scene + " presentation cannot advance simulation");
-                    Color saved = adapter.style.ordinaryRail;
+                    Color[] saved = adapter.style.ordinaryIdentityColors;
                     try
                     {
-                        adapter.style.ordinaryRail = Color.magenta; Refresh();
+                        adapter.style.ordinaryIdentityColors = Enumerable.Repeat(Color.magenta, 6).ToArray(); Refresh();
                         var safe = state; safe.dangerSeverity = 0;
                         Check(labPrefab.style.Rail(safe, 0) == Color.magenta && sharedPill.ProgressPlate.material == labPrefab.pill.material &&
                             pills.All(p => p.ProgressPlate.color.r > .99f && p.ProgressPlate.color.b > .99f),
                             scene + " one live style edit propagates to gameplay and lab asset references");
                     }
-                    finally { adapter.style.ordinaryRail = saved; Refresh(); }
+                    finally { adapter.style.ordinaryIdentityColors = saved; Refresh(); }
                     long allocated = PresentationAllocationProbe.Measure(() => { for (int i = 0; i < 1000; i++) adapter.StateFor(c); });
                     if (allocated >= 0) Check(allocated == 0, scene + " 1000 mapping calls allocate " + allocated + " managed bytes (calibrated GC.Alloc)");
                     else checks.Add("UNAVAILABLE " + scene + " allocation recorder failed sentinel calibration; no zero-allocation claim");
@@ -136,7 +145,7 @@ namespace Uptime.Connections.EditorTools
                 {
                     typeof(ConnectionDisplayGraphic).GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic,
                         null, new[] { typeof(VertexHelper) }, null).Invoke(killedView.SharedDisplay.path, new object[] { mesh });
-                    Color activityColor = killedView.SharedDisplay.style.ordinaryActivity; activityColor.a = .42f;
+                    Color activityColor = killedView.SharedDisplay.style.Activity(DisplayTrafficClass.Ordinary, true);
                     var vertex = new UIVertex(); bool activityRetained = false;
                     for (int i = 0; i < mesh.currentVertCount; i++)
                     { mesh.PopulateUIVertex(ref vertex, i); activityRetained |= vertex.color.Equals((Color32)activityColor); }

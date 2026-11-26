@@ -13,6 +13,8 @@ namespace Uptime.Connections
         private ConnectionGameplayDisplay gameplayDisplay;
         public bool UsesSharedDisplay => sharedDisplay != null;
         public ConnectionDisplayView SharedDisplay => sharedDisplay;
+        private int identitySlot;
+        public void SetIdentitySlot(int slot) => identitySlot = slot;
         private double resolutionBegan = double.NaN;
         public ConnectionDisplayState DisplayState
         {
@@ -24,7 +26,8 @@ namespace Uptime.Connections
                     if (double.IsNaN(resolutionBegan)) resolutionBegan = now;
                     departureElapsed = (float)Math.Max(0, now - resolutionBegan);
                 }
-                return ConnectionGameplayDisplay.Map(state, sharedDisplay.style, departureElapsed);
+                var display = ConnectionGameplayDisplay.Map(state, sharedDisplay.style, departureElapsed);
+                display.identitySlot = identitySlot; return display;
             }
         }
         [SerializeField] private TerminalMarkerStyle terminalMarkerPrefab;

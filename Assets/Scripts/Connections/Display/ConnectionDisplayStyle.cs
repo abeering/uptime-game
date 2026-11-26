@@ -5,13 +5,19 @@ namespace Uptime.Connections.Display
     [CreateAssetMenu(menuName = "Uptime/Connection display style")]
     public sealed class ConnectionDisplayStyle : ScriptableObject
     {
-        [Header("Traffic class")]
-        public Color ordinaryRail = new Color(.57f, .64f, .69f);
-        public Color ordinaryBody = new Color(.15f, .19f, .22f);
-        public Color priorityRail = new Color(.24f, .63f, .94f);
-        public Color priorityBody = new Color(.045f, .17f, .27f);
-        public Color ordinaryActivity = new Color(.83f, .88f, .9f);
-        public Color priorityActivity = new Color(.63f, .85f, 1f);
+        [Header("Stable identity families (same lifetime slot on every segment)")]
+        public Color[] ordinaryIdentityColors = {
+            new(.62f, .71f, .78f), new(.66f, .74f, .66f), new(.78f, .71f, .64f),
+            new(.59f, .67f, .72f), new(.71f, .65f, .76f), new(.62f, .75f, .72f) };
+        // The previous six blue/teal connection accents; synthetic priority only.
+        public Color[] priorityIdentityColors = {
+            new(.36f, .87f, .91f), new(.35f, .91f, .76f), new(.43f, .82f, .92f),
+            new(.43f, .89f, .79f), new(.31f, .85f, .84f), new(.49f, .87f, .75f) };
+        [Range(0, 1)] public float bodyFillOpacity = .34f;
+        public Color ordinaryActivity = new(.68f, .74f, .77f);
+        public Color priorityActivity = new(.53f, .79f, .85f);
+        [Range(0, 1)] public float activityOpacity = .60f;
+        [Range(0, 1)] public float stalledActivityOpacityMultiplier = .70f;
         [Header("Uniform rail warning pulse")]
         public Color behind = new Color(.94f, .69f, .25f);
         public Color endangered = new Color(1f, .34f, .18f);
@@ -39,12 +45,22 @@ namespace Uptime.Connections.Display
 
         public float Spacing(float load) => Mathf.Max(minimumSpacing,
             spacingAtOneLoad / (1 + densityPerLoad * Mathf.Max(0, load - 1)));
-        public Color ClassRail(DisplayTrafficClass c) => c == DisplayTrafficClass.Priority ? priorityRail : ordinaryRail;
-        public Color ClassBody(DisplayTrafficClass c) => c == DisplayTrafficClass.Priority ? priorityBody : ordinaryBody;
-        public Color Activity(DisplayTrafficClass c) => c == DisplayTrafficClass.Priority ? priorityActivity : ordinaryActivity;
+        public Color IdentityColor(ConnectionDisplayState s) => IdentityColor(s.trafficClass, s.identitySlot);
+        public Color IdentityColor(DisplayTrafficClass traffic, int slot)
+        {
+            Color[] family = traffic == DisplayTrafficClass.Priority ? priorityIdentityColors : ordinaryIdentityColors;
+            return family != null && family.Length > 0 ? family[Mathf.Max(0, slot) % family.Length] : Color.gray;
+        }
+        public Color Body(ConnectionDisplayState s, double beats)
+        { Color c = Rail(s, beats); c.a *= bodyFillOpacity; return c; }
+        public Color Activity(DisplayTrafficClass traffic, bool stalled = false)
+        {
+            Color c = traffic == DisplayTrafficClass.Priority ? priorityActivity : ordinaryActivity;
+            c.a *= activityOpacity * (stalled ? stalledActivityOpacityMultiplier : 1); return c;
+        }
         public Color Rail(ConnectionDisplayState s, double beats)
         {
-            Color baseColor = ClassRail(s.trafficClass);
+            Color baseColor = IdentityColor(s);
             float danger = Mathf.Clamp01(s.dangerSeverity);
             Color warning = danger < .55f ? Color.Lerp(behind, endangered, danger / .55f) :
                 Color.Lerp(endangered, critical, (danger - .55f) / .45f);

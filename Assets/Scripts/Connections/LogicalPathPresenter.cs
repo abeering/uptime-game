@@ -195,6 +195,7 @@ namespace Uptime.Connections
                     continue;
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
+                views[connection].SetIdentitySlot(identityPalette.AssignSlot(connection));
                 var nodes = new NodeView[connection.Definition.Route.Length];
                 var links = new PhysicalLinkView[connection.RouteLinks.Length];
                 for (int i = 0; i < nodes.Length; i++)

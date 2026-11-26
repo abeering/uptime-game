@@ -4,6 +4,10 @@ Open **Assets/Scenes/Connections.unity** or **Assets/Scenes/ConnectionsAdvanced.
 
 [Architecture, model mapping, danger formula and clock policy](../../Connections/connections-visual-integration-v0.md) · [Shared Display Lab](../../Connections/connections-display-lab-v0.md).
 
+## Corrective visual pass
+
+[Palette, ribbon fill, quieter activity and before/after evidence](CorrectivePass.md) follow human gameplay feedback. Current screenshots/reels use the correction. Ordinary connections have stable muted identity colors; synthetic priority reuses the previous blue/teal family. Body and rails share resolved warning color while pills retain base identity. Heartbeat/danger mechanics, geometry and canonical scene assets are unchanged by this correction.
+
 ## Preparation and source boundary
 
 Normal GitHub merges, in the explicitly authorized order: #128 → `6620f882`, #129 → `52f9b771`, #130 → `8391df0a`. Both source design sections and both implementation records were retained; conflicting Core output was regenerated from sources. Integrated main `8391df0a5da5901c15571faffc5ca1ff92a84344` compiled and ran the Fragility/lab/canonical and broad regression checks **before** the fresh feature branch was created. Experimental PRs #115/#124/#125/#126 were untouched.
@@ -13,10 +17,10 @@ The adapter reads actual visible identity, effective requested LOAD, productive 
 ## Actual checks
 
 - Unity 6000.3.11f1 compiled and rendered in an isolated project copy; the original Editor session was left open.
-- [Focused integration](deterministic-checks.txt): 75 semantic/mesh assertions passed; two scoped allocation measurements are explicitly unavailable after failed sentinel calibration. Covers real overload/recovery, zero-WORK/full-LOAD stalls, actual progress/reset, full-speed danger, cancellation, withdrawal, hostile information parity, shared style propagation, prefix reveal and Probe clipping.
+- [Focused integration](deterministic-checks.txt): 81 semantic/mesh assertions passed; two scoped allocation measurements are explicitly unavailable after failed sentinel calibration. Covers real overload/recovery, zero-WORK/full-LOAD stalls, actual progress/reset, full-speed danger, cancellation, withdrawal, hostile information parity, shared style propagation, prefix reveal and Probe clipping.
 - [Fragility](fragility-checks.txt): 126 assertions passed. [Canonical and mechanical regressions](canonical-regression-checks.txt), [Fragility/terminal regressions](fragility-regression-checks.txt), and [additional identity/Probe results](regression-checks.txt) retain exact outcomes. Canonical parity: 883 checks passed. Geometry/route ordering, lifecycle, behavior/WORK, natural LOAD noise, BACKDOOR, LOADER, INFECTOR, Payload, Worm, Infection, Integrity/CORE, inspect/history, diagnostics, identity hopping/reactive aliases, Probe and sweep checks passed.
-- [Gameplay Play Mode](graphical-checks.txt): 466 scripted assertions passed across both canonical scenes at 1920×1080 and 1280×720. Includes actual terminal submission/focus, visible IDs and bounds, rescue, timeout/retirement, sacrifice, connecting interruption, crowding, alias/Probe revelation, moving attacks, zero productivity, operation reset, pause/overlay/reset semantics and CORE freezing.
-- [Original Fragility graphical runner](fragility-graphical-checks.txt): 54 scripted assertions passed across both scenes and resolutions.
+- [Gameplay Play Mode](graphical-checks.txt): 546 scripted assertions passed across both canonical scenes at 1920×1080 and 1280×720. Includes actual terminal submission/focus, visible IDs and bounds, rescue, timeout/retirement, sacrifice, connecting interruption, crowding, alias/Probe revelation, moving attacks, zero productivity, operation reset, pause/overlay/reset semantics and CORE freezing.
+- Initial integration [original Fragility graphical runner](fragility-graphical-checks.txt): 54 scripted assertions passed across both scenes and resolutions.
 - [Authoring safety](authoring-safety-checks.txt): repeat migration is refused; lab fixture regeneration leaves nine shared/canonical asset files byte-identical and the regenerated lab retains its focused checks. Shared assets are never rebuilt by ordinary lab authoring.
 - The lab's focused/graphical reports are linked from [its review guide](../ConnectionsDisplayLabV0/README.md). Allocation claims from the earlier uncalibrated thread-counter experiment are superseded; no per-renderer zero-allocation claim is made here.
 - [Isolation](isolation-checks.txt) verifies unchanged authoritative simulation, allocator, threats, Packet and historical scene assets. Project Core generation/check and staged whitespace checks pass.
@@ -51,6 +55,10 @@ Every row has both resolutions for both scenes. The links below open 720p; chang
 | Eight crowded paths | [Frame](Captures/Connections/11-crowded-paths-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/11-crowded-paths-1280x720.png) |
 | Advertised hopping alias | [Frame](Captures/Connections/12-hopping-alias-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/12-hopping-alias-1280x720.png) |
 | Probe revelation | [Frame](Captures/Connections/13-probe-revelation-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/13-probe-revelation-1280x720.png) |
+| Shared links, diverging destinations | [Frame](Captures/Connections/22-shared-and-diverging-routes-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/22-shared-and-diverging-routes-1280x720.png) |
+| Low WORK fill | [Frame](Captures/Connections/23-pill-low-work-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/23-pill-low-work-1280x720.png) |
+| Medium WORK fill | [Frame](Captures/Connections/24-pill-medium-work-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/24-pill-medium-work-1280x720.png) |
+| High WORK fill | [Frame](Captures/Connections/25-pill-high-work-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/25-pill-high-work-1280x720.png) |
 | Existing Payload and Worm | [Frame](Captures/Connections/14-existing-moving-attacks-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/14-existing-moving-attacks-1280x720.png) |
 | Configured Duel pause | [Frame](Captures/Connections/15-duel-pause-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/15-duel-pause-1280x720.png) |
 | CORE freeze | [Frame](Captures/Connections/16-core-frozen-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/16-core-frozen-1280x720.png) |
@@ -59,7 +67,7 @@ Every row has both resolutions for both scenes. The links below open 720p; chang
 | Operation before transition | [Frame](Captures/Connections/19-operation-before-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/19-operation-before-1280x720.png) |
 | Operation progress reset | [Frame](Captures/Connections/20-operation-reset-1280x720.png) | [Frame](Captures/ConnectionsAdvanced/20-operation-reset-1280x720.png) |
 
-[Shared-style edit: Small](Captures/Connections/21-shared-style-proof-1920x1080.png) · [Advanced](Captures/ConnectionsAdvanced/21-shared-style-proof-1920x1080.png) · [Lab](../ConnectionsDisplayLabV0/shared-style-proof.png). The same `DisplayStyle.asset.ordinaryRail` was temporarily set to white in memory, then restored. No independent canonical scene styling change was needed. The ordinary screenshots use the accepted palette.
+[Shared-style edit: Small](Captures/Connections/21-shared-style-proof-1920x1080.png) · [Advanced](Captures/ConnectionsAdvanced/21-shared-style-proof-1920x1080.png) · [Lab](../ConnectionsDisplayLabV0/shared-style-proof.png). The same `DisplayStyle.asset.ordinaryIdentityColors` family was temporarily set to white in memory, then restored. No independent canonical scene styling change was needed. The ordinary screenshots use the accepted palette.
 
 The controlled cases reuse the real Fragility PURPOSE fixture/queue/allocator. Late recovery uses the same safe two-request demand, waiting until earlier delay leaves too little normal-rate budget; sacrificing the peer restores full speed without erasing danger. The zero-WORK and two-operation review plans reuse the actual generated route and existing generic rate/operation mechanisms. These are disposable in-memory witnesses. Ordinary ambient scheduling is sampled separately and is not retuned. No natural-congestion or overall-balance verdict is established.
 
@@ -78,9 +86,9 @@ The chapters concatenate unpainted Play Mode PNG frames. They are separate scena
 
 ## Performance observations and limits
 
-[Raw measurements](presentation-profile.txt). A sampled presentation pass includes **two existing layout passes**, all path updates and forced Canvas work; it excludes authoritative stepping, object discovery, PNG encoding and GPU timing. With eight connections, the observed mean was approximately **2.7ms Small / 4.1ms Advanced**, with peak path meshes **1,632 / 2,716 vertices**. These are instrumented Editor observations, not a standalone FPS budget.
+[Raw measurements](presentation-profile.txt). A sampled presentation pass includes **two existing layout passes**, all path updates and forced Canvas work; it excludes authoritative stepping, object discovery, PNG encoding and GPU timing. With eight connections, the observed mean was approximately **3.0ms Small / 3.5ms Advanced**, with peak path meshes **1,632 / 2,716 vertices**. These are instrumented Editor observations, not a standalone FPS budget.
 
-A separate 30-frame ordinary PlayerLoop sample with eight connections and **no PNG capture** calibrated `GC Allocated In Frame` with a 1-MB sentinel. Whole Editor/engine/simulation/UI means were approximately **82KB / 117KB per frame**. These bytes cannot be attributed solely to the renderer. Existing route/pill layout creates collections, and UI/simulation also allocate; those owners were not broadly refactored. The per-thread API reports zero even for an explicit allocation, and the scoped GC.Alloc recorder also fails calibration, so scoped bytes are marked **UNAVAILABLE**. No whole-engine or binding-loop zero-allocation claim is made.
+A separate 30-frame ordinary PlayerLoop sample with eight connections and **no PNG capture** calibrated `GC Allocated In Frame` with a 1-MB sentinel. Whole Editor/engine/simulation/UI means were approximately **82KB / 115KB per frame**. These bytes cannot be attributed solely to the renderer. Existing route/pill layout creates collections, and UI/simulation also allocate; those owners were not broadly refactored. The per-thread API reports zero even for an explicit allocation, and the scoped GC.Alloc recorder also fails calibration, so scoped bytes are marked **UNAVAILABLE**. No whole-engine or binding-loop zero-allocation claim is made.
 
 There is one path/activity mesh per connection, no per-blip GameObjects or material clones. Geometry arrays are reused when the route is unchanged; dynamic mesh content is rebuilt for animation. Resolved models release resources immediately, then their visual meshes, packed IDs and sockets retire after the shared departure. The timeout capture verifies retirement, and no visual objects survive restart.
 

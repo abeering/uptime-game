@@ -131,6 +131,21 @@ PASS authored CanvasRenderer components: NATURAL COMPLETION / FADE
 PASS linked reusable display prefab: NATURAL COMPLETION / FADE
 PASS coherent default phase/subdivision: NATURAL COMPLETION / FADE
 PASS primary animated interior fill: NATURAL COMPLETION / FADE
+PASS two shared six-slot identity families
+PASS priority slot 0 restores previous blue/teal accent
+PASS ordinary slot 0 is differentiated and readable
+PASS priority slot 1 restores previous blue/teal accent
+PASS ordinary slot 1 is differentiated and readable
+PASS priority slot 2 restores previous blue/teal accent
+PASS ordinary slot 2 is differentiated and readable
+PASS priority slot 3 restores previous blue/teal accent
+PASS ordinary slot 3 is differentiated and readable
+PASS priority slot 4 restores previous blue/teal accent
+PASS ordinary slot 4 is differentiated and readable
+PASS priority slot 5 restores previous blue/teal accent
+PASS ordinary slot 5 is differentiated and readable
+PASS authored lab demonstrates all ordinary identity slots without new hierarchy
+PASS meaningful translucent body and quieter activity defaults
 PASS default BPM: expected 120, observed 120
 PASS beat begins at prior settled position: expected 0, observed 0
 PASS smooth halfway movement: expected 9, observed 9
@@ -163,328 +178,328 @@ PASS Perimeter exact 0/25/50/75/99 WORK samples
 PASS Perimeter independent high-contrast identity text
 PASS joined multi-segment variable-width route
 PASS existing path endpoints preserved
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=1, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=1, speed=0, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=1, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Priority, normal deficit=False, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Priority, normal deficit=False, time=0.375
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Priority, normal deficit=True, time=0.125
-PASS continuous opaque rails: segments=3, speed=0, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=1, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=1, speed=0, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=1, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.65, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0.22, danger=1, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.3, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.8, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=0.98, class=Priority, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Ordinary, normal deficit=True, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Priority, normal deficit=False, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Priority, normal deficit=False, time=0.375
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Priority, normal deficit=True, time=0.125
+PASS continuous opaque rails and status-colored translucent body: segments=3, speed=0, danger=1, class=Priority, normal deficit=True, time=0.375
 PASS bent route emits rails and activity into a shared mesh
-PASS all 156 activity vertices clipped inside route endpoint extent
+PASS all 104 activity vertices clipped inside route endpoint extent
 PASS activity width and feather remain inside rail body
 PASS new operation resets WORK and reverses direction without rerouting
 PASS recovery sequence starts slow and endangered

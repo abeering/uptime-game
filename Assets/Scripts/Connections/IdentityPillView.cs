@@ -10,7 +10,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionProgressPillGraphic progressPlate;
         [SerializeField] private ConnectionDisplayStyle displayStyle;
         private float displayOpacity = 1;
-        private DisplayTrafficClass displayTrafficClass;
+        private Color displayIdentityColor;
         public bool UsesSharedDisplay => progressPlate != null;
         public ConnectionProgressPillGraphic ProgressPlate => progressPlate;
         [SerializeField] private TMP_Text idText;
@@ -52,9 +52,9 @@ namespace Uptime.Connections
         public void SetDisplayState(ConnectionDisplayState state, PillProgressTreatment treatment = PillProgressTreatment.Interior, bool applyOpacity = true)
         {
             if (!UsesSharedDisplay || displayStyle == null) return;
-            displayTrafficClass = state.trafficClass;
+            displayIdentityColor = displayStyle.IdentityColor(state);
             displayOpacity = applyOpacity ? displayStyle.Opacity(state) : 1;
-            Color tint = displayStyle.ClassRail(state.trafficClass); tint.a *= displayOpacity;
+            Color tint = displayIdentityColor; tint.a *= displayOpacity;
             progressPlate.Render(state.workProgress, treatment, tint);
             if (idText != null) idText.alpha = displayOpacity;
             RefreshAccent();
@@ -105,11 +105,10 @@ namespace Uptime.Connections
             Color accent = Color.Lerp(baseAccent, Color.white,
                 identityChangeWhiteMix * remaining);
             if (plate != null) plate.SetOutline(accent);
-            // Shared progress and text retain the lab palette; aliases still receive
-            // the existing brief emphasis without turning an identity color into priority.
+            // Base identity remains recognizable during rail danger; aliases retain brief emphasis.
             if (progressPlate != null && displayStyle != null)
             {
-                Color neutral = Color.Lerp(displayStyle.ClassRail(displayTrafficClass), Color.white, identityChangeWhiteMix * remaining);
+                Color neutral = Color.Lerp(displayIdentityColor, Color.white, identityChangeWhiteMix * remaining);
                 neutral.a = displayOpacity; progressPlate.color = neutral;
             }
             if (!UsesSharedDisplay && tintTextWithAccent && idText != null) idText.color = accent;

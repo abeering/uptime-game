@@ -27,11 +27,11 @@ namespace Uptime.Connections.Display
                 if (pillBinding == null) pillBinding = pill.GetComponent<IdentityPillView>();
                 if (pillBinding != null)
                 {
-                    if (!pillBound) { pillBinding.Bind(state.identity, style.ClassRail(state.trafficClass)); pillBound = true; }
+                    if (!pillBound) { pillBinding.Bind(state.identity, style.IdentityColor(state)); pillBound = true; }
                     else pillBinding.SetDisplayedId(state.identity);
                     pillBinding.SetDisplayState(state, progressTreatment, displayGroup == null);
                 }
-                else pill.Render(state.workProgress, progressTreatment, style.ClassRail(state.trafficClass));
+                else pill.Render(state.workProgress, progressTreatment, style.IdentityColor(state));
                 ((RectTransform)pill.transform).anchoredPosition = path.PointAt(pillPosition);
             }
             if (identity != null && identity.text != state.identity) identity.SetText(state.identity);

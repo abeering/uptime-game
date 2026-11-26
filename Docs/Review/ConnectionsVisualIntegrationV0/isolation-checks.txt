@@ -1,4 +1,4 @@
-PASS Existing Assets changes are restricted to the 18 explicitly scoped presentation/authoring/scene files.
+PASS Existing Assets changes are restricted to the 21 explicitly scoped presentation/authoring/scene files.
 PASS No simulation, allocator, behavior, traffic, threat, Packet or historical scene asset is changed.
 PASS Connections: only three existing serialized blocks change (two presenter references and host component list); two new clock/adapter blocks. No topology/layout/traffic/resource fields change.
 PASS ConnectionsAdvanced: only three existing serialized blocks change (two presenter references and host component list); two new clock/adapter blocks. No topology/layout/traffic/resource fields change.

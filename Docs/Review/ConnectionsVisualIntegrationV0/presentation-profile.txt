@@ -1,11 +1,15 @@
 Actual Play Mode samples: two existing layout passes + all path updates + forced Canvas work. Excludes simulation stepping, object discovery, PNG encoding and GPU timing. Includes inherited layout/packing allocations; not whole-engine zero allocations or standalone FPS.
-Connections/ambient: 144 frames, peak connections=2, peak path vertices=276; sampled presentation mean=0.738ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-Connections/overclock-rescue: 192 frames, peak connections=2, peak path vertices=408; sampled presentation mean=0.919ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-Connections/timeout: 63 frames, peak connections=2, peak path vertices=360; sampled presentation mean=0.956ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-Connections/crowded: 48 frames, peak connections=8, peak path vertices=1632; sampled presentation mean=2.740ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-Connections/native crowded gameplay (30 ordinary PlayerLoop frames, no PNG capture): GC Allocated In Frame calibrated=True, mean=81781, max=95422 bytes; includes engine/Editor/UI/simulation, not a per-renderer allocation claim.
-ConnectionsAdvanced/ambient: 144 frames, peak connections=2, peak path vertices=312; sampled presentation mean=0.843ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-ConnectionsAdvanced/overclock-rescue: 192 frames, peak connections=2, peak path vertices=688; sampled presentation mean=1.308ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/ambient: 144 frames, peak connections=2, peak path vertices=276; sampled presentation mean=0.796ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/overclock-rescue: 192 frames, peak connections=2, peak path vertices=408; sampled presentation mean=0.957ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/timeout: 63 frames, peak connections=2, peak path vertices=360; sampled presentation mean=0.974ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/crowded: 48 frames, peak connections=8, peak path vertices=1632; sampled presentation mean=2.980ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/native crowded gameplay (30 ordinary PlayerLoop frames, no PNG capture): GC Allocated In Frame calibrated=True, mean=82428, max=96062 bytes; includes engine/Editor/UI/simulation, not a per-renderer allocation claim.
+Connections/diverging: 72 frames, peak connections=3, peak path vertices=328; sampled presentation mean=1.544ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+Connections/stalled: 48 frames, peak connections=1, peak path vertices=192; sampled presentation mean=1.493ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+ConnectionsAdvanced/ambient: 144 frames, peak connections=2, peak path vertices=312; sampled presentation mean=0.866ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+ConnectionsAdvanced/overclock-rescue: 192 frames, peak connections=2, peak path vertices=688; sampled presentation mean=1.352ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
 ConnectionsAdvanced/timeout: 63 frames, peak connections=2, peak path vertices=688; sampled presentation mean=1.308ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-ConnectionsAdvanced/crowded: 48 frames, peak connections=8, peak path vertices=2716; sampled presentation mean=4.114ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
-ConnectionsAdvanced/native crowded gameplay (30 ordinary PlayerLoop frames, no PNG capture): GC Allocated In Frame calibrated=True, mean=116958, max=138220 bytes; includes engine/Editor/UI/simulation, not a per-renderer allocation claim.
+ConnectionsAdvanced/crowded: 48 frames, peak connections=8, peak path vertices=2716; sampled presentation mean=3.518ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+ConnectionsAdvanced/native crowded gameplay (30 ordinary PlayerLoop frames, no PNG capture): GC Allocated In Frame calibrated=True, mean=115020, max=138124 bytes; includes engine/Editor/UI/simulation, not a per-renderer allocation claim.
+ConnectionsAdvanced/diverging: 72 frames, peak connections=3, peak path vertices=512; sampled presentation mean=1.422ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
+ConnectionsAdvanced/stalled: 48 frames, peak connections=1, peak path vertices=356; sampled presentation mean=1.287ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.

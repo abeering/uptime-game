@@ -128,7 +128,7 @@ namespace Uptime.Connections.Display
             mesh.Clear();
             if (style == null || lengths == null || PathLength <= 0 || reveal <= 0) { LastVertexCount = 0; return; }
             unitsPerPixel = 1 / Mathf.Max(.001f, canvas != null ? canvas.scaleFactor : 1);
-            Color rail = style.Rail(state, beats), body = style.ClassBody(state.trafficClass);
+            Color rail = style.Rail(state, beats), body = style.Body(state, beats);
             Strip(mesh, 0, PathLength, -1, 1, body, body);
             // One coherent full-route warning pulse; no spatial sweep suggests a bad physical segment.
             float speed = state.productiveSpeed;
@@ -147,8 +147,7 @@ namespace Uptime.Connections.Display
             int direction = LogicalPathView.DirectionFor(state.operation);
             double phase = travel;
             float first = (float)((phase % spacing + spacing) % spacing);
-            Color activity = style.Activity(state.trafficClass);
-            if (speed <= .0001f) activity.a = .42f;
+            Color activity = style.Activity(state.trafficClass, speed <= .0001f);
             for (float s = first; s < PathLength; s += spacing)
             {
                 float halfLength = style.blipLength * .5f;

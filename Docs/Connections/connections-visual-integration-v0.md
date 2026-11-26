@@ -14,7 +14,7 @@ Before the feature branch was created, Unity 6000.3.11f1 compiled integrated mai
 - `DisplayIdentityPill.prefab`, including its progress graphic, TMP identity, material and shader, is used directly by gameplay's existing `IdentityPresenter`. Its initial 62×32 size and 20-point identity follow the accepted lab; authored RectTransform/TMP settings remain the source for future changes, rather than legacy size/font fields. The lab view and gameplay packing call the same pill-state binding, with one opacity owner per composition. The existing solver reads this size; lane ordering, placement, clearance and cycling retain their owners. Packed poses use the overlay's center anchor; lab racks keep their authored anchors.
 - `ConnectionDisplayView`, `ConnectionDisplayGraphic`, `ConnectionHeartbeat`, `DisplayStyle.asset` and the progress shader are shared. The view permits separate pill/marker layers; it does not require gameplay to adopt the lab sample hierarchy.
 - `LogicalPathView` keeps route geometry, progressive reveal, layout interpolation and sockets. It supplies segments/widths to the shared renderer. Probe clips the same mesh in its existing scanner frame. Payload, Worm, physical links and Integrity presentation retain their existing separate renderers.
-- The older path/pill assets remain for historical scenes, terminal headers and the legacy geometry-preview/study tools. Canonical ordinary connections do not instantiate a parallel legacy path renderer. Existing identity-palette ownership remains available to inspection; ordinary network rails/pills use the shared neutral palette.
+- The older path/pill assets remain for historical scenes, terminal headers and the legacy geometry-preview/study tools. Canonical ordinary connections do not instantiate a parallel legacy path renderer. Existing identity-palette ownership remains available to inspection. The initial uniform neutral network palette is superseded by the corrective identity families below.
 
 The lab authoring command now rebuilds only synthetic scene fixtures. Shared prefabs, style, shader and material must already exist; missing assets cause a clear error. It neither regenerates them nor saves unrelated dirty assets. The separate one-time integration authoring utility establishes composition and canonical bindings, and refuses to run again once the gameplay prefab exists. Normal lab experimentation edits the shared assets directly through the Inspector. [Authoring safety checks](../Review/ConnectionsVisualIntegrationV0/authoring-safety-checks.txt) verify fixture regeneration leaves shared assets and both canonical scene files unchanged.
 
@@ -66,3 +66,26 @@ Redundant `AT RISK` text is removed from the canonical network pill. Explicit se
 ## Validation and review
 
 [Review guide](../Review/ConnectionsVisualIntegrationV0/README.md) records actual compilation, deterministic/regression results, Play Mode captures at both resolutions, motion, profiling scope and human-review limitations. Controlled Fragility fixtures remain disposable in-memory tuning; canonical traffic scheduling is unchanged. Ordinary generated gameplay is sampled separately. No natural-congestion or balance verdict is established.
+
+## Corrective visual pass — identity ribbons
+
+Human gameplay review accepted the shared architecture/mechanics and requested stronger ribbon identity with subordinate activity. This presentation-only correction keeps heartbeat timing, density/direction, danger calculation, geometry/packing, shaders/materials and gameplay untouched. Both canonical scene assets are unchanged by this correction.
+
+`ConnectionIdentityPalette.AssignSlot` retains the existing six-slot, lifetime-owned rotating assignment and release/reset behavior. Its original `Assign` still returns the old inspection accents. `LogicalPathPresenter` supplies that same slot to the shared display DTO; aliases, hopping and Probe never recompute it. Every segment, interior-progress pill and destination socket derives color from the shared style. Actual gameplay remains Ordinary; Priority is synthetic only.
+
+Initial shared sRGB component values (0–1):
+
+| Slot | Ordinary neutral | Priority (previous blue/teal family) |
+|---|---|---|
+| 0 | blue-grey `(0.62, 0.71, 0.78)` | cyan `(0.36, 0.87, 0.91)` |
+| 1 | green-grey `(0.66, 0.74, 0.66)` | teal `(0.35, 0.91, 0.76)` |
+| 2 | warm grey `(0.78, 0.71, 0.64)` | blue-green `(0.43, 0.82, 0.92)` |
+| 3 | slate `(0.59, 0.67, 0.72)` | seafoam `(0.43, 0.89, 0.79)` |
+| 4 | violet-grey `(0.71, 0.65, 0.76)` | turquoise `(0.31, 0.85, 0.84)` |
+| 5 | mint-grey `(0.62, 0.75, 0.72)` | cool mint `(0.49, 0.87, 0.75)` |
+
+`DisplayStyle.asset` owns both arrays, `bodyFillOpacity = 0.34`, ordinary activity RGB `(0.68, 0.74, 0.77)`, priority activity RGB `(0.53, 0.79, 0.85)`, `activityOpacity = 0.60`, and `stalledActivityOpacityMultiplier = 0.70` (stationary alpha 0.42). Body vertices use the **resolved rail RGB at the same heartbeat instant**, including danger pulse, budget deficit and departure colors, with alpha 0.34. This is a visible translucent fill over the scene, rather than the earlier dark opaque class body. The same miter/width/progressive-reveal/Probe/departure mesh paths apply. No decorative objects or new materials are added.
+
+Activity geometry remains 9 units long and half-width fraction 0.5 plus its existing feather. Only contrast/opacity change. Stepped movement, slowdown missed beats, EXECUTE breathing, requested-LOAD spacing and operation directions are unchanged. ID text, typography and packing are unchanged; the existing dark WORK fill (identity RGB ×0.38 in the shared shader) stays below the bright text. Pill borders retain **base identity** while danger increasingly takes over the ribbon/socket, so identity remains available even at maximum warning. Severe danger deliberately prioritizes status on the route; no new danger formula or smoothing is added.
+
+The existing lab samples now use explicit synthetic identity slots, all six ordinary variants, and several priority examples. The paired progress racks retain interior/perimeter treatments and matched ordinary slot colors. Updated actual Play Mode palette plates show all six colors of each family using the same existing rows; those comparison overrides are disposable capture state. Lab fixture authoring remains protected against shared-asset overwrite.

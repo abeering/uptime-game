@@ -8,6 +8,9 @@ PASS Connections current operation WORK fill: expected 0.05399996, observed 0.05
 PASS Connections current-rate failure with meaningful rescue headroom
 PASS Connections visible identity and neutral class; no invented priority
 PASS Connections shared path implementation; no parallel legacy renderer per connection
+PASS Connections existing lifetime slot allocator differentiates adjacent connection ribbons
+PASS Connections every route segment and terminal socket shares its lifetime identity/status
+PASS Connections every route segment and terminal socket shares its lifetime identity/status
 PASS Connections established target sockets retained
 PASS Connections actual packed pills use interior fill
 PASS Connections presentation cannot advance simulation
@@ -27,6 +30,9 @@ PASS ConnectionsAdvanced current operation WORK fill: expected 0.03599998, obser
 PASS ConnectionsAdvanced current-rate failure with meaningful rescue headroom
 PASS ConnectionsAdvanced visible identity and neutral class; no invented priority
 PASS ConnectionsAdvanced shared path implementation; no parallel legacy renderer per connection
+PASS ConnectionsAdvanced existing lifetime slot allocator differentiates adjacent connection ribbons
+PASS ConnectionsAdvanced every route segment and terminal socket shares its lifetime identity/status
+PASS ConnectionsAdvanced every route segment and terminal socket shares its lifetime identity/status
 PASS ConnectionsAdvanced established target sockets retained
 PASS ConnectionsAdvanced actual packed pills use interior fill
 PASS ConnectionsAdvanced presentation cannot advance simulation

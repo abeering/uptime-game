@@ -14,6 +14,7 @@ namespace Uptime.Connections.Display
     {
         public string identity;
         public DisplayTrafficClass trafficClass;
+        [Min(0)] public int identitySlot;
         public OperationKind operation;
         [Min(0)] public float requestedLoad;
         [Range(0, 2)] public float productiveSpeed;

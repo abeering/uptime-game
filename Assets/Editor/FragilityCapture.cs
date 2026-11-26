@@ -291,6 +291,36 @@ namespace Uptime.Connections.EditorTools
                 FindObjectsByType<ConnectionDisplayGraphic>(FindObjectsSortMode.None).Length == 8,
                 "eight crowded logical paths use one shared mesh each");
 
+            // Reuse the actual traffic route builder for shared links with different destinations.
+            FragilityWitness.ConfigureFixture(host, 0, 0);
+            var trafficForRoutes = host.GetComponent<ConnectionTrafficDirector>();
+            var routeMethod = typeof(ConnectionTrafficDirector).GetMethod("FindRoute",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            int routeIndex = 0;
+            foreach (string destination in new[] { "DB", "API", "AUTH" })
+            {
+                var branchRoute = (NodeView[])routeMethod.Invoke(trafficForRoutes,
+                    new object[] { host.FindNodeResources("EXT1").View, host.FindNodeResources(destination).View });
+                var plan = new ConnectionSpawnPlan(0, "r" + routeIndex, branchRoute, "visual-review", "Shared and diverging route review",
+                    new[] { new OperationStage((OperationKind)(routeIndex % 3), 100, 1, destination) });
+                host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan)); routeIndex++;
+            }
+            FragilityWitness.Advance(host, 4); yield return null;
+            Frames("22-shared-and-diverging-routes"); yield return Motion("diverging", 3);
+            Check(host.RuntimeConnections.Where(c => c.IsActive).Select(c => c.TargetNode).Distinct().Count() == 3,
+                "real shared-link routes retain three distinct destinations and stable identity slots");
+
+            ids = FragilityWitness.ConfigureFixture(host, 0, 1);
+            FragilityWitness.Advance(host, 3); yield return null;
+            var progressReview = host.FindConnection(ids[0]);
+            Frames("23-pill-low-work");
+            FragilityWitness.Advance(host, 9); yield return null;
+            Frames("24-pill-medium-work");
+            FragilityWitness.Advance(host, 8); yield return null;
+            Frames("25-pill-high-work");
+            Check(progressReview.CompletedWork / progressReview.CurrentTotalWork > .9f && progressReview.IsActive,
+                "actual high-WORK pill stays readable before completion; low and medium captures use the same identity");
+
             ids = FragilityWitness.ConfigureFixture(host, 4, 2); FragilityWitness.Advance(host, 3);
             var late = host.FindConnection(ids[0]);
             FragilityWitness.Advance(host, late.EstablishedAtSeconds + 27 - host.SimulationTimeSeconds);
@@ -311,6 +341,7 @@ namespace Uptime.Connections.EditorTools
                 "fully allocated zero-WORK connection is stalled with recovery opportunity");
             Submit("inspect -v z0"); yield return null;
             Frames("18-zero-work-stall");
+            yield return Motion("stalled", 2);
             FragilityWitness.ConfigureFixture(host, 4, 0);
             var arcPlan = new ConnectionSpawnPlan(0, "a0", route, "visual-review", "Operation progress review", new[] {
                 new OperationStage(OperationKind.Read, 10, 5, "First"), new OperationStage(OperationKind.Write, 100, 5, "Second") });
@@ -331,6 +362,9 @@ namespace Uptime.Connections.EditorTools
             Check(hopping.KnownIdentity != hopping.ConnectionId && adapter.StateFor(hopping).identity == hopping.KnownIdentity,
                 "adapter displays hopping alias, never concealed canonical identity");
             Frames("12-hopping-alias");
+            var aliasView = FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None).Single(v => v.DisplayState.identity == hopping.KnownIdentity);
+            int aliasSlot = aliasView.DisplayState.identitySlot;
+            Color aliasColor = adapter.style.IdentityColor(aliasView.DisplayState);
             var firstA = hopping.Definition.Route[0].Node; var firstB = hopping.Definition.Route[1].Node;
             var firstLink = host.PhysicalLinks.First(l => l.View.NodeA == firstA && l.View.NodeB == firstB ||
                 l.View.NodeA == firstB && l.View.NodeB == firstA);
@@ -338,6 +372,8 @@ namespace Uptime.Connections.EditorTools
             Check(hopping.KnownIdentity == hopping.ConnectionId && adapter.StateFor(hopping).identity == hopping.KnownIdentity,
                 "existing Probe reveals command identity through the same adapter");
             Frames("13-probe-revelation");
+            Check(aliasView.DisplayState.identitySlot == aliasSlot && adapter.style.IdentityColor(aliasView.DisplayState) == aliasColor,
+                "Probe identity revelation preserves the existing connection color slot");
             Submit("payload db steady"); Submit("worm ext1 port-scanned");
             FragilityWitness.Advance(host, 1.1f); yield return null;
             Frames("14-existing-moving-attacks");
@@ -378,9 +414,9 @@ namespace Uptime.Connections.EditorTools
             input.ActivateInputField(); yield return null;
             Check(input.isFocused && input.text == "inspect ", "prompt and draft remain available after overlay/reset review");
             FragilityWitness.ConfigureFixture(host, 4, 1); FragilityWitness.Advance(host, 3); yield return null;
-            Color original = adapter.style.ordinaryRail;
-            try { adapter.style.ordinaryRail = Color.white; Frames("21-shared-style-proof"); }
-            finally { adapter.style.ordinaryRail = original; }
+            Color[] original = adapter.style.ordinaryIdentityColors;
+            try { adapter.style.ordinaryIdentityColors = Enumerable.Repeat(Color.white, 6).ToArray(); Frames("21-shared-style-proof"); }
+            finally { adapter.style.ordinaryIdentityColors = original; }
         }
         private void Submit(string command) => input.onSubmit.Invoke(command);
         private void Frames(string name)

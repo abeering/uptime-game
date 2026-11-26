@@ -20,7 +20,7 @@ namespace Uptime.Connections.Display
             foreach (var sample in samples) if (sample != null) sample.Render(heartbeat.ElapsedSeconds, heartbeat);
             if (progressComparisons != null && style != null)
                 foreach (var pill in progressComparisons) if (pill != null)
-                    pill.Render(pill.progress, pill.treatment, style.ordinaryRail);
+                    pill.Render(pill.progress, pill.treatment, style.IdentityColor(DisplayTrafficClass.Ordinary, System.Array.IndexOf(progressComparisons, pill) % 5));
             if (clockLabel != null) clockLabel.SetText("{0:0} BPM   /   {1:0.00}s   /   {2:0.00} BEATS",
                 heartbeat.bpm, (float)heartbeat.ElapsedSeconds, (float)heartbeat.Beats);
         }
