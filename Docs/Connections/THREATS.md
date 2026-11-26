@@ -223,6 +223,17 @@ A subtle carrier with *no anomaly* is a future/rare case requiring other plausib
 
 Unlike a sustained LOADER, an INFECTOR must advance toward completion: the 0× attack-active rate is not its default delivery mechanic.
 
+
+### Keyword idea: SIGNALING (one-shot completion tell)
+
+**Exploratory; not an implemented behavior or an implementation request.** An operation delivering a negative completion effect (for example, an INFECTOR installing an infection) would briefly spike its **requested LOAD exactly once** near the end of its WORK—illustratively at about **99% completion**, with the threshold, magnitude, and duration tunable—then finish and apply its effect through ordinary completion. This is not a repeated high/low cycle or a sustained attack, and the spike does not replace or trigger early delivery.
+
+**Player-facing intent: "I just did something bad."** This would be a fleeting, consequence-adjacent tell, not an actionable warning or a new interception window. Even if the burst begins slightly before success, its intended reading is at or just after the harmful act, perhaps only caught by someone watching the network. It need not appear on every hostile operation.
+
+**Vocabulary distinction:** Existing `SPIKING` repeats brief elevated-demand windows, `OVERLOAD` escalates and stays elevated, and `WAVING` smoothly oscillates. Working-name `SIGNALING` is a **single completion-linked burst**. It is neither a threat genus nor an automatic proof of hostility.
+
+**Open:** Exact trigger relative to successful completion/effect; ensuring visibility when 99%→100% and connection retirement occur in one simulation step; whether the real LOAD spike should change allocation/WORK timing; preventing an interrupted or failed delivery from falsely signaling success; and possible benign lookalikes. Naming and implementation remain undecided.
+
 ## Investigation and fiction boundaries
 
 The player should be able to compare observed LOAD and *nominal duration* with expected behavior for the claimed PURPOSE. A typical-range comparison may eventually appear in verbose inspection, in a separate service reference, or through optional difficulty assistance. **Not yet decided**; no new command or classifier is authorized by this document.

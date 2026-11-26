@@ -27,7 +27,7 @@ We need to revisit and formalize the **vocabulary, composition rules, and genera
 
 Specifically:
 
-1. **Keywords / behaviors:** How are modifiers like SPIKING, OVERLOAD, WAVING, etc. selected and attached to connections or individual operations?
+1. **Keywords / behaviors:** How are modifiers like SPIKING, OVERLOAD, WAVING, etc. selected and attached to connections or individual operations? Distinguish the proposed [SIGNALING](Docs/Connections/THREATS.md#keyword-idea-signaling-one-shot-completion-tell) one-shot completion tell from repeating SPIKING.
 2. **Infection selection:** How do INFECTORs choose what infection they deliver, with what parameters and under whose control (ambient generation, villain, level, difficulty)?
 3. **Spawner repertoires:** How do infections determine what they generate—LOADERs, INFECTORs, Payloads, status-applying connections, additional Spawners, etc.?
 
