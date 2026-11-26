@@ -1,1 +1,7 @@
 Docs/_generated/Uptime_Project_Core.md text eol=lf
+
+# Unity emits spaces after empty YAML scalars. Preserve its native serialization;
+# retain the other Git whitespace checks without trimming these files on handoff.
+*.unity whitespace=-blank-at-eol
+*.prefab whitespace=-blank-at-eol
+*.asset whitespace=-blank-at-eol

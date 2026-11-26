@@ -1,0 +1,7 @@
+Unity 6000.3.11f1 native reserialization in an isolated project copy; no forced UI layout.
+PASS Small: native passes 2, 3, 4 byte-identical.
+PASS Advanced: native passes 2, 3, 4 byte-identical.
+PASS scene object file-ID sets unchanged.
+PASS every scene value preserved during native normalization; only order/whitespace changes.
+PASS original Advanced user save backed up; multiplier2.5 preserved locally and excluded from the serialization commit.
+PASS fallback font change verified as generated U+2212 atlas/cache data, backed up before removal.

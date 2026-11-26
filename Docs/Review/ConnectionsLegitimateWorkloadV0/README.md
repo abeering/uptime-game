@@ -35,3 +35,13 @@ Reproduce focused checks using `Uptime.Connections.EditorTools.LegitimateWorkloa
 4. Use `log save`/`log folder` and inspect `run.legitimateWorkloadMultiplier`, `plan_queued.definition.businessWorkValue`, operation requirements and successful `business_work_credit` receipts. Return the scene to 1.5× and discard unsaved review tuning.
 
 Do not infer final difficulty from the mechanical fixtures. The next change should follow gameplay feel. The generated Project Core is refreshed from source and verified; refreshing the uploaded ChatGPT Project Source after the accepted source merge remains a manual step.
+
+## Inspector-save serialization follow-up
+
+After the implementation commit `1135e6c`, a human changed only Advanced's multiplier from 1.5 to 2.5 and saved. Unity reordered existing scene-object blocks and the newly inserted serialized field, emitted its usual whitespace, refreshed TMP style/color caches and rounded a few transform floats. No objects were added or removed. A separate fallback-font diff was generated atlas data for U+2212 (minus), not an authored font change; this package already clears such dynamic data when the Editor closes.
+
+The separate serialization commit adopts native Unity ordering for both canonical scenes. Four consecutive native reserialization passes per scene converge after the first pass and remain byte-stable on passes 2–4. File-ID comparisons confirm no changed values during normalization; the Advanced scene's already-saved TMP/float caches are retained. `AGENTS.md` now prohibits reconstructing scenes into an older Git layout to reduce implementation diffs. The intended gameplay configuration in the PR remains 1.5× in both scenes; the human's 2.5× Advanced tuning remains a separate, uncommitted local edit. Earlier byte-comparison/scope reports describe the original implementation checkpoint, before this serialization-only follow-up. No gameplay code or visible layout was changed by the follow-up.
+
+Generated TMP atlas data may still appear during an open Editor session. Keep it separate from authored changes; do not mark tracked assets assume-unchanged. If Unity asks to reload the externally updated scene, reload it: the local 2.5× value is preserved on disk. Backups of the original human save were made before cleanup.
+
+`.gitattributes` allows Unity's native end-of-line scalar spacing in scenes/prefabs/assets while retaining other whitespace checks. This is a whitespace-check setting, not an ignore rule or content filter.
