@@ -1,5 +1,7 @@
 # Connections — Connection Fragility V0
 
+**Business Reliability follow-up:** [Shift Objectives V0](connections-business-reliability-shift-v0.md) now consumes this unchanged failure ledger for dismissal and credits successful whole jobs toward an untimed shift. The original phase deferrals below remain historical; service deadlines, failure receipts and danger projections keep their authority.
+
 **Visual Integration V0 follow-up (November 25, 2026):** The canonical network pill's temporary AT RISK text is replaced by shared rail danger and interior operation-WORK fill. Verbose service explanations, timeout history and business-failure count remain. The [cosmetic integration mapping](connections-visual-integration-v0.md) consumes these timing/projection facts without changing this service contract or reading hidden hostility. The temporary-presentation wording below records the original Fragility phase.
 
 

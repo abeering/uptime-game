@@ -450,6 +450,7 @@ namespace Uptime.Connections
 
         public void QueueSpawnPlan(ConnectionSpawnPlan plan, string source = "explicit")
         {
+            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (plan == null || string.IsNullOrWhiteSpace(plan.ConnectionId) ||
                 !reservedIds.Add(plan.ConnectionId))
                 throw new InvalidOperationException("Spawn plans require a unique, nonempty connection ID.");
@@ -461,6 +462,7 @@ namespace Uptime.Connections
 
         public void Tick(float simulationTime, bool allowAmbient)
         {
+            if (host != null && host.RunEnded) return;
             if (random == null) ResetDirector();
             int blackoutCount = 0;
             foreach (NodeInfection infection in host.Infections)
@@ -564,6 +566,7 @@ namespace Uptime.Connections
             ConnectionSpawnOverrides overrides = null, bool idHopping = false,
             bool idReactive = false)
         {
+            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (random == null) ResetDirector();
             ConnectionTrafficProfile selected = null;
             foreach (ConnectionTrafficProfile profile in profiles)
@@ -626,6 +629,7 @@ namespace Uptime.Connections
         // Opt-in mechanical witness. Normal ambient selection excludes profiles with weight zero.
         public ConnectionSpawnPlan QueueHighDemandWitness(string targetId = "DB", bool obvious = true)
         {
+            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (random == null) ResetDirector();
             NodeView origin = ChooseAmbientOrigin();
             NodeView target = FindNode(targetId);
@@ -935,6 +939,7 @@ namespace Uptime.Connections
         public ConnectionSpawnPlan QueueSpawnerChild(NodeInfection parent, float atTime,
             out string reason)
         {
+            if (host != null && host.RunEnded) { reason = host.RunEndedError; return null; }
             if (random == null) ResetDirector();
             NodeView origin = parent.Target.View;
             var choices = new List<(ConnectionTrafficProfile profile, NodeView target)>();

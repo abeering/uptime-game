@@ -116,7 +116,7 @@ namespace Uptime.Connections
         public PayloadState Spawn(string targetId, PayloadMotionProfile profile,
             string originId = null, float[] witnessTravelSeconds = null)
         {
-            if (host != null && host.RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (!Enum.IsDefined(typeof(PayloadMotionProfile), profile))
                 throw new InvalidOperationException("Unknown Payload movement profile.");
             if (host == null || host.RuntimeConnections == null)
@@ -197,7 +197,7 @@ namespace Uptime.Connections
         public bool TryIntercept(string payloadId, string nodeId, out string error,
             string command = null)
         {
-            if (host != null && host.RunEnded) { error = "core_breached"; return false; }
+            if (host != null && host.RunEnded) { error = host.RunEndedError; return false; }
             PayloadState payload = payloadId == null ? null : FindActive(payloadId);
             if (payloadId != null && payload == null)
             { error = "Unknown or resolved Payload ID."; return false; }

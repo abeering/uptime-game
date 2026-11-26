@@ -1,0 +1,17 @@
+Unity 6000.3.11f1, isolated validation copy; original open Editor left open.
+PASS C# compilation during batch witness and graphical Editor launches.
+PASS BusinessShiftWitness.Run: 88 deterministic assertions, repeated against final serialized scenes.
+PASS NetworkHealthWitness.Run against final serialized scenes with original-prefab legacy fixture.
+PASS BusinessShiftCapture.Run: 672 scripted Play Mode assertions; 56 actual captures, both canonical scenes at 1920x1080 and 1280x720.
+PASS final validated Assets exactly byte-equivalent to repository Assets after Unity exits.
+PASS final recorder extracts preserve every event, matching final objective state and snapshot; see recorder-extract-checks.txt.
+PASS integrated Fragility/broad/visual suites except the three inherited leaf assertion failures retained in reports.
+INHERITED FAIL Overclock: Advanced compact three-tool row.
+INHERITED FAIL Resource: inspect-header pill geometry/identity styling.
+INHERITED FAIL GeneratedIdentity: stale hostile traffic weights/arrival tuning assertion.
+UNAVAILABLE visual allocation sentinel instrumentation: two visual integration measurements and one lab measurement; no zero-allocation claim.
+PASS Project Core generated from source documents; generator --check.
+PASS git diff --check.
+PASS protected remote branches still match: main 4c099d76328c12bc64240f0607b0066b3be3e90b; #115 3a96d7996a2aa1a2643e6d37b7e00e3f4aee7bcd; #124 7cec0ae7e2c0b363fa07613c99cc4b3e2898dcf3; #125 7c98f4fc20fe75e3af808e3a05677f76f696c19e; #126 9cc564807c9b6cd48e6900fb2d4a24b0569018dd.
+CAVEAT scripted evidence is not human keyboard/IME playtesting or natural ambient balance calibration.
+CAVEAT nonfatal Unity QuickSearch startup exception in graphical log; capture runner exits successfully.

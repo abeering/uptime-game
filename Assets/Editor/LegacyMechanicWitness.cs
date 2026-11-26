@@ -11,6 +11,7 @@ namespace Uptime.Connections.EditorTools
         public static void Configure(SimulationHost host, bool originalStatusPrefab = false)
         {
             var fields = new SerializedObject(host);
+            fields.FindProperty("shiftEnabled").boolValue = false;
             fields.FindProperty("integrityTuning.enabled").boolValue = false;
             // Preserve the historical overdue/behavior fixtures; canonical fragility is
             // tested separately with the actual scene setting enabled.

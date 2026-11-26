@@ -1,5 +1,7 @@
 # Connections — Integrity & CORE Breach V0
 
+**Canonical objectives follow-up:** [Business Reliability & Shift Objectives V0](connections-business-reliability-shift-v0.md) routes CORE through the common terminal outcome owner alongside FIRED and SHIFT COMPLETE, settling all same-boundary effects before choosing CORE precedence. The original experimental scene retains its own scope below; physical Integrity, breach paths and damage rules are unchanged.
+
 **Canonical promotion:** [Canonical Scenes V0](connections-canonical-scenes-v0.md) now enables these same rules/presentation in Small and Advanced. Scene exclusions below describe the original experiment. Its Integrity scene/evidence remain unchanged historical fixtures.
 
 Experimental implementation on `feat/connections-integrity-core-breach-v0`, stacked on Maximum Pressure PR #116. The agreed presentation and two-point revision supersede the original pasted brief's three-point/badge suggestions. This is a survival hypothesis and provisional tuning, not a settled balance contract. Living Shift PR #115 is excluded.

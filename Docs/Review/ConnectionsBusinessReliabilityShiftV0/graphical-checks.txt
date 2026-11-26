@@ -1,0 +1,672 @@
+PASS Connections 01-authored-objectives actual viewport 1920x1080
+PASS Connections 01-authored-objectives readable Clock
+PASS Connections 01-authored-objectives readable HealthValue
+PASS Connections 01-authored-objectives readable BusinessFailures
+PASS Connections 01-authored-objectives readable SignedRate
+PASS Connections 01-authored-objectives status text stays inside compact strip: Clock
+PASS Connections 01-authored-objectives status text stays inside compact strip: HealthValue
+PASS Connections 01-authored-objectives status text stays inside compact strip: BusinessFailures
+PASS Connections 01-authored-objectives status text stays inside compact strip: SignedRate
+PASS Connections 01-authored-objectives objective columns and tools do not overlap
+PASS Connections 01-authored-objectives single authoritative result panel visibility
+PASS Connections 01-authored-objectives actual viewport 1280x720
+PASS Connections 01-authored-objectives readable Clock
+PASS Connections 01-authored-objectives readable HealthValue
+PASS Connections 01-authored-objectives readable BusinessFailures
+PASS Connections 01-authored-objectives readable SignedRate
+PASS Connections 01-authored-objectives status text stays inside compact strip: Clock
+PASS Connections 01-authored-objectives status text stays inside compact strip: HealthValue
+PASS Connections 01-authored-objectives status text stays inside compact strip: BusinessFailures
+PASS Connections 01-authored-objectives status text stays inside compact strip: SignedRate
+PASS Connections 01-authored-objectives objective columns and tools do not overlap
+PASS Connections 01-authored-objectives single authoritative result panel visibility
+PASS Connections whole-job WORK receipt and multi-ID inspect preserve focus
+PASS Connections 02-credit-and-inspect actual viewport 1920x1080
+PASS Connections 02-credit-and-inspect readable Clock
+PASS Connections 02-credit-and-inspect readable HealthValue
+PASS Connections 02-credit-and-inspect readable BusinessFailures
+PASS Connections 02-credit-and-inspect readable SignedRate
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: Clock
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: HealthValue
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: BusinessFailures
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: SignedRate
+PASS Connections 02-credit-and-inspect objective columns and tools do not overlap
+PASS Connections 02-credit-and-inspect single authoritative result panel visibility
+PASS Connections 02-credit-and-inspect actual viewport 1280x720
+PASS Connections 02-credit-and-inspect readable Clock
+PASS Connections 02-credit-and-inspect readable HealthValue
+PASS Connections 02-credit-and-inspect readable BusinessFailures
+PASS Connections 02-credit-and-inspect readable SignedRate
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: Clock
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: HealthValue
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: BusinessFailures
+PASS Connections 02-credit-and-inspect status text stays inside compact strip: SignedRate
+PASS Connections 02-credit-and-inspect objective columns and tools do not overlap
+PASS Connections 02-credit-and-inspect single authoritative result panel visibility
+PASS Connections intermediate operation has no shift credit
+PASS Connections 03-intermediate-zero-credit actual viewport 1920x1080
+PASS Connections 03-intermediate-zero-credit readable Clock
+PASS Connections 03-intermediate-zero-credit readable HealthValue
+PASS Connections 03-intermediate-zero-credit readable BusinessFailures
+PASS Connections 03-intermediate-zero-credit readable SignedRate
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: Clock
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: HealthValue
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: BusinessFailures
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: SignedRate
+PASS Connections 03-intermediate-zero-credit objective columns and tools do not overlap
+PASS Connections 03-intermediate-zero-credit single authoritative result panel visibility
+PASS Connections 03-intermediate-zero-credit actual viewport 1280x720
+PASS Connections 03-intermediate-zero-credit readable Clock
+PASS Connections 03-intermediate-zero-credit readable HealthValue
+PASS Connections 03-intermediate-zero-credit readable BusinessFailures
+PASS Connections 03-intermediate-zero-credit readable SignedRate
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: Clock
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: HealthValue
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: BusinessFailures
+PASS Connections 03-intermediate-zero-credit status text stays inside compact strip: SignedRate
+PASS Connections 03-intermediate-zero-credit objective columns and tools do not overlap
+PASS Connections 03-intermediate-zero-credit single authoritative result panel visibility
+PASS Connections CLEAN active before result
+PASS Connections SHIFT COMPLETE aborts active Duel/CLEAN presentation without penalty or fabricated outcome
+PASS Connections ending restores focus and command draft
+PASS Connections actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS Connections 04-shift-complete actual viewport 1920x1080
+PASS Connections 04-shift-complete readable Clock
+PASS Connections 04-shift-complete readable HealthValue
+PASS Connections 04-shift-complete readable BusinessFailures
+PASS Connections 04-shift-complete readable SignedRate
+PASS Connections 04-shift-complete status text stays inside compact strip: Clock
+PASS Connections 04-shift-complete status text stays inside compact strip: HealthValue
+PASS Connections 04-shift-complete status text stays inside compact strip: BusinessFailures
+PASS Connections 04-shift-complete status text stays inside compact strip: SignedRate
+PASS Connections 04-shift-complete objective columns and tools do not overlap
+PASS Connections 04-shift-complete single authoritative result panel visibility
+PASS Connections 04-shift-complete outcome title and final totals fit
+PASS Connections 04-shift-complete actual viewport 1280x720
+PASS Connections 04-shift-complete readable Clock
+PASS Connections 04-shift-complete readable HealthValue
+PASS Connections 04-shift-complete readable BusinessFailures
+PASS Connections 04-shift-complete readable SignedRate
+PASS Connections 04-shift-complete status text stays inside compact strip: Clock
+PASS Connections 04-shift-complete status text stays inside compact strip: HealthValue
+PASS Connections 04-shift-complete status text stays inside compact strip: BusinessFailures
+PASS Connections 04-shift-complete status text stays inside compact strip: SignedRate
+PASS Connections 04-shift-complete objective columns and tools do not overlap
+PASS Connections 04-shift-complete single authoritative result panel visibility
+PASS Connections 04-shift-complete outcome title and final totals fit
+PASS Connections same-seed restart clears both objectives and result
+PASS Connections 05-restart-after-success actual viewport 1920x1080
+PASS Connections 05-restart-after-success readable Clock
+PASS Connections 05-restart-after-success readable HealthValue
+PASS Connections 05-restart-after-success readable BusinessFailures
+PASS Connections 05-restart-after-success readable SignedRate
+PASS Connections 05-restart-after-success status text stays inside compact strip: Clock
+PASS Connections 05-restart-after-success status text stays inside compact strip: HealthValue
+PASS Connections 05-restart-after-success status text stays inside compact strip: BusinessFailures
+PASS Connections 05-restart-after-success status text stays inside compact strip: SignedRate
+PASS Connections 05-restart-after-success objective columns and tools do not overlap
+PASS Connections 05-restart-after-success single authoritative result panel visibility
+PASS Connections 05-restart-after-success actual viewport 1280x720
+PASS Connections 05-restart-after-success readable Clock
+PASS Connections 05-restart-after-success readable HealthValue
+PASS Connections 05-restart-after-success readable BusinessFailures
+PASS Connections 05-restart-after-success readable SignedRate
+PASS Connections 05-restart-after-success status text stays inside compact strip: Clock
+PASS Connections 05-restart-after-success status text stays inside compact strip: HealthValue
+PASS Connections 05-restart-after-success status text stays inside compact strip: BusinessFailures
+PASS Connections 05-restart-after-success status text stays inside compact strip: SignedRate
+PASS Connections 05-restart-after-success objective columns and tools do not overlap
+PASS Connections 05-restart-after-success single authoritative result panel visibility
+PASS Connections two completed processing operations still give zero business WORK
+PASS Connections 06-final-operation-stall actual viewport 1920x1080
+PASS Connections 06-final-operation-stall readable Clock
+PASS Connections 06-final-operation-stall readable HealthValue
+PASS Connections 06-final-operation-stall readable BusinessFailures
+PASS Connections 06-final-operation-stall readable SignedRate
+PASS Connections 06-final-operation-stall status text stays inside compact strip: Clock
+PASS Connections 06-final-operation-stall status text stays inside compact strip: HealthValue
+PASS Connections 06-final-operation-stall status text stays inside compact strip: BusinessFailures
+PASS Connections 06-final-operation-stall status text stays inside compact strip: SignedRate
+PASS Connections 06-final-operation-stall objective columns and tools do not overlap
+PASS Connections 06-final-operation-stall single authoritative result panel visibility
+PASS Connections 06-final-operation-stall actual viewport 1280x720
+PASS Connections 06-final-operation-stall readable Clock
+PASS Connections 06-final-operation-stall readable HealthValue
+PASS Connections 06-final-operation-stall readable BusinessFailures
+PASS Connections 06-final-operation-stall readable SignedRate
+PASS Connections 06-final-operation-stall status text stays inside compact strip: Clock
+PASS Connections 06-final-operation-stall status text stays inside compact strip: HealthValue
+PASS Connections 06-final-operation-stall status text stays inside compact strip: BusinessFailures
+PASS Connections 06-final-operation-stall status text stays inside compact strip: SignedRate
+PASS Connections 06-final-operation-stall objective columns and tools do not overlap
+PASS Connections 06-final-operation-stall single authoritative result panel visibility
+PASS Connections failed whole arc grants zero and causes dismissal
+PASS Connections 07-fired-failed-arc actual viewport 1920x1080
+PASS Connections 07-fired-failed-arc readable Clock
+PASS Connections 07-fired-failed-arc readable HealthValue
+PASS Connections 07-fired-failed-arc readable BusinessFailures
+PASS Connections 07-fired-failed-arc readable SignedRate
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: Clock
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: HealthValue
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: BusinessFailures
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: SignedRate
+PASS Connections 07-fired-failed-arc objective columns and tools do not overlap
+PASS Connections 07-fired-failed-arc single authoritative result panel visibility
+PASS Connections 07-fired-failed-arc outcome title and final totals fit
+PASS Connections 07-fired-failed-arc actual viewport 1280x720
+PASS Connections 07-fired-failed-arc readable Clock
+PASS Connections 07-fired-failed-arc readable HealthValue
+PASS Connections 07-fired-failed-arc readable BusinessFailures
+PASS Connections 07-fired-failed-arc readable SignedRate
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: Clock
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: HealthValue
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: BusinessFailures
+PASS Connections 07-fired-failed-arc status text stays inside compact strip: SignedRate
+PASS Connections 07-fired-failed-arc objective columns and tools do not overlap
+PASS Connections 07-fired-failed-arc single authoritative result panel visibility
+PASS Connections 07-fired-failed-arc outcome title and final totals fit
+PASS Connections failure limit preserves unfinished scan without adding failures
+PASS Connections actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS Connections 08-fired-reliability actual viewport 1920x1080
+PASS Connections 08-fired-reliability readable Clock
+PASS Connections 08-fired-reliability readable HealthValue
+PASS Connections 08-fired-reliability readable BusinessFailures
+PASS Connections 08-fired-reliability readable SignedRate
+PASS Connections 08-fired-reliability status text stays inside compact strip: Clock
+PASS Connections 08-fired-reliability status text stays inside compact strip: HealthValue
+PASS Connections 08-fired-reliability status text stays inside compact strip: BusinessFailures
+PASS Connections 08-fired-reliability status text stays inside compact strip: SignedRate
+PASS Connections 08-fired-reliability objective columns and tools do not overlap
+PASS Connections 08-fired-reliability single authoritative result panel visibility
+PASS Connections 08-fired-reliability outcome title and final totals fit
+PASS Connections 08-fired-reliability actual viewport 1280x720
+PASS Connections 08-fired-reliability readable Clock
+PASS Connections 08-fired-reliability readable HealthValue
+PASS Connections 08-fired-reliability readable BusinessFailures
+PASS Connections 08-fired-reliability readable SignedRate
+PASS Connections 08-fired-reliability status text stays inside compact strip: Clock
+PASS Connections 08-fired-reliability status text stays inside compact strip: HealthValue
+PASS Connections 08-fired-reliability status text stays inside compact strip: BusinessFailures
+PASS Connections 08-fired-reliability status text stays inside compact strip: SignedRate
+PASS Connections 08-fired-reliability objective columns and tools do not overlap
+PASS Connections 08-fired-reliability single authoritative result panel visibility
+PASS Connections 08-fired-reliability outcome title and final totals fit
+PASS Connections same-seed restart clears both objectives and result
+PASS Connections 09-restart-after-fired actual viewport 1920x1080
+PASS Connections 09-restart-after-fired readable Clock
+PASS Connections 09-restart-after-fired readable HealthValue
+PASS Connections 09-restart-after-fired readable BusinessFailures
+PASS Connections 09-restart-after-fired readable SignedRate
+PASS Connections 09-restart-after-fired status text stays inside compact strip: Clock
+PASS Connections 09-restart-after-fired status text stays inside compact strip: HealthValue
+PASS Connections 09-restart-after-fired status text stays inside compact strip: BusinessFailures
+PASS Connections 09-restart-after-fired status text stays inside compact strip: SignedRate
+PASS Connections 09-restart-after-fired objective columns and tools do not overlap
+PASS Connections 09-restart-after-fired single authoritative result panel visibility
+PASS Connections 09-restart-after-fired actual viewport 1280x720
+PASS Connections 09-restart-after-fired readable Clock
+PASS Connections 09-restart-after-fired readable HealthValue
+PASS Connections 09-restart-after-fired readable BusinessFailures
+PASS Connections 09-restart-after-fired readable SignedRate
+PASS Connections 09-restart-after-fired status text stays inside compact strip: Clock
+PASS Connections 09-restart-after-fired status text stays inside compact strip: HealthValue
+PASS Connections 09-restart-after-fired status text stays inside compact strip: BusinessFailures
+PASS Connections 09-restart-after-fired status text stays inside compact strip: SignedRate
+PASS Connections 09-restart-after-fired objective columns and tools do not overlap
+PASS Connections 09-restart-after-fired single authoritative result panel visibility
+PASS Connections close to success and failure limits with real earned/sacrificed jobs
+PASS Connections 10-just-in-time-before actual viewport 1920x1080
+PASS Connections 10-just-in-time-before readable Clock
+PASS Connections 10-just-in-time-before readable HealthValue
+PASS Connections 10-just-in-time-before readable BusinessFailures
+PASS Connections 10-just-in-time-before readable SignedRate
+PASS Connections 10-just-in-time-before status text stays inside compact strip: Clock
+PASS Connections 10-just-in-time-before status text stays inside compact strip: HealthValue
+PASS Connections 10-just-in-time-before status text stays inside compact strip: BusinessFailures
+PASS Connections 10-just-in-time-before status text stays inside compact strip: SignedRate
+PASS Connections 10-just-in-time-before objective columns and tools do not overlap
+PASS Connections 10-just-in-time-before single authoritative result panel visibility
+PASS Connections 10-just-in-time-before actual viewport 1280x720
+PASS Connections 10-just-in-time-before readable Clock
+PASS Connections 10-just-in-time-before readable HealthValue
+PASS Connections 10-just-in-time-before readable BusinessFailures
+PASS Connections 10-just-in-time-before readable SignedRate
+PASS Connections 10-just-in-time-before status text stays inside compact strip: Clock
+PASS Connections 10-just-in-time-before status text stays inside compact strip: HealthValue
+PASS Connections 10-just-in-time-before status text stays inside compact strip: BusinessFailures
+PASS Connections 10-just-in-time-before status text stays inside compact strip: SignedRate
+PASS Connections 10-just-in-time-before objective columns and tools do not overlap
+PASS Connections 10-just-in-time-before single authoritative result panel visibility
+PASS Connections operator Overclock changes just-in-time outcome to success
+PASS Connections 11-just-in-time-saved actual viewport 1920x1080
+PASS Connections 11-just-in-time-saved readable Clock
+PASS Connections 11-just-in-time-saved readable HealthValue
+PASS Connections 11-just-in-time-saved readable BusinessFailures
+PASS Connections 11-just-in-time-saved readable SignedRate
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: Clock
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: HealthValue
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: BusinessFailures
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: SignedRate
+PASS Connections 11-just-in-time-saved objective columns and tools do not overlap
+PASS Connections 11-just-in-time-saved single authoritative result panel visibility
+PASS Connections 11-just-in-time-saved outcome title and final totals fit
+PASS Connections 11-just-in-time-saved actual viewport 1280x720
+PASS Connections 11-just-in-time-saved readable Clock
+PASS Connections 11-just-in-time-saved readable HealthValue
+PASS Connections 11-just-in-time-saved readable BusinessFailures
+PASS Connections 11-just-in-time-saved readable SignedRate
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: Clock
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: HealthValue
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: BusinessFailures
+PASS Connections 11-just-in-time-saved status text stays inside compact strip: SignedRate
+PASS Connections 11-just-in-time-saved objective columns and tools do not overlap
+PASS Connections 11-just-in-time-saved single authoritative result panel visibility
+PASS Connections 11-just-in-time-saved outcome title and final totals fit
+PASS Connections CORE independent defeat preserves unfinished business
+PASS Connections actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS Connections 12-core-breached actual viewport 1920x1080
+PASS Connections 12-core-breached readable Clock
+PASS Connections 12-core-breached readable HealthValue
+PASS Connections 12-core-breached readable BusinessFailures
+PASS Connections 12-core-breached readable SignedRate
+PASS Connections 12-core-breached status text stays inside compact strip: Clock
+PASS Connections 12-core-breached status text stays inside compact strip: HealthValue
+PASS Connections 12-core-breached status text stays inside compact strip: BusinessFailures
+PASS Connections 12-core-breached status text stays inside compact strip: SignedRate
+PASS Connections 12-core-breached objective columns and tools do not overlap
+PASS Connections 12-core-breached single authoritative result panel visibility
+PASS Connections 12-core-breached outcome title and final totals fit
+PASS Connections 12-core-breached actual viewport 1280x720
+PASS Connections 12-core-breached readable Clock
+PASS Connections 12-core-breached readable HealthValue
+PASS Connections 12-core-breached readable BusinessFailures
+PASS Connections 12-core-breached readable SignedRate
+PASS Connections 12-core-breached status text stays inside compact strip: Clock
+PASS Connections 12-core-breached status text stays inside compact strip: HealthValue
+PASS Connections 12-core-breached status text stays inside compact strip: BusinessFailures
+PASS Connections 12-core-breached status text stays inside compact strip: SignedRate
+PASS Connections 12-core-breached objective columns and tools do not overlap
+PASS Connections 12-core-breached single authoritative result panel visibility
+PASS Connections 12-core-breached outcome title and final totals fit
+PASS Connections same-seed restart clears both objectives and result
+PASS Connections 13-restart-after-core actual viewport 1920x1080
+PASS Connections 13-restart-after-core readable Clock
+PASS Connections 13-restart-after-core readable HealthValue
+PASS Connections 13-restart-after-core readable BusinessFailures
+PASS Connections 13-restart-after-core readable SignedRate
+PASS Connections 13-restart-after-core status text stays inside compact strip: Clock
+PASS Connections 13-restart-after-core status text stays inside compact strip: HealthValue
+PASS Connections 13-restart-after-core status text stays inside compact strip: BusinessFailures
+PASS Connections 13-restart-after-core status text stays inside compact strip: SignedRate
+PASS Connections 13-restart-after-core objective columns and tools do not overlap
+PASS Connections 13-restart-after-core single authoritative result panel visibility
+PASS Connections 13-restart-after-core actual viewport 1280x720
+PASS Connections 13-restart-after-core readable Clock
+PASS Connections 13-restart-after-core readable HealthValue
+PASS Connections 13-restart-after-core readable BusinessFailures
+PASS Connections 13-restart-after-core readable SignedRate
+PASS Connections 13-restart-after-core status text stays inside compact strip: Clock
+PASS Connections 13-restart-after-core status text stays inside compact strip: HealthValue
+PASS Connections 13-restart-after-core status text stays inside compact strip: BusinessFailures
+PASS Connections 13-restart-after-core status text stays inside compact strip: SignedRate
+PASS Connections 13-restart-after-core objective columns and tools do not overlap
+PASS Connections 13-restart-after-core single authoritative result panel visibility
+PASS Connections no elapsed-time defeat beyond six minutes
+PASS Connections 14-unbounded-uptime actual viewport 1920x1080
+PASS Connections 14-unbounded-uptime readable Clock
+PASS Connections 14-unbounded-uptime readable HealthValue
+PASS Connections 14-unbounded-uptime readable BusinessFailures
+PASS Connections 14-unbounded-uptime readable SignedRate
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: Clock
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: HealthValue
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: BusinessFailures
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: SignedRate
+PASS Connections 14-unbounded-uptime objective columns and tools do not overlap
+PASS Connections 14-unbounded-uptime single authoritative result panel visibility
+PASS Connections 14-unbounded-uptime actual viewport 1280x720
+PASS Connections 14-unbounded-uptime readable Clock
+PASS Connections 14-unbounded-uptime readable HealthValue
+PASS Connections 14-unbounded-uptime readable BusinessFailures
+PASS Connections 14-unbounded-uptime readable SignedRate
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: Clock
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: HealthValue
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: BusinessFailures
+PASS Connections 14-unbounded-uptime status text stays inside compact strip: SignedRate
+PASS Connections 14-unbounded-uptime objective columns and tools do not overlap
+PASS Connections 14-unbounded-uptime single authoritative result panel visibility
+PASS ConnectionsAdvanced 01-authored-objectives actual viewport 1920x1080
+PASS ConnectionsAdvanced 01-authored-objectives readable Clock
+PASS ConnectionsAdvanced 01-authored-objectives readable HealthValue
+PASS ConnectionsAdvanced 01-authored-objectives readable BusinessFailures
+PASS ConnectionsAdvanced 01-authored-objectives readable SignedRate
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 01-authored-objectives objective columns and tools do not overlap
+PASS ConnectionsAdvanced 01-authored-objectives single authoritative result panel visibility
+PASS ConnectionsAdvanced 01-authored-objectives actual viewport 1280x720
+PASS ConnectionsAdvanced 01-authored-objectives readable Clock
+PASS ConnectionsAdvanced 01-authored-objectives readable HealthValue
+PASS ConnectionsAdvanced 01-authored-objectives readable BusinessFailures
+PASS ConnectionsAdvanced 01-authored-objectives readable SignedRate
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 01-authored-objectives status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 01-authored-objectives objective columns and tools do not overlap
+PASS ConnectionsAdvanced 01-authored-objectives single authoritative result panel visibility
+PASS ConnectionsAdvanced whole-job WORK receipt and multi-ID inspect preserve focus
+PASS ConnectionsAdvanced 02-credit-and-inspect actual viewport 1920x1080
+PASS ConnectionsAdvanced 02-credit-and-inspect readable Clock
+PASS ConnectionsAdvanced 02-credit-and-inspect readable HealthValue
+PASS ConnectionsAdvanced 02-credit-and-inspect readable BusinessFailures
+PASS ConnectionsAdvanced 02-credit-and-inspect readable SignedRate
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 02-credit-and-inspect objective columns and tools do not overlap
+PASS ConnectionsAdvanced 02-credit-and-inspect single authoritative result panel visibility
+PASS ConnectionsAdvanced 02-credit-and-inspect actual viewport 1280x720
+PASS ConnectionsAdvanced 02-credit-and-inspect readable Clock
+PASS ConnectionsAdvanced 02-credit-and-inspect readable HealthValue
+PASS ConnectionsAdvanced 02-credit-and-inspect readable BusinessFailures
+PASS ConnectionsAdvanced 02-credit-and-inspect readable SignedRate
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 02-credit-and-inspect status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 02-credit-and-inspect objective columns and tools do not overlap
+PASS ConnectionsAdvanced 02-credit-and-inspect single authoritative result panel visibility
+PASS ConnectionsAdvanced intermediate operation has no shift credit
+PASS ConnectionsAdvanced 03-intermediate-zero-credit actual viewport 1920x1080
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable Clock
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable HealthValue
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable BusinessFailures
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable SignedRate
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 03-intermediate-zero-credit objective columns and tools do not overlap
+PASS ConnectionsAdvanced 03-intermediate-zero-credit single authoritative result panel visibility
+PASS ConnectionsAdvanced 03-intermediate-zero-credit actual viewport 1280x720
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable Clock
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable HealthValue
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable BusinessFailures
+PASS ConnectionsAdvanced 03-intermediate-zero-credit readable SignedRate
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 03-intermediate-zero-credit status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 03-intermediate-zero-credit objective columns and tools do not overlap
+PASS ConnectionsAdvanced 03-intermediate-zero-credit single authoritative result panel visibility
+PASS ConnectionsAdvanced CLEAN active before result
+PASS ConnectionsAdvanced SHIFT COMPLETE aborts active Duel/CLEAN presentation without penalty or fabricated outcome
+PASS ConnectionsAdvanced ending restores focus and command draft
+PASS ConnectionsAdvanced actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS ConnectionsAdvanced 04-shift-complete actual viewport 1920x1080
+PASS ConnectionsAdvanced 04-shift-complete readable Clock
+PASS ConnectionsAdvanced 04-shift-complete readable HealthValue
+PASS ConnectionsAdvanced 04-shift-complete readable BusinessFailures
+PASS ConnectionsAdvanced 04-shift-complete readable SignedRate
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 04-shift-complete objective columns and tools do not overlap
+PASS ConnectionsAdvanced 04-shift-complete single authoritative result panel visibility
+PASS ConnectionsAdvanced 04-shift-complete outcome title and final totals fit
+PASS ConnectionsAdvanced 04-shift-complete actual viewport 1280x720
+PASS ConnectionsAdvanced 04-shift-complete readable Clock
+PASS ConnectionsAdvanced 04-shift-complete readable HealthValue
+PASS ConnectionsAdvanced 04-shift-complete readable BusinessFailures
+PASS ConnectionsAdvanced 04-shift-complete readable SignedRate
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 04-shift-complete status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 04-shift-complete objective columns and tools do not overlap
+PASS ConnectionsAdvanced 04-shift-complete single authoritative result panel visibility
+PASS ConnectionsAdvanced 04-shift-complete outcome title and final totals fit
+PASS ConnectionsAdvanced same-seed restart clears both objectives and result
+PASS ConnectionsAdvanced 05-restart-after-success actual viewport 1920x1080
+PASS ConnectionsAdvanced 05-restart-after-success readable Clock
+PASS ConnectionsAdvanced 05-restart-after-success readable HealthValue
+PASS ConnectionsAdvanced 05-restart-after-success readable BusinessFailures
+PASS ConnectionsAdvanced 05-restart-after-success readable SignedRate
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 05-restart-after-success objective columns and tools do not overlap
+PASS ConnectionsAdvanced 05-restart-after-success single authoritative result panel visibility
+PASS ConnectionsAdvanced 05-restart-after-success actual viewport 1280x720
+PASS ConnectionsAdvanced 05-restart-after-success readable Clock
+PASS ConnectionsAdvanced 05-restart-after-success readable HealthValue
+PASS ConnectionsAdvanced 05-restart-after-success readable BusinessFailures
+PASS ConnectionsAdvanced 05-restart-after-success readable SignedRate
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 05-restart-after-success status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 05-restart-after-success objective columns and tools do not overlap
+PASS ConnectionsAdvanced 05-restart-after-success single authoritative result panel visibility
+PASS ConnectionsAdvanced two completed processing operations still give zero business WORK
+PASS ConnectionsAdvanced 06-final-operation-stall actual viewport 1920x1080
+PASS ConnectionsAdvanced 06-final-operation-stall readable Clock
+PASS ConnectionsAdvanced 06-final-operation-stall readable HealthValue
+PASS ConnectionsAdvanced 06-final-operation-stall readable BusinessFailures
+PASS ConnectionsAdvanced 06-final-operation-stall readable SignedRate
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 06-final-operation-stall objective columns and tools do not overlap
+PASS ConnectionsAdvanced 06-final-operation-stall single authoritative result panel visibility
+PASS ConnectionsAdvanced 06-final-operation-stall actual viewport 1280x720
+PASS ConnectionsAdvanced 06-final-operation-stall readable Clock
+PASS ConnectionsAdvanced 06-final-operation-stall readable HealthValue
+PASS ConnectionsAdvanced 06-final-operation-stall readable BusinessFailures
+PASS ConnectionsAdvanced 06-final-operation-stall readable SignedRate
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 06-final-operation-stall status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 06-final-operation-stall objective columns and tools do not overlap
+PASS ConnectionsAdvanced 06-final-operation-stall single authoritative result panel visibility
+PASS ConnectionsAdvanced failed whole arc grants zero and causes dismissal
+PASS ConnectionsAdvanced 07-fired-failed-arc actual viewport 1920x1080
+PASS ConnectionsAdvanced 07-fired-failed-arc readable Clock
+PASS ConnectionsAdvanced 07-fired-failed-arc readable HealthValue
+PASS ConnectionsAdvanced 07-fired-failed-arc readable BusinessFailures
+PASS ConnectionsAdvanced 07-fired-failed-arc readable SignedRate
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 07-fired-failed-arc objective columns and tools do not overlap
+PASS ConnectionsAdvanced 07-fired-failed-arc single authoritative result panel visibility
+PASS ConnectionsAdvanced 07-fired-failed-arc outcome title and final totals fit
+PASS ConnectionsAdvanced 07-fired-failed-arc actual viewport 1280x720
+PASS ConnectionsAdvanced 07-fired-failed-arc readable Clock
+PASS ConnectionsAdvanced 07-fired-failed-arc readable HealthValue
+PASS ConnectionsAdvanced 07-fired-failed-arc readable BusinessFailures
+PASS ConnectionsAdvanced 07-fired-failed-arc readable SignedRate
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 07-fired-failed-arc status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 07-fired-failed-arc objective columns and tools do not overlap
+PASS ConnectionsAdvanced 07-fired-failed-arc single authoritative result panel visibility
+PASS ConnectionsAdvanced 07-fired-failed-arc outcome title and final totals fit
+PASS ConnectionsAdvanced failure limit preserves unfinished scan without adding failures
+PASS ConnectionsAdvanced actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS ConnectionsAdvanced 08-fired-reliability actual viewport 1920x1080
+PASS ConnectionsAdvanced 08-fired-reliability readable Clock
+PASS ConnectionsAdvanced 08-fired-reliability readable HealthValue
+PASS ConnectionsAdvanced 08-fired-reliability readable BusinessFailures
+PASS ConnectionsAdvanced 08-fired-reliability readable SignedRate
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 08-fired-reliability objective columns and tools do not overlap
+PASS ConnectionsAdvanced 08-fired-reliability single authoritative result panel visibility
+PASS ConnectionsAdvanced 08-fired-reliability outcome title and final totals fit
+PASS ConnectionsAdvanced 08-fired-reliability actual viewport 1280x720
+PASS ConnectionsAdvanced 08-fired-reliability readable Clock
+PASS ConnectionsAdvanced 08-fired-reliability readable HealthValue
+PASS ConnectionsAdvanced 08-fired-reliability readable BusinessFailures
+PASS ConnectionsAdvanced 08-fired-reliability readable SignedRate
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 08-fired-reliability status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 08-fired-reliability objective columns and tools do not overlap
+PASS ConnectionsAdvanced 08-fired-reliability single authoritative result panel visibility
+PASS ConnectionsAdvanced 08-fired-reliability outcome title and final totals fit
+PASS ConnectionsAdvanced same-seed restart clears both objectives and result
+PASS ConnectionsAdvanced 09-restart-after-fired actual viewport 1920x1080
+PASS ConnectionsAdvanced 09-restart-after-fired readable Clock
+PASS ConnectionsAdvanced 09-restart-after-fired readable HealthValue
+PASS ConnectionsAdvanced 09-restart-after-fired readable BusinessFailures
+PASS ConnectionsAdvanced 09-restart-after-fired readable SignedRate
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 09-restart-after-fired objective columns and tools do not overlap
+PASS ConnectionsAdvanced 09-restart-after-fired single authoritative result panel visibility
+PASS ConnectionsAdvanced 09-restart-after-fired actual viewport 1280x720
+PASS ConnectionsAdvanced 09-restart-after-fired readable Clock
+PASS ConnectionsAdvanced 09-restart-after-fired readable HealthValue
+PASS ConnectionsAdvanced 09-restart-after-fired readable BusinessFailures
+PASS ConnectionsAdvanced 09-restart-after-fired readable SignedRate
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 09-restart-after-fired status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 09-restart-after-fired objective columns and tools do not overlap
+PASS ConnectionsAdvanced 09-restart-after-fired single authoritative result panel visibility
+PASS ConnectionsAdvanced close to success and failure limits with real earned/sacrificed jobs
+PASS ConnectionsAdvanced 10-just-in-time-before actual viewport 1920x1080
+PASS ConnectionsAdvanced 10-just-in-time-before readable Clock
+PASS ConnectionsAdvanced 10-just-in-time-before readable HealthValue
+PASS ConnectionsAdvanced 10-just-in-time-before readable BusinessFailures
+PASS ConnectionsAdvanced 10-just-in-time-before readable SignedRate
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 10-just-in-time-before objective columns and tools do not overlap
+PASS ConnectionsAdvanced 10-just-in-time-before single authoritative result panel visibility
+PASS ConnectionsAdvanced 10-just-in-time-before actual viewport 1280x720
+PASS ConnectionsAdvanced 10-just-in-time-before readable Clock
+PASS ConnectionsAdvanced 10-just-in-time-before readable HealthValue
+PASS ConnectionsAdvanced 10-just-in-time-before readable BusinessFailures
+PASS ConnectionsAdvanced 10-just-in-time-before readable SignedRate
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 10-just-in-time-before status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 10-just-in-time-before objective columns and tools do not overlap
+PASS ConnectionsAdvanced 10-just-in-time-before single authoritative result panel visibility
+PASS ConnectionsAdvanced operator Overclock changes just-in-time outcome to success
+PASS ConnectionsAdvanced 11-just-in-time-saved actual viewport 1920x1080
+PASS ConnectionsAdvanced 11-just-in-time-saved readable Clock
+PASS ConnectionsAdvanced 11-just-in-time-saved readable HealthValue
+PASS ConnectionsAdvanced 11-just-in-time-saved readable BusinessFailures
+PASS ConnectionsAdvanced 11-just-in-time-saved readable SignedRate
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 11-just-in-time-saved objective columns and tools do not overlap
+PASS ConnectionsAdvanced 11-just-in-time-saved single authoritative result panel visibility
+PASS ConnectionsAdvanced 11-just-in-time-saved outcome title and final totals fit
+PASS ConnectionsAdvanced 11-just-in-time-saved actual viewport 1280x720
+PASS ConnectionsAdvanced 11-just-in-time-saved readable Clock
+PASS ConnectionsAdvanced 11-just-in-time-saved readable HealthValue
+PASS ConnectionsAdvanced 11-just-in-time-saved readable BusinessFailures
+PASS ConnectionsAdvanced 11-just-in-time-saved readable SignedRate
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 11-just-in-time-saved status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 11-just-in-time-saved objective columns and tools do not overlap
+PASS ConnectionsAdvanced 11-just-in-time-saved single authoritative result panel visibility
+PASS ConnectionsAdvanced 11-just-in-time-saved outcome title and final totals fit
+PASS ConnectionsAdvanced CORE independent defeat preserves unfinished business
+PASS ConnectionsAdvanced actual frame loop freezes authoritative time and shared heartbeat; recorder finalized
+PASS ConnectionsAdvanced 12-core-breached actual viewport 1920x1080
+PASS ConnectionsAdvanced 12-core-breached readable Clock
+PASS ConnectionsAdvanced 12-core-breached readable HealthValue
+PASS ConnectionsAdvanced 12-core-breached readable BusinessFailures
+PASS ConnectionsAdvanced 12-core-breached readable SignedRate
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 12-core-breached objective columns and tools do not overlap
+PASS ConnectionsAdvanced 12-core-breached single authoritative result panel visibility
+PASS ConnectionsAdvanced 12-core-breached outcome title and final totals fit
+PASS ConnectionsAdvanced 12-core-breached actual viewport 1280x720
+PASS ConnectionsAdvanced 12-core-breached readable Clock
+PASS ConnectionsAdvanced 12-core-breached readable HealthValue
+PASS ConnectionsAdvanced 12-core-breached readable BusinessFailures
+PASS ConnectionsAdvanced 12-core-breached readable SignedRate
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 12-core-breached status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 12-core-breached objective columns and tools do not overlap
+PASS ConnectionsAdvanced 12-core-breached single authoritative result panel visibility
+PASS ConnectionsAdvanced 12-core-breached outcome title and final totals fit
+PASS ConnectionsAdvanced same-seed restart clears both objectives and result
+PASS ConnectionsAdvanced 13-restart-after-core actual viewport 1920x1080
+PASS ConnectionsAdvanced 13-restart-after-core readable Clock
+PASS ConnectionsAdvanced 13-restart-after-core readable HealthValue
+PASS ConnectionsAdvanced 13-restart-after-core readable BusinessFailures
+PASS ConnectionsAdvanced 13-restart-after-core readable SignedRate
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 13-restart-after-core objective columns and tools do not overlap
+PASS ConnectionsAdvanced 13-restart-after-core single authoritative result panel visibility
+PASS ConnectionsAdvanced 13-restart-after-core actual viewport 1280x720
+PASS ConnectionsAdvanced 13-restart-after-core readable Clock
+PASS ConnectionsAdvanced 13-restart-after-core readable HealthValue
+PASS ConnectionsAdvanced 13-restart-after-core readable BusinessFailures
+PASS ConnectionsAdvanced 13-restart-after-core readable SignedRate
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 13-restart-after-core status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 13-restart-after-core objective columns and tools do not overlap
+PASS ConnectionsAdvanced 13-restart-after-core single authoritative result panel visibility
+PASS ConnectionsAdvanced no elapsed-time defeat beyond six minutes
+PASS ConnectionsAdvanced 14-unbounded-uptime actual viewport 1920x1080
+PASS ConnectionsAdvanced 14-unbounded-uptime readable Clock
+PASS ConnectionsAdvanced 14-unbounded-uptime readable HealthValue
+PASS ConnectionsAdvanced 14-unbounded-uptime readable BusinessFailures
+PASS ConnectionsAdvanced 14-unbounded-uptime readable SignedRate
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 14-unbounded-uptime objective columns and tools do not overlap
+PASS ConnectionsAdvanced 14-unbounded-uptime single authoritative result panel visibility
+PASS ConnectionsAdvanced 14-unbounded-uptime actual viewport 1280x720
+PASS ConnectionsAdvanced 14-unbounded-uptime readable Clock
+PASS ConnectionsAdvanced 14-unbounded-uptime readable HealthValue
+PASS ConnectionsAdvanced 14-unbounded-uptime readable BusinessFailures
+PASS ConnectionsAdvanced 14-unbounded-uptime readable SignedRate
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: Clock
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: HealthValue
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: BusinessFailures
+PASS ConnectionsAdvanced 14-unbounded-uptime status text stays inside compact strip: SignedRate
+PASS ConnectionsAdvanced 14-unbounded-uptime objective columns and tools do not overlap
+PASS ConnectionsAdvanced 14-unbounded-uptime single authoritative result panel visibility
