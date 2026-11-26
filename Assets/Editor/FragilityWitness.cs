@@ -74,6 +74,7 @@ namespace Uptime.Connections.EditorTools
         public static string[] ConfigureFixture(SimulationHost host, float baseline, int count = 2)
         {
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
+            Set(traffic, "legitimateWorkloadMultiplier", 1f); // Retain this fixture's authored 100 WORK / 5 LOAD examples.
             traffic.AutoGenerationEnabled = false; traffic.HostileGenerationEnabled = false;
             traffic.RandomizeSeed = false; traffic.Seed = 1701;
             Set(host, "naturalLoadNoiseEnabled", false);

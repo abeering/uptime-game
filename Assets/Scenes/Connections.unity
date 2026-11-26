@@ -7756,6 +7756,7 @@ MonoBehaviour:
   seed: 1701
   randomizeSeed: 1
   initialGraceSeconds: 3
+  legitimateWorkloadMultiplier: 1.5
   benignPopulationGoal: 3
   coverageStartupGoal: 1
   coverageRampSeconds: 75

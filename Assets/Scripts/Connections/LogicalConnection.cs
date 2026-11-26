@@ -285,6 +285,8 @@ namespace Uptime.Connections
 
         public string ConnectionId => connectionId;
         public string ProfileId => profileId;
+        // Generated plans carry their pre-workload-scaling job value; authored definitions use the sum below.
+        public double? BusinessWorkValue { get; private set; }
         public bool IsHostile => isHostile;
         public string ClaimedPurpose => claimedPurpose;
         public string ActivityDescription => activityDescription;
@@ -327,6 +329,7 @@ namespace Uptime.Connections
             {
                 connectionId = plan.ConnectionId,
                 profileId = plan.ProfileId,
+                BusinessWorkValue = plan.BusinessWorkValue,
                 isHostile = plan.IsHostile,
                 claimedPurpose = plan.ClaimedPurpose,
                 activityDescription = plan.Operations[0].ActivityDescription,
@@ -386,7 +389,8 @@ namespace Uptime.Connections
             PhysicalLinkReference[] routeLinks, NodeResources targetResources)
         {
             Definition = definition;
-            for (int i = 0; i < definition.OperationCount; i++) BusinessWorkValue += definition.WorkAt(i);
+            if (definition.BusinessWorkValue.HasValue) BusinessWorkValue = definition.BusinessWorkValue.Value;
+            else for (int i = 0; i < definition.OperationCount; i++) BusinessWorkValue += definition.WorkAt(i);
             RouteLinks = routeLinks;
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
@@ -417,7 +421,7 @@ namespace Uptime.Connections
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
 
-        // Fixed concrete plan value, including sampled recipe anomalies, before runtime modifiers.
+        // Fixed concrete job value, including sampled anomalies, before workload scaling/runtime modifiers.
         public double BusinessWorkValue { get; }
 
         private readonly bool[] deliveredEffects;

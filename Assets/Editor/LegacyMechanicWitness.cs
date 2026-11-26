@@ -10,6 +10,7 @@ namespace Uptime.Connections.EditorTools
     {
         public static void Configure(SimulationHost host, bool originalStatusPrefab = false)
         {
+            FragilityWitness.Set(host.GetComponent<ConnectionTrafficDirector>(), "legitimateWorkloadMultiplier", 1f);
             var fields = new SerializedObject(host);
             fields.FindProperty("shiftEnabled").boolValue = false;
             fields.FindProperty("integrityTuning.enabled").boolValue = false;
