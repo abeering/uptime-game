@@ -14687,7 +14687,7 @@ MonoBehaviour:
       - workFraction: 0.94
         activity: storefront.page.serve
         result: OK
-  legitimateWorkloadMultiplier: 1.5
+  legitimateWorkloadMultiplier: 2.5
   identityHopIntervalSeconds: 2
   ambientIdentityHopChance: 0.1
   ambientIdentityReactiveChance: 0.1
