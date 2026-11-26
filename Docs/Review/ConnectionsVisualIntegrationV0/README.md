@@ -4,6 +4,10 @@ Open **Assets/Scenes/Connections.unity** or **Assets/Scenes/ConnectionsAdvanced.
 
 [Architecture, model mapping, danger formula and clock policy](../../Connections/connections-visual-integration-v0.md) · [Shared Display Lab](../../Connections/connections-display-lab-v0.md).
 
+## Final destination-socket refinement
+
+[Current socket treatment, focused before/after crops and checks](SocketRefinement/README.md) enlarge and strengthen the shared destination socket and size it against visible socket neighbors. Both canonical scenes and the lab share the refinement. The 104-image gallery, reels, 546-check gameplay report and performance observations below remain the **preceding a0ffc00 corrective checkpoint**; the SocketRefinement folder is the final socket evidence. Palette/style, heartbeat and gameplay remain unchanged by this refinement. Deferred slate-family and inspect WORK-bar deadline-checkpoint ideas are recorded, with no implementation.
+
 ## Corrective visual pass
 
 [Palette, ribbon fill, quieter activity and before/after evidence](CorrectivePass.md) follow human gameplay feedback. Current screenshots/reels use the correction. Ordinary connections have stable muted identity colors; synthetic priority reuses the previous blue/teal family. Body and rails share resolved warning color while pills retain base identity. Heartbeat/danger mechanics, geometry and canonical scene assets are unchanged by this correction.

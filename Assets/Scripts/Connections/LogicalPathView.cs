@@ -232,7 +232,7 @@ namespace Uptime.Connections
         public void SetLayout(float[] nextStarts, float[] nextEnds, float[] widths,
             float maximumSocketDiameter = float.PositiveInfinity)
         {
-            if (terminalMarker != null)
+            if (terminalMarker != null && !terminalMarker.FitsSocketNeighbors)
                 terminalMarker.SetMaximumDiameter(maximumSocketDiameter, relayoutSeconds);
             if (targetStartOffsets == null)
             {

@@ -12,6 +12,14 @@ namespace Uptime.Connections
         [SerializeField, HideInInspector] private Color fillColor =
             new Color(0.025f, 0.075f, 0.10f, 1f);
 
+        public float BorderThickness => borderThickness;
+        public void SetBorderThickness(float thickness)
+        {
+            thickness = Mathf.Max(0, thickness);
+            if (Mathf.Approximately(borderThickness, thickness)) return;
+            borderThickness = thickness; SetVerticesDirty();
+        }
+
         public void SetOutline(Color outline)
         {
             if (color != outline)

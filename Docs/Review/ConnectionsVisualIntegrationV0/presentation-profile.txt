@@ -1,3 +1,4 @@
+Checkpoint a0ffc00: preceding identity-ribbon corrective pass. Final socket refinement evidence is in SocketRefinement/README.md.
 Actual Play Mode samples: two existing layout passes + all path updates + forced Canvas work. Excludes simulation stepping, object discovery, PNG encoding and GPU timing. Includes inherited layout/packing allocations; not whole-engine zero allocations or standalone FPS.
 Connections/ambient: 144 frames, peak connections=2, peak path vertices=276; sampled presentation mean=0.796ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.
 Connections/overclock-rescue: 192 frames, peak connections=2, peak path vertices=408; sampled presentation mean=0.957ms, UNAVAILABLE managed bytes/pass; GC.Alloc recorder calibrated=False.

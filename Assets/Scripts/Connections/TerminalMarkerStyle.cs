@@ -15,6 +15,21 @@ namespace Uptime.Connections
         [SerializeField] private Color backingColor = new Color(0.018f, 0.055f, 0.071f);
         [SerializeField, Range(0f, 1f)] private float dotOpacity = 0.8f;
 
+        [SerializeField] private bool fitToSocketNeighbors;
+        [SerializeField, Min(0f)] private float socketClearance = 3f;
+        [SerializeField, Range(.05f, .25f)] private float compactRingWeightFraction = .18f;
+        private float authoredRingWeight;
+        public bool FitsSocketNeighbors => fitToSocketNeighbors;
+        public float SocketClearance => socketClearance;
+
+        private void OnEnable()
+        {
+            if (!fitToSocketNeighbors) return;
+            if (ring != null && authoredRingWeight <= 0) authoredRingWeight = ring.BorderThickness;
+            if (shownDiameter <= 0) shownDiameter = targetDiameter = preferredDiameter;
+            ApplyDiameter();
+        }
+
         private float shownDiameter;
         private float fromDiameter;
         private float targetDiameter;
@@ -31,11 +46,18 @@ namespace Uptime.Connections
 
         public void SetMaximumDiameter(float maximum, float seconds)
         {
-            float diameter = Mathf.Clamp(maximum, 12f, preferredDiameter);
-            if (shownDiameter <= 0f)
+            float diameter = Mathf.Clamp(maximum, fitToSocketNeighbors ? 0f : 12f, preferredDiameter);
+            if (shownDiameter <= 0f && !fitToSocketNeighbors)
                 shownDiameter = preferredDiameter;
             if (Mathf.Approximately(targetDiameter, diameter))
                 return;
+            // Available room is a hard limit at render time; expansion may ease,
+            // but never tween an oversized socket through its neighbor.
+            if (fitToSocketNeighbors && diameter < shownDiameter)
+            {
+                shownDiameter = targetDiameter = diameter;
+                ApplyDiameter(); return;
+            }
             fromDiameter = shownDiameter;
             targetDiameter = diameter;
             resizeElapsed = 0f;
@@ -46,16 +68,26 @@ namespace Uptime.Connections
 
         public void AdvanceVisual(float deltaSeconds)
         {
-            if (shownDiameter <= 0f || Mathf.Approximately(shownDiameter, targetDiameter))
+            if ((!fitToSocketNeighbors && shownDiameter <= 0f) || Mathf.Approximately(shownDiameter, targetDiameter))
                 return;
             resizeElapsed += Mathf.Max(0f, deltaSeconds);
             float t = Mathf.SmoothStep(0f, 1f,
                 Mathf.Clamp01(resizeElapsed / resizeSeconds));
             shownDiameter = Mathf.Lerp(fromDiameter, targetDiameter, t);
+            ApplyDiameter();
+        }
+
+        private void ApplyDiameter()
+        {
             float scale = shownDiameter / preferredDiameter;
             rectTransform.sizeDelta = Vector2.one * shownDiameter;
             if (ring != null)
+            {
                 ring.rectTransform.sizeDelta = Vector2.one * (ringDiameter * scale);
+                if (fitToSocketNeighbors && authoredRingWeight <= 0) authoredRingWeight = ring.BorderThickness;
+                if (fitToSocketNeighbors)
+                    ring.SetBorderThickness(Mathf.Min(authoredRingWeight, ringDiameter * scale * compactRingWeightFraction));
+            }
             if (innerDot != null)
                 innerDot.rectTransform.sizeDelta = Vector2.one * (dotDiameter * scale);
         }

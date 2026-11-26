@@ -17,6 +17,8 @@ namespace Uptime.Connections.EditorTools
     public static class FragilityCapture
     {
         private const string Pending = "Uptime.FragilityCapture";
+        private const string Sockets = "Uptime.SocketCapture";
+        public static void RunSockets() { SessionState.SetBool(Sockets, true); RunVisualIntegration(); }
         private const string Integration = "Uptime.VisualIntegrationCapture";
         public static void RunVisualIntegration() { SessionState.SetBool(Integration, true); Run(); }
         static FragilityCapture() => EditorApplication.update += Launch;
@@ -30,13 +32,15 @@ namespace Uptime.Connections.EditorTools
             if (!SessionState.GetBool(Pending, false) || !Application.isPlaying) return;
             SessionState.SetBool(Pending, false);
             var runner = new GameObject("Fragility graphical witness").AddComponent<FragilityCaptureRunner>();
+            runner.socketsOnly = SessionState.GetBool(Sockets, false); SessionState.SetBool(Sockets, false);
             runner.integration = SessionState.GetBool(Integration, false); SessionState.SetBool(Integration, false);
         }
     }
     public sealed class FragilityCaptureRunner : MonoBehaviour
     {
         public bool integration;
-        private string Evidence => integration ? ConnectionVisualIntegrationWitness.Evidence : FragilityWitness.Evidence;
+        public bool socketsOnly;
+        private string Evidence => socketsOnly ? ConnectionVisualIntegrationWitness.Evidence + "/SocketRefinement" : integration ? ConnectionVisualIntegrationWitness.Evidence : FragilityWitness.Evidence;
         private SimulationHost host;
         private TMP_InputField input;
         private Camera cameraForCapture;
@@ -47,7 +51,7 @@ namespace Uptime.Connections.EditorTools
         private IEnumerator Start()
         {
             Directory.CreateDirectory(Evidence);
-            if (integration) File.WriteAllText(Evidence + "/presentation-profile.txt",
+            if (integration && !socketsOnly) File.WriteAllText(Evidence + "/presentation-profile.txt",
                 "Actual Play Mode samples: two existing layout passes + all path updates + forced Canvas work. Excludes simulation stepping, object discovery, PNG encoding and GPU timing. Includes inherited layout/packing allocations; not whole-engine zero allocations or standalone FPS.\n");
             DontDestroyOnLoad(gameObject);
             yield return null;
@@ -111,6 +115,13 @@ namespace Uptime.Connections.EditorTools
                 Canvas.ForceUpdateCanvases(); yield return null;
                 folder = Evidence + "/Captures/" + host.gameObject.scene.name;
                 Directory.CreateDirectory(folder);
+                if (socketsOnly)
+                {
+                    yield return SocketCases();
+                    canvas.renderMode = oldMode; canvas.worldCamera = oldCamera;
+                    Destroy(cameraForCapture.gameObject); Destroy(captureViewport); yield return null;
+                    continue;
+                }
                 if (integration)
                 {
                     traffic.AutoGenerationEnabled = true; traffic.HostileGenerationEnabled = true; host.ResetSimulation();
@@ -193,8 +204,40 @@ namespace Uptime.Connections.EditorTools
                 canvas.renderMode = oldMode; canvas.worldCamera = oldCamera;
                 Destroy(cameraForCapture.gameObject); Destroy(captureViewport); yield return null;
             }
-            Debug.Log(integration ? "ConnectionVisualIntegrationCapture PASS: " + checks.Count + " checks; both canonical scenes, both resolutions and actual gameplay motion." :
+            Debug.Log(socketsOnly ? "SocketCapture PASS: " + checks.Count + " checks, ordinary/paired/crowded boundaries in both scenes/resolutions." : integration ? "ConnectionVisualIntegrationCapture PASS: " + checks.Count + " checks; both canonical scenes, both resolutions and actual gameplay motion." :
                 "FragilityCapture PASS: both Play Mode scenes, 32 frames at 1920x1080/1280x720, service danger/rescue/timeout/focus.");
+        }
+        private IEnumerator SocketCases()
+        {
+            foreach (int count in new[] { 1, 2, 8 })
+            {
+                string[] ids = FragilityWitness.ConfigureFixture(host, count == 1 ? 4 : count == 2 ? 2 : 0, count);
+                FragilityWitness.Advance(host, 3); yield return null; yield return null;
+                Submit("inspect -v " + ids[0]); yield return null;
+                Frames(count == 1 ? "ordinary" : count == 2 ? "paired" : "crowded");
+                var paths = FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None);
+                var markers = paths.Select(v => v.TerminalMarker).Where(m => m.gameObject.activeInHierarchy).ToArray();
+                Check(markers.Length == count && markers.All(m => m.FitsSocketNeighbors), "shared destination sockets visible: " + count);
+                Check(markers.All(m => m.rectTransform.rect.width > 0 && m.rectTransform.rect.width <= 32.01f), "socket size respects preferred bound: " + count);
+                foreach (var marker in markers)
+                {
+                    float available = marker.PreferredDiameter;
+                    var area = FindFirstObjectByType<LogicalPathPresenter>().NetworkArea;
+                    foreach (var other in markers)
+                        if (other != marker) available = Mathf.Min(available, Mathf.Max(0, Vector2.Distance(
+                            area.InverseTransformPoint(marker.transform.position), area.InverseTransformPoint(other.transform.position)) - marker.SocketClearance));
+                    Check(Mathf.Abs(marker.rectTransform.rect.width - available) < .02f,
+                        "settled socket uses available space: diameter=" + marker.rectTransform.rect.width + ", maximum=" + available);
+                }
+                for (int i = 0; i < markers.Length; i++)
+                for (int j = i + 1; j < markers.Length; j++)
+                {
+                    var area = FindFirstObjectByType<LogicalPathPresenter>().NetworkArea;
+                    float distance = Vector2.Distance(area.InverseTransformPoint(markers[i].transform.position), area.InverseTransformPoint(markers[j].transform.position));
+                    Check(distance >= (markers[i].rectTransform.rect.width + markers[j].rectTransform.rect.width) * .5f + 2.9f,
+                        "destination backings retain clearance at both capture resolutions: " + i + "/" + j);
+                }
+            }
         }
         private IEnumerator Motion(string name, float seconds, int overclockFrame = -1)
         {
@@ -445,6 +488,13 @@ namespace Uptime.Connections.EditorTools
                     foreach (var view in paths)
                         view.AdvanceVisual(view.DisplayState.resolution == DisplayResolution.Active ? view.RelayoutSeconds : 0);
                     presenter.RefreshLayouts();
+                    if (socketsOnly)
+                    {
+                        // The disabled-host fixture owns its visual clock. Settle
+                        // socket expansion after endpoint layout has reached its pose.
+                        presenter.RefreshSocketSizes();
+                        foreach (var view in paths) view.TerminalMarker?.AdvanceVisual(view.RelayoutSeconds);
+                    }
                 }
                 else FindFirstObjectByType<LogicalPathPresenter>().RefreshLayouts();
                 FindFirstObjectByType<WormPresenter>().RenderNow(); FindFirstObjectByType<PayloadPresenter>().RenderNow();
@@ -458,6 +508,18 @@ namespace Uptime.Connections.EditorTools
                 Canvas.ForceUpdateCanvases(); cameraForCapture.Render(); RenderTexture.active = target;
                 picture.ReadPixels(new Rect(0, 0, width, height), 0, 0); picture.Apply();
                 File.WriteAllBytes(folder + "/" + name + "-" + width + "x" + height + ".png", picture.EncodeToPNG());
+                if (socketsOnly)
+                {
+                    var corners = new Vector3[4]; ((RectTransform)host.FindNodeResources("DB").View.transform).GetWorldCorners(corners);
+                    var pixels = corners.Select(c => RectTransformUtility.WorldToScreenPoint(cameraForCapture, c)).ToArray();
+                    float scale = canvas.scaleFactor;
+                    int left = Mathf.Max(0, Mathf.FloorToInt(pixels.Min(p => p.x) - 40 * scale));
+                    int top = Mathf.Max(0, Mathf.FloorToInt(height - pixels.Max(p => p.y) - 65 * scale));
+                    int right = Mathf.Min(width, Mathf.CeilToInt(pixels.Max(p => p.x) + 40 * scale));
+                    int bottom = Mathf.Min(height, Mathf.CeilToInt(height - pixels.Max(p => p.y) + 35 * scale));
+                    File.WriteAllText(folder + "/" + name + "-" + width + "x" + height + "-crop.txt",
+                        $"{right - left}:{bottom - top}:{left}:{top}");
+                }
             }
             finally { RenderTexture.active = old; cameraForCapture.targetTexture = oldTarget; Canvas.ForceUpdateCanvases(); Destroy(picture); Destroy(target); }
         }

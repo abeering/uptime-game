@@ -1,0 +1,52 @@
+PASS Connections shared 32-unit socket; established count=1
+PASS Connections full authored socket where room permits
+PASS Connections endpoint and resolved identity/status unchanged; count=1
+PASS Connections backing circles do not overlap; count=1; diameter=32
+PASS Connections compact ring leaves a visible dark annulus; count=1
+PASS Connections no forced 12-unit floor or oversized shrink tween
+PASS Connections socket recovers from zero when space returns
+PASS Connections shared 32-unit socket; established count=2
+PASS Connections endpoint and resolved identity/status unchanged; count=2
+PASS Connections backing circles do not overlap; count=2; diameter=32
+PASS Connections compact ring leaves a visible dark annulus; count=2
+PASS Connections no forced 12-unit floor or oversized shrink tween
+PASS Connections socket recovers from zero when space returns
+PASS Connections shared 32-unit socket; established count=8
+PASS Connections endpoint and resolved identity/status unchanged; count=8
+PASS Connections backing circles do not overlap; count=8; diameter=9.203934
+PASS Connections compact ring leaves a visible dark annulus; count=8
+PASS Connections no forced 12-unit floor or oversized shrink tween
+PASS Connections socket recovers from zero when space returns
+PASS Connections shared 32-unit socket; established count=16
+PASS Connections endpoint and resolved identity/status unchanged; count=16
+PASS Connections backing circles do not overlap; count=16; diameter=4.510071
+PASS Connections compact ring leaves a visible dark annulus; count=16
+PASS Connections no forced 12-unit floor or oversized shrink tween
+PASS Connections socket recovers from zero when space returns
+PASS Connections transit lanes and different-node destinations do not unnecessarily shrink isolated sockets
+PASS ConnectionsAdvanced shared 32-unit socket; established count=1
+PASS ConnectionsAdvanced full authored socket where room permits
+PASS ConnectionsAdvanced endpoint and resolved identity/status unchanged; count=1
+PASS ConnectionsAdvanced backing circles do not overlap; count=1; diameter=32
+PASS ConnectionsAdvanced compact ring leaves a visible dark annulus; count=1
+PASS ConnectionsAdvanced no forced 12-unit floor or oversized shrink tween
+PASS ConnectionsAdvanced socket recovers from zero when space returns
+PASS ConnectionsAdvanced shared 32-unit socket; established count=2
+PASS ConnectionsAdvanced endpoint and resolved identity/status unchanged; count=2
+PASS ConnectionsAdvanced backing circles do not overlap; count=2; diameter=32
+PASS ConnectionsAdvanced compact ring leaves a visible dark annulus; count=2
+PASS ConnectionsAdvanced no forced 12-unit floor or oversized shrink tween
+PASS ConnectionsAdvanced socket recovers from zero when space returns
+PASS ConnectionsAdvanced shared 32-unit socket; established count=8
+PASS ConnectionsAdvanced endpoint and resolved identity/status unchanged; count=8
+PASS ConnectionsAdvanced backing circles do not overlap; count=8; diameter=20.47537
+PASS ConnectionsAdvanced compact ring leaves a visible dark annulus; count=8
+PASS ConnectionsAdvanced no forced 12-unit floor or oversized shrink tween
+PASS ConnectionsAdvanced socket recovers from zero when space returns
+PASS ConnectionsAdvanced shared 32-unit socket; established count=16
+PASS ConnectionsAdvanced endpoint and resolved identity/status unchanged; count=16
+PASS ConnectionsAdvanced backing circles do not overlap; count=16; diameter=8.69696
+PASS ConnectionsAdvanced compact ring leaves a visible dark annulus; count=16
+PASS ConnectionsAdvanced no forced 12-unit floor or oversized shrink tween
+PASS ConnectionsAdvanced socket recovers from zero when space returns
+PASS ConnectionsAdvanced transit lanes and different-node destinations do not unnecessarily shrink isolated sockets

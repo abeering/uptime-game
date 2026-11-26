@@ -522,8 +522,34 @@ namespace Uptime.Connections
             }
         }
 
+        private void OnEnable() => Canvas.preWillRenderCanvases += RefreshSocketSizes;
+
+        // Paths keep their existing endpoint/relayout ownership. Measure after all
+        // LateUpdates, before Canvas geometry, so only actual visible sockets compete.
+        public void RefreshSocketSizes()
+        {
+            if (previewMode || networkArea == null) return;
+            foreach (var view in views.Values)
+            {
+                var marker = view != null ? view.TerminalMarker : null;
+                if (marker == null || !marker.FitsSocketNeighbors || !marker.gameObject.activeInHierarchy) continue;
+                float maximum = marker.PreferredDiameter;
+                Vector2 center = networkArea.InverseTransformPoint(marker.rectTransform.position);
+                foreach (var otherView in views.Values)
+                {
+                    var other = otherView != null ? otherView.TerminalMarker : null;
+                    if (other == null || other == marker || !other.gameObject.activeInHierarchy) continue;
+                    Vector2 otherCenter = networkArea.InverseTransformPoint(other.rectTransform.position);
+                    float clearance = Mathf.Max(marker.SocketClearance, other.SocketClearance);
+                    maximum = Mathf.Min(maximum, Mathf.Max(0, Vector2.Distance(center, otherCenter) - clearance));
+                }
+                marker.SetMaximumDiameter(maximum, view.RelayoutSeconds);
+            }
+        }
+
         private void OnDisable()
         {
+            Canvas.preWillRenderCanvases -= RefreshSocketSizes;
             SetProbe(null);
             ClearPhysicalPositions();
         }

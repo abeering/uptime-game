@@ -1,3 +1,4 @@
+Checkpoint a0ffc00: preceding identity-ribbon corrective pass. Final socket refinement evidence is in SocketRefinement/README.md.
 Corrective pass isolation against initial integration commit 1a72a6edc3bcd23b14e218ef1505d75340b26e2d.
 PASS unchanged SHA256 ae48b3cd66fb808f8835fdce51889d540f79fcd2cd2db82f7039d172026cba6a Assets/Scenes/Connections.unity
 PASS unchanged SHA256 68781631005c4c0f8d3e58954f1dc431c2b39370b6c1a10f60c37e6749cfaa74 Assets/Scenes/ConnectionsAdvanced.unity

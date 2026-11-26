@@ -25,6 +25,7 @@ namespace Uptime.Connections.EditorTools
             UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>().RefreshLayouts();
             foreach (var view in UnityEngine.Object.FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None)) view.AdvanceVisual(delta);
             UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>().RefreshLayouts();
+            UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>().RefreshSocketSizes();
             Canvas.ForceUpdateCanvases();
         }
         private static void BindFixture(SimulationHost host)
@@ -206,6 +207,72 @@ namespace Uptime.Connections.EditorTools
             File.WriteAllLines(Evidence + "/regression-checks.txt", report);
             if (report.Any(r => r.StartsWith("FAIL"))) throw new Exception("Integrated regression failures; compare baseline reports to distinguish inherited UI assertions.");
         }
+        public static void Sockets()
+        {
+            Run(); GeometryWitness.Run(); CanonicalSceneWitness.Run(); ConnectionDisplayLabWitness.Run();
+            checks.Clear(); string folder = Evidence + "/SocketRefinement"; Directory.CreateDirectory(folder);
+            try
+            {
+                foreach (string scene in new[] { "Connections", "ConnectionsAdvanced" })
+                {
+                    foreach (int count in new[] { 1, 2, 8, 16 })
+                    {
+                        var host = FragilityWitness.Open("Assets/Scenes/" + scene + ".unity");
+                        FragilityWitness.ConfigureFixture(host, 0, count); FragilityWitness.Advance(host, 3);
+                        BindFixture(host); Refresh(1);
+                        var presenter = UnityEngine.Object.FindFirstObjectByType<LogicalPathPresenter>();
+                        var paths = UnityEngine.Object.FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None);
+                        var markers = paths.Select(v => v.TerminalMarker).ToArray();
+                        Check(markers.Length == count && markers.All(m => m.FitsSocketNeighbors && m.PreferredDiameter == 32),
+                            scene + " shared 32-unit socket; established count=" + count);
+                        if (count == 1) Check(markers[0].rectTransform.rect.width == 32 && markers[0].Ring.rectTransform.rect.width == 28 &&
+                            markers[0].InnerDot.rectTransform.rect.width == 7 && markers[0].Ring.BorderThickness == 3.5f, scene + " full authored socket where room permits");
+                        bool placement = true, separation = true;
+                        foreach (var path in paths)
+                        {
+                            var c = host.RuntimeConnections.Single(c => c.KnownIdentity == path.DisplayState.identity);
+                            var offsets = (float[])typeof(LogicalPathView).GetField("endOffsets", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(path);
+                            Vector2 from = presenter.NetworkArea.InverseTransformPoint(c.Definition.Route[c.Definition.Route.Length - 2].Node.transform.position);
+                            Vector2 target = presenter.NetworkArea.InverseTransformPoint(c.TargetNode.transform.position);
+                            Vector2 expected = LogicalPathView.TerminalSocketCenter(EdgeGeometry.CardRect(c.TargetNode, presenter.NetworkArea),
+                                (from - target).normalized, -offsets[offsets.Length - 1], path.TerminalMarker.BorderOutset);
+                            Vector2 actual = presenter.NetworkArea.InverseTransformPoint(path.TerminalMarker.transform.position);
+                            placement &= Vector2.Distance(expected, actual) < .01f && path.TerminalMarker.color == path.DisplayAccent;
+                        }
+                        for (int i = 0; i < markers.Length; i++)
+                        for (int j = i + 1; j < markers.Length; j++)
+                        {
+                            Vector2 a = presenter.NetworkArea.InverseTransformPoint(markers[i].transform.position);
+                            Vector2 b = presenter.NetworkArea.InverseTransformPoint(markers[j].transform.position);
+                            separation &= Vector2.Distance(a, b) + .01f >= (markers[i].rectTransform.rect.width + markers[j].rectTransform.rect.width) * .5f + 3;
+                        }
+                        Check(placement, scene + " endpoint and resolved identity/status unchanged; count=" + count);
+                        Check(separation, scene + " backing circles do not overlap; count=" + count + "; diameter=" + markers[0].rectTransform.rect.width);
+                        Check(markers.All(m => m.Ring.BorderThickness <= m.Ring.rectTransform.rect.width * .18f + .01f),
+                            scene + " compact ring leaves a visible dark annulus; count=" + count);
+                        var marker = markers[0]; marker.SetMaximumDiameter(0, .2f); marker.SetMaximumDiameter(0, .2f); marker.AdvanceVisual(.1f);
+                        Check(marker.rectTransform.rect.width == 0, scene + " no forced 12-unit floor or oversized shrink tween");
+                        marker.SetMaximumDiameter(32, .2f); marker.AdvanceVisual(.2f);
+                        Check(marker.rectTransform.rect.width == 32, scene + " socket recovers from zero when space returns");
+                    }
+                    var h = FragilityWitness.Open("Assets/Scenes/" + scene + ".unity");
+                    var routeBuilder = typeof(ConnectionTrafficDirector).GetMethod("FindRoute", BindingFlags.Instance | BindingFlags.NonPublic);
+                    int id = 0;
+                    foreach (string destination in new[] { "DB", "API", "AUTH" })
+                    {
+                        var route = (NodeView[])routeBuilder.Invoke(h.GetComponent<ConnectionTrafficDirector>(),
+                            new object[] { h.FindNodeResources("EXT1").View, h.FindNodeResources(destination).View });
+                        h.RegisterConnection(LogicalConnectionDefinition.FromPlan(new ConnectionSpawnPlan(0, "s" + id++, route, "socket-review", "Socket review",
+                            new[] { new OperationStage(OperationKind.Read, 100, 1, "Read") })));
+                    }
+                    FragilityWitness.Advance(h, 3); BindFixture(h); Refresh(1);
+                    Check(UnityEngine.Object.FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None).All(v => v.TerminalMarker.rectTransform.rect.width == 32),
+                        scene + " transit lanes and different-node destinations do not unnecessarily shrink isolated sockets");
+                }
+            }
+            finally { File.WriteAllLines(folder + "/deterministic-checks.txt", checks); }
+        }
+
         public static void AuthoringSafety()
         {
             Directory.CreateDirectory(Evidence);

@@ -1,5 +1,7 @@
 # Connection visual integration — corrective review
 
+**Checkpoint:** the following records `a0ffc00`, before the [final socket refinement](SocketRefinement/README.md). Its screenshots, motion, isolation hashes and measurements retain that provenance.
+
 This is the focused correction on draft PR #131, following human gameplay review of initial integration `1a72a6e`. Architecture, mechanics, heartbeat and danger mapping are retained. Both canonical scene assets, shared prefab hierarchy, pill artwork/material/shader and packing remain unchanged in this pass. All new evidence uses the real shared Unity renderer.
 
 ## Selected starting treatment

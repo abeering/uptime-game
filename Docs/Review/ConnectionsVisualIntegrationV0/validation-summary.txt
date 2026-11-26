@@ -1,3 +1,4 @@
+Checkpoint a0ffc00: preceding identity-ribbon corrective pass. Final socket refinement evidence is in SocketRefinement/README.md.
 Connection Visual Integration V0 — November 25, 2026.
 Integrated baseline: 8391df0a5da5901c15571faffc5ca1ff92a84344, after normal GitHub merges #128, #129, #130 in that order.
 Source documents reconciled, preserving both accepted design sections and implementation records; Project Core regenerated from sources.

@@ -5,6 +5,10 @@ Open **Assets/Scenes/ConnectionsDisplayLab.unity** in Unity 6000.3.11f1 and ente
 [Implementation, mappings, asset inventory and integration seams](../../Connections/connections-display-lab-v0.md).
 
 
+## Final socket refinement
+
+The shared socket now uses a 32-unit backing, 28-unit heavier ring and stronger dot/backing contrast in gameplay and the lab. [Current lab evidence and focused gameplay before/after](../ConnectionsVisualIntegrationV0/SocketRefinement/README.md) records this final refinement. The overview/palette PNGs and motion below retain the preceding `a0ffc00` checkpoint; current lab screenshots/checks are linked from that folder. Palette and heartbeat are unchanged.
+
 ## Current corrective pass (#131)
 
 Human gameplay feedback asked for connection ribbons as the primary visual carrier. Shared tuning now restores a visible body at 0.34 opacity, six muted ordinary identity colors, the previous six blue/teal accents for synthetic priority, and quieter activity at 0.60 opacity (stationary multiplier 0.70). Shapes, heartbeat, density/direction and danger mapping remain. [Selected values and assignment](../../Connections/connections-visual-integration-v0.md#corrective-visual-pass--identity-ribbons).

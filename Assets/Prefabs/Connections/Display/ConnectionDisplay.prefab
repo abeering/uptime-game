@@ -183,11 +183,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1000001, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 18
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 1000001, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 18
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 1000001, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_LocalPosition.x
@@ -239,19 +239,83 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5637809954156404891, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 13.846154
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 5637809954156404891, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 13.846154
+      value: 28
       objectReference: {fileID: 0}
     - target: {fileID: 9108619173923496671, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 2.7692308
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 9108619173923496671, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 2.7692308
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: preferredDiameter
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: ringDiameter
+      value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: dotDiameter
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: dotOpacity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: fitToSocketNeighbors
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: socketClearance
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: backingColor.r
+      value: 0.006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: backingColor.g
+      value: 0.016
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: backingColor.b
+      value: 0.021
+      objectReference: {fileID: 0}
+    - target: {fileID: 878356237740298051, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: cornerRadius
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 878356237740298051, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: borderThickness
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 379319512831854237, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: cornerRadius
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 379319512831854237, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: borderThickness
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4424003831009601058, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: cornerRadius
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4424003831009601058, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: borderThickness
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000004, guid: 724baed3d0694eb7b0f1516df14d2485, type: 3}
+      propertyPath: compactRingWeightFraction
+      value: 0.18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
