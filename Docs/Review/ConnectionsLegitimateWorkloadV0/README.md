@@ -45,3 +45,9 @@ The separate serialization commit adopts native Unity ordering for both canonica
 Generated TMP atlas data may still appear during an open Editor session. Keep it separate from authored changes; do not mark tracked assets assume-unchanged. If Unity asks to reload the externally updated scene, reload it: the local 2.5× value is preserved on disk. Backups of the original human save were made before cleanup.
 
 `.gitattributes` allows Unity's native end-of-line scalar spacing in scenes/prefabs/assets while retaining other whitespace checks. This is a whitespace-check setting, not an ignore rule or content filter.
+
+## Accepted tuning before merge
+
+Human playtesting of #134 accepted 2.5× in both scenes as the provisional baseline; brief legitimate overload was observed. The Small scene now matches the user-authored Advanced value. The updated focused witness compares 1×/2.5× recipes and explicitly verifies real queued 2.5× completion, unscaled business credit 100, nominal 20s/budget 30s and run metadata in both scenes. The original four 1×/1.5× screenshots and prior 452-check report describe the earlier comparison, not new 2.5× gameplay validation. No calibration matrix or unrelated tuning was added.
+
+Accepted tuning evidence: [456 focused assertions](accepted-2.5x-checks.txt), [1×/2.5× recipes](accepted-2.5x-recipes.csv) and [five passing regression groups](accepted-2.5x-regressions.txt). Unity 6000.3.11f1 compiled and executed these checks before merging #134.

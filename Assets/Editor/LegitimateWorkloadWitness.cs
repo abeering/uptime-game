@@ -43,14 +43,14 @@ namespace Uptime.Connections.EditorTools
                 foreach (string scene in CanonicalSceneAuthoring.Scenes)
                 {
                     EditorSceneManager.OpenScene(scene); var authored = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
-                    Check(authored.GetComponent<ConnectionTrafficDirector>().LegitimateWorkloadMultiplier == 1.5f && authored.ShiftEnabled &&
-                        authored.BusinessFailureLimit == 10 && authored.ShiftWorkTarget == (scene == CanonicalSceneAuthoring.Scenes[0] ? 1000 : 1500), scene + " authored 1.5x and accepted objectives");
+                    Check(authored.GetComponent<ConnectionTrafficDirector>().LegitimateWorkloadMultiplier == 2.5f && authored.ShiftEnabled &&
+                        authored.BusinessFailureLimit == 10 && authored.ShiftWorkTarget == (scene == CanonicalSceneAuthoring.Scenes[0] ? 1000 : 1500), scene + " authored 2.5x and accepted objectives");
                     foreach (var mode in new[] { ("normal", 0f, 0f), ("static-keyword-outliers", 1f, 0f), ("waving-outliers", 1f, 1f) })
                     {
-                        var baseline = Plans(scene, 1, mode.Item2, mode.Item3); var scaled = Plans(scene, 1.5f, mode.Item2, mode.Item3);
+                        var baseline = Plans(scene, 1, mode.Item2, mode.Item3); var scaled = Plans(scene, 2.5f, mode.Item2, mode.Item3);
                         for (int n = 0; n < baseline.Length; n++)
                         {
-                            var a = baseline[n]; var b = scaled[n]; double factor = a.IsHostile ? 1 : 1.5;
+                            var a = baseline[n]; var b = scaled[n]; double factor = a.IsHostile ? 1 : 2.5;
                             Check(a.ConnectionId == b.ConnectionId && a.ProfileId == b.ProfileId && a.IsHostile == b.IsHostile &&
                                 a.ScheduledSpawnTime == b.ScheduledSpawnTime && a.Route.Select(x => x.NodeId).SequenceEqual(b.Route.Select(x => x.NodeId)) &&
                                 a.IdentityMode == b.IdentityMode && a.IdentitySeed == b.IdentitySeed && a.NaturalLoadSeed == b.NaturalLoadSeed &&
@@ -99,6 +99,16 @@ namespace Uptime.Connections.EditorTools
                             h.Ending == RunEnding.Fired && h.CreditedWork == 0 && h.LegitimateFailureCount == 2,
                             scene + " same two jobs and capacity, " + multiplier + "x: expected contention changes real completion/failure, not quota value");
                     }
+                    var accepted = Open(scene, 2.5f); ConfigureQueue(accepted, 2.5f);
+                    var acceptedPlan = accepted.GetComponent<ConnectionTrafficDirector>().QueueProfile("product-lookup");
+                    accepted.StepSimulation(3); var acceptedJob = accepted.FindConnection(acceptedPlan.ConnectionId);
+                    Check(acceptedJob.DesiredLoad == 12.5f && acceptedJob.CurrentTotalWork == 250 && acceptedJob.BusinessWorkValue == 100 &&
+                        Near(acceptedJob.ServiceNominalDurationSeconds, 20) && Near(acceptedJob.ServiceBudgetSeconds, 30),
+                        scene + " accepted 2.5x: processing250/LOAD12.5, business100, nominal20/budget30");
+                    accepted.StepSimulation(26);
+                    Check(acceptedJob.Resolution == ConnectionResolution.Completed && accepted.CreditedWork == 100 && accepted.LegitimateFailureCount == 0 &&
+                        accepted.Recorder.CurrentLog.run.legitimateWorkloadMultiplier == 2.5f,
+                        scene + " accepted 2.5x real queue completes at existing capacity and credits100 with effective metadata");
                     var empty = Open(scene, 1.5f); empty.Recorder.RecordingEnabled = false;
                     ConfigureQueue(empty, 1.5f); empty.Recorder.RecordingEnabled = false;
                     empty.GetComponent<ConnectionTrafficDirector>().QueueProfile("product-lookup"); empty.StepSimulation(24);
