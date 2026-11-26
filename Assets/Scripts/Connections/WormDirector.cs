@@ -134,7 +134,7 @@ namespace Uptime.Connections
         public WormOutbreak Spawn(string originId, WormEffect effect,
             WormTuning witnessTuning = null)
         {
-            if (host != null && host.RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (host != null && host.RunEnded) throw new InvalidOperationException(host.RunEndedMessage);
             if (!Enum.IsDefined(typeof(WormEffect), effect))
                 throw new InvalidOperationException("Unknown Worm effect.");
             if (host == null || host.RuntimeConnections == null)
@@ -332,39 +332,44 @@ namespace Uptime.Connections
 
         public bool TryIsolate(string nodeId, string command, out string error)
         {
-            if (host != null && host.RunEnded) { error = "core_breached"; return false; }
+            if (host != null && host.RunEnded) { error = host.RunEndedError; return false; }
             NodeResources node = host?.FindNodeResources(nodeId);
             if (node == null) { error = "Unknown node: " + nodeId; return false; }
-            float now = host.SimulationTimeSeconds;
-            if (isolations.ContainsKey(node.View))
-            { error = "Already isolated: " + node.View.NodeId; return false; }
-            if (cooldowns.TryGetValue(node.View, out float until) && now < until - .00001f)
-            { error = "Isolation cooling down at " + node.View.NodeId; return false; }
-            var state = new IsolationState { Node = node, ActivatedAt = now,
-                ExpiresAt = now + isolationSeconds,
-                CooldownUntil = now + isolationCooldownSeconds };
-            if (command != null)
-                state.ActionSequence = host.Recorder?.RecordPlayerAction(command, null,
-                    true, node.View.NodeId, "isolation_activated") ?? 0;
-            isolations.Add(node.View, state);
-            cooldowns[node.View] = state.CooldownUntil;
-            foreach (WormOutbreak outbreak in outbreaks)
+            bool previousBoundary = host.BeginBoundaryMutation();
+            try
             {
-                foreach (WormBranch branch in outbreak.branches)
-                    if (branch.Phase == WormPhase.Acting && branch.CurrentNode == node.View ||
-                        branch.Phase == WormPhase.Entering && branch.NextNode == node.View)
-                    {
-                        KillBranch(branch, "isolated", now);
-                        state.WormsKilled++;
-                    }
-                FinishIfDone(outbreak, now);
+                float now = host.SimulationTimeSeconds;
+                if (isolations.ContainsKey(node.View))
+                { error = "Already isolated: " + node.View.NodeId; return false; }
+                if (cooldowns.TryGetValue(node.View, out float until) && now < until - .00001f)
+                { error = "Isolation cooling down at " + node.View.NodeId; return false; }
+                var state = new IsolationState { Node = node, ActivatedAt = now,
+                    ExpiresAt = now + isolationSeconds,
+                    CooldownUntil = now + isolationCooldownSeconds };
+                if (command != null)
+                    state.ActionSequence = host.Recorder?.RecordPlayerAction(command, null,
+                        true, node.View.NodeId, "isolation_activated") ?? 0;
+                isolations.Add(node.View, state);
+                cooldowns[node.View] = state.CooldownUntil;
+                foreach (WormOutbreak outbreak in outbreaks)
+                {
+                    foreach (WormBranch branch in outbreak.branches)
+                        if (branch.Phase == WormPhase.Acting && branch.CurrentNode == node.View ||
+                            branch.Phase == WormPhase.Entering && branch.NextNode == node.View)
+                        {
+                            KillBranch(branch, "isolated", now);
+                            state.WormsKilled++;
+                        }
+                    FinishIfDone(outbreak, now);
+                }
+                state.ConnectionsCanceled = host.InterruptForIsolation(node);
+                host.Recorder?.RecordIsolation("isolation_activated", state, now);
+                host.Recorder?.CaptureSnapshot(now);
+                IsolationActivated?.Invoke(state);
+                error = null;
+                return true;
             }
-            state.ConnectionsCanceled = host.InterruptForIsolation(node);
-            host.Recorder?.RecordIsolation("isolation_activated", state, now);
-            host.Recorder?.CaptureSnapshot(now);
-            IsolationActivated?.Invoke(state);
-            error = null;
-            return true;
+            finally { host.EndBoundaryMutation(previousBoundary); }
         }
 
         public bool IsNodeIsolated(NodeView node) => node != null && isolations.ContainsKey(node);

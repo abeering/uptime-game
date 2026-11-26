@@ -1,5 +1,7 @@
 # Connections Run Recorder V0
 
+**Schema 4 follow-up — Business Reliability:** [Whole-connection shift accounting](connections-business-reliability-shift-v0.md#recorder-schema-4) adds fixed business WORK values, canonical `business_work_credit` receipts (operation index −1), independent WORK/failure configuration, objective snapshots and exactly-once `shift_ended`/finalization. Existing processing completions and `business_failure` events remain distinct and unchanged. No fixed shift duration is recorded. Prior schema 1–3 examples and the unmerged #124 operation-credit/deadline evidence remain historical, with optional/defaulted new fields for older JSON.
+
 **Connection Fragility V0 update (November 25, 2026):** Both canonical scenes now enforce legitimate service timeouts independently of Network Health, retain `TimedOut` / `ServiceTimeout` receipts and count one business failure per legitimate interruption. Hostile timing remains unchanged with uniform service-target presentation. Recorder schema 3 retains service budgets/deadlines, partial failure progress, exact-once failure receipts and totals. See the [current fragility contract](connections-fragility-v0.md); older descriptions below preserve their phase scope.
 
 

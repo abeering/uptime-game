@@ -20,6 +20,20 @@ namespace Uptime.Connections.EditorTools
                 EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
                 var sceneHost = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
                 LegacyMechanicWitness.Configure(sceneHost);
+                // Reuse #124's retained-prefab fixture: Health geometry is tested
+                // against its original authored layout, not the new business WORK bar.
+                var healthPanel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();
+                var originalPanel = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Connections/NetworkHealthPanel.prefab").GetComponent<NetworkHealthPanel>();
+                var oldFields = new SerializedObject(originalPanel); var currentFields = new SerializedObject(healthPanel);
+                foreach (string field in new[] { "clockText", "valueText", "rateText", "healthFill" })
+                {
+                    var original = (Component)oldFields.FindProperty(field).objectReferenceValue;
+                    var current = (Component)currentFields.FindProperty(field).objectReferenceValue;
+                    var sourceRect = (RectTransform)(field == "healthFill" ? original.transform.parent : original.transform);
+                    var destinationRect = (RectTransform)(field == "healthFill" ? current.transform.parent : current.transform);
+                    destinationRect.anchoredPosition = sourceRect.anchoredPosition; destinationRect.sizeDelta = sourceRect.sizeDelta;
+                    if (current is TMP_Text text && original is TMP_Text sourceText) text.fontSize = sourceText.fontSize;
+                }
                 sceneHost.ResetSimulation();
                 CheckPanelBindings(sceneHost);
                 var scenePanel = UnityEngine.Object.FindFirstObjectByType<NetworkHealthPanel>();

@@ -1,0 +1,4378 @@
+{
+  "schemaVersion": 4,
+  "run": {
+    "shiftEnabled": true,
+    "shiftWorkTarget": 200.0,
+    "businessFailureLimit": 2,
+    "businessWorkPolicy": "completed_legitimate_connection_authored_work",
+    "finalShift": {
+      "enabled": true,
+      "target": 200.0,
+      "timeSeconds": 31.19999885559082,
+      "failureLimit": 2,
+      "failures": 2,
+      "completedJobs": 0,
+      "credited": 0.0,
+      "eligible": 200.0,
+      "lost": 200.0,
+      "unfinished": 0.0,
+      "ending": "Fired",
+      "shiftSucceeded": false,
+      "runFailed": true
+    },
+    "runId": "1c2314b7",
+    "startedUtc": "2026-11-26T05:36:45.7786230Z",
+    "endedUtc": "2026-11-26T05:36:45.8899670Z",
+    "lastSavedUtc": "2026-11-26T05:36:45.8900250Z",
+    "hackerDirective": "SPREAD",
+    "hackerCommitmentSeconds": 60.0,
+    "hackerPreferenceProbability": 0.699999988079071,
+    "unityVersion": "6000.3.11f1",
+    "sceneName": "Connections",
+    "mode": "Generated",
+    "seed": 1701,
+    "fixedStepSeconds": 0.019999992102384567,
+    "serviceTimeoutsEnabled": true,
+    "serviceTimeoutTolerance": 1.5,
+    "defaultPhantomLoad": 8.0,
+    "defaultSpawnerCadence": 20.0,
+    "defaultPayloadSpawnerCadence": 20.0,
+    "backdoorWorkMultiplier": 2.0,
+    "connectionTravelSecondsPerLink": 0.6000000238418579,
+    "scanDurationSeconds": 8.0,
+    "payloadInterceptWindowSeconds": 8.0,
+    "payloadInterceptCooldownSeconds": 15.0,
+    "payloadInterceptRequestedLoad": 4.0,
+    "naturalLoadNoiseAmplitude": 0.10000000149011612,
+    "naturalLoadNoiseMinPeriodSeconds": 3.0,
+    "naturalLoadNoiseMaxPeriodSeconds": 6.0,
+    "nodes": [
+      {
+        "id": "EXT1",
+        "loadCapacity": 10.0
+      },
+      {
+        "id": "API",
+        "loadCapacity": 10.0
+      },
+      {
+        "id": "DB",
+        "loadCapacity": 10.0,
+        "baselineLoad": 4.0
+      },
+      {
+        "id": "AUTH",
+        "loadCapacity": 10.0
+      }
+    ],
+    "traffic": {
+      "ambientOriginId": "EXT1",
+      "ambientOrigins": [
+        {
+          "nodeId": "EXT1",
+          "weight": 1.0
+        }
+      ],
+      "openingGraceSeconds": 3.0,
+      "hostileMeanIntervalSeconds": 54.0,
+      "ambientIdentityHopChance": 0.10000000149011612,
+      "ambientIdentityReactiveChance": 0.10000000149011612,
+      "ordinaryActivityWeight": 4.0,
+      "reconnaissanceActivityWeight": 2.0,
+      "payloadActivityWeight": 2.0,
+      "wormActivityWeight": 1.0,
+      "payloadLauncherActivityWeight": 1.0,
+      "variablePayloadChance": 0.5,
+      "scanJammedWormChance": 0.699999988079071,
+      "reconnaissanceFollowupChance": 0.4000000059604645,
+      "reconnaissanceFollowupDelaySeconds": 8.0,
+      "portScanLoad": 4.0,
+      "portScanWork": 28.0,
+      "portScannedSeconds": 20.0,
+      "benignPopulationGoal": 3.0,
+      "coverageStartupGoal": 1.0,
+      "coverageRampSeconds": 75.0,
+      "coverageMeanIntervalSeconds": 8.0,
+      "coverageResponse": 0.6000000238418579,
+      "coverageCancellationMemorySeconds": 60.0,
+      "coverageAtGoalChance": 0.11999999731779099,
+      "coverageOutageRetryMaxSeconds": 20.0,
+      "coverageImminentPlanSeconds": 5.0,
+      "coverageCanceledAttemptWeight": 2,
+      "deliveryChance": 0.5,
+      "benignWavingOutlierChance": 0.30000001192092896,
+      "secondAnomalyChance": 0.15000000596046448,
+      "subtleDeliveryChance": 0.10000000149011612,
+      "loaderDelayedChance": 0.3499999940395355,
+      "loaderMinAttackCapacityFraction": 0.800000011920929,
+      "loaderMaxAttackCapacityFraction": 1.2000000476837158,
+      "loaderMinOnsetSeconds": 5.0,
+      "loaderMaxOnsetSeconds": 15.0,
+      "loaderSpikeQuietSeconds": 5.0,
+      "loaderSpikeElevatedSeconds": 2.0,
+      "loaderMinDurationSeconds": 30.0,
+      "loaderMaxDurationSeconds": 60.0,
+      "infectorDelayedChance": 0.33000001311302185,
+      "infectorMinDeliverySeconds": 25.0,
+      "infectorMinFinalEvidenceSeconds": 18.0,
+      "infectorHighLoadWeight": 50.0,
+      "infectorLowLoadWeight": 10.0,
+      "infectorOperationWeight": 15.0,
+      "infectorWorkLongWeight": 10.0,
+      "infectorWavingWeight": 15.0,
+      "phantomLoadWeight": 1.0,
+      "blackoutWeight": 1.0,
+      "spawnerWeight": 1.0,
+      "payloadSpawnerWeight": 1.0,
+      "backdoorWeight": 1.0,
+      "profiles": [
+        {
+          "id": "product-lookup",
+          "purposeTemplate": true,
+          "claimedPurpose": "Product Detail Lookups",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "ambientWeight": 1.5,
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Retrieving product details",
+              "minimumLoad": 5.0,
+              "maximumLoad": 5.0,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 100.0
+            }
+          ]
+        },
+        {
+          "id": "customer-login",
+          "purposeTemplate": true,
+          "claimedPurpose": "Customer Authentications",
+          "eligibleTargetIds": [
+            "AUTH"
+          ],
+          "authoredEligibleTargetIds": [
+            "AUTH"
+          ],
+          "ambientWeight": 1.0,
+          "operations": [
+            {
+              "kind": "Execute",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Authenticating customer",
+              "minimumLoad": 0.800000011920929,
+              "maximumLoad": 1.600000023841858,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 48.0
+            }
+          ]
+        },
+        {
+          "id": "cart-pricing",
+          "purposeTemplate": true,
+          "claimedPurpose": "Cart Price Calculations",
+          "eligibleTargetIds": [
+            "API"
+          ],
+          "authoredEligibleTargetIds": [
+            "API"
+          ],
+          "ambientWeight": 1.0,
+          "operations": [
+            {
+              "kind": "Execute",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Calculating cart price",
+              "minimumLoad": 1.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 70.0
+            }
+          ]
+        },
+        {
+          "id": "order-submit",
+          "purposeTemplate": true,
+          "claimedPurpose": "Customer Checkouts",
+          "eligibleTargetIds": [
+            "API"
+          ],
+          "authoredEligibleTargetIds": [
+            "API"
+          ],
+          "ambientWeight": 0.8999999761581421,
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Submitting order",
+              "minimumLoad": 1.5,
+              "maximumLoad": 3.0,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 120.0
+            },
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading order confirmation",
+              "minimumLoad": 0.6000000238418579,
+              "maximumLoad": 1.2999999523162842,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 36.0
+            }
+          ]
+        },
+        {
+          "id": "inventory-sync",
+          "purposeTemplate": true,
+          "claimedPurpose": "Inventory Reconciliations",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "ambientWeight": 0.6000000238418579,
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading inventory",
+              "minimumLoad": 1.0,
+              "maximumLoad": 1.7999999523162842,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 80.0
+            },
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Updating inventory",
+              "minimumLoad": 1.7000000476837158,
+              "maximumLoad": 3.200000047683716,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 130.0
+            }
+          ]
+        },
+        {
+          "id": "sales-export",
+          "purposeTemplate": true,
+          "claimedPurpose": "Sales Report Export",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "ambientWeight": 0.25,
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Exporting sales report",
+              "minimumLoad": 2.5,
+              "maximumLoad": 4.5,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 75.0,
+              "meanWork": 290.0
+            }
+          ]
+        },
+        {
+          "id": "logs-checkout-evidence",
+          "isHostile": true,
+          "claimedPurpose": "Customer Checkouts",
+          "eligibleTargetIds": [
+            "API"
+          ],
+          "authoredEligibleTargetIds": [
+            "API"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Submitting order",
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 50.0,
+              "maximumDurationSeconds": 50.0
+            },
+            {
+              "kind": "Read",
+              "completionEffect": "InfectionDelivery",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading order confirmation",
+              "minimumLoad": 1.0,
+              "maximumLoad": 1.0,
+              "minimumDurationSeconds": 35.0,
+              "maximumDurationSeconds": 35.0
+            }
+          ]
+        },
+        {
+          "id": "logs-demo",
+          "claimedPurpose": "Diagnostic Transfer",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading diagnostic sample",
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 60.0,
+              "maximumDurationSeconds": 60.0
+            },
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing diagnostic summary",
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 60.0,
+              "maximumDurationSeconds": 60.0
+            }
+          ]
+        },
+        {
+          "id": "retrieval",
+          "claimedPurpose": "Record Retrieval",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading records",
+              "minimumLoad": 1.0,
+              "maximumLoad": 2.5,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 70.0
+            }
+          ]
+        },
+        {
+          "id": "indexing",
+          "claimedPurpose": "Record Indexing",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Updating the DB index",
+              "minimumLoad": 1.5,
+              "maximumLoad": 3.0,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 35.0
+            },
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading the updated index",
+              "minimumLoad": 1.0,
+              "maximumLoad": 2.5,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 35.0
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "claimedPurpose": "Customer Authentications",
+          "eligibleTargetIds": [
+            "AUTH"
+          ],
+          "authoredEligibleTargetIds": [
+            "AUTH"
+          ],
+          "operations": [
+            {
+              "kind": "Execute",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Processing authentications",
+              "minimumLoad": 1.0,
+              "maximumLoad": 2.5,
+              "minimumDurationSeconds": 40.0,
+              "maximumDurationSeconds": 70.0
+            }
+          ]
+        },
+        {
+          "id": "updates",
+          "claimedPurpose": "Application Updates",
+          "eligibleTargetIds": [
+            "API"
+          ],
+          "authoredEligibleTargetIds": [
+            "API"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Applying updates",
+              "minimumLoad": 1.5,
+              "maximumLoad": 3.0,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 35.0
+            },
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Verifying updates",
+              "minimumLoad": 1.0,
+              "maximumLoad": 2.5,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 35.0
+            }
+          ]
+        },
+        {
+          "id": "quick-lookup",
+          "claimedPurpose": "Quick Record Lookup",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Looking up a record",
+              "minimumLoad": 0.5,
+              "maximumLoad": 1.5,
+              "minimumDurationSeconds": 4.0,
+              "maximumDurationSeconds": 8.0
+            }
+          ]
+        },
+        {
+          "id": "payload-launcher",
+          "isHostile": true,
+          "claimedPurpose": "Application Updates",
+          "eligibleTargetIds": [
+            "API"
+          ],
+          "authoredEligibleTargetIds": [
+            "API"
+          ],
+          "operations": [
+            {
+              "kind": "Execute",
+              "completionEffect": "PayloadLaunch",
+              "launchDestinationNodeId": "DB",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Applying service update",
+              "minimumLoad": 3.0,
+              "maximumLoad": 3.0,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 20.0
+            }
+          ]
+        },
+        {
+          "id": "basic-threat",
+          "isHostile": true,
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "InfectionDelivery",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "minimumLoad": 12.0,
+              "maximumLoad": 12.0,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 20.0
+            }
+          ]
+        },
+        {
+          "id": "delayed-threat",
+          "isHostile": true,
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Read",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Reading records",
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 8.0,
+              "maximumDurationSeconds": 8.0
+            },
+            {
+              "kind": "Write",
+              "completionEffect": "InfectionDelivery",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "minimumLoad": 12.0,
+              "maximumLoad": 12.0,
+              "minimumDurationSeconds": 20.0,
+              "maximumDurationSeconds": 20.0
+            }
+          ]
+        },
+        {
+          "id": "spiking-threat",
+          "isHostile": true,
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "InfectionDelivery",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "behaviors": [
+                {
+                  "id": "SPIKING",
+                  "kind": "Spiking",
+                  "normalIntervalSeconds": 5.0,
+                  "elevatedIntervalSeconds": 2.0,
+                  "spikeInitialDelaySeconds": 5.0,
+                  "loadDelta": 10.0,
+                  "workRateMultiplier": 1.0
+                }
+              ],
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 120.0,
+              "maximumDurationSeconds": 120.0
+            }
+          ]
+        },
+        {
+          "id": "spiking-benign",
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "behaviors": [
+                {
+                  "id": "SPIKING",
+                  "kind": "Spiking",
+                  "normalIntervalSeconds": 5.0,
+                  "elevatedIntervalSeconds": 2.0,
+                  "spikeInitialDelaySeconds": 5.0,
+                  "loadDelta": 10.0,
+                  "workRateMultiplier": 1.0
+                }
+              ],
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 120.0,
+              "maximumDurationSeconds": 120.0
+            }
+          ]
+        },
+        {
+          "id": "overload-demo",
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "behaviors": [
+                {
+                  "id": "OVERLOAD",
+                  "kind": "Overload",
+                  "startAfterSeconds": 5.0,
+                  "loadDelta": 10.0,
+                  "workRateMultiplier": 1.0
+                }
+              ],
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 120.0,
+              "maximumDurationSeconds": 120.0
+            }
+          ]
+        },
+        {
+          "id": "waving-moderate",
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "behaviors": [
+                {
+                  "id": "WAVING_MODERATE",
+                  "kind": "Waving",
+                  "startAfterSeconds": 3.0,
+                  "minimumLoadOffset": -1.0,
+                  "maximumLoadOffset": 1.0,
+                  "wavePeriodSeconds": 20.0,
+                  "workRateMultiplier": 1.0
+                }
+              ],
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 180.0,
+              "maximumDurationSeconds": 180.0
+            }
+          ]
+        },
+        {
+          "id": "waving-strong",
+          "claimedPurpose": "Database Maintenance",
+          "eligibleTargetIds": [
+            "DB"
+          ],
+          "authoredEligibleTargetIds": [
+            "DB"
+          ],
+          "operations": [
+            {
+              "kind": "Write",
+              "completionEffect": "None",
+              "launchMotionProfile": "Steady",
+              "activityDescription": "Writing records",
+              "behaviors": [
+                {
+                  "id": "WAVING_STRONG",
+                  "kind": "Waving",
+                  "startAfterSeconds": 3.0,
+                  "maximumLoadOffset": 8.0,
+                  "wavePeriodSeconds": 30.0,
+                  "workRateMultiplier": 1.0
+                }
+              ],
+              "minimumLoad": 2.0,
+              "maximumLoad": 2.0,
+              "minimumDurationSeconds": 360.0,
+              "maximumDurationSeconds": 360.0
+            }
+          ]
+        }
+      ]
+    },
+    "integrityEnabled": true,
+    "maximumIntegrity": 2,
+    "integritySevereLoadRatio": 1.5,
+    "integrityWarningSeconds": 10.0
+  },
+  "events": [
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 1,
+      "timeSeconds": 0.0,
+      "type": "plan_queued",
+      "connectionId": "m7",
+      "source": "manual",
+      "profileId": "product-lookup",
+      "generation": {
+        "purposeId": "product-lookup",
+        "objective": "NONE",
+        "generationDecision": "MANUAL_BENIGN",
+        "normalOperations": [
+          {
+            "kind": "Read",
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "completionEffect": "None"
+          }
+        ],
+        "finalOperations": [
+          {
+            "kind": "Read",
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "completionEffect": "None"
+          }
+        ],
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 2,
+      "timeSeconds": 0.0,
+      "type": "plan_queued",
+      "connectionId": "f3",
+      "source": "manual",
+      "profileId": "product-lookup",
+      "generation": {
+        "purposeId": "product-lookup",
+        "objective": "NONE",
+        "generationDecision": "MANUAL_BENIGN",
+        "normalOperations": [
+          {
+            "kind": "Read",
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "completionEffect": "None"
+          }
+        ],
+        "finalOperations": [
+          {
+            "kind": "Read",
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "completionEffect": "None"
+          }
+        ],
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 3,
+      "timeSeconds": 0.0,
+      "type": "connection_spawned",
+      "connectionId": "m7",
+      "profileId": "product-lookup",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 4,
+      "timeSeconds": 0.0,
+      "type": "connection_spawned",
+      "connectionId": "f3",
+      "profileId": "product-lookup",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 5,
+      "timeSeconds": 0.5999996066093445,
+      "type": "connection_node_arrived",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "API",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 6,
+      "timeSeconds": 0.5999996066093445,
+      "type": "connection_node_arrived",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "API",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 7,
+      "timeSeconds": 1.1999990940093994,
+      "type": "connection_node_arrived",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "DB",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "serviceNominalDurationSeconds": 20.0,
+      "serviceBudgetSeconds": 30.0,
+      "serviceDeadlineSeconds": 31.19999885559082,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 8,
+      "timeSeconds": 1.1999990940093994,
+      "type": "connection_established",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "establishedAtSeconds": 1.1999990940093994,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 9,
+      "timeSeconds": 1.1999990940093994,
+      "type": "operation_started",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "sourceOperationIndex": -1,
+      "desiredLoad": 5.0,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 10,
+      "timeSeconds": 1.1999990940093994,
+      "type": "connection_node_arrived",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "DB",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "serviceNominalDurationSeconds": 20.0,
+      "serviceBudgetSeconds": 30.0,
+      "serviceDeadlineSeconds": 31.19999885559082,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 11,
+      "timeSeconds": 1.1999990940093994,
+      "type": "connection_established",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "establishedAtSeconds": 1.1999990940093994,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 12,
+      "timeSeconds": 1.1999990940093994,
+      "type": "operation_started",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "sourceOperationIndex": -1,
+      "desiredLoad": 5.0,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 13,
+      "timeSeconds": 1.8799984455108643,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 1,
+      "logWorkThreshold": 2.0,
+      "logActivity": "product.key.normalize",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 14,
+      "timeSeconds": 1.8799984455108643,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 1,
+      "logWorkThreshold": 2.0,
+      "logActivity": "product.key.normalize",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 15,
+      "timeSeconds": 2.2199981212615967,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 2,
+      "logAuthoredIndex": 1,
+      "logWorkThreshold": 3.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 16,
+      "timeSeconds": 2.2199981212615967,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 2,
+      "logAuthoredIndex": 1,
+      "logWorkThreshold": 3.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 17,
+      "timeSeconds": 2.5399978160858154,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 3,
+      "logAuthoredIndex": 2,
+      "logWorkThreshold": 4.0,
+      "logActivity": "product.variant.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 18,
+      "timeSeconds": 2.5399978160858154,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 3,
+      "logAuthoredIndex": 2,
+      "logWorkThreshold": 4.0,
+      "logActivity": "product.variant.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 19,
+      "timeSeconds": 5.199995517730713,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 4,
+      "logAuthoredIndex": 3,
+      "logWorkThreshold": 12.0,
+      "logActivity": "product.price.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 20,
+      "timeSeconds": 5.199995517730713,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 4,
+      "logAuthoredIndex": 3,
+      "logWorkThreshold": 12.0,
+      "logActivity": "product.price.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 21,
+      "timeSeconds": 5.539995193481445,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 5,
+      "logAuthoredIndex": 4,
+      "logWorkThreshold": 13.0,
+      "logActivity": "product.availability.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 22,
+      "timeSeconds": 5.539995193481445,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 5,
+      "logAuthoredIndex": 4,
+      "logWorkThreshold": 13.0,
+      "logActivity": "product.availability.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 23,
+      "timeSeconds": 5.879994869232178,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 6,
+      "logAuthoredIndex": 5,
+      "logWorkThreshold": 14.0,
+      "logActivity": "product.detail.assemble",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 24,
+      "timeSeconds": 5.879994869232178,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 6,
+      "logAuthoredIndex": 5,
+      "logWorkThreshold": 14.0,
+      "logActivity": "product.detail.assemble",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 25,
+      "timeSeconds": 6.1999945640563965,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 7,
+      "logAuthoredIndex": 6,
+      "logWorkThreshold": 15.000000953674316,
+      "logActivity": "product.detail.return",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 26,
+      "timeSeconds": 6.1999945640563965,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 7,
+      "logAuthoredIndex": 6,
+      "logWorkThreshold": 15.000000953674316,
+      "logActivity": "product.detail.return",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 27,
+      "timeSeconds": 10.220043182373047,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 8,
+      "logAuthoredIndex": 7,
+      "logWorkThreshold": 27.000001907348633,
+      "logActivity": "product.key.normalize",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 28,
+      "timeSeconds": 10.220043182373047,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 8,
+      "logAuthoredIndex": 7,
+      "logWorkThreshold": 27.000001907348633,
+      "logActivity": "product.key.normalize",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 29,
+      "timeSeconds": 10.540050506591797,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 9,
+      "logAuthoredIndex": 8,
+      "logWorkThreshold": 28.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "MISS",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 30,
+      "timeSeconds": 10.540050506591797,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 9,
+      "logAuthoredIndex": 8,
+      "logWorkThreshold": 28.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "MISS",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 31,
+      "timeSeconds": 10.880058288574219,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 10,
+      "logAuthoredIndex": 9,
+      "logWorkThreshold": 29.0,
+      "logActivity": "product.lookup.retry",
+      "logResult": "RETRY",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 32,
+      "timeSeconds": 10.880058288574219,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 10,
+      "logAuthoredIndex": 9,
+      "logWorkThreshold": 29.0,
+      "logActivity": "product.lookup.retry",
+      "logResult": "RETRY",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 33,
+      "timeSeconds": 11.22006607055664,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 11,
+      "logAuthoredIndex": 10,
+      "logWorkThreshold": 30.000001907348633,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 34,
+      "timeSeconds": 11.22006607055664,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 11,
+      "logAuthoredIndex": 10,
+      "logWorkThreshold": 30.000001907348633,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 35,
+      "timeSeconds": 15.540164947509766,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 12,
+      "logAuthoredIndex": 11,
+      "logWorkThreshold": 43.0,
+      "logActivity": "product.catalog.scan",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 36,
+      "timeSeconds": 15.540164947509766,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 12,
+      "logAuthoredIndex": 11,
+      "logWorkThreshold": 43.0,
+      "logActivity": "product.catalog.scan",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 37,
+      "timeSeconds": 15.880172729492188,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 13,
+      "logAuthoredIndex": 12,
+      "logWorkThreshold": 44.0,
+      "logActivity": "product.variant.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 38,
+      "timeSeconds": 15.880172729492188,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 13,
+      "logAuthoredIndex": 12,
+      "logWorkThreshold": 44.0,
+      "logActivity": "product.variant.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 39,
+      "timeSeconds": 16.200180053710938,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 14,
+      "logAuthoredIndex": 13,
+      "logWorkThreshold": 45.0,
+      "logActivity": "product.price.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 40,
+      "timeSeconds": 16.200180053710938,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 14,
+      "logAuthoredIndex": 13,
+      "logWorkThreshold": 45.0,
+      "logActivity": "product.price.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 41,
+      "timeSeconds": 20.200271606445312,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 15,
+      "logAuthoredIndex": 14,
+      "logWorkThreshold": 57.0,
+      "logActivity": "product.availability.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 42,
+      "timeSeconds": 20.200271606445312,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 15,
+      "logAuthoredIndex": 14,
+      "logWorkThreshold": 57.0,
+      "logActivity": "product.availability.read",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 43,
+      "timeSeconds": 20.540279388427734,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 16,
+      "logAuthoredIndex": 15,
+      "logWorkThreshold": 58.0,
+      "logActivity": "product.detail.assemble",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 44,
+      "timeSeconds": 20.540279388427734,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 16,
+      "logAuthoredIndex": 15,
+      "logWorkThreshold": 58.0,
+      "logActivity": "product.detail.assemble",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 45,
+      "timeSeconds": 20.880287170410156,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 17,
+      "logAuthoredIndex": 16,
+      "logWorkThreshold": 58.999996185302734,
+      "logActivity": "product.detail.return",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 46,
+      "timeSeconds": 20.880287170410156,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 17,
+      "logAuthoredIndex": 16,
+      "logWorkThreshold": 58.999996185302734,
+      "logActivity": "product.detail.return",
+      "logResult": "OK",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 47,
+      "timeSeconds": 25.540393829345703,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 18,
+      "logAuthoredIndex": 17,
+      "logWorkThreshold": 73.0,
+      "logActivity": "product.batch.lookup",
+      "logResult": "DONE",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 48,
+      "timeSeconds": 25.540393829345703,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 18,
+      "logAuthoredIndex": 17,
+      "logWorkThreshold": 73.0,
+      "logActivity": "product.batch.lookup",
+      "logResult": "DONE",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 49,
+      "timeSeconds": 25.880401611328125,
+      "type": "connection_log_emitted",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 19,
+      "logAuthoredIndex": 18,
+      "logWorkThreshold": 74.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 50,
+      "timeSeconds": 25.880401611328125,
+      "type": "connection_log_emitted",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "logSequence": 19,
+      "logAuthoredIndex": 18,
+      "logWorkThreshold": 74.0,
+      "logActivity": "product.sku.lookup",
+      "logResult": "HIT",
+      "sourceOperationIndex": -1,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 51,
+      "timeSeconds": 30.200000762939453,
+      "type": "player_action",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "DB",
+      "sourceOperationIndex": -1,
+      "reason": "scan_started",
+      "command": "scan db",
+      "success": true,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 52,
+      "timeSeconds": 30.200000762939453,
+      "type": "scan_started",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "targetNodeId": "DB",
+      "sourceOperationIndex": -1,
+      "actionSequence": 51,
+      "scanSessionId": 1,
+      "scanStartedAtSeconds": 30.200000762939453,
+      "scanScheduledCompletionAtSeconds": 38.20000076293945,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "terminationRequiredWork": 100.0,
+      "legitimateFailureTotal": 1,
+      "businessFailureUnits": 1,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 53,
+      "timeSeconds": 31.19999885559082,
+      "type": "business_failure",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "completedWork": 89.99801635742188,
+      "resolutionReason": "TimedOut",
+      "resolutionCause": "ServiceTimeout",
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "serviceNominalDurationSeconds": 20.0,
+      "serviceBudgetSeconds": 30.0,
+      "serviceDeadlineSeconds": 31.19999885559082,
+      "terminationRequiredWork": 100.0,
+      "legitimateFailureTotal": 1,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 54,
+      "timeSeconds": 31.19999885559082,
+      "type": "connection_resolved",
+      "connectionId": "f3",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "sourceOperationIndex": -1,
+      "completedWork": 89.99801635742188,
+      "resolutionReason": "TimedOut",
+      "resolutionCause": "ServiceTimeout",
+      "terminationPhase": "Active",
+      "established": true,
+      "establishedAtSeconds": 1.1999990940093994,
+      "resolvedAtSeconds": 31.19999885559082,
+      "elapsedLifetimeSeconds": 31.19999885559082,
+      "loaderActivatedAtSeconds": -1.0,
+      "loaderWithdrawAtSeconds": -1.0,
+      "healthAfter": 94.0033950805664,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "terminationRequiredWork": 100.0,
+      "legitimateFailureTotal": 2,
+      "businessFailureUnits": 1,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 55,
+      "timeSeconds": 31.19999885559082,
+      "type": "business_failure",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "completedWork": 89.99801635742188,
+      "resolutionReason": "TimedOut",
+      "resolutionCause": "ServiceTimeout",
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": false,
+        "target": 0.0,
+        "timeSeconds": 0.0,
+        "failureLimit": 0,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 0.0,
+        "lost": 0.0,
+        "unfinished": 0.0,
+        "ending": "",
+        "shiftSucceeded": false,
+        "runFailed": false
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "serviceNominalDurationSeconds": 20.0,
+      "serviceBudgetSeconds": 30.0,
+      "serviceDeadlineSeconds": 31.19999885559082,
+      "terminationRequiredWork": 100.0,
+      "legitimateFailureTotal": 2,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 56,
+      "timeSeconds": 31.19999885559082,
+      "type": "connection_resolved",
+      "connectionId": "m7",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "profileId": "product-lookup",
+        "claimedPurpose": "Product Detail Lookups",
+        "origin": "EXT1",
+        "target": "DB",
+        "route": [
+          "EXT1",
+          "API",
+          "DB"
+        ],
+        "operations": [
+          {
+            "kind": "Read",
+            "completionEffect": "None",
+            "activityDescription": "Retrieving product details",
+            "plannedLogs": [
+              {
+                "workFraction": 0.019999999552965164,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 1,
+                "workFraction": 0.029999999329447746,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 2,
+                "workFraction": 0.03999999910593033,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 3,
+                "workFraction": 0.11999999731779099,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 4,
+                "workFraction": 0.12999999523162842,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 5,
+                "workFraction": 0.14000000059604645,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 6,
+                "workFraction": 0.15000000596046448,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 7,
+                "workFraction": 0.27000001072883606,
+                "activity": "product.key.normalize",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 8,
+                "workFraction": 0.2800000011920929,
+                "activity": "product.sku.lookup",
+                "result": "MISS"
+              },
+              {
+                "authoredIndex": 9,
+                "workFraction": 0.28999999165534973,
+                "activity": "product.lookup.retry",
+                "result": "RETRY"
+              },
+              {
+                "authoredIndex": 10,
+                "workFraction": 0.30000001192092896,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 11,
+                "workFraction": 0.4300000071525574,
+                "activity": "product.catalog.scan",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 12,
+                "workFraction": 0.4399999976158142,
+                "activity": "product.variant.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 13,
+                "workFraction": 0.44999998807907104,
+                "activity": "product.price.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 14,
+                "workFraction": 0.5699999928474426,
+                "activity": "product.availability.read",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 15,
+                "workFraction": 0.5799999833106995,
+                "activity": "product.detail.assemble",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 16,
+                "workFraction": 0.5899999737739563,
+                "activity": "product.detail.return",
+                "result": "OK"
+              },
+              {
+                "authoredIndex": 17,
+                "workFraction": 0.7300000190734863,
+                "activity": "product.batch.lookup",
+                "result": "DONE"
+              },
+              {
+                "authoredIndex": 18,
+                "workFraction": 0.7400000095367432,
+                "activity": "product.sku.lookup",
+                "result": "HIT"
+              },
+              {
+                "authoredIndex": 19,
+                "workFraction": 0.9100000262260437,
+                "activity": "product.detail.return",
+                "result": "OK"
+              }
+            ],
+            "desiredLoad": 5.0,
+            "totalWork": 100.0,
+            "nominalDurationSeconds": 20.0
+          }
+        ],
+        "loaderAttack": {},
+        "naturalLoadNoise": true,
+        "naturalLoadSeed": 1701,
+        "identityMode": "Normal"
+      },
+      "operationIndex": 0,
+      "operationKind": "Read",
+      "sourceOperationIndex": -1,
+      "completedWork": 89.99801635742188,
+      "resolutionReason": "TimedOut",
+      "resolutionCause": "ServiceTimeout",
+      "terminationPhase": "Active",
+      "established": true,
+      "establishedAtSeconds": 1.1999990940093994,
+      "resolvedAtSeconds": 31.19999885559082,
+      "elapsedLifetimeSeconds": 31.19999885559082,
+      "loaderActivatedAtSeconds": -1.0,
+      "loaderWithdrawAtSeconds": -1.0,
+      "healthAfter": 94.0033950805664,
+      "snapshotIndex": -1
+    },
+    {
+      "shift": {
+        "enabled": true,
+        "target": 200.0,
+        "timeSeconds": 31.19999885559082,
+        "failureLimit": 2,
+        "failures": 2,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 200.0,
+        "lost": 200.0,
+        "unfinished": 0.0,
+        "ending": "Fired",
+        "shiftSucceeded": false,
+        "runFailed": true
+      },
+      "businessWork": 0.0,
+      "creditedWork": 0.0,
+      "legitimateFailureTotal": 0,
+      "businessFailureUnits": 0,
+      "integrity": {},
+      "hackerOffensive": {},
+      "hackerTarget": {
+        "preferenceRoll": -1.0
+      },
+      "sequence": 57,
+      "timeSeconds": 31.19999885559082,
+      "type": "shift_ended",
+      "generation": {
+        "forcedOptions": {},
+        "loaderAttack": {},
+        "infector": {}
+      },
+      "definition": {
+        "loaderAttack": {}
+      },
+      "operationIndex": 0,
+      "sourceOperationIndex": -1,
+      "reason": "Fired",
+      "snapshotIndex": -1
+    }
+  ],
+  "snapshots": [
+    {
+      "shift": {
+        "enabled": true,
+        "target": 200.0,
+        "timeSeconds": 31.19999885559082,
+        "failureLimit": 2,
+        "failures": 2,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 200.0,
+        "lost": 200.0,
+        "unfinished": 0.0,
+        "ending": "Fired",
+        "shiftSucceeded": false,
+        "runFailed": true
+      },
+      "integrity": {
+        "nodes": [
+          {
+            "id": "API",
+            "integrity": 2
+          },
+          {
+            "id": "AUTH",
+            "critical": true,
+            "integrity": 2
+          },
+          {
+            "id": "DB",
+            "critical": true,
+            "integrity": 2
+          },
+          {
+            "id": "EXT1",
+            "external": true,
+            "connected": true,
+            "integrity": -1
+          }
+        ],
+        "links": [
+          {
+            "id": "E1",
+            "nodeA": "EXT1",
+            "nodeB": "API"
+          },
+          {
+            "id": "E2",
+            "nodeA": "API",
+            "nodeB": "DB"
+          },
+          {
+            "id": "E3",
+            "nodeA": "API",
+            "nodeB": "AUTH"
+          }
+        ],
+        "breach": {
+          "trigger": {}
+        }
+      },
+      "hackerDirective": {
+        "directive": "SPREAD",
+        "offensive": {}
+      },
+      "timeSeconds": 31.19999885559082,
+      "legitimateFailureTotal": 2,
+      "health": {
+        "value": 94.0033950805664,
+        "netRate": 0.3499999940395355,
+        "recoveryRate": 0.3499999940395355
+      },
+      "nodes": [
+        {
+          "id": "EXT1",
+          "loadCapacity": 10.0
+        },
+        {
+          "id": "API",
+          "loadCapacity": 10.0
+        },
+        {
+          "id": "DB",
+          "loadCapacity": 10.0,
+          "baselineLoad": 4.0,
+          "requestedLoad": 4.0,
+          "allocatedLoad": 4.0
+        },
+        {
+          "id": "AUTH",
+          "loadCapacity": 10.0
+        }
+      ]
+    }
+  ],
+  "evidenceExtract": {
+    "source": "BusinessShiftCapture.Run, Unity 6000.3.11f1 scripted Play Mode",
+    "sourceSha256": "cd034bcbc193985e47d377c970d724dde78e03d76f4c8fc607dc810124a9b3dd",
+    "allEventsRetained": 57,
+    "periodicSnapshotsOmitted": 31,
+    "notes": "All events, metadata and final diagnostic snapshot retained. Empty/default fields omitted. Reproduce the capture command for unabridged logs."
+  }
+}

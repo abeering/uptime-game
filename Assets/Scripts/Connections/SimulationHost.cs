@@ -263,7 +263,7 @@ namespace Uptime.Connections
             // A Payload launch or Payload Spawner installation must take effect at
             // its fixed-step completion, even in a coarse witness interval.
             float fixedStep = Mathf.Max(.000001f, Time.fixedDeltaTime);
-            if (deltaSeconds > fixedStep + .000001f && (IntegrityEnabled || HasPendingPayloadSource()))
+            if (deltaSeconds > fixedStep + .000001f && (shiftEnabled || IntegrityEnabled || HasPendingPayloadSource()))
             {
                 float remainingLaunch = deltaSeconds;
                 while (remainingLaunch > .000001f && !RunEnded)
@@ -282,7 +282,7 @@ namespace Uptime.Connections
                 trafficDirector.HostileGenerationEnabled)
             {
                 float remainingCoarse = deltaSeconds;
-                while (remainingCoarse > 0.000001f)
+                while (remainingCoarse > 0.000001f && !RunEnded)
                 {
                     float piece = Mathf.Min(1f, remainingCoarse);
                     StepSimulation(piece);
@@ -303,6 +303,8 @@ namespace Uptime.Connections
                 BeginDueConnections();
                 WithdrawDueLoaders();
                 ResolveDueTimeouts();
+                SettleTerminalBoundary();
+                if (RunEnded) { steppingIntegrity = false; RefreshDisplays(); return; }
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
@@ -366,7 +368,7 @@ namespace Uptime.Connections
                 AdvanceIdentities();
                 ExpireConditions();
                 duelDirector?.Advance(simulationTimeSeconds);
-                CompleteIntegrityBoundary();
+                SettleTerminalBoundary();
                 if (RunEnded) { steppingIntegrity = false; RefreshDisplays(); return; }
                 remaining -= segment;
             }
@@ -374,7 +376,7 @@ namespace Uptime.Connections
             BeginDueConnections();
             StepSpawners();
             steppingIntegrity = false;
-            CompleteIntegrityBoundary();
+            SettleTerminalBoundary();
             RefreshServiceDanger();
             recorder?.CaptureDueSnapshot(simulationTimeSeconds);
             RefreshDisplays();
@@ -559,7 +561,7 @@ namespace Uptime.Connections
 
         public LogicalConnectionState RegisterConnection(LogicalConnectionDefinition definition)
         {
-            if (RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (RunEnded) throw new InvalidOperationException(RunEndedMessage);
             if (runtimeConnections == null) ResetSimulation();
             LogicalConnectionState state = BuildState(definition);
             if (HasEverUsedId(state.ConnectionId) || IsLiveAlias(state.ConnectionId) ||
@@ -593,7 +595,7 @@ namespace Uptime.Connections
             string sourceConnectionId = null, int sourceOperationIndex = -1,
             string sourceWormBranchId = null)
         {
-            if (RunEnded) throw new InvalidOperationException("CORE BREACHED: restart the run.");
+            if (RunEnded) throw new InvalidOperationException(RunEndedMessage);
             if (target == null || payload == null || !payload.IsValid ||
                 Array.IndexOf(nodes, target) < 0)
                 throw new InvalidOperationException("Condition needs a configured target and valid payload.");
@@ -638,35 +640,40 @@ namespace Uptime.Connections
                 if (string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase) &&
                     (state.IsActive || state.IsConnecting))
                 {
-                    bool wasActive = state.IsActive;
-                    state.TerminationRequiredWork = state.CurrentTotalWork;
-                    state.TerminationPhase = state.Lifecycle;
-                    state.TerminationCause = ConnectionTerminationCause.Player;
-                    state.Lifecycle = Lifecycle.Complete;
-                    state.AllocatedLoad = 0f;
-                    if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
-                    state.NaturalLoadDelta = 0f;
-                    Resolve(state, ConnectionResolution.Killed);
-                    var next = new List<LogicalConnectionState>(runtimeConnections);
-                    next.Remove(state);
-                    runtimeConnections = next.ToArray();
-                    pathPresenter?.Retire(state);
-                    // Publish released LOAD immediately; peers receive new allocations next step.
-                    foreach (NodeResources node in nodes) node.ClearConnectionUsage();
-                    foreach (LogicalConnectionState live in runtimeConnections)
-                        if (live.IsDemanding)
-                            live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
-                    RefreshServiceDanger();
-                    recorder?.CaptureSnapshot(simulationTimeSeconds);
-                    RefreshDisplays();
-                    return true;
+                    bool previousBoundary = BeginBoundaryMutation();
+                    try
+                    {
+                        bool wasActive = state.IsActive;
+                        state.TerminationRequiredWork = state.CurrentTotalWork;
+                        state.TerminationPhase = state.Lifecycle;
+                        state.TerminationCause = ConnectionTerminationCause.Player;
+                        state.Lifecycle = Lifecycle.Complete;
+                        state.AllocatedLoad = 0f;
+                        if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
+                        state.NaturalLoadDelta = 0f;
+                        Resolve(state, ConnectionResolution.Killed);
+                        var next = new List<LogicalConnectionState>(runtimeConnections);
+                        next.Remove(state);
+                        runtimeConnections = next.ToArray();
+                        pathPresenter?.Retire(state);
+                        // Publish released LOAD immediately; peers receive new allocations next step.
+                        foreach (NodeResources node in nodes) node.ClearConnectionUsage();
+                        foreach (LogicalConnectionState live in runtimeConnections)
+                            if (live.IsDemanding)
+                                live.TargetResources.AddUsage(live.DesiredLoad, live.AllocatedLoad);
+                        RefreshServiceDanger();
+                        recorder?.CaptureSnapshot(simulationTimeSeconds);
+                        RefreshDisplays();
+                        return true;
+                    }
+                    finally { EndBoundaryMutation(previousBoundary); }
                 }
             return false;
         }
 
         private void Resolve(LogicalConnectionState state, ConnectionResolution reason)
         {
-            if (state.Resolution.HasValue) return;
+            if (RunEnded || state.Resolution.HasValue) return;
             state.Resolution = reason;
             state.ResolvedAtSeconds = simulationTimeSeconds;
             state.AtRisk = false;
@@ -675,6 +682,7 @@ namespace Uptime.Connections
             state.HealthPenaltyAmount = penalty?.Amount ?? 0f;
             if (penalty != null) recorder?.RecordHealthPenalty(penalty, health.Snapshot.Value);
             recorder?.RecordResolution(state, reason, simulationTimeSeconds);
+            CreditSuccessfulConnection(state);
             ConnectionResolved?.Invoke(state, reason);
         }
 
@@ -684,7 +692,7 @@ namespace Uptime.Connections
         public bool TryInjectInfection(string nodeId, InfectionKind kind, float parameter,
             out string error)
         {
-            if (RunEnded) { error = "core_breached"; return false; }
+            if (RunEnded) { error = RunEndedError; return false; }
             NodeResources target = FindNodeResources(nodeId);
             if (target == null)
             {
@@ -704,11 +712,15 @@ namespace Uptime.Connections
                 kind == InfectionKind.PhantomLoad ? parameter : 0f,
                 kind == InfectionKind.Spawner || kind == InfectionKind.PayloadSpawner ?
                     parameter : 0f);
-            bool applied = ApplyInfection(target, payload, null, -1);
-            if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
-            if (!steppingIntegrity) CompleteIntegrityBoundary();
-            error = applied ? null : kind + " is already active on " + target.View.NodeId;
-            return applied;
+            bool previousBoundary = BeginBoundaryMutation();
+            try
+            {
+                bool applied = ApplyInfection(target, payload, null, -1);
+                if (applied && kind == InfectionKind.Blackout) InterruptRoutesThrough(target);
+                error = applied ? null : kind + " is already active on " + target.View.NodeId;
+                return applied;
+            }
+            finally { EndBoundaryMutation(previousBoundary); }
         }
 
         public bool TryApplyDuelInfection(NodeResources target, InfectionKind kind,
@@ -719,7 +731,7 @@ namespace Uptime.Connections
         public bool TryApplyConsequenceInfection(string targetNodeId, InfectionKind kind,
             float parameter, string source, out string error, bool suppressIntegrityDamage = false)
         {
-            if (RunEnded) { error = "core_breached"; return false; }
+            if (RunEnded) { error = RunEndedError; return false; }
             NodeResources target = FindNodeResources(targetNodeId);
             if (target == null || Array.IndexOf(nodes, target) < 0)
             { error = "unknown_node"; return false; }
@@ -908,7 +920,7 @@ namespace Uptime.Connections
 
         public bool TryRemoveInfection(string nodeId, InfectionKind kind, out string error)
         {
-            if (RunEnded) { error = "core_breached"; return false; }
+            if (RunEnded) { error = RunEndedError; return false; }
             NodeResources target = FindNodeResources(nodeId);
             if (target == null)
             {
@@ -969,7 +981,7 @@ namespace Uptime.Connections
 
         public void RefreshPayloadAllocations()
         {
-            if (runtimeConnections == null || nodes == null) return;
+            if (RunEnded || runtimeConnections == null || nodes == null) return;
             RefreshBackdoorRates();
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections,
                 payloadDirector != null ? payloadDirector.DemandAt : null);
@@ -1002,7 +1014,7 @@ namespace Uptime.Connections
                 ConnectionTerminationCause.Isolation : ConnectionTerminationCause.Blackout;
 
         public int InterruptForIsolation(NodeResources node) =>
-            InterruptRoutesThrough(node, ConnectionTerminationCause.Isolation);
+            RunEnded ? 0 : InterruptRoutesThrough(node, ConnectionTerminationCause.Isolation);
 
         private int InterruptRoutesThrough(NodeResources offline,
             ConnectionTerminationCause cause = ConnectionTerminationCause.Blackout)
@@ -1151,6 +1163,7 @@ namespace Uptime.Connections
         {
             steppingIntegrity = false;
             simulationGeneration++;
+            ResetShiftAccounting();
             ClearProbe();
             ClearOverclock();
             activeClean = null;
@@ -1162,7 +1175,6 @@ namespace Uptime.Connections
             simulationTimeSeconds = 0f;
             health = new NetworkHealth(healthTuning ?? new NetworkHealthTuning());
             history.Clear();
-            businessFailures.Clear();
             if (float.IsNaN(serviceTimeoutTolerance) || float.IsInfinity(serviceTimeoutTolerance) ||
                 serviceTimeoutTolerance <= 0f)
                 throw new InvalidOperationException("Service timeout tolerance must be finite and positive.");
@@ -1215,7 +1227,7 @@ namespace Uptime.Connections
 
         public bool TryActivateProbe(string linkId, string command, out string result)
         {
-            if (RunEnded) { result = "CORE BREACHED: restart the run."; return false; }
+            if (RunEnded) { result = RunEndedMessage; return false; }
             PhysicalLinkReference selected = null;
             if (!string.IsNullOrWhiteSpace(linkId) && physicalLinks != null)
                 foreach (PhysicalLinkReference link in physicalLinks)
@@ -1281,7 +1293,7 @@ namespace Uptime.Connections
 
         public bool TryActivateOverclock(string nodeId, string command, out string result)
         {
-            if (RunEnded) { result = "CORE BREACHED: restart the run."; return false; }
+            if (RunEnded) { result = RunEndedMessage; return false; }
             NodeResources target = FindNodeResources(nodeId);
             string reason = target == null ? "unknown_node" :
                 overclockedNode != null ? "busy" :

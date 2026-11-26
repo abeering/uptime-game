@@ -69,6 +69,7 @@ namespace Uptime.Connections.EditorTools
             traffic.RandomizeSeed = false; traffic.Seed = seed;
             traffic.AutoGenerationEnabled = trafficEnabled;
             typeof(ConnectionsDuelDirector).GetMethod("OnEnable", Private).Invoke(host.GetComponent<ConnectionsDuelDirector>(), null);
+            Set(host, "shiftEnabled", false); // Historical mechanics fixture.
             configure?.Invoke(host);
             host.ResetSimulation();
             host.Recorder.BeginRun();

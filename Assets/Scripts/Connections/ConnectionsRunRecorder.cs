@@ -13,7 +13,7 @@ namespace Uptime.Connections
 {
     [Serializable] public sealed class ConnectionsRunLog
     {
-        public int schemaVersion = 3;
+        public int schemaVersion = 4;
         public RunMetadata run;
         public List<RunEvent> events = new List<RunEvent>();
         public List<NetworkSnapshot> snapshots = new List<NetworkSnapshot>();
@@ -21,6 +21,11 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunMetadata
     {
+        public bool shiftEnabled;
+        public float shiftWorkTarget;
+        public int businessFailureLimit;
+        public string businessWorkPolicy;
+        public ShiftSnapshot finalShift;
         public string runId;
         public string startedUtc;
         public string endedUtc;
@@ -178,6 +183,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public ShiftSnapshot shift;
+        public double businessWork, creditedWork;
         public float serviceNominalDurationSeconds, serviceBudgetSeconds, serviceDeadlineSeconds;
         public float terminationRequiredWork;
         public int completedOperationCount, legitimateFailureTotal, businessFailureUnits;
@@ -437,6 +444,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public ShiftSnapshot shift;
         public IntegritySnapshot integrity;
         public HackerDirectiveSnapshot hackerDirective;
         public float timeSeconds;
@@ -549,6 +557,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionSnapshot
     {
+        public double businessWorkValue;
         public string id;
         public string lifecycle;
         public int operationIndex;
@@ -629,6 +638,10 @@ namespace Uptime.Connections
                 log.run.hackerCommitmentSeconds = directives.CommitmentSeconds;
                 log.run.hackerPreferenceProbability = directives.PreferenceProbability;
             }
+            log.run.shiftEnabled = host.ShiftEnabled;
+            log.run.shiftWorkTarget = host.ShiftWorkTarget;
+            log.run.businessFailureLimit = host.BusinessFailureLimit;
+            log.run.businessWorkPolicy = "completed_legitimate_connection_authored_work";
             log.run.integrityEnabled = host.IntegrityEnabled;
             if (host.Integrity != null)
             {
@@ -1462,6 +1475,23 @@ namespace Uptime.Connections
             entry.reason = decision.reason;
         }
 
+        public void RecordWorkCredit(BusinessWorkCredit receipt)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("business_work_credit", receipt.TimeSeconds);
+            entry.connectionId = receipt.ConnectionId;
+            entry.operationIndex = -1; // Whole job, never an operation-credit key.
+            entry.businessWork = receipt.Work; entry.creditedWork = receipt.CumulativeWork;
+        }
+
+        public void RecordShiftEnded(ShiftSnapshot state)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("shift_ended", state.timeSeconds);
+            entry.shift = state; entry.reason = state.ending;
+            log.run.finalShift = state;
+        }
+
         public void RecordIntegrity(IntegrityEvent occurrence)
         {
             if (!IsRecording) return;
@@ -1487,6 +1517,7 @@ namespace Uptime.Connections
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
                 legitimateFailureTotal = host.LegitimateFailureCount,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
+            snapshot.shift = host.Shift;
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
             if (directives != null && directives.isActiveAndEnabled && host.IntegrityEnabled)
@@ -1595,6 +1626,7 @@ namespace Uptime.Connections
                 }
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
+                    businessWorkValue = state.BusinessWorkValue,
                     serviceDeadlineSeconds = state.ServiceDeadlineSeconds,
                     serviceRemainingSeconds = state.ServiceRemainingSeconds,
                     projectedServiceSeconds = float.IsPositiveInfinity(state.ProjectedServiceSeconds) ? -1f : state.ProjectedServiceSeconds,

@@ -1,0 +1,3 @@
+scene,plans,min_business_work,median_business_work,max_business_work,mean_business_work,target,failures
+Connections,200,36.21,58.578,347.35,101.422,1000,10
+ConnectionsAdvanced,200,19.216,58.335,328.889,87.926,1500,10

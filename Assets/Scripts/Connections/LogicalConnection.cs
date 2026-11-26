@@ -386,6 +386,7 @@ namespace Uptime.Connections
             PhysicalLinkReference[] routeLinks, NodeResources targetResources)
         {
             Definition = definition;
+            for (int i = 0; i < definition.OperationCount; i++) BusinessWorkValue += definition.WorkAt(i);
             RouteLinks = routeLinks;
             TargetResources = targetResources;
             deliveredEffects = new bool[definition.OperationCount];
@@ -415,6 +416,9 @@ namespace Uptime.Connections
                 definition.IdentityHopSeconds, definition.IdentitySeed, definition.IdentityMode);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
+
+        // Fixed concrete plan value, including sampled recipe anomalies, before runtime modifiers.
+        public double BusinessWorkValue { get; }
 
         private readonly bool[] deliveredEffects;
         private readonly LogMilestone[][] logMilestones;

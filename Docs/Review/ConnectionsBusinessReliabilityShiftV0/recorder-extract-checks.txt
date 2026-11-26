@@ -1,0 +1,10 @@
+PASS Connections-complete.json: ShiftComplete, WORK 200.0, failures 0; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 20 original events retained.
+PASS Connections-core.json: CoreBreached, WORK 0.0, failures 0; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 12 original events retained.
+PASS Connections-failed-arc.json: Fired, WORK 0.0, failures 1; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 15 original events retained.
+PASS Connections-fired.json: Fired, WORK 0.0, failures 2; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 57 original events retained.
+PASS Connections-just-in-time.json: ShiftComplete, WORK 400.0, failures 1; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 74 original events retained.
+PASS ConnectionsAdvanced-complete.json: ShiftComplete, WORK 200.0, failures 0; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 21 original events retained.
+PASS ConnectionsAdvanced-core.json: CoreBreached, WORK 0.0, failures 0; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 13 original events retained.
+PASS ConnectionsAdvanced-failed-arc.json: Fired, WORK 0.0, failures 1; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 16 original events retained.
+PASS ConnectionsAdvanced-fired.json: Fired, WORK 0.0, failures 2; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 59 original events retained.
+PASS ConnectionsAdvanced-just-in-time.json: ShiftComplete, WORK 400.0, failures 1; unique canonical whole-job credits, no duplicated failures, one terminal event, matching final snapshot; 77 original events retained.

@@ -26,6 +26,7 @@ namespace Uptime.Connections.EditorTools
             EditorSceneManager.OpenScene(scene);
             var host = UnityEngine.Object.FindFirstObjectByType<SimulationHost>();
             host.enabled = false;
+            Set(host, "shiftEnabled", false); // Service mechanics independently of shift outcomes.
             Check(host.ServiceTimeoutsEnabled, scene + " authored service enforcement enabled");
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             traffic.AutoGenerationEnabled = false; traffic.HostileGenerationEnabled = false;

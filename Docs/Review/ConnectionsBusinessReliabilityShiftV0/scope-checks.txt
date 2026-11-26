@@ -1,0 +1,153 @@
+Validation scope against accepted main 4c099d76328c12bc64240f0607b0066b3be3e90b.
+PASS current implementation branch created from that baseline.
+PASS unchanged: Assets/Scripts/Connections/ResourceAllocator.cs
+PASS unchanged: Assets/Scripts/Connections/SimulationHost.Service.cs
+PASS unchanged: Assets/Scenes/GameScene.unity
+PASS unchanged: Assets/Scenes/ABScene.unity
+PASS unchanged: Assets/Scenes/ConnectionsDisplayLab.unity
+PASS unchanged: Assets/Prefabs/Connections/CleanOverlay.prefab
+PASS unchanged: Assets/Prefabs/Connections/CleanOverlay.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/ConnectionDebugReadout.prefab
+PASS unchanged: Assets/Prefabs/Connections/ConnectionDebugReadout.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/Display.meta
+PASS unchanged: Assets/Prefabs/Connections/Display/ConnectionDisplay.prefab
+PASS unchanged: Assets/Prefabs/Connections/Display/ConnectionDisplay.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayIdentityPill.prefab
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayIdentityPill.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayLabSample.prefab
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayLabSample.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayStyle.asset
+PASS unchanged: Assets/Prefabs/Connections/Display/DisplayStyle.asset.meta
+PASS unchanged: Assets/Prefabs/Connections/Display/GameplayConnection.prefab
+PASS unchanged: Assets/Prefabs/Connections/Display/GameplayConnection.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/DockedTitlebar.prefab
+PASS unchanged: Assets/Prefabs/Connections/DockedTitlebar.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/DockedWindowFrame.prefab
+PASS unchanged: Assets/Prefabs/Connections/DockedWindowFrame.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/DuelOverlay.prefab
+PASS unchanged: Assets/Prefabs/Connections/DuelOverlay.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/IdentityPill.prefab
+PASS unchanged: Assets/Prefabs/Connections/IdentityPill.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/InspectOperationToken.prefab
+PASS unchanged: Assets/Prefabs/Connections/InspectOperationToken.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/InspectOutput.prefab
+PASS unchanged: Assets/Prefabs/Connections/InspectOutput.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LinkResourceReadout.prefab
+PASS unchanged: Assets/Prefabs/Connections/LinkResourceReadout.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LoadOutput.prefab
+PASS unchanged: Assets/Prefabs/Connections/LoadOutput.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LoadRequestRow.prefab
+PASS unchanged: Assets/Prefabs/Connections/LoadRequestRow.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LogicalPath.prefab
+PASS unchanged: Assets/Prefabs/Connections/LogicalPath.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LogsEntryRow.prefab
+PASS unchanged: Assets/Prefabs/Connections/LogsEntryRow.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/LogsOutput.prefab
+PASS unchanged: Assets/Prefabs/Connections/LogsOutput.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/NetworkHealthPanel.prefab
+PASS unchanged: Assets/Prefabs/Connections/NetworkHealthPanel.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/NodeEventStamp.prefab
+PASS unchanged: Assets/Prefabs/Connections/NodeEventStamp.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/NodeResourceReadout.prefab
+PASS unchanged: Assets/Prefabs/Connections/NodeResourceReadout.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/NodeStatus.prefab
+PASS unchanged: Assets/Prefabs/Connections/NodeStatus.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/NodeStatusIntegrity.prefab
+PASS unchanged: Assets/Prefabs/Connections/NodeStatusIntegrity.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/PayloadBody.prefab
+PASS unchanged: Assets/Prefabs/Connections/PayloadBody.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/PlaceholderBlock.prefab
+PASS unchanged: Assets/Prefabs/Connections/PlaceholderBlock.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/ProbeRegion.prefab
+PASS unchanged: Assets/Prefabs/Connections/ProbeRegion.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/ResolvedInspectRow.prefab
+PASS unchanged: Assets/Prefabs/Connections/ResolvedInspectRow.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/ScanOutput.prefab
+PASS unchanged: Assets/Prefabs/Connections/ScanOutput.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/TerminalMarker.prefab
+PASS unchanged: Assets/Prefabs/Connections/TerminalMarker.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/TextCommunicationEntry.prefab
+PASS unchanged: Assets/Prefabs/Connections/TextCommunicationEntry.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/TextRow.prefab
+PASS unchanged: Assets/Prefabs/Connections/TextRow.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/VideoCall.prefab
+PASS unchanged: Assets/Prefabs/Connections/VideoCall.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/WorkOutput.prefab
+PASS unchanged: Assets/Prefabs/Connections/WorkOutput.prefab.meta
+PASS unchanged: Assets/Prefabs/Connections/WorkRequestRow.prefab
+PASS unchanged: Assets/Prefabs/Connections/WorkRequestRow.prefab.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayGraphic.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayGraphic.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayLab.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayLab.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayLabSample.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayLabSample.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayState.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayState.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayStyle.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayStyle.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayView.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionDisplayView.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionGameplayDisplay.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionGameplayDisplay.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionHeartbeat.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionHeartbeat.cs.meta
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionProgressPillGraphic.cs
+PASS unchanged: Assets/Scripts/Connections/Display/ConnectionProgressPillGraphic.cs.meta
+PASS unchanged: Assets/Shaders/ConnectionsDisplay.meta
+PASS unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.mat
+PASS unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.mat.meta
+PASS unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.shader
+PASS unchanged: Assets/Shaders/ConnectionsDisplay/ProgressPill.shader.meta
+PASS unchanged: Assets/Shaders/ConnectionsLine.mat
+PASS unchanged: Assets/Shaders/ConnectionsLine.mat.meta
+PASS unchanged: Assets/Shaders/ConnectionsLine.shader
+PASS unchanged: Assets/Shaders/ConnectionsLine.shader.meta
+PASS unchanged: Assets/Shaders/ConnectionsPill.mat
+PASS unchanged: Assets/Shaders/ConnectionsPill.mat.meta
+PASS unchanged: Assets/Shaders/ConnectionsPill.shader
+PASS unchanged: Assets/Shaders/ConnectionsPill.shader.meta
+PASS unchanged: Assets/Shaders/GlitchOverlay.mat
+PASS unchanged: Assets/Shaders/GlitchOverlay.mat.meta
+PASS unchanged: Assets/Shaders/GlitchOverlay.shader
+PASS unchanged: Assets/Shaders/GlitchOverlay.shader.meta
+PASS unchanged: Assets/Shaders/GlitchOverlayV2.mat
+PASS unchanged: Assets/Shaders/GlitchOverlayV2.mat.meta
+PASS unchanged: Assets/Shaders/GlitchOverlayv2.shader
+PASS unchanged: Assets/Shaders/GlitchOverlayv2.shader.meta
+PASS unchanged: Assets/Shaders/PacketBorderFX.mat
+PASS unchanged: Assets/Shaders/PacketBorderFX.mat.meta
+PASS unchanged: Assets/Shaders/PacketBorderFX.shader
+PASS unchanged: Assets/Shaders/PacketBorderFX.shader.meta
+PASS unchanged: Assets/Shaders/PacketBorderGlow.mat
+PASS unchanged: Assets/Shaders/PacketBorderGlow.mat.meta
+PASS unchanged: Assets/Shaders/PacketBorderGlow.shader
+PASS unchanged: Assets/Shaders/PacketBorderGlow.shader.meta
+PASS unchanged: Assets/Shaders/PacketBorderGlowV2.mat
+PASS unchanged: Assets/Shaders/PacketBorderGlowV2.mat.meta
+PASS unchanged: Assets/Shaders/PacketBorderGlowv2.shader
+PASS unchanged: Assets/Shaders/PacketBorderGlowv2.shader.meta
+PASS unchanged: Assets/Shaders/PacketBorderV3.mat
+PASS unchanged: Assets/Shaders/PacketBorderV3.mat.meta
+PASS unchanged: Assets/Shaders/PacketBorderv3.shader
+PASS unchanged: Assets/Shaders/PacketBorderv3.shader.meta
+PASS unchanged: Assets/Shaders/PacketEdgeFill.shadergraph
+PASS unchanged: Assets/Shaders/PacketEdgeFill.shadergraph.meta
+PASS unchanged: Assets/Shaders/PacketEdgeFill_Mat.mat
+PASS unchanged: Assets/Shaders/PacketEdgeFill_Mat.mat.meta
+PASS unchanged scene object IDs/count: Assets/Scenes/Connections.unity
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!114 &449929704
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!1001 &1706645207
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!224 &1967539332
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!114 &1996901015
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!114 &1996901043
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!114 &574266361
+INFO changed serialized block Assets/Scenes/Connections.unity --- !u!224 &574266363
+PASS unchanged scene object IDs/count: Assets/Scenes/ConnectionsAdvanced.unity
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!224 &277413637
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!114 &599793742
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!1001 &1706645207
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!114 &1996901015
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!114 &1996901043
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!114 &256346858
+INFO changed serialized block Assets/Scenes/ConnectionsAdvanced.unity --- !u!224 &256346860

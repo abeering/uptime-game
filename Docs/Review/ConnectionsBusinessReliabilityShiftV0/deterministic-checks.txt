@@ -1,0 +1,88 @@
+PASS Assets/Scenes/Connections.unity initial objectives
+PASS Assets/Scenes/Connections.unity first operation grants no business credit
+PASS Assets/Scenes/Connections.unity second operation grants no business credit
+PASS Assets/Scenes/Connections.unity whole arc credit: expected 200, observed 200
+PASS Assets/Scenes/Connections.unity exact successful job receipt
+PASS Assets/Scenes/Connections.unity canonical whole-job receipt follows completed resolution, distinct from operation evidence
+PASS Assets/Scenes/Connections.unity duplicate resolution cannot recredit: expected 200, observed 200
+PASS Assets/Scenes/Connections.unity hostile completion excluded: expected 200, observed 200
+PASS Assets/Scenes/Connections.unity success and coarse-step early stop
+PASS Assets/Scenes/Connections.unity frozen and recorder finalized
+PASS Assets/Scenes/Connections.unity failure boundary dismissal
+PASS Assets/Scenes/Connections.unity complete reset
+PASS Assets/Scenes/Connections.unity fixed authored business value: expected 40, observed 40
+PASS Assets/Scenes/Connections.unity processing modifier does not inflate credit; resolution=Completed, processing=50, credit=40
+PASS Assets/Scenes/Connections.unity cheaper processing retains business value
+PASS Assets/Scenes/Connections.unity two completed operations still grant zero
+PASS Assets/Scenes/Connections.unity failed multi-operation job loses whole credit and counts one failure
+PASS Assets/Scenes/Connections.unity simultaneous timeouts settle before failure-limit ending
+PASS Assets/Scenes/Connections.unity existing failure receipts are not duplicated and result recorded once
+PASS Assets/Scenes/Connections.unity failure beats same-boundary success independent of ID/order and observer callbacks
+PASS Assets/Scenes/Connections.unity final recorder retains both successful WORK and failure
+PASS Assets/Scenes/Connections.unity failure beats same-boundary success independent of ID/order and observer callbacks
+PASS Assets/Scenes/Connections.unity final recorder retains both successful WORK and failure
+PASS Assets/Scenes/Connections.unity exact-deadline completion succeeds before timeout at identical authoritative time
+PASS Assets/Scenes/Connections.unity elapsed time beyond six minutes does not end an empty shift
+PASS Assets/Scenes/Connections.unity recorder-disabled authoritative credit
+PASS Assets/Scenes/Connections.unity exact deterministic accounting/reset replay with reused canonical ID
+PASS Assets/Scenes/Connections.unity frozen unfinished job is not failed or partially credited
+PASS Assets/Scenes/Connections.unity ended simulation and direct mutation gates
+PASS Assets/Scenes/Connections.unity post-ending infection/Overclock/isolation rejected
+PASS Assets/Scenes/Connections.unity post-ending traffic queue rejected before mutation
+PASS Assets/Scenes/Connections.unity whole interruption batch settled before firing: isolation
+PASS Assets/Scenes/Connections.unity interruption uses one existing receipt per job
+PASS Assets/Scenes/Connections.unity whole interruption batch settled before firing: Blackout
+PASS Assets/Scenes/Connections.unity interruption uses one existing receipt per job
+PASS Assets/Scenes/Connections.unity ending preserves diagnostic sessions without fabricated cancellation/concession
+PASS Assets/Scenes/Connections.unity exactly one clean Duel abort receipt
+PASS Assets/Scenes/Connections.unity just-in-time fixture reaches both objective margins
+PASS Assets/Scenes/Connections.unity real operator intervention changes just-in-time outcome; Overclock=False
+PASS Assets/Scenes/Connections.unity just-in-time fixture reaches both objective margins
+PASS Assets/Scenes/Connections.unity real operator intervention changes just-in-time outcome; Overclock=True
+PASS Assets/Scenes/Connections.unity real physical path prepared one strike short of CORE
+PASS Assets/Scenes/Connections.unity CORE beats simultaneous failure limit and WORK success without dropping receipts
+PASS Assets/Scenes/Connections.unity CORE finalizes unified recorder exactly once
+PASS Assets/Scenes/ConnectionsAdvanced.unity initial objectives
+PASS Assets/Scenes/ConnectionsAdvanced.unity first operation grants no business credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity second operation grants no business credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity whole arc credit: expected 200, observed 200
+PASS Assets/Scenes/ConnectionsAdvanced.unity exact successful job receipt
+PASS Assets/Scenes/ConnectionsAdvanced.unity canonical whole-job receipt follows completed resolution, distinct from operation evidence
+PASS Assets/Scenes/ConnectionsAdvanced.unity duplicate resolution cannot recredit: expected 200, observed 200
+PASS Assets/Scenes/ConnectionsAdvanced.unity hostile completion excluded: expected 200, observed 200
+PASS Assets/Scenes/ConnectionsAdvanced.unity success and coarse-step early stop
+PASS Assets/Scenes/ConnectionsAdvanced.unity frozen and recorder finalized
+PASS Assets/Scenes/ConnectionsAdvanced.unity failure boundary dismissal
+PASS Assets/Scenes/ConnectionsAdvanced.unity complete reset
+PASS Assets/Scenes/ConnectionsAdvanced.unity fixed authored business value: expected 40, observed 40
+PASS Assets/Scenes/ConnectionsAdvanced.unity processing modifier does not inflate credit; resolution=Completed, processing=50, credit=40
+PASS Assets/Scenes/ConnectionsAdvanced.unity cheaper processing retains business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity two completed operations still grant zero
+PASS Assets/Scenes/ConnectionsAdvanced.unity failed multi-operation job loses whole credit and counts one failure
+PASS Assets/Scenes/ConnectionsAdvanced.unity simultaneous timeouts settle before failure-limit ending
+PASS Assets/Scenes/ConnectionsAdvanced.unity existing failure receipts are not duplicated and result recorded once
+PASS Assets/Scenes/ConnectionsAdvanced.unity failure beats same-boundary success independent of ID/order and observer callbacks
+PASS Assets/Scenes/ConnectionsAdvanced.unity final recorder retains both successful WORK and failure
+PASS Assets/Scenes/ConnectionsAdvanced.unity failure beats same-boundary success independent of ID/order and observer callbacks
+PASS Assets/Scenes/ConnectionsAdvanced.unity final recorder retains both successful WORK and failure
+PASS Assets/Scenes/ConnectionsAdvanced.unity exact-deadline completion succeeds before timeout at identical authoritative time
+PASS Assets/Scenes/ConnectionsAdvanced.unity elapsed time beyond six minutes does not end an empty shift
+PASS Assets/Scenes/ConnectionsAdvanced.unity recorder-disabled authoritative credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity exact deterministic accounting/reset replay with reused canonical ID
+PASS Assets/Scenes/ConnectionsAdvanced.unity frozen unfinished job is not failed or partially credited
+PASS Assets/Scenes/ConnectionsAdvanced.unity ended simulation and direct mutation gates
+PASS Assets/Scenes/ConnectionsAdvanced.unity post-ending infection/Overclock/isolation rejected
+PASS Assets/Scenes/ConnectionsAdvanced.unity post-ending traffic queue rejected before mutation
+PASS Assets/Scenes/ConnectionsAdvanced.unity whole interruption batch settled before firing: isolation
+PASS Assets/Scenes/ConnectionsAdvanced.unity interruption uses one existing receipt per job
+PASS Assets/Scenes/ConnectionsAdvanced.unity whole interruption batch settled before firing: Blackout
+PASS Assets/Scenes/ConnectionsAdvanced.unity interruption uses one existing receipt per job
+PASS Assets/Scenes/ConnectionsAdvanced.unity ending preserves diagnostic sessions without fabricated cancellation/concession
+PASS Assets/Scenes/ConnectionsAdvanced.unity exactly one clean Duel abort receipt
+PASS Assets/Scenes/ConnectionsAdvanced.unity just-in-time fixture reaches both objective margins
+PASS Assets/Scenes/ConnectionsAdvanced.unity real operator intervention changes just-in-time outcome; Overclock=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity just-in-time fixture reaches both objective margins
+PASS Assets/Scenes/ConnectionsAdvanced.unity real operator intervention changes just-in-time outcome; Overclock=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity real physical path prepared one strike short of CORE
+PASS Assets/Scenes/ConnectionsAdvanced.unity CORE beats simultaneous failure limit and WORK success without dropping receipts
+PASS Assets/Scenes/ConnectionsAdvanced.unity CORE finalizes unified recorder exactly once
