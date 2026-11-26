@@ -6,6 +6,16 @@
 - trace/block (separate later investigation work)
 - logs (separate later investigation work)
 
+## TODO — Irregular ambient hostile clustering
+
+The current hostile stream has a seeded exponential wait between opportunities, with one hostile activity selected per opportunity. That already allows close arrivals and lulls, but in play it may still feel like a measured trickle of isolated threats.
+
+Explore **occasional random clusters**: several hostile activities may arrive together or within a short, variable window, with quieter stretches elsewhere. Allow mixed threat types, not just multiple ordinary connections. This is ambient unpredictability, **not** a substitute for deliberate, coordinated Level Director incidents.
+
+Keep total expected hostile pressure independently tunable from its *burstiness*, so adding clusters does not automatically raise average threat volume. Preserve seeded replay and recorder provenance. Compare overlap, quiet stretches, and concurrent attention demands in playtests before choosing a distribution, cap, or implementation.
+
+See [Ambient Hostile Activity V2](Docs/Connections/connections-ambient-hostile-activity-v2.md#future-experiment-clustered-hostile-opportunities). **Exploration only; no selected scheduling change.**
+
 # TODO — WAVING / Natural LOAD Noise
 
 WAVING V0 works well, but the one-decimal LOAD readout can feel metronomic because its changes occur at predictable intervals.
