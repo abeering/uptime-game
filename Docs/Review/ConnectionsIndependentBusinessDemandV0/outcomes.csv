@@ -1,0 +1,9 @@
+scene,scenario,observed_seconds,materialized_jobs,arrived,admitted,business_failures,credited_work,completed,timed_out,killed,canceled
+Connections,healthy,119.9919,4,4,4,0,36.2100410461426,1,0,0,0
+Connections,congested,119.9919,4,4,4,1,0,0,1,0,0
+Connections,kill,119.9919,4,4,4,4,0,0,0,4,0
+Connections,outage,119.9919,4,4,4,4,0,0,0,0,4
+ConnectionsAdvanced,healthy,119.9919,5,5,5,0,63.5066909790039,1,0,0,0
+ConnectionsAdvanced,congested,119.9919,5,5,5,0,0,0,0,0,0
+ConnectionsAdvanced,kill,119.9919,5,5,5,5,0,0,0,5,0
+ConnectionsAdvanced,outage,119.9919,5,5,5,5,0,0,0,0,5

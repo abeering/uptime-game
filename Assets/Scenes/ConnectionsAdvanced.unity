@@ -13500,14 +13500,7 @@ MonoBehaviour:
   seed: 1701
   randomizeSeed: 1
   initialGraceSeconds: 3
-  benignPopulationGoal: 4
-  coverageStartupGoal: 1
-  coverageRampSeconds: 75
-  coverageMeanIntervalSeconds: 8
-  coverageResponse: 0.6
-  coverageCancellationMemorySeconds: 60
-  coverageAtGoalChance: 0.12
-  coverageOutageRetryMaxSeconds: 20
+  legitimateMeanArrivalSeconds: 18.947369
   ambientOriginId: EXT1
   ambientOrigins:
   - nodeId: EXT1

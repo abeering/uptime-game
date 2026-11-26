@@ -97,8 +97,7 @@ namespace Uptime.Connections.EditorTools
                 director.EffectiveAmbientOrigins[1].nodeId == "EXT2" &&
                 Mathf.Approximately(director.EffectiveAmbientOrigins[1].weight, 0.4f),
                 "weighted dual ingress");
-            Check(director.BenignPopulationGoal == 4f && director.CoverageStartupGoal == 1f &&
-                director.CoverageRampSeconds == 75f &&
+            Check(director.LegitimateMeanArrivalSeconds > 0 &&
                 director.HostileMeanIntervalSeconds == 30f,
                 "population and hostile scheduling");
             director.ResetDirector();

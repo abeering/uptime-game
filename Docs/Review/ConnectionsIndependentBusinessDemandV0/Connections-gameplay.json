@@ -1,0 +1,1874 @@
+{
+    "scene": "Connections",
+    "seed": 1701,
+    "workload": 2.5,
+    "traffic": {
+        "legitimateArrivalPolicy": "IndependentBusinessDemand",
+        "legitimateMeanArrivalSeconds": 23.225807189941408,
+        "autoGenerationEnabled": true,
+        "ambientOriginId": "EXT1",
+        "ambientOrigins": [
+            {
+                "nodeId": "EXT1",
+                "weight": 1.0
+            }
+        ],
+        "openingGraceSeconds": 3.0,
+        "hostileGenerationEnabled": true,
+        "hostileMeanIntervalSeconds": 54.0,
+        "ambientIdentityHopChance": 0.10000000149011612,
+        "ambientIdentityReactiveChance": 0.10000000149011612,
+        "ordinaryActivityWeight": 4.0,
+        "reconnaissanceActivityWeight": 2.0,
+        "payloadActivityWeight": 2.0,
+        "wormActivityWeight": 1.0,
+        "payloadLauncherActivityWeight": 1.0,
+        "variablePayloadChance": 0.5,
+        "scanJammedWormChance": 0.699999988079071,
+        "backdoorWormChance": 0.0,
+        "reconnaissanceFollowupChance": 0.4000000059604645,
+        "reconnaissanceFollowupDelaySeconds": 8.0,
+        "portScanLoad": 4.0,
+        "portScanWork": 28.0,
+        "portScannedSeconds": 20.0,
+        "benignPopulationGoal": 0.0,
+        "coverageStartupGoal": 0.0,
+        "coverageRampSeconds": 0.0,
+        "coverageMeanIntervalSeconds": 0.0,
+        "coverageResponse": 0.0,
+        "coverageCancellationMemorySeconds": 0.0,
+        "coverageAtGoalChance": 0.0,
+        "coverageOutageRetryMaxSeconds": 0.0,
+        "coverageImminentPlanSeconds": 0.0,
+        "coverageCanceledAttemptWeight": 0,
+        "deliveryChance": 0.5,
+        "benignOutlierChance": 0.07999999821186066,
+        "benignWavingOutlierChance": 0.30000001192092898,
+        "secondAnomalyChance": 0.15000000596046449,
+        "subtleDeliveryChance": 0.10000000149011612,
+        "normalWorkSpread": 0.25,
+        "loaderDelayedChance": 0.3499999940395355,
+        "loaderMinAttackCapacityFraction": 0.800000011920929,
+        "loaderMaxAttackCapacityFraction": 1.2000000476837159,
+        "loaderMinOnsetSeconds": 5.0,
+        "loaderMaxOnsetSeconds": 15.0,
+        "loaderSpikeQuietSeconds": 5.0,
+        "loaderSpikeElevatedSeconds": 2.0,
+        "loaderMinDurationSeconds": 30.0,
+        "loaderMaxDurationSeconds": 60.0,
+        "infectorDelayedChance": 0.33000001311302187,
+        "infectorMinDeliverySeconds": 25.0,
+        "infectorMinFinalEvidenceSeconds": 18.0,
+        "infectorHighLoadWeight": 50.0,
+        "infectorLowLoadWeight": 10.0,
+        "infectorOperationWeight": 15.0,
+        "infectorWorkLongWeight": 10.0,
+        "infectorWavingWeight": 15.0,
+        "phantomLoadWeight": 1.0,
+        "blackoutWeight": 1.0,
+        "spawnerWeight": 1.0,
+        "payloadSpawnerWeight": 1.0,
+        "backdoorWeight": 1.0,
+        "profiles": [
+            {
+                "id": "product-lookup",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Product Detail Lookups",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 1.5,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Retrieving product details",
+                        "behaviors": [],
+                        "minimumLoad": 0.5,
+                        "maximumLoad": 1.100000023841858,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 48.0
+                    }
+                ]
+            },
+            {
+                "id": "customer-login",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Customer Authentications",
+                "eligibleTargetIds": [
+                    "AUTH"
+                ],
+                "authoredEligibleTargetIds": [
+                    "AUTH"
+                ],
+                "ambientWeight": 1.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Execute",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Authenticating customer",
+                        "behaviors": [],
+                        "minimumLoad": 0.800000011920929,
+                        "maximumLoad": 1.600000023841858,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 48.0
+                    }
+                ]
+            },
+            {
+                "id": "cart-pricing",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Cart Price Calculations",
+                "eligibleTargetIds": [
+                    "API"
+                ],
+                "authoredEligibleTargetIds": [
+                    "API"
+                ],
+                "ambientWeight": 1.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Execute",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Calculating cart price",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 70.0
+                    }
+                ]
+            },
+            {
+                "id": "order-submit",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Customer Checkouts",
+                "eligibleTargetIds": [
+                    "API"
+                ],
+                "authoredEligibleTargetIds": [
+                    "API"
+                ],
+                "ambientWeight": 0.8999999761581421,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Submitting order",
+                        "behaviors": [],
+                        "minimumLoad": 1.5,
+                        "maximumLoad": 3.0,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 120.0
+                    },
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading order confirmation",
+                        "behaviors": [],
+                        "minimumLoad": 0.6000000238418579,
+                        "maximumLoad": 1.2999999523162842,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 36.0
+                    }
+                ]
+            },
+            {
+                "id": "inventory-sync",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Inventory Reconciliations",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.6000000238418579,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading inventory",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 1.7999999523162842,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 80.0
+                    },
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Updating inventory",
+                        "behaviors": [],
+                        "minimumLoad": 1.7000000476837159,
+                        "maximumLoad": 3.200000047683716,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 130.0
+                    }
+                ]
+            },
+            {
+                "id": "sales-export",
+                "isHostile": false,
+                "purposeTemplate": true,
+                "claimedPurpose": "Sales Report Export",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.25,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Exporting sales report",
+                        "behaviors": [],
+                        "minimumLoad": 2.5,
+                        "maximumLoad": 4.5,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 75.0,
+                        "meanWork": 290.0
+                    }
+                ]
+            },
+            {
+                "id": "logs-checkout-evidence",
+                "isHostile": true,
+                "purposeTemplate": false,
+                "claimedPurpose": "Customer Checkouts",
+                "eligibleTargetIds": [
+                    "API"
+                ],
+                "authoredEligibleTargetIds": [
+                    "API"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Submitting order",
+                        "behaviors": [],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 50.0,
+                        "maximumDurationSeconds": 50.0,
+                        "meanWork": 0.0
+                    },
+                    {
+                        "kind": "Read",
+                        "completionEffect": "InfectionDelivery",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading order confirmation",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 1.0,
+                        "minimumDurationSeconds": 35.0,
+                        "maximumDurationSeconds": 35.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "logs-demo",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Diagnostic Transfer",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading diagnostic sample",
+                        "behaviors": [],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 60.0,
+                        "maximumDurationSeconds": 60.0,
+                        "meanWork": 0.0
+                    },
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing diagnostic summary",
+                        "behaviors": [],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 60.0,
+                        "maximumDurationSeconds": 60.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "retrieval",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Record Retrieval",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading records",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 2.5,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 70.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "indexing",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Record Indexing",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Updating the DB index",
+                        "behaviors": [],
+                        "minimumLoad": 1.5,
+                        "maximumLoad": 3.0,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 35.0,
+                        "meanWork": 0.0
+                    },
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading the updated index",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 2.5,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 35.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "auth",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Customer Authentications",
+                "eligibleTargetIds": [
+                    "AUTH"
+                ],
+                "authoredEligibleTargetIds": [
+                    "AUTH"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Execute",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Processing authentications",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 2.5,
+                        "minimumDurationSeconds": 40.0,
+                        "maximumDurationSeconds": 70.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "updates",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Application Updates",
+                "eligibleTargetIds": [
+                    "API"
+                ],
+                "authoredEligibleTargetIds": [
+                    "API"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Applying updates",
+                        "behaviors": [],
+                        "minimumLoad": 1.5,
+                        "maximumLoad": 3.0,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 35.0,
+                        "meanWork": 0.0
+                    },
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Verifying updates",
+                        "behaviors": [],
+                        "minimumLoad": 1.0,
+                        "maximumLoad": 2.5,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 35.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "quick-lookup",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Quick Record Lookup",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Looking up a record",
+                        "behaviors": [],
+                        "minimumLoad": 0.5,
+                        "maximumLoad": 1.5,
+                        "minimumDurationSeconds": 4.0,
+                        "maximumDurationSeconds": 8.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "payload-launcher",
+                "isHostile": true,
+                "purposeTemplate": false,
+                "claimedPurpose": "Application Updates",
+                "eligibleTargetIds": [
+                    "API"
+                ],
+                "authoredEligibleTargetIds": [
+                    "API"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Execute",
+                        "completionEffect": "PayloadLaunch",
+                        "launchDestinationNodeId": "DB",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Applying service update",
+                        "behaviors": [],
+                        "minimumLoad": 3.0,
+                        "maximumLoad": 3.0,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 20.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "basic-threat",
+                "isHostile": true,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "InfectionDelivery",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [],
+                        "minimumLoad": 12.0,
+                        "maximumLoad": 12.0,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 20.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "delayed-threat",
+                "isHostile": true,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Reading records",
+                        "behaviors": [],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 8.0,
+                        "maximumDurationSeconds": 8.0,
+                        "meanWork": 0.0
+                    },
+                    {
+                        "kind": "Write",
+                        "completionEffect": "InfectionDelivery",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [],
+                        "minimumLoad": 12.0,
+                        "maximumLoad": 12.0,
+                        "minimumDurationSeconds": 20.0,
+                        "maximumDurationSeconds": 20.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "spiking-threat",
+                "isHostile": true,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "InfectionDelivery",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [
+                            {
+                                "id": "SPIKING",
+                                "kind": "Spiking",
+                                "startAfterSeconds": 0.0,
+                                "stopAfterSeconds": 0.0,
+                                "normalIntervalSeconds": 5.0,
+                                "elevatedIntervalSeconds": 2.0,
+                                "spikeInitialDelaySeconds": 5.0,
+                                "minimumLoadOffset": 0.0,
+                                "maximumLoadOffset": 0.0,
+                                "wavePeriodSeconds": 0.0,
+                                "workDelta": 0.0,
+                                "loadDelta": 10.0,
+                                "workRateMultiplier": 1.0
+                            }
+                        ],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 120.0,
+                        "maximumDurationSeconds": 120.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "spiking-benign",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [
+                            {
+                                "id": "SPIKING",
+                                "kind": "Spiking",
+                                "startAfterSeconds": 0.0,
+                                "stopAfterSeconds": 0.0,
+                                "normalIntervalSeconds": 5.0,
+                                "elevatedIntervalSeconds": 2.0,
+                                "spikeInitialDelaySeconds": 5.0,
+                                "minimumLoadOffset": 0.0,
+                                "maximumLoadOffset": 0.0,
+                                "wavePeriodSeconds": 0.0,
+                                "workDelta": 0.0,
+                                "loadDelta": 10.0,
+                                "workRateMultiplier": 1.0
+                            }
+                        ],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 120.0,
+                        "maximumDurationSeconds": 120.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "overload-demo",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [
+                            {
+                                "id": "OVERLOAD",
+                                "kind": "Overload",
+                                "startAfterSeconds": 5.0,
+                                "stopAfterSeconds": 0.0,
+                                "normalIntervalSeconds": 0.0,
+                                "elevatedIntervalSeconds": 0.0,
+                                "spikeInitialDelaySeconds": 0.0,
+                                "minimumLoadOffset": 0.0,
+                                "maximumLoadOffset": 0.0,
+                                "wavePeriodSeconds": 0.0,
+                                "workDelta": 0.0,
+                                "loadDelta": 10.0,
+                                "workRateMultiplier": 1.0
+                            }
+                        ],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 120.0,
+                        "maximumDurationSeconds": 120.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "waving-moderate",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [
+                            {
+                                "id": "WAVING_MODERATE",
+                                "kind": "Waving",
+                                "startAfterSeconds": 3.0,
+                                "stopAfterSeconds": 0.0,
+                                "normalIntervalSeconds": 0.0,
+                                "elevatedIntervalSeconds": 0.0,
+                                "spikeInitialDelaySeconds": 0.0,
+                                "minimumLoadOffset": -1.0,
+                                "maximumLoadOffset": 1.0,
+                                "wavePeriodSeconds": 20.0,
+                                "workDelta": 0.0,
+                                "loadDelta": 0.0,
+                                "workRateMultiplier": 1.0
+                            }
+                        ],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 180.0,
+                        "maximumDurationSeconds": 180.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            },
+            {
+                "id": "waving-strong",
+                "isHostile": false,
+                "purposeTemplate": false,
+                "claimedPurpose": "Database Maintenance",
+                "eligibleTargetIds": [
+                    "DB"
+                ],
+                "authoredEligibleTargetIds": [
+                    "DB"
+                ],
+                "ambientWeight": 0.0,
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "Steady",
+                        "activityDescription": "Writing records",
+                        "behaviors": [
+                            {
+                                "id": "WAVING_STRONG",
+                                "kind": "Waving",
+                                "startAfterSeconds": 3.0,
+                                "stopAfterSeconds": 0.0,
+                                "normalIntervalSeconds": 0.0,
+                                "elevatedIntervalSeconds": 0.0,
+                                "spikeInitialDelaySeconds": 0.0,
+                                "minimumLoadOffset": 0.0,
+                                "maximumLoadOffset": 8.0,
+                                "wavePeriodSeconds": 30.0,
+                                "workDelta": 0.0,
+                                "loadDelta": 0.0,
+                                "workRateMultiplier": 1.0
+                            }
+                        ],
+                        "minimumLoad": 2.0,
+                        "maximumLoad": 2.0,
+                        "minimumDurationSeconds": 360.0,
+                        "maximumDurationSeconds": 360.0,
+                        "meanWork": 0.0
+                    }
+                ]
+            }
+        ]
+    },
+    "demand": {
+        "arrived": 3,
+        "admitted": 3,
+        "waiting": 0,
+        "unadmitted": 0,
+        "nextArrivalAtSeconds": 113.96664592971755
+    },
+    "shift": {
+        "enabled": true,
+        "target": 1000.0,
+        "timeSeconds": 90.01690673828125,
+        "failureLimit": 10,
+        "failures": 0,
+        "completedJobs": 0,
+        "credited": 0.0,
+        "eligible": 583.191593170166,
+        "lost": 0.0,
+        "unfinished": 583.191593170166,
+        "ending": "None",
+        "shiftSucceeded": false,
+        "runFailed": false
+    },
+    "receipts": [
+        {
+            "type": "plan_queued",
+            "id": "m7",
+            "reason": "",
+            "sequence": 0,
+            "idealDue": 0.0,
+            "nextDue": 0.0,
+            "observedAt": 38.44068908691406,
+            "definition": {
+                "businessWorkValue": 413.8685188293457,
+                "profileId": "order-submit",
+                "isHostile": true,
+                "claimedPurpose": "Customer Checkouts",
+                "origin": "EXT1",
+                "target": "API",
+                "route": [
+                    "EXT1",
+                    "API"
+                ],
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Submitting order",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.029999999329447748,
+                                "activity": "checkout.received",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "checkout.validate",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.05000000074505806,
+                                "activity": "payment.authorize",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.14000000059604646,
+                                "activity": "checkout.commit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.17000000178813935,
+                                "activity": "checkout.received",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.18000000715255738,
+                                "activity": "payment.authorize",
+                                "result": "RETRY"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.1899999976158142,
+                                "activity": "payment.authorize",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.20999999344348908,
+                                "activity": "checkout.commit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.5099999904632568,
+                                "activity": "checkout.received",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 9,
+                                "workFraction": 0.5299999713897705,
+                                "activity": "checkout.validate",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 10,
+                                "workFraction": 0.550000011920929,
+                                "activity": "payment.authorize",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 11,
+                                "workFraction": 0.5600000023841858,
+                                "activity": "checkout.commit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 12,
+                                "workFraction": 0.8500000238418579,
+                                "activity": "checkout.batch.flush",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 13,
+                                "workFraction": 0.9200000166893005,
+                                "activity": "checkout.receipt.queue",
+                                "result": "QUEUED"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 7.0648088455200199,
+                        "totalWork": 372.3362731933594,
+                        "nominalDurationSeconds": 52.70294952392578
+                    },
+                    {
+                        "kind": "Read",
+                        "completionEffect": "InfectionDelivery",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "Backdoor",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Reading order confirmation",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "receipt.fetch",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.05000000074505806,
+                                "activity": "checkout.status.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.05999999865889549,
+                                "activity": "receipt.fetch",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.18000000715255738,
+                                "activity": "receipt.fetch",
+                                "result": "RETRY"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.1899999976158142,
+                                "activity": "receipt.fetch",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.4000000059604645,
+                                "activity": "checkout.confirmation.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.7099999785423279,
+                                "activity": "receipt.fetch",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.7200000286102295,
+                                "activity": "checkout.status.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.9300000071525574,
+                                "activity": "checkout.confirmation.read",
+                                "result": "OK"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 0.6353287696838379,
+                        "totalWork": 41.53224563598633,
+                        "nominalDurationSeconds": 65.37126922607422
+                    }
+                ],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": true,
+                "naturalLoadSeed": 1701,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": "Normal"
+            }
+        },
+        {
+            "type": "business_demand_arrived",
+            "id": "f3",
+            "reason": "",
+            "sequence": 1,
+            "idealDue": 40.489770633971328,
+            "nextDue": 55.95996601602435,
+            "observedAt": 40.500736236572269,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        },
+        {
+            "type": "plan_queued",
+            "id": "f3",
+            "reason": "",
+            "sequence": 0,
+            "idealDue": 0.0,
+            "nextDue": 0.0,
+            "observedAt": 40.500736236572269,
+            "definition": {
+                "businessWorkValue": 215.85105895996095,
+                "profileId": "inventory-sync",
+                "isHostile": false,
+                "claimedPurpose": "Inventory Reconciliations",
+                "origin": "EXT1",
+                "target": "DB",
+                "route": [
+                    "EXT1",
+                    "API",
+                    "DB"
+                ],
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Reading inventory",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.019999999552965165,
+                                "activity": "inventory.snapshot.open",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.029999999329447748,
+                                "activity": "inventory.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "inventory.batch.compare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.12999999523162843,
+                                "activity": "inventory.discrepancy.count",
+                                "result": "3"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.14000000059604646,
+                                "activity": "inventory.stock.check",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.2800000011920929,
+                                "activity": "inventory.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.28999999165534975,
+                                "activity": "inventory.batch.compare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.4300000071525574,
+                                "activity": "inventory.discrepancy.count",
+                                "result": "0"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.4399999976158142,
+                                "activity": "inventory.snapshot.verify",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 9,
+                                "workFraction": 0.7200000286102295,
+                                "activity": "inventory.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 10,
+                                "workFraction": 0.9100000262260437,
+                                "activity": "inventory.snapshot.verify",
+                                "result": "OK"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 4.262558937072754,
+                        "totalWork": 159.24362182617188,
+                        "nominalDurationSeconds": 37.35869216918945
+                    },
+                    {
+                        "kind": "Write",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Updating inventory",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.029999999329447748,
+                                "activity": "inventory.delta.prepare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "inventory.delta.apply",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.05000000074505806,
+                                "activity": "inventory.ledger.update",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.1899999976158142,
+                                "activity": "inventory.batch.conflict",
+                                "result": "RETRY"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.20000000298023225,
+                                "activity": "inventory.delta.prepare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.20999999344348908,
+                                "activity": "inventory.delta.apply",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.5299999713897705,
+                                "activity": "inventory.ledger.update",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.5400000214576721,
+                                "activity": "inventory.commit.verify",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.8299999833106995,
+                                "activity": "inventory.reconciliation.commit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 9,
+                                "workFraction": 0.9399999976158142,
+                                "activity": "inventory.commit.verify",
+                                "result": "OK"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 5.073701858520508,
+                        "totalWork": 380.384033203125,
+                        "nominalDurationSeconds": 74.97169494628906
+                    }
+                ],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": true,
+                "naturalLoadSeed": 1701,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": "Normal"
+            }
+        },
+        {
+            "type": "business_demand_admitted",
+            "id": "f3",
+            "reason": "",
+            "sequence": 1,
+            "idealDue": 40.489768981933597,
+            "nextDue": 55.95996601602435,
+            "observedAt": 40.500736236572269,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        },
+        {
+            "type": "business_demand_arrived",
+            "id": "i0",
+            "reason": "",
+            "sequence": 2,
+            "idealDue": 55.95996601602435,
+            "nextDue": 62.05995685769556,
+            "observedAt": 55.961090087890628,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        },
+        {
+            "type": "plan_queued",
+            "id": "i0",
+            "reason": "",
+            "sequence": 0,
+            "idealDue": 0.0,
+            "nextDue": 0.0,
+            "observedAt": 55.961090087890628,
+            "definition": {
+                "businessWorkValue": 36.21004104614258,
+                "profileId": "customer-login",
+                "isHostile": false,
+                "claimedPurpose": "Customer Authentications",
+                "origin": "EXT1",
+                "target": "AUTH",
+                "route": [
+                    "EXT1",
+                    "API",
+                    "AUTH"
+                ],
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Execute",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Authenticating customer",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.019999999552965165,
+                                "activity": "login.attempt",
+                                "result": "START"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.029999999329447748,
+                                "activity": "login.token.parse",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "login.token.verify",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.05000000074505806,
+                                "activity": "login.policy.check",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.14000000059604646,
+                                "activity": "login.session.issue",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.15000000596046449,
+                                "activity": "login.session.validate",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.27000001072883608,
+                                "activity": "login.attempt",
+                                "result": "START"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.2800000011920929,
+                                "activity": "login.token.parse",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.28999999165534975,
+                                "activity": "login.token.verify",
+                                "result": "REJECTED"
+                            },
+                            {
+                                "authoredIndex": 9,
+                                "workFraction": 0.30000001192092898,
+                                "activity": "login.challenge.request",
+                                "result": "START"
+                            },
+                            {
+                                "authoredIndex": 10,
+                                "workFraction": 0.4399999976158142,
+                                "activity": "login.challenge.verify",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 11,
+                                "workFraction": 0.44999998807907107,
+                                "activity": "login.session.issue",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 12,
+                                "workFraction": 0.5799999833106995,
+                                "activity": "login.session.refresh",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 13,
+                                "workFraction": 0.5899999737739563,
+                                "activity": "login.session.validate",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 14,
+                                "workFraction": 0.7200000286102295,
+                                "activity": "login.attempt",
+                                "result": "RETRY"
+                            },
+                            {
+                                "authoredIndex": 15,
+                                "workFraction": 0.7300000190734863,
+                                "activity": "login.token.verify",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 16,
+                                "workFraction": 0.7400000095367432,
+                                "activity": "login.policy.check",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 17,
+                                "workFraction": 0.8600000143051148,
+                                "activity": "login.session.issue",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 18,
+                                "workFraction": 0.8700000047683716,
+                                "activity": "login.session.expire",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 19,
+                                "workFraction": 0.9599999785423279,
+                                "activity": "login.session.validate",
+                                "result": "OK"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 2.2685604095458986,
+                        "totalWork": 90.52510070800781,
+                        "nominalDurationSeconds": 39.904205322265628
+                    }
+                ],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": true,
+                "naturalLoadSeed": 1701,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": "Normal"
+            }
+        },
+        {
+            "type": "business_demand_admitted",
+            "id": "i0",
+            "reason": "",
+            "sequence": 2,
+            "idealDue": 55.959964752197269,
+            "nextDue": 62.05995685769556,
+            "observedAt": 55.961090087890628,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        },
+        {
+            "type": "business_demand_arrived",
+            "id": "g5",
+            "reason": "",
+            "sequence": 3,
+            "idealDue": 62.05995685769556,
+            "nextDue": 113.96664592971755,
+            "observedAt": 62.06122970581055,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        },
+        {
+            "type": "plan_queued",
+            "id": "g5",
+            "reason": "",
+            "sequence": 0,
+            "idealDue": 0.0,
+            "nextDue": 0.0,
+            "observedAt": 62.06122970581055,
+            "definition": {
+                "businessWorkValue": 331.1304931640625,
+                "profileId": "sales-export",
+                "isHostile": false,
+                "claimedPurpose": "Sales Report Export",
+                "origin": "EXT1",
+                "target": "DB",
+                "route": [
+                    "EXT1",
+                    "API",
+                    "DB"
+                ],
+                "connectionBehaviors": [],
+                "operations": [
+                    {
+                        "kind": "Read",
+                        "completionEffect": "None",
+                        "launchDestinationNodeId": "",
+                        "launchMotionProfile": "",
+                        "conditionKind": "",
+                        "conditionDurationSeconds": 0.0,
+                        "infectionKind": "",
+                        "infectionLoad": 0.0,
+                        "infectionCadence": 0.0,
+                        "activityDescription": "Exporting sales report",
+                        "plannedLogs": [
+                            {
+                                "authoredIndex": 0,
+                                "workFraction": 0.019999999552965165,
+                                "activity": "export.job.open",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 1,
+                                "workFraction": 0.029999999329447748,
+                                "activity": "report.query.prepare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 2,
+                                "workFraction": 0.03999999910593033,
+                                "activity": "report.partition.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 3,
+                                "workFraction": 0.11999999731779099,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 4,
+                                "workFraction": 0.12999999523162843,
+                                "activity": "report.aggregate.partial",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 5,
+                                "workFraction": 0.2199999988079071,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 6,
+                                "workFraction": 0.23000000417232514,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 7,
+                                "workFraction": 0.23999999463558198,
+                                "activity": "report.aggregate.partial",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 8,
+                                "workFraction": 0.4000000059604645,
+                                "activity": "report.chunk.emit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 9,
+                                "workFraction": 0.4099999964237213,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 10,
+                                "workFraction": 0.41999998688697817,
+                                "activity": "report.aggregate.partial",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 11,
+                                "workFraction": 0.550000011920929,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 12,
+                                "workFraction": 0.5600000023841858,
+                                "activity": "report.index.seek",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 13,
+                                "workFraction": 0.5699999928474426,
+                                "activity": "report.segment.read",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 14,
+                                "workFraction": 0.5799999833106995,
+                                "activity": "report.aggregate.partial",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 15,
+                                "workFraction": 0.7200000286102295,
+                                "activity": "report.chunk.emit",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 16,
+                                "workFraction": 0.8600000143051148,
+                                "activity": "report.footer.prepare",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 17,
+                                "workFraction": 0.9399999976158142,
+                                "activity": "report.finalize",
+                                "result": "OK"
+                            },
+                            {
+                                "authoredIndex": 18,
+                                "workFraction": 0.9800000190734863,
+                                "activity": "export.job.complete",
+                                "result": "OK"
+                            }
+                        ],
+                        "behaviors": [],
+                        "desiredLoad": 6.924060821533203,
+                        "totalWork": 827.8262329101563,
+                        "nominalDurationSeconds": 119.55790710449219
+                    }
+                ],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": true,
+                "naturalLoadSeed": 1701,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": "Normal"
+            }
+        },
+        {
+            "type": "business_demand_admitted",
+            "id": "g5",
+            "reason": "",
+            "sequence": 3,
+            "idealDue": 62.05995559692383,
+            "nextDue": 113.96664592971755,
+            "observedAt": 62.06122970581055,
+            "definition": {
+                "businessWorkValue": 0.0,
+                "profileId": "",
+                "isHostile": false,
+                "claimedPurpose": "",
+                "origin": "",
+                "target": "",
+                "route": [],
+                "connectionBehaviors": [],
+                "operations": [],
+                "loaderAttack": {
+                    "structure": 0,
+                    "pattern": 0,
+                    "attackOperationIndex": 0,
+                    "targetCapacity": 0.0,
+                    "normalLoad": 0.0,
+                    "attackLoad": 0.0,
+                    "onsetSeconds": 0.0,
+                    "spikeQuietSeconds": 0.0,
+                    "spikeElevatedSeconds": 0.0,
+                    "durationSeconds": 0.0
+                },
+                "naturalLoadNoise": false,
+                "naturalLoadSeed": 0,
+                "identityHopSeconds": 0.0,
+                "identitySeed": 0,
+                "identityMode": ""
+            }
+        }
+    ]
+}

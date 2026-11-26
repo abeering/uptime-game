@@ -69,6 +69,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class TrafficConfiguration
     {
+        public string legitimateArrivalPolicy;
+        public float legitimateMeanArrivalSeconds;
         public bool autoGenerationEnabled;
         public string ambientOriginId;
         public AmbientOriginRecord[] ambientOrigins;
@@ -184,6 +186,9 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public int demandSequence;
+        public double demandDueAtSeconds, demandIntervalSeconds, demandNextAtSeconds;
+        public float demandMeanSeconds;
         public ShiftSnapshot shift;
         public double businessWork, creditedWork;
         public float serviceNominalDurationSeconds, serviceBudgetSeconds, serviceDeadlineSeconds;
@@ -446,6 +451,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public BusinessDemandSnapshot businessDemand;
         public ShiftSnapshot shift;
         public IntegritySnapshot integrity;
         public HackerDirectiveSnapshot hackerDirective;
@@ -782,6 +788,16 @@ namespace Uptime.Connections
             entry.parentInfectionAppliedAtSeconds = plan.ParentInfectionAppliedAtSeconds;
             // A queued plan is complete evidence even if the connection never spawns.
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public void RecordBusinessDemand(string type, int sequence, float observedAt, double dueAt,
+            float mean, double interval, double nextAt, string connectionId, string reason = null)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent(type, observedAt); entry.demandSequence = sequence;
+            entry.demandDueAtSeconds = dueAt; entry.demandMeanSeconds = mean;
+            entry.demandIntervalSeconds = interval; entry.demandNextAtSeconds = nextAt;
+            entry.connectionId = connectionId; entry.reason = reason;
         }
 
         public void RecordCoverageOpportunity(float time, int establishedBenign,
@@ -1521,6 +1537,7 @@ namespace Uptime.Connections
                 legitimateFailureTotal = host.LegitimateFailureCount,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.shift = host.Shift;
+            snapshot.businessDemand = trafficDirector?.BusinessDemand;
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
             if (directives != null && directives.isActiveAndEnabled && host.IntegrityEnabled)
@@ -1701,18 +1718,8 @@ namespace Uptime.Connections
                 hostileMeanIntervalSeconds = trafficDirector.HostileMeanIntervalSeconds,
                 ambientIdentityHopChance = trafficDirector.AmbientIdentityHopChance,
                 ambientIdentityReactiveChance = trafficDirector.AmbientIdentityReactiveChance,
-                benignPopulationGoal = trafficDirector.BenignPopulationGoal,
-                coverageStartupGoal = trafficDirector.CoverageStartupGoal,
-                coverageRampSeconds = trafficDirector.CoverageRampSeconds,
-                coverageMeanIntervalSeconds = trafficDirector.CoverageMeanIntervalSeconds,
-                coverageResponse = trafficDirector.CoverageResponse,
-                coverageCancellationMemorySeconds =
-                    trafficDirector.CoverageCancellationMemorySeconds,
-                coverageAtGoalChance = trafficDirector.CoverageAtGoalChance,
-                coverageOutageRetryMaxSeconds = trafficDirector.CoverageOutageRetryMaxSeconds,
-                coverageImminentPlanSeconds = trafficDirector.CoverageImminentPlanSeconds,
-                coverageCanceledAttemptWeight =
-                    trafficDirector.CoverageCanceledAttemptWeight,
+                legitimateArrivalPolicy = "IndependentBusinessDemand",
+                legitimateMeanArrivalSeconds = trafficDirector.LegitimateMeanArrivalSeconds,
                 deliveryChance = trafficDirector.DeliveryChance,
                 benignOutlierChance = trafficDirector.BenignOutlierChance,
                 benignWavingOutlierChance = trafficDirector.BenignWavingOutlierChance,

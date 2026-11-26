@@ -1,0 +1,17 @@
+Baseline: normal merge of #134 at 98908528099cdde7eb29ed8aa88515fe7e6bfdfc.
+PASS 139 allocator, workload/business-value, service/shift lifecycle, shared visual, Packet and lab files unchanged.
+PASS unchanged method: HostileDelay
+PASS unchanged method: GenerateHostilePlan
+PASS unchanged method: GenerateBenignPlan
+PASS unchanged method: GenerateWeightedPurposePlan
+PASS unchanged method: BuildPlan
+PASS unchanged method: BuildPurposePlan
+PASS unchanged method: ComposeLoader
+PASS unchanged method: ComposeInfector
+PASS unchanged method: QueueSpawnPlan
+PASS Connections: only retired population settings replaced by independent mean; 2.5x workload, capacities, goals, weights/frequency and all other scene values unchanged.
+PASS ConnectionsAdvanced: only retired population settings replaced by independent mean; 2.5x workload, capacities, goals, weights/frequency and all other scene values unchanged.
+PASS Connections gameplay extract: effective configuration, demand accounting and joined concrete plan/admission receipts.
+PASS ConnectionsAdvanced gameplay extract: effective configuration, demand accounting and joined concrete plan/admission receipts.
+PASS final repository Assets exactly match the isolated Unity validation copy after Editor exit.
+PASS final focused witness47 assertions; focused regression set7 groups and graphical10 assertions; no full balance matrix.

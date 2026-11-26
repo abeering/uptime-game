@@ -1,0 +1,47 @@
+PASS Assets/Scenes/Connections.unity accepted authored rates, workload and shift objectives
+PASS Assets/Scenes/Connections.unity healthy real lifecycle completes jobs and earns business WORK
+PASS Assets/Scenes/Connections.unity identical ideal schedules and complete recipes through 120s: healthy vs congested
+PASS Assets/Scenes/Connections.unity actual congestion/interruption with existing resolution ledger: congested
+PASS Assets/Scenes/Connections.unity concrete queued registrations admitted even under congested
+PASS Assets/Scenes/Connections.unity identical ideal schedules and complete recipes through 120s: healthy vs kill
+PASS Assets/Scenes/Connections.unity actual congestion/interruption with existing resolution ledger: kill
+PASS Assets/Scenes/Connections.unity concrete queued registrations admitted even under kill
+PASS Assets/Scenes/Connections.unity identical ideal schedules and complete recipes through 120s: healthy vs outage
+PASS Assets/Scenes/Connections.unity actual congestion/interruption with existing resolution ledger: outage
+PASS Assets/Scenes/Connections.unity concrete queued registrations admitted even under outage
+PASS Assets/Scenes/Connections.unity reset/same seed exact replay
+PASS Assets/Scenes/Connections.unity effective recorder policy/mean/workload
+PASS Assets/Scenes/Connections.unity stochastic waits retain bursts/lulls rather than fixed cadence
+PASS Assets/Scenes/Connections.unity reset of previously active host clears counters and restores the same first due time/seed
+PASS Assets/Scenes/Connections.unity no-purpose generation failure recorded honestly, not a fabricated connection failure
+PASS Assets/Scenes/Connections.unity finite IDs do not stop demand clock or invent a waiting queue
+PASS Assets/Scenes/Connections.unity invalid concrete plan records queue rejection without phantom admission
+PASS Assets/Scenes/Connections.unity explicit ambient disable creates no demand
+PASS Assets/Scenes/Connections.unity re-enable samples fresh wait, no disabled-period catch-up
+PASS Assets/Scenes/Connections.unity authoritative demand works without recording
+PASS Assets/Scenes/Connections.unity real independent demand reaches SHIFT COMPLETE and freezes clock/recorder exactly once
+PASS Assets/Scenes/Connections.unity real independent demand reaches FIRED and freezes clock/recorder exactly once
+PASS Assets/Scenes/ConnectionsAdvanced.unity accepted authored rates, workload and shift objectives
+PASS Assets/Scenes/ConnectionsAdvanced.unity healthy real lifecycle completes jobs and earns business WORK
+PASS Assets/Scenes/ConnectionsAdvanced.unity identical ideal schedules and complete recipes through 120s: healthy vs congested
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual congestion/interruption with existing resolution ledger: congested
+PASS Assets/Scenes/ConnectionsAdvanced.unity concrete queued registrations admitted even under congested
+PASS Assets/Scenes/ConnectionsAdvanced.unity identical ideal schedules and complete recipes through 120s: healthy vs kill
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual congestion/interruption with existing resolution ledger: kill
+PASS Assets/Scenes/ConnectionsAdvanced.unity concrete queued registrations admitted even under kill
+PASS Assets/Scenes/ConnectionsAdvanced.unity identical ideal schedules and complete recipes through 120s: healthy vs outage
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual congestion/interruption with existing resolution ledger: outage
+PASS Assets/Scenes/ConnectionsAdvanced.unity concrete queued registrations admitted even under outage
+PASS Assets/Scenes/ConnectionsAdvanced.unity reset/same seed exact replay
+PASS Assets/Scenes/ConnectionsAdvanced.unity effective recorder policy/mean/workload
+PASS Assets/Scenes/ConnectionsAdvanced.unity stochastic waits retain bursts/lulls rather than fixed cadence
+PASS Assets/Scenes/ConnectionsAdvanced.unity reset of previously active host clears counters and restores the same first due time/seed
+PASS Assets/Scenes/ConnectionsAdvanced.unity no-purpose generation failure recorded honestly, not a fabricated connection failure
+PASS Assets/Scenes/ConnectionsAdvanced.unity finite IDs do not stop demand clock or invent a waiting queue
+PASS Assets/Scenes/ConnectionsAdvanced.unity invalid concrete plan records queue rejection without phantom admission
+PASS Assets/Scenes/ConnectionsAdvanced.unity explicit ambient disable creates no demand
+PASS Assets/Scenes/ConnectionsAdvanced.unity re-enable samples fresh wait, no disabled-period catch-up
+PASS Assets/Scenes/ConnectionsAdvanced.unity authoritative demand works without recording
+PASS Assets/Scenes/ConnectionsAdvanced.unity real independent demand reaches SHIFT COMPLETE and freezes clock/recorder exactly once
+PASS Assets/Scenes/ConnectionsAdvanced.unity real independent demand reaches FIRED and freezes clock/recorder exactly once
+PASS ordinary hostile clock and complete recipes unchanged at equivalent .02s boundaries/capacities when legitimate jobs are killed
