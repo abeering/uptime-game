@@ -1,0 +1,22 @@
+PASS Assets/Scenes/Connections.unity authored workload and objectives enabled
+PASS Assets/Scenes/Connections.unity 1x metadata, live shift and terminal focus
+PASS Assets/Scenes/Connections.unity 1x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/Connections.unity 1x existing allocator/performance treatment
+PASS Assets/Scenes/Connections.unity 1x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/Connections.unity 1x existing allocator/performance treatment
+PASS Assets/Scenes/Connections.unity 1.5x metadata, live shift and terminal focus
+PASS Assets/Scenes/Connections.unity 1.5x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/Connections.unity 1.5x existing allocator/performance treatment
+PASS Assets/Scenes/Connections.unity 1.5x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/Connections.unity 1.5x existing allocator/performance treatment
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored workload and objectives enabled
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x metadata, live shift and terminal focus
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x existing allocator/performance treatment
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x existing allocator/performance treatment
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x metadata, live shift and terminal focus
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x existing allocator/performance treatment
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x two real queued jobs: scaled processing, same business value/budget, no partial credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x existing allocator/performance treatment

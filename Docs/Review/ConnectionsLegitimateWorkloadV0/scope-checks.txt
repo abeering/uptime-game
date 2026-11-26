@@ -1,0 +1,10 @@
+Implementation checkpoint 1135e6c, before the separate native-serialization follow-up described in README.md.
+PASS merged baseline: #132 normal GitHub merge 9ceff51e5e1b4a6a4dd7b6ae61c25a94b54a82fc.
+PASS 96 allocator, service/shift lifecycle, shared visuals and Packet/lab files unchanged against merged baseline.
+PASS canonical scene diffs contain only legitimateWorkloadMultiplier: 1.5; capacities, tolerance, goals, frequency, profiles and weights unchanged.
+PASS complete repository Assets byte-identical to final Unity validation copy after Editor exit.
+PASS deterministic-checks: 452 passing entries.
+PASS graphical-checks: 22 passing entries.
+PASS regression-checks: 5 passing entries.
+KNOWN INHERITED, not rerun in this focused phase: Advanced Overclock compact row, Resource inspect header, stale Generated Identity tuning (#132 evidence).
+CAVEAT graphical Editor startup logs a nonfatal QuickSearch exception; all 22 capture checks complete successfully.

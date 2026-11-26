@@ -12,7 +12,7 @@ The host’s default objective switch is off for historical fixtures/scenes. Tha
 
 ## Business success is a whole connection
 
-`LogicalConnectionState.BusinessWorkValue` is frozen at state construction as a double-precision sum of the concrete definition’s `WorkAt(i)` for every operation. It is not recomputed as processing evolves.
+`LogicalConnectionState.BusinessWorkValue` is frozen from the concrete job’s operation WORK after sampling/anomalies. The [Legitimate Workload Increase V0](connections-legitimate-workload-v0.md) follow-up captures that sum in the generated plan before proportional processing LOAD/WORK scaling and carries it into state; authored definitions retain the sum-of-authored-WORK fallback. It is not recomputed as processing evolves.
 
 - Recipe sampling (`normalWorkSpread`) and generation-time `work-deviation` affect those concrete operation requirements and therefore the job value. A generation-time `operation-deviation` that adds a stage contributes that stage’s concrete WORK.
 - LOAD-only changes, waving/keyword demand, allocation, natural LOAD noise, productivity multipliers and runtime required-WORK modifiers do not change the frozen business value. A 40-WORK job whose runtime processing requirement rises to 50 or falls to 20 still delivers 40 business WORK if it succeeds.

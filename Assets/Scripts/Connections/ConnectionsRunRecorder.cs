@@ -21,6 +21,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunMetadata
     {
+        public float legitimateWorkloadMultiplier;
         public bool shiftEnabled;
         public float shiftWorkTarget;
         public int businessFailureLimit;
@@ -399,6 +400,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionDefinitionRecord
     {
+        public double businessWorkValue;
         public string profileId;
         public bool isHostile;
         public string claimedPurpose;
@@ -639,6 +641,7 @@ namespace Uptime.Connections
                 log.run.hackerPreferenceProbability = directives.PreferenceProbability;
             }
             log.run.shiftEnabled = host.ShiftEnabled;
+            log.run.legitimateWorkloadMultiplier = trafficDirector != null ? trafficDirector.LegitimateWorkloadMultiplier : 1f;
             log.run.shiftWorkTarget = host.ShiftWorkTarget;
             log.run.businessFailureLimit = host.BusinessFailureLimit;
             log.run.businessWorkPolicy = "completed_legitimate_connection_authored_work";
@@ -1798,6 +1801,7 @@ namespace Uptime.Connections
         private static ConnectionDefinitionRecord Definition(LogicalConnectionDefinition definition)
         {
             var result = new ConnectionDefinitionRecord { profileId = definition.ProfileId,
+                businessWorkValue = definition.BusinessWorkValue ?? 0,
                 isHostile = definition.IsHostile,
                 claimedPurpose = definition.ClaimedPurpose,
                 route = new string[definition.Route.Length],
@@ -1815,6 +1819,7 @@ namespace Uptime.Connections
             result.target = result.route[result.route.Length - 1];
             for (int i = 0; i < result.operations.Length; i++)
             {
+                if (!definition.BusinessWorkValue.HasValue) result.businessWorkValue += definition.WorkAt(i);
                 float load = definition.LoadAt(i);
                 result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
                     completionEffect = definition.EffectAt(i).ToString(),

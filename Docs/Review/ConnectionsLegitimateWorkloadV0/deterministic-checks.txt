@@ -1,0 +1,452 @@
+PASS Assets/Scenes/Connections.unity authored 1.5x and accepted objectives
+PASS Assets/Scenes/Connections.unity normal 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 0 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 1 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 2 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 3 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 4 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 5 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 6 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 7 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 8 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 9 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 10 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 11 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 12 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 13 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 14 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 15 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 16 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 17 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 18 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 19 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 20 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 21 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity normal 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 22 plan copies retain business value
+PASS Assets/Scenes/Connections.unity normal 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity normal 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity normal 23 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 0 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 1 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 2 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 3 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 4 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 5 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 6 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 7 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 8 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 9 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 10 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 11 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 12 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 13 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 14 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 15 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 16 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 17 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 18 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 19 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 20 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 21 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 22 plan copies retain business value
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity static-keyword-outliers 23 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 0 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 1 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 2 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 3 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 4 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 5 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 6 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 7 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 8 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 9 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 10 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 11 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 12 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 13 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 14 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 15 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 16 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 17 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 18 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 19 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 20 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 21 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/Connections.unity waving-outliers 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 22 plan copies retain business value
+PASS Assets/Scenes/Connections.unity waving-outliers 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/Connections.unity waving-outliers 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/Connections.unity waving-outliers 23 plan copies retain business value
+PASS Assets/Scenes/Connections.unity actual queue 1x: LOAD/processing scaled, nominal20/budget30/business100
+PASS Assets/Scenes/Connections.unity metadata and queued definition retain effective factor and unscaled job value
+PASS Assets/Scenes/Connections.unity 1x same uncontended lifetime and actual business credit: resolution=Completed, credit=100, receipts=1, failures=0, service=20.0203
+PASS Assets/Scenes/Connections.unity same two jobs and capacity, 1x: expected contention changes real completion/failure, not quota value
+PASS Assets/Scenes/Connections.unity actual queue 1.5x: LOAD/processing scaled, nominal20/budget30/business100
+PASS Assets/Scenes/Connections.unity metadata and queued definition retain effective factor and unscaled job value
+PASS Assets/Scenes/Connections.unity 1.5x same uncontended lifetime and actual business credit: resolution=Completed, credit=100, receipts=1, failures=0, service=20.0003
+PASS Assets/Scenes/Connections.unity same two jobs and capacity, 1.5x: expected contention changes real completion/failure, not quota value
+PASS Assets/Scenes/Connections.unity scaled job accounting independent of recording
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored 1.5x and accepted objectives
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 0 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 1 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 2 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 3 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 4 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 5 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 6 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 7 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 8 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 9 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 10 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 11 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 12 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 13 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 14 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 15 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 16 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 17 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 18 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 19 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 20 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 21 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 22 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity normal 23 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 0 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 1 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 2 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 3 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 4 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 5 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 6 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 7 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 8 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 9 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 10 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 11 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 12 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 13 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 14 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 15 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 16 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 17 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 18 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 19 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 20 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 21 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 22 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity static-keyword-outliers 23 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 0 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 0 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 0 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 1 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 1 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 1 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 2 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 2 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 2 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 3 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 3 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 3 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 4 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 4 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 4 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 5 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 5 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 5 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 6 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 6 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 6 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 7 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 7 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 7 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 8 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 8 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 8 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 9 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 9 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 9 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 10 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 10 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 10 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 11 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 11 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 11 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 12 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 12 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 12 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 13 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 13 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 13 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 14 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 14 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 14 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 15 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 15 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 15 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 16 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 16 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 16 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 17 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 17 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 17 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 18 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 18 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 18 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 19 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 19 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 19 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 20 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 20 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 20 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 21 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 21 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 21 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 22 same recipe/route/identity/nominal arrival/business value; hostile=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 22 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 22 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 23 same recipe/route/identity/nominal arrival/business value; hostile=True
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 23 proportional processing, unchanged nominal duration and exact anomaly/behavior/log/effect parameters
+PASS Assets/Scenes/ConnectionsAdvanced.unity waving-outliers 23 plan copies retain business value
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual queue 1x: LOAD/processing scaled, nominal20/budget30/business100
+PASS Assets/Scenes/ConnectionsAdvanced.unity metadata and queued definition retain effective factor and unscaled job value
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1x same uncontended lifetime and actual business credit: resolution=Completed, credit=100, receipts=1, failures=0, service=20.02031
+PASS Assets/Scenes/ConnectionsAdvanced.unity same two jobs and capacity, 1x: expected contention changes real completion/failure, not quota value
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual queue 1.5x: LOAD/processing scaled, nominal20/budget30/business100
+PASS Assets/Scenes/ConnectionsAdvanced.unity metadata and queued definition retain effective factor and unscaled job value
+PASS Assets/Scenes/ConnectionsAdvanced.unity 1.5x same uncontended lifetime and actual business credit: resolution=Completed, credit=100, receipts=1, failures=0, service=20.00031
+PASS Assets/Scenes/ConnectionsAdvanced.unity same two jobs and capacity, 1.5x: expected contention changes real completion/failure, not quota value
+PASS Assets/Scenes/ConnectionsAdvanced.unity scaled job accounting independent of recording

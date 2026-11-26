@@ -32,6 +32,7 @@ namespace Uptime.Connections
         public NodeView[] Route { get; }
         public string ProfileId { get; }
         public bool IsHostile { get; }
+        public double BusinessWorkValue { get; }
         public string ClaimedPurpose { get; }
         public OperationStage[] Operations { get; }
         public TimedModifierBehaviorDefinition[] ConnectionBehaviors { get; }
@@ -58,7 +59,8 @@ namespace Uptime.Connections
             bool naturalLoadNoise = false, int naturalLoadSeed = 0,
             string hostileEventId = null,
             float identityHopSeconds = 0f, int identitySeed = 0,
-            ConnectionIdentityMode identityMode = ConnectionIdentityMode.Normal)
+            ConnectionIdentityMode identityMode = ConnectionIdentityMode.Normal,
+            double? businessWorkValue = null)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -77,6 +79,8 @@ namespace Uptime.Connections
                     stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload,
                     stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs);
             }
+            if (businessWorkValue.HasValue) BusinessWorkValue = businessWorkValue.Value;
+            else foreach (var stage in Operations) BusinessWorkValue += stage?.TotalWork ?? 0f;
             ConnectionBehaviors = OperationStage.CopyBehaviors(connectionBehaviors);
             GenerationTrace = generationTrace?.Copy();
             LoaderAttack = loaderAttack?.Copy();
@@ -97,14 +101,14 @@ namespace Uptime.Connections
             ScheduledSpawnTime, ConnectionId, route, ProfileId, ClaimedPurpose, Operations,
             IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId, ParentConnectionId,
             ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise, NaturalLoadSeed,
-            HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode);
+            HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
 
         public ConnectionSpawnPlan ForEvent(string eventId) => new ConnectionSpawnPlan(
             ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose,
             Operations, IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId,
             ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack,
             NaturalLoadNoise, NaturalLoadSeed, eventId,
-            IdentityHopSeconds, IdentitySeed, IdentityMode);
+            IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
 
         public ConnectionSpawnPlan WithAmbientIdentity(ConnectionIdentityMode mode,
             float hopSeconds, int aliasSeed, float selectionRoll)
@@ -120,7 +124,27 @@ namespace Uptime.Connections
                 ProfileId, ClaimedPurpose, Operations, IsHostile, ConnectionBehaviors,
                 trace, ParentNodeId, ParentConnectionId, ParentInfectionAppliedAtSeconds,
                 LoaderAttack, NaturalLoadNoise, NaturalLoadSeed, HostileEventId,
-                hopSeconds, aliasSeed, mode);
+                hopSeconds, aliasSeed, mode, BusinessWorkValue);
+        }
+
+        // Called once after recipe/anomaly composition, never on shared PURPOSE definitions.
+        internal ConnectionSpawnPlan WithLegitimateWorkload(float multiplier)
+        {
+            if (IsHostile) throw new InvalidOperationException("Hostile workload must remain unchanged.");
+            var scaled = new OperationStage[Operations.Length];
+            for (int i = 0; i < scaled.Length; i++)
+            {
+                var stage = Operations[i];
+                scaled[i] = new OperationStage(stage.Operation, stage.TotalWork * multiplier,
+                    stage.DesiredLoad * multiplier, stage.ActivityDescription, stage.EffectOnCompletion,
+                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs);
+            }
+            var trace = GenerationTrace?.Copy();
+            if (trace != null) trace.finalOperations = ConnectionGenerationTrace.Capture(scaled);
+            return new ConnectionSpawnPlan(ScheduledSpawnTime, ConnectionId, Route, ProfileId,
+                ClaimedPurpose, scaled, false, ConnectionBehaviors, trace, ParentNodeId,
+                ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise,
+                NaturalLoadSeed, HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
         }
     }
 

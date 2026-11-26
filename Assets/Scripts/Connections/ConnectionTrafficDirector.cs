@@ -78,6 +78,9 @@ namespace Uptime.Connections
         [Tooltip("Optional PURPOSE destination overrides for this scene. Empty retains each catalog definition.")]
         [SerializeField] private PurposeTargetOverride[] purposeTargetOverrides;
         [SerializeField] private ConnectionTrafficProfile[] profiles;
+        [Header("Legitimate generated workload")]
+        [Tooltip("Scales non-hostile generated operation LOAD and processing WORK together after sampling/anomalies. Business WORK value stays unscaled. Restart after edits.")]
+        [SerializeField, Min(.01f)] private float legitimateWorkloadMultiplier = 1f;
         [Header("Identity behavior")]
         [SerializeField, Min(0.1f)] private float identityHopIntervalSeconds = 2f;
         [Tooltip("Chance of hopping within successfully generated ordinary hostile connections.")]
@@ -213,6 +216,7 @@ namespace Uptime.Connections
         public float SecondAnomalyChance => secondAnomalyChance;
         public float SubtleDeliveryChance => subtleDeliveryChance;
         public float NormalWorkSpread => normalWorkSpread;
+        public float LegitimateWorkloadMultiplier => legitimateWorkloadMultiplier;
         public float LoaderDelayedChance => loaderDelayedChance;
         public float LoaderMinAttackCapacityFraction => loaderMinAttackCapacityFraction;
         public float LoaderMaxAttackCapacityFraction => loaderMaxAttackCapacityFraction;
@@ -260,6 +264,8 @@ namespace Uptime.Connections
 
         public void ResetDirector()
         {
+            if (!float.IsFinite(legitimateWorkloadMultiplier) || legitimateWorkloadMultiplier <= 0f)
+                throw new InvalidOperationException("Legitimate workload multiplier must be finite and positive.");
             // Edit Mode witnesses reset the director without MonoBehaviour enable callbacks.
             if (host != null)
             {
@@ -1022,11 +1028,12 @@ namespace Uptime.Connections
                             host.DefaultPhantomLoad) : null,
                     launch: spec.launchSpec, logs: spec.logs);
             }
+            ConnectionSpawnPlan plan;
             if (selected.purposeTemplate)
-                return BuildPurposePlan(selected, atTime, id, route, stages, ambient,
+                plan = BuildPurposePlan(selected, atTime, id, route, stages, ambient,
                     overrides, forceBenign, selectedObjective, loaderStructure, loaderPattern,
                     infectorStructure, infectorPrimary, infectorSecondary, selectedInfectionKind);
-            return new ConnectionSpawnPlan(atTime, id, route, selected.id,
+            else plan = new ConnectionSpawnPlan(atTime, id, route, selected.id,
                 selected.claimedPurpose, stages, selected.isHostile,
                 selected.connectionBehaviors,
                 identityHopSeconds: manualIdentityHop ? identityHopIntervalSeconds : 0f,
@@ -1034,6 +1041,8 @@ namespace Uptime.Connections
                 identityMode: manualIdentityReactive ? ConnectionIdentityMode.ReactiveMisdirection :
                     manualIdentityHop ? ConnectionIdentityMode.ContinuousHopping :
                     ConnectionIdentityMode.Normal);
+            return plan.IsHostile || legitimateWorkloadMultiplier == 1f ? plan :
+                plan.WithLegitimateWorkload(legitimateWorkloadMultiplier);
         }
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,

@@ -1,0 +1,9 @@
+scene,multiplier,id,requested_load,allocated_load,processing_work,completed_processing,business_work,service_budget,credited_work
+Connections,1,m7,5,5,100,49.99949,100,30,0
+Connections,1,f3,5,5,100,49.99949,100,30,0
+Connections,1.5,m7,7.5,5,150,49.99949,100,30,0
+Connections,1.5,f3,7.5,5,150,49.99949,100,30,0
+ConnectionsAdvanced,1,m7,5,5,100,49.99942,100,30,0
+ConnectionsAdvanced,1,f3,5,5,100,49.99942,100,30,0
+ConnectionsAdvanced,1.5,m7,7.5,5,150,49.99942,100,30,0
+ConnectionsAdvanced,1.5,f3,7.5,5,150,49.99942,100,30,0
