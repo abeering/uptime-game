@@ -108,6 +108,16 @@ The accepted next implementation replaces population-responsive legitimate arriv
 
 Future company circumstances may deliberately change frequency, PURPOSE mix, workload, directed batches and individual-request importance. Importance belongs to requests and their circumstances, rather than permanently to PURPOSES; operator-configured processing priority is separate. This phase implements neither company events nor priority mechanics. Historical experiments remain evidence, not dependencies.
 
+## Connections — first persistent API policy (2026-11-26)
+
+[API Configuration V0](../Connections/connections-api-configuration-v0.md) implements the narrow API candidate from #128: one known-PURPOSE slot, empty by default, changed through `ssh api`, with a provisional configurable 2× allocation weight for matching routes containing API. Allocation is capped at actual demand and redistributes spare shares; favoring one class can save its business WORK at the expense of another. Hostiles claiming the same stable PURPOSE receive the same benefit. This is allocation priority, not company-assigned importance or knowledge of legitimacy. CACHE, other policies, multiple slots, maintenance, events and contextual importance remain proposals. The earlier milestone wording is retained as design provenance; this contract establishes only the first slot.
+
+### Deferred observations from API Configuration V0
+
+Threat readability and investigative fairness need a dedicated future pass. Suspicion should lead to meaningful investigation rather than arbitrary identification. Benign anomalies and genuine hostiles should be distinguishable through sufficient evidence, without making ordinary demand itself proof of hostility.
+
+High-density operational pressure and lower-density investigative pressure are different legitimate gameplay profiles. Company demand characteristics and hacker behavior characteristics can independently shape those profiles. Future LOADER refinement should explore greater prevalence and richer keyword combinations. These are recorded design observations, not changes to current hostile frequency, keyword generation, palettes or investigation mechanics.
+
 ## Active working designs and unresolved details
 
 **Run framing.** Overarching run and progression design belongs to Uptime as a whole. “Run = job” and “level = day/shift” is the working shared frame: the operator works for a company through a series of increasingly difficult shifts; survival and performance may be judged separately. Exact number and length of days, failure thresholds, advancement, difficulty selection, and reward schedule remain flexible. Prototype-specific progression mechanics do not transfer automatically between Packet and Connections. [level-and-run-structure.md](level-and-run-structure.md) contains the full proposal, including Packet-shaped examples; [levels-phase1.md](../historical/levels-phase1.md) and the [illustrative first prototype level](../research/first-prototype-level.md) preserve other level-thinking and implementation hypotheses.

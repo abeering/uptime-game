@@ -78,7 +78,7 @@ namespace Uptime.Connections.EditorTools
                 foreach (string scene in CanonicalSceneAuthoring.Scenes)
                 {
                     EditorSceneManager.OpenScene(scene); var authored = UnityEngine.Object.FindFirstObjectByType<SimulationHost>(); var traffic = authored.GetComponent<ConnectionTrafficDirector>();
-                    Check(traffic.LegitimateWorkloadMultiplier == 2.5f && traffic.LegitimateMeanArrivalSeconds == (scene == CanonicalSceneAuthoring.Scenes[0] ? 23.225807f : 18.947369f) &&
+                    Check(traffic.LegitimateWorkloadMultiplier == 2.5f && traffic.LegitimateMeanArrivalSeconds == (scene == CanonicalSceneAuthoring.Scenes[0] ? 23.225807f : 20f) &&
                         authored.ShiftEnabled && authored.BusinessFailureLimit == 10 && authored.ShiftWorkTarget == (scene == CanonicalSceneAuthoring.Scenes[0] ? 1000 : 1500), scene + " accepted authored rates, workload and shift objectives");
                     var baseline = Scenario(scene, "healthy"); var schedule = Schedule(baseline); var recipes = Recipes(baseline); Retain(baseline, "healthy");
                     Check(schedule.Length > 1 && baseline.WorkCreditCount > 0, scene + " healthy real lifecycle completes jobs and earns business WORK");

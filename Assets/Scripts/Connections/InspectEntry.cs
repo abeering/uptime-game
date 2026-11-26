@@ -220,8 +220,9 @@ namespace Uptime.Connections
             }
             Color accent = identityAccent ?? activeColor;
             Set(identity, string.Empty);
-            Set(purpose, string.IsNullOrWhiteSpace(state.Definition.ClaimedPurpose) ?
-                string.Empty : state.Definition.ClaimedPurpose);
+            string priority = state.AllocationWeight > 1f && !string.IsNullOrEmpty(state.AllocationPolicyNodeId) ?
+                $"{state.AllocationPolicyNodeId} ×{state.AllocationWeight:G3} · " : string.Empty;
+            Set(purpose, priority + (state.Definition.ClaimedPurpose ?? string.Empty));
             if (identity != null) identity.color = state.IsComplete ? quietColor : accent;
             if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)

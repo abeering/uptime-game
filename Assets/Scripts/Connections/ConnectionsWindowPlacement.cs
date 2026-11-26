@@ -9,20 +9,29 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsVideoCall videoCall;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
         [SerializeField] private ConnectionsDuelOverlay duelOverlay;
+        [SerializeField] private ConnectionsSshOverlay sshOverlay;
+        [SerializeField] private RectTransform[] sshContent;
         [SerializeField] private RectTransform[] callContent;
         [SerializeField] private RectTransform[] cleanContent;
         [SerializeField] private TextCommunicationDirector textCommunications;
 
         public void PlaceCall() => Place((RectTransform)videoCall.transform,
-            cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform : null, cleanContent, null);
+            cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform :
+                sshOverlay != null && sshOverlay.IsOpen ? (RectTransform)sshOverlay.transform : null,
+            cleanOverlay.IsOpen ? cleanContent : sshContent, null);
 
         public void PlaceClean(NodeView target) => Place((RectTransform)cleanOverlay.transform,
             videoCall.IsActive ? (RectTransform)videoCall.transform : null, callContent, target);
 
+        public void PlaceSsh(NodeView target) => Place((RectTransform)sshOverlay.transform,
+            cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform : videoCall.IsActive ? (RectTransform)videoCall.transform : null,
+            cleanOverlay.IsOpen ? cleanContent : callContent, target);
+
         public void PlaceDuel(NodeView target) => Place((RectTransform)duelOverlay.transform,
             cleanOverlay.IsOpen ? (RectTransform)cleanOverlay.transform :
+                sshOverlay != null && sshOverlay.IsOpen ? (RectTransform)sshOverlay.transform :
                 videoCall.IsActive ? (RectTransform)videoCall.transform : null,
-            cleanOverlay.IsOpen ? cleanContent : callContent, target,
+            cleanOverlay.IsOpen ? cleanContent : sshOverlay != null && sshOverlay.IsOpen ? sshContent : callContent, target,
             cleanOverlay.IsOpen && videoCall.IsActive ?
                 (RectTransform)videoCall.transform : null, callContent);
 

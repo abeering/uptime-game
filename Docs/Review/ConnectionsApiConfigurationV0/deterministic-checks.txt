@@ -1,0 +1,131 @@
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity empty slot original allocation A: expected 5, actual 5
+PASS Assets/Scenes/Connections.unity empty slot original allocation B: expected 5, actual 5
+PASS Assets/Scenes/Connections.unity known stable PURPOSE selected
+PASS Assets/Scenes/Connections.unity selection waits for allocation update: expected 5, actual 5
+PASS Assets/Scenes/Connections.unity favored8 receives6.67: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/Connections.unity ordinary8 receives3.33: expected 3.33333325386047, actual 3.33333325386047
+PASS Assets/Scenes/Connections.unity weight never changes requested LOAD, processing/business WORK or service target
+PASS Assets/Scenes/Connections.unity change policy favors existing B: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/Connections.unity clear restores A: expected 5, actual 5
+PASS Assets/Scenes/Connections.unity clear restores B: expected 5, actual 5
+PASS Assets/Scenes/Connections.unity display labels are not policy identities
+PASS Assets/Scenes/Connections.unity recorder joins policy changes, configured weight and applied allocation evidence
+PASS Assets/Scenes/Connections.unity repeated same policy adds no duplicate change event
+PASS Assets/Scenes/Connections.unity existing favored shares with new arrival: expected 4, actual 4
+PASS Assets/Scenes/Connections.unity newly established favored shares equally: expected 4, actual 4
+PASS Assets/Scenes/Connections.unity ordinary peer retains weighted share: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity restart clears policy and objectives
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity favored request cap: expected 1, actual 1
+PASS Assets/Scenes/Connections.unity unused share redistributed: expected 3.5, actual 3.5
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity uncontended favored unchanged: expected 8, actual 8
+PASS Assets/Scenes/Connections.unity uncontended ordinary unchanged: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity multiple favored A: expected 4, actual 4
+PASS Assets/Scenes/Connections.unity multiple favored B: expected 4, actual 4
+PASS Assets/Scenes/Connections.unity multiple favored ordinary peer: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity multiple saturated favored A: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity multiple saturated favored B: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity all capped shares redistributed: expected 6, actual 6
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity connections targeting API qualify: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/Connections.unity API target peer weighted: expected 3.33333325386047, actual 3.33333325386047
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity hostile stable claimed PURPOSE benefits equally: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/Connections.unity policy never filters hidden hostility
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity equal display strings do not create equal PURPOSE identity
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity independent DB target: expected 8, actual 8
+PASS Assets/Scenes/Connections.unity independent AUTH target: expected 8, actual 8
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity existing defense reservation activated
+PASS Assets/Scenes/Connections.unity infection keeps reserved2: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity defense keeps reserved4: expected 4, actual 4
+PASS Assets/Scenes/Connections.unity remaining3 favors A: expected 2, actual 2
+PASS Assets/Scenes/Connections.unity remaining3 ordinary B: expected 1, actual 1
+PASS Assets/Scenes/Connections.unity no total capacity inflation: expected 10, actual 10
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity configurable3x weight: expected 7.5, actual 7.5
+PASS Assets/Scenes/Connections.unity configurable3x ordinary peer: expected 2.5, actual 2.5
+PASS Assets/Scenes/Connections.unity favored kill retains exact-once failure and zero business credit
+PASS Assets/Scenes/Connections.unity killed favored releases all target resources: expected 8, actual 8
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity favored unscaled whole-job credit ends shift and freezes unfinished peer without fabricated failure
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity generated 2.5x tradeoff: NONE loses both/FIRED
+PASS Assets/Scenes/Connections.unity terminal outcome rejects policy mutation
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity generated 2.5x tradeoff: product-lookup saved32 business WORK at expense of peer
+PASS Assets/Scenes/Connections.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/Connections.unity generated 2.5x tradeoff: sales-export saved32 business WORK at expense of peer
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity empty slot original allocation A: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity empty slot original allocation B: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity known stable PURPOSE selected
+PASS Assets/Scenes/ConnectionsAdvanced.unity selection waits for allocation update: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity favored8 receives6.67: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary8 receives3.33: expected 3.33333325386047, actual 3.33333325386047
+PASS Assets/Scenes/ConnectionsAdvanced.unity weight never changes requested LOAD, processing/business WORK or service target
+PASS Assets/Scenes/ConnectionsAdvanced.unity change policy favors existing B: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/ConnectionsAdvanced.unity clear restores A: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity clear restores B: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity display labels are not policy identities
+PASS Assets/Scenes/ConnectionsAdvanced.unity recorder joins policy changes, configured weight and applied allocation evidence
+PASS Assets/Scenes/ConnectionsAdvanced.unity repeated same policy adds no duplicate change event
+PASS Assets/Scenes/ConnectionsAdvanced.unity existing favored shares with new arrival: expected 4, actual 4
+PASS Assets/Scenes/ConnectionsAdvanced.unity newly established favored shares equally: expected 4, actual 4
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary peer retains weighted share: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity restart clears policy and objectives
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity favored request cap: expected 1, actual 1
+PASS Assets/Scenes/ConnectionsAdvanced.unity unused share redistributed: expected 3.5, actual 3.5
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity uncontended favored unchanged: expected 8, actual 8
+PASS Assets/Scenes/ConnectionsAdvanced.unity uncontended ordinary unchanged: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity multiple favored A: expected 4, actual 4
+PASS Assets/Scenes/ConnectionsAdvanced.unity multiple favored B: expected 4, actual 4
+PASS Assets/Scenes/ConnectionsAdvanced.unity multiple favored ordinary peer: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity multiple saturated favored A: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity multiple saturated favored B: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity all capped shares redistributed: expected 6, actual 6
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity connections targeting API qualify: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/ConnectionsAdvanced.unity API target peer weighted: expected 3.33333325386047, actual 3.33333325386047
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity hostile stable claimed PURPOSE benefits equally: expected 6.66666650772095, actual 6.66666650772095
+PASS Assets/Scenes/ConnectionsAdvanced.unity policy never filters hidden hostility
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity equal display strings do not create equal PURPOSE identity
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity independent DB target: expected 8, actual 8
+PASS Assets/Scenes/ConnectionsAdvanced.unity independent AUTH target: expected 8, actual 8
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Advanced real EXT1→WEB bypass excludes API policy
+PASS Advanced bypass retains original proportional allocation: expected 5, actual 5
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity existing defense reservation activated
+PASS Assets/Scenes/ConnectionsAdvanced.unity infection keeps reserved2: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity defense keeps reserved4: expected 4, actual 4
+PASS Assets/Scenes/ConnectionsAdvanced.unity remaining3 favors A: expected 2, actual 2
+PASS Assets/Scenes/ConnectionsAdvanced.unity remaining3 ordinary B: expected 1, actual 1
+PASS Assets/Scenes/ConnectionsAdvanced.unity no total capacity inflation: expected 10, actual 10
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity configurable3x weight: expected 7.5, actual 7.5
+PASS Assets/Scenes/ConnectionsAdvanced.unity configurable3x ordinary peer: expected 2.5, actual 2.5
+PASS Assets/Scenes/ConnectionsAdvanced.unity favored kill retains exact-once failure and zero business credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity killed favored releases all target resources: expected 8, actual 8
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity favored unscaled whole-job credit ends shift and freezes unfinished peer without fabricated failure
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated 2.5x tradeoff: NONE loses both/FIRED
+PASS Assets/Scenes/ConnectionsAdvanced.unity terminal outcome rejects policy mutation
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated 2.5x tradeoff: product-lookup saved32 business WORK at expense of peer
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored API node/2x and empty initial slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated 2.5x tradeoff: sales-export saved32 business WORK at expense of peer

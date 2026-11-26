@@ -1,0 +1,13 @@
+PASS API
+PASS Shift
+PASS Fragility
+PASS Demand
+PASS Workload
+PASS Integrity
+PASS Traffic
+PASS Recorder
+PASS Canonical
+PASS DuelConcession
+FAIL Resource: ResourceWitness failed: inspect header pill keeps authored large geometry and identity color
+FAIL Overclock: OverclockWitness FAILED: ConnectionsAdvanced compact three-tool row
+FAIL GeneratedIdentity: Generated Identity Witness: Connections hostile activity weights and arrival interval unchanged

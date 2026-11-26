@@ -2,6 +2,8 @@
 
 Implementation from verified main `98908528099cdde7eb29ed8aa88515fe7e6bfdfc`, the normal GitHub merge of human-accepted #134 after setting both canonical scenes to **2.5× legitimate workload**. Scope: Connections Small and Advanced. Packet, visual presentation and the accepted workload/shift rules remain separate and unchanged.
 
+**Accepted follow-up:** #135 merged normally at `79e2d90`. API Configuration V0 preserves the user-authored Advanced mean interval of 20s; the original 18.947369s choice and reasoning below remain historical evidence. Small stays 23.225807s. The scheduling algorithm and accepted 2.5× workload are unchanged.
+
 ## One business clock
 
 The company's ordinary legitimate requests now arrive independently of network performance. `ConnectionTrafficDirector` uses a dedicated seeded exponential clock, reusing #125's seed stream (`seed XOR 0x1B3D4A7`). The first request is opening grace plus a sampled wait; each later ideal due time is the previous due time plus another wait. A one-microsecond numerical guard keeps waits positive without imposing a gameplay cadence. Natural bursts and lulls remain possible.

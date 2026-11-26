@@ -413,6 +413,7 @@ namespace Uptime.Connections
                 }
             }
             RefreshBackdoorRates();
+            RefreshApiAllocationWeights();
             List<ResourceAllocator.OperationCompletion> completed =
                 ResourceAllocator.Step(nodes, runtimeConnections, infections, deltaSeconds,
                     allocated => health.Step(allocated, simulationTimeSeconds, deltaSeconds),
@@ -983,6 +984,7 @@ namespace Uptime.Connections
         {
             if (RunEnded || runtimeConnections == null || nodes == null) return;
             RefreshBackdoorRates();
+            RefreshApiAllocationWeights();
             ResourceAllocator.RefreshAllocations(nodes, runtimeConnections, infections,
                 payloadDirector != null ? payloadDirector.DemandAt : null);
             RefreshServiceDanger();
@@ -1164,6 +1166,7 @@ namespace Uptime.Connections
             steppingIntegrity = false;
             simulationGeneration++;
             ResetShiftAccounting();
+            ResetApiConfiguration();
             ClearProbe();
             ClearOverclock();
             activeClean = null;

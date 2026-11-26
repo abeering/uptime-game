@@ -1,0 +1,110 @@
+PASS Connections-1920 native viewport
+PASS Connections-1920 empty policy5/5
+PASS Connections-1920 ssh command opens authored window and owns typing
+PASS Connections-1920 keyboard selects/applies PURPOSE and remains open; cursor=5, selected=product-lookup
+PASS Connections-1920 simulation advances during configuration
+PASS Connections-1920 readable SSH text: Title preferred=36.97 rect=45
+PASS Connections-1920 readable SSH text: Current policy preferred=29.05 rect=36
+PASS Connections-1920 readable SSH text: Tradeoff preferred=25.09 rect=32
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1920 readable SSH text: Keyboard hint preferred=26.41 rect=34
+PASS Connections-1920 SSH fully within viewport
+PASS Connections-1920 Escape closes, persists policy, restores command focus
+PASS Connections-1920 verbose inspect identifies applied API benefit
+PASS Connections-1920 actual Play Mode saves selected32 WORK, other times out; work=32 failures=1 ending=None product=Completed sales=TimedOut
+PASS Connections-1920 existing Duel can preempt SSH
+PASS Connections-1920 Duel takes exclusive focus above SSH
+PASS Connections-1920 suspended SSH ignores Duel keystrokes
+PASS Connections-1920 Duel teardown restores SSH focus
+PASS Connections-1920 keyboard clears policy
+PASS Connections-1920 restart clears policy and closes configuration
+PASS Connections-1920 shift ending aborts configuration and freezes mutations
+PASS Connections-1280 native viewport
+PASS Connections-1280 empty policy5/5
+PASS Connections-1280 ssh command opens authored window and owns typing
+PASS Connections-1280 keyboard selects/applies PURPOSE and remains open; cursor=5, selected=product-lookup
+PASS Connections-1280 simulation advances during configuration
+PASS Connections-1280 readable SSH text: Title preferred=36.97 rect=45
+PASS Connections-1280 readable SSH text: Current policy preferred=29.05 rect=36
+PASS Connections-1280 readable SSH text: Tradeoff preferred=25.09 rect=32
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS Connections-1280 readable SSH text: Keyboard hint preferred=26.41 rect=34
+PASS Connections-1280 SSH fully within viewport
+PASS Connections-1280 Escape closes, persists policy, restores command focus
+PASS Connections-1280 verbose inspect identifies applied API benefit
+PASS Connections-1280 actual Play Mode saves selected32 WORK, other times out; work=32 failures=1 ending=None product=Completed sales=TimedOut
+PASS Connections-1280 existing Duel can preempt SSH
+PASS Connections-1280 Duel takes exclusive focus above SSH
+PASS Connections-1280 suspended SSH ignores Duel keystrokes
+PASS Connections-1280 Duel teardown restores SSH focus
+PASS Connections-1280 keyboard clears policy
+PASS Connections-1280 restart clears policy and closes configuration
+PASS Connections-1280 shift ending aborts configuration and freezes mutations
+PASS ConnectionsAdvanced-1920 native viewport
+PASS ConnectionsAdvanced-1920 empty policy5/5
+PASS ConnectionsAdvanced-1920 ssh command opens authored window and owns typing
+PASS ConnectionsAdvanced-1920 keyboard selects/applies PURPOSE and remains open; cursor=6, selected=sales-export
+PASS ConnectionsAdvanced-1920 simulation advances during configuration
+PASS ConnectionsAdvanced-1920 readable SSH text: Title preferred=36.97 rect=45
+PASS ConnectionsAdvanced-1920 readable SSH text: Current policy preferred=29.05 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Tradeoff preferred=25.09 rect=32
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1920 readable SSH text: Keyboard hint preferred=26.41 rect=34
+PASS ConnectionsAdvanced-1920 SSH fully within viewport
+PASS ConnectionsAdvanced-1920 Escape closes, persists policy, restores command focus
+PASS ConnectionsAdvanced-1920 verbose inspect identifies applied API benefit
+PASS ConnectionsAdvanced-1920 actual Play Mode saves selected32 WORK, other times out; work=32 failures=1 ending=None product=TimedOut sales=Completed
+PASS ConnectionsAdvanced-1920 existing Duel can preempt SSH
+PASS ConnectionsAdvanced-1920 Duel takes exclusive focus above SSH
+PASS ConnectionsAdvanced-1920 suspended SSH ignores Duel keystrokes
+PASS ConnectionsAdvanced-1920 Duel teardown restores SSH focus
+PASS ConnectionsAdvanced-1920 keyboard clears policy
+PASS ConnectionsAdvanced-1920 restart clears policy and closes configuration
+PASS ConnectionsAdvanced-1920 shift ending aborts configuration and freezes mutations
+PASS ConnectionsAdvanced-1280 native viewport
+PASS ConnectionsAdvanced-1280 empty policy5/5
+PASS ConnectionsAdvanced-1280 ssh command opens authored window and owns typing
+PASS ConnectionsAdvanced-1280 keyboard selects/applies PURPOSE and remains open; cursor=6, selected=sales-export
+PASS ConnectionsAdvanced-1280 simulation advances during configuration
+PASS ConnectionsAdvanced-1280 readable SSH text: Title preferred=36.97 rect=45
+PASS ConnectionsAdvanced-1280 readable SSH text: Current policy preferred=29.05 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Tradeoff preferred=25.09 rect=32
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Label preferred=25.09 rect=36
+PASS ConnectionsAdvanced-1280 readable SSH text: Keyboard hint preferred=26.41 rect=34
+PASS ConnectionsAdvanced-1280 SSH fully within viewport
+PASS ConnectionsAdvanced-1280 Escape closes, persists policy, restores command focus
+PASS ConnectionsAdvanced-1280 verbose inspect identifies applied API benefit
+PASS ConnectionsAdvanced-1280 actual Play Mode saves selected32 WORK, other times out; work=32 failures=1 ending=None product=TimedOut sales=Completed
+PASS ConnectionsAdvanced-1280 existing Duel can preempt SSH
+PASS ConnectionsAdvanced-1280 Duel takes exclusive focus above SSH
+PASS ConnectionsAdvanced-1280 suspended SSH ignores Duel keystrokes
+PASS ConnectionsAdvanced-1280 Duel teardown restores SSH focus
+PASS ConnectionsAdvanced-1280 keyboard clears policy
+PASS ConnectionsAdvanced-1280 restart clears policy and closes configuration
+PASS ConnectionsAdvanced-1280 shift ending aborts configuration and freezes mutations

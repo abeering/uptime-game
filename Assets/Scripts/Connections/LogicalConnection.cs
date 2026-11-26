@@ -485,6 +485,8 @@ namespace Uptime.Connections
         internal bool IsInfector { get; }
         public float EffectiveWorkRateMultiplier =>
             Behaviors.EffectiveWorkRateMultiplier(CurrentOperationIndex) * BackdoorWorkFactor;
+        public float AllocationWeight { get; internal set; } = 1f;
+        public string AllocationPolicyNodeId { get; internal set; }
         public float ActualWorkRate
         {
             get

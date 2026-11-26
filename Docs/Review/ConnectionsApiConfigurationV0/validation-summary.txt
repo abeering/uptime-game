@@ -1,0 +1,8 @@
+Unity 6000.3.11f1 actual Editor compilation: PASS
+Final ApiConfigurationWitness: PASS 131 assertions
+Final graphics-enabled Play Mode: PASS 110 assertions, 16 PNGs, both scenes at 1920x1080 and 1280x720
+Broad regressions: 10 PASS / 3 inherited FAIL (Resource inspect header; Overclock Advanced row; GeneratedIdentity stale tuning)
+Graphical startup: inherited nonfatal Unity QuickSearch indexing exception
+Scope: authored2x API weight; accepted2.5x workload; Small23.225807s; preserve user Advanced20s; no other tuning
+Core generator/check and git diff --check: PASS
+Human keyboard/IME and ordinary gameplay policy usefulness: pending human review

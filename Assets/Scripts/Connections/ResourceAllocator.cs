@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uptime.Connections
 {
-    // Each target grants the same fraction of every active request when overloaded.
+    // Each target shares available LOAD by requested LOAD × policy weight, capped at the request.
     internal static class ResourceAllocator
     {
         private const float Epsilon = 0.0001f;
@@ -122,15 +122,41 @@ namespace Uptime.Connections
                 node.SetDefensiveUsage(requestedDefense,
                     Mathf.Min(requestedDefense, available - infectionAllocated));
             }
-            foreach (LogicalConnectionState connection in ordered)
+            foreach (NodeResources target in nodes)
             {
-                if (!connection.IsDemanding) continue;
-                NodeResources target = nodeByView[connection.TargetNode];
-                float demand = connectionDemand[target];
                 float available = Mathf.Max(0f, target.LoadCapacity - target.BaselineLoad -
                     target.InfectionAllocatedLoad - target.DefensiveAllocatedLoad);
-                float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
-                connection.AllocatedLoad = connection.DesiredLoad * fraction;
+                var pending = new List<LogicalConnectionState>(); bool weighted = false;
+                foreach (var c in ordered)
+                    if (c.IsDemanding && c.TargetNode == target.View)
+                    { pending.Add(c); weighted |= c.AllocationWeight != 1f; }
+                if (!weighted)
+                {
+                    // Preserve the original arithmetic exactly for an empty policy.
+                    float demand = connectionDemand[target];
+                    float fraction = demand > 0f ? Mathf.Min(1f, available / demand) : 0f;
+                    foreach (var c in pending) c.AllocatedLoad = c.DesiredLoad * fraction;
+                    continue;
+                }
+                double remaining = available;
+                while (pending.Count > 0 && remaining > 0)
+                {
+                    double total = 0;
+                    foreach (var c in pending) total += (double)c.DesiredLoad * c.AllocationWeight;
+                    if (total <= 0) break;
+                    double budget = remaining; bool capped = false;
+                    for (int i = pending.Count - 1; i >= 0; i--)
+                    {
+                        var c = pending[i];
+                        if (budget * c.DesiredLoad * c.AllocationWeight / total < c.DesiredLoad) continue;
+                        c.AllocatedLoad = c.DesiredLoad; remaining -= c.DesiredLoad;
+                        pending.RemoveAt(i); capped = true;
+                    }
+                    if (capped) continue; // Redistribute unused weighted shares among uncapped requests.
+                    foreach (var c in pending)
+                        c.AllocatedLoad = (float)Math.Min(c.DesiredLoad, remaining * c.DesiredLoad * c.AllocationWeight / total);
+                    break;
+                }
             }
         }
 
