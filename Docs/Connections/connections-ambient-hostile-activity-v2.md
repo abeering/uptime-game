@@ -12,6 +12,16 @@ An opportunity result retains the selected type, selection roll, success or fail
 
 The activity selector, ordinary hostile recipes, benign purpose sampling, Payload route/timing, Worm propagation, and hostile arrival clock retain deterministic seeded state. Large witness steps with ambient hostility enabled are processed in one-second pieces, so due opportunities produce entities during the step and those entities move from their creation time. This matches repeated one-second simulation steps; regular fixed-step Play Mode timing remains unchanged.
 
+## Future experiment: clustered hostile opportunities
+
+**Design note (November 25, 2026; not implemented).** The current exponential hostile clock is already irregular: it can put two opportunities close together or leave a long lull. However, a due opportunity selects **one** activity. The concern is that the overall play rhythm can still feel like isolated, carefully metered threats rather than occasional sudden concurrency. This is a play-feel hypothesis, not a claim that the clock has a fixed interval.
+
+Explore an additional source of **stochastic clustering**: occasionally generate several hostile activities together or slightly staggered, possibly mixing ordinary hostile connections, Reconnaissance, Payloads, and Worms, while still allowing genuine lulls. Separate *how many hostile activities occur on average* from *how tightly they bunch*, rather than incidentally increasing difficulty by only adding traffic. Preserve deterministic seeds and record whether activities were part of a cluster, their selected types, and their times for comparisons.
+
+This would be ambient texture, not an intelligent attacker campaign. Intentionally coordinated assaults, authored set pieces, and responsive escalation remain potential Level Director responsibilities. The random director need not understand attacker strategy merely to produce intermittent clumps.
+
+**Open questions:** cluster frequency and size distribution, same-time versus short-window offsets, limits on overlapping activity types or total concurrency, how to expose tuning across scenarios, and whether the change actually improves attention pressure in playtests. The selection mechanism, rates, and implementation scope are **not decided**.
+
 ## Recorder
 
 `hostile_activity_selected` stores all four configured weights, its selection roll and scheduled time, the produced identity, selected origin/target, Payload profile or Worm effect, and a failure reason when selection cannot produce an entity. `hostile_opportunity` carries the same resulting identity and outcome alongside its next interval. The run metadata records the weights and profile/effect probabilities. Existing entity and event receipts continue to record hidden routes, target effects, branch lineage, Reconnaissance follow-up, and service consequences. None of this hidden selection data appears in ordinary `inspect` output.
