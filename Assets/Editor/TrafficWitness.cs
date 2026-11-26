@@ -224,7 +224,7 @@ namespace Uptime.Connections.EditorTools
                 CheckManualProfilesAndThreats(host, director);
                 CheckDelayedThreat(host, director);
                 CheckGeneratedPurposeRuntime(host, director);
-                CheckPopulationCoverage(host, director, travelField);
+                CheckIndependentBusinessDemand(host, director, travelField);
                 Debug.Log("TrafficWitness PASS");
             }
             finally
@@ -917,8 +917,8 @@ namespace Uptime.Connections.EditorTools
                 Check(firstMix == replayMix, "same seed replays ambient profile mix");
                 host.ResetSimulation(); recorder.BeginRun();
                 FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField(
-                    "nextCoverageAt", BindingFlags.Instance | BindingFlags.NonPublic);
-                nextCoverage.SetValue(director, float.PositiveInfinity);
+                    "nextBusinessDemandAt", BindingFlags.Instance | BindingFlags.NonPublic);
+                nextCoverage.SetValue(director, double.PositiveInfinity);
                 for (int i = 0; i < 180; i++) host.StepSimulation(1f);
                 Check(hostileWithBenign == HostileScheduleSignature(recorder),
                     "hostile schedule and generation do not depend on benign opportunities");
@@ -928,7 +928,7 @@ namespace Uptime.Connections.EditorTools
                 for (int i = 0; i < 180; i++) host.StepSimulation(1f);
                 Check(recorder.CurrentLog.events.All(e => e.type != "hostile_opportunity" &&
                     e.source != "ambient_hostile") &&
-                    recorder.CurrentLog.events.Any(e => e.source == "ambient_benign"),
+                    recorder.CurrentLog.events.Any(e => e.source == "independent_business"),
                     "hostile toggle disables only ambient hostile generation");
                 director.HostileGenerationEnabled = true;
                 host.StepSimulation(0.1f);
@@ -970,10 +970,10 @@ namespace Uptime.Connections.EditorTools
             recorder.BeginRun();
             for (int i = 0; i < 180; i++) host.StepSimulation(1f);
             RunEvent[] arrivals = recorder.CurrentLog.events.Where(e =>
-                e.type == "plan_queued" && (e.source == "ambient_benign" ||
+                e.type == "plan_queued" && (e.source == "independent_business" ||
                     e.source == "ambient_hostile")).ToArray();
             Check(arrivals.Length >= 2 && arrivals.All(e => e.scheduledSpawnTime >= 3f) &&
-                arrivals.Any(e => e.source == "ambient_benign") &&
+                arrivals.Any(e => e.source == "independent_business") &&
                 arrivals.Any(e => e.source == "ambient_hostile") &&
                 arrivals.All(e => e.definition.isHostile == (e.source == "ambient_hostile")),
                 "independent ambient streams respect grace and retain correct attribution");
@@ -997,231 +997,24 @@ namespace Uptime.Connections.EditorTools
             return signature;
         }
 
-        private static void CheckPopulationCoverage(SimulationHost host,
+        private static void CheckIndependentBusinessDemand(SimulationHost host,
             ConnectionTrafficDirector director, FieldInfo travelField)
         {
-            var recorder = host.Recorder;
-            bool oldAuto = director.AutoGenerationEnabled;
-            int oldSeed = director.Seed;
-            float oldTravel = (float)travelField.GetValue(host);
-            FieldInfo nextHostile = typeof(ConnectionTrafficDirector).GetField("nextHostileAt",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            FieldInfo weights = typeof(ConnectionTrafficDirector).GetField("ambientWeightOverrides",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            float oldStartupGoal = (float)startupGoal.GetValue(director);
-            var oldWeights = (AmbientWeightOverride[])weights.GetValue(director);
-            try
-            {
-                travelField.SetValue(host, 0.6f);
-                director.Seed = 456;
-                director.AutoGenerationEnabled = true;
-                MethodInfo effectiveGoal = typeof(ConnectionTrafficDirector).GetMethod(
-                    "EffectiveCoverageGoal", BindingFlags.Instance | BindingFlags.NonPublic);
-                Check(Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 0f }) - 1f) < 0.001f &&
-                    Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 37.5f }) - 2f) < 0.001f &&
-                    Mathf.Abs((float)effectiveGoal.Invoke(director, new object[] { 75f }) - 3f) < 0.001f,
-                    "configured startup coverage ramp reaches normal goal at 75 seconds");
-                string first = CoverageRunSignature(host, recorder, out string ordinary);
-                string replay = CoverageRunSignature(host, recorder, out string replayOrdinary);
-                Check(first == replay && ordinary == replayOrdinary,
-                    "seeded coverage opportunities and plans replay after reset");
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextCoverage.SetValue(director, float.PositiveInfinity);
-                for (int i = 0; i < 120; i++) host.StepSimulation(0.5f);
-                string ordinaryWithoutCoverage = string.Join("|", recorder.CurrentLog.events
-                    .Where(e => e.type == "plan_queued" && e.source == "ambient_hostile")
-                    .Select(e => e.scheduledSpawnTime + ":" + e.profileId + ":" +
-                        JsonUtility.ToJson(e.generation)));
-                Check(ordinary == ordinaryWithoutCoverage,
-                    "benign stream leaves hostile purpose and objective draws intact");
-
-                var onePurpose = director.Profiles.Where(p => p.purposeTemplate)
-                    .Select(p => new AmbientWeightOverride { profileId = p.id,
-                        weight = p.id == "product-lookup" ? 1f : 0f }).ToArray();
-                weights.SetValue(director, onePurpose);
-                startupGoal.SetValue(director, 3f);
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Single(e => e.type == "plan_queued")
-                    .profileId == "product-lookup",
-                    "coverage honors canonical purpose weight overrides");
-                foreach (AmbientWeightOverride entry in onePurpose) entry.weight = 0f;
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.All(e => e.type != "plan_queued") &&
-                    recorder.CurrentLog.events.Single(e => e.type == "coverage_opportunity")
-                        .reason == "no_weighted_purpose",
-                    "coverage skips cleanly when no canonical purpose is weighted");
-                weights.SetValue(director, oldWeights);
-
-                director.AutoGenerationEnabled = false;
-                host.ResetSimulation(); recorder.BeginRun();
-                director.QueueProfile("product-lookup");
-                host.StepSimulation(30f);
-                Check(recorder.CurrentLog.events.Count(e => e.type == "plan_queued") == 1 &&
-                    recorder.CurrentLog.events.All(e => e.type != "coverage_opportunity") &&
-                    recorder.CurrentLog.events.Any(e => e.type == "connection_spawned"),
-                    "ambient toggle suppresses both streams while manual plans dispatch");
-
-                director.AutoGenerationEnabled = true;
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                host.StepSimulation(0.1f);
-                float emptyMean = recorder.CurrentLog.events.Single(e =>
-                    e.type == "coverage_opportunity").nextCoverageMeanSeconds;
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                director.QueueProfile("product-lookup");
-                host.StepSimulation(0.1f);
-                RunEvent withManual = recorder.CurrentLog.events.Single(e =>
-                    e.type == "coverage_opportunity");
-                Check(withManual.anticipatedBenign == 1 &&
-                    withManual.nextCoverageMeanSeconds > emptyMean,
-                    "queued manual benign plan eases coverage before dispatch");
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                ConnectionSpawnPlan imminent = director.QueueProfile("product-lookup");
-                director.QueueSpawnPlan(new ConnectionSpawnPlan(500f, "z9", imminent.Route,
-                    imminent.ProfileId, imminent.ClaimedPurpose, imminent.Operations), "future-test");
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Single(e => e.type == "coverage_opportunity")
-                    .anticipatedBenign == 1,
-                    "far-future queued plan does not suppress current coverage");
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                for (int i = 0; i < 5; i++) director.QueueProfile("product-lookup");
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Single(e => e.type == "coverage_opportunity")
-                    .reason == "probability_skip" &&
-                    recorder.CurrentLog.events.Count(e => e.source == "ambient_benign") == 0,
-                    "high benign occupancy usually skips supplemental generation");
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 1000f);
-                director.QueueProfile("product-lookup");
-                host.StepSimulation(0.1f);
-                Check(host.RuntimeConnections.Any(c => c.IsConnecting && !c.IsHostile),
-                    "manual benign plan is connecting during coverage anticipation test");
-                nextCoverage.SetValue(director, host.SimulationTimeSeconds);
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Single(e =>
-                    e.type == "coverage_opportunity").anticipatedBenign >= 1,
-                    "connecting benign plan counts before establishment");
-
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                director.QueueProfile("basic-threat");
-                host.StepSimulation(0.1f);
-                RunEvent withHostile = recorder.CurrentLog.events.Single(e =>
-                    e.type == "coverage_opportunity");
-                Check(withHostile.establishedBenign == 0 &&
-                    withHostile.anticipatedBenign == 0 &&
-                    Mathf.Abs(withHostile.nextCoverageMeanSeconds - emptyMean) < 0.001f,
-                    "hostile plan does not satisfy benign coverage");
-
-                director.AutoGenerationEnabled = false;
-                host.ResetSimulation(); recorder.BeginRun();
-                Check(host.TryInjectInfection("API", InfectionKind.Blackout, 0f, out _),
-                    "coverage cancellation test Blackout installed");
-                director.QueueProfile("product-lookup");
-                host.StepSimulation(1f);
-                Check(recorder.CurrentLog.events.Any(e => e.type == "connection_resolved" &&
-                    e.resolutionReason == "Canceled"), "benign route canceled at Blackout");
-                director.AutoGenerationEnabled = true;
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, host.SimulationTimeSeconds);
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Single(e =>
-                    e.type == "coverage_opportunity").recentCanceledBenign >= 1,
-                    "recent canceled benign attempt eases repeated failed top-ups");
-                float outageNext = (float)nextCoverage.GetValue(director);
-                Check(outageNext <= host.SimulationTimeSeconds +
-                    director.CoverageOutageRetryMaxSeconds + 0.001f,
-                    "outage backoff remains bounded while Blackout persists");
-                int queuedBeforeClean = recorder.CurrentLog.events.Count(e =>
-                    e.type == "plan_queued" && e.source == "ambient_benign");
-                Check(host.StartClean("API", "clean API", out CleanSession cleanSession) ==
-                    CleanStartResult.Started && host.SelectCleanPid(
-                        cleanSession.Processes.Single(p => p.CpuPercent >= 82).Pid,
-                        out int removed) == CleanSelectionResult.Success && removed == 1,
-                    "coverage recovery test cleans Blackout through PID selection");
-                host.StepSimulation(0.1f);
-                Check((float)nextCoverage.GetValue(director) <=
-                    host.SimulationTimeSeconds + 1f + 0.001f,
-                    "cleaning pulls next coverage opportunity forward");
-                host.StepSimulation(1.2f);
-                host.StepSimulation(0.1f);
-                Check(recorder.CurrentLog.events.Where(e => e.type == "coverage_opportunity")
-                    .Last().recentCanceledBenign == 0 &&
-                    recorder.CurrentLog.events.Count(e => e.type == "plan_queued" &&
-                        e.source == "ambient_benign") - queuedBeforeClean <= 1,
-                    "cleaned network clears pressure without a catch-up burst");
-                recorder.EndRun();
-                Debug.Log("TrafficWitness coverage: seeded replay, ordinary hostile stream, " +
-                    "ambient toggle, manual and connecting anticipation, hostile exclusion, cancellation memory.");
-            }
-            finally
-            {
-                recorder.EndRun();
-                director.AutoGenerationEnabled = oldAuto;
-                director.Seed = oldSeed;
-                weights.SetValue(director, oldWeights);
-                startupGoal.SetValue(director, oldStartupGoal);
-                travelField.SetValue(host, oldTravel);
-                host.ResetSimulation();
-            }
+            // Population feedback is intentionally retired; the focused demand witness
+            // covers schedule invariance, failure accounting and reset across both scenes.
+            bool oldAuto = director.AutoGenerationEnabled, oldHostile = director.HostileGenerationEnabled;
+            director.AutoGenerationEnabled = true; director.HostileGenerationEnabled = false;
+            host.ResetSimulation(); host.Recorder.BeginRun();
+            typeof(ConnectionTrafficDirector).GetField("nextBusinessDemandAt", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(director, 0d);
+            host.StepSimulation(.1f);
+            Check(host.Recorder.CurrentLog.events.Any(e => e.type == "business_demand_arrived") &&
+                host.Recorder.CurrentLog.events.Any(e => e.type == "plan_queued" && e.source == "independent_business") &&
+                host.Recorder.CurrentLog.events.Any(e => e.type == "business_demand_admitted"),
+                "independent demand reuses ordinary benign generation, concrete queue and lifecycle registration");
+            host.Recorder.EndRun(); director.AutoGenerationEnabled = oldAuto; director.HostileGenerationEnabled = oldHostile; host.ResetSimulation();
         }
 
-        private static string CoverageRunSignature(SimulationHost host,
-            ConnectionsRunRecorder recorder, out string ordinary)
-        {
-            host.ResetSimulation(); recorder.BeginRun();
-            for (int i = 0; i < 120; i++) host.StepSimulation(0.5f);
-            RunEvent[] plans = recorder.CurrentLog.events.Where(e =>
-                e.type == "plan_queued").ToArray();
-            RunEvent[] coverage = plans.Where(e => e.source == "ambient_benign").ToArray();
-            Check(coverage.Length > 0 && coverage.All(e =>
-                !e.definition.isHostile && e.generation.objective == "NONE" &&
-                e.generation.normalOperations.Length > 0 &&
-                e.generation.finalOperations.Length == e.definition.operations.Length &&
-                e.definition.route.Length >= 2),
-                "coverage uses canonical benign purpose plans and full recorded definitions");
-            float[] times = coverage.Select(e => e.timeSeconds).ToArray();
-            Check(times.Length >= 1 && recorder.CurrentLog.events.Any(e =>
-                e.type == "coverage_opportunity" && e.reason == "probability_skip"),
-                "fixed seed produces coverage and skipped opportunities without a hard cap");
-            Check(recorder.CurrentLog.events.Any(e => e.type == "coverage_opportunity" &&
-                e.nextCoverageMeanSeconds > 0f && e.nextCoverageIntervalSeconds > 0f &&
-                e.effectiveCoverageGoal > 0f &&
-                e.coverageSpawnChance > 0f),
-                "recorder explains ramp, selection, and timing from occupancy");
-            ordinary = string.Join("|", plans.Where(e => e.source == "ambient_hostile")
-                .Select(e => e.scheduledSpawnTime + ":" + e.profileId + ":" +
-                    JsonUtility.ToJson(e.generation)));
-            string signature = string.Join("|", recorder.CurrentLog.events.Where(e =>
-                e.type == "plan_queued" || e.type == "coverage_opportunity")
-                .Select(e => JsonUtility.ToJson(e)));
-            recorder.EndRun();
-            return signature;
-        }
+
 
         private static string TrafficSignature(ConnectionSpawnPlan p) => p.ScheduledSpawnTime + "|" +
             p.ProfileId + "|" + string.Join(">", p.Route.Select(n => n.NodeId)) +

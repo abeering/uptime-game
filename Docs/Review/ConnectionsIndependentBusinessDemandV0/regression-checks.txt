@@ -1,0 +1,7 @@
+PASS IndependentDemand
+PASS Workload
+PASS Shift
+PASS Fragility
+PASS Traffic
+PASS Recorder
+PASS Canonical

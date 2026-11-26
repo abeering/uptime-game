@@ -1,0 +1,10 @@
+PASS Assets/Scenes/Connections.unity actual canonical mixed traffic/objectives/Integrity and accepted workload
+PASS Assets/Scenes/Connections.unity sample 45: actual time=45.00084, demand=1, admitted=1, ending=None, Duel pause=False
+PASS Assets/Scenes/Connections.unity actual 1280x720 viewport
+PASS Assets/Scenes/Connections.unity sample 90: actual time=90.01691, demand=3, admitted=3, ending=None, Duel pause=False
+PASS Assets/Scenes/Connections.unity actual 1280x720 viewport
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual canonical mixed traffic/objectives/Integrity and accepted workload
+PASS Assets/Scenes/ConnectionsAdvanced.unity sample 45: actual time=45.00084, demand=1, admitted=1, ending=None, Duel pause=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual 1280x720 viewport
+PASS Assets/Scenes/ConnectionsAdvanced.unity sample 90: actual time=90.01691, demand=3, admitted=3, ending=None, Duel pause=False
+PASS Assets/Scenes/ConnectionsAdvanced.unity actual 1280x720 viewport

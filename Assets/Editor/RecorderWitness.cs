@@ -56,16 +56,8 @@ namespace Uptime.Connections.EditorTools
                     initial.run.traffic.infectorOperationWeight == 15f &&
                     initial.run.traffic.infectorWorkLongWeight == 10f &&
                     initial.run.traffic.infectorWavingWeight == 15f &&
-                    initial.run.traffic.benignPopulationGoal == 3f &&
-                    initial.run.traffic.coverageStartupGoal == 1f &&
-                    initial.run.traffic.coverageRampSeconds == 75f &&
-                    initial.run.traffic.coverageMeanIntervalSeconds == 8f &&
-                    initial.run.traffic.coverageResponse == 0.6f &&
-                    initial.run.traffic.coverageCancellationMemorySeconds == 60f &&
-                    initial.run.traffic.coverageAtGoalChance == 0.12f &&
-                    initial.run.traffic.coverageOutageRetryMaxSeconds == 20f &&
-                    initial.run.traffic.coverageImminentPlanSeconds == 5f &&
-                    initial.run.traffic.coverageCanceledAttemptWeight == 2,
+                    initial.run.traffic.legitimateArrivalPolicy == "IndependentBusinessDemand" &&
+                    initial.run.traffic.legitimateMeanArrivalSeconds > 0,
                     "copied run metadata and generator configuration");
                 ProfileConfiguration purposeProfile = initial.run.traffic.profiles.Single(p =>
                     p.id == "product-lookup");
@@ -364,54 +356,21 @@ namespace Uptime.Connections.EditorTools
         private static void CheckCoverageRecording(SimulationHost host,
             ConnectionTrafficDirector director, ConnectionsRunRecorder recorder)
         {
-            bool oldAuto = director.AutoGenerationEnabled;
-            FieldInfo startupGoal = typeof(ConnectionTrafficDirector).GetField("coverageStartupGoal",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            float oldStartupGoal = (float)startupGoal.GetValue(director);
-            FieldInfo nextHostile = typeof(ConnectionTrafficDirector).GetField("nextHostileAt",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            FieldInfo nextCoverage = typeof(ConnectionTrafficDirector).GetField("nextCoverageAt",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            try
-            {
-                director.AutoGenerationEnabled = true;
-                startupGoal.SetValue(director, 3f);
-                host.ResetSimulation(); recorder.BeginRun();
-                nextHostile.SetValue(director, 1000f);
-                nextCoverage.SetValue(director, 0f);
-                director.QueueProfile("product-lookup");
-                host.StepSimulation(0.1f);
-                recorder.CaptureSnapshot(host.SimulationTimeSeconds);
-                Check(recorder.Save(true), "coverage run saved");
-                ConnectionsRunLog saved = Read(recorder.OutputPath);
-                RunEvent coverage = saved.events.Single(e => e.type == "coverage_opportunity");
-                RunEvent plan = saved.events.Single(e =>
-                    e.type == "plan_queued" && e.source == "ambient_benign");
-                Check(coverage.anticipatedBenign == 1 &&
-                    coverage.effectiveCoverageGoal == 3f &&
-                    coverage.coverageSpawnChance == 1f &&
-                    coverage.coverageRoll < coverage.coverageSpawnChance &&
-                    coverage.nextCoveragePressure >= 2 &&
-                    coverage.nextCoverageMeanSeconds > 0f &&
-                    coverage.nextCoverageIntervalSeconds > 0f &&
-                    coverage.nextCoverageAtSeconds > coverage.timeSeconds &&
-                    coverage.connectionId == plan.connectionId &&
-                    !plan.definition.isHostile && plan.generation.objective == "NONE",
-                    "saved opportunity explains occupancy and links to complete benign coverage plan");
-                NetworkSnapshot snapshot = saved.snapshots.Last();
-                Check(snapshot.establishedBenign == host.RuntimeConnections.Count(c =>
-                    c.IsActive && !c.IsHostile) && snapshot.establishedHostile == 0 &&
-                    snapshot.activeConnections == snapshot.establishedBenign,
-                    "saved snapshot counts established benign occupancy separately");
-                recorder.EndRun();
-            }
-            finally
-            {
-                startupGoal.SetValue(director, oldStartupGoal);
-                recorder.EndRun();
-                director.AutoGenerationEnabled = oldAuto;
-                host.ResetSimulation();
-            }
+            bool oldAuto = director.AutoGenerationEnabled, oldHostile = director.HostileGenerationEnabled;
+            director.AutoGenerationEnabled = true; director.HostileGenerationEnabled = false;
+            host.ResetSimulation(); recorder.BeginRun();
+            typeof(ConnectionTrafficDirector).GetField("nextBusinessDemandAt", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(director, 0d);
+            host.StepSimulation(.1f); recorder.CaptureSnapshot(host.SimulationTimeSeconds);
+            Check(recorder.Save(true), "independent business demand saved");
+            var saved = Read(recorder.OutputPath);
+            var arrival = saved.events.Single(e => e.type == "business_demand_arrived");
+            var admitted = saved.events.Single(e => e.type == "business_demand_admitted");
+            var plan = saved.events.Single(e => e.type == "plan_queued" && e.source == "independent_business");
+            Check(arrival.demandSequence == admitted.demandSequence && arrival.connectionId == plan.connectionId &&
+                admitted.connectionId == plan.connectionId && !plan.definition.isHostile &&
+                arrival.demandNextAtSeconds > arrival.demandDueAtSeconds && saved.snapshots.Last().businessDemand.admitted == 1,
+                "saved demand joins ideal schedule, concrete plan, registration and authoritative counts");
+            recorder.EndRun(); director.AutoGenerationEnabled = oldAuto; director.HostileGenerationEnabled = oldHostile; host.ResetSimulation();
         }
 
         private static void CheckHealthRecording(SimulationHost host,

@@ -54,6 +54,12 @@ namespace Uptime.Connections
         public string[] eligibleTargetIds;
     }
 
+    [Serializable] public sealed class BusinessDemandSnapshot
+    {
+        public int arrived, admitted, waiting, unadmitted;
+        public double nextArrivalAtSeconds;
+    }
+
     // Owns only generation and scheduling. SimulationHost owns every live connection.
     public sealed class ConnectionTrafficDirector : MonoBehaviour
     {
@@ -63,15 +69,8 @@ namespace Uptime.Connections
         [SerializeField] private int seed = 1701;
         [SerializeField] private bool randomizeSeed = true;
         [SerializeField, Min(0f)] private float initialGraceSeconds = 3f;
-        [Header("Benign population (soft coverage)")]
-        [SerializeField, Min(0f)] private float benignPopulationGoal = 3f;
-        [SerializeField, Min(0f)] private float coverageStartupGoal = 1f;
-        [SerializeField, Min(0.01f)] private float coverageRampSeconds = 75f;
-        [SerializeField, Min(0.01f)] private float coverageMeanIntervalSeconds = 8f;
-        [SerializeField, Min(0f)] private float coverageResponse = 0.6f;
-        [SerializeField, Min(0f)] private float coverageCancellationMemorySeconds = 60f;
-        [SerializeField, Range(0f, 1f)] private float coverageAtGoalChance = 0.12f;
-        [SerializeField, Min(0.1f)] private float coverageOutageRetryMaxSeconds = 20f;
+        [Header("Independent business demand (restart after edits)")]
+        [SerializeField, Min(.01f)] private float legitimateMeanArrivalSeconds = 23.225807f;
         [SerializeField] private string ambientOriginId = "EXT1";
         [Tooltip("Optional weighted ambient origins. Empty preserves the legacy single ambientOriginId with no new random draws.")]
         [SerializeField] private AmbientOriginWeight[] ambientOrigins;
@@ -132,24 +131,23 @@ namespace Uptime.Connections
         }
         private readonly List<Queued> queue = new List<Queued>();
         private readonly HashSet<string> reservedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private readonly List<float> recentBenignCancellations = new List<float>();
         private const string IdLetters = "abcdefghijklmnopqrstuvwxyz";
         private const string IdDigits = "0123456789";
-        private const int CanceledAttemptWeight = 2;
-        private const float ImminentPlanSeconds = 5f;
         private string[] shuffledIds;
         private int nextIdIndex;
         private bool idsExhausted;
         private System.Random random;
         private System.Random spawnerRandom;
-        private System.Random coverageRandom;
+        private System.Random businessDemandRandom;
+        private double nextBusinessDemandAt;
+        private bool businessClockPaused;
+        private int demandArrived, demandAdmitted;
+        private readonly Dictionary<string, int> pendingBusinessDemand = new Dictionary<string, int>();
         private System.Random benignPlanRandom;
         private System.Random hostileScheduleRandom;
         private System.Random identitySelectionRandom;
         private float nextHostileAt;
-        private float nextCoverageAt;
         private bool hostileClockPaused;
-        private int lastBlackoutCount;
         private long nextOrder;
         private readonly Dictionary<string, float> effectiveWeights =
             new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
@@ -192,16 +190,11 @@ namespace Uptime.Connections
             get => hostileMeanIntervalSeconds;
             set => hostileMeanIntervalSeconds = Mathf.Max(.01f, value);
         }
-        public float BenignPopulationGoal => benignPopulationGoal;
-        public float CoverageStartupGoal => coverageStartupGoal;
-        public float CoverageRampSeconds => coverageRampSeconds;
-        public float CoverageMeanIntervalSeconds => coverageMeanIntervalSeconds;
-        public float CoverageResponse => coverageResponse;
-        public float CoverageCancellationMemorySeconds => coverageCancellationMemorySeconds;
-        public float CoverageAtGoalChance => coverageAtGoalChance;
-        public float CoverageOutageRetryMaxSeconds => coverageOutageRetryMaxSeconds;
-        public float CoverageImminentPlanSeconds => ImminentPlanSeconds;
-        public int CoverageCanceledAttemptWeight => CanceledAttemptWeight;
+        public float LegitimateMeanArrivalSeconds => legitimateMeanArrivalSeconds;
+        public BusinessDemandSnapshot BusinessDemand => new BusinessDemandSnapshot
+        { arrived = demandArrived, admitted = demandAdmitted, waiting = pendingBusinessDemand.Count,
+            unadmitted = demandArrived - demandAdmitted - pendingBusinessDemand.Count,
+            nextArrivalAtSeconds = nextBusinessDemandAt };
         public string AmbientOriginId => ambientOriginId;
         public IReadOnlyList<AmbientOriginWeight> EffectiveAmbientOrigins =>
             ambientOrigins != null && ambientOrigins.Length > 0 ? ambientOrigins :
@@ -251,35 +244,21 @@ namespace Uptime.Connections
             seed = chosen == seed ? (chosen == int.MaxValue ? 0 : chosen + 1) : chosen;
         }
 
-        private void OnDisable()
-        {
-            if (host != null) host.ConnectionResolved -= OnConnectionResolved;
-        }
-
-        private void OnConnectionResolved(LogicalConnectionState state, ConnectionResolution reason)
-        {
-            if (reason == ConnectionResolution.Canceled && !state.IsHostile)
-                recentBenignCancellations.Add(state.ResolvedAtSeconds);
-        }
-
         public void ResetDirector()
         {
-            if (!float.IsFinite(legitimateWorkloadMultiplier) || legitimateWorkloadMultiplier <= 0f)
-                throw new InvalidOperationException("Legitimate workload multiplier must be finite and positive.");
-            // Edit Mode witnesses reset the director without MonoBehaviour enable callbacks.
-            if (host != null)
-            {
-                host.ConnectionResolved -= OnConnectionResolved;
-                host.ConnectionResolved += OnConnectionResolved;
-            }
+            if (!float.IsFinite(legitimateWorkloadMultiplier) || legitimateWorkloadMultiplier <= 0f ||
+                !float.IsFinite(legitimateMeanArrivalSeconds) || legitimateMeanArrivalSeconds <= 0f)
+                throw new InvalidOperationException("Business demand interval and workload multiplier must be finite and positive.");
+            businessDemandRandom = new System.Random(unchecked(seed ^ (int)0x1B3D4A7));
+            nextBusinessDemandAt = initialGraceSeconds + BusinessDemandDelay();
+            businessClockPaused = false;
+            demandArrived = demandAdmitted = 0; pendingBusinessDemand.Clear();
             random = new System.Random(seed);
             spawnerRandom = new System.Random(unchecked(seed ^ (int)0x53A7B10));
-            coverageRandom = new System.Random(unchecked(seed ^ (int)0xC0B3A63));
             benignPlanRandom = new System.Random(unchecked(seed ^ (int)0xB36E610));
             hostileScheduleRandom = new System.Random(unchecked(seed ^ (int)0x4853541));
             identitySelectionRandom = new System.Random(unchecked(seed ^ (int)0x1D37A11));
             queue.Clear();
-            recentBenignCancellations.Clear();
             reservedIds.Clear();
             shuffledIds = new string[IdLetters.Length * IdDigits.Length];
             for (int i = 0; i < shuffledIds.Length; i++)
@@ -296,10 +275,7 @@ namespace Uptime.Connections
             idsExhausted = false;
             nextOrder = 0;
             nextHostileAt = initialGraceSeconds + HostileDelay();
-            nextCoverageAt = initialGraceSeconds + CoverageDelay(0,
-                EffectiveCoverageGoal(initialGraceSeconds));
             hostileClockPaused = false;
-            lastBlackoutCount = 0;
             if (profiles == null || profiles.Length == 0)
                 profiles = DefaultProfiles();
             RebuildEffectiveWeights();
@@ -470,17 +446,13 @@ namespace Uptime.Connections
         {
             if (host != null && host.RunEnded) return;
             if (random == null) ResetDirector();
-            int blackoutCount = 0;
-            foreach (NodeInfection infection in host.Infections)
-                if (infection.Payload.Kind == InfectionKind.Blackout) blackoutCount++;
-            if (blackoutCount < lastBlackoutCount)
+            if (!allowAmbient || !autoGenerationEnabled) businessClockPaused = true;
+            else if (businessClockPaused)
             {
-                if (blackoutCount == 0) recentBenignCancellations.Clear();
-                // Cleaning restores a viable route; don't retain a long delay sampled
-                // while it was blocked. This reschedules only the coverage stream.
-                nextCoverageAt = Mathf.Min(nextCoverageAt, simulationTime + 1f);
+                // Explicit disable is not an outage. Resume without inventing missed requests.
+                nextBusinessDemandAt = simulationTime + BusinessDemandDelay();
+                businessClockPaused = false;
             }
-            lastBlackoutCount = blackoutCount;
             bool hostileActive = allowAmbient && autoGenerationEnabled && hostileGenerationEnabled;
             if (!hostileActive) hostileClockPaused = true;
             else if (hostileClockPaused)
@@ -519,38 +491,7 @@ namespace Uptime.Connections
                             hostileMeanIntervalSeconds, interval, nextHostileAt, result);
                     }
                 }
-                // One stochastic opportunity per step prevents catch-up bursts after long steps.
-                if (!idsExhausted && nextCoverageAt <= simulationTime + 0.00001f)
-                {
-                    int established, anticipated;
-                    CountBenignPopulation(simulationTime, out established, out anticipated);
-                    int cancellations = RecentBenignCancellations(simulationTime);
-                    float goal = EffectiveCoverageGoal(simulationTime);
-                    int selectionPressure = established + anticipated +
-                        (blackoutCount > 0 ? CanceledAttemptWeight * cancellations : 0);
-                    float chance = Mathf.Lerp(coverageAtGoalChance, 1f,
-                        Mathf.Clamp01((goal - selectionPressure) / 1.5f));
-                    float roll = (float)coverageRandom.NextDouble();
-                    bool selected = roll < chance;
-                    ConnectionSpawnPlan plan = selected ? GenerateBenignPlan(simulationTime) : null;
-                    if (plan != null) QueueSpawnPlan(plan, "ambient_benign");
-                    int afterEstablished, afterAnticipated;
-                    CountBenignPopulation(simulationTime, out afterEstablished, out afterAnticipated);
-                    // Failed attempts remain recent evidence that another immediate
-                    // attempt is unlikely to establish while an outage persists.
-                    int nextPressure = afterEstablished + afterAnticipated +
-                        CanceledAttemptWeight * cancellations;
-                    float mean = CoverageMean(nextPressure, goal);
-                    float interval = CoverageDelay(nextPressure, goal);
-                    if (cancellations > 0 && blackoutCount > 0)
-                        interval = Mathf.Min(interval, coverageOutageRetryMaxSeconds);
-                    nextCoverageAt = simulationTime + interval;
-                    host.Recorder?.RecordCoverageOpportunity(simulationTime, established,
-                        anticipated, cancellations, goal, chance, roll, nextPressure,
-                        mean, interval, nextCoverageAt, plan?.ConnectionId,
-                        plan != null ? null : !selected ? "probability_skip" :
-                            idsExhausted ? "ids_exhausted" : "no_weighted_purpose");
-                }
+                CreateBusinessDemand(simulationTime);
             }
             hostileActivities?.Tick(simulationTime);
             queue.Sort((a, b) =>
@@ -562,7 +503,34 @@ namespace Uptime.Connections
             {
                 ConnectionSpawnPlan plan = queue[0].Plan;
                 queue.RemoveAt(0);
-                host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
+                bool business = pendingBusinessDemand.TryGetValue(plan.ConnectionId, out int sequence);
+                var beforeRegistration = business ? host.FindConnection(plan.ConnectionId) : null;
+                try
+                {
+                    host.RegisterConnection(LogicalConnectionDefinition.FromPlan(plan));
+                    if (business)
+                    {
+                        pendingBusinessDemand.Remove(plan.ConnectionId); demandAdmitted++;
+                        host.Recorder?.RecordBusinessDemand("business_demand_admitted", sequence, simulationTime,
+                            plan.ScheduledSpawnTime, legitimateMeanArrivalSeconds, 0, nextBusinessDemandAt, plan.ConnectionId);
+                    }
+                }
+                catch (Exception error)
+                {
+                    if (!business) throw;
+                    pendingBusinessDemand.Remove(plan.ConnectionId);
+                    if (host.FindConnection(plan.ConnectionId) != beforeRegistration)
+                    {
+                        demandAdmitted++;
+                        host.Recorder?.RecordBusinessDemand("business_demand_admitted", sequence, simulationTime,
+                            plan.ScheduledSpawnTime, legitimateMeanArrivalSeconds, 0, nextBusinessDemandAt, plan.ConnectionId,
+                            "registered_before_callback_error: " + error.Message);
+                        throw; // Preserve the actual registration and surface the observer error.
+                    }
+                    host.Recorder?.RecordBusinessDemand("business_demand_unadmitted", sequence, simulationTime,
+                        plan.ScheduledSpawnTime, legitimateMeanArrivalSeconds, 0, nextBusinessDemandAt, plan.ConnectionId,
+                        "registration_failed: " + error.Message);
+                }
             }
         }
 
@@ -876,49 +844,39 @@ namespace Uptime.Connections
             purpose.purposeTemplate && (objective == null || objective == "LOADER" ||
                 objective == "DELIVERY"); // The six current PURPOSES support both genera.
 
-        private void CountBenignPopulation(float now, out int established, out int anticipated)
+        private double BusinessDemandDelay() => Math.Max(.000001d,
+            -Math.Log(1d - businessDemandRandom.NextDouble()) * legitimateMeanArrivalSeconds);
+
+        private void CreateBusinessDemand(float now)
         {
-            established = 0;
-            anticipated = 0;
-            if (host.RuntimeConnections != null)
-                foreach (LogicalConnectionState state in host.RuntimeConnections)
+            // Advance from ideal due times, never from occupancy, health, failure or outage state.
+            while (nextBusinessDemandAt <= now)
+            {
+                double due = nextBusinessDemandAt, interval = BusinessDemandDelay();
+                nextBusinessDemandAt = due + interval;
+                int sequence = ++demandArrived;
+                ConnectionSpawnPlan plan = null; string reason = null;
+                try
                 {
-                    if (state.IsHostile) continue;
-                    if (state.IsActive) established++;
-                    else if (state.IsConnecting || state.IsPending) anticipated++;
+                    plan = idsExhausted ? null : GenerateBenignPlan((float)due);
+                    if (plan == null) reason = idsExhausted ? "ids_exhausted" : "no_weighted_purpose";
                 }
-            foreach (Queued queued in queue)
-                if (!queued.Plan.IsHostile &&
-                    queued.Plan.ScheduledSpawnTime <= now + ImminentPlanSeconds) anticipated++;
-        }
-
-        private int RecentBenignCancellations(float now)
-        {
-            recentBenignCancellations.RemoveAll(at =>
-                now - at >= coverageCancellationMemorySeconds);
-            return recentBenignCancellations.Count;
-        }
-
-        private float EffectiveCoverageGoal(float now)
-        {
-            return Mathf.Lerp(Mathf.Max(0f, coverageStartupGoal),
-                Mathf.Max(0f, benignPopulationGoal),
-                Mathf.Clamp01(now / Mathf.Max(0.01f, coverageRampSeconds)));
-        }
-
-        private float CoverageMean(int coveragePressure, float goal)
-        {
-            return Mathf.Max(0.01f, coverageMeanIntervalSeconds) *
-                Mathf.Exp(Mathf.Clamp(coverageResponse *
-                    (coveragePressure - goal), -1.4f, 1.8f));
-        }
-
-        private float CoverageDelay(int coveragePressure, float goal)
-        {
-            // Exponential waiting times allow both lulls and close arrivals. The occupancy
-            // response changes their mean, without a hard floor or population cap.
-            return Mathf.Max(0.1f, (float)(-Math.Log(1d - coverageRandom.NextDouble()) *
-                CoverageMean(coveragePressure, goal)));
+                catch (Exception error) { reason = "generation_failed: " + error.Message; }
+                host.Recorder?.RecordBusinessDemand("business_demand_arrived", sequence, now, due,
+                    legitimateMeanArrivalSeconds, interval, nextBusinessDemandAt, plan?.ConnectionId, reason);
+                if (plan != null)
+                {
+                    try
+                    {
+                        QueueSpawnPlan(plan, "independent_business");
+                        pendingBusinessDemand.Add(plan.ConnectionId, sequence);
+                        continue;
+                    }
+                    catch (Exception error) { reason = "queue_failed: " + error.Message; }
+                }
+                host.Recorder?.RecordBusinessDemand("business_demand_unadmitted", sequence, now, due,
+                    legitimateMeanArrivalSeconds, interval, nextBusinessDemandAt, plan?.ConnectionId, reason);
+            }
         }
 
         private float HostileDelay()

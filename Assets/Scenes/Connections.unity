@@ -7893,14 +7893,7 @@ MonoBehaviour:
   seed: 1701
   randomizeSeed: 1
   initialGraceSeconds: 3
-  benignPopulationGoal: 3
-  coverageStartupGoal: 1
-  coverageRampSeconds: 75
-  coverageMeanIntervalSeconds: 8
-  coverageResponse: 0.6
-  coverageCancellationMemorySeconds: 60
-  coverageAtGoalChance: 0.12
-  coverageOutageRetryMaxSeconds: 20
+  legitimateMeanArrivalSeconds: 23.225807
   ambientOriginId: EXT1
   ambientOrigins: []
   purposeTargetOverrides: []

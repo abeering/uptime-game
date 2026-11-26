@@ -70,7 +70,7 @@ namespace Uptime.Connections.EditorTools
                 host.RunMode == ConnectionRunMode.Generated && traffic.AutoGenerationEnabled &&
                 traffic.HostileGenerationEnabled && traffic.RandomizeSeed &&
                 traffic.HostileMeanIntervalSeconds == 8 && traffic.InitialGraceSeconds == 3 &&
-                traffic.BenignPopulationGoal == 4 && activity.OrdinaryWeight == 6 &&
+                traffic.LegitimateMeanArrivalSeconds > 0 && activity.OrdinaryWeight == 6 &&
                 activity.ReconnaissanceWeight == 2 && activity.PayloadWeight == 2 &&
                 activity.WormWeight == 2 && activity.PayloadLauncherWeight == 2 &&
                 activity.DirectDuelWeight == 1 && activity.ConnectionDuelWeight == 1 &&
