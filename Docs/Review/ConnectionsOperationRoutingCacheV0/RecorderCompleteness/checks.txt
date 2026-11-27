@@ -1,0 +1,74 @@
+PASS existing overclock supplies effective capacity
+PASS existing defense reserves LOAD
+PASS actual run JSON saved
+PASS sampled effective capacity includes authored 1.5x Overclock rather than base 5: expected 7.5, observed 7.5
+PASS baseline reservation: expected 1, observed 1
+PASS infection reservation: expected 2, observed 2
+PASS defense reservation: expected 4, observed 4
+PASS zero productive rate is still actual allocation demand
+PASS ordinary/actual destinations and committed policy remain distinct from current selection
+PASS saved values reconstruct uncached sampled demand including all active modifiers/noise: expected 6.89989, observed 6.89989
+PASS saved values reconstruct unoptimized WORK including requirement modifier: expected 1050, observed 1050
+PASS original base LOAD distinguished from composed LOAD: expected 4, observed 4
+PASS test exercises genuine fixed/keyword/wave/rate/noise composition, not base-only demand
+PASS applied API weight and locked CACHE factors serialized
+PASS existing operation/configuration timestamps present
+PASS new raw flag survives disk serialization without increasing sample frequency
+PASS existing overclock supplies effective capacity
+PASS existing defense reserves LOAD
+PASS actual run JSON saved
+PASS sampled effective capacity includes authored 1.5x Overclock rather than base 5: expected 7.5, observed 7.5
+PASS baseline reservation: expected 1, observed 1
+PASS infection reservation: expected 2, observed 2
+PASS defense reservation: expected 4, observed 4
+PASS zero productive rate is still actual allocation demand
+PASS ordinary/actual destinations and committed policy remain distinct from current selection
+PASS saved values reconstruct uncached sampled demand including all active modifiers/noise: expected 6.89989, observed 6.89989
+PASS saved values reconstruct unoptimized WORK including requirement modifier: expected 1050, observed 1050
+PASS original base LOAD distinguished from composed LOAD: expected 4, observed 4
+PASS test exercises genuine fixed/keyword/wave/rate/noise composition, not base-only demand
+PASS applied API weight and locked CACHE factors serialized
+PASS existing operation/configuration timestamps present
+PASS new raw flag survives disk serialization without increasing sample frequency
+PASS real held transition boundary reached
+PASS actual run JSON saved
+PASS held Active operation is excluded from offline allocation demand; preceding end time recorded
+PASS actual run JSON saved
+PASS next started operation resumes recorded demand
+PASS existing overclock supplies effective capacity
+PASS existing defense reserves LOAD
+PASS actual run JSON saved
+PASS sampled effective capacity includes authored 1.5x Overclock rather than base 5: expected 7.5, observed 7.5
+PASS baseline reservation: expected 1, observed 1
+PASS infection reservation: expected 2, observed 2
+PASS defense reservation: expected 4, observed 4
+PASS zero productive rate is still actual allocation demand
+PASS ordinary/actual destinations and committed policy remain distinct from current selection
+PASS saved values reconstruct uncached sampled demand including all active modifiers/noise: expected 8.221016, observed 8.221016
+PASS saved values reconstruct unoptimized WORK including requirement modifier: expected 1050, observed 1050
+PASS original base LOAD distinguished from composed LOAD: expected 4, observed 4
+PASS test exercises genuine fixed/keyword/wave/rate/noise composition, not base-only demand
+PASS applied API weight and locked CACHE factors serialized
+PASS existing operation/configuration timestamps present
+PASS new raw flag survives disk serialization without increasing sample frequency
+PASS existing overclock supplies effective capacity
+PASS existing defense reserves LOAD
+PASS actual run JSON saved
+PASS sampled effective capacity includes authored 1.5x Overclock rather than base 5: expected 7.5, observed 7.5
+PASS baseline reservation: expected 1, observed 1
+PASS infection reservation: expected 2, observed 2
+PASS defense reservation: expected 4, observed 4
+PASS zero productive rate is still actual allocation demand
+PASS ordinary/actual destinations and committed policy remain distinct from current selection
+PASS saved values reconstruct uncached sampled demand including all active modifiers/noise: expected 8.221016, observed 8.221016
+PASS saved values reconstruct unoptimized WORK including requirement modifier: expected 1050, observed 1050
+PASS original base LOAD distinguished from composed LOAD: expected 4, observed 4
+PASS test exercises genuine fixed/keyword/wave/rate/noise composition, not base-only demand
+PASS applied API weight and locked CACHE factors serialized
+PASS existing operation/configuration timestamps present
+PASS new raw flag survives disk serialization without increasing sample frequency
+PASS real held transition boundary reached
+PASS actual run JSON saved
+PASS held Active operation is excluded from offline allocation demand; preceding end time recorded
+PASS actual run JSON saved
+PASS next started operation resumes recorded demand

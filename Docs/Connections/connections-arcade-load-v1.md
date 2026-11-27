@@ -8,6 +8,8 @@ Slice 3A adds optional additive modifiers to an operation's authored WORK and re
 
 **API Configuration V0 follow-up:** The original neutral formula below remains exact with an empty policy. [API PURPOSE priority](connections-api-configuration-v0.md) adds a capped weight to effective target requests, redistributing excess after unchanged baseline/infection/defense reservations. Routes containing API qualify; transit itself consumes no additional LOAD. Requested LOAD, processing WORK, capacity and service budgets are unchanged.
 
+**Operation Routing & CACHE follow-up:** Allocation now reads the current operation’s committed target and effective requirements. CACHE applies locked WORK/LOAD efficiency after the existing workload pipeline and behavior composition; it remains an ordinary node capacity pool. Original business value and whole-connection service budget do not shrink. [Full contract](connections-operation-routing-cache-v0.md).
+
 ## Mechanical model
 
 - A route's final node is its current target. Earlier nodes and physical links remain visible route geometry and do not consume or constrain LOAD.

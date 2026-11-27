@@ -1,0 +1,30 @@
+PASS Connections serialized generation component unchanged (arrival/workload/PURPOSE/hostile recipes, weights, cadence, seed settings)
+PASS Connections legitimateWorkloadMultiplier: 2.5
+PASS Connections legitimateMeanArrivalSeconds: 23.225807
+PASS Connections hostileMeanIntervalSeconds: 54
+PASS Connections serviceTimeoutTolerance: 1.5
+PASS Connections shiftWorkTarget: 1000
+PASS Connections businessFailureLimit: 10
+PASS Connections apiAllocationWeight: 2
+PASS Connections existing loadCapacity unchanged; append CACHE 10
+PASS Connections existing baselineLoad unchanged; append CACHE 0
+INFO Connections native object IDs: added 57, removed 0
+PASS ConnectionsAdvanced serialized generation component unchanged (arrival/workload/PURPOSE/hostile recipes, weights, cadence, seed settings)
+PASS ConnectionsAdvanced legitimateWorkloadMultiplier: 2.5
+PASS ConnectionsAdvanced legitimateMeanArrivalSeconds: 20
+PASS ConnectionsAdvanced hostileMeanIntervalSeconds: 30
+PASS ConnectionsAdvanced serviceTimeoutTolerance: 1.5
+PASS ConnectionsAdvanced shiftWorkTarget: 1500
+PASS ConnectionsAdvanced businessFailureLimit: 10
+PASS ConnectionsAdvanced apiAllocationWeight: 2
+PASS ConnectionsAdvanced existing loadCapacity unchanged; append CACHE 10
+PASS ConnectionsAdvanced existing baselineLoad unchanged; append CACHE 0
+INFO ConnectionsAdvanced native object IDs: added 57, removed 0
+PASS unchanged Assets/Scenes/GameScene.unity
+PASS unchanged Assets/Scenes/ABScene.unity
+PASS unchanged Assets/Scenes/ConnectionsDisplayLab.unity
+PASS unchanged Assets/Scripts/Connections/ResourceAllocator.cs
+PASS unchanged Assets/Scripts/Connections/SimulationHost.Shift.cs
+PASS generation runtime only copies new optional intended destination; no sampling or scheduling changes
+PASS no shared heartbeat/style/shader/display code or Display Lab changes
+PASS all four actual Play Mode allocation snapshots retain business32 with effective LOAD4/WORK20

@@ -1,0 +1,108 @@
+PASS Assets/Scenes/Connections.unity identical route directly starts next operation
+PASS Assets/Scenes/Connections.unity/shared-prefix longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.59999942779541
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/Connections.unity/shorter longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0, actual 0
+PASS strictly shorter route charges zero time; cosmetic retraction never gates WORK
+PASS recorded reroute duration equals new physical traversal: expected 0, actual 0
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/Connections.unity/longer longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.599999487400055
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/Connections.unity/origin longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.599999487400055
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS oversubscribed old target allocates proportionally: expected 3.33333325386047, actual 3.33333325386047
+PASS old-target peer immediately receives released processing capacity: expected 8, actual 8
+PASS new target reserves no processing during reroute: expected 0, actual 0
+PASS new target resumes operation allocation after suffix establishment: expected 4, actual 4
+PASS connection timers advance while upcoming operation timers wait
+PASS identity hopping and live alias reservation persist during rerouting
+PASS operation behavior starts only after new route establishment
+PASS offline future node keeps locked route until arrival
+PASS BLACKOUT during rerouting cancels exactly once without failover/partial credit
+PASS BLACKOUT on retained prefix interrupts immediately
+PASS BLACKOUT during rerouting cancels exactly once without failover/partial credit
+PASS obsolete tail is presentational; its BLACKOUT cannot cancel the newly committed path
+PASS reroute resumes at new target after obsolete-node outage
+PASS original service timeout continues during REROUTING
+PASS rerouting connection remains addressable/killable
+PASS repeated termination cannot duplicate accounting
+PASS Assets/Scenes/ConnectionsAdvanced.unity identical route directly starts next operation
+PASS Assets/Scenes/ConnectionsAdvanced.unity/shared-prefix longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.5999995470047
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/ConnectionsAdvanced.unity/shorter longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0, actual 0
+PASS strictly shorter route charges zero time; cosmetic retraction never gates WORK
+PASS recorded reroute duration equals new physical traversal: expected 0, actual 0
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/ConnectionsAdvanced.unity/longer longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.59999942779541
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS Assets/Scenes/ConnectionsAdvanced.unity/origin longest common prefix
+PASS persistent established identity/value/deadline across rerouting
+PASS only suffix links charged: expected 0.600000023841858, actual 0.600000023841858
+PASS real REROUTING state releases processing and performs no WORK
+PASS already established prefix remains reached
+PASS recorder retains established classification and explicit rerouting evidence
+PASS elapsed traversal never executes processing WORK
+PASS recorded reroute duration equals new physical traversal: expected 0.600000023841858, actual 0.599999487400055
+PASS exact-once connection/operation/rerouting boundaries
+PASS whole arc earns original business credit once
+PASS oversubscribed old target allocates proportionally: expected 3.33333325386047, actual 3.33333325386047
+PASS old-target peer immediately receives released processing capacity: expected 8, actual 8
+PASS new target reserves no processing during reroute: expected 0, actual 0
+PASS new target resumes operation allocation after suffix establishment: expected 4, actual 4
+PASS connection timers advance while upcoming operation timers wait
+PASS identity hopping and live alias reservation persist during rerouting
+PASS operation behavior starts only after new route establishment
+PASS offline future node keeps locked route until arrival
+PASS BLACKOUT during rerouting cancels exactly once without failover/partial credit
+PASS BLACKOUT on retained prefix interrupts immediately
+PASS BLACKOUT during rerouting cancels exactly once without failover/partial credit
+PASS obsolete tail is presentational; its BLACKOUT cannot cancel the newly committed path
+PASS reroute resumes at new target after obsolete-node outage
+PASS original service timeout continues during REROUTING
+PASS rerouting connection remains addressable/killable
+PASS repeated termination cannot duplicate accounting

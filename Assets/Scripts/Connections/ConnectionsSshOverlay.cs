@@ -16,6 +16,9 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text title;
         [SerializeField] private TMP_Text currentPolicy;
         [SerializeField] private TMP_Text hint;
+        [SerializeField] private TMP_Text description;
+        private bool configuringCache;
+        private NodeView configuredNode;
         [SerializeField] private TMP_Text[] choices;
         [SerializeField] private Button[] choiceButtons;
         [SerializeField] private Color selectedColor = new(.64f, .94f, .81f);
@@ -29,17 +32,19 @@ namespace Uptime.Connections
         public bool CanDismissWithEscape => IsOpen;
         public int SelectedIndex => selected;
 
-        public bool Open(SimulationHost simulation, Terminal owner)
+        public bool Open(SimulationHost simulation, Terminal owner) => Open(simulation, owner, simulation?.ApiConfigurationNode);
+        public bool Open(SimulationHost simulation, Terminal owner, NodeView node)
         {
-            if (simulation == null || simulation.RunEnded || simulation.ApiConfigurationNode == null) return false;
+            if (simulation == null || simulation.RunEnded || node == null) return false;
             if (opened) Close();
-            host = simulation; terminal = owner; catalog = host.ApiPurposeChoices;
+            host = simulation; terminal = owner; configuredNode = node; configuringCache = node == host.CacheConfigurationNode;
+            catalog = configuringCache ? host.CachePurposeChoices : host.ApiPurposeChoices;
             if (catalog.Count + 1 > choices.Length || choices.Length != choiceButtons.Length) return false;
             selected = 0;
-            for (int i = 0; i < catalog.Count; i++) if (catalog[i].id == host.ApiFavoredPurposeId) selected = i + 1;
+            for (int i = 0; i < catalog.Count; i++) if (catalog[i].id == SelectedPurpose) selected = i + 1;
             opened = true; suspended = false;
-            host.ApiPolicyChanged += Render; host.SimulationReset += Abort; host.RunFinished += Abort;
-            gameObject.SetActive(true); title.text = "SSH / " + host.ApiConfigurationNode.NodeId;
+            host.ApiPolicyChanged += Render; host.CachePolicyChanged += Render; host.SimulationReset += Abort; host.RunFinished += Abort;
+            gameObject.SetActive(true); title.text = "SSH / " + configuredNode.NodeId;
             for (int i = 0; i < choices.Length; i++)
             {
                 int index = i; choiceButtons[i].onClick.RemoveAllListeners();
@@ -48,7 +53,7 @@ namespace Uptime.Connections
             }
             terminal.SuspendKeyboard(true);
             waitingForRelease = Keyboard.current != null && Keyboard.current.anyKey.isPressed;
-            placement.PlaceSsh(host.ApiConfigurationNode); transform.SetAsLastSibling();
+            placement.PlaceSsh(configuredNode); transform.SetAsLastSibling();
             escapeCoordinator.Register(this); EventSystem.current?.SetSelectedGameObject(gameObject);
             Render(); return true;
         }
@@ -79,19 +84,23 @@ namespace Uptime.Connections
         {
             if (!IsOpen || suspended || duelOverlay != null && duelOverlay.IsOpen) return;
             string id = selected == 0 ? null : catalog[selected - 1].id;
-            if (host.TrySetApiPurpose(id, out string result)) terminal.AppendText(result, selectedColor);
+            bool accepted = configuringCache ? host.TrySetCachePurpose(id, out string result) : host.TrySetApiPurpose(id, out result);
+            if (accepted) terminal.AppendText(result, selectedColor);
             Render(); EventSystem.current?.SetSelectedGameObject(gameObject);
         }
+        private string SelectedPurpose => configuringCache ? host.CachePurposeId : host.ApiFavoredPurposeId;
         private void Render()
         {
             if (host == null || catalog == null) return;
-            currentPolicy.text = "FAVORED: " + (string.IsNullOrEmpty(host.ApiFavoredPurposeId) ? "NONE" : host.ApiFavoredPurposeId) + $"     WEIGHT ×{host.ApiAllocationWeight:G3}";
+            currentPolicy.text = (configuringCache ? "CACHED: " : "FAVORED: ") + (string.IsNullOrEmpty(SelectedPurpose) ? "NONE" : SelectedPurpose) +
+                (configuringCache ? "" : $"     WEIGHT ×{host.ApiAllocationWeight:G3}");
+            if (description != null) description.text = configuringCache ? $"READ ONLY · WORK ×{host.CachedWorkMultiplier:G3} · LOAD ×{host.CachedLoadMultiplier:G3}" : "FAVOR ONE PURPOSE · TOTAL CAPACITY UNCHANGED";
             for (int i = 0; i <= catalog.Count; i++)
             {
                 string id = i == 0 ? null : catalog[i - 1].id;
-                bool active = id == (string.IsNullOrEmpty(host.ApiFavoredPurposeId) ? null : host.ApiFavoredPurposeId);
+                bool active = id == (string.IsNullOrEmpty(SelectedPurpose) ? null : SelectedPurpose);
                 choices[i].text = (i == selected ? "> " : "  ") + (active ? "[X] " : "[ ] ") +
-                    (i == 0 ? "NONE / CLEAR PRIORITY" : catalog[i - 1].id + "  /  " + catalog[i - 1].claimedPurpose);
+                    (i == 0 ? (configuringCache ? "NONE / CLEAR CACHE" : "NONE / CLEAR PRIORITY") : catalog[i - 1].id + "  /  " + catalog[i - 1].claimedPurpose);
                 choices[i].color = i == selected ? selectedColor : ordinaryColor;
             }
             hint.text = "↑↓ CHOOSE   ENTER APPLY" + (escapeTarget ? "   ESC CLOSE" : "");
@@ -103,7 +112,7 @@ namespace Uptime.Connections
         {
             if (!opened) return;
             opened = false;
-            if (host != null) { host.ApiPolicyChanged -= Render; host.SimulationReset -= Abort; host.RunFinished -= Abort; }
+            if (host != null) { host.ApiPolicyChanged -= Render; host.CachePolicyChanged -= Render; host.SimulationReset -= Abort; host.RunFinished -= Abort; }
             escapeCoordinator?.Unregister(this); gameObject.SetActive(false);
             if (duelOverlay == null || !duelOverlay.IsOpen)
             { terminal?.SuspendKeyboard(false, true); terminal?.RestoreKeyboardFocus(); }

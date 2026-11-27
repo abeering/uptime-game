@@ -77,7 +77,7 @@ namespace Uptime.Connections
                 Operations[i] = stage == null ? null : new OperationStage(stage.Operation,
                     stage.TotalWork, stage.DesiredLoad, stage.ActivityDescription,
                     stage.EffectOnCompletion, stage.Behaviors, stage.InfectionPayload,
-                    stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs);
+                    stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs, stage.IntendedDestination);
             }
             if (businessWorkValue.HasValue) BusinessWorkValue = businessWorkValue.Value;
             else foreach (var stage in Operations) BusinessWorkValue += stage?.TotalWork ?? 0f;
@@ -137,7 +137,7 @@ namespace Uptime.Connections
                 var stage = Operations[i];
                 scaled[i] = new OperationStage(stage.Operation, stage.TotalWork * multiplier,
                     stage.DesiredLoad * multiplier, stage.ActivityDescription, stage.EffectOnCompletion,
-                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs);
+                    stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec, stage.PlannedLogs, stage.IntendedDestination);
             }
             var trace = GenerationTrace?.Copy();
             if (trace != null) trace.finalOperations = ConnectionGenerationTrace.Capture(scaled);

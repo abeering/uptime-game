@@ -10,6 +10,8 @@ Slice 3A calls the existing ordered logical definition a **Connection Plan**, wh
 
 Phase 2 adds authored, ordered operations to one logical connection. Packet is unchanged.
 
+**Operation Routing & CACHE V0 follow-up:** The fixed-route description below records the original arc milestone. [The new contract](connections-operation-routing-cache-v0.md) separates the persistent logical request from each committed operation destination/route, retains original business value and service budget, reuses an identical established route and traverses a different route before processing. Existing next-step sequencing, completion effects and final-only connection credit remain.
+
 ## Stage model
 
 - Each operation has READ, WRITE, or EXECUTE, total WORK, desired LOAD, and an optional activity description.

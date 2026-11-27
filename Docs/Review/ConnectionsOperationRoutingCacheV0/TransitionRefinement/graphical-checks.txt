@@ -1,0 +1,59 @@
+PASS Connections-1920-divergent no productive WORK/allocation while REROUTING frame7
+PASS Connections-1920-divergent no productive WORK/allocation while REROUTING frame8
+PASS Connections-1920-divergent no productive WORK/allocation while REROUTING frame9
+PASS Connections-1920-divergent same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS Connections-1920-divergent identity color and established prefix remain continuous
+PASS Connections-1920-divergent actual retraction/extension and visible REROUTING inspection
+PASS Connections-1920-divergent only new suffix traversal charged
+PASS Connections-1280-divergent no productive WORK/allocation while REROUTING frame11
+PASS Connections-1280-divergent no productive WORK/allocation while REROUTING frame12
+PASS Connections-1280-divergent no productive WORK/allocation while REROUTING frame13
+PASS Connections-1280-divergent no productive WORK/allocation while REROUTING frame14
+PASS Connections-1280-divergent no productive WORK/allocation while REROUTING frame15
+PASS Connections-1280-divergent same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS Connections-1280-divergent identity color and established prefix remain continuous
+PASS Connections-1280-divergent actual retraction/extension and visible REROUTING inspection
+PASS Connections-1280-divergent only new suffix traversal charged
+PASS Connections-1280-shorter same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS Connections-1280-shorter identity color and established prefix remain continuous
+PASS Connections-1280-shorter actual retraction/extension and visible REROUTING inspection
+PASS Connections-1280-shorter only new suffix traversal charged
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame11
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame12
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame13
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame14
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame15
+PASS Connections-1280-longer no productive WORK/allocation while REROUTING frame16
+PASS Connections-1280-longer same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS Connections-1280-longer identity color and established prefix remain continuous
+PASS Connections-1280-longer actual retraction/extension and visible REROUTING inspection
+PASS Connections-1280-longer only new suffix traversal charged
+PASS ConnectionsAdvanced-1920-divergent no productive WORK/allocation while REROUTING frame7
+PASS ConnectionsAdvanced-1920-divergent no productive WORK/allocation while REROUTING frame8
+PASS ConnectionsAdvanced-1920-divergent no productive WORK/allocation while REROUTING frame9
+PASS ConnectionsAdvanced-1920-divergent same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS ConnectionsAdvanced-1920-divergent identity color and established prefix remain continuous
+PASS ConnectionsAdvanced-1920-divergent actual retraction/extension and visible REROUTING inspection
+PASS ConnectionsAdvanced-1920-divergent only new suffix traversal charged
+PASS ConnectionsAdvanced-1280-divergent no productive WORK/allocation while REROUTING frame11
+PASS ConnectionsAdvanced-1280-divergent no productive WORK/allocation while REROUTING frame12
+PASS ConnectionsAdvanced-1280-divergent no productive WORK/allocation while REROUTING frame13
+PASS ConnectionsAdvanced-1280-divergent no productive WORK/allocation while REROUTING frame14
+PASS ConnectionsAdvanced-1280-divergent no productive WORK/allocation while REROUTING frame15
+PASS ConnectionsAdvanced-1280-divergent same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS ConnectionsAdvanced-1280-divergent identity color and established prefix remain continuous
+PASS ConnectionsAdvanced-1280-divergent actual retraction/extension and visible REROUTING inspection
+PASS ConnectionsAdvanced-1280-divergent only new suffix traversal charged
+PASS ConnectionsAdvanced-1280-shorter same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS ConnectionsAdvanced-1280-shorter identity color and established prefix remain continuous
+PASS ConnectionsAdvanced-1280-shorter actual retraction/extension and visible REROUTING inspection
+PASS ConnectionsAdvanced-1280-shorter only new suffix traversal charged
+PASS ConnectionsAdvanced-1280-longer no productive WORK/allocation while REROUTING frame11
+PASS ConnectionsAdvanced-1280-longer no productive WORK/allocation while REROUTING frame12
+PASS ConnectionsAdvanced-1280-longer no productive WORK/allocation while REROUTING frame13
+PASS ConnectionsAdvanced-1280-longer no productive WORK/allocation while REROUTING frame14
+PASS ConnectionsAdvanced-1280-longer no productive WORK/allocation while REROUTING frame15
+PASS ConnectionsAdvanced-1280-longer same model/identity/view/socket/shared renderer/heartbeat after transition
+PASS ConnectionsAdvanced-1280-longer identity color and established prefix remain continuous
+PASS ConnectionsAdvanced-1280-longer actual retraction/extension and visible REROUTING inspection
+PASS ConnectionsAdvanced-1280-longer only new suffix traversal charged

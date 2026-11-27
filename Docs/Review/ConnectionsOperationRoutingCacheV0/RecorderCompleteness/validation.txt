@@ -1,0 +1,6 @@
+Unity 6000.3.11f1, batch Editor, isolated project copy
+Execute: Uptime.Connections.EditorTools.RecorderPolicyEvidenceWitness.Regressions
+Exit code: 0
+RecorderPolicyEvidenceWitness PASS: 74 checks.
+RouteTransitionWitness PASS: 108 assertions.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-display-lab-v0/Logs/UptimeRuns/uptime_20261127_043744_seed-01701_5f6b4961.json

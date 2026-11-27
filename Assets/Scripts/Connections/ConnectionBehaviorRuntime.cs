@@ -272,8 +272,13 @@ namespace Uptime.Connections
         internal void Advance(float delta, float time)
         {
             if (!operationStarted) return;
-            foreach (TimedInstance behavior in connectionBehaviors) behavior.Advance(this, delta, time);
+            AdvanceConnection(delta, time);
             foreach (TimedInstance behavior in operationBehaviors) behavior.Advance(this, delta, time);
+        }
+        internal void AdvanceConnection(float delta, float time)
+        {
+            if (!connectionStarted) return;
+            foreach (TimedInstance behavior in connectionBehaviors) behavior.Advance(this, delta, time);
         }
 
         internal void EndOperation(float time)

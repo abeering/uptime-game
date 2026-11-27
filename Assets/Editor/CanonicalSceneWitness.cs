@@ -75,7 +75,7 @@ namespace Uptime.Connections.EditorTools
             var host = Open(scene, auto: true); bool small = scene == CanonicalSceneAuthoring.Scenes[0];
             var traffic = host.GetComponent<ConnectionTrafficDirector>();
             var activity = host.GetComponent<HostileActivityDirector>();
-            Check(host.Nodes.Length == (small ? 4 : 8) && host.PhysicalLinks.Length == (small ? 3 : 7), scene + " authored topology counts");
+            Check(host.Nodes.Length == (small ? 5 : 9) && host.PhysicalLinks.Length == (small ? 4 : 8), scene + " authored topology counts");
             Check(host.IntegrityEnabled && IntegrityState.Maximum == 2 && host.Integrity.Nodes.Where(n => !n.External).All(n => n.Value == 2), scene + " two-point Integrity enabled");
             Check(host.Integrity.SevereLoadRatio == 1.5f && host.Integrity.WarningSeconds == 10, scene + " shared severe-load rule");
             Check(new SerializedObject(traffic).FindProperty("profiles").arraySize > 0 &&
@@ -88,7 +88,9 @@ namespace Uptime.Connections.EditorTools
             var legal = host.Nodes.Where(n => traffic.IsInternalNode(n.View)).Select(n => n.View.NodeId).ToHashSet();
             var served = traffic.Profiles.Where(p => p.purposeTemplate && traffic.EffectiveAmbientWeight(p.id) > 0)
                 .SelectMany(p => traffic.EffectiveTargetIds(p)).ToHashSet();
-            Check(served.SetEquals(legal), scene + " every internal node has legitimate canonical destination cover");
+            Check(host.CacheConfigurationNode != null && host.CachePurposeChoices.Count > 0, scene + " CACHE has eligible configurable READ cover");
+            served.Add(host.CacheConfigurationNode.NodeId);
+            Check(served.SetEquals(legal), scene + " every internal node has ordinary or configured READ destination cover");
             foreach (var profile in traffic.Profiles.Where(p => p.purposeTemplate))
                 Check(traffic.EffectiveTargetIds(profile).All(legal.Contains) && profile.operations.All(o => o.meanWork > 0 && o.logs?.Length > 0),
                     scene + " valid PURPOSE/log/WORK content: " + profile.id);

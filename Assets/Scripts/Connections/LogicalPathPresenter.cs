@@ -190,18 +190,19 @@ namespace Uptime.Connections
             var routes = new List<RouteLaneOrder.Route>();
             foreach (LogicalConnectionState connection in connections)
             {
-                if (!connection.IsActive && !connection.IsConnecting &&
+                if (!connection.IsLive &&
                     !(connection.IsComplete && (!connection.IsNormalDeparture || views[connection].UsesSharedDisplay)))
                     continue;
+                views[connection].RefreshOperationRoute();
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
                 views[connection].SetIdentitySlot(identityPalette.AssignSlot(connection));
-                var nodes = new NodeView[connection.Definition.Route.Length];
-                var links = new PhysicalLinkView[connection.RouteLinks.Length];
+                var nodes = new NodeView[views[connection].PresentationRoute.Length];
+                var links = new PhysicalLinkView[views[connection].PresentationLinks.Length];
                 for (int i = 0; i < nodes.Length; i++)
-                    nodes[i] = connection.Definition.Route[i].Node;
+                    nodes[i] = views[connection].PresentationRoute[i].Node;
                 for (int i = 0; i < links.Length; i++)
-                    links[i] = connection.RouteLinks[i].View;
+                    links[i] = views[connection].PresentationLinks[i].View;
                 routes.Add(new RouteLaneOrder.Route(connection.ConnectionId, nodes, links));
             }
             var payloadLinks = new Dictionary<PayloadState, PhysicalLinkView>();
@@ -281,17 +282,17 @@ namespace Uptime.Connections
                 identityPresenter.BeginFrame();
             foreach (LogicalConnectionState connection in connections)
             {
-                if (!connection.IsActive && !connection.IsConnecting &&
+                if (!connection.IsLive &&
                     !(connection.IsComplete && (!connection.IsNormalDeparture || views[connection].UsesSharedDisplay)))
                     continue;
                 Color accent = identityPalette.Assign(connection);
-                float[] starts = new float[connection.RouteLinks.Length];
+                float[] starts = new float[views[connection].PresentationLinks.Length];
                 float[] ends = new float[starts.Length];
                 float[] widths = new float[starts.Length];
                 float maximumSocketDiameter = float.PositiveInfinity;
                 for (int edge = 0; edge < starts.Length; edge++)
                 {
-                    PhysicalLinkReference link = connection.RouteLinks[edge];
+                    PhysicalLinkReference link = views[connection].PresentationLinks[edge];
                     PhysicalLinkView linkView = link.View;
                     List<string> users = laneOrder.Orders[linkView];
                     ports.TryGetValue(linkView, out NodePortPacking.Port port);
@@ -305,15 +306,15 @@ namespace Uptime.Connections
                     float offset = EdgeGeometry.Offset(users.IndexOf(connection.ConnectionId),
                         users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
-                    bool forward = connection.Definition.Route[edge].Node == linkView.NodeA;
+                    bool forward = views[connection].PresentationRoute[edge].Node == linkView.NodeA;
                     float sign = forward ? 1f : -1f;
                     starts[edge] = sign * (offset + (forward ? port.AtA : port.AtB));
                     ends[edge] = sign * (offset + (forward ? port.AtB : port.AtA));
                     widths[edge] = width;
                     if (identityPresenter != null)
                     {
-                        NodeView routeA = connection.Definition.Route[edge].Node;
-                        NodeView routeB = connection.Definition.Route[edge + 1].Node;
+                        NodeView routeA = views[connection].PresentationRoute[edge].Node;
+                        NodeView routeB = views[connection].PresentationRoute[edge + 1].Node;
                         Vector2 a = networkArea.InverseTransformPoint(routeA.transform.position);
                         Vector2 b = networkArea.InverseTransformPoint(routeB.transform.position);
                         Vector2 direction = (b - a).normalized;
@@ -468,12 +469,12 @@ namespace Uptime.Connections
                     users.Count, minLineGap, maxLineWidth);
                 foreach (LogicalConnectionState connection in connections)
                 {
-                    if (!connection.IsActive && !connection.IsConnecting) continue;
+                    if (!connection.IsLive) continue;
                     if (!views.TryGetValue(connection, out LogicalPathView view) || view == null)
                         continue;
-                    for (int i = 0; i < connection.RouteLinks.Length; i++)
+                    for (int i = 0; i < views[connection].PresentationLinks.Length; i++)
                     {
-                        if (connection.RouteLinks[i].View != probedLink) continue;
+                        if (views[connection].PresentationLinks[i].View != probedLink || !connection.Uses(views[connection].PresentationLinks[i])) continue;
                         if (view.TryGetVisualSegment(i, out Vector2 start, out Vector2 end,
                             out float visibleFraction, out _, out float lineWidth) &&
                             visibleFraction > 0f)
@@ -514,9 +515,9 @@ namespace Uptime.Connections
                 if (!views.TryGetValue(connection, out LogicalPathView view) || view == null)
                     continue;
                 int segment = -1;
-                if (connection.IsActive || connection.IsConnecting)
-                    for (int i = 0; i < connection.RouteLinks.Length; i++)
-                        if (connection.RouteLinks[i].View == probedLink) { segment = i; break; }
+                if (connection.IsLive)
+                    for (int i = 0; i < views[connection].PresentationLinks.Length; i++)
+                        if (views[connection].PresentationLinks[i].View == probedLink && connection.Uses(views[connection].PresentationLinks[i])) { segment = i; break; }
                 view.SetProbe(segment, center, along, halfSize,
                     connection.IsHostile ? probeHostileColor : probeBenignColor);
             }

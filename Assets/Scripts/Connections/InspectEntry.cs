@@ -38,6 +38,7 @@ namespace Uptime.Connections
 
         private readonly List<InspectOperationToken> operationTokens = new List<InspectOperationToken>();
         private LogicalConnectionState renderedState;
+        private int renderedRouteRevision = -1;
         private int renderedStage = -1;
         private int renderedOperationCount = -1;
         private bool renderedComplete;
@@ -222,7 +223,7 @@ namespace Uptime.Connections
             Set(identity, string.Empty);
             string priority = state.AllocationWeight > 1f && !string.IsNullOrEmpty(state.AllocationPolicyNodeId) ?
                 $"{state.AllocationPolicyNodeId} ×{state.AllocationWeight:G3} · " : string.Empty;
-            Set(purpose, priority + (state.Definition.ClaimedPurpose ?? string.Empty));
+            Set(purpose, priority + (state.IsRerouting ? "REROUTING · " : "") + (state.IsCached ? "CACHE · " : "") + (state.Definition.ClaimedPurpose ?? string.Empty));
             if (identity != null) identity.color = state.IsComplete ? quietColor : accent;
             if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)
@@ -238,7 +239,7 @@ namespace Uptime.Connections
             Color tint = state.IsComplete || !state.IsActive || state.IsTransitioning ? quietColor :
                 state.Performance == LoadPerformance.AtSpeed ? atSpeedColor :
                 state.Performance == LoadPerformance.Slowed ? limitedColor : stalledColor;
-            if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex ||
+            if (!ReferenceEquals(renderedState, state) || renderedStage != state.CurrentOperationIndex || renderedRouteRevision != state.RouteRevision ||
                 renderedOperationCount != state.OperationCount || renderedComplete != state.IsComplete ||
                 (operationRow != null &&
                     Mathf.Abs(renderedTimelineWidth - operationRow.rect.width) > 0.5f))
@@ -256,7 +257,7 @@ namespace Uptime.Connections
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.Resolution == ConnectionResolution.Withdrawn ? "WITHDRAWN" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
-                state.IsConnecting ? "CONNECTING" :
+                state.IsRerouting ? "REROUTING" : state.IsConnecting ? "CONNECTING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
             string reason = string.Empty;
@@ -272,7 +273,8 @@ namespace Uptime.Connections
             Set(throughput, status + reason + rateNote + (state.AtRisk ? " · AT RISK" : ""));
             if (throughput != null) throughput.color = tint;
             float fraction = CurrentWorkFraction(state);
-            Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}");
+            Set(work, $"WORK {fraction * 100f:0}%   {state.CompletedWork:0.#}/{state.CurrentTotalWork:0.#}" +
+                (state.IsCached ? $"  (×{state.WorkMultiplier:G3}W/×{state.LoadMultiplier:G3}L)" : ""));
             Set(bottleneck, state.ActivityDescription);
             Set(eta, CurrentOperationEta(state));
             if (throughput != null)
@@ -304,6 +306,7 @@ namespace Uptime.Connections
                 operationRow, operationTokenPrefab, operationTokens);
             renderedState = state;
             renderedStage = state.CurrentOperationIndex;
+            renderedRouteRevision = state.RouteRevision;
             renderedOperationCount = state.OperationCount;
             renderedComplete = state.IsComplete;
             renderedTimelineWidth = operationRow != null ? operationRow.rect.width : 0f;
@@ -345,7 +348,8 @@ namespace Uptime.Connections
                 operationTokens.Add(token);
                 return token;
             }
-            string target = state.TargetNode.NodeId;
+            string target = state.OperationDestinationAt(state.CurrentOperationIndex).NodeId;
+            string previousTarget = state.OperationDestinationAt(Mathf.Max(0, state.CurrentOperationIndex - 1)).NodeId;
             int current = state.CurrentOperationIndex;
             int completedCount = completedNormally ? state.OperationCount - 1 : current;
             int futureCount = completedNormally ? 0 : state.OperationCount - current - 1;
@@ -384,7 +388,7 @@ namespace Uptime.Connections
             {
                 float previousWidth = operationTokenPrefab.Measure(
                     InspectOperationToken.OperationLabel(state.Definition.OperationAt(current - 1),
-                        target), true);
+                        previousTarget), true);
                 float olderWidth = olderCount > 0 ?
                     operationTokenPrefab.Measure("+" + olderCount, true) : 0f;
                 float replacement = previousWidth + (olderCount > 0 ? olderWidth : 0f);
@@ -395,7 +399,7 @@ namespace Uptime.Connections
                 {
                     float shortPreviousWidth = operationTokenPrefab.Measure(
                         InspectOperationToken.OperationLabel(
-                            state.Definition.OperationAt(current - 1), target, true), true);
+                            state.Definition.OperationAt(current - 1), previousTarget, true), true);
                     candidateWidths = candidateWidths - previousWidth + shortPreviousWidth;
                     shortPrevious = true;
                 }
@@ -409,7 +413,7 @@ namespace Uptime.Connections
             if (showOlder) AddToken().ShowCompletedCount(olderCount);
             else if (showHistory) AddToken().ShowCompletedCount(completedCount);
             if (showPrevious)
-                AddToken().ShowOperation(state.Definition.OperationAt(current - 1), target, true,
+                AddToken().ShowOperation(state.Definition.OperationAt(current - 1), previousTarget, true,
                     quietColor, shortPrevious);
             InspectOperationToken activeToken = AddToken();
             activeToken.ShowOperation(state.Definition.OperationAt(current), target,

@@ -1017,6 +1017,7 @@ MonoBehaviour:
   title: {fileID: 6048477482929116119}
   currentPolicy: {fileID: 5486544710421872284}
   hint: {fileID: 8283125541325006124}
+  description: {fileID: 5927153182877094879}
   choices:
   - {fileID: 5895038028467655069}
   - {fileID: 6651792502798111487}

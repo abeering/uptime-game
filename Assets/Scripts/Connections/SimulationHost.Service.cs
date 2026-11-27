@@ -56,7 +56,7 @@ namespace Uptime.Connections
             if (!serviceTimeoutsEnabled) return;
             var due = new List<LogicalConnectionState>();
             foreach (var state in runtimeConnections)
-                if (state.IsActive && !state.IsHostile && state.HasServiceTarget &&
+                if (state.HasEstablished && !state.IsComplete && !state.IsHostile && state.HasServiceTarget &&
                     simulationTimeSeconds >= state.ServiceDeadlineSeconds) due.Add(state);
             due.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             foreach (var state in due)

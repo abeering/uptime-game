@@ -21,6 +21,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunMetadata
     {
+        public string cacheConfigurationNodeId;
+        public float cachedWorkMultiplier, cachedLoadMultiplier;
         public string apiConfigurationNodeId;
         public float apiAllocationWeight;
         public float legitimateWorkloadMultiplier;
@@ -188,6 +190,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public OperationRoutingRecord operationRouting;
+        public ReroutingRecord rerouting;
         public string policyNodeId, previousPurposeId, favoredPurposeId;
         public float priorityWeight;
         public int demandSequence;
@@ -428,6 +432,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class OperationRecord
     {
+        public string intendedDestinationNodeId;
         public string kind;
         public string completionEffect;
         public string launchDestinationNodeId;
@@ -455,6 +460,7 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public string cachePurposeId;
         public string apiFavoredPurposeId;
         public float apiAllocationWeight;
         public BusinessDemandSnapshot businessDemand;
@@ -571,11 +577,15 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionSnapshot
     {
+        public OperationRoutingRecord operationRouting;
+        public ReroutingRecord rerouting;
         public float allocationWeight;
         public string allocationPolicyNodeId;
         public double businessWorkValue;
         public string id;
         public string lifecycle;
+        // Active can also be a held stage boundary; only demanding operations enter allocation.
+        public bool isDemanding;
         public int operationIndex;
         public string operationKind;
         public string target;
@@ -593,6 +603,23 @@ namespace Uptime.Connections
         public string performance;
         public float serviceDeadlineSeconds, serviceRemainingSeconds, projectedServiceSeconds;
         public bool serviceAtRisk;
+    }
+
+    [Serializable] public sealed class ReroutingRecord
+    {
+        public string[] previousRoute;
+        public int sharedNodeCount, newLinkCount, reachedNodeIndex;
+        public float startedAtSeconds, travelSeconds, linkElapsedSeconds;
+        public float finishedAtSeconds = -1;
+    }
+
+    [Serializable] public sealed class OperationRoutingRecord
+    {
+        public int operationIndex;
+        public string intendedDestination, actualDestination, reason, selectedCachePurpose;
+        public string[] route;
+        public bool cached;
+        public float committedAtSeconds, workMultiplier, loadMultiplier, originalWork, originalLoad, processingWork, processingLoad;
     }
 
     // Observes authoritative state and writes one replaceable JSON file per Play Mode run.
@@ -654,6 +681,8 @@ namespace Uptime.Connections
                 log.run.hackerCommitmentSeconds = directives.CommitmentSeconds;
                 log.run.hackerPreferenceProbability = directives.PreferenceProbability;
             }
+            log.run.cacheConfigurationNodeId = host.CacheConfigurationNode?.NodeId;
+            log.run.cachedWorkMultiplier = host.CachedWorkMultiplier; log.run.cachedLoadMultiplier = host.CachedLoadMultiplier;
             log.run.apiConfigurationNodeId = host.ApiConfigurationNode?.NodeId;
             log.run.apiAllocationWeight = host.ApiAllocationWeight;
             log.run.shiftEnabled = host.ShiftEnabled;
@@ -798,6 +827,45 @@ namespace Uptime.Connections
             entry.parentInfectionAppliedAtSeconds = plan.ParentInfectionAppliedAtSeconds;
             // A queued plan is complete evidence even if the connection never spawns.
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public void RecordCachePolicyChange(string nodeId, string previous, string selected, float time)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("cache_policy_changed", time); entry.policyNodeId = nodeId;
+            entry.previousPurposeId = previous; entry.favoredPurposeId = selected; CaptureSnapshot(time);
+        }
+        private OperationRoutingRecord Routing(LogicalConnectionState state)
+        {
+            var r = state.Routing; if (r == null) return null;
+            int index = r.OperationIndex;
+            return new OperationRoutingRecord { operationIndex = index, intendedDestination = r.IntendedDestination.NodeId,
+                actualDestination = r.Target.View.NodeId, reason = r.Reason, selectedCachePurpose = r.SelectedCachePurpose,
+                route = Array.ConvertAll(r.Route, n => n.Node.NodeId), cached = r.Cached, committedAtSeconds = r.CommittedAtSeconds,
+                workMultiplier = r.WorkMultiplier, loadMultiplier = r.LoadMultiplier,
+                originalWork = state.Definition.WorkAt(index), originalLoad = state.Definition.LoadAt(index),
+                processingWork = state.Definition.WorkAt(index) * r.WorkMultiplier, processingLoad = state.Definition.LoadAt(index) * r.LoadMultiplier };
+        }
+        private ReroutingRecord Rerouting(LogicalConnectionState state)
+        {
+            var r = state.RouteTransition; if (r == null || r.RouteRevision != state.RouteRevision) return null;
+            return new ReroutingRecord { previousRoute = Array.ConvertAll(r.PreviousRoute, n => n.Node.NodeId),
+                sharedNodeCount = r.SharedNodeCount, newLinkCount = r.NewLinkCount, reachedNodeIndex = state.ReachedRouteNodeIndex,
+                startedAtSeconds = r.StartedAtSeconds, travelSeconds = r.TravelSeconds, linkElapsedSeconds = state.LinkTravelElapsedSeconds,
+                finishedAtSeconds = r.FinishedAtSeconds ?? -1 };
+        }
+        public void RecordRerouting(string type, LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent(type, time); entry.connectionId = state.ConnectionId; entry.operationIndex = state.CurrentOperationIndex;
+            entry.operationRouting = Routing(state); entry.rerouting = Rerouting(state); entry.targetNodeId = state.TargetNode.NodeId;
+        }
+
+        public void RecordOperationRoute(LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("operation_route_committed", time); entry.connectionId = state.ConnectionId;
+            entry.operationIndex = state.CurrentOperationIndex; entry.targetNodeId = state.TargetNode.NodeId; entry.operationRouting = Routing(state);
         }
 
         public void RecordApiPolicyChange(string nodeId, string previous, string selected, float weight, float time)
@@ -1075,6 +1143,7 @@ namespace Uptime.Connections
             entry.connectionId = state.ConnectionId;
             entry.operationIndex = index;
             entry.operationKind = state.CurrentOperation.ToString();
+            entry.targetNodeId = state.TargetNode.NodeId; entry.operationRouting = Routing(state);
             entry.completedWork = state.CompletedWork;
             entry.desiredLoad = state.DesiredLoad;
         }
@@ -1555,6 +1624,7 @@ namespace Uptime.Connections
                 legitimateFailureTotal = host.LegitimateFailureCount,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.shift = host.Shift;
+            snapshot.cachePurposeId = host.CachePurposeId;
             snapshot.apiFavoredPurposeId = host.ApiFavoredPurposeId;
             snapshot.apiAllocationWeight = host.ApiAllocationWeight;
             snapshot.businessDemand = trafficDirector?.BusinessDemand;
@@ -1657,22 +1727,22 @@ namespace Uptime.Connections
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
             {
-                if (!state.IsPending && !state.IsConnecting && !state.IsActive) continue;
-                if (state.IsActive)
+                if (!state.IsPending && !state.IsLive) continue;
+                if (state.IsActive || state.IsRerouting)
                 {
                     snapshot.activeConnections++;
                     if (state.IsHostile) snapshot.establishedHostile++;
                     else snapshot.establishedBenign++;
                 }
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
-                active.Add(new ConnectionSnapshot { id = state.ConnectionId,
+                active.Add(new ConnectionSnapshot { id = state.ConnectionId, operationRouting = Routing(state), rerouting = Rerouting(state),
                     allocationWeight = state.AllocationWeight, allocationPolicyNodeId = state.AllocationPolicyNodeId,
                     businessWorkValue = state.BusinessWorkValue,
                     serviceDeadlineSeconds = state.ServiceDeadlineSeconds,
                     serviceRemainingSeconds = state.ServiceRemainingSeconds,
                     projectedServiceSeconds = float.IsPositiveInfinity(state.ProjectedServiceSeconds) ? -1f : state.ProjectedServiceSeconds,
                     serviceAtRisk = state.AtRisk,
-                    lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
+                    lifecycle = state.Lifecycle.ToString(), isDemanding = state.IsDemanding, operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
                     desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
                     naturalLoadDelta = state.NaturalLoadDelta,
@@ -1849,7 +1919,7 @@ namespace Uptime.Connections
             {
                 if (!definition.BusinessWorkValue.HasValue) result.businessWorkValue += definition.WorkAt(i);
                 float load = definition.LoadAt(i);
-                result.operations[i] = new OperationRecord { kind = definition.OperationAt(i).ToString(),
+                result.operations[i] = new OperationRecord { intendedDestinationNodeId = definition.DestinationAt(i)?.NodeId, kind = definition.OperationAt(i).ToString(),
                     completionEffect = definition.EffectAt(i).ToString(),
                     launchDestinationNodeId = definition.LaunchAt(i)?.DestinationNodeId,
                     launchMotionProfile = definition.LaunchAt(i)?.MotionProfile.ToString(),

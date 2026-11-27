@@ -1,0 +1,5 @@
+scene,cache,product_resolution,sales_resolution,business_work,failures,ending
+Connections,False,TimedOut,TimedOut,0,2,Fired
+Connections,True,Completed,Completed,64,0,ShiftComplete
+ConnectionsAdvanced,False,TimedOut,TimedOut,0,2,Fired
+ConnectionsAdvanced,True,Completed,Completed,64,0,ShiftComplete

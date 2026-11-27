@@ -20,7 +20,7 @@ namespace Uptime.Connections.EditorTools
             fields.ApplyModifiedPropertiesWithoutUndo();
             if (host.GetComponent<IntegrityPresenter>() is { } presenter) presenter.enabled = false;
             if (host.GetComponent<HackerDirectives>() is { } directives) directives.enabled = false;
-            if (host.Nodes.Length == 4)
+            if (host.Nodes.Length == 4 || host.gameObject.scene.path == CanonicalSceneAuthoring.Scenes[0])
             {
                 var traffic = new SerializedObject(host.GetComponent<ConnectionTrafficDirector>());
                 traffic.FindProperty("payloadSpawnerWeight").floatValue = 0;

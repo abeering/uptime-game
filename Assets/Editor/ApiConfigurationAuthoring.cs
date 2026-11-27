@@ -46,7 +46,7 @@ namespace Uptime.Connections.EditorTools
                 labels[i].text = i == 0 ? "> [X] NONE / CLEAR PRIORITY" : "  [ ] PURPOSE";
             }
             var hint = Label(root.transform, "Keyboard hint", source, -506, 28, 20); hint.text = "↑↓ CHOOSE   ENTER APPLY   ESC CLOSE";
-            Set(overlay, "title", title); Set(overlay, "currentPolicy", policy); Set(overlay, "hint", hint);
+            Set(overlay, "title", title); Set(overlay, "currentPolicy", policy); Set(overlay, "hint", hint); Set(overlay, "description", note);
             var fields = new SerializedObject(overlay); var entries = fields.FindProperty("choices"); var actions = fields.FindProperty("choiceButtons");
             entries.arraySize = labels.Length; actions.arraySize = buttons.Length;
             for (int i = 0; i < labels.Length; i++) { entries.GetArrayElementAtIndex(i).objectReferenceValue = labels[i]; actions.GetArrayElementAtIndex(i).objectReferenceValue = buttons[i]; }

@@ -68,7 +68,7 @@ namespace Uptime.Connections
                 bool matches = apiConfigurationNode != null && !string.IsNullOrEmpty(apiFavoredPurposeId) &&
                     string.Equals(c.Definition.ProfileId, apiFavoredPurposeId, StringComparison.OrdinalIgnoreCase);
                 bool traverses = false;
-                if (matches) foreach (var stop in c.Definition.Route)
+                if (matches) foreach (var stop in c.Route)
                     if (stop.Node == apiConfigurationNode) { traverses = true; break; }
                 c.AllocationWeight = traverses ? apiAllocationWeight : 1f;
                 c.AllocationPolicyNodeId = traverses ? apiConfigurationNode.NodeId : null;

@@ -1,0 +1,221 @@
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/Connections.unity empty policy retains original authored physical route
+PASS empty requested LOAD: expected 5, observed 5
+PASS empty processing WORK: expected 100, observed 100
+PASS empty business value: expected 100, observed 100
+PASS empty service budget: expected 30, observed 30
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS known stable read PURPOSE canonicalized
+PASS Assets/Scenes/Connections.unity READ redirects before traversal
+PASS cached WORK25: expected 25, observed 25
+PASS cached LOAD2.5: expected 2.5, observed 2.5
+PASS cached original business100: expected 100, observed 100
+PASS concrete source definition remains unmodified
+PASS cached retains original30 service budget: expected 30, observed 30
+PASS policy changes never reroute/reprice committed READ
+PASS bounded simulation reaches expected boundary
+PASS whole cached job credits original business value: expected 100, observed 100
+PASS cached completion preserves every earned evidence milestone and exact-once credit
+PASS recorder joins original requirements, committed path, locked efficiency and metadata
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS Write keeps ordinary destination/requirements
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS Execute keeps ordinary destination/requirements
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS equal display string is not a PURPOSE match
+PASS reject display strings and catalog classes without READ
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS operation ordinary intended destination is independent of logical plan default
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS READ requiring an adjacent launch destination falls back without sanitizing its effect
+PASS fallback READ retains actual Payload launch
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS bounded simulation reaches expected boundary
+PASS clear leaves current cached operation locked
+PASS bounded simulation reaches expected boundary
+PASS mixed next WRITE changes route but retains identity and previous destination history
+PASS route traversal retains original deadline/value and no partial credit
+PASS bounded simulation reaches expected boundary
+PASS next READ independently uses then-current policy
+PASS bounded simulation reaches expected boundary
+PASS mixed arc credits once only after final operation
+PASS three operation decisions/starts, one persistent connection establishment
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS DB independently relieved: expected 8, observed 8
+PASS cached effective node demand: expected 12, observed 12
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS live API priority favors first committed cached class: expected 3.33333325386047, observed 3.33333325386047
+PASS second committed cached class retains weighted share: expected 1.66666662693024, observed 1.66666662693024
+PASS API can change live shares without rerouting either cached class: expected 3.33333325386047, observed 3.33333325386047
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS offline CACHE falls back only during resolution
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS unreachable CACHE falls back to unchanged ordinary route
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS CACHE-origin requests retain ordinary route; zero-link local execution is not invented
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS locked CACHE BLACKOUT traversal uses existing failure semantics without failover
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS locked CACHE BLACKOUT processing uses existing failure semantics without failover
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS matching hostile READ retains one real infection effect at actual CACHE destination and zero business credit
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS CACHE preserves hostile behavior activation, cheaper composed demand and paused WORK
+PASS kill cleans cached behaviors without effects
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS original service deadline continues through subsequent route traversal with no partial credit
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS cached natural noise recorded in effective LOAD units exactly once: expected -0.0304240230470896, observed -0.0304241180419922
+PASS cached noise remains seeded and productive without mutating source requirements
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS CACHE accepts ordinary defense
+PASS CACHE reserves baseline/infection/defense before productive A: expected 1.5, observed 1.5
+PASS CACHE reserves before productive B: expected 1.5, observed 1.5
+PASS CACHE capacity remains authoritative: expected 10, observed 10
+PASS CACHE accepts ordinary conditions/infections and loses both Integrity points without special immunity
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/Connections.unity generated controlled CACHE False saves identical64 business value or loses both
+PASS ending gates configuration
+PASS restart clears both configurations and accounting
+PASS Assets/Scenes/Connections.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/Connections.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/Connections.unity generated controlled CACHE True saves identical64 business value or loses both
+PASS ending gates configuration
+PASS restart clears both configurations and accounting
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/ConnectionsAdvanced.unity empty policy retains original authored physical route
+PASS empty requested LOAD: expected 5, observed 5
+PASS empty processing WORK: expected 100, observed 100
+PASS empty business value: expected 100, observed 100
+PASS empty service budget: expected 30, observed 30
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS known stable read PURPOSE canonicalized
+PASS Assets/Scenes/ConnectionsAdvanced.unity READ redirects before traversal
+PASS cached WORK25: expected 25, observed 25
+PASS cached LOAD2.5: expected 2.5, observed 2.5
+PASS cached original business100: expected 100, observed 100
+PASS concrete source definition remains unmodified
+PASS cached retains original30 service budget: expected 30, observed 30
+PASS policy changes never reroute/reprice committed READ
+PASS bounded simulation reaches expected boundary
+PASS whole cached job credits original business value: expected 100, observed 100
+PASS cached completion preserves every earned evidence milestone and exact-once credit
+PASS recorder joins original requirements, committed path, locked efficiency and metadata
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS Write keeps ordinary destination/requirements
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS Execute keeps ordinary destination/requirements
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS equal display string is not a PURPOSE match
+PASS reject display strings and catalog classes without READ
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS operation ordinary intended destination is independent of logical plan default
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS READ requiring an adjacent launch destination falls back without sanitizing its effect
+PASS fallback READ retains actual Payload launch
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS bounded simulation reaches expected boundary
+PASS clear leaves current cached operation locked
+PASS bounded simulation reaches expected boundary
+PASS mixed next WRITE changes route but retains identity and previous destination history
+PASS route traversal retains original deadline/value and no partial credit
+PASS bounded simulation reaches expected boundary
+PASS next READ independently uses then-current policy
+PASS bounded simulation reaches expected boundary
+PASS mixed arc credits once only after final operation
+PASS three operation decisions/starts, one persistent connection establishment
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS CACHE ordinary proportional competition: expected 3.33333325386047, observed 3.33333325386047
+PASS DB independently relieved: expected 8, observed 8
+PASS cached effective node demand: expected 12, observed 12
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS live API priority favors first committed cached class: expected 3.33333325386047, observed 3.33333325386047
+PASS second committed cached class retains weighted share: expected 1.66666662693024, observed 1.66666662693024
+PASS API can change live shares without rerouting either cached class: expected 3.33333325386047, observed 3.33333325386047
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS offline CACHE falls back only during resolution
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS unreachable CACHE falls back to unchanged ordinary route
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS CACHE-origin requests retain ordinary route; zero-link local execution is not invented
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS locked CACHE BLACKOUT traversal uses existing failure semantics without failover
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS locked CACHE BLACKOUT processing uses existing failure semantics without failover
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS matching hostile READ retains one real infection effect at actual CACHE destination and zero business credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS CACHE preserves hostile behavior activation, cheaper composed demand and paused WORK
+PASS kill cleans cached behaviors without effects
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS API eligibility uses actual cached path, not immutable WEB plan route
+PASS bounded simulation reaches expected boundary
+PASS next WEB WRITE loses API benefit and changes segment count
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS original service deadline continues through subsequent route traversal with no partial credit
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS cached natural noise recorded in effective LOAD units exactly once: expected -0.0210614614188671, observed -0.0210614204406738
+PASS cached noise remains seeded and productive without mutating source requirements
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS CACHE accepts ordinary defense
+PASS CACHE reserves baseline/infection/defense before productive A: expected 1.5, observed 1.5
+PASS CACHE reserves before productive B: expected 1.5, observed 1.5
+PASS CACHE capacity remains authoritative: expected 10, observed 10
+PASS CACHE accepts ordinary conditions/infections and loses both Integrity points without special immunity
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated controlled CACHE False saves identical64 business value or loses both
+PASS ending gates configuration
+PASS restart clears both configurations and accounting
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored CACHE/quarter WORK/half LOAD/empty slot
+PASS Assets/Scenes/ConnectionsAdvanced.unity ordinary capacity10 leaf node
+PASS Assets/Scenes/ConnectionsAdvanced.unity generated controlled CACHE True saves identical64 business value or loses both
+PASS ending gates configuration
+PASS restart clears both configurations and accounting
