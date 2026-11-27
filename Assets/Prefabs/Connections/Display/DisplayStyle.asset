@@ -12,6 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a22a056d863f24385a0a99b4492fc25c, type: 3}
   m_Name: DisplayStyle
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionDisplayStyle
+  ordinaryIdentityPalette: 1
+  performanceColorTreatment: 1
+  uniformOrdinaryIdentity: {r: 0.68, g: 0.72, b: 0.75, a: 1}
+  grayscaleIdentityColors:
+  - {r: 0.53, g: 0.53, b: 0.53, a: 1}
+  - {r: 0.61, g: 0.61, b: 0.61, a: 1}
+  - {r: 0.69, g: 0.69, b: 0.69, a: 1}
+  - {r: 0.77, g: 0.77, b: 0.77, a: 1}
+  - {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  - {r: 0.93, g: 0.93, b: 0.93, a: 1}
+  uniformPerformanceBase: {r: 0.65, g: 0.7, b: 0.74, a: 1}
   ordinaryIdentityColors:
   - {r: 0.62, g: 0.71, b: 0.78, a: 1}
   - {r: 0.66, g: 0.74, b: 0.66, a: 1}

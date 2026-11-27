@@ -1,5 +1,7 @@
 # Connections — Connection Visual Integration V0
 
+**PR #139 live palette refinement:** [Two independent presentation selectors](connections-palette-experiment-v0.md) now support ordinary Uniform/Muted Hues/Grayscale and Blended/Uniform Performance. Review defaults are Muted Hues + Uniform Performance. IMPORTANT identity remains bright; terminal/history pills follow live changes. Earlier descriptions below retain their phase provenance.
+
 Connections presentation only, November 25, 2026. The canonical Small and Advanced scenes adopt the accepted [Display Lab](connections-display-lab-v0.md) second pass. The lab remains the permanent synthetic development environment for the same connection visuals. Packet and historical experimental scene assets remain unchanged.
 
 **Business Importance V0 follow-up:** [IMPORTANT requests](connections-business-importance-v0.md) adopt the former synthetic Priority family and correct terminal identity consistency through the shared style and lifetime slot. Original integration descriptions below retain their phase provenance; gameplay is no longer always Ordinary, and the old independently colored inspection palette is retired. Current ordinary colors, heartbeat and danger semantics remain.

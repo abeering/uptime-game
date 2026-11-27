@@ -1,0 +1,2609 @@
+PASS authored Muted Hues + Uniform Performance defaults
+PASS Uniform identity slot cardinality / Blended
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS Uniform identity slot cardinality / Uniform
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Uniform / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Uniform / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS MutedHues identity slot cardinality / Blended
+PASS muted hues exactly preserved / Blended
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS MutedHues identity slot cardinality / Uniform
+PASS muted hues exactly preserved / Uniform
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / MutedHues / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / MutedHues / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS Grayscale identity slot cardinality / Blended
+PASS distinct achromatic high-contrast grays / Blended
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Blended / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS Grayscale identity slot cardinality / Uniform
+PASS distinct achromatic high-contrast grays / Uniform
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 0.35 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 0.35 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.35 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.35 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 0.8 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 0.8 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 0
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 0
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 1
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 1
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 2
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 2
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 3
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 3
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 4
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 4
+PASS activity speed does not recolor identity or alter independent danger
+PASS IMPORTANT family unaffected / Grayscale / Uniform / 1 / 1 / 5
+PASS uniform rail independent of family/slot / Grayscale / 1 / 1 / 5
+PASS activity speed does not recolor identity or alter independent danger
+PASS Blended reproduces pre-experiment ordinary rail sample exactly
+PASS Blended reproduces pre-experiment IMPORTANT rail sample exactly
+PASS unchanged killed departure target / Blended
+PASS unchanged timeout departure target / Blended
+PASS unchanged killed departure target / Uniform
+PASS unchanged timeout departure target / Uniform

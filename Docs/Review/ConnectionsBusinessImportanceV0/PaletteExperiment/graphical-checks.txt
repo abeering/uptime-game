@@ -1,0 +1,666 @@
+PASS Assets/Scenes/Connections.unity real mixed-route traffic reaches service danger
+PASS Assets/Scenes/Connections.unity nominal AUTH and slowed DB coexist
+PASS Connections-Uniform-Blended / i1 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Blended / o0 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Blended / o0 / FullContent
+PASS Connections-Uniform-Blended / i0 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Blended / i0 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Blended / i0 / FullContent
+PASS Connections-Uniform-Blended / i1 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Blended / n1 / IdentityOverlay
+PASS Connections-Uniform-Blended / n1 / IdentityOverlay
+PASS Connections-Uniform-Blended / o0 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Blended / o0 / FullContent
+PASS Connections-Uniform-Blended / o1 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Blended / i1 / IdentityOverlay
+PASS Connections-Uniform-Blended / o1 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Blended / o1 / IdentityOverlay
+PASS Connections-Uniform-Blended / i0 / IdentityOverlay
+PASS Connections-Uniform-Blended / i0 / FullContent
+PASS Connections-Uniform-Blended / n0 / IdentityOverlay
+PASS Connections-Uniform-Blended / i0 / IdentityOverlay
+PASS Connections-Uniform-Blended / o0 / IdentityOverlay
+PASS Connections-Uniform-Blended meaningful live/frozen terminal/network coverage
+PASS Connections-Uniform-Blended actual LOAD and WORK surfaces present
+PASS Connections-Uniform-Blended mode switch retains all view/model instances
+PASS Connections-Uniform-Blended changing color advances no WORK/time/route
+PASS Connections-Uniform-Uniform / i1 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Uniform / o0 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Uniform / o1 / IdentityOverlay
+PASS Connections-Uniform-Uniform / o0 / FullContent
+PASS Connections-Uniform-Uniform / i0 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Uniform / i0 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Uniform / i0 / FullContent
+PASS Connections-Uniform-Uniform / i1 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Uniform / n1 / IdentityOverlay
+PASS Connections-Uniform-Uniform / n1 / IdentityOverlay
+PASS Connections-Uniform-Uniform / o0 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Uniform / o0 / FullContent
+PASS Connections-Uniform-Uniform / o1 / WorkRequestRow(Clone)
+PASS Connections-Uniform-Uniform / i1 / IdentityOverlay
+PASS Connections-Uniform-Uniform / o1 / LoadRequestRow(Clone)
+PASS Connections-Uniform-Uniform / o1 / IdentityOverlay
+PASS Connections-Uniform-Uniform / i0 / IdentityOverlay
+PASS Connections-Uniform-Uniform / i0 / FullContent
+PASS Connections-Uniform-Uniform / n0 / IdentityOverlay
+PASS Connections-Uniform-Uniform / i0 / IdentityOverlay
+PASS Connections-Uniform-Uniform / n0 / IdentityOverlay
+PASS Connections-Uniform-Uniform / o0 / IdentityOverlay
+PASS Connections-Uniform-Uniform meaningful live/frozen terminal/network coverage
+PASS Connections-Uniform-Uniform actual LOAD and WORK surfaces present
+PASS Connections-Uniform-Uniform mode switch retains all view/model instances
+PASS Connections-Uniform-Uniform changing color advances no WORK/time/route
+PASS Connections-MutedHues-Blended / i1 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Blended / o0 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Blended / o1 / IdentityOverlay
+PASS Connections-MutedHues-Blended / o0 / FullContent
+PASS Connections-MutedHues-Blended / i0 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Blended / i0 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Blended / i0 / FullContent
+PASS Connections-MutedHues-Blended / i1 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Blended / n1 / IdentityOverlay
+PASS Connections-MutedHues-Blended / n1 / IdentityOverlay
+PASS Connections-MutedHues-Blended / o0 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Blended / o0 / FullContent
+PASS Connections-MutedHues-Blended / o1 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Blended / i1 / IdentityOverlay
+PASS Connections-MutedHues-Blended / o1 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Blended / o1 / IdentityOverlay
+PASS Connections-MutedHues-Blended / i0 / IdentityOverlay
+PASS Connections-MutedHues-Blended / i0 / FullContent
+PASS Connections-MutedHues-Blended / n0 / IdentityOverlay
+PASS Connections-MutedHues-Blended / i0 / IdentityOverlay
+PASS Connections-MutedHues-Blended / n0 / IdentityOverlay
+PASS Connections-MutedHues-Blended / o0 / IdentityOverlay
+PASS Connections-MutedHues-Blended meaningful live/frozen terminal/network coverage
+PASS Connections-MutedHues-Blended actual LOAD and WORK surfaces present
+PASS Connections-MutedHues-Blended mode switch retains all view/model instances
+PASS Connections-MutedHues-Blended changing color advances no WORK/time/route
+PASS Connections-MutedHues-Uniform / i1 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / o0 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / o1 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / o0 / FullContent
+PASS Connections-MutedHues-Uniform / i0 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / i0 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / i0 / FullContent
+PASS Connections-MutedHues-Uniform / i1 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / n1 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / n1 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / o0 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / o0 / FullContent
+PASS Connections-MutedHues-Uniform / o1 / WorkRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / i1 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / o1 / LoadRequestRow(Clone)
+PASS Connections-MutedHues-Uniform / o1 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / i0 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / i0 / FullContent
+PASS Connections-MutedHues-Uniform / n0 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / i0 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / n0 / IdentityOverlay
+PASS Connections-MutedHues-Uniform / o0 / IdentityOverlay
+PASS Connections-MutedHues-Uniform meaningful live/frozen terminal/network coverage
+PASS Connections-MutedHues-Uniform actual LOAD and WORK surfaces present
+PASS Connections-MutedHues-Uniform mode switch retains all view/model instances
+PASS Connections-MutedHues-Uniform changing color advances no WORK/time/route
+PASS Connections-Grayscale-Blended / i1 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Blended / o0 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Blended / o1 / IdentityOverlay
+PASS Connections-Grayscale-Blended / o0 / FullContent
+PASS Connections-Grayscale-Blended / i0 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Blended / i0 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Blended / i0 / FullContent
+PASS Connections-Grayscale-Blended / i1 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Blended / n1 / IdentityOverlay
+PASS Connections-Grayscale-Blended / n1 / IdentityOverlay
+PASS Connections-Grayscale-Blended / o0 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Blended / o0 / FullContent
+PASS Connections-Grayscale-Blended / o1 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Blended / i1 / IdentityOverlay
+PASS Connections-Grayscale-Blended / o1 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Blended / o1 / IdentityOverlay
+PASS Connections-Grayscale-Blended / i0 / IdentityOverlay
+PASS Connections-Grayscale-Blended / i0 / FullContent
+PASS Connections-Grayscale-Blended / n0 / IdentityOverlay
+PASS Connections-Grayscale-Blended / i0 / IdentityOverlay
+PASS Connections-Grayscale-Blended / n0 / IdentityOverlay
+PASS Connections-Grayscale-Blended / o0 / IdentityOverlay
+PASS Connections-Grayscale-Blended meaningful live/frozen terminal/network coverage
+PASS Connections-Grayscale-Blended actual LOAD and WORK surfaces present
+PASS Connections-Grayscale-Blended mode switch retains all view/model instances
+PASS Connections-Grayscale-Blended changing color advances no WORK/time/route
+PASS Connections-Grayscale-Uniform / i1 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / o0 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / o1 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / o0 / FullContent
+PASS Connections-Grayscale-Uniform / i0 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / i0 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / i0 / FullContent
+PASS Connections-Grayscale-Uniform / i1 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / n1 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / n1 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / o0 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / o0 / FullContent
+PASS Connections-Grayscale-Uniform / o1 / WorkRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / i1 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / o1 / LoadRequestRow(Clone)
+PASS Connections-Grayscale-Uniform / o1 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / i0 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / i0 / FullContent
+PASS Connections-Grayscale-Uniform / n0 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / i0 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / n0 / IdentityOverlay
+PASS Connections-Grayscale-Uniform / o0 / IdentityOverlay
+PASS Connections-Grayscale-Uniform meaningful live/frozen terminal/network coverage
+PASS Connections-Grayscale-Uniform actual LOAD and WORK surfaces present
+PASS Connections-Grayscale-Uniform mode switch retains all view/model instances
+PASS Connections-Grayscale-Uniform changing color advances no WORK/time/route
+PASS Assets/Scenes/Connections.unity frozen resolved inspect history retained
+PASS Assets/Scenes/Connections.unity history / Uniform / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Uniform / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Uniform / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Uniform / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o1 / ResolvedInspectRow
+PASS Assets/Scenes/Connections.unity history / Uniform / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Uniform / n0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / i0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Uniform meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/Connections.unity history / MutedHues / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / MutedHues / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / MutedHues / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / MutedHues / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o1 / ResolvedInspectRow
+PASS Assets/Scenes/Connections.unity history / MutedHues / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / MutedHues / n0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / i0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / MutedHues meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/Connections.unity history / Grayscale / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Grayscale / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Grayscale / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Grayscale / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o1 / ResolvedInspectRow
+PASS Assets/Scenes/Connections.unity history / Grayscale / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history / Grayscale / n0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / i0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history / Grayscale meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/Connections.unity live switch needs no restart while host continues
+PASS Assets/Scenes/ConnectionsAdvanced.unity real mixed-route traffic reaches service danger
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal AUTH and slowed DB coexist
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Blended / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Blended / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Blended meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-Uniform-Blended actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-Uniform-Blended mode switch retains all view/model instances
+PASS ConnectionsAdvanced-Uniform-Blended changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Uniform / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-Uniform-Uniform / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Uniform-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Uniform-Uniform meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-Uniform-Uniform actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-Uniform-Uniform mode switch retains all view/model instances
+PASS ConnectionsAdvanced-Uniform-Uniform changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Blended / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Blended / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Blended meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-MutedHues-Blended actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-MutedHues-Blended mode switch retains all view/model instances
+PASS ConnectionsAdvanced-MutedHues-Blended changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Uniform / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-MutedHues-Uniform / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-MutedHues-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-MutedHues-Uniform meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-MutedHues-Uniform actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-MutedHues-Uniform mode switch retains all view/model instances
+PASS ConnectionsAdvanced-MutedHues-Uniform changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Blended / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Blended / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Blended meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-Grayscale-Blended actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-Grayscale-Blended mode switch retains all view/model instances
+PASS ConnectionsAdvanced-Grayscale-Blended changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Uniform / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-Grayscale-Uniform / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-Grayscale-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-Grayscale-Uniform meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-Grayscale-Uniform actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-Grayscale-Uniform mode switch retains all view/model instances
+PASS ConnectionsAdvanced-Grayscale-Uniform changing color advances no WORK/time/route
+PASS Assets/Scenes/ConnectionsAdvanced.unity frozen resolved inspect history retained
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o1 / ResolvedInspectRow
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Uniform meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o1 / ResolvedInspectRow
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / MutedHues meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o1 / ResolvedInspectRow
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / Grayscale meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/ConnectionsAdvanced.unity live switch needs no restart while host continues
+PASS Lab same sample views / Uniform / Blended
+PASS Lab live identity / a1 / Uniform / Blended
+PASS Lab live identity / a2 / Uniform / Blended
+PASS Lab live identity / a3 / Uniform / Blended
+PASS Lab live identity / a4 / Uniform / Blended
+PASS Lab live identity / a5 / Uniform / Blended
+PASS Lab live identity / a6 / Uniform / Blended
+PASS Lab live identity / b1 / Uniform / Blended
+PASS Lab live identity / b2 / Uniform / Blended
+PASS Lab live identity / b3 / Uniform / Blended
+PASS Lab live identity / b4 / Uniform / Blended
+PASS Lab live identity / b5 / Uniform / Blended
+PASS Lab live identity / b6 / Uniform / Blended
+PASS Lab live identity / c1 / Uniform / Blended
+PASS Lab live identity / c2 / Uniform / Blended
+PASS Lab live identity / c3 / Uniform / Blended
+PASS Lab live identity / c4 / Uniform / Blended
+PASS Lab live identity / c5 / Uniform / Blended
+PASS Lab live identity / c6 / Uniform / Blended
+PASS Lab live identity / c7 / Uniform / Blended
+PASS Lab live identity / d1 / Uniform / Blended
+PASS Lab live identity / d2 / Uniform / Blended
+PASS Lab live identity / d3 / Uniform / Blended
+PASS Lab live identity / d4 / Uniform / Blended
+PASS Lab live identity / d5 / Uniform / Blended
+PASS Lab live identity / d6 / Uniform / Blended
+PASS Lab live identity / d7 / Uniform / Blended
+PASS Lab same sample views / Uniform / Uniform
+PASS Lab live identity / a1 / Uniform / Uniform
+PASS Lab live identity / a2 / Uniform / Uniform
+PASS Lab live identity / a3 / Uniform / Uniform
+PASS Lab live identity / a4 / Uniform / Uniform
+PASS Lab live identity / a5 / Uniform / Uniform
+PASS Lab live identity / a6 / Uniform / Uniform
+PASS Lab live identity / b1 / Uniform / Uniform
+PASS Lab live identity / b2 / Uniform / Uniform
+PASS Lab live identity / b3 / Uniform / Uniform
+PASS Lab live identity / b4 / Uniform / Uniform
+PASS Lab live identity / b5 / Uniform / Uniform
+PASS Lab live identity / b6 / Uniform / Uniform
+PASS Lab live identity / c1 / Uniform / Uniform
+PASS Lab live identity / c2 / Uniform / Uniform
+PASS Lab live identity / c3 / Uniform / Uniform
+PASS Lab live identity / c4 / Uniform / Uniform
+PASS Lab live identity / c5 / Uniform / Uniform
+PASS Lab live identity / c6 / Uniform / Uniform
+PASS Lab live identity / c7 / Uniform / Uniform
+PASS Lab live identity / d1 / Uniform / Uniform
+PASS Lab live identity / d2 / Uniform / Uniform
+PASS Lab live identity / d3 / Uniform / Uniform
+PASS Lab live identity / d4 / Uniform / Uniform
+PASS Lab live identity / d5 / Uniform / Uniform
+PASS Lab live identity / d6 / Uniform / Uniform
+PASS Lab live identity / d7 / Uniform / Uniform
+PASS Lab same sample views / MutedHues / Blended
+PASS Lab live identity / a1 / MutedHues / Blended
+PASS Lab live identity / a2 / MutedHues / Blended
+PASS Lab live identity / a3 / MutedHues / Blended
+PASS Lab live identity / a4 / MutedHues / Blended
+PASS Lab live identity / a5 / MutedHues / Blended
+PASS Lab live identity / a6 / MutedHues / Blended
+PASS Lab live identity / b1 / MutedHues / Blended
+PASS Lab live identity / b2 / MutedHues / Blended
+PASS Lab live identity / b3 / MutedHues / Blended
+PASS Lab live identity / b4 / MutedHues / Blended
+PASS Lab live identity / b5 / MutedHues / Blended
+PASS Lab live identity / b6 / MutedHues / Blended
+PASS Lab live identity / c1 / MutedHues / Blended
+PASS Lab live identity / c2 / MutedHues / Blended
+PASS Lab live identity / c3 / MutedHues / Blended
+PASS Lab live identity / c4 / MutedHues / Blended
+PASS Lab live identity / c5 / MutedHues / Blended
+PASS Lab live identity / c6 / MutedHues / Blended
+PASS Lab live identity / c7 / MutedHues / Blended
+PASS Lab live identity / d1 / MutedHues / Blended
+PASS Lab live identity / d2 / MutedHues / Blended
+PASS Lab live identity / d3 / MutedHues / Blended
+PASS Lab live identity / d4 / MutedHues / Blended
+PASS Lab live identity / d5 / MutedHues / Blended
+PASS Lab live identity / d6 / MutedHues / Blended
+PASS Lab live identity / d7 / MutedHues / Blended
+PASS Lab same sample views / MutedHues / Uniform
+PASS Lab live identity / a1 / MutedHues / Uniform
+PASS Lab live identity / a2 / MutedHues / Uniform
+PASS Lab live identity / a3 / MutedHues / Uniform
+PASS Lab live identity / a4 / MutedHues / Uniform
+PASS Lab live identity / a5 / MutedHues / Uniform
+PASS Lab live identity / a6 / MutedHues / Uniform
+PASS Lab live identity / b1 / MutedHues / Uniform
+PASS Lab live identity / b2 / MutedHues / Uniform
+PASS Lab live identity / b3 / MutedHues / Uniform
+PASS Lab live identity / b4 / MutedHues / Uniform
+PASS Lab live identity / b5 / MutedHues / Uniform
+PASS Lab live identity / b6 / MutedHues / Uniform
+PASS Lab live identity / c1 / MutedHues / Uniform
+PASS Lab live identity / c2 / MutedHues / Uniform
+PASS Lab live identity / c3 / MutedHues / Uniform
+PASS Lab live identity / c4 / MutedHues / Uniform
+PASS Lab live identity / c5 / MutedHues / Uniform
+PASS Lab live identity / c6 / MutedHues / Uniform
+PASS Lab live identity / c7 / MutedHues / Uniform
+PASS Lab live identity / d1 / MutedHues / Uniform
+PASS Lab live identity / d2 / MutedHues / Uniform
+PASS Lab live identity / d3 / MutedHues / Uniform
+PASS Lab live identity / d4 / MutedHues / Uniform
+PASS Lab live identity / d5 / MutedHues / Uniform
+PASS Lab live identity / d6 / MutedHues / Uniform
+PASS Lab live identity / d7 / MutedHues / Uniform
+PASS Lab same sample views / Grayscale / Blended
+PASS Lab live identity / a1 / Grayscale / Blended
+PASS Lab live identity / a2 / Grayscale / Blended
+PASS Lab live identity / a3 / Grayscale / Blended
+PASS Lab live identity / a4 / Grayscale / Blended
+PASS Lab live identity / a5 / Grayscale / Blended
+PASS Lab live identity / a6 / Grayscale / Blended
+PASS Lab live identity / b1 / Grayscale / Blended
+PASS Lab live identity / b2 / Grayscale / Blended
+PASS Lab live identity / b3 / Grayscale / Blended
+PASS Lab live identity / b4 / Grayscale / Blended
+PASS Lab live identity / b5 / Grayscale / Blended
+PASS Lab live identity / b6 / Grayscale / Blended
+PASS Lab live identity / c1 / Grayscale / Blended
+PASS Lab live identity / c2 / Grayscale / Blended
+PASS Lab live identity / c3 / Grayscale / Blended
+PASS Lab live identity / c4 / Grayscale / Blended
+PASS Lab live identity / c5 / Grayscale / Blended
+PASS Lab live identity / c6 / Grayscale / Blended
+PASS Lab live identity / c7 / Grayscale / Blended
+PASS Lab live identity / d1 / Grayscale / Blended
+PASS Lab live identity / d2 / Grayscale / Blended
+PASS Lab live identity / d3 / Grayscale / Blended
+PASS Lab live identity / d4 / Grayscale / Blended
+PASS Lab live identity / d5 / Grayscale / Blended
+PASS Lab live identity / d6 / Grayscale / Blended
+PASS Lab live identity / d7 / Grayscale / Blended
+PASS Lab same sample views / Grayscale / Uniform
+PASS Lab live identity / a1 / Grayscale / Uniform
+PASS Lab live identity / a2 / Grayscale / Uniform
+PASS Lab live identity / a3 / Grayscale / Uniform
+PASS Lab live identity / a4 / Grayscale / Uniform
+PASS Lab live identity / a5 / Grayscale / Uniform
+PASS Lab live identity / a6 / Grayscale / Uniform
+PASS Lab live identity / b1 / Grayscale / Uniform
+PASS Lab live identity / b2 / Grayscale / Uniform
+PASS Lab live identity / b3 / Grayscale / Uniform
+PASS Lab live identity / b4 / Grayscale / Uniform
+PASS Lab live identity / b5 / Grayscale / Uniform
+PASS Lab live identity / b6 / Grayscale / Uniform
+PASS Lab live identity / c1 / Grayscale / Uniform
+PASS Lab live identity / c2 / Grayscale / Uniform
+PASS Lab live identity / c3 / Grayscale / Uniform
+PASS Lab live identity / c4 / Grayscale / Uniform
+PASS Lab live identity / c5 / Grayscale / Uniform
+PASS Lab live identity / c6 / Grayscale / Uniform
+PASS Lab live identity / c7 / Grayscale / Uniform
+PASS Lab live identity / d1 / Grayscale / Uniform
+PASS Lab live identity / d2 / Grayscale / Uniform
+PASS Lab live identity / d3 / Grayscale / Uniform
+PASS Lab live identity / d4 / Grayscale / Uniform
+PASS Lab live identity / d5 / Grayscale / Uniform
+PASS Lab live identity / d6 / Grayscale / Uniform
+PASS Lab live identity / d7 / Grayscale / Uniform

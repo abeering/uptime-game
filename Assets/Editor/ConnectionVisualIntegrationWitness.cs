@@ -90,7 +90,7 @@ namespace Uptime.Connections.EditorTools
                     {
                         adapter.style.ordinaryIdentityColors = Enumerable.Repeat(Color.magenta, 6).ToArray(); Refresh();
                         var safe = state; safe.dangerSeverity = 0;
-                        Check(labPrefab.style.Rail(safe, 0) == Color.magenta && sharedPill.ProgressPlate.material == labPrefab.pill.material &&
+                        Check(labPrefab.style.Rail(safe, 0) == (adapter.style.performanceColorTreatment == PerformanceColorTreatment.Uniform ? adapter.style.uniformPerformanceBase : Color.magenta) && sharedPill.ProgressPlate.material == labPrefab.pill.material &&
                             pills.All(p => p.ProgressPlate.color.r > .99f && p.ProgressPlate.color.b > .99f),
                             scene + " one live style edit propagates to gameplay and lab asset references");
                     }

@@ -1,5 +1,7 @@
 # Business Importance V0 review
 
+**Current #139 follow-up:** [Live palette experiment, six-way comparisons and Inspector instructions](PaletteExperiment/README.md). Initial importance evidence below predates the new default Uniform Performance treatment; mechanics remain unchanged.
+
 Connections implementation on `feature/connections-business-importance-v0`, based on accepted #137 normally merged at `f43b89758c07098e0939d59dfa429a25f7e81b82`. The new implementation PR remains draft/unmerged for human gameplay review. [Contract and Inspector instructions](../../Connections/connections-business-importance-v0.md).
 
 ## What changed

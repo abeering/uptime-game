@@ -24,6 +24,7 @@ namespace Uptime.Connections
         private LogicalConnectionState renderedState;
         private InspectOperationToken activeToken;
         private Color identityAccent;
+        private ConnectionIdentityPalette identityPalette;
         private int renderedOperation = -1;
         private float renderedWidth = -1f;
 
@@ -37,6 +38,8 @@ namespace Uptime.Connections
             identityPill?.Bind(id, accent);
         }
 
+        public void FollowIdentity(LogicalConnectionState state, ConnectionIdentityPalette palette)
+        { identityPalette = palette; identityPill?.FollowIdentity(state, palette); }
         public void SetDisplayedId(string id) => identityPill?.SetDisplayedId(id);
 
         public void FitWidth(float width)
@@ -63,6 +66,7 @@ namespace Uptime.Connections
 
         public void Render(LogicalConnectionState state)
         {
+            if (identityPalette != null && identityPalette.TryGet(state, out Color accent)) identityAccent = accent;
             if (purpose != null)
             {
                 string label = state.Definition.ClaimedPurpose ?? string.Empty;

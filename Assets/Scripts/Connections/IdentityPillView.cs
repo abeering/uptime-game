@@ -21,6 +21,15 @@ namespace Uptime.Connections
         [SerializeField, Min(0f)] private float identityChangeEmphasisSeconds = 0.22f;
         [SerializeField, Range(0f, 1f)] private float identityChangeWhiteMix = 0.24f;
 
+        private LogicalConnectionState identityState;
+        private ConnectionIdentityPalette identityPalette;
+        public void FollowIdentity(LogicalConnectionState state, ConnectionIdentityPalette palette)
+        { identityState = state; identityPalette = palette; RefreshIdentity(); }
+        private void RefreshIdentity()
+        {
+            if (identityState != null && identityPalette != null && identityPalette.TryGet(identityState, out Color color) && color != baseAccent)
+                SetAccentColor(color);
+        }
         private Color baseAccent;
         private float changedAt = float.NegativeInfinity;
 
@@ -31,6 +40,7 @@ namespace Uptime.Connections
 
         public void Bind(string connectionId, Color accent)
         {
+            identityState = null; identityPalette = null;
             idText.text = connectionId.ToLowerInvariant();
             changedAt = float.NegativeInfinity;
             SetAccentColor(accent);
@@ -93,6 +103,7 @@ namespace Uptime.Connections
 
         private void Update()
         {
+            RefreshIdentity();
             if (Time.unscaledTime - changedAt < identityChangeEmphasisSeconds)
                 RefreshAccent();
         }

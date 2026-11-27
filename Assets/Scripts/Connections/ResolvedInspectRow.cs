@@ -32,6 +32,7 @@ namespace Uptime.Connections
             FitWidth();
         }
 
+        public void FollowIdentity(LogicalConnectionState state, ConnectionIdentityPalette palette) => identityPill.FollowIdentity(state, palette);
         public void FitWidth()
         {
             if (state == null) return;

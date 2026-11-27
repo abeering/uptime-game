@@ -1,5 +1,7 @@
 # Connections — Business Importance V0
 
+**PR #139 live palette refinement:** [Two independent presentation selectors](connections-palette-experiment-v0.md) now support ordinary Uniform/Muted Hues/Grayscale and Blended/Uniform Performance. Review defaults are Muted Hues + Uniform Performance. IMPORTANT identity remains bright; terminal/history pills follow live changes. Earlier descriptions below retain their phase provenance.
+
 Connections implementation, based on human-accepted #137 normally merged at `f43b89758c07098e0939d59dfa429a25f7e81b82`. Small and Advanced retain existing workload, demand intervals, hostile tuning, capacities, objectives, allocator, service budgets and timeout tolerance. Packet is unchanged.
 
 ## Company importance and operator preference

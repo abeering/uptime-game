@@ -2,9 +2,20 @@ using UnityEngine;
 
 namespace Uptime.Connections.Display
 {
+    public enum OrdinaryIdentityPalette { Uniform, MutedHues, Grayscale }
+    public enum PerformanceColorTreatment { Blended, Uniform }
+
     [CreateAssetMenu(menuName = "Uptime/Connection display style")]
     public sealed class ConnectionDisplayStyle : ScriptableObject
     {
+        [Header("Live palette experiment")]
+        public OrdinaryIdentityPalette ordinaryIdentityPalette = OrdinaryIdentityPalette.MutedHues;
+        public PerformanceColorTreatment performanceColorTreatment = PerformanceColorTreatment.Uniform;
+        public Color uniformOrdinaryIdentity = new(.68f, .72f, .75f);
+        public Color[] grayscaleIdentityColors = {
+            new(.53f,.53f,.53f), new(.61f,.61f,.61f), new(.69f,.69f,.69f),
+            new(.77f,.77f,.77f), new(.85f,.85f,.85f), new(.93f,.93f,.93f) };
+        public Color uniformPerformanceBase = new(.65f, .70f, .74f);
         [Header("Stable identity families (same lifetime slot on every segment)")]
         public Color[] ordinaryIdentityColors = {
             new(.62f, .71f, .78f), new(.66f, .74f, .66f), new(.78f, .71f, .64f),
@@ -50,7 +61,10 @@ namespace Uptime.Connections.Display
         public Color IdentityColor(ConnectionDisplayState s) => IdentityColor(s.trafficClass, s.identitySlot);
         public Color IdentityColor(DisplayTrafficClass traffic, int slot)
         {
-            Color[] family = traffic == DisplayTrafficClass.Important ? importantIdentityColors : ordinaryIdentityColors;
+            if (traffic == DisplayTrafficClass.Ordinary && ordinaryIdentityPalette == OrdinaryIdentityPalette.Uniform)
+                return uniformOrdinaryIdentity;
+            Color[] family = traffic == DisplayTrafficClass.Important ? importantIdentityColors :
+                ordinaryIdentityPalette == OrdinaryIdentityPalette.Grayscale ? grayscaleIdentityColors : ordinaryIdentityColors;
             return family != null && family.Length > 0 ? family[Mathf.Max(0, slot) % family.Length] : Color.gray;
         }
         public Color Body(ConnectionDisplayState s, double beats)
@@ -62,7 +76,7 @@ namespace Uptime.Connections.Display
         }
         public Color Rail(ConnectionDisplayState s, double beats)
         {
-            Color baseColor = IdentityColor(s);
+            Color baseColor = performanceColorTreatment == PerformanceColorTreatment.Uniform ? uniformPerformanceBase : IdentityColor(s);
             float danger = Mathf.Clamp01(s.dangerSeverity);
             Color warning = danger < .55f ? Color.Lerp(behind, endangered, danger / .55f) :
                 Color.Lerp(endangered, critical, (danger - .55f) / .45f);

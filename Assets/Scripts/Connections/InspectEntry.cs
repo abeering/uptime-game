@@ -56,6 +56,9 @@ namespace Uptime.Connections
         public bool IsResolvedSummary => resolvedSummary;
         public bool IsSummaryTransitioning => summaryTransition;
 
+        public void FollowIdentity(LogicalConnectionState state, ConnectionIdentityPalette palette)
+        { headerIdentityPill?.FollowIdentity(state, palette); resolvedRow?.FollowIdentity(state, palette); }
+
         public void ShowFullCard()
         {
             resolvedSummary = false;

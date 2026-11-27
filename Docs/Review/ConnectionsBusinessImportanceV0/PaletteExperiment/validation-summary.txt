@@ -1,0 +1,12 @@
+Unity 6000.3.11f1 isolated project
+Focused regression run exit: 0
+Graphical run exit: 0
+PaletteExperimentWitness PASS: 2609 assertions.
+BusinessImportanceWitness PASS: 314 assertions.
+ConnectionDisplayLabWitness PASS: 512 assertions; hierarchy=334; binding GC=-1
+ConnectionVisualIntegrationWitness PASS: 81 assertions; 2 unavailable measurements.
+RecorderPolicyEvidenceWitness PASS: 74 checks.
+RouteTransitionWitness PASS: 108 assertions.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-display-lab-v0/Logs/UptimeRuns/uptime_20261127_170501_seed-01701_c1c6faac.json
+PaletteExperimentCapture PASS: 666 actual Play Mode checks.
+Known inherited graphical QuickSearch startup exception remains nonfatal.
