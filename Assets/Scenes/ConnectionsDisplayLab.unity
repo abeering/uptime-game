@@ -10189,7 +10189,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal important
+  m_text: SYNTHETIC STATES  /  shared heartbeat  /  shared teal/cyan identities + IMPORTANT !
     /  shared gameplay assets
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5f765039b92fac549a4f909052a0c509, type: 2}

@@ -18,9 +18,9 @@ namespace Uptime.Connections
 
         public const int SlotCount = 6;
 
-        public Color Assign(LogicalConnectionState connection) => ColorFor(connection, AssignSlot(connection));
-        private Color ColorFor(LogicalConnectionState connection, int slot) => style != null ?
-            style.IdentityColor(connection.IsImportant ? Display.DisplayTrafficClass.Important : Display.DisplayTrafficClass.Ordinary, slot) : Color.gray;
+        public Color Assign(LogicalConnectionState connection) => ColorFor(AssignSlot(connection));
+        private Color ColorFor(int slot) => style != null ?
+            style.IdentityColor(Display.DisplayTrafficClass.Ordinary, slot) : Color.gray;
 
         // Shared display families reuse the same lifetime slot ownership, independent of aliases.
         public int AssignSlot(LogicalConnectionState connection)
@@ -52,7 +52,7 @@ namespace Uptime.Connections
         {
             if (historicalSlots != null && historicalSlots.TryGetValue(connection, out int slot))
             {
-                color = ColorFor(connection, slot);
+                color = ColorFor(slot);
                 return true;
             }
             color = default;

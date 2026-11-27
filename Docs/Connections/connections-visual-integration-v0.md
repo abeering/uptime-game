@@ -1,5 +1,7 @@
 # Connections — Connection Visual Integration V0
 
+**Current #139 presentation supersedes the previous palette experiment:** [One historical teal/cyan palette for all connections, inline IMPORTANT `!`, bright identity text, and identity-colored nominal rails with Blended/Uniform warnings](connections-identity-marker-v0.md). Importance mechanics and shared identity ownership remain; earlier descriptions below preserve their phase provenance.
+
 **PR #139 live palette refinement:** [Two independent presentation selectors](connections-palette-experiment-v0.md) now support ordinary Uniform/Muted Hues/Grayscale and Blended/Uniform Performance. Review defaults are Muted Hues + Uniform Performance. IMPORTANT identity remains bright; terminal/history pills follow live changes. Earlier descriptions below retain their phase provenance.
 
 Connections presentation only, November 25, 2026. The canonical Small and Advanced scenes adopt the accepted [Display Lab](connections-display-lab-v0.md) second pass. The lab remains the permanent synthetic development environment for the same connection visuals. Packet and historical experimental scene assets remain unchanged.

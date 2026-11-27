@@ -142,16 +142,16 @@ namespace Uptime.Connections.EditorTools
                 for (int i = 0; i < paletteRows.Length; i++)
                 { paletteRows[i].phases[0].state = states[i]; paletteRows[i].title.SetText(titles[i]); }
             }
-            Color[] originalRail = lab.style.ordinaryIdentityColors;
+            Color[] originalRail = lab.style.identityColors;
             try
             {
-                lab.style.ordinaryIdentityColors = Enumerable.Repeat(Color.white, 6).ToArray();
+                lab.style.identityColors = Enumerable.Repeat(Color.white, 6).ToArray();
                 lab.heartbeat.SetReviewTime(0); lab.RenderNow(); Canvas.ForceUpdateCanvases();
                 SetViewport(1920, 1080);
                 Save(ConnectionDisplayLabWitness.Evidence + "/shared-style-proof.png");
                 Check(lab.samples[0].view.style == lab.style, "shared style proof uses the same asset in the lab");
             }
-            finally { lab.style.ordinaryIdentityColors = originalRail; }
+            finally { lab.style.identityColors = originalRail; }
             // A reproducible real Unity rendering of an 18-second presentation timeline.
             // PNG encoding allocations are capture instrumentation, outside renderer measurements.
             string frames = "/tmp/uptime-display-lab-motion"; Directory.CreateDirectory(frames);

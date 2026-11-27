@@ -17,7 +17,7 @@ namespace Uptime.Connections
         [SerializeField] private TMP_Text serviceDangerText;
         [SerializeField] private Vector2 dimensions = new Vector2(54f, 28f);
         [SerializeField, Min(8f)] private float fontSize = 16f;
-        [SerializeField] private bool tintTextWithAccent;
+        [SerializeField] private Color identifierTextColor = new(.85f, .97f, .95f);
         [SerializeField, Min(0f)] private float identityChangeEmphasisSeconds = 0.22f;
         [SerializeField, Range(0f, 1f)] private float identityChangeWhiteMix = 0.24f;
 
@@ -27,21 +27,30 @@ namespace Uptime.Connections
         { identityState = state; identityPalette = palette; RefreshIdentity(); }
         private void RefreshIdentity()
         {
+            if (identityState != null) SetImportant(identityState.IsImportant);
             if (identityState != null && identityPalette != null && identityPalette.TryGet(identityState, out Color color) && color != baseAccent)
                 SetAccentColor(color);
         }
+        private string displayedId;
+        private bool important;
+        public bool IsImportant => important;
+        public string RenderedLabel => idText != null ? idText.text : string.Empty;
+        public void SetImportant(bool value)
+        { if (important == value) return; important = value; RefreshLabel(); }
+        private void RefreshLabel()
+        { if (idText != null && displayedId != null) idText.SetText(important ? displayedId + "<size=75%>!</size>" : displayedId); }
         private Color baseAccent;
         private float changedAt = float.NegativeInfinity;
 
         public Vector2 Size => UsesSharedDisplay ? ((RectTransform)transform).rect.size :
             new Vector2(Mathf.Max(32f, dimensions.x), Mathf.Max(23f, dimensions.y));
         public Color AccentColor => progressPlate != null ? progressPlate.color : plate != null ? plate.color : Color.clear;
-        public string DisplayedId => idText != null ? idText.text : string.Empty;
+        public string DisplayedId => displayedId ?? (idText != null ? idText.text : string.Empty);
 
         public void Bind(string connectionId, Color accent)
         {
             identityState = null; identityPalette = null;
-            idText.text = connectionId.ToLowerInvariant();
+            displayedId = connectionId.ToLowerInvariant(); important = false; RefreshLabel();
             changedAt = float.NegativeInfinity;
             SetAccentColor(accent);
             if (plate != null) plate.raycastTarget = false;
@@ -62,6 +71,7 @@ namespace Uptime.Connections
         public void SetDisplayState(ConnectionDisplayState state, PillProgressTreatment treatment = PillProgressTreatment.Interior, bool applyOpacity = true)
         {
             if (!UsesSharedDisplay || displayStyle == null) return;
+            SetImportant(state.trafficClass == DisplayTrafficClass.Important);
             displayIdentityColor = displayStyle.IdentityColor(state);
             displayOpacity = applyOpacity ? displayStyle.Opacity(state) : 1;
             Color tint = displayIdentityColor; tint.a *= displayOpacity;
@@ -93,10 +103,10 @@ namespace Uptime.Connections
 
         public void SetDisplayedId(string identity)
         {
-            if (idText == null || string.IsNullOrEmpty(identity) || idText.text == identity) return;
+            if (idText == null || string.IsNullOrEmpty(identity)) return;
             string text = identity.ToLowerInvariant();
-            if (idText.text == text) return;
-            idText.text = text;
+            if (DisplayedId == text) return;
+            displayedId = text; RefreshLabel();
             changedAt = Time.unscaledTime;
             RefreshAccent();
         }
@@ -122,7 +132,7 @@ namespace Uptime.Connections
                 Color neutral = Color.Lerp(displayIdentityColor, Color.white, identityChangeWhiteMix * remaining);
                 neutral.a = displayOpacity; progressPlate.color = neutral;
             }
-            if (!UsesSharedDisplay && tintTextWithAccent && idText != null) idText.color = accent;
+            if (idText != null) { idText.color = identifierTextColor; idText.alpha = UsesSharedDisplay ? displayOpacity : 1; }
         }
 
         private void OnValidate() => ApplySize();

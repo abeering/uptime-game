@@ -189,7 +189,7 @@ namespace Uptime.Connections.EditorTools
                     !five.IsSummary && Activities(five).Last() == "write-b" &&
                     !Indicator(five).gameObject.activeSelf &&
                     Purpose(five).color == Quiet(five) &&
-                    Pill(five).AccentColor == Quiet(five) &&
+                    Pill(five).AccentColor == Identity(five) &&
                     Rows(five).All(r => r.ActivityText.color == Quiet(five)),
                     "completion immediately mutes the expanded earned tail");
                 float stoppedAngle = Angle(five);
@@ -394,7 +394,7 @@ namespace Uptime.Connections.EditorTools
                     live.RefreshNow(0f);
                     Check(state.Resolution == expected &&
                         Purpose(live).color == Quiet(live) &&
-                        Pill(live).AccentColor == Quiet(live) &&
+                        Pill(live).AccentColor == Identity(live) &&
                         Rows(live).All(r => r.ActivityText.color == Quiet(live)) &&
                         Activities(live).SequenceEqual(new[] { "earned" }),
                         expected + " live card immediately mutes earned entry");
@@ -500,6 +500,12 @@ namespace Uptime.Connections.EditorTools
             (IdentityPillView)new SerializedObject(panel).FindProperty("identityPill")
                 .objectReferenceValue;
 
+        private static Color Identity(LogsOutput panel)
+        {
+            var state = (LogicalConnectionState)typeof(LogsOutput).GetField("state", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(panel);
+            var host = (SimulationHost)typeof(LogsOutput).GetField("host", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(panel);
+            return host.PresentationPalette != null && host.PresentationPalette.TryGet(state, out Color color) ? color : new SerializedObject(panel).FindProperty("activeColor").colorValue;
+        }
         private static Color Quiet(LogsOutput panel) =>
             new SerializedObject(panel).FindProperty("quietColor").colorValue;
 

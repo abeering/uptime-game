@@ -1,5 +1,7 @@
 # Business Importance V0 review
 
+**Current presentation follow-up:** [Shared historical palette, inline IMPORTANT marker and two-mode warning evidence](IdentityMarker/README.md). Earlier importance-family/preset comparisons below are historical and superseded; mechanics remain unchanged.
+
 **Small-scene layout follow-up:** [Symmetric tree, 1080p/720p captures and spacing checks](BasicTreeLayout/README.md). Advanced and all gameplay/topology remain unchanged.
 
 **Current #139 follow-up:** [Live palette experiment, six-way comparisons and Inspector instructions](PaletteExperiment/README.md). Initial importance evidence below predates the new default Uniform Performance treatment; mechanics remain unchanged.

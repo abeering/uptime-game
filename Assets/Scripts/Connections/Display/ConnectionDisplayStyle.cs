@@ -2,33 +2,22 @@ using UnityEngine;
 
 namespace Uptime.Connections.Display
 {
-    public enum OrdinaryIdentityPalette { Uniform, MutedHues, Grayscale }
     public enum PerformanceColorTreatment { Blended, Uniform }
 
     [CreateAssetMenu(menuName = "Uptime/Connection display style")]
     public sealed class ConnectionDisplayStyle : ScriptableObject
     {
-        [Header("Live palette experiment")]
-        public OrdinaryIdentityPalette ordinaryIdentityPalette = OrdinaryIdentityPalette.MutedHues;
+        [Header("Live performance color comparison")]
         public PerformanceColorTreatment performanceColorTreatment = PerformanceColorTreatment.Uniform;
-        public Color uniformOrdinaryIdentity = new(.68f, .72f, .75f);
-        public Color[] grayscaleIdentityColors = {
-            new(.53f,.53f,.53f), new(.61f,.61f,.61f), new(.69f,.69f,.69f),
-            new(.77f,.77f,.77f), new(.85f,.85f,.85f), new(.93f,.93f,.93f) };
-        public Color uniformPerformanceBase = new(.65f, .70f, .74f);
-        [Header("Stable identity families (same lifetime slot on every segment)")]
-        public Color[] ordinaryIdentityColors = {
-            new(.62f, .71f, .78f), new(.66f, .74f, .66f), new(.78f, .71f, .64f),
-            new(.59f, .67f, .72f), new(.71f, .65f, .76f), new(.62f, .75f, .72f) };
-        // Original blue/teal identity accents, now the business IMPORTANT family.
+        [Header("Stable identity slots — shared by all connections")]
+        [UnityEngine.Serialization.FormerlySerializedAs("importantIdentityColors")]
         [UnityEngine.Serialization.FormerlySerializedAs("priorityIdentityColors")]
-        public Color[] importantIdentityColors = {
+        public Color[] identityColors = {
             new(.36f, .87f, .91f), new(.35f, .91f, .76f), new(.43f, .82f, .92f),
             new(.43f, .89f, .79f), new(.31f, .85f, .84f), new(.49f, .87f, .75f) };
         [Range(0, 1)] public float bodyFillOpacity = .34f;
-        public Color ordinaryActivity = new(.68f, .74f, .77f);
-        [UnityEngine.Serialization.FormerlySerializedAs("priorityActivity")]
-        public Color importantActivity = new(.53f, .79f, .85f);
+        [UnityEngine.Serialization.FormerlySerializedAs("ordinaryActivity")]
+        public Color activityColor = new(.68f, .74f, .77f);
         [Range(0, 1)] public float activityOpacity = .60f;
         [Range(0, 1)] public float stalledActivityOpacityMultiplier = .70f;
         [Header("Uniform rail warning pulse")]
@@ -59,31 +48,29 @@ namespace Uptime.Connections.Display
         public float Spacing(float load) => Mathf.Max(minimumSpacing,
             spacingAtOneLoad / (1 + densityPerLoad * Mathf.Max(0, load - 1)));
         public Color IdentityColor(ConnectionDisplayState s) => IdentityColor(s.trafficClass, s.identitySlot);
+        // Importance selects the pill marker; every connection uses the same lifetime-slot colors.
         public Color IdentityColor(DisplayTrafficClass traffic, int slot)
         {
-            if (traffic == DisplayTrafficClass.Ordinary && ordinaryIdentityPalette == OrdinaryIdentityPalette.Uniform)
-                return uniformOrdinaryIdentity;
-            Color[] family = traffic == DisplayTrafficClass.Important ? importantIdentityColors :
-                ordinaryIdentityPalette == OrdinaryIdentityPalette.Grayscale ? grayscaleIdentityColors : ordinaryIdentityColors;
-            return family != null && family.Length > 0 ? family[Mathf.Max(0, slot) % family.Length] : Color.gray;
+            return identityColors != null && identityColors.Length > 0 ? identityColors[Mathf.Max(0, slot) % identityColors.Length] : Color.gray;
         }
         public Color Body(ConnectionDisplayState s, double beats)
         { Color c = Rail(s, beats); c.a *= bodyFillOpacity; return c; }
         public Color Activity(DisplayTrafficClass traffic, bool stalled = false)
         {
-            Color c = traffic == DisplayTrafficClass.Important ? importantActivity : ordinaryActivity;
+            Color c = activityColor;
             c.a *= activityOpacity * (stalled ? stalledActivityOpacityMultiplier : 1); return c;
         }
         public Color Rail(ConnectionDisplayState s, double beats)
         {
-            Color baseColor = performanceColorTreatment == PerformanceColorTreatment.Uniform ? uniformPerformanceBase : IdentityColor(s);
+            Color baseColor = IdentityColor(s);
             float danger = Mathf.Clamp01(s.dangerSeverity);
             Color warning = danger < .55f ? Color.Lerp(behind, endangered, danger / .55f) :
                 Color.Lerp(endangered, critical, (danger - .55f) / .45f);
             if (s.exceedsNormalBudget) warning = Color.Lerp(warning, exceedsNormal,
                 s.normalBudgetWarningMix > 0 ? s.normalBudgetWarningMix : 1);
             float pulse = .5f + .5f * Mathf.Sin((float)(beats % 1) * Mathf.PI * 2);
-            Color c = Color.Lerp(baseColor, warning, danger);
+            Color c = performanceColorTreatment == PerformanceColorTreatment.Uniform && danger > 0 ?
+                warning : Color.Lerp(baseColor, warning, danger);
             c *= 1 - warningPulseDepth * danger * (1 - pulse);
             c.a = 1;
             if (s.resolution == DisplayResolution.Killed || s.resolution == DisplayResolution.Canceled) c = critical;

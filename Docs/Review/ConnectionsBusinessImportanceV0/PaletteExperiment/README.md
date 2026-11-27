@@ -1,5 +1,7 @@
 # PR #139 — live palette comparison
 
+**Historical comparison:** Superseded by [the shared-palette/inline-marker direction](../IdentityMarker/README.md). The ordinary presets and identity-neutral healthy rails described below are no longer current behavior.
+
 Connections presentation refinement on `feature/connections-business-importance-v0`. [Contract and exact Inspector location](../../../Connections/connections-palette-experiment-v0.md). PR #139 stays unmerged.
 
 Open **Assets/Prefabs/Connections/Display/DisplayStyle.asset → Live palette experiment**. Change **Ordinary Identity Palette** and **Performance Color Treatment** during Play Mode. Both canonical scenes and the lab reference this same asset. Authored defaults: **Muted Hues + Uniform Performance**.

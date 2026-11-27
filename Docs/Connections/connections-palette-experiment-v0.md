@@ -1,5 +1,7 @@
 # Connections — Palette Experiment (PR #139)
 
+**Current #139 presentation supersedes the previous palette experiment:** [One historical teal/cyan palette for all connections, inline IMPORTANT `!`, bright identity text, and identity-colored nominal rails with Blended/Uniform warnings](connections-identity-marker-v0.md). Importance mechanics and shared identity ownership remain; earlier descriptions below preserve their phase provenance.
+
 Presentation refinement on the existing Business Importance V0 branch. No gameplay, importance, allocation, recipe, traffic, routing, timing or socket-packing changes. The shared renderer, progress fill, heartbeat, LOAD density and activity movement retain their current owners.
 
 ## Two independent live selectors

@@ -75,7 +75,7 @@ namespace Uptime.Connections.EditorTools
                     foreach (var view in paths)
                     {
                         var display = view.DisplayState;
-                        Check(adapter.style.IdentityColor(display) == adapter.style.ordinaryIdentityColors[display.identitySlot] &&
+                        Check(adapter.style.IdentityColor(display) == adapter.style.identityColors[display.identitySlot] &&
                             view.TerminalMarker.color == view.DisplayAccent,
                             scene + " every route segment and terminal socket shares its lifetime identity/status");
                     }
@@ -85,16 +85,16 @@ namespace Uptime.Connections.EditorTools
                     float work = c.CompletedWork, time = host.SimulationTimeSeconds;
                     adapter.heartbeat.SetReviewTime(3.25); Refresh();
                     Check(c.CompletedWork == work && host.SimulationTimeSeconds == time, scene + " presentation cannot advance simulation");
-                    Color[] saved = adapter.style.ordinaryIdentityColors;
+                    Color[] saved = adapter.style.identityColors;
                     try
                     {
-                        adapter.style.ordinaryIdentityColors = Enumerable.Repeat(Color.magenta, 6).ToArray(); Refresh();
+                        adapter.style.identityColors = Enumerable.Repeat(Color.magenta, 6).ToArray(); Refresh();
                         var safe = state; safe.dangerSeverity = 0;
-                        Check(labPrefab.style.Rail(safe, 0) == (adapter.style.performanceColorTreatment == PerformanceColorTreatment.Uniform ? adapter.style.uniformPerformanceBase : Color.magenta) && sharedPill.ProgressPlate.material == labPrefab.pill.material &&
+                        Check(labPrefab.style.Rail(safe, 0) == Color.magenta && sharedPill.ProgressPlate.material == labPrefab.pill.material &&
                             pills.All(p => p.ProgressPlate.color.r > .99f && p.ProgressPlate.color.b > .99f),
                             scene + " one live style edit propagates to gameplay and lab asset references");
                     }
-                    finally { adapter.style.ordinaryIdentityColors = saved; Refresh(); }
+                    finally { adapter.style.identityColors = saved; Refresh(); }
                     long allocated = PresentationAllocationProbe.Measure(() => { for (int i = 0; i < 1000; i++) adapter.StateFor(c); });
                     if (allocated >= 0) Check(allocated == 0, scene + " 1000 mapping calls allocate " + allocated + " managed bytes (calibrated GC.Alloc)");
                     else checks.Add("UNAVAILABLE " + scene + " allocation recorder failed sentinel calibration; no zero-allocation claim");

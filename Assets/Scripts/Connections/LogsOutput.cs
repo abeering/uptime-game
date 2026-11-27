@@ -72,7 +72,7 @@ namespace Uptime.Connections
             Color accent = host.PresentationPalette != null &&
                 host.PresentationPalette.TryGet(state, out Color assigned) ? assigned : activeColor;
             if (identityPill != null)
-                identityPill.Bind(state.ConnectionId, selected.IsComplete ? quietColor : accent);
+                { identityPill.Bind(state.ConnectionId, accent); identityPill.FollowIdentity(state, host.PresentationPalette); }
             if (fullContent != null) fullContent.gameObject.SetActive(true);
             if (summaryText != null) summaryText.gameObject.SetActive(false);
             if (fullAlpha != null) fullAlpha.alpha = 1f;
@@ -124,7 +124,7 @@ namespace Uptime.Connections
                 indicatorColor.a = .72f;
                 activityIndicator.color = indicatorColor;
             }
-            if (identityPill != null) identityPill.SetAccentColor(chrome);
+            if (identityPill != null) { identityPill.SetAccentColor(accent); identityPill.FollowIdentity(state, host.PresentationPalette); }
             if (purposeText != null)
             {
                 purposeText.text = state.Definition.ClaimedPurpose ?? string.Empty;
@@ -283,7 +283,7 @@ namespace Uptime.Connections
                 summaryText.gameObject.SetActive(true);
             }
             if (summaryAlpha != null) summaryAlpha.alpha = 1f;
-            if (identityPill != null) identityPill.SetAccentColor(quietColor);
+            if (identityPill != null) { identityPill.FollowIdentity(null, null); identityPill.SetAccentColor(quietColor); }
             collapsed = true;
             SetHeightAnchored(summaryHeight);
             enabled = false;

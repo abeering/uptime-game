@@ -1,0 +1,16 @@
+Unity 6000.3.11f1 isolated project
+Focused regressions exit: 0
+Final exact-source focused witness exit: 0
+Graphical run exit: 0
+IdentityPresentationWitness PASS: 276 assertions.
+BusinessImportanceWitness PASS: 314 assertions.
+ConnectionDisplayLabWitness PASS: 512 assertions; hierarchy=334; binding GC=-1
+ConnectionVisualIntegrationWitness PASS: 81 assertions; 2 unavailable measurements.
+RecorderPolicyEvidenceWitness PASS: 74 checks.
+RouteTransitionWitness PASS: 108 assertions.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-display-lab-v0/Logs/UptimeRuns/uptime_20261127_203347_seed-01701_89f46b55.json
+LogsOutputWitness PASS: parsing, scene bindings, pending/connecting/empty, burst and retained tails, command addressability, operation transition, completion hold, kill/cancel/withdraw, historical collapse, reset, canonical hopping identity, clipping, narrow and wide widths, scaled independent spinner, zero WORK, recorder isolation.
+IdentityPresentationWitness PASS: 276 assertions.
+PaletteExperimentCapture PASS: 1524 actual Play Mode checks.
+Inherited nonfatal Unity QuickSearch startup indexing exception observed.
+Core --check and git diff --check pass.

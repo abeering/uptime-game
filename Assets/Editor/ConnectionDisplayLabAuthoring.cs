@@ -48,7 +48,7 @@ namespace Uptime.Connections.EditorTools
             var lab = canvasObject.AddComponent<ConnectionDisplayLab>();
             lab.heartbeat = canvasObject.AddComponent<ConnectionHeartbeat>(); lab.style = style;
             Label("Title", root, "CONNECTION DISPLAY LAB / V0", 30, new Vector2(1400, 42), new Vector2(42, -25), Text);
-            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal important  /  shared gameplay assets", 17,
+            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  shared teal/cyan identities + IMPORTANT !  /  shared gameplay assets", 17,
                 new Vector2(1750, 24), new Vector2(42, -72), Muted);
             lab.clockLabel = Label("Clock", root, "120 BPM", 16, new Vector2(550, 26), new Vector2(1085, -32), Muted);
             Button(root, "PauseResume", "PAUSE / RESUME", new Vector2(1560, -30), lab.TogglePause);
