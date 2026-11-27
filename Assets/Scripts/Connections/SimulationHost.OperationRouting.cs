@@ -25,6 +25,25 @@ namespace Uptime.Connections
         public float CommittedAtSeconds { get; }
     }
 
+    // Mechanical route-transition evidence; the view owns the cosmetic retraction.
+    public sealed class OperationRouteTransition
+    {
+        public RouteNode[] PreviousRoute { get; }
+        public PhysicalLinkReference[] PreviousLinks { get; }
+        public int SharedNodeCount { get; }
+        public int SharedLinkCount => Math.Max(0, SharedNodeCount - 1);
+        public int NewLinkCount { get; }
+        public float StartedAtSeconds { get; }
+        public float TravelSeconds { get; }
+        public int RouteRevision { get; }
+        public float? FinishedAtSeconds { get; internal set; }
+        internal OperationRouteTransition(RouteNode[] previous, PhysicalLinkReference[] links, int common, int newLinks, float time, float perLink, int revision)
+        { PreviousRoute = previous; PreviousLinks = links; SharedNodeCount = common; NewLinkCount = newLinks;
+            StartedAtSeconds = time; TravelSeconds = newLinks * perLink; RouteRevision = revision; }
+        public static int CommonPrefix(RouteNode[] a, RouteNode[] b)
+        { int count = 0; while (count < a.Length && count < b.Length && a[count].Node == b[count].Node) count++; return count; }
+    }
+
     public sealed partial class SimulationHost
     {
         [Header("CACHE configuration: one READ PURPOSE slot")]
@@ -93,16 +112,25 @@ namespace Uptime.Connections
                 else { actual = cacheConfigurationNode; route = candidate; cached = true; reason = "cache_read_match"; }
             }
             var links = RouteLinksFor(route);
-            bool changed = state.Route.Length != route.Length;
-            if (!changed) for (int i = 0; i < route.Length; i++) changed |= state.Route[i].Node != route[i].Node;
+            var previousRoute = state.Route; var previousLinks = state.RouteLinks;
+            int common = OperationRouteTransition.CommonPrefix(previousRoute, route);
+            bool changed = common != previousRoute.Length || common != route.Length;
             state.CommitRoute(new OperationRouteResolution(index, intended, FindNodeResources(actual.NodeId), route,
                 links, cached, cached ? cachedWorkMultiplier : 1, cached ? cachedLoadMultiplier : 1, reason, simulationTimeSeconds, cachePurposeId));
             if (state.HasEstablished && changed)
             {
-                state.Lifecycle = Lifecycle.Connecting; state.IsTransitioning = false;
-                state.ReachedRouteNodeIndex = 0; state.LinkTravelElapsedSeconds = 0; state.AllocatedLoad = 0;
+                state.RouteTransition = new OperationRouteTransition(previousRoute, previousLinks, common,
+                    links.Length - Math.Max(0, common - 1), simulationTimeSeconds, state.TravelSecondsPerLink, state.RouteRevision);
+                state.Lifecycle = Lifecycle.Rerouting; state.IsTransitioning = false;
+                state.ReachedRouteNodeIndex = Math.Max(0, common - 1); state.LinkTravelElapsedSeconds = 0; state.AllocatedLoad = 0;
             }
             if (record) recorder?.RecordOperationRoute(state, simulationTimeSeconds);
+            if (state.IsRerouting)
+            {
+                recorder?.RecordRerouting("connection_rerouting_started", state, simulationTimeSeconds);
+                // A shorter route may already be fully established. Retraction never charges simulation time.
+                if (state.ReachedRouteNodeIndex == state.RouteLinks.Length) EstablishOperationRoute(state);
+            }
         }
         private bool CanFulfillEffect(LogicalConnectionDefinition definition, int index, NodeView target)
         {

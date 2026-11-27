@@ -372,7 +372,8 @@ namespace Uptime.Connections
         Pending,
         Connecting,
         Active,
-        Complete
+        Complete,
+        Rerouting
     }
 
     public enum ConnectionResolution { Completed, Killed, Canceled, Withdrawn, TimedOut }
@@ -527,6 +528,10 @@ namespace Uptime.Connections
         public Lifecycle Lifecycle { get; internal set; }
         public bool IsPending => Lifecycle == Lifecycle.Pending;
         public bool IsConnecting => Lifecycle == Lifecycle.Connecting;
+        public bool IsRerouting => Lifecycle == Lifecycle.Rerouting;
+        public bool IsTraversing => IsConnecting || IsRerouting;
+        public bool IsLive => IsActive || IsTraversing;
+        public OperationRouteTransition RouteTransition { get; internal set; }
         public bool IsComplete => Lifecycle == Lifecycle.Complete;
         public bool IsNormalDeparture => Resolution == ConnectionResolution.Completed ||
             Resolution == ConnectionResolution.Withdrawn;
@@ -575,7 +580,7 @@ namespace Uptime.Connections
             if (!HasServiceTarget || !HasEstablished || IsComplete) { AtRisk = false; return; }
             ServiceRemainingSeconds = Mathf.Max(0f, ServiceDeadlineSeconds - time);
             // A held transition has not started the next operation: estimate it nominally.
-            float projected = IsConnecting ?
+            float projected = IsTraversing ?
                 Mathf.Max(0f, (RouteLinks.Length - ReachedRouteNodeIndex) * TravelSecondsPerLink - LinkTravelElapsedSeconds) + NominalOperationSeconds(CurrentOperationIndex) : IsTransitioning ?
                 NominalOperationSeconds(CurrentOperationIndex) : RemainingWork <= .0001f ? 0f :
                 ActualWorkRate > 0f ? RemainingWork / ActualWorkRate : float.PositiveInfinity;

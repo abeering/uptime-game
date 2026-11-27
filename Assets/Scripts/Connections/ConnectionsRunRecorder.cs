@@ -191,6 +191,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class RunEvent
     {
         public OperationRoutingRecord operationRouting;
+        public ReroutingRecord rerouting;
         public string policyNodeId, previousPurposeId, favoredPurposeId;
         public float priorityWeight;
         public int demandSequence;
@@ -577,6 +578,7 @@ namespace Uptime.Connections
     [Serializable] public sealed class ConnectionSnapshot
     {
         public OperationRoutingRecord operationRouting;
+        public ReroutingRecord rerouting;
         public float allocationWeight;
         public string allocationPolicyNodeId;
         public double businessWorkValue;
@@ -599,6 +601,14 @@ namespace Uptime.Connections
         public string performance;
         public float serviceDeadlineSeconds, serviceRemainingSeconds, projectedServiceSeconds;
         public bool serviceAtRisk;
+    }
+
+    [Serializable] public sealed class ReroutingRecord
+    {
+        public string[] previousRoute;
+        public int sharedNodeCount, newLinkCount, reachedNodeIndex;
+        public float startedAtSeconds, travelSeconds, linkElapsedSeconds;
+        public float finishedAtSeconds = -1;
     }
 
     [Serializable] public sealed class OperationRoutingRecord
@@ -834,6 +844,21 @@ namespace Uptime.Connections
                 originalWork = state.Definition.WorkAt(index), originalLoad = state.Definition.LoadAt(index),
                 processingWork = state.Definition.WorkAt(index) * r.WorkMultiplier, processingLoad = state.Definition.LoadAt(index) * r.LoadMultiplier };
         }
+        private ReroutingRecord Rerouting(LogicalConnectionState state)
+        {
+            var r = state.RouteTransition; if (r == null || r.RouteRevision != state.RouteRevision) return null;
+            return new ReroutingRecord { previousRoute = Array.ConvertAll(r.PreviousRoute, n => n.Node.NodeId),
+                sharedNodeCount = r.SharedNodeCount, newLinkCount = r.NewLinkCount, reachedNodeIndex = state.ReachedRouteNodeIndex,
+                startedAtSeconds = r.StartedAtSeconds, travelSeconds = r.TravelSeconds, linkElapsedSeconds = state.LinkTravelElapsedSeconds,
+                finishedAtSeconds = r.FinishedAtSeconds ?? -1 };
+        }
+        public void RecordRerouting(string type, LogicalConnectionState state, float time)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent(type, time); entry.connectionId = state.ConnectionId; entry.operationIndex = state.CurrentOperationIndex;
+            entry.operationRouting = Routing(state); entry.rerouting = Rerouting(state); entry.targetNodeId = state.TargetNode.NodeId;
+        }
+
         public void RecordOperationRoute(LogicalConnectionState state, float time)
         {
             if (!IsRecording) return;
@@ -1700,15 +1725,15 @@ namespace Uptime.Connections
             var active = new List<ConnectionSnapshot>();
             foreach (LogicalConnectionState state in host.RuntimeConnections)
             {
-                if (!state.IsPending && !state.IsConnecting && !state.IsActive) continue;
-                if (state.IsActive)
+                if (!state.IsPending && !state.IsLive) continue;
+                if (state.IsActive || state.IsRerouting)
                 {
                     snapshot.activeConnections++;
                     if (state.IsHostile) snapshot.establishedHostile++;
                     else snapshot.establishedBenign++;
                 }
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
-                active.Add(new ConnectionSnapshot { id = state.ConnectionId, operationRouting = Routing(state),
+                active.Add(new ConnectionSnapshot { id = state.ConnectionId, operationRouting = Routing(state), rerouting = Rerouting(state),
                     allocationWeight = state.AllocationWeight, allocationPolicyNodeId = state.AllocationPolicyNodeId,
                     businessWorkValue = state.BusinessWorkValue,
                     serviceDeadlineSeconds = state.ServiceDeadlineSeconds,

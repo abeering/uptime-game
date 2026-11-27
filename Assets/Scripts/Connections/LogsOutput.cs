@@ -166,7 +166,7 @@ namespace Uptime.Connections
             {
                 emptyText.gameObject.SetActive(visible == 0);
                 emptyText.text = state.IsPending ? "WAITING FOR CONNECTION" :
-                    state.IsConnecting ? "CONNECTING" : "NO LOGS EMITTED";
+                    state.IsRerouting ? "REROUTING" : state.IsConnecting ? "CONNECTING" : "NO LOGS EMITTED";
                 if (resolved) emptyText.color = quietColor;
             }
             if (rowCountChanged || Mathf.Abs(contentWidth - width) > .01f)

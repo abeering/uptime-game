@@ -130,7 +130,7 @@ namespace Uptime.Connections
         {
             if (string.IsNullOrEmpty(id) || runtimeConnections == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
-                if ((state.IsActive || state.IsConnecting) && state.Identity.IsDisguised &&
+                if (state.IsLive && state.Identity.IsDisguised &&
                     string.Equals(state.Identity.AliasIdentity, id,
                         StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase))
@@ -148,7 +148,7 @@ namespace Uptime.Connections
             if (runtimeConnections == null || string.IsNullOrEmpty(attemptedId)) return;
             foreach (LogicalConnectionState state in runtimeConnections)
             {
-                if ((!state.IsActive && !state.IsConnecting) ||
+                if (!state.IsLive ||
                     state.Identity.Mode != ConnectionIdentityMode.ReactiveMisdirection) continue;
                 string previous = state.Identity.AliasIdentity;
                 if (!state.Identity.ReactToFailedAddress(attemptedId,
@@ -305,13 +305,21 @@ namespace Uptime.Connections
                 ResolveDueTimeouts();
                 SettleTerminalBoundary();
                 if (RunEnded) { steppingIntegrity = false; RefreshDisplays(); return; }
+                // Resolve before choosing the next boundary so even coarse steps charge only new links.
+                foreach (var connection in runtimeConnections)
+                    if (connection.IsTransitioning && !completedThisStep.Contains(connection))
+                    {
+                        CommitOperationRoute(connection);
+                        if (connection.IsTransitioning)
+                        { StartOperation(connection); recorder?.RecordOperationStarted(connection, simulationTimeSeconds); }
+                    }
                 float segment = remaining;
                 foreach (LogicalConnectionState connection in runtimeConnections)
                 {
                     if (connection.Identity.IsHopping && connection.Identity.Started)
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             (float)(connection.Identity.NextHopAtSeconds - simulationTimeSeconds)));
-                    if (connection.IsActive && connection.Definition.LoaderAttack != null)
+                    if (connection.IsLive && connection.HasEstablished && connection.Definition.LoaderAttack != null)
                     {
                         // A coarse witness step must still observe timed attack activation
                         // and withdrawal rather than run through the entire attack at once.
@@ -324,7 +332,7 @@ namespace Uptime.Connections
                         connection.HasServiceTarget)
                         segment = Mathf.Min(segment, Mathf.Max(.000001f,
                             connection.ServiceDeadlineSeconds - simulationTimeSeconds));
-                    if (connection.IsConnecting)
+                    if (connection.IsTraversing)
                         segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                             connection.TravelSecondsPerLink - connection.LinkTravelElapsedSeconds));
                     if (connection.IsPending)
@@ -355,7 +363,7 @@ namespace Uptime.Connections
                 int payloadsBeforeSegment = payloadDirector?.Payloads.Count ?? 0;
                 StepSegment(segment, completedThisStep);
                 ResolveDueTimeouts();
-                AdvanceConnecting(segment);
+                AdvanceRouteTraversal(segment);
                 payloadDirector?.Advance(segment, simulationTimeSeconds, payloadsBeforeSegment);
                 wormDirector?.Advance(segment, simulationTimeSeconds);
                 CompleteDueScan();
@@ -402,13 +410,6 @@ namespace Uptime.Connections
         {
             foreach (LogicalConnectionState connection in runtimeConnections)
             {
-                if (connection.IsTransitioning && !completedThisStep.Contains(connection))
-                {
-                    CommitOperationRoute(connection);
-                    if (connection.IsConnecting) continue;
-                    StartOperation(connection);
-                    recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
-                }
                 if (connection.IsActive && !completedThisStep.Contains(connection))
                 {
                     UpdateNaturalLoad(connection);
@@ -416,7 +417,7 @@ namespace Uptime.Connections
                 }
             }
             foreach (var connection in runtimeConnections)
-                if (connection.IsConnecting && connection.HasEstablished) connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
+                if (connection.IsRerouting) connection.Behaviors.AdvanceConnection(deltaSeconds, simulationTimeSeconds);
             RefreshBackdoorRates();
             RefreshApiAllocationWeights();
             List<ResourceAllocator.OperationCompletion> completed =
@@ -508,14 +509,14 @@ namespace Uptime.Connections
             return false;
         }
 
-        private void AdvanceConnecting(float deltaSeconds)
+        private void AdvanceRouteTraversal(float deltaSeconds)
         {
             var ordered = new List<LogicalConnectionState>(runtimeConnections);
             ordered.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
             bool establishedAny = false;
             foreach (LogicalConnectionState state in ordered)
             {
-                if (!state.IsConnecting) continue;
+                if (!state.IsTraversing) continue;
                 state.LinkTravelElapsedSeconds += deltaSeconds;
                 if (state.LinkTravelElapsedSeconds + 0.00001f < state.TravelSecondsPerLink)
                     continue;
@@ -529,25 +530,30 @@ namespace Uptime.Connections
                     continue;
                 }
                 if (state.ReachedRouteNodeIndex != state.RouteLinks.Length) continue;
-                state.Lifecycle = Lifecycle.Active;
+                EstablishOperationRoute(state);
                 establishedAny = true;
-                bool firstEstablishment = !state.HasEstablished;
-                if (firstEstablishment)
-                {
-                    state.HasEstablished = true;
-                    state.EstablishedAtSeconds = simulationTimeSeconds;
-                    health.Activate(state, simulationTimeSeconds);
-                    EstablishService(state);
-                    state.Behaviors.StartConnection();
-                    recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
-                }
-                StartOperation(state);
-                recorder?.RecordOperationStarted(state, simulationTimeSeconds);
             }
             // Arrival can end the outer step. Publish the first real allocation now so
             // presentation never interprets an unallocated Active state as stalled.
             if (establishedAny)
                 RefreshPayloadAllocations();
+        }
+
+        private void EstablishOperationRoute(LogicalConnectionState state)
+        {
+            bool rerouted = state.IsRerouting; state.Lifecycle = Lifecycle.Active;
+            if (!state.HasEstablished)
+            {
+                state.HasEstablished = true; state.EstablishedAtSeconds = simulationTimeSeconds;
+                health.Activate(state, simulationTimeSeconds); EstablishService(state); state.Behaviors.StartConnection();
+                recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
+            }
+            if (rerouted)
+            {
+                state.RouteTransition.FinishedAtSeconds = simulationTimeSeconds;
+                recorder?.RecordRerouting("connection_rerouting_finished", state, simulationTimeSeconds);
+            }
+            StartOperation(state); recorder?.RecordOperationStarted(state, simulationTimeSeconds);
         }
 
         private void StartOperation(LogicalConnectionState state)
@@ -648,7 +654,7 @@ namespace Uptime.Connections
             if (runtimeConnections == null || id == null) return false;
             foreach (LogicalConnectionState state in runtimeConnections)
                 if (string.Equals(state.ConnectionId, id, StringComparison.OrdinalIgnoreCase) &&
-                    (state.IsActive || state.IsConnecting))
+                    state.IsLive)
                 {
                     bool previousBoundary = BeginBoundaryMutation();
                     try
@@ -1038,7 +1044,7 @@ namespace Uptime.Connections
                         if (routeNode.Node == offline.View)
                         { interrupted.Add(state); break; }
                 }
-                else if (state.IsConnecting)
+                else if (state.IsTraversing)
                     for (int i = 0; i <= state.ReachedRouteNodeIndex; i++)
                         if (state.Route[i].Node == offline.View)
                         { interrupted.Add(state); break; }
@@ -1356,7 +1362,7 @@ namespace Uptime.Connections
             if (HasEverUsedId(candidate) || IsTrafficIdReserved(candidate)) return false;
             if (runtimeConnections == null) return true;
             foreach (LogicalConnectionState other in runtimeConnections)
-                if (other != owner && (other.IsActive || other.IsConnecting) &&
+                if (other != owner && other.IsLive &&
                     other.Identity.IsDisguised &&
                     string.Equals(other.Identity.AliasIdentity, candidate,
                         StringComparison.OrdinalIgnoreCase)) return false;
@@ -1378,7 +1384,7 @@ namespace Uptime.Connections
         {
             if (runtimeConnections == null) return;
             foreach (LogicalConnectionState state in runtimeConnections)
-                if (state.IsActive || state.IsConnecting)
+                if (state.IsLive)
                     state.Identity.Advance(simulationTimeSeconds,
                         candidate => AliasAvailable(state, candidate),
                         (at, alias) => recorder?.RecordIdentityAlias(state, (float)at));
@@ -1391,7 +1397,7 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState state in runtimeConnections)
             {
                 bool visibleOnEdge = false;
-                if (probedLink != null && (state.IsActive || state.IsConnecting))
+                if (probedLink != null && state.IsLive)
                     for (int i = 0; i < state.RouteLinks.Length; i++)
                         if (state.RouteLinks[i] == probedLink &&
                             (state.IsActive || i < state.ReachedRouteNodeIndex ||
@@ -1527,7 +1533,7 @@ namespace Uptime.Connections
             if (runtimeConnections == null) return;
             var due = new List<LogicalConnectionState>();
             foreach (LogicalConnectionState state in runtimeConnections)
-                if (state.IsActive && state.Definition.LoaderAttack != null &&
+                if (state.IsLive && state.HasEstablished && state.Definition.LoaderAttack != null &&
                     state.LoaderWithdrawAtSeconds >= 0f &&
                     state.LoaderWithdrawAtSeconds <= simulationTimeSeconds + 0.00001f)
                     due.Add(state);
@@ -1677,9 +1683,9 @@ namespace Uptime.Connections
                     continue;
                 }
 
-                if (connection.IsConnecting)
+                if (connection.IsTraversing)
                 {
-                    output.Append("CONNECTING  ")
+                    output.Append(connection.IsRerouting ? "REROUTING  " : "CONNECTING  ")
                         .Append(Mathf.RoundToInt(connection.RouteReveal * 100f))
                         .Append("% route");
                     continue;

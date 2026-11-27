@@ -139,19 +139,50 @@ namespace Uptime.Connections
             }
         }
 
-        private NodeView[] renderedRoute;
+        private RouteNode[] presentedRoute;
+        private PhysicalLinkReference[] presentedLinks;
+        private int presentedRevision = -1;
+        private bool routeAnimation, extendingRoute;
+        private float routeAnimationElapsed, retractionSeconds, routeTravelSeconds, retractionStartReveal = 1, lastReveal;
+        private int visualSharedLinks;
+        private float[] retainedStarts, retainedEnds, retainedWidths;
+        public RouteNode[] PresentationRoute => presentedRoute ?? state.Route;
+        internal PhysicalLinkReference[] PresentationLinks => presentedLinks ?? state.RouteLinks;
+        public bool IsRetractingRoute => routeAnimation && !extendingRoute;
+        public float VisibleRouteFraction => CurrentReveal();
         public void RefreshOperationRoute()
         {
             if (state == null) return;
-            bool changed = renderedRoute == null || renderedRoute.Length != state.Route.Length;
-            if (!changed) for (int i = 0; i < renderedRoute.Length; i++) changed |= renderedRoute[i] != state.Route[i].Node;
-            if (!changed) return;
-            renderedRoute = Array.ConvertAll(state.Route, n => n.Node);
-            int count = state.RouteLinks.Length;
-            starts = new Vector2[count]; ends = new Vector2[count];
+            if (presentedRoute == null) { SwitchPresentedRoute(state.Route, state.RouteLinks); presentedRevision = state.RouteRevision; return; }
+            if (state.IsComplete) return; // Freeze the actually visible route for the existing departure.
+            if (presentedRevision != state.RouteRevision)
+            {
+                presentedRevision = state.RouteRevision;
+                int common = OperationRouteTransition.CommonPrefix(presentedRoute, state.Route);
+                if (common == presentedRoute.Length && common == state.Route.Length) return;
+                var transition = state.RouteTransition;
+                if (transition == null || transition.RouteRevision != state.RouteRevision)
+                { SwitchPresentedRoute(state.Route, state.RouteLinks); return; }
+                routeAnimation = true; extendingRoute = false; routeAnimationElapsed = 0;
+                visualSharedLinks = Mathf.Max(0, common - 1); retractionStartReveal = lastReveal;
+                routeTravelSeconds = transition.TravelSeconds;
+                retractionSeconds = visualSharedLinks >= presentedLinks.Length ? 0 : routeTravelSeconds > 0 ? Mathf.Min(relayoutSeconds, routeTravelSeconds * .5f) : relayoutSeconds;
+            }
+            if (routeAnimation && gameplayDisplay?.host != null)
+                routeAnimationElapsed = Mathf.Max(routeAnimationElapsed, gameplayDisplay.host.SimulationTimeSeconds - state.RouteTransition.StartedAtSeconds);
+            if (routeAnimation && !extendingRoute && routeAnimationElapsed >= retractionSeconds)
+            { SwitchPresentedRoute(state.Route, state.RouteLinks); extendingRoute = true; }
+        }
+        private void SwitchPresentedRoute(RouteNode[] route, PhysicalLinkReference[] links)
+        {
+            int retained = presentedRoute == null ? 0 : Mathf.Max(0, OperationRouteTransition.CommonPrefix(presentedRoute, route) - 1);
+            retainedStarts = new float[retained]; retainedEnds = new float[retained]; retainedWidths = new float[retained];
+            for (int i = 0; i < retained && startOffsets != null; i++)
+            { retainedStarts[i] = startOffsets[i]; retainedEnds[i] = endOffsets[i]; retainedWidths[i] = lineWidths[i]; }
+            presentedRoute = route; presentedLinks = links;
+            starts = new Vector2[links.Length]; ends = new Vector2[links.Length];
             startOffsets = endOffsets = lineWidths = targetStartOffsets = targetEndOffsets = targetWidths = null;
-            fromStartOffsets = fromEndOffsets = fromWidths = null;
-            establishedVisual = false;
+            fromStartOffsets = fromEndOffsets = fromWidths = null; establishedVisual = false;
             if (terminalMarker != null) terminalMarker.gameObject.SetActive(false);
         }
 
@@ -226,6 +257,18 @@ namespace Uptime.Connections
 
         private float CurrentReveal()
         {
+            if (state.IsComplete && routeAnimation) return lastReveal;
+            if (routeAnimation)
+            {
+                float totalLength = 0, prefixLength = 0;
+                for (int i = 0; i < starts.Length; i++)
+                { float length = Vector2.Distance(starts[i], ends[i]); totalLength += length; if (i < visualSharedLinks) prefixLength += length; }
+                float prefix = totalLength > .0001f ? prefixLength / totalLength : 0;
+                if (!extendingRoute) return Mathf.Lerp(retractionStartReveal, Mathf.Min(retractionStartReveal, prefix),
+                    Mathf.SmoothStep(0, 1, Mathf.Clamp01(routeAnimationElapsed / Mathf.Max(.0001f, retractionSeconds))));
+                float extension = routeTravelSeconds <= retractionSeconds ? 1 : Mathf.Clamp01((routeAnimationElapsed - retractionSeconds) / (routeTravelSeconds - retractionSeconds));
+                return Mathf.Lerp(prefix, 1, extension);
+            }
             if (state.IsActive || state.IsComplete &&
                 (state.IsNormalDeparture ||
                  state.TerminationPhase == Lifecycle.Active)) return 1f;
@@ -256,9 +299,13 @@ namespace Uptime.Connections
                 startOffsets = (float[])nextStarts.Clone();
                 endOffsets = (float[])nextEnds.Clone();
                 lineWidths = (float[])widths.Clone();
-                fromStartOffsets = (float[])nextStarts.Clone();
-                fromEndOffsets = (float[])nextEnds.Clone();
-                fromWidths = (float[])widths.Clone();
+                if (retainedStarts != null)
+                    for (int i = 0; i < retainedStarts.Length; i++)
+                    { startOffsets[i] = retainedStarts[i]; endOffsets[i] = retainedEnds[i]; lineWidths[i] = retainedWidths[i]; }
+                retainedStarts = retainedEnds = retainedWidths = null;
+                fromStartOffsets = (float[])startOffsets.Clone();
+                fromEndOffsets = (float[])endOffsets.Clone();
+                fromWidths = (float[])lineWidths.Clone();
             }
             else
             {
@@ -287,6 +334,7 @@ namespace Uptime.Connections
             if (state == null || networkArea == null || (!UsesSharedDisplay && path == null) || state.IsPending || startOffsets == null)
                 return;
 
+            if (routeAnimation && !state.IsComplete) routeAnimationElapsed += deltaSeconds;
             if (terminalMarker != null)
                 terminalMarker.AdvanceVisual(deltaSeconds);
 
@@ -324,15 +372,15 @@ namespace Uptime.Connections
             }
             for (int i = 0; i < starts.Length; i++)
             {
-                Vector2 a = networkArea.InverseTransformPoint(state.Route[i].Node.transform.position);
-                Vector2 b = networkArea.InverseTransformPoint(state.Route[i + 1].Node.transform.position);
+                Vector2 a = networkArea.InverseTransformPoint(PresentationRoute[i].Node.transform.position);
+                Vector2 b = networkArea.InverseTransformPoint(PresentationRoute[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
-                starts[i] = EdgeGeometry.CardUnderlap(state.Route[i].Node,
+                starts[i] = EdgeGeometry.CardUnderlap(PresentationRoute[i].Node,
                     networkArea, direction, startOffsets[i], lineWidths[i]);
-                ends[i] = EdgeGeometry.CardUnderlap(state.Route[i + 1].Node,
+                ends[i] = EdgeGeometry.CardUnderlap(PresentationRoute[i + 1].Node,
                     networkArea, -direction, -endOffsets[i], lineWidths[i]);
             }
-            float reveal = CurrentReveal();
+            float reveal = CurrentReveal(); lastReveal = reveal;
             float fade = state.IsComplete && state.IsNormalDeparture ?
                 1f - Mathf.Clamp01(departureElapsed / departureSeconds) : 1f;
             LoadPerformance performance = state.Performance;
@@ -340,7 +388,7 @@ namespace Uptime.Connections
             {
                 if (gameplayDisplay == null) return;
                 sharedDisplay.path.SetGeometry(starts, ends, lineWidths);
-                sharedDisplay.path.SetVisibility(reveal, state.IsDemanding || state.IsComplete && state.TerminationPhase == Lifecycle.Active);
+                sharedDisplay.path.SetVisibility(reveal, !IsRetractingRoute && (state.IsDemanding || state.IsComplete && state.TerminationPhase == Lifecycle.Active));
                 sharedDisplay.path.SetProbe(probeSegment, probeCenter, probeAlong, probeHalfSize, probeTint);
                 sharedDisplay.Render(DisplayState, gameplayDisplay.heartbeat);
                 fade = sharedDisplay.style.Opacity(DisplayState);
@@ -348,7 +396,7 @@ namespace Uptime.Connections
             else
             {
                 Color tint = state.IsComplete && !state.IsNormalDeparture ?
-                    DisplayAccent : state.IsConnecting ? identityColor : BeamColorFor(performance);
+                    DisplayAccent : state.IsTraversing ? identityColor : BeamColorFor(performance);
                 tint.a *= fade;
                 if (path.color != tint) path.color = tint;
                 path.SetPath(starts, ends, lineWidths, reveal);
@@ -356,14 +404,14 @@ namespace Uptime.Connections
             }
             if (terminalMarker != null)
             {
-                bool reachedTarget = reveal >= 1f;
+                bool reachedTarget = reveal >= 1f && (!extendingRoute || !state.IsRerouting);
                 terminalMarker.gameObject.SetActive(reachedTarget);
                 if (reachedTarget)
                 {
                     int last = ends.Length - 1;
-                    NodeView target = state.TargetNode;
+                    NodeView target = PresentationRoute[PresentationRoute.Length - 1].Node;
                     Vector2 from = networkArea.InverseTransformPoint(
-                        state.Route[last].Node.transform.position);
+                        PresentationRoute[last].Node.transform.position);
                     Vector2 to = networkArea.InverseTransformPoint(target.transform.position);
                     Vector2 towardSource = (from - to).normalized;
                     Vector2 socket = TerminalSocketCenter(EdgeGeometry.CardRect(target,

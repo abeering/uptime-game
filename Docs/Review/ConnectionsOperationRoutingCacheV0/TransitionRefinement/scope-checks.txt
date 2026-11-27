@@ -1,0 +1,14 @@
+PASS unchanged Assets/Scenes/Connections.unity
+PASS unchanged Assets/Scenes/ConnectionsAdvanced.unity
+PASS unchanged Assets/Scenes/ConnectionsDisplayLab.unity
+PASS unchanged Assets/Scenes/GameScene.unity
+PASS unchanged Assets/Scenes/ABScene.unity
+PASS unchanged Assets/Scripts/Connections/ResourceAllocator.cs
+PASS unchanged Assets/Scripts/Connections/SimulationHost.Service.cs
+PASS unchanged Assets/Scripts/Connections/SimulationHost.Shift.cs
+PASS unchanged Assets/Scripts/Connections/ConnectionTrafficDirector.cs
+PASS unchanged Assets/Prefabs/Connections/ConnectionsSshOverlay.prefab
+PASS no new colors, shaders, materials, renderer component or prefab
+PASS original per-link travel authoring and CACHE/workload/demand/objective tuning unchanged
+PASS lifecycle enum append preserves existing numeric values
+PASS original local TMP fallback cache excluded from this refinement

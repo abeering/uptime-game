@@ -24,16 +24,20 @@ namespace Uptime.Connections.EditorTools
         {
             EditorSceneManager.OpenScene(CanonicalSceneAuthoring.Scenes[0]); SessionState.SetBool(Pending, true); EditorApplication.isPlaying = true;
         }
+        public static void RunTransitions() { SessionState.SetBool(Pending + ".Transitions", true); Run(); }
         private static void Launch()
         {
             if (!SessionState.GetBool(Pending, false) || !Application.isPlaying) return;
-            SessionState.SetBool(Pending, false); new GameObject("CACHE gameplay evidence").AddComponent<OperationRoutingCacheCaptureRunner>();
+            SessionState.SetBool(Pending, false); var runner = new GameObject("CACHE gameplay evidence").AddComponent<OperationRoutingCacheCaptureRunner>();
+            runner.TransitionReview = SessionState.GetBool(Pending + ".Transitions", false); SessionState.SetBool(Pending + ".Transitions", false);
         }
     }
     public sealed class OperationRoutingCacheCaptureRunner : MonoBehaviour
     {
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private readonly List<string> checks = new();
+        public bool TransitionReview;
+        private string Evidence => TransitionReview ? RouteTransitionWitness.Evidence : OperationRoutingCacheWitness.Evidence;
         private Keyboard keyboard;
         private ConnectionsSshOverlay ssh;
         private void Check(bool ok, string message) { checks.Add((ok ? "PASS " : "FAIL ") + message); if (!ok) throw new Exception(message); }
@@ -52,7 +56,7 @@ namespace Uptime.Connections.EditorTools
             var oldFocus = InputSystem.settings.editorInputBehaviorInPlayMode; var oldBehavior = InputSystem.settings.backgroundBehavior;
             InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus; keyboard = InputSystem.AddDevice<Keyboard>(); keyboard.MakeCurrent();
-            var capture = Capture(); Exception failure = null;
+            var capture = TransitionReview ? CaptureTransitions() : Capture(); Exception failure = null;
             while (true)
             {
                 bool more; try { more = capture.MoveNext(); } catch (Exception e) { failure = e; break; }
@@ -60,7 +64,7 @@ namespace Uptime.Connections.EditorTools
             }
             (capture as IDisposable)?.Dispose(); InputSystem.RemoveDevice(keyboard); Time.timeScale = oldScale; Application.runInBackground = oldBackground;
             InputSystem.settings.editorInputBehaviorInPlayMode = oldFocus; InputSystem.settings.backgroundBehavior = oldBehavior;
-            Directory.CreateDirectory(OperationRoutingCacheWitness.Evidence); File.WriteAllLines(OperationRoutingCacheWitness.Evidence + "/graphical-checks.txt", checks);
+            Directory.CreateDirectory(Evidence); File.WriteAllLines(Evidence + "/graphical-checks.txt", checks);
             if (failure != null) Debug.LogException(failure); else Debug.Log("OperationRoutingCacheCapture PASS: " + checks.Count + " actual Play Mode checks.");
             if (Application.isBatchMode) EditorApplication.Exit(failure == null ? 0 : 1); else EditorApplication.isPlaying = false;
         }
@@ -153,15 +157,80 @@ namespace Uptime.Connections.EditorTools
                 canvas.renderMode = oldMode; canvas.worldCamera = oldCamera; Destroy(camera.gameObject); yield return null;
             }
         }
-        private void Save(Camera camera, RenderTexture viewport, string name)
+        private IEnumerator CaptureTransitions()
+        {
+            foreach (string scene in CanonicalSceneAuthoring.Scenes)
+            {
+                if (SceneManager.GetActiveScene().path != scene) { EditorSceneManager.LoadSceneInPlayMode(scene, new LoadSceneParameters(LoadSceneMode.Single)); yield return null; }
+                var h = FindFirstObjectByType<SimulationHost>(); h.enabled = false; Time.timeScale = 0;
+                var terminal = FindFirstObjectByType<Terminal>(); var input = (TMP_InputField)new SerializedObject(terminal).FindProperty("commandInput").objectReferenceValue;
+                var canvas = terminal.GetComponentInParent<Canvas>(); var oldMode = canvas.renderMode; var oldCamera = canvas.worldCamera;
+                var camera = new GameObject("Route transition evidence camera", typeof(Camera)).GetComponent<Camera>(); camera.clearFlags = CameraClearFlags.SolidColor;
+                camera.backgroundColor = new Color(.025f, .065f, .08f); camera.orthographic = true; camera.transform.position = new Vector3(0, 0, -100);
+                canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = camera; canvas.planeDistance = 10;
+                foreach (int width in new[] { 1920, 1280 })
+                {
+                    var viewport = new RenderTexture(width, width * 9 / 16, 24); camera.targetTexture = viewport; yield return null; yield return null;
+                    foreach (string shape in width == 1280 ? new[] { "divergent", "shorter", "longer" } : new[] { "divergent" })
+                    {
+                        Time.timeScale = 0; var model = OperationRoutingCacheWitness.LoadMixed(h, 8, "DB");
+                        if (shape != "divergent")
+                        {
+                            h.ResetSimulation(); h.Recorder.BeginRun(); model = RouteTransitionWitness.Arc(h, shape == "shorter" ? "CACHE" : "API", shape == "shorter" ? "API" : "CACHE", firstWork: 4);
+                        }
+                        RouteTransitionWitness.Until(h, () => model.IsActive); yield return null; yield return null;
+                        var view = View(model); var marker = view.TerminalMarker; int id = view.GetInstanceID(); var graphic = view.SharedDisplay.path; var heartbeat = FindFirstObjectByType<ConnectionGameplayDisplay>().heartbeat;
+                        var originalColor = view.DisplayAccent;
+                        input.onSubmit.Invoke("inspect -v r0"); yield return null; yield return null;
+                        string prefix = h.gameObject.scene.name + "-" + width + "-" + shape;
+                        Save(camera, viewport, prefix + "-before", visualDelta: 0);
+                        h.enabled = true; Time.timeScale = 1;
+                        string directory = "/tmp/uptime-reroute-frames/" + prefix; var frames = new List<RouteMotionFrame>();
+                        bool retracting = false, extending = false, sawRerouting = false, inspectRerouting = false, prefixPreserved = true;
+                        for (int frame = 0; frame < 55; frame++)
+                        {
+                            Save(camera, viewport, frame.ToString("0000"), directory, 0);
+                            if (model.RouteRevision > 1)
+                            {
+                                sawRerouting |= model.IsRerouting;
+                                if (model.IsRerouting) Check(model.CompletedWork == 0 && model.AllocatedLoad == 0, prefix + " no productive WORK/allocation while REROUTING frame" + frame);
+                                bool firstFull = view.TryGetVisualSegment(0, out _, out _, out float fraction, out _) && fraction >= .999f;
+                                prefixPreserved &= firstFull;
+                                if (view.IsRetractingRoute && !retracting) { retracting = true; Save(camera, viewport, prefix + "-retract", visualDelta: 0); }
+                                if (!view.IsRetractingRoute && model.IsRerouting && !extending) { extending = true; Save(camera, viewport, prefix + "-extend", visualDelta: 0); }
+                                inspectRerouting |= FindObjectsByType<TMP_Text>(FindObjectsSortMode.None).Any(t => t.text.Contains("REROUTING"));
+                            }
+                            frames.Add(new RouteMotionFrame { time = h.SimulationTimeSeconds, lifecycle = model.Lifecycle.ToString(), operation = model.CurrentOperationIndex,
+                                target = model.TargetNode.NodeId, visibleTarget = view.PresentationRoute.Last().Node.NodeId, reveal = view.VisibleRouteFraction,
+                                retracting = view.IsRetractingRoute, work = model.CompletedWork, allocated = model.AllocatedLoad });
+                            yield return new WaitForSecondsRealtime(.05f);
+                        }
+                        Time.timeScale = 0;
+                        Check(model.RouteRevision == 2 && model.IsActive && model.KnownIdentity == "r0" && View(model).GetInstanceID() == id && View(model).TerminalMarker == marker && View(model).SharedDisplay.path == graphic && FindFirstObjectByType<ConnectionGameplayDisplay>().heartbeat == heartbeat, prefix + " same model/identity/view/socket/shared renderer/heartbeat after transition");
+                        Check(view.DisplayAccent == originalColor && prefixPreserved, prefix + " identity color and established prefix remain continuous");
+                        Check(shape == "longer" ? !retracting && extending && sawRerouting && inspectRerouting : retracting && (shape == "shorter" || extending && sawRerouting && inspectRerouting), prefix + " actual retraction/extension and visible REROUTING inspection");
+                        Check(shape == "shorter" ? model.RouteTransition.TravelSeconds == 0 : model.RouteTransition.TravelSeconds == .6f, prefix + " only new suffix traversal charged");
+                        Save(camera, viewport, prefix + "-after", visualDelta: 0);
+                        Directory.CreateDirectory(Evidence); File.WriteAllText(Evidence + "/" + prefix + "-motion.json", JsonUtility.ToJson(new RouteMotionEvidence { frames = frames.ToArray() }, true));
+                    }
+                    camera.targetTexture = null; Destroy(viewport);
+                }
+                canvas.renderMode = oldMode; canvas.worldCamera = oldCamera; Destroy(camera.gameObject); yield return null;
+            }
+        }
+
+        private void Save(Camera camera, RenderTexture viewport, string name, string frameDirectory = null, float visualDelta = .2f)
         {
             Canvas.ForceUpdateCanvases(); FindFirstObjectByType<NetworkHealthPanel>().Render(); var paths = FindFirstObjectByType<LogicalPathPresenter>(); paths.RefreshLayouts(); paths.RefreshSocketSizes();
-            foreach (var view in FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None)) view.AdvanceVisual(.2f);
+            foreach (var view in FindObjectsByType<LogicalPathView>(FindObjectsSortMode.None)) view.AdvanceVisual(visualDelta);
             paths.RefreshLayouts(); paths.RefreshSocketSizes(); Canvas.ForceUpdateCanvases(); camera.Render();
             var previous = RenderTexture.active; RenderTexture.active = viewport; var picture = new Texture2D(viewport.width, viewport.height, TextureFormat.RGB24, false);
-            picture.ReadPixels(new Rect(0, 0, viewport.width, viewport.height), 0, 0); picture.Apply(); Directory.CreateDirectory(OperationRoutingCacheWitness.Evidence + "/Captures");
-            File.WriteAllBytes(OperationRoutingCacheWitness.Evidence + "/Captures/" + name + ".png", picture.EncodeToPNG()); RenderTexture.active = previous; Destroy(picture);
+            picture.ReadPixels(new Rect(0, 0, viewport.width, viewport.height), 0, 0); picture.Apply(); string directory = frameDirectory ?? Evidence + "/Captures"; Directory.CreateDirectory(directory);
+            File.WriteAllBytes(directory + "/" + name + ".png", picture.EncodeToPNG()); RenderTexture.active = previous; Destroy(picture);
         }
     }
+    [Serializable] public sealed class RouteMotionFrame
+    { public float time, reveal, work, allocated; public int operation; public string lifecycle, target, visibleTarget; public bool retracting; }
+    [Serializable] public sealed class RouteMotionEvidence { public RouteMotionFrame[] frames; }
     [Serializable] public sealed class CacheRoutingEvidence { public RunEvent[] events; }
 }

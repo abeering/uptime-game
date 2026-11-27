@@ -78,10 +78,10 @@ namespace Uptime.Connections.EditorTools
                     Until(h, () => a.IsActive); float deadline = a.ServiceDeadlineSeconds; double business = a.BusinessWorkValue;
                     h.TrySetCachePurpose(null, out _); Check(a.IsCached, "clear leaves current cached operation locked");
                     Until(h, () => a.CurrentOperationIndex == 1 && a.Routing != null);
-                    Check(a.IsConnecting && a.TargetNode.NodeId == "DB" && a.OperationDestinationAt(0).NodeId == "CACHE" && a.ConnectionId == "mixed" && !a.IsCached, "mixed next WRITE changes route but retains identity and previous destination history");
+                    Check(a.IsRerouting && a.TargetNode.NodeId == "DB" && a.OperationDestinationAt(0).NodeId == "CACHE" && a.ConnectionId == "mixed" && !a.IsCached, "mixed next WRITE changes route but retains identity and previous destination history");
                     Check(a.HasEstablished && a.ServiceDeadlineSeconds == deadline && a.BusinessWorkValue == business && h.CreditedWork == 0, "route traversal retains original deadline/value and no partial credit");
                     h.TrySetCachePurpose("product-lookup", out _); Until(h, () => a.CurrentOperationIndex == 2 && a.Routing != null);
-                    Check(a.IsCached && a.TargetNode.NodeId == "CACHE" && a.IsConnecting && a.ServiceDeadlineSeconds == deadline, "next READ independently uses then-current policy");
+                    Check(a.IsCached && a.TargetNode.NodeId == "CACHE" && a.IsRerouting && a.ServiceDeadlineSeconds == deadline, "next READ independently uses then-current policy");
                     Until(h, () => a.IsComplete); Check(a.Resolution == ConnectionResolution.Completed && h.CreditedWork == 36 && h.WorkCreditCount == 1, "mixed arc credits once only after final operation");
                     Check(h.Recorder.CurrentLog.events.Count(e => e.type == "operation_route_committed") == 3 && h.Recorder.CurrentLog.events.Count(e => e.type == "operation_started") == 3 && h.Recorder.CurrentLog.events.Count(e => e.type == "connection_established") == 1, "three operation decisions/starts, one persistent connection establishment");
                     h = Open(scene); h.TrySetCachePurpose("product-lookup", out _); var peers = Enumerable.Range(0, 3).Select(i => Add(h, "cache" + i, new[] { new OperationStage(OperationKind.Read, 1000, 8, "Contended") })).ToArray();
@@ -118,8 +118,8 @@ namespace Uptime.Connections.EditorTools
                         Until(h, () => b.CurrentOperationIndex == 1 && b.Routing != null); h.StepSimulation(.02f);
                         Check(b.Route.Length == 2 && b.TargetNode.NodeId == "WEB" && b.AllocationWeight == 1, "next WEB WRITE loses API benefit and changes segment count");
                     }
-                    h = Open(scene); h.TrySetCachePurpose("product-lookup", out _); a = Add(h, "travel-timeout", new[] { new OperationStage(OperationKind.Read, 1, 4, "Short cached read"), new OperationStage(OperationKind.Write, 1, 4, "Short write") }); h.StepSimulation(8);
-                    Check(a.Resolution == ConnectionResolution.TimedOut && a.CurrentOperationIndex == 1 && a.TerminationPhase == Lifecycle.Connecting && a.HasEstablished && h.LegitimateFailureCount == 1 && h.CreditedWork == 0, "original service deadline continues through subsequent route traversal with no partial credit");
+                    h = Open(scene); h.TrySetCachePurpose("product-lookup", out _); a = Add(h, "travel-timeout", new[] { new OperationStage(OperationKind.Read, .5f, 4, "Short cached read"), new OperationStage(OperationKind.Write, 1, 4, "Short write") }); h.StepSimulation(8);
+                    Check(a.Resolution == ConnectionResolution.TimedOut && a.CurrentOperationIndex == 1 && a.TerminationPhase == Lifecycle.Rerouting && a.HasEstablished && h.LegitimateFailureCount == 1 && h.CreditedWork == 0, "original service deadline continues through subsequent route traversal with no partial credit");
                     h = Open(scene); h.TrySetCachePurpose("product-lookup", out _); Set(h, "naturalLoadNoiseEnabled", true);
                     var noisy = new ConnectionSpawnPlan(0, "noise", ApiConfigurationWitness.Route(h), "product-lookup", "Read with noise", new[] { new OperationStage(OperationKind.Read, 1000, 5, "Noisy read") }, naturalLoadNoise: true, naturalLoadSeed: 99);
                     a = h.RegisterConnection(LogicalConnectionDefinition.FromPlan(noisy)); h.StepSimulation(4);
@@ -166,14 +166,14 @@ namespace Uptime.Connections.EditorTools
             }
             FixtureProduct = Queue("product-lookup").ConnectionId; FixtureSales = Queue("sales-export").ConnectionId;
         }
-        public static LogicalConnectionState LoadMixed(SimulationHost h, float readWork = 20)
+        public static LogicalConnectionState LoadMixed(SimulationHost h, float readWork = 20, string ordinaryDestination = null)
         {
             var t = h.GetComponent<ConnectionTrafficDirector>(); t.AutoGenerationEnabled = t.HostileGenerationEnabled = false;
             t.RandomizeSeed = false; t.Seed = 1701; Set(h, "naturalLoadNoiseEnabled", false);
             Set(h, "shiftEnabled", true); Set(h, "shiftWorkTarget", 10000f); Set(h, "businessFailureLimit", 100);
             h.ResetSimulation(); h.Recorder.BeginRun(); h.TrySetCachePurpose("product-lookup", out _);
             return Add(h, "r0", new[] { new OperationStage(OperationKind.Read, readWork, 4, "Read catalog"),
-                new OperationStage(OperationKind.Write, 100, 4, "Write ordinary destination") }, h.FindNodeResources("WEB") == null ? "DB" : "WEB");
+                new OperationStage(OperationKind.Write, 100, 4, "Write ordinary destination") }, ordinaryDestination ?? (h.FindNodeResources("WEB") == null ? "DB" : "WEB"));
         }
         [MenuItem("Tools/Connections/Load CACHE Mixed Route (Play Mode only)")]
         public static void LoadPlayMixed()

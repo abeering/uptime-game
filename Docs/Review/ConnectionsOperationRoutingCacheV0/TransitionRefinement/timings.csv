@@ -1,0 +1,9 @@
+scene,case,shared_nodes,new_links,started,finished,charged
+Connections,shared-prefix,2,1,1.299999,1.899999,0.6
+Connections,shorter,2,0,1.299999,1.299999,0
+Connections,longer,2,1,0.6999999,1.299999,0.6
+Connections,origin,1,1,0.6999999,1.299999,0.6
+ConnectionsAdvanced,shared-prefix,3,1,1.899999,2.499998,0.6
+ConnectionsAdvanced,shorter,3,0,1.899999,1.899999,0
+ConnectionsAdvanced,longer,3,1,1.299999,1.899999,0.6
+ConnectionsAdvanced,origin,1,1,0.6999999,1.299999,0.6

@@ -2,6 +2,8 @@
 
 Connections implementation after the normal GitHub merge of human-accepted #136 at `6ecb3ce6c30159e2f2b1a5217a8c03e46dc3a65b`. The new implementation PR stays draft/unmerged for human review. [Runtime, architecture and Inspector contract](../../Connections/connections-operation-routing-cache-v0.md).
 
+**Current transition refinement:** [Shared-prefix REROUTING mechanics, lifecycle audit, updated checks and actual motion evidence](TransitionRefinement/README.md) supersede the initial full-origin mixed-route transition behavior/captures below. The earlier CACHE evidence is retained as phase history.
+
 ## What changed
 
 - Separate original logical plans from immutable per-operation route/efficiency decisions. One operation commits once, uses its actual target for allocation/effects/interruptions, and keeps that decision until completion/termination. A subsequent operation resolves independently from the same request origin; identical routes reuse established traversal, different routes traverse before processing. The original whole-connection deadline continues throughout.

@@ -39,7 +39,7 @@ namespace Uptime.Connections.Display
                 workProgress = required > 0 ? Mathf.Clamp01(c.CompletedWork / required) : 0,
                 resolution = Resolution(c), resolutionAge = age
             };
-            if (!c.IsActive || !c.HasServiceTarget) return state;
+            if ((!c.IsActive && !c.IsRerouting) || !c.HasServiceTarget) return state;
             float normal = NormalSeconds(c);
             float remaining = c.ServiceRemainingSeconds;
             float finiteNormal = float.IsInfinity(normal) ? c.ServiceBudgetSeconds : normal;

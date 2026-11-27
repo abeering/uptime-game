@@ -1,0 +1,10 @@
+Unity 6000.3.11f1 runtime/Editor compilation: PASS
+RouteTransitionWitness: PASS 108 assertions
+Existing CACHE221 / API131 / Fragility126 / Demand47 / Workload456 / Integrity327 / Canonical971: PASS
+Integrated regression report: 12 PASS / 3 inherited FAIL; transition witness passes separately before that aggregate
+Actual real-time Play Mode: PASS 59 checks; 8 movies and 28 PNGs; both canonical scenes at 1920x1080 and 1280x720
+Known inherited failures: Resource inspect-header styling; Advanced Overclock compact row; GeneratedIdentity stale tuning
+Graphical startup: inherited nonfatal Unity QuickSearch indexing exception
+Scope: no scenes/prefabs/tuning/allocator changes; existing shader/material/renderer and heartbeat retained
+Core generator/check and Git diff checks: PASS
+Original local TMP fallback cache untouched and uncommitted

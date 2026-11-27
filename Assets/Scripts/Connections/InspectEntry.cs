@@ -223,7 +223,7 @@ namespace Uptime.Connections
             Set(identity, string.Empty);
             string priority = state.AllocationWeight > 1f && !string.IsNullOrEmpty(state.AllocationPolicyNodeId) ?
                 $"{state.AllocationPolicyNodeId} ×{state.AllocationWeight:G3} · " : string.Empty;
-            Set(purpose, priority + (state.IsCached ? "CACHE · " : "") + (state.Definition.ClaimedPurpose ?? string.Empty));
+            Set(purpose, priority + (state.IsRerouting ? "REROUTING · " : "") + (state.IsCached ? "CACHE · " : "") + (state.Definition.ClaimedPurpose ?? string.Empty));
             if (identity != null) identity.color = state.IsComplete ? quietColor : accent;
             if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)
@@ -257,7 +257,7 @@ namespace Uptime.Connections
                 state.Resolution == ConnectionResolution.Killed ? "KILLED" :
                 state.Resolution == ConnectionResolution.Withdrawn ? "WITHDRAWN" :
                 state.IsComplete ? "COMPLETE" : state.IsPending ? "PENDING" :
-                state.IsConnecting ? "CONNECTING" :
+                state.IsRerouting ? "REROUTING" : state.IsConnecting ? "CONNECTING" :
                 state.IsTransitioning ? "NEXT OPERATION" : state.Performance == LoadPerformance.AtSpeed ?
                 "AT SPEED" : state.Performance == LoadPerformance.Slowed ? "SLOWED" : "STALLED";
             string reason = string.Empty;
