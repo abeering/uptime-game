@@ -584,6 +584,8 @@ namespace Uptime.Connections
         public double businessWorkValue;
         public string id;
         public string lifecycle;
+        // Active can also be a held stage boundary; only demanding operations enter allocation.
+        public bool isDemanding;
         public int operationIndex;
         public string operationKind;
         public string target;
@@ -1740,7 +1742,7 @@ namespace Uptime.Connections
                     serviceRemainingSeconds = state.ServiceRemainingSeconds,
                     projectedServiceSeconds = float.IsPositiveInfinity(state.ProjectedServiceSeconds) ? -1f : state.ProjectedServiceSeconds,
                     serviceAtRisk = state.AtRisk,
-                    lifecycle = state.Lifecycle.ToString(), operationIndex = state.CurrentOperationIndex,
+                    lifecycle = state.Lifecycle.ToString(), isDemanding = state.IsDemanding, operationIndex = state.CurrentOperationIndex,
                     operationKind = state.CurrentOperation.ToString(), target = state.TargetNode.NodeId,
                     desiredLoad = state.DesiredLoad, baseLoad = state.BaseLoad,
                     naturalLoadDelta = state.NaturalLoadDelta,

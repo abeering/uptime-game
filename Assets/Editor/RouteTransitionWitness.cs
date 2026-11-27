@@ -52,7 +52,7 @@ namespace Uptime.Connections.EditorTools
                             Check(a.IsRerouting && !a.IsDemanding && a.AllocatedLoad == 0 && a.CompletedWork == 0, "real REROUTING state releases processing and performs no WORK");
                             Check(a.ReachedRouteNodeIndex == shared - 1, "already established prefix remains reached");
                             h.Recorder.CaptureSnapshot(h.SimulationTimeSeconds); var snapshot = h.Recorder.CurrentLog.snapshots.Last();
-                            Check(snapshot.activeConnections == 1 && snapshot.establishedBenign == 1 && snapshot.anticipatedBenign == 0 && snapshot.connections.Single().lifecycle == "Rerouting" && snapshot.connections.Single().rerouting.sharedNodeCount == shared, "recorder retains established classification and explicit rerouting evidence");
+                            Check(snapshot.activeConnections == 1 && snapshot.establishedBenign == 1 && snapshot.anticipatedBenign == 0 && snapshot.connections.Single().lifecycle == "Rerouting" && !snapshot.connections.Single().isDemanding && snapshot.connections.Single().rerouting.sharedNodeCount == shared, "recorder retains established classification and explicit non-demanding rerouting evidence");
                             h.StepSimulation(.1f); Check(a.IsRerouting && a.CompletedWork == 0 && a.AllocatedLoad == 0, "elapsed traversal never executes processing WORK");
                             Until(h, () => a.IsActive);
                         }
