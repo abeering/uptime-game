@@ -104,7 +104,9 @@ namespace Uptime.Connections.EditorTools
                         Debug.Log("Unrendered path " + sample.name + " active=" + sample.view.path.isActiveAndEnabled +
                             " cull=" + sample.view.path.canvasRenderer.cull + " length=" + sample.view.path.PathLength +
                             " rect=" + sample.view.path.rectTransform.rect + " world=" + sample.view.path.transform.position);
-                    Check(sample.view.path.LastVertexCount > 0, size + " rail/activity mesh rendered: " + sample.name);
+                    bool hiddenEstablishment = sample.phases[sample.PhaseIndex].traversing && sample.phases[sample.PhaseIndex].establishedPrefix == 0;
+                    Check(hiddenEstablishment ? sample.view.path.LastVertexCount == 0 : sample.view.path.LastVertexCount > 0,
+                        size + " rail/activity mesh respects current route reveal: " + sample.name);
                 }
                 foreach (double t in new[] { 0.0, 8.2, 16.4 })
                 {
@@ -140,16 +142,16 @@ namespace Uptime.Connections.EditorTools
                 for (int i = 0; i < paletteRows.Length; i++)
                 { paletteRows[i].phases[0].state = states[i]; paletteRows[i].title.SetText(titles[i]); }
             }
-            Color[] originalRail = lab.style.ordinaryIdentityColors;
+            Color[] originalRail = lab.style.identityColors;
             try
             {
-                lab.style.ordinaryIdentityColors = Enumerable.Repeat(Color.white, 6).ToArray();
+                lab.style.identityColors = Enumerable.Repeat(Color.white, 6).ToArray();
                 lab.heartbeat.SetReviewTime(0); lab.RenderNow(); Canvas.ForceUpdateCanvases();
                 SetViewport(1920, 1080);
                 Save(ConnectionDisplayLabWitness.Evidence + "/shared-style-proof.png");
                 Check(lab.samples[0].view.style == lab.style, "shared style proof uses the same asset in the lab");
             }
-            finally { lab.style.ordinaryIdentityColors = originalRail; }
+            finally { lab.style.identityColors = originalRail; }
             // A reproducible real Unity rendering of an 18-second presentation timeline.
             // PNG encoding allocations are capture instrumentation, outside renderer measurements.
             string frames = "/tmp/uptime-display-lab-motion"; Directory.CreateDirectory(frames);

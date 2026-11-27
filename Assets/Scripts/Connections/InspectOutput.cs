@@ -114,6 +114,7 @@ namespace Uptime.Connections
                         Mathf.Clamp01((now - collapseAt[i]) / duration);
                     cards[i].SetSummaryTransition(progress);
                 }
+                cards[i].FollowIdentity(states[i], palette);
                 if (!frozen[i] || now < collapseAt[i] || cards[i].IsSummaryTransitioning)
                     allFrozen = false;
                 if (cards[i].IsSummaryTransitioning)

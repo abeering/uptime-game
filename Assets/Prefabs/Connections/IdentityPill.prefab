@@ -88,7 +88,7 @@ MonoBehaviour:
   serviceDangerText: {fileID: 1330993393903689039}
   dimensions: {x: 54, y: 28}
   fontSize: 22
-  tintTextWithAccent: 0
+  identifierTextColor: {r: 0.85, g: 0.97, b: 0.95, a: 1}
   identityChangeEmphasisSeconds: 0.22
   identityChangeWhiteMix: 0.24
 --- !u!1 &2674788278054799834

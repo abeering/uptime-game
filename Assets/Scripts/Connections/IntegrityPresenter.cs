@@ -101,7 +101,7 @@ namespace Uptime.Connections
                     string.Join(" → ", host.Integrity.Breach.path) : host.Ending == RunEnding.ShiftComplete ?
                     "REQUIRED WORK CONFIRMED" : "LEGITIMATE CONNECTION FAILURE LIMIT REACHED";
                 string totals = host.ShiftEnabled ? "UPTIME " + SimulationHost.FormatUptime(host.SimulationTimeSeconds) +
-                    $"   /   WORK {System.Math.Floor(host.CreditedWork):0} / {host.ShiftWorkTarget:0.##}\nFAILURES {host.LegitimateFailureCount} / {host.BusinessFailureLimit}\n\n" : "";
+                    $"   /   WORK {System.Math.Floor(host.CreditedWork):0} / {host.ShiftWorkTarget:0.##}\nFAILURES {host.BusinessFailureUnits} / {host.BusinessFailureLimit}\n\n" : "";
                 breachPath.text = totals + cause + "\n\nSIMULATION FROZEN  /  TYPE restart";
                 if (!ended)
                 {

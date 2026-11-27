@@ -447,7 +447,7 @@ namespace Uptime.Connections.EditorTools
             var label = (TMP_Text)pillFields.FindProperty("idText").objectReferenceValue;
             Check(pill != null && plate.material == material && pill.Size == new Vector2(100f, 66f) &&
                 pillFields.FindProperty("fontSize").floatValue == 50f &&
-                pillFields.FindProperty("tintTextWithAccent").boolValue &&
+                pillFields.FindProperty("identifierTextColor").colorValue.grayscale > .85f &&
                 label.alignment == TextAlignmentOptions.Center &&
                 label.rectTransform.sizeDelta == new Vector2(-16f, -8f) &&
                 new SerializedObject(plate).FindProperty("cornerRadius").floatValue == 12f &&

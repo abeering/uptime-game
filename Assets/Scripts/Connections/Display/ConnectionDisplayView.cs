@@ -34,7 +34,7 @@ namespace Uptime.Connections.Display
                 else pill.Render(state.workProgress, progressTreatment, style.IdentityColor(state));
                 ((RectTransform)pill.transform).anchoredPosition = path.PointAt(pillPosition);
             }
-            if (identity != null && identity.text != state.identity) identity.SetText(state.identity);
+            if (identity != null && pillBinding == null) identity.SetText(state.trafficClass == DisplayTrafficClass.Important ? state.identity + "!" : state.identity);
             if (terminalMarker != null)
             {
                 terminalMarker.rectTransform.anchoredPosition = path.PointAt(1);

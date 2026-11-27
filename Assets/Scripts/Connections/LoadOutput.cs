@@ -116,6 +116,7 @@ namespace Uptime.Connections
                     host.PresentationPalette.TryGet(state, out Color accent) ?
                     accent : mutedIdentityColor;
                 row.Bind(state.KnownIdentity, color);
+                row.FollowIdentity(state, host.PresentationPalette);
                 order.Add(state);
                 rows.Add(state, row);
             }

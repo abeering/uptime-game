@@ -12,14 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a22a056d863f24385a0a99b4492fc25c, type: 3}
   m_Name: DisplayStyle
   m_EditorClassIdentifier: Assembly-CSharp::Uptime.Connections.Display.ConnectionDisplayStyle
-  ordinaryIdentityColors:
-  - {r: 0.62, g: 0.71, b: 0.78, a: 1}
-  - {r: 0.66, g: 0.74, b: 0.66, a: 1}
-  - {r: 0.78, g: 0.71, b: 0.64, a: 1}
-  - {r: 0.59, g: 0.67, b: 0.72, a: 1}
-  - {r: 0.71, g: 0.65, b: 0.76, a: 1}
-  - {r: 0.62, g: 0.75, b: 0.72, a: 1}
-  priorityIdentityColors:
+  performanceColorTreatment: 1
+  identityColors:
   - {r: 0.36, g: 0.87, b: 0.91, a: 1}
   - {r: 0.35, g: 0.91, b: 0.76, a: 1}
   - {r: 0.43, g: 0.82, b: 0.92, a: 1}
@@ -27,8 +21,7 @@ MonoBehaviour:
   - {r: 0.31, g: 0.85, b: 0.84, a: 1}
   - {r: 0.49, g: 0.87, b: 0.75, a: 1}
   bodyFillOpacity: 0.34
-  ordinaryActivity: {r: 0.68, g: 0.74, b: 0.77, a: 1}
-  priorityActivity: {r: 0.53, g: 0.79, b: 0.85, a: 1}
+  activityColor: {r: 0.68, g: 0.74, b: 0.77, a: 1}
   activityOpacity: 0.6
   stalledActivityOpacityMultiplier: 0.7
   behind: {r: 0.94, g: 0.69, b: 0.25, a: 1}

@@ -32,6 +32,9 @@ namespace Uptime.Connections
         public NodeView[] Route { get; }
         public string ProfileId { get; }
         public bool IsHostile { get; }
+        public BusinessImportance Importance { get; }
+        public float ImportanceSelectionRoll { get; }
+        public float ImportanceSelectionChance { get; }
         public double BusinessWorkValue { get; }
         public string ClaimedPurpose { get; }
         public OperationStage[] Operations { get; }
@@ -60,7 +63,9 @@ namespace Uptime.Connections
             string hostileEventId = null,
             float identityHopSeconds = 0f, int identitySeed = 0,
             ConnectionIdentityMode identityMode = ConnectionIdentityMode.Normal,
-            double? businessWorkValue = null)
+            double? businessWorkValue = null,
+            BusinessImportance importance = BusinessImportance.Ordinary,
+            float importanceSelectionRoll = -1f, float importanceSelectionChance = 0f)
         {
             if (float.IsNaN(scheduledSpawnTime) || float.IsInfinity(scheduledSpawnTime) || scheduledSpawnTime < 0f)
                 throw new ArgumentOutOfRangeException(nameof(scheduledSpawnTime));
@@ -69,6 +74,12 @@ namespace Uptime.Connections
             Route = route != null ? (NodeView[])route.Clone() : Array.Empty<NodeView>();
             ProfileId = profileId;
             IsHostile = isHostile;
+            if (isHostile && importance != BusinessImportance.Ordinary)
+                throw new ArgumentException("Hostile connections cannot be IMPORTANT.");
+            if (!Enum.IsDefined(typeof(BusinessImportance), importance)) throw new ArgumentOutOfRangeException(nameof(importance));
+            Importance = importance;
+            ImportanceSelectionRoll = importanceSelectionRoll;
+            ImportanceSelectionChance = importanceSelectionChance;
             ClaimedPurpose = claimedPurpose;
             Operations = new OperationStage[operations?.Length ?? 0];
             for (int i = 0; i < Operations.Length; i++)
@@ -101,14 +112,14 @@ namespace Uptime.Connections
             ScheduledSpawnTime, ConnectionId, route, ProfileId, ClaimedPurpose, Operations,
             IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId, ParentConnectionId,
             ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise, NaturalLoadSeed,
-            HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
+            HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue, Importance, ImportanceSelectionRoll, ImportanceSelectionChance);
 
         public ConnectionSpawnPlan ForEvent(string eventId) => new ConnectionSpawnPlan(
             ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose,
             Operations, IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId,
             ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack,
             NaturalLoadNoise, NaturalLoadSeed, eventId,
-            IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
+            IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue, Importance, ImportanceSelectionRoll, ImportanceSelectionChance);
 
         public ConnectionSpawnPlan WithAmbientIdentity(ConnectionIdentityMode mode,
             float hopSeconds, int aliasSeed, float selectionRoll)
@@ -124,8 +135,17 @@ namespace Uptime.Connections
                 ProfileId, ClaimedPurpose, Operations, IsHostile, ConnectionBehaviors,
                 trace, ParentNodeId, ParentConnectionId, ParentInfectionAppliedAtSeconds,
                 LoaderAttack, NaturalLoadNoise, NaturalLoadSeed, HostileEventId,
-                hopSeconds, aliasSeed, mode, BusinessWorkValue);
+                hopSeconds, aliasSeed, mode, BusinessWorkValue, Importance, ImportanceSelectionRoll, ImportanceSelectionChance);
         }
+
+        // Explicit assignment for authored requests and future company events; no live mutation.
+        public ConnectionSpawnPlan WithBusinessImportance(BusinessImportance importance,
+            float selectionRoll = -1f, float selectionChance = 0f) => new ConnectionSpawnPlan(
+                ScheduledSpawnTime, ConnectionId, Route, ProfileId, ClaimedPurpose, Operations,
+                IsHostile, ConnectionBehaviors, GenerationTrace, ParentNodeId, ParentConnectionId,
+                ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise, NaturalLoadSeed,
+                HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue,
+                importance, selectionRoll, selectionChance);
 
         // Called once after recipe/anomaly composition, never on shared PURPOSE definitions.
         internal ConnectionSpawnPlan WithLegitimateWorkload(float multiplier)
@@ -144,7 +164,7 @@ namespace Uptime.Connections
             return new ConnectionSpawnPlan(ScheduledSpawnTime, ConnectionId, Route, ProfileId,
                 ClaimedPurpose, scaled, false, ConnectionBehaviors, trace, ParentNodeId,
                 ParentConnectionId, ParentInfectionAppliedAtSeconds, LoaderAttack, NaturalLoadNoise,
-                NaturalLoadSeed, HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue);
+                NaturalLoadSeed, HostileEventId, IdentityHopSeconds, IdentitySeed, IdentityMode, BusinessWorkValue, Importance, ImportanceSelectionRoll, ImportanceSelectionChance);
         }
     }
 

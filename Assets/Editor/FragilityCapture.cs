@@ -457,9 +457,9 @@ namespace Uptime.Connections.EditorTools
             input.ActivateInputField(); yield return null;
             Check(input.isFocused && input.text == "inspect ", "prompt and draft remain available after overlay/reset review");
             FragilityWitness.ConfigureFixture(host, 4, 1); FragilityWitness.Advance(host, 3); yield return null;
-            Color[] original = adapter.style.ordinaryIdentityColors;
-            try { adapter.style.ordinaryIdentityColors = Enumerable.Repeat(Color.white, 6).ToArray(); Frames("21-shared-style-proof"); }
-            finally { adapter.style.ordinaryIdentityColors = original; }
+            Color[] original = adapter.style.identityColors;
+            try { adapter.style.identityColors = Enumerable.Repeat(Color.white, 6).ToArray(); Frames("21-shared-style-proof"); }
+            finally { adapter.style.identityColors = original; }
         }
         private void Submit(string command) => input.onSubmit.Invoke(command);
         private void Frames(string name)

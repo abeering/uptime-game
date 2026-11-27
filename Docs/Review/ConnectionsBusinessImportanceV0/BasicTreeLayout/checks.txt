@@ -1,0 +1,361 @@
+PASS five original nodes / four original physical links
+PASS unchanged exact physical topology and link IDs
+PASS 1920 native supported viewport
+PASS 1920 centered EXT1 / API / CACHE spine
+PASS 1920 bottom row evenly spaced and level
+PASS 1920 equal vertical tree levels
+PASS 1920 node in network bounds 0
+PASS 1920 node cards do not overlap 0/1
+PASS 1920 node cards do not overlap 0/2
+PASS 1920 node cards do not overlap 0/3
+PASS 1920 node cards do not overlap 0/4
+PASS 1920 node in network bounds 1
+PASS 1920 node cards do not overlap 1/2
+PASS 1920 node cards do not overlap 1/3
+PASS 1920 node cards do not overlap 1/4
+PASS 1920 node in network bounds 2
+PASS 1920 node cards do not overlap 2/3
+PASS 1920 node cards do not overlap 2/4
+PASS 1920 node in network bounds 3
+PASS 1920 node cards do not overlap 3/4
+PASS 1920 node in network bounds 4
+PASS 1280 native supported viewport
+PASS 1280 centered EXT1 / API / CACHE spine
+PASS 1280 bottom row evenly spaced and level
+PASS 1280 equal vertical tree levels
+PASS 1280 node in network bounds 0
+PASS 1280 node cards do not overlap 0/1
+PASS 1280 node cards do not overlap 0/2
+PASS 1280 node cards do not overlap 0/3
+PASS 1280 node cards do not overlap 0/4
+PASS 1280 node in network bounds 1
+PASS 1280 node cards do not overlap 1/2
+PASS 1280 node cards do not overlap 1/3
+PASS 1280 node cards do not overlap 1/4
+PASS 1280 node in network bounds 2
+PASS 1280 node cards do not overlap 2/3
+PASS 1280 node cards do not overlap 2/4
+PASS 1280 node in network bounds 3
+PASS 1280 node cards do not overlap 3/4
+PASS 1280 node in network bounds 4
+PASS six real established operations: two per bottom destination
+PASS 1920 visible network identities under shared-trunk traffic
+PASS 1920 edge label within network 0
+PASS 1920 label clears node cards 0
+PASS 1920 label clears node cards 0
+PASS 1920 label clears node cards 0
+PASS 1920 label clears node cards 0
+PASS 1920 label clears node cards 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 label clears network pills 0
+PASS 1920 edge label within network 1
+PASS 1920 label clears node cards 1
+PASS 1920 label clears node cards 1
+PASS 1920 label clears node cards 1
+PASS 1920 label clears node cards 1
+PASS 1920 label clears node cards 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 label clears network pills 1
+PASS 1920 edge label within network 2
+PASS 1920 label clears node cards 2
+PASS 1920 label clears node cards 2
+PASS 1920 label clears node cards 2
+PASS 1920 label clears node cards 2
+PASS 1920 label clears node cards 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 label clears network pills 2
+PASS 1920 edge label within network 3
+PASS 1920 label clears node cards 3
+PASS 1920 label clears node cards 3
+PASS 1920 label clears node cards 3
+PASS 1920 label clears node cards 3
+PASS 1920 label clears node cards 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 label clears network pills 3
+PASS 1920 pill clears nodes 0
+PASS 1920 pill clears nodes 0
+PASS 1920 pill clears nodes 0
+PASS 1920 pill clears nodes 0
+PASS 1920 pill clears nodes 0
+PASS 1920 parallel identities separated 0/1
+PASS 1920 parallel identities separated 0/2
+PASS 1920 parallel identities separated 0/3
+PASS 1920 parallel identities separated 0/4
+PASS 1920 parallel identities separated 0/5
+PASS 1920 parallel identities separated 0/6
+PASS 1920 parallel identities separated 0/7
+PASS 1920 parallel identities separated 0/8
+PASS 1920 parallel identities separated 0/9
+PASS 1920 pill clears nodes 1
+PASS 1920 pill clears nodes 1
+PASS 1920 pill clears nodes 1
+PASS 1920 pill clears nodes 1
+PASS 1920 pill clears nodes 1
+PASS 1920 parallel identities separated 1/2
+PASS 1920 parallel identities separated 1/3
+PASS 1920 parallel identities separated 1/4
+PASS 1920 parallel identities separated 1/5
+PASS 1920 parallel identities separated 1/6
+PASS 1920 parallel identities separated 1/7
+PASS 1920 parallel identities separated 1/8
+PASS 1920 parallel identities separated 1/9
+PASS 1920 pill clears nodes 2
+PASS 1920 pill clears nodes 2
+PASS 1920 pill clears nodes 2
+PASS 1920 pill clears nodes 2
+PASS 1920 pill clears nodes 2
+PASS 1920 parallel identities separated 2/3
+PASS 1920 parallel identities separated 2/4
+PASS 1920 parallel identities separated 2/5
+PASS 1920 parallel identities separated 2/6
+PASS 1920 parallel identities separated 2/7
+PASS 1920 parallel identities separated 2/8
+PASS 1920 parallel identities separated 2/9
+PASS 1920 pill clears nodes 3
+PASS 1920 pill clears nodes 3
+PASS 1920 pill clears nodes 3
+PASS 1920 pill clears nodes 3
+PASS 1920 pill clears nodes 3
+PASS 1920 parallel identities separated 3/4
+PASS 1920 parallel identities separated 3/5
+PASS 1920 parallel identities separated 3/6
+PASS 1920 parallel identities separated 3/7
+PASS 1920 parallel identities separated 3/8
+PASS 1920 parallel identities separated 3/9
+PASS 1920 pill clears nodes 4
+PASS 1920 pill clears nodes 4
+PASS 1920 pill clears nodes 4
+PASS 1920 pill clears nodes 4
+PASS 1920 pill clears nodes 4
+PASS 1920 parallel identities separated 4/5
+PASS 1920 parallel identities separated 4/6
+PASS 1920 parallel identities separated 4/7
+PASS 1920 parallel identities separated 4/8
+PASS 1920 parallel identities separated 4/9
+PASS 1920 pill clears nodes 5
+PASS 1920 pill clears nodes 5
+PASS 1920 pill clears nodes 5
+PASS 1920 pill clears nodes 5
+PASS 1920 pill clears nodes 5
+PASS 1920 parallel identities separated 5/6
+PASS 1920 parallel identities separated 5/7
+PASS 1920 parallel identities separated 5/8
+PASS 1920 parallel identities separated 5/9
+PASS 1920 pill clears nodes 6
+PASS 1920 pill clears nodes 6
+PASS 1920 pill clears nodes 6
+PASS 1920 pill clears nodes 6
+PASS 1920 pill clears nodes 6
+PASS 1920 parallel identities separated 6/7
+PASS 1920 parallel identities separated 6/8
+PASS 1920 parallel identities separated 6/9
+PASS 1920 pill clears nodes 7
+PASS 1920 pill clears nodes 7
+PASS 1920 pill clears nodes 7
+PASS 1920 pill clears nodes 7
+PASS 1920 pill clears nodes 7
+PASS 1920 parallel identities separated 7/8
+PASS 1920 parallel identities separated 7/9
+PASS 1920 pill clears nodes 8
+PASS 1920 pill clears nodes 8
+PASS 1920 pill clears nodes 8
+PASS 1920 pill clears nodes 8
+PASS 1920 pill clears nodes 8
+PASS 1920 parallel identities separated 8/9
+PASS 1920 pill clears nodes 9
+PASS 1920 pill clears nodes 9
+PASS 1920 pill clears nodes 9
+PASS 1920 pill clears nodes 9
+PASS 1920 pill clears nodes 9
+PASS 1280 visible network identities under shared-trunk traffic
+PASS 1280 edge label within network 0
+PASS 1280 label clears node cards 0
+PASS 1280 label clears node cards 0
+PASS 1280 label clears node cards 0
+PASS 1280 label clears node cards 0
+PASS 1280 label clears node cards 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 label clears network pills 0
+PASS 1280 edge label within network 1
+PASS 1280 label clears node cards 1
+PASS 1280 label clears node cards 1
+PASS 1280 label clears node cards 1
+PASS 1280 label clears node cards 1
+PASS 1280 label clears node cards 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 label clears network pills 1
+PASS 1280 edge label within network 2
+PASS 1280 label clears node cards 2
+PASS 1280 label clears node cards 2
+PASS 1280 label clears node cards 2
+PASS 1280 label clears node cards 2
+PASS 1280 label clears node cards 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 label clears network pills 2
+PASS 1280 edge label within network 3
+PASS 1280 label clears node cards 3
+PASS 1280 label clears node cards 3
+PASS 1280 label clears node cards 3
+PASS 1280 label clears node cards 3
+PASS 1280 label clears node cards 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 label clears network pills 3
+PASS 1280 pill clears nodes 0
+PASS 1280 pill clears nodes 0
+PASS 1280 pill clears nodes 0
+PASS 1280 pill clears nodes 0
+PASS 1280 pill clears nodes 0
+PASS 1280 parallel identities separated 0/1
+PASS 1280 parallel identities separated 0/2
+PASS 1280 parallel identities separated 0/3
+PASS 1280 parallel identities separated 0/4
+PASS 1280 parallel identities separated 0/5
+PASS 1280 parallel identities separated 0/6
+PASS 1280 parallel identities separated 0/7
+PASS 1280 parallel identities separated 0/8
+PASS 1280 parallel identities separated 0/9
+PASS 1280 pill clears nodes 1
+PASS 1280 pill clears nodes 1
+PASS 1280 pill clears nodes 1
+PASS 1280 pill clears nodes 1
+PASS 1280 pill clears nodes 1
+PASS 1280 parallel identities separated 1/2
+PASS 1280 parallel identities separated 1/3
+PASS 1280 parallel identities separated 1/4
+PASS 1280 parallel identities separated 1/5
+PASS 1280 parallel identities separated 1/6
+PASS 1280 parallel identities separated 1/7
+PASS 1280 parallel identities separated 1/8
+PASS 1280 parallel identities separated 1/9
+PASS 1280 pill clears nodes 2
+PASS 1280 pill clears nodes 2
+PASS 1280 pill clears nodes 2
+PASS 1280 pill clears nodes 2
+PASS 1280 pill clears nodes 2
+PASS 1280 parallel identities separated 2/3
+PASS 1280 parallel identities separated 2/4
+PASS 1280 parallel identities separated 2/5
+PASS 1280 parallel identities separated 2/6
+PASS 1280 parallel identities separated 2/7
+PASS 1280 parallel identities separated 2/8
+PASS 1280 parallel identities separated 2/9
+PASS 1280 pill clears nodes 3
+PASS 1280 pill clears nodes 3
+PASS 1280 pill clears nodes 3
+PASS 1280 pill clears nodes 3
+PASS 1280 pill clears nodes 3
+PASS 1280 parallel identities separated 3/4
+PASS 1280 parallel identities separated 3/5
+PASS 1280 parallel identities separated 3/6
+PASS 1280 parallel identities separated 3/7
+PASS 1280 parallel identities separated 3/8
+PASS 1280 parallel identities separated 3/9
+PASS 1280 pill clears nodes 4
+PASS 1280 pill clears nodes 4
+PASS 1280 pill clears nodes 4
+PASS 1280 pill clears nodes 4
+PASS 1280 pill clears nodes 4
+PASS 1280 parallel identities separated 4/5
+PASS 1280 parallel identities separated 4/6
+PASS 1280 parallel identities separated 4/7
+PASS 1280 parallel identities separated 4/8
+PASS 1280 parallel identities separated 4/9
+PASS 1280 pill clears nodes 5
+PASS 1280 pill clears nodes 5
+PASS 1280 pill clears nodes 5
+PASS 1280 pill clears nodes 5
+PASS 1280 pill clears nodes 5
+PASS 1280 parallel identities separated 5/6
+PASS 1280 parallel identities separated 5/7
+PASS 1280 parallel identities separated 5/8
+PASS 1280 parallel identities separated 5/9
+PASS 1280 pill clears nodes 6
+PASS 1280 pill clears nodes 6
+PASS 1280 pill clears nodes 6
+PASS 1280 pill clears nodes 6
+PASS 1280 pill clears nodes 6
+PASS 1280 parallel identities separated 6/7
+PASS 1280 parallel identities separated 6/8
+PASS 1280 parallel identities separated 6/9
+PASS 1280 pill clears nodes 7
+PASS 1280 pill clears nodes 7
+PASS 1280 pill clears nodes 7
+PASS 1280 pill clears nodes 7
+PASS 1280 pill clears nodes 7
+PASS 1280 parallel identities separated 7/8
+PASS 1280 parallel identities separated 7/9
+PASS 1280 pill clears nodes 8
+PASS 1280 pill clears nodes 8
+PASS 1280 pill clears nodes 8
+PASS 1280 pill clears nodes 8
+PASS 1280 pill clears nodes 8
+PASS 1280 parallel identities separated 8/9
+PASS 1280 pill clears nodes 9
+PASS 1280 pill clears nodes 9
+PASS 1280 pill clears nodes 9
+PASS 1280 pill clears nodes 9
+PASS 1280 pill clears nodes 9

@@ -8,26 +8,27 @@ namespace Uptime.Connections
     [Serializable]
     public sealed class ConnectionIdentityPalette
     {
-        [SerializeField] private Color cyan = new Color(0.36f, 0.87f, 0.91f);
-        [SerializeField] private Color teal = new Color(0.35f, 0.91f, 0.76f);
-        [SerializeField] private Color blueGreen = new Color(0.43f, 0.82f, 0.92f);
-        [SerializeField] private Color seafoam = new Color(0.43f, 0.89f, 0.79f);
-        [SerializeField] private Color turquoise = new Color(0.31f, 0.85f, 0.84f);
-        [SerializeField] private Color coolMint = new Color(0.49f, 0.87f, 0.75f);
+        [NonSerialized] private Display.ConnectionDisplayStyle style;
+        // Released paths free their live slot but keep terminal/history identity until reset.
+        [NonSerialized] private Dictionary<LogicalConnectionState, int> historicalSlots;
+        public void UseStyle(Display.ConnectionDisplayStyle sharedStyle) => style = sharedStyle;
 
         [NonSerialized] private Dictionary<LogicalConnectionState, int> slots;
         [NonSerialized] private int nextSlot;
 
         public const int SlotCount = 6;
 
-        public Color Assign(LogicalConnectionState connection) => ColorAt(AssignSlot(connection));
+        public Color Assign(LogicalConnectionState connection) => ColorFor(AssignSlot(connection));
+        private Color ColorFor(int slot) => style != null ?
+            style.IdentityColor(Display.DisplayTrafficClass.Ordinary, slot) : Color.gray;
 
         // Shared display families reuse the same lifetime slot ownership, independent of aliases.
         public int AssignSlot(LogicalConnectionState connection)
         {
             if (slots == null)
                 slots = new Dictionary<LogicalConnectionState, int>();
-            if (slots.TryGetValue(connection, out int existing))
+            if (historicalSlots == null) historicalSlots = new Dictionary<LogicalConnectionState, int>();
+            if (historicalSlots.TryGetValue(connection, out int existing))
                 return existing;
 
             var occupied = new bool[SlotCount];
@@ -42,15 +43,16 @@ namespace Uptime.Connections
                 break;
             }
             slots.Add(connection, chosen);
+            historicalSlots.Add(connection, chosen);
             nextSlot = (chosen + 1) % SlotCount;
             return chosen;
         }
 
         public bool TryGet(LogicalConnectionState connection, out Color color)
         {
-            if (slots != null && slots.TryGetValue(connection, out int slot))
+            if (historicalSlots != null && historicalSlots.TryGetValue(connection, out int slot))
             {
-                color = ColorAt(slot);
+                color = ColorFor(slot);
                 return true;
             }
             color = default;
@@ -62,21 +64,10 @@ namespace Uptime.Connections
         public void Reset()
         {
             slots?.Clear();
+            historicalSlots?.Clear();
             nextSlot = 0;
         }
 
-        public Color ColorAt(int slot)
-        {
-            switch (slot)
-            {
-                case 0: return cyan;
-                case 1: return teal;
-                case 2: return blueGreen;
-                case 3: return seafoam;
-                case 4: return turquoise;
-                case 5: return coolMint;
-                default: throw new ArgumentOutOfRangeException(nameof(slot));
-            }
-        }
+        public Color ColorAt(int slot) => style != null ? style.IdentityColor(Display.DisplayTrafficClass.Ordinary, slot) : Color.gray;
     }
 }

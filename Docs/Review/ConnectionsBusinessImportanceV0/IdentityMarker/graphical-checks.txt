@@ -1,0 +1,1524 @@
+PASS Assets/Scenes/Connections.unity real mixed-route traffic reaches service danger
+PASS Assets/Scenes/Connections.unity nominal AUTH and slowed DB coexist
+PASS Connections-1920-Blended / o0 / LoadRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended / o0 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended / i0 / LoadRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / i0
+PASS Connections-1920-Blended visible parsed marker / i0
+PASS Connections-1920-Blended glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Blended bright identifier / i0
+PASS Connections-1920-Blended / i1 / LoadRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / i1
+PASS Connections-1920-Blended visible parsed marker / i1
+PASS Connections-1920-Blended glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1920-Blended bright identifier / i1
+PASS Connections-1920-Blended / o0 / WorkRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended / o1 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / o1
+PASS Connections-1920-Blended visible parsed marker / o1
+PASS Connections-1920-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1920-Blended bright identifier / o1
+PASS Connections-1920-Blended / n1 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / n1
+PASS Connections-1920-Blended visible parsed marker / n1
+PASS Connections-1920-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1920-Blended bright identifier / n1
+PASS Connections-1920-Blended / o1 / WorkRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / o1
+PASS Connections-1920-Blended visible parsed marker / o1
+PASS Connections-1920-Blended glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1920-Blended bright identifier / o1
+PASS Connections-1920-Blended / o1 / LoadRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / o1
+PASS Connections-1920-Blended visible parsed marker / o1
+PASS Connections-1920-Blended glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1920-Blended bright identifier / o1
+PASS Connections-1920-Blended / n1 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / n1
+PASS Connections-1920-Blended visible parsed marker / n1
+PASS Connections-1920-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1920-Blended bright identifier / n1
+PASS Connections-1920-Blended / n0 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / n0
+PASS Connections-1920-Blended visible parsed marker / n0
+PASS Connections-1920-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Blended bright identifier / n0
+PASS Connections-1920-Blended / i1 / WorkRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / i1
+PASS Connections-1920-Blended visible parsed marker / i1
+PASS Connections-1920-Blended glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1920-Blended bright identifier / i1
+PASS Connections-1920-Blended / i0 / WorkRequestRow(Clone)
+PASS Connections-1920-Blended importance glyph / i0
+PASS Connections-1920-Blended visible parsed marker / i0
+PASS Connections-1920-Blended glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Blended bright identifier / i0
+PASS Connections-1920-Blended / o0 / FullContent
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended / i0 / FullContent
+PASS Connections-1920-Blended importance glyph / i0
+PASS Connections-1920-Blended visible parsed marker / i0
+PASS Connections-1920-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1920-Blended bright identifier / i0
+PASS Connections-1920-Blended / i0 / FullContent
+PASS Connections-1920-Blended importance glyph / i0
+PASS Connections-1920-Blended visible parsed marker / i0
+PASS Connections-1920-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1920-Blended bright identifier / i0
+PASS Connections-1920-Blended / i0 / LogsCard
+PASS Connections-1920-Blended importance glyph / i0
+PASS Connections-1920-Blended visible parsed marker / i0
+PASS Connections-1920-Blended glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Blended bright identifier / i0
+PASS Connections-1920-Blended / o0 / FullContent
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended / o0 / IdentityOverlay
+PASS Connections-1920-Blended importance glyph / o0
+PASS Connections-1920-Blended visible parsed marker / o0
+PASS Connections-1920-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Blended bright identifier / o0
+PASS Connections-1920-Blended meaningful live/frozen terminal/network coverage
+PASS Connections-1920-Blended actual LOAD and WORK surfaces present
+PASS Connections-1920-Blended mode switch retains all view/model instances
+PASS Connections-1920-Blended changing color advances no WORK/time/route
+PASS Connections-1920-Uniform / o0 / LoadRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform / o0 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform / i1 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / i1
+PASS Connections-1920-Uniform visible parsed marker / i1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Connections-1920-Uniform bright identifier / i1
+PASS Connections-1920-Uniform / i0 / LoadRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / o1 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / o1
+PASS Connections-1920-Uniform visible parsed marker / o1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1920-Uniform bright identifier / o1
+PASS Connections-1920-Uniform / n0 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / n0
+PASS Connections-1920-Uniform visible parsed marker / n0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Uniform bright identifier / n0
+PASS Connections-1920-Uniform / i1 / LoadRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / i1
+PASS Connections-1920-Uniform visible parsed marker / i1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1920-Uniform bright identifier / i1
+PASS Connections-1920-Uniform / o0 / WorkRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform / o1 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / o1
+PASS Connections-1920-Uniform visible parsed marker / o1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1920-Uniform bright identifier / o1
+PASS Connections-1920-Uniform / n1 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / n1
+PASS Connections-1920-Uniform visible parsed marker / n1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1920-Uniform bright identifier / n1
+PASS Connections-1920-Uniform / o1 / WorkRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / o1
+PASS Connections-1920-Uniform visible parsed marker / o1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1920-Uniform bright identifier / o1
+PASS Connections-1920-Uniform / o1 / LoadRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / o1
+PASS Connections-1920-Uniform visible parsed marker / o1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1920-Uniform bright identifier / o1
+PASS Connections-1920-Uniform / n1 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / n1
+PASS Connections-1920-Uniform visible parsed marker / n1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1920-Uniform bright identifier / n1
+PASS Connections-1920-Uniform / i0 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / n0 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / n0
+PASS Connections-1920-Uniform visible parsed marker / n0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Uniform bright identifier / n0
+PASS Connections-1920-Uniform / i1 / WorkRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / i1
+PASS Connections-1920-Uniform visible parsed marker / i1
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1920-Uniform bright identifier / i1
+PASS Connections-1920-Uniform / i0 / WorkRequestRow(Clone)
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / o0 / FullContent
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform / i0 / FullContent
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / i0 / FullContent
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / i0 / LogsCard
+PASS Connections-1920-Uniform importance glyph / i0
+PASS Connections-1920-Uniform visible parsed marker / i0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1920-Uniform bright identifier / i0
+PASS Connections-1920-Uniform / o0 / FullContent
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform / o0 / IdentityOverlay
+PASS Connections-1920-Uniform importance glyph / o0
+PASS Connections-1920-Uniform visible parsed marker / o0
+PASS Connections-1920-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1920-Uniform bright identifier / o0
+PASS Connections-1920-Uniform meaningful live/frozen terminal/network coverage
+PASS Connections-1920-Uniform actual LOAD and WORK surfaces present
+PASS Connections-1920-Uniform mode switch retains all view/model instances
+PASS Connections-1920-Uniform changing color advances no WORK/time/route
+PASS Connections-1280-Blended / o0 / LoadRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended / o0 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended / i1 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / i1
+PASS Connections-1280-Blended visible parsed marker / i1
+PASS Connections-1280-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Connections-1280-Blended bright identifier / i1
+PASS Connections-1280-Blended / i0 / LoadRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / o1 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / o1
+PASS Connections-1280-Blended visible parsed marker / o1
+PASS Connections-1280-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1280-Blended bright identifier / o1
+PASS Connections-1280-Blended / n0 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / n0
+PASS Connections-1280-Blended visible parsed marker / n0
+PASS Connections-1280-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Blended bright identifier / n0
+PASS Connections-1280-Blended / i1 / LoadRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / i1
+PASS Connections-1280-Blended visible parsed marker / i1
+PASS Connections-1280-Blended glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1280-Blended bright identifier / i1
+PASS Connections-1280-Blended / o0 / WorkRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended / o1 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / o1
+PASS Connections-1280-Blended visible parsed marker / o1
+PASS Connections-1280-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1280-Blended bright identifier / o1
+PASS Connections-1280-Blended / n1 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / n1
+PASS Connections-1280-Blended visible parsed marker / n1
+PASS Connections-1280-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1280-Blended bright identifier / n1
+PASS Connections-1280-Blended / o1 / WorkRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / o1
+PASS Connections-1280-Blended visible parsed marker / o1
+PASS Connections-1280-Blended glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1280-Blended bright identifier / o1
+PASS Connections-1280-Blended / o1 / LoadRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / o1
+PASS Connections-1280-Blended visible parsed marker / o1
+PASS Connections-1280-Blended glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1280-Blended bright identifier / o1
+PASS Connections-1280-Blended / n1 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / n1
+PASS Connections-1280-Blended visible parsed marker / n1
+PASS Connections-1280-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1280-Blended bright identifier / n1
+PASS Connections-1280-Blended / i0 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / n0 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / n0
+PASS Connections-1280-Blended visible parsed marker / n0
+PASS Connections-1280-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Blended bright identifier / n0
+PASS Connections-1280-Blended / i1 / WorkRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / i1
+PASS Connections-1280-Blended visible parsed marker / i1
+PASS Connections-1280-Blended glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1280-Blended bright identifier / i1
+PASS Connections-1280-Blended / i0 / WorkRequestRow(Clone)
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / o0 / FullContent
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended / i0 / FullContent
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / i0 / FullContent
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / i0 / LogsCard
+PASS Connections-1280-Blended importance glyph / i0
+PASS Connections-1280-Blended visible parsed marker / i0
+PASS Connections-1280-Blended glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Blended bright identifier / i0
+PASS Connections-1280-Blended / o0 / FullContent
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended / o0 / IdentityOverlay
+PASS Connections-1280-Blended importance glyph / o0
+PASS Connections-1280-Blended visible parsed marker / o0
+PASS Connections-1280-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Blended bright identifier / o0
+PASS Connections-1280-Blended meaningful live/frozen terminal/network coverage
+PASS Connections-1280-Blended actual LOAD and WORK surfaces present
+PASS Connections-1280-Blended mode switch retains all view/model instances
+PASS Connections-1280-Blended changing color advances no WORK/time/route
+PASS Connections-1280-Uniform / o0 / LoadRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform / o0 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform / i1 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / i1
+PASS Connections-1280-Uniform visible parsed marker / i1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Connections-1280-Uniform bright identifier / i1
+PASS Connections-1280-Uniform / i0 / LoadRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / o1 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / o1
+PASS Connections-1280-Uniform visible parsed marker / o1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1280-Uniform bright identifier / o1
+PASS Connections-1280-Uniform / n0 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / n0
+PASS Connections-1280-Uniform visible parsed marker / n0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Uniform bright identifier / n0
+PASS Connections-1280-Uniform / i1 / LoadRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / i1
+PASS Connections-1280-Uniform visible parsed marker / i1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1280-Uniform bright identifier / i1
+PASS Connections-1280-Uniform / o0 / WorkRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform / o1 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / o1
+PASS Connections-1280-Uniform visible parsed marker / o1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Connections-1280-Uniform bright identifier / o1
+PASS Connections-1280-Uniform / n1 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / n1
+PASS Connections-1280-Uniform visible parsed marker / n1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1280-Uniform bright identifier / n1
+PASS Connections-1280-Uniform / o1 / WorkRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / o1
+PASS Connections-1280-Uniform visible parsed marker / o1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1280-Uniform bright identifier / o1
+PASS Connections-1280-Uniform / o1 / LoadRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / o1
+PASS Connections-1280-Uniform visible parsed marker / o1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Connections-1280-Uniform bright identifier / o1
+PASS Connections-1280-Uniform / n1 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / n1
+PASS Connections-1280-Uniform visible parsed marker / n1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Connections-1280-Uniform bright identifier / n1
+PASS Connections-1280-Uniform / i0 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / n0 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / n0
+PASS Connections-1280-Uniform visible parsed marker / n0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Uniform bright identifier / n0
+PASS Connections-1280-Uniform / i1 / WorkRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / i1
+PASS Connections-1280-Uniform visible parsed marker / i1
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS Connections-1280-Uniform bright identifier / i1
+PASS Connections-1280-Uniform / i0 / WorkRequestRow(Clone)
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / o0 / FullContent
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform / i0 / FullContent
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / i0 / FullContent
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / i0 / LogsCard
+PASS Connections-1280-Uniform importance glyph / i0
+PASS Connections-1280-Uniform visible parsed marker / i0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Connections-1280-Uniform bright identifier / i0
+PASS Connections-1280-Uniform / o0 / FullContent
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform / o0 / IdentityOverlay
+PASS Connections-1280-Uniform importance glyph / o0
+PASS Connections-1280-Uniform visible parsed marker / o0
+PASS Connections-1280-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Connections-1280-Uniform bright identifier / o0
+PASS Connections-1280-Uniform meaningful live/frozen terminal/network coverage
+PASS Connections-1280-Uniform actual LOAD and WORK surfaces present
+PASS Connections-1280-Uniform mode switch retains all view/model instances
+PASS Connections-1280-Uniform changing color advances no WORK/time/route
+PASS Assets/Scenes/Connections.unity frozen resolved inspect history retained
+PASS Assets/Scenes/Connections.unity history / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history / i1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / i1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Assets/Scenes/Connections.unity history bright identifier / i1
+PASS Assets/Scenes/Connections.unity history / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / o1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Assets/Scenes/Connections.unity history bright identifier / o1
+PASS Assets/Scenes/Connections.unity history / n0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / n0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / n0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/Connections.unity history bright identifier / n0
+PASS Assets/Scenes/Connections.unity history / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history / o1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / o1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Assets/Scenes/Connections.unity history bright identifier / o1
+PASS Assets/Scenes/Connections.unity history / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / n1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / n1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Assets/Scenes/Connections.unity history bright identifier / n1
+PASS Assets/Scenes/Connections.unity history / o1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / o1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Assets/Scenes/Connections.unity history bright identifier / o1
+PASS Assets/Scenes/Connections.unity history / o1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / o1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Assets/Scenes/Connections.unity history bright identifier / o1
+PASS Assets/Scenes/Connections.unity history / n1 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / n1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / n1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Assets/Scenes/Connections.unity history bright identifier / n1
+PASS Assets/Scenes/Connections.unity history / i1 / ResolvedInspectRow
+PASS Assets/Scenes/Connections.unity history importance glyph / i1
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i1
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i1 / ResolvedInspectRow / (-11.98, -5.82) to (10.61, 6.82)
+PASS Assets/Scenes/Connections.unity history bright identifier / i1
+PASS Assets/Scenes/Connections.unity history / i0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / n0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / n0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / n0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/Connections.unity history bright identifier / n0
+PASS Assets/Scenes/Connections.unity history / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / i0 / FullContent
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / i0 / LogsCard
+PASS Assets/Scenes/Connections.unity history importance glyph / i0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / i0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/Connections.unity history bright identifier / i0
+PASS Assets/Scenes/Connections.unity history / o0 / FullContent
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history / o0 / IdentityOverlay
+PASS Assets/Scenes/Connections.unity history importance glyph / o0
+PASS Assets/Scenes/Connections.unity history visible parsed marker / o0
+PASS Assets/Scenes/Connections.unity history glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/Connections.unity history bright identifier / o0
+PASS Assets/Scenes/Connections.unity history meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/Connections.unity live switch needs no restart while host continues
+PASS Assets/Scenes/ConnectionsAdvanced.unity real mixed-route traffic reaches service danger
+PASS Assets/Scenes/ConnectionsAdvanced.unity nominal AUTH and slowed DB coexist
+PASS ConnectionsAdvanced-1920-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1920-Blended / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1920-Blended / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1920-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / n1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / n1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / n1
+PASS ConnectionsAdvanced-1920-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1920-Blended / i0 / LogsCard
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / n0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / n0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / n0
+PASS ConnectionsAdvanced-1920-Blended / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1920-Blended / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / n1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / n1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / n1
+PASS ConnectionsAdvanced-1920-Blended / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1920-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / n0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / n0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / n0
+PASS ConnectionsAdvanced-1920-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1920-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1920-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1920-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1920-Blended / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1920-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1920-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1920-Blended meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-1920-Blended actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-1920-Blended mode switch retains all view/model instances
+PASS ConnectionsAdvanced-1920-Blended changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-1920-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1920-Uniform / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1920-Uniform / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1920-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / n1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / n1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / n1
+PASS ConnectionsAdvanced-1920-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1920-Uniform / i0 / LogsCard
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / n0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / n0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / n0
+PASS ConnectionsAdvanced-1920-Uniform / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1920-Uniform / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / n1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / n1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / n1
+PASS ConnectionsAdvanced-1920-Uniform / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1920-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / n0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / n0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / n0
+PASS ConnectionsAdvanced-1920-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1920-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1920-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1920-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1920-Uniform / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1920-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1920-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1920-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1920-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1920-Uniform meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-1920-Uniform actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-1920-Uniform mode switch retains all view/model instances
+PASS ConnectionsAdvanced-1920-Uniform changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-1280-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1280-Blended / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1280-Blended / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1280-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / n1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / n1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / n1
+PASS ConnectionsAdvanced-1280-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1280-Blended / i0 / LogsCard
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / n0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / n0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / n0
+PASS ConnectionsAdvanced-1280-Blended / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1280-Blended / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / i0 / FullContent
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / n1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / n1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / n1
+PASS ConnectionsAdvanced-1280-Blended / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1280-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / n0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / n0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / n0
+PASS ConnectionsAdvanced-1280-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1280-Blended / o0 / FullContent
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o0
+PASS ConnectionsAdvanced-1280-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1280-Blended / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i1
+PASS ConnectionsAdvanced-1280-Blended / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Blended importance glyph / i0
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / i0
+PASS ConnectionsAdvanced-1280-Blended / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Blended importance glyph / o1
+PASS ConnectionsAdvanced-1280-Blended visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Blended glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Blended bright identifier / o1
+PASS ConnectionsAdvanced-1280-Blended meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-1280-Blended actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-1280-Blended mode switch retains all view/model instances
+PASS ConnectionsAdvanced-1280-Blended changing color advances no WORK/time/route
+PASS ConnectionsAdvanced-1280-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1280-Uniform / o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1280-Uniform / i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i1 / LoadRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1280-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / n1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / n1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / n1
+PASS ConnectionsAdvanced-1280-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1280-Uniform / i0 / LogsCard
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / n0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / n0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / n0
+PASS ConnectionsAdvanced-1280-Uniform / i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i1 / WorkRequestRow(Clone) / (-16.48, -8.00) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1280-Uniform / o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / i0 / FullContent
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / n1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / n1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / n1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / n1
+PASS ConnectionsAdvanced-1280-Uniform / o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1280-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / n0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / n0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / n0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / n0
+PASS ConnectionsAdvanced-1280-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1280-Uniform / o0 / FullContent
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o0
+PASS ConnectionsAdvanced-1280-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1280-Uniform / i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i1
+PASS ConnectionsAdvanced-1280-Uniform / i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / i0
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / i0
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / i0
+PASS ConnectionsAdvanced-1280-Uniform / o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280-Uniform importance glyph / o1
+PASS ConnectionsAdvanced-1280-Uniform visible parsed marker / o1
+PASS ConnectionsAdvanced-1280-Uniform glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS ConnectionsAdvanced-1280-Uniform bright identifier / o1
+PASS ConnectionsAdvanced-1280-Uniform meaningful live/frozen terminal/network coverage
+PASS ConnectionsAdvanced-1280-Uniform actual LOAD and WORK surfaces present
+PASS ConnectionsAdvanced-1280-Uniform mode switch retains all view/model instances
+PASS ConnectionsAdvanced-1280-Uniform changing color advances no WORK/time/route
+PASS Assets/Scenes/ConnectionsAdvanced.unity frozen resolved inspect history retained
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o1 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o1 / WorkRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / LogsCard
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / LogsCard / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / LoadRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / FullContent / (-37.45, -18.50) to (33.15, 21.30)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / WorkRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / n1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / n1 / IdentityOverlay / (-14.66, -7.28) to (13.13, 7.40)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / n1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o1 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o1 / LoadRequestRow(Clone) / (-11.66, -8.12) to (12.15, 8.14)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i1 / ResolvedInspectRow
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i1 / ResolvedInspectRow / (-11.98, -5.82) to (10.61, 6.82)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / IdentityOverlay / (-14.80, -7.40) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / n0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / n0 / IdentityOverlay / (-10.16, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / n0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / IdentityOverlay / (-10.30, -7.40) to (10.40, 7.60)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / FullContent
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / FullContent / (-26.50, -18.50) to (26.60, 19.00)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o0 / WorkRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o0 / WorkRequestRow(Clone) / (-11.66, -8.14) to (11.70, 8.36)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i1 / IdentityOverlay / (-14.80, -7.28) to (13.13, 8.34)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / i0 / LoadRequestRow(Clone)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / i0 / LoadRequestRow(Clone) / (-16.48, -8.14) to (14.59, 9.37)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / i0
+PASS Assets/Scenes/ConnectionsAdvanced.unity history / o1 / IdentityOverlay
+PASS Assets/Scenes/ConnectionsAdvanced.unity history importance glyph / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history visible parsed marker / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history glyph ink fits authored bounds / o1 / IdentityOverlay / (-10.30, -7.36) to (10.80, 7.40)
+PASS Assets/Scenes/ConnectionsAdvanced.unity history bright identifier / o1
+PASS Assets/Scenes/ConnectionsAdvanced.unity history meaningful live/frozen terminal/network coverage
+PASS Assets/Scenes/ConnectionsAdvanced.unity live switch needs no restart while host continues
+PASS Lab same sample views / Blended
+PASS Lab live identity / a1 / Blended
+PASS Lab live identity / a2 / Blended
+PASS Lab live identity / a3 / Blended
+PASS Lab live identity / a4 / Blended
+PASS Lab live identity / a5 / Blended
+PASS Lab live identity / a6 / Blended
+PASS Lab live identity / b1 / Blended
+PASS Lab live identity / b2 / Blended
+PASS Lab live identity / b3 / Blended
+PASS Lab live identity / b4 / Blended
+PASS Lab live identity / b5 / Blended
+PASS Lab live identity / b6 / Blended
+PASS Lab live identity / c1 / Blended
+PASS Lab live identity / c2 / Blended
+PASS Lab live identity / c3 / Blended
+PASS Lab live identity / c4 / Blended
+PASS Lab live identity / c5 / Blended
+PASS Lab live identity / c6 / Blended
+PASS Lab live identity / c7 / Blended
+PASS Lab live identity / d1 / Blended
+PASS Lab live identity / d2 / Blended
+PASS Lab live identity / d3 / Blended
+PASS Lab live identity / d4 / Blended
+PASS Lab live identity / d5 / Blended
+PASS Lab live identity / d6 / Blended
+PASS Lab live identity / d7 / Blended
+PASS Lab marker / a1
+PASS Lab marker / a2
+PASS Lab marker / a3
+PASS Lab marker / a4
+PASS Lab marker / a5
+PASS Lab marker / a6
+PASS Lab marker / b1
+PASS Lab marker / b2
+PASS Lab marker / b3
+PASS Lab marker / b4
+PASS Lab marker / b5
+PASS Lab marker / b6
+PASS Lab marker / c1
+PASS Lab marker / c2
+PASS Lab marker / c3
+PASS Lab marker / c4
+PASS Lab marker / c5
+PASS Lab marker / c6
+PASS Lab marker / c7
+PASS Lab marker / d1
+PASS Lab marker / d2
+PASS Lab marker / d3
+PASS Lab marker / d4
+PASS Lab marker / d5
+PASS Lab marker / d6
+PASS Lab marker / d7
+PASS Lab same sample views / Uniform
+PASS Lab live identity / a1 / Uniform
+PASS Lab live identity / a2 / Uniform
+PASS Lab live identity / a3 / Uniform
+PASS Lab live identity / a4 / Uniform
+PASS Lab live identity / a5 / Uniform
+PASS Lab live identity / a6 / Uniform
+PASS Lab live identity / b1 / Uniform
+PASS Lab live identity / b2 / Uniform
+PASS Lab live identity / b3 / Uniform
+PASS Lab live identity / b4 / Uniform
+PASS Lab live identity / b5 / Uniform
+PASS Lab live identity / b6 / Uniform
+PASS Lab live identity / c1 / Uniform
+PASS Lab live identity / c2 / Uniform
+PASS Lab live identity / c3 / Uniform
+PASS Lab live identity / c4 / Uniform
+PASS Lab live identity / c5 / Uniform
+PASS Lab live identity / c6 / Uniform
+PASS Lab live identity / c7 / Uniform
+PASS Lab live identity / d1 / Uniform
+PASS Lab live identity / d2 / Uniform
+PASS Lab live identity / d3 / Uniform
+PASS Lab live identity / d4 / Uniform
+PASS Lab live identity / d5 / Uniform
+PASS Lab live identity / d6 / Uniform
+PASS Lab live identity / d7 / Uniform
+PASS Lab marker / a1
+PASS Lab marker / a2
+PASS Lab marker / a3
+PASS Lab marker / a4
+PASS Lab marker / a5
+PASS Lab marker / a6
+PASS Lab marker / b1
+PASS Lab marker / b2
+PASS Lab marker / b3
+PASS Lab marker / b4
+PASS Lab marker / b5
+PASS Lab marker / b6
+PASS Lab marker / c1
+PASS Lab marker / c2
+PASS Lab marker / c3
+PASS Lab marker / c4
+PASS Lab marker / c5
+PASS Lab marker / c6
+PASS Lab marker / c7
+PASS Lab marker / d1
+PASS Lab marker / d2
+PASS Lab marker / d3
+PASS Lab marker / d4
+PASS Lab marker / d5
+PASS Lab marker / d6
+PASS Lab marker / d7
+PASS Lab same sample views / Blended
+PASS Lab live identity / a1 / Blended
+PASS Lab live identity / a2 / Blended
+PASS Lab live identity / a3 / Blended
+PASS Lab live identity / a4 / Blended
+PASS Lab live identity / a5 / Blended
+PASS Lab live identity / a6 / Blended
+PASS Lab live identity / b1 / Blended
+PASS Lab live identity / b2 / Blended
+PASS Lab live identity / b3 / Blended
+PASS Lab live identity / b4 / Blended
+PASS Lab live identity / b5 / Blended
+PASS Lab live identity / b6 / Blended
+PASS Lab live identity / c1 / Blended
+PASS Lab live identity / c2 / Blended
+PASS Lab live identity / c3 / Blended
+PASS Lab live identity / c4 / Blended
+PASS Lab live identity / c5 / Blended
+PASS Lab live identity / c6 / Blended
+PASS Lab live identity / c7 / Blended
+PASS Lab live identity / d1 / Blended
+PASS Lab live identity / d2 / Blended
+PASS Lab live identity / d3 / Blended
+PASS Lab live identity / d4 / Blended
+PASS Lab live identity / d5 / Blended
+PASS Lab live identity / d6 / Blended
+PASS Lab live identity / d7 / Blended
+PASS Lab marker / a1
+PASS Lab marker / a2
+PASS Lab marker / a3
+PASS Lab marker / a4
+PASS Lab marker / a5
+PASS Lab marker / a6
+PASS Lab marker / b1
+PASS Lab marker / b2
+PASS Lab marker / b3
+PASS Lab marker / b4
+PASS Lab marker / b5
+PASS Lab marker / b6
+PASS Lab marker / c1
+PASS Lab marker / c2
+PASS Lab marker / c3
+PASS Lab marker / c4
+PASS Lab marker / c5
+PASS Lab marker / c6
+PASS Lab marker / c7
+PASS Lab marker / d1
+PASS Lab marker / d2
+PASS Lab marker / d3
+PASS Lab marker / d4
+PASS Lab marker / d5
+PASS Lab marker / d6
+PASS Lab marker / d7
+PASS Lab same sample views / Uniform
+PASS Lab live identity / a1 / Uniform
+PASS Lab live identity / a2 / Uniform
+PASS Lab live identity / a3 / Uniform
+PASS Lab live identity / a4 / Uniform
+PASS Lab live identity / a5 / Uniform
+PASS Lab live identity / a6 / Uniform
+PASS Lab live identity / b1 / Uniform
+PASS Lab live identity / b2 / Uniform
+PASS Lab live identity / b3 / Uniform
+PASS Lab live identity / b4 / Uniform
+PASS Lab live identity / b5 / Uniform
+PASS Lab live identity / b6 / Uniform
+PASS Lab live identity / c1 / Uniform
+PASS Lab live identity / c2 / Uniform
+PASS Lab live identity / c3 / Uniform
+PASS Lab live identity / c4 / Uniform
+PASS Lab live identity / c5 / Uniform
+PASS Lab live identity / c6 / Uniform
+PASS Lab live identity / c7 / Uniform
+PASS Lab live identity / d1 / Uniform
+PASS Lab live identity / d2 / Uniform
+PASS Lab live identity / d3 / Uniform
+PASS Lab live identity / d4 / Uniform
+PASS Lab live identity / d5 / Uniform
+PASS Lab live identity / d6 / Uniform
+PASS Lab live identity / d7 / Uniform
+PASS Lab marker / a1
+PASS Lab marker / a2
+PASS Lab marker / a3
+PASS Lab marker / a4
+PASS Lab marker / a5
+PASS Lab marker / a6
+PASS Lab marker / b1
+PASS Lab marker / b2
+PASS Lab marker / b3
+PASS Lab marker / b4
+PASS Lab marker / b5
+PASS Lab marker / b6
+PASS Lab marker / c1
+PASS Lab marker / c2
+PASS Lab marker / c3
+PASS Lab marker / c4
+PASS Lab marker / c5
+PASS Lab marker / c6
+PASS Lab marker / c7
+PASS Lab marker / d1
+PASS Lab marker / d2
+PASS Lab marker / d3
+PASS Lab marker / d4
+PASS Lab marker / d5
+PASS Lab marker / d6
+PASS Lab marker / d7

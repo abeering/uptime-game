@@ -1,0 +1,7 @@
+Unity 6000.3.11f1 isolated project / BasicTreeLayoutCapture.Run
+Exit: 0
+361 actual Play Mode checks; 1920x1080 and 1280x720; empty + six-connection screenshots
+Small: only RectTransform anchor/position lines differ from prior head
+Advanced: byte-identical (SHA256 0cb929f350a7121cb6aaee1d771038c85895c949afcc3c70fb71dd5578b02d15)
+Inherited nonfatal Unity QuickSearch startup exception observed
+Core --check and diff --check pass

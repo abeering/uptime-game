@@ -2,6 +2,8 @@
 
 Implementation branch `feature/connections-business-reliability-shift-v0`, based on merged main `4c099d76328c12bc64240f0607b0066b3be3e90b`. Scope: canonical Small and Advanced Connections. Packet and historical scenes remain separate. This implements one shift, without multi-shift progression or new demand scheduling.
 
+**Business Importance V0 follow-up:** The initial all-ordinary counts below retain their phase provenance. [Individual importance](connections-business-importance-v0.md) now weights an unsuccessful IMPORTANT job as one receipt worth three configurable failure units; allowance/HUD/threshold use units, while unsuccessful jobs remain separately counted. Original business WORK and terminal-outcome rules stay unchanged.
+
 ## The playable rule
 
 **Complete the required successful business WORK before the company’s legitimate connection failure limit is reached.** There is no shift deadline, required WORK-per-second pace, elapsed-time penalty or insufficient-WORK ending. A slower successful shift exposes the player to the existing simulation for longer. Individual connection service deadlines from Fragility still apply independently.

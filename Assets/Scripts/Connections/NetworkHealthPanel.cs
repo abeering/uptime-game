@@ -64,7 +64,7 @@ namespace Uptime.Connections
             int minuteOfDay = Mathf.FloorToInt(clockMinutes) % 1440;
             if (clockText != null) clockText.text = $"{minuteOfDay / 60:00}:{minuteOfDay % 60:00}";
             if (businessFailureText != null)
-                businessFailureText.text = $"BUSINESS FAILURES {host.LegitimateFailureCount}";
+                businessFailureText.text = $"BUSINESS FAILURES {host.BusinessFailureUnits}";
             RenderTools();
             NetworkHealthSnapshot health = host.Health;
             if (health == null) return;
@@ -88,8 +88,8 @@ namespace Uptime.Connections
             if (valueText != null) valueText.text = $"WORK {System.Math.Floor(host.CreditedWork):0} / {host.ShiftWorkTarget:0.##}";
             if (businessFailureText != null)
             {
-                businessFailureText.text = $"FAILURES {host.LegitimateFailureCount} / {host.BusinessFailureLimit}";
-                businessFailureText.color = host.LegitimateFailureCount >= host.BusinessFailureLimit - 1 ? criticalBarColor : stableColor;
+                businessFailureText.text = $"FAILURES {host.BusinessFailureUnits} / {host.BusinessFailureLimit}";
+                businessFailureText.color = host.BusinessFailureUnits >= host.BusinessFailureLimit - 1 ? criticalBarColor : stableColor;
             }
             if (healthFill != null)
             {

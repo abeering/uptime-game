@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Uptime.Connections.Display
 {
-    public enum DisplayTrafficClass { Ordinary, Priority }
+    public enum DisplayTrafficClass { Ordinary, Important }
     public enum DisplayResolution { Active, Completed, Killed, TimedOut, Canceled, Withdrawn }
     public enum PillProgressTreatment { Interior, Perimeter }
 
     // Presentation inputs only. Synthetic fixtures and gameplay adapters supply the same value.
-    // No severity thresholds or priority decisions feed back into simulation.
+    // No severity thresholds or importance presentation feed back into simulation.
     [Serializable]
     public struct ConnectionDisplayState
     {

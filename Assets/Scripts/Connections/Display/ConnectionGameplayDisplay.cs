@@ -32,7 +32,7 @@ namespace Uptime.Connections.Display
             if (required <= 0) required = c.CurrentTotalWork;
             var state = new ConnectionDisplayState
             {
-                identity = c.KnownIdentity, trafficClass = DisplayTrafficClass.Ordinary,
+                identity = c.KnownIdentity, trafficClass = c.IsImportant ? DisplayTrafficClass.Important : DisplayTrafficClass.Ordinary,
                 operation = c.CurrentOperation, requestedLoad = c.DesiredLoad,
                 productiveSpeed = c.IsDemanding && c.DesiredLoad > .0001f ?
                     Mathf.Max(0, c.ActualWorkRate / c.DesiredLoad) : 0,

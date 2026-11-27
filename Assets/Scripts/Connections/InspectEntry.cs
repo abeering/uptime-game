@@ -37,6 +37,7 @@ namespace Uptime.Connections
         [SerializeField] private Color completeBackground = new Color(0.026f, 0.078f, 0.095f);
 
         private readonly List<InspectOperationToken> operationTokens = new List<InspectOperationToken>();
+        private Color renderedIdentityAccent;
         private LogicalConnectionState renderedState;
         private int renderedRouteRevision = -1;
         private int renderedStage = -1;
@@ -54,6 +55,9 @@ namespace Uptime.Connections
             (showService && !resolvedSummary ? 66f : 0f);
         public bool IsResolvedSummary => resolvedSummary;
         public bool IsSummaryTransitioning => summaryTransition;
+
+        public void FollowIdentity(LogicalConnectionState state, ConnectionIdentityPalette palette)
+        { headerIdentityPill?.FollowIdentity(state, palette); resolvedRow?.FollowIdentity(state, palette); }
 
         public void ShowFullCard()
         {
@@ -76,7 +80,7 @@ namespace Uptime.Connections
             resolvedSummary = true;
             summaryTransition = true;
             resolvedRow.gameObject.SetActive(true);
-            resolvedRow.Bind(state, quietColor);
+            resolvedRow.Bind(state, quietColor, renderedIdentityAccent);
             resolvedRow.FitWidth();
             SetContentAlpha(1f, 0f);
         }
@@ -220,6 +224,7 @@ namespace Uptime.Connections
                 Set(service, state.ServiceExplanation);
             }
             Color accent = identityAccent ?? activeColor;
+            renderedIdentityAccent = accent;
             Set(identity, string.Empty);
             string priority = state.AllocationWeight > 1f && !string.IsNullOrEmpty(state.AllocationPolicyNodeId) ?
                 $"{state.AllocationPolicyNodeId} ×{state.AllocationWeight:G3} · " : string.Empty;
@@ -228,7 +233,7 @@ namespace Uptime.Connections
             if (purpose != null) purpose.color = state.IsComplete ? quietColor : accent;
             if (headerIdentityPill != null)
             {
-                Color identityColor = state.IsComplete ? quietColor : accent;
+                Color identityColor = accent;
                 if (!ReferenceEquals(renderedState, state))
                     headerIdentityPill.Bind(state.ConnectionId, identityColor);
                 else

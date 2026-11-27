@@ -80,6 +80,10 @@ namespace Uptime.Connections
         [Header("Legitimate generated workload")]
         [Tooltip("Scales non-hostile generated operation LOAD and processing WORK together after sampling/anomalies. Business WORK value stays unscaled. Restart after edits.")]
         [SerializeField, Min(.01f)] private float legitimateWorkloadMultiplier = 1f;
+        [Header("Business importance (legitimate generated requests only)")]
+        [SerializeField, Range(0f, 1f)] private float importantConnectionChance = .15f;
+        public float ImportantConnectionChance => importantConnectionChance;
+        private System.Random importanceRandom;
         [Header("Identity behavior")]
         [SerializeField, Min(0.1f)] private float identityHopIntervalSeconds = 2f;
         [Tooltip("Chance of hopping within successfully generated ordinary hostile connections.")]
@@ -249,6 +253,9 @@ namespace Uptime.Connections
             if (!float.IsFinite(legitimateWorkloadMultiplier) || legitimateWorkloadMultiplier <= 0f ||
                 !float.IsFinite(legitimateMeanArrivalSeconds) || legitimateMeanArrivalSeconds <= 0f)
                 throw new InvalidOperationException("Business demand interval and workload multiplier must be finite and positive.");
+            if (!float.IsFinite(importantConnectionChance) || importantConnectionChance < 0 || importantConnectionChance > 1)
+                throw new InvalidOperationException("IMPORTANT probability must be between zero and one.");
+            importanceRandom = new System.Random(unchecked(seed ^ (int)0x1B057A1));
             businessDemandRandom = new System.Random(unchecked(seed ^ (int)0x1B3D4A7));
             nextBusinessDemandAt = initialGraceSeconds + BusinessDemandDelay();
             businessClockPaused = false;
@@ -999,8 +1006,11 @@ namespace Uptime.Connections
                 identityMode: manualIdentityReactive ? ConnectionIdentityMode.ReactiveMisdirection :
                     manualIdentityHop ? ConnectionIdentityMode.ContinuousHopping :
                     ConnectionIdentityMode.Normal);
-            return plan.IsHostile || legitimateWorkloadMultiplier == 1f ? plan :
-                plan.WithLegitimateWorkload(legitimateWorkloadMultiplier);
+            if (plan.IsHostile) return plan;
+            float importanceRoll = (float)importanceRandom.NextDouble();
+            plan = plan.WithBusinessImportance(importanceRoll < importantConnectionChance ?
+                BusinessImportance.Important : BusinessImportance.Ordinary, importanceRoll, importantConnectionChance);
+            return legitimateWorkloadMultiplier == 1f ? plan : plan.WithLegitimateWorkload(legitimateWorkloadMultiplier);
         }
 
         private ConnectionSpawnPlan BuildPurposePlan(ConnectionTrafficProfile purpose, float atTime,

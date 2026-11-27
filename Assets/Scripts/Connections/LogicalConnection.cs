@@ -259,12 +259,18 @@ namespace Uptime.Connections
         }
     }
 
+    public enum BusinessImportance { Ordinary, Important }
+
     [Serializable]
     public sealed class LogicalConnectionDefinition
     {
         [SerializeField] private string connectionId;
         [SerializeField] private string profileId;
         [SerializeField] private bool isHostile;
+        [SerializeField] private BusinessImportance importance;
+        public float ImportanceSelectionRoll { get; private set; } = -1f;
+        public float ImportanceSelectionChance { get; private set; }
+        public BusinessImportance Importance => importance;
         [SerializeField] private string claimedPurpose;
         [SerializeField] private string activityDescription;
         [SerializeField] private OperationKind currentOperation;
@@ -333,7 +339,9 @@ namespace Uptime.Connections
                 connectionId = plan.ConnectionId,
                 profileId = plan.ProfileId,
                 BusinessWorkValue = plan.BusinessWorkValue,
-                isHostile = plan.IsHostile,
+                isHostile = plan.IsHostile, importance = plan.Importance,
+                ImportanceSelectionRoll = plan.ImportanceSelectionRoll,
+                ImportanceSelectionChance = plan.ImportanceSelectionChance,
                 claimedPurpose = plan.ClaimedPurpose,
                 activityDescription = plan.Operations[0].ActivityDescription,
                 currentOperation = plan.Operations[0].Operation,
@@ -390,9 +398,15 @@ namespace Uptime.Connections
     public sealed class LogicalConnectionState
     {
         internal LogicalConnectionState(LogicalConnectionDefinition definition,
-            PhysicalLinkReference[] routeLinks, NodeResources targetResources)
+            PhysicalLinkReference[] routeLinks, NodeResources targetResources, int importantFailureUnits = 3)
         {
             Definition = definition;
+            if (definition.IsHostile && definition.Importance != BusinessImportance.Ordinary)
+                throw new ArgumentException("Hostile connections cannot be IMPORTANT.");
+            if (importantFailureUnits < 1) throw new ArgumentOutOfRangeException(nameof(importantFailureUnits));
+            if (!Enum.IsDefined(typeof(BusinessImportance), definition.Importance)) throw new ArgumentException("Invalid business importance.");
+            Importance = definition.Importance;
+            BusinessFailureCost = definition.IsHostile ? 0 : Importance == BusinessImportance.Important ? importantFailureUnits : 1;
             if (definition.BusinessWorkValue.HasValue) BusinessWorkValue = definition.BusinessWorkValue.Value;
             else for (int i = 0; i < definition.OperationCount; i++) BusinessWorkValue += definition.WorkAt(i);
             RouteLinks = routeLinks;
@@ -426,6 +440,10 @@ namespace Uptime.Connections
                 definition.IdentityHopSeconds, definition.IdentitySeed, definition.IdentityMode);
             Lifecycle = definition.StartDelaySeconds > 0f ? Lifecycle.Pending : Lifecycle.Connecting;
         }
+
+        public BusinessImportance Importance { get; }
+        public bool IsImportant => Importance == BusinessImportance.Important;
+        public int BusinessFailureCost { get; }
 
         // Fixed concrete job value, including sampled anomalies, before workload scaling/runtime modifiers.
         public double BusinessWorkValue { get; }
