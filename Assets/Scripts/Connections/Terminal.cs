@@ -438,12 +438,14 @@ namespace Uptime.Connections
                     break;
                 case "ssh":
                     if (tokens.Length != 2) AppendText("USAGE  ssh <nodeId>", CommandFailureColor());
-                    else if (simulationHost?.ApiConfigurationNode == null ||
-                        !tokens[1].Equals(simulationHost.ApiConfigurationNode.NodeId, StringComparison.OrdinalIgnoreCase))
-                        AppendText("NODE CONFIGURATION UNAVAILABLE  " + tokens[1].ToUpperInvariant(), CommandFailureColor());
-                    else if (sshOverlay == null || !sshOverlay.Open(simulationHost, this))
-                        AppendText("SSH INTERFACE UNAVAILABLE", CommandFailureColor());
-                    else AppendText("SSH SESSION  " + simulationHost.ApiConfigurationNode.NodeId, normalColor);
+                    else
+                    {
+                        NodeView node = simulationHost?.FindNodeResources(tokens[1])?.View;
+                        if (node == null || node != simulationHost.ApiConfigurationNode && node != simulationHost.CacheConfigurationNode)
+                            AppendText("NODE CONFIGURATION UNAVAILABLE  " + tokens[1].ToUpperInvariant(), CommandFailureColor());
+                        else if (sshOverlay == null || !sshOverlay.Open(simulationHost, this, node)) AppendText("SSH INTERFACE UNAVAILABLE", CommandFailureColor());
+                        else AppendText("SSH SESSION  " + node.NodeId, normalColor);
+                    }
                     break;
                 case "clean":
                     Clean(tokens, command);
@@ -796,7 +798,7 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", CommandFailureColor());
                     break;
                 case "help":
-                    AppendText("ssh api  // configure one favored PURPOSE; shared capacity", mutedColor);
+                    AppendText("ssh api | ssh cache  // PURPOSE allocation or READ efficiency", mutedColor);
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("LOGS  logs <id>  logs -n <1..30> <id>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);

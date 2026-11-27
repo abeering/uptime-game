@@ -139,6 +139,22 @@ namespace Uptime.Connections
             }
         }
 
+        private NodeView[] renderedRoute;
+        public void RefreshOperationRoute()
+        {
+            if (state == null) return;
+            bool changed = renderedRoute == null || renderedRoute.Length != state.Route.Length;
+            if (!changed) for (int i = 0; i < renderedRoute.Length; i++) changed |= renderedRoute[i] != state.Route[i].Node;
+            if (!changed) return;
+            renderedRoute = Array.ConvertAll(state.Route, n => n.Node);
+            int count = state.RouteLinks.Length;
+            starts = new Vector2[count]; ends = new Vector2[count];
+            startOffsets = endOffsets = lineWidths = targetStartOffsets = targetEndOffsets = targetWidths = null;
+            fromStartOffsets = fromEndOffsets = fromWidths = null;
+            establishedVisual = false;
+            if (terminalMarker != null) terminalMarker.gameObject.SetActive(false);
+        }
+
         public void SetPresentationActive(bool active)
         {
             gameObject.SetActive(active);
@@ -232,6 +248,7 @@ namespace Uptime.Connections
         public void SetLayout(float[] nextStarts, float[] nextEnds, float[] widths,
             float maximumSocketDiameter = float.PositiveInfinity)
         {
+            RefreshOperationRoute();
             if (terminalMarker != null && !terminalMarker.FitsSocketNeighbors)
                 terminalMarker.SetMaximumDiameter(maximumSocketDiameter, relayoutSeconds);
             if (targetStartOffsets == null)
@@ -307,12 +324,12 @@ namespace Uptime.Connections
             }
             for (int i = 0; i < starts.Length; i++)
             {
-                Vector2 a = networkArea.InverseTransformPoint(state.Definition.Route[i].Node.transform.position);
-                Vector2 b = networkArea.InverseTransformPoint(state.Definition.Route[i + 1].Node.transform.position);
+                Vector2 a = networkArea.InverseTransformPoint(state.Route[i].Node.transform.position);
+                Vector2 b = networkArea.InverseTransformPoint(state.Route[i + 1].Node.transform.position);
                 Vector2 direction = (b - a).normalized;
-                starts[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i].Node,
+                starts[i] = EdgeGeometry.CardUnderlap(state.Route[i].Node,
                     networkArea, direction, startOffsets[i], lineWidths[i]);
-                ends[i] = EdgeGeometry.CardUnderlap(state.Definition.Route[i + 1].Node,
+                ends[i] = EdgeGeometry.CardUnderlap(state.Route[i + 1].Node,
                     networkArea, -direction, -endOffsets[i], lineWidths[i]);
             }
             float reveal = CurrentReveal();
@@ -346,7 +363,7 @@ namespace Uptime.Connections
                     int last = ends.Length - 1;
                     NodeView target = state.TargetNode;
                     Vector2 from = networkArea.InverseTransformPoint(
-                        state.Definition.Route[last].Node.transform.position);
+                        state.Route[last].Node.transform.position);
                     Vector2 to = networkArea.InverseTransformPoint(target.transform.position);
                     Vector2 towardSource = (from - to).normalized;
                     Vector2 socket = TerminalSocketCenter(EdgeGeometry.CardRect(target,

@@ -1,0 +1,306 @@
+PASS Assets/Scenes/Connections.unity preserved authored workload/demand and CACHE10
+PASS Connections-1920 native viewport
+PASS Connections-1920 authored node cards do not overlap: EXT1/API
+PASS Connections-1920 authored node cards do not overlap: EXT1/DB
+PASS Connections-1920 authored node cards do not overlap: EXT1/AUTH
+PASS Connections-1920 authored node cards do not overlap: EXT1/CACHE
+PASS Connections-1920 authored node cards do not overlap: API/EXT1
+PASS Connections-1920 authored node cards do not overlap: API/DB
+PASS Connections-1920 authored node cards do not overlap: API/AUTH
+PASS Connections-1920 authored node cards do not overlap: API/CACHE
+PASS Connections-1920 authored node cards do not overlap: DB/EXT1
+PASS Connections-1920 authored node cards do not overlap: DB/API
+PASS Connections-1920 authored node cards do not overlap: DB/AUTH
+PASS Connections-1920 authored node cards do not overlap: DB/CACHE
+PASS Connections-1920 authored node cards do not overlap: AUTH/EXT1
+PASS Connections-1920 authored node cards do not overlap: AUTH/API
+PASS Connections-1920 authored node cards do not overlap: AUTH/DB
+PASS Connections-1920 authored node cards do not overlap: AUTH/CACHE
+PASS Connections-1920 authored node cards do not overlap: CACHE/EXT1
+PASS Connections-1920 authored node cards do not overlap: CACHE/API
+PASS Connections-1920 authored node cards do not overlap: CACHE/DB
+PASS Connections-1920 authored node cards do not overlap: CACHE/AUTH
+PASS Connections-1920 ssh cache reuses shared authored window and owns input
+PASS Connections-1920 keyboard CACHE selection independent of API slot
+PASS Connections-1920 simulation continues during CACHE configuration
+PASS Connections-1920 SSH text fits: Title
+PASS Connections-1920 SSH text fits: Current policy
+PASS Connections-1920 SSH text fits: Tradeoff
+PASS Connections-1920 SSH text fits: Label
+PASS Connections-1920 SSH text fits: Label
+PASS Connections-1920 SSH text fits: Label
+PASS Connections-1920 SSH text fits: Label
+PASS Connections-1920 SSH text fits: Label
+PASS Connections-1920 SSH text fits: Keyboard hint
+PASS Connections-1920 Duel preempts CACHE SSH without closing it
+PASS Connections-1920 CACHE ignores Duel keystrokes
+PASS Connections-1920 Duel abort restores CACHE focus
+PASS Connections-1920 Escape returns terminal focus and preserves CACHE slot
+PASS Connections-1920 actual generated efficiency relieves DB without changing value/budget
+PASS Connections-1920 inspect explains cached identity, actual destination and requirements
+PASS Connections-1920 actual CACHE shift delivers unchanged64 WORK in two whole credits
+PASS Connections-1920 mixed READ uses existing shared rail/pill/socket
+PASS Connections-1920 clearing does not reprice/reroute committed READ
+PASS Connections-1920 live inspect refreshes to committed WRITE destination
+PASS Connections-1920 mixed WRITE changes actual route while retaining the same view, socket and connection identity
+PASS Connections-1920 route segment count/history, original budget, no partial credit
+PASS Connections-1920 shared SSH still opens independent API configuration
+PASS Connections-1920 API keyboard policy remains independent of CACHE
+PASS Connections-1920 API Escape restores focus after mixed routing
+PASS Connections-1920 restart clears both independent slots
+PASS Connections-1280 native viewport
+PASS Connections-1280 authored node cards do not overlap: EXT1/API
+PASS Connections-1280 authored node cards do not overlap: EXT1/DB
+PASS Connections-1280 authored node cards do not overlap: EXT1/AUTH
+PASS Connections-1280 authored node cards do not overlap: EXT1/CACHE
+PASS Connections-1280 authored node cards do not overlap: API/EXT1
+PASS Connections-1280 authored node cards do not overlap: API/DB
+PASS Connections-1280 authored node cards do not overlap: API/AUTH
+PASS Connections-1280 authored node cards do not overlap: API/CACHE
+PASS Connections-1280 authored node cards do not overlap: DB/EXT1
+PASS Connections-1280 authored node cards do not overlap: DB/API
+PASS Connections-1280 authored node cards do not overlap: DB/AUTH
+PASS Connections-1280 authored node cards do not overlap: DB/CACHE
+PASS Connections-1280 authored node cards do not overlap: AUTH/EXT1
+PASS Connections-1280 authored node cards do not overlap: AUTH/API
+PASS Connections-1280 authored node cards do not overlap: AUTH/DB
+PASS Connections-1280 authored node cards do not overlap: AUTH/CACHE
+PASS Connections-1280 authored node cards do not overlap: CACHE/EXT1
+PASS Connections-1280 authored node cards do not overlap: CACHE/API
+PASS Connections-1280 authored node cards do not overlap: CACHE/DB
+PASS Connections-1280 authored node cards do not overlap: CACHE/AUTH
+PASS Connections-1280 ssh cache reuses shared authored window and owns input
+PASS Connections-1280 keyboard CACHE selection independent of API slot
+PASS Connections-1280 simulation continues during CACHE configuration
+PASS Connections-1280 SSH text fits: Title
+PASS Connections-1280 SSH text fits: Current policy
+PASS Connections-1280 SSH text fits: Tradeoff
+PASS Connections-1280 SSH text fits: Label
+PASS Connections-1280 SSH text fits: Label
+PASS Connections-1280 SSH text fits: Label
+PASS Connections-1280 SSH text fits: Label
+PASS Connections-1280 SSH text fits: Label
+PASS Connections-1280 SSH text fits: Keyboard hint
+PASS Connections-1280 Duel preempts CACHE SSH without closing it
+PASS Connections-1280 CACHE ignores Duel keystrokes
+PASS Connections-1280 Duel abort restores CACHE focus
+PASS Connections-1280 Escape returns terminal focus and preserves CACHE slot
+PASS Connections-1280 actual generated efficiency relieves DB without changing value/budget
+PASS Connections-1280 inspect explains cached identity, actual destination and requirements
+PASS Connections-1280 actual CACHE shift delivers unchanged64 WORK in two whole credits
+PASS Connections-1280 mixed READ uses existing shared rail/pill/socket
+PASS Connections-1280 clearing does not reprice/reroute committed READ
+PASS Connections-1280 live inspect refreshes to committed WRITE destination
+PASS Connections-1280 mixed WRITE changes actual route while retaining the same view, socket and connection identity
+PASS Connections-1280 route segment count/history, original budget, no partial credit
+PASS Connections-1280 shared SSH still opens independent API configuration
+PASS Connections-1280 API keyboard policy remains independent of CACHE
+PASS Connections-1280 API Escape restores focus after mixed routing
+PASS Connections-1280 actual empty CACHE comparison loses both jobs
+PASS Connections-1280 restart clears both independent slots
+PASS Assets/Scenes/ConnectionsAdvanced.unity preserved authored workload/demand and CACHE10
+PASS ConnectionsAdvanced-1920 native viewport
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT1/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: WEB/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: AUTH/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: API/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: DB/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: RPT/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/EXT2
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: JOBS/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: EXT2/CACHE
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/EXT1
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/WEB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/AUTH
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/API
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/DB
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/RPT
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/JOBS
+PASS ConnectionsAdvanced-1920 authored node cards do not overlap: CACHE/EXT2
+PASS ConnectionsAdvanced-1920 ssh cache reuses shared authored window and owns input
+PASS ConnectionsAdvanced-1920 keyboard CACHE selection independent of API slot
+PASS ConnectionsAdvanced-1920 simulation continues during CACHE configuration
+PASS ConnectionsAdvanced-1920 SSH text fits: Title
+PASS ConnectionsAdvanced-1920 SSH text fits: Current policy
+PASS ConnectionsAdvanced-1920 SSH text fits: Tradeoff
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Label
+PASS ConnectionsAdvanced-1920 SSH text fits: Keyboard hint
+PASS ConnectionsAdvanced-1920 Duel preempts CACHE SSH without closing it
+PASS ConnectionsAdvanced-1920 CACHE ignores Duel keystrokes
+PASS ConnectionsAdvanced-1920 Duel abort restores CACHE focus
+PASS ConnectionsAdvanced-1920 Escape returns terminal focus and preserves CACHE slot
+PASS ConnectionsAdvanced-1920 actual generated efficiency relieves DB without changing value/budget
+PASS ConnectionsAdvanced-1920 inspect explains cached identity, actual destination and requirements
+PASS ConnectionsAdvanced-1920 actual CACHE shift delivers unchanged64 WORK in two whole credits
+PASS ConnectionsAdvanced-1920 mixed READ uses existing shared rail/pill/socket
+PASS ConnectionsAdvanced-1920 clearing does not reprice/reroute committed READ
+PASS ConnectionsAdvanced-1920 live inspect refreshes to committed WRITE destination
+PASS ConnectionsAdvanced-1920 mixed WRITE changes actual route while retaining the same view, socket and connection identity
+PASS ConnectionsAdvanced-1920 route segment count/history, original budget, no partial credit
+PASS ConnectionsAdvanced-1920 shared SSH still opens independent API configuration
+PASS ConnectionsAdvanced-1920 API keyboard policy remains independent of CACHE
+PASS ConnectionsAdvanced-1920 API Escape restores focus after mixed routing
+PASS ConnectionsAdvanced-1920 restart clears both independent slots
+PASS ConnectionsAdvanced-1280 native viewport
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT1/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: WEB/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: AUTH/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: API/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: DB/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: RPT/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/EXT2
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: JOBS/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: EXT2/CACHE
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/EXT1
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/WEB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/AUTH
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/API
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/DB
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/RPT
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/JOBS
+PASS ConnectionsAdvanced-1280 authored node cards do not overlap: CACHE/EXT2
+PASS ConnectionsAdvanced-1280 ssh cache reuses shared authored window and owns input
+PASS ConnectionsAdvanced-1280 keyboard CACHE selection independent of API slot
+PASS ConnectionsAdvanced-1280 simulation continues during CACHE configuration
+PASS ConnectionsAdvanced-1280 SSH text fits: Title
+PASS ConnectionsAdvanced-1280 SSH text fits: Current policy
+PASS ConnectionsAdvanced-1280 SSH text fits: Tradeoff
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Label
+PASS ConnectionsAdvanced-1280 SSH text fits: Keyboard hint
+PASS ConnectionsAdvanced-1280 Duel preempts CACHE SSH without closing it
+PASS ConnectionsAdvanced-1280 CACHE ignores Duel keystrokes
+PASS ConnectionsAdvanced-1280 Duel abort restores CACHE focus
+PASS ConnectionsAdvanced-1280 Escape returns terminal focus and preserves CACHE slot
+PASS ConnectionsAdvanced-1280 actual generated efficiency relieves DB without changing value/budget
+PASS ConnectionsAdvanced-1280 inspect explains cached identity, actual destination and requirements
+PASS ConnectionsAdvanced-1280 actual CACHE shift delivers unchanged64 WORK in two whole credits
+PASS ConnectionsAdvanced-1280 mixed READ uses existing shared rail/pill/socket
+PASS ConnectionsAdvanced-1280 clearing does not reprice/reroute committed READ
+PASS ConnectionsAdvanced-1280 live inspect refreshes to committed WRITE destination
+PASS ConnectionsAdvanced-1280 mixed WRITE changes actual route while retaining the same view, socket and connection identity
+PASS ConnectionsAdvanced-1280 route segment count/history, original budget, no partial credit
+PASS ConnectionsAdvanced-1280 shared SSH still opens independent API configuration
+PASS ConnectionsAdvanced-1280 API keyboard policy remains independent of CACHE
+PASS ConnectionsAdvanced-1280 API Escape restores focus after mixed routing
+PASS ConnectionsAdvanced-1280 actual empty CACHE comparison loses both jobs
+PASS ConnectionsAdvanced-1280 restart clears both independent slots

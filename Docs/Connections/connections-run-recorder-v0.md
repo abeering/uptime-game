@@ -76,4 +76,8 @@ For visual Play Mode review, play `Connections.unity` at 16:9. Confirm a file ap
 
 ## API Configuration V0 additions
 
-Optional schema4 metadata identifies the authored API node/weight. `api_policy_changed` records previous/new stable PURPOSE IDs and simulation time; network snapshots record selected policy and connection snapshots record applied weight/source alongside existing LOAD/WORK evidence. Selection takes effect on subsequent allocation updates, so an immediate change-event snapshot may still carry preceding allocations. See [API contract](connections-api-configuration-v0.md).
+Optional schema 4 metadata identifies the authored API node/weight. `api_policy_changed` records previous/new stable PURPOSE IDs and simulation time; network snapshots record selected policy and connection snapshots record applied weight/source alongside existing LOAD/WORK evidence. Selection takes effect on subsequent allocation updates, so an immediate change-event snapshot may still carry preceding allocations. See [API contract](connections-api-configuration-v0.md).
+
+## Operation Routing & CACHE V0 additions
+
+Optional schema 4 fields record CACHE node/efficiency metadata and selected snapshot PURPOSE. `cache_policy_changed` records slot changes; `operation_route_committed` records original/actual destinations, physical path, original/reduced base requirements, locked multipliers, commitment time/reason and the PURPOSE selected at commitment. Started-operation events and current snapshots carry routing evidence beside effective WORK/LOAD; original definitions retain per-operation intended destinations. A later selection cannot rewrite a committed decision or its historical recording. See [routing/efficiency contract](connections-operation-routing-cache-v0.md).

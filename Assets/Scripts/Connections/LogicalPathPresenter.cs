@@ -193,13 +193,14 @@ namespace Uptime.Connections
                 if (!connection.IsActive && !connection.IsConnecting &&
                     !(connection.IsComplete && (!connection.IsNormalDeparture || views[connection].UsesSharedDisplay)))
                     continue;
+                views[connection].RefreshOperationRoute();
                 Color accent = identityPalette.Assign(connection);
                 views[connection].SetIdentityColor(accent);
                 views[connection].SetIdentitySlot(identityPalette.AssignSlot(connection));
-                var nodes = new NodeView[connection.Definition.Route.Length];
+                var nodes = new NodeView[connection.Route.Length];
                 var links = new PhysicalLinkView[connection.RouteLinks.Length];
                 for (int i = 0; i < nodes.Length; i++)
-                    nodes[i] = connection.Definition.Route[i].Node;
+                    nodes[i] = connection.Route[i].Node;
                 for (int i = 0; i < links.Length; i++)
                     links[i] = connection.RouteLinks[i].View;
                 routes.Add(new RouteLaneOrder.Route(connection.ConnectionId, nodes, links));
@@ -305,15 +306,15 @@ namespace Uptime.Connections
                     float offset = EdgeGeometry.Offset(users.IndexOf(connection.ConnectionId),
                         users.Count, width, gap);
                     // The lane is stable in the physical edge's A-to-B frame, including reverse routes.
-                    bool forward = connection.Definition.Route[edge].Node == linkView.NodeA;
+                    bool forward = connection.Route[edge].Node == linkView.NodeA;
                     float sign = forward ? 1f : -1f;
                     starts[edge] = sign * (offset + (forward ? port.AtA : port.AtB));
                     ends[edge] = sign * (offset + (forward ? port.AtB : port.AtA));
                     widths[edge] = width;
                     if (identityPresenter != null)
                     {
-                        NodeView routeA = connection.Definition.Route[edge].Node;
-                        NodeView routeB = connection.Definition.Route[edge + 1].Node;
+                        NodeView routeA = connection.Route[edge].Node;
+                        NodeView routeB = connection.Route[edge + 1].Node;
                         Vector2 a = networkArea.InverseTransformPoint(routeA.transform.position);
                         Vector2 b = networkArea.InverseTransformPoint(routeB.transform.position);
                         Vector2 direction = (b - a).normalized;

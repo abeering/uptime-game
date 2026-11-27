@@ -1,0 +1,21 @@
+{
+    "operationIndex": 0,
+    "intendedDestination": "DB",
+    "actualDestination": "CACHE",
+    "reason": "cache_read_match",
+    "selectedCachePurpose": "product-lookup",
+    "route": [
+        "EXT1",
+        "WEB",
+        "API",
+        "CACHE"
+    ],
+    "cached": true,
+    "committedAtSeconds": 0.0,
+    "workMultiplier": 0.25,
+    "loadMultiplier": 0.5,
+    "originalWork": 100.0,
+    "originalLoad": 5.0,
+    "processingWork": 25.0,
+    "processingLoad": 2.5
+}

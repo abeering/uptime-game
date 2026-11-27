@@ -2,6 +2,8 @@
 
 Connections implementation from verified main `79e2d90c5b88bf2fd04aa5ac0c5b85a60f361718`, the normal GitHub merge of human-accepted #135. This implements the first API policy proposed in [Business Operations & Reliability (#128)](../Design/Uptime_Design.md#2-node-configuration-can-change-passing-traffic). Packet is unchanged.
 
+**Accepted follow-up:** Human playtesting accepted #136, merged normally at `6ecb3ce`. [Operation Routing & CACHE V0](connections-operation-routing-cache-v0.md) now supplies actual committed per-operation routes for API eligibility and reuses this authored SSH window for CACHE. Live allocation priority remains independent of locked route/efficiency decisions. The original V0 deferrals below describe that phase, not a prohibition on its authorized follow-up.
+
 ## One persistent PURPOSE slot
 
 `ssh api` opens the shared authored `ConnectionsSshOverlay` prefab in either canonical scene. Arrows choose a row, Enter applies it, and coordinated Escape closes the window and returns command focus. The `NONE / CLEAR PRIORITY` row clears the setting. Mouse selection also works. The panel shows API, current policy, weight and known PURPOSE choices. Simulation continues during configuration; a Duel takes exclusive input and restores SSH focus afterward. Reset and shift endings abort the window safely.

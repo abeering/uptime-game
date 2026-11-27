@@ -1523,7 +1523,7 @@ namespace Uptime.Connections
                 load ?? stage.DesiredLoad, description ?? stage.ActivityDescription,
                 effect ?? stage.EffectOnCompletion, behaviors ?? stage.Behaviors,
                 payload ?? stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec,
-                stage.PlannedLogs);
+                stage.PlannedLogs, stage.IntendedDestination);
 
         private static string Activity(OperationKind kind) => kind == OperationKind.Read
             ? "Reading records" : kind == OperationKind.Write ? "Writing records" : "Processing request";

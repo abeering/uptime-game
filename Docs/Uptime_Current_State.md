@@ -6,6 +6,8 @@ Uptime is one game being explored through two different gameplay prototypes. **P
 
 **Connections follow-up (2026-11-26):** Human-accepted Independent Business Demand #135 merged normally at `79e2d90`. API Configuration V0 adds the first persistent one-slot PURPOSE allocation policy on its feature branch, with shared authored `ssh api`, configurable 2× weight, capped redistribution, route eligibility and policy recording. Broader company importance and node systems remain deferred. The dated baseline below is retained for provenance; [Connections Current State](Connections/Current_State.md) describes later implementation.
 
+**Connections follow-up — CACHE:** Human-accepted API Configuration #136 merged normally at `6ecb3ce`. The next feature branch implements per-operation committed routing and one configurable CACHE READ-PURPOSE slot through shared `ssh` UI. CACHE is an ordinary attackable 10-LOAD pool with 0.25× WORK/0.5× LOAD efficiency; identity, original business value and service budget persist. Small now has 5 nodes/4 links and Advanced 9/8. Broader routing systems and SSH presentation proposals remain deferred. See [the operation-routing contract](Connections/connections-operation-routing-cache-v0.md).
+
 ## Playable boundaries
 
 | Prototype | Scene and runtime | Current posture |

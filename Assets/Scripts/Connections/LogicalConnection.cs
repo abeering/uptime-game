@@ -204,6 +204,7 @@ namespace Uptime.Connections
     public sealed class OperationStage
     {
         [SerializeField] private OperationKind operation;
+        [SerializeField] private NodeView intendedDestination;
         [SerializeField, Min(0f)] private float totalWork;
         [SerializeField, Min(0f)] private float desiredLoad = 5f;
         [SerializeField] private string activityDescription;
@@ -215,6 +216,7 @@ namespace Uptime.Connections
         [SerializeField] private PlannedOperationLog[] plannedLogs;
 
         public OperationKind Operation => operation;
+        public NodeView IntendedDestination => intendedDestination;
         public float TotalWork => Mathf.Max(0f, totalWork);
         public float DesiredLoad => Mathf.Max(0f, desiredLoad);
         public string ActivityDescription => activityDescription;
@@ -230,8 +232,8 @@ namespace Uptime.Connections
             TimedModifierBehaviorDefinition[] behaviors = null,
             InfectionPayload payload = null, ConditionPayload condition = null,
             PayloadLaunchSpec launch = null,
-            PlannedOperationLog[] logs = null)
-        { operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
+            PlannedOperationLog[] logs = null, NodeView intendedDestination = null)
+        { this.intendedDestination = intendedDestination; operation = kind; totalWork = work; desiredLoad = load; activityDescription = description;
             completionEffect = effect; this.behaviors = CopyBehaviors(behaviors);
             infectionPayload = effect == CompletionEffect.InfectionDelivery ?
                 (payload ?? new InfectionPayload(InfectionKind.PhantomLoad, 8f)).Copy() : null;
@@ -298,6 +300,7 @@ namespace Uptime.Connections
         public float StartDelaySeconds => Mathf.Max(0f, startDelaySeconds);
         public int OperationCount => operations != null && operations.Length > 0 ? operations.Length : 1;
         public OperationKind OperationAt(int index) => HasArc ? StageAt(index).Operation : currentOperation;
+        public NodeView DestinationAt(int index) => HasArc ? StageAt(index).IntendedDestination ?? TargetNode : TargetNode;
         public float WorkAt(int index) => HasArc ? StageAt(index).TotalWork : TotalWork;
         public float LoadAt(int index) => HasArc ? StageAt(index).DesiredLoad : DesiredLoad;
         public string ActivityAt(int index) => HasArc ? StageAt(index).ActivityDescription : activityDescription;
@@ -351,7 +354,7 @@ namespace Uptime.Connections
                 result.operations[i] = new OperationStage(stage.Operation, stage.TotalWork,
                     stage.DesiredLoad, stage.ActivityDescription, stage.EffectOnCompletion,
                     stage.Behaviors, stage.InfectionPayload, stage.ConditionPayload, stage.LaunchSpec,
-                    stage.PlannedLogs);
+                    stage.PlannedLogs, stage.IntendedDestination);
             }
             return result;
         }
@@ -392,7 +395,9 @@ namespace Uptime.Connections
             if (definition.BusinessWorkValue.HasValue) BusinessWorkValue = definition.BusinessWorkValue.Value;
             else for (int i = 0; i < definition.OperationCount; i++) BusinessWorkValue += definition.WorkAt(i);
             RouteLinks = routeLinks;
+            Route = definition.Route;
             TargetResources = targetResources;
+            operationRoutes = new OperationRouteResolution[definition.OperationCount];
             deliveredEffects = new bool[definition.OperationCount];
             logMilestones = new LogMilestone[definition.OperationCount][];
             nextLogMilestone = new int[definition.OperationCount];
@@ -446,12 +451,12 @@ namespace Uptime.Connections
             int operationIndex = CurrentOperationIndex;
             LogMilestone[] milestones = logMilestones[operationIndex];
             while (nextLogMilestone[operationIndex] < milestones.Length &&
-                milestones[nextLogMilestone[operationIndex]].Threshold <= reachedWork)
+                milestones[nextLogMilestone[operationIndex]].Threshold * WorkMultiplier <= reachedWork)
             {
                 LogMilestone milestone = milestones[nextLogMilestone[operationIndex]++];
                 var emitted = new EmittedConnectionLog(ConnectionId, emittedLogs.Count + 1,
                     operationIndex, Definition.OperationAt(operationIndex), milestone.AuthoredIndex,
-                    timeSeconds, milestone.Threshold, milestone.Entry.Activity,
+                    timeSeconds, milestone.Threshold * WorkMultiplier, milestone.Entry.Activity,
                     milestone.Entry.Result);
                 emittedLogs.Add(emitted);
                 onEmitted?.Invoke(emitted);
@@ -459,24 +464,39 @@ namespace Uptime.Connections
         }
 
         public LogicalConnectionDefinition Definition { get; }
-        public NodeResources TargetResources { get; }
+        public NodeResources TargetResources { get; private set; }
+        public RouteNode[] Route { get; private set; }
+        private readonly OperationRouteResolution[] operationRoutes;
+        public OperationRouteResolution Routing => operationRoutes[CurrentOperationIndex];
+        public int RouteRevision { get; private set; }
+        public NodeView OperationDestinationAt(int index) => operationRoutes[index]?.Target.View ?? Definition.DestinationAt(index);
+        public float WorkMultiplier => Routing?.WorkMultiplier ?? 1f;
+        public float LoadMultiplier => Routing?.LoadMultiplier ?? 1f;
+        public bool IsCached => Routing?.Cached ?? false;
+        internal void CommitRoute(OperationRouteResolution resolved)
+        {
+            if (operationRoutes[CurrentOperationIndex] != null) throw new InvalidOperationException("Operation route is already committed.");
+            operationRoutes[CurrentOperationIndex] = resolved;
+            Route = resolved.Route; RouteLinks = resolved.Links; TargetResources = resolved.Target;
+            RouteRevision++;
+        }
         public ConnectionBehaviorRuntime Behaviors { get; }
         public ConnectionIdentityRuntime Identity { get; }
-        internal PhysicalLinkReference[] RouteLinks { get; }
+        internal PhysicalLinkReference[] RouteLinks { get; private set; }
         public string ConnectionId => Definition.ConnectionId;
         public string KnownIdentity => Identity.KnownIdentity;
         public bool IsHostile => Definition.IsHostile;
         public int CurrentOperationIndex { get; internal set; }
         public int OperationCount => Definition.OperationCount;
         public OperationKind CurrentOperation => Definition.OperationAt(CurrentOperationIndex);
-        public float BaseWork => Definition.WorkAt(CurrentOperationIndex);
-        public float BaseLoad => Definition.LoadAt(CurrentOperationIndex);
+        public float BaseWork => Definition.WorkAt(CurrentOperationIndex) * WorkMultiplier;
+        public float BaseLoad => Definition.LoadAt(CurrentOperationIndex) * LoadMultiplier;
         public float NaturalLoadDelta { get; internal set; }
         public float OperationStartedAtSeconds { get; internal set; }
-        public float CurrentTotalWork => Behaviors.EffectiveWork(CurrentOperationIndex);
-        public float DesiredLoad => Behaviors.EffectiveLoad(CurrentOperationIndex);
+        public float CurrentTotalWork => Behaviors.EffectiveWork(CurrentOperationIndex) * WorkMultiplier;
+        public float DesiredLoad => Behaviors.EffectiveLoad(CurrentOperationIndex) * LoadMultiplier;
         public string ActivityDescription => Definition.ActivityAt(CurrentOperationIndex);
-        public NodeView TargetNode => Definition.TargetNode;
+        public NodeView TargetNode => TargetResources.View;
         public float CompletedWork { get; internal set; }
         public float RemainingWork => Mathf.Max(0f, CurrentTotalWork - CompletedWork);
         public float AllocatedLoad { get; internal set; }
@@ -552,10 +572,11 @@ namespace Uptime.Connections
 
         internal void UpdateServiceDanger(float time)
         {
-            if (!HasServiceTarget || !IsActive) { AtRisk = false; return; }
+            if (!HasServiceTarget || !HasEstablished || IsComplete) { AtRisk = false; return; }
             ServiceRemainingSeconds = Mathf.Max(0f, ServiceDeadlineSeconds - time);
             // A held transition has not started the next operation: estimate it nominally.
-            float projected = IsTransitioning ?
+            float projected = IsConnecting ?
+                Mathf.Max(0f, (RouteLinks.Length - ReachedRouteNodeIndex) * TravelSecondsPerLink - LinkTravelElapsedSeconds) + NominalOperationSeconds(CurrentOperationIndex) : IsTransitioning ?
                 NominalOperationSeconds(CurrentOperationIndex) : RemainingWork <= .0001f ? 0f :
                 ActualWorkRate > 0f ? RemainingWork / ActualWorkRate : float.PositiveInfinity;
             for (int i = CurrentOperationIndex + 1; i < OperationCount; i++)
@@ -565,7 +586,7 @@ namespace Uptime.Connections
         }
 
         private float NominalOperationSeconds(int index) => Definition.LoadAt(index) > 0f ?
-            Definition.WorkAt(index) / Definition.LoadAt(index) :
+            Definition.WorkAt(index) * (operationRoutes[index]?.WorkMultiplier ?? 1f) / (Definition.LoadAt(index) * (operationRoutes[index]?.LoadMultiplier ?? 1f)) :
             Definition.WorkAt(index) > 0f ? float.PositiveInfinity : 0f;
 
         internal ConnectionEffectOccurrence OnWorkCompleted(int operationIndex, float timeSeconds)

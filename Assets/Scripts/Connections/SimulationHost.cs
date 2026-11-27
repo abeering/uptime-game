@@ -320,7 +320,7 @@ namespace Uptime.Connections
                             segment = Mathf.Min(segment, Mathf.Max(0.000001f,
                                 connection.LoaderWithdrawAtSeconds - simulationTimeSeconds));
                     }
-                    if (serviceTimeoutsEnabled && connection.IsActive && !connection.IsHostile &&
+                    if (serviceTimeoutsEnabled && connection.HasEstablished && !connection.IsComplete && !connection.IsHostile &&
                         connection.HasServiceTarget)
                         segment = Mathf.Min(segment, Mathf.Max(.000001f,
                             connection.ServiceDeadlineSeconds - simulationTimeSeconds));
@@ -388,11 +388,12 @@ namespace Uptime.Connections
                 if (connection.IsPending && simulationTimeSeconds + 0.00001f >=
                     connection.Definition.StartDelaySeconds)
                 {
+                    CommitOperationRoute(connection);
                     connection.Lifecycle = Lifecycle.Connecting;
                     StartIdentity(connection);
-                    if (IsNodeOffline(connection.Definition.Route[0].Node))
-                        CancelConnection(connection, connection.Definition.Route[0].Node.NodeId,
-                            UnavailabilityCause(connection.Definition.Route[0].Node));
+                    if (IsNodeOffline(connection.Route[0].Node))
+                        CancelConnection(connection, connection.Route[0].Node.NodeId,
+                            UnavailabilityCause(connection.Route[0].Node));
                 }
         }
 
@@ -403,6 +404,8 @@ namespace Uptime.Connections
             {
                 if (connection.IsTransitioning && !completedThisStep.Contains(connection))
                 {
+                    CommitOperationRoute(connection);
+                    if (connection.IsConnecting) continue;
                     StartOperation(connection);
                     recorder?.RecordOperationStarted(connection, simulationTimeSeconds);
                 }
@@ -412,6 +415,8 @@ namespace Uptime.Connections
                     connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
                 }
             }
+            foreach (var connection in runtimeConnections)
+                if (connection.IsConnecting && connection.HasEstablished) connection.Behaviors.Advance(deltaSeconds, simulationTimeSeconds);
             RefreshBackdoorRates();
             RefreshApiAllocationWeights();
             List<ResourceAllocator.OperationCompletion> completed =
@@ -516,7 +521,7 @@ namespace Uptime.Connections
                     continue;
                 state.LinkTravelElapsedSeconds = 0f;
                 state.ReachedRouteNodeIndex++;
-                NodeView arrived = state.Definition.Route[state.ReachedRouteNodeIndex].Node;
+                NodeView arrived = state.Route[state.ReachedRouteNodeIndex].Node;
                 recorder?.RecordNodeArrival(state, arrived.NodeId, simulationTimeSeconds);
                 if (IsNodeOffline(arrived))
                 {
@@ -526,13 +531,17 @@ namespace Uptime.Connections
                 if (state.ReachedRouteNodeIndex != state.RouteLinks.Length) continue;
                 state.Lifecycle = Lifecycle.Active;
                 establishedAny = true;
-                state.HasEstablished = true;
-                state.EstablishedAtSeconds = simulationTimeSeconds;
-                health.Activate(state, simulationTimeSeconds);
-                EstablishService(state);
-                state.Behaviors.StartConnection();
+                bool firstEstablishment = !state.HasEstablished;
+                if (firstEstablishment)
+                {
+                    state.HasEstablished = true;
+                    state.EstablishedAtSeconds = simulationTimeSeconds;
+                    health.Activate(state, simulationTimeSeconds);
+                    EstablishService(state);
+                    state.Behaviors.StartConnection();
+                    recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
+                }
                 StartOperation(state);
-                recorder?.RecordConnectionEstablished(state, simulationTimeSeconds);
                 recorder?.RecordOperationStarted(state, simulationTimeSeconds);
             }
             // Arrival can end the outer step. Publish the first real allocation now so
@@ -554,9 +563,9 @@ namespace Uptime.Connections
                 NaturalLoadVariation.Delta(state.Definition.NaturalLoadSeed,
                     state.ConnectionId, state.CurrentOperationIndex,
                     simulationTimeSeconds - state.OperationStartedAtSeconds,
-                    state.BaseLoad, naturalLoadNoiseAmplitude,
+                    state.Definition.LoadAt(state.CurrentOperationIndex), naturalLoadNoiseAmplitude,
                     naturalLoadNoiseMinPeriodSeconds, naturalLoadNoiseMaxPeriodSeconds) : 0f;
-            state.NaturalLoadDelta = delta;
+            state.NaturalLoadDelta = delta * state.LoadMultiplier;
             state.Behaviors.SetDynamicLoadDelta("natural", delta);
         }
 
@@ -574,12 +583,12 @@ namespace Uptime.Connections
             runtimeConnections = next.ToArray();
             history.Add(state.ConnectionId, state);
             recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+            if (state.IsConnecting) { CommitOperationRoute(state); StartIdentity(state); }
             ConnectionRegistered?.Invoke(state);
-            if (state.IsConnecting) StartIdentity(state);
             if (Application.isPlaying) pathPresenter?.Add(state);
-            if (state.IsConnecting && IsNodeOffline(state.Definition.Route[0].Node))
-                CancelConnection(state, state.Definition.Route[0].Node.NodeId,
-                    UnavailabilityCause(state.Definition.Route[0].Node));
+            if (state.IsConnecting && IsNodeOffline(state.Route[0].Node))
+                CancelConnection(state, state.Route[0].Node.NodeId,
+                    UnavailabilityCause(state.Route[0].Node));
             return state;
         }
 
@@ -650,7 +659,7 @@ namespace Uptime.Connections
                         state.TerminationCause = ConnectionTerminationCause.Player;
                         state.Lifecycle = Lifecycle.Complete;
                         state.AllocatedLoad = 0f;
-                        if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
+                        if (wasActive || state.HasEstablished) state.Behaviors.EndConnection(simulationTimeSeconds);
                         state.NaturalLoadDelta = 0f;
                         Resolve(state, ConnectionResolution.Killed);
                         var next = new List<LogicalConnectionState>(runtimeConnections);
@@ -1025,13 +1034,13 @@ namespace Uptime.Connections
             foreach (LogicalConnectionState state in runtimeConnections)
             {
                 if (state.IsActive) {
-                    foreach (RouteNode routeNode in state.Definition.Route)
+                    foreach (RouteNode routeNode in state.Route)
                         if (routeNode.Node == offline.View)
                         { interrupted.Add(state); break; }
                 }
                 else if (state.IsConnecting)
                     for (int i = 0; i <= state.ReachedRouteNodeIndex; i++)
-                        if (state.Definition.Route[i].Node == offline.View)
+                        if (state.Route[i].Node == offline.View)
                         { interrupted.Add(state); break; }
             }
             interrupted.Sort((a, b) => string.CompareOrdinal(a.ConnectionId, b.ConnectionId));
@@ -1054,7 +1063,7 @@ namespace Uptime.Connections
             state.FailureNodeId = failureNodeId;
             state.Lifecycle = Lifecycle.Complete;
             state.AllocatedLoad = 0f;
-            if (wasActive) state.Behaviors.EndConnection(simulationTimeSeconds);
+            if (wasActive || state.HasEstablished) state.Behaviors.EndConnection(simulationTimeSeconds);
             state.NaturalLoadDelta = 0f;
             Resolve(state, ConnectionResolution.Canceled);
             var next = new List<LogicalConnectionState>(runtimeConnections);
@@ -1167,6 +1176,7 @@ namespace Uptime.Connections
             simulationGeneration++;
             ResetShiftAccounting();
             ResetApiConfiguration();
+            ResetOperationRouting();
             ClearProbe();
             ClearOverclock();
             activeClean = null;
@@ -1212,13 +1222,14 @@ namespace Uptime.Connections
             runtimeConnections = states.ToArray();
             trafficDirector?.ResetDirector();
             foreach (LogicalConnectionState state in runtimeConnections)
-                if (state.IsConnecting) StartIdentity(state);
+                if (state.IsConnecting) { CommitOperationRoute(state, false); StartIdentity(state); }
             if (Application.isPlaying)
             {
                 recorder?.BeginRun();
                 foreach (LogicalConnectionState state in runtimeConnections)
                 {
                     recorder?.RecordConnectionSpawned(state, simulationTimeSeconds);
+                    if (state.Routing != null) recorder?.RecordOperationRoute(state, simulationTimeSeconds);
                 }
                 recorder?.CaptureSnapshot(simulationTimeSeconds);
                 recorder?.Save(false);
@@ -1410,6 +1421,8 @@ namespace Uptime.Connections
                     throw new InvalidOperationException("Connection has an invalid or repeated route node.");
             for (int i = 0; i < definition.OperationCount; i++)
             {
+                if (!nodeByView.ContainsKey(definition.DestinationAt(i)) || FindOperationRoute(definition.Route[0].Node, definition.DestinationAt(i), false) == null)
+                    throw new InvalidOperationException("Operation needs a reachable, configured ordinary destination.");
                 if (definition.WorkAt(i) <= 0f || definition.LoadAt(i) <= 0f ||
                     float.IsNaN(definition.WorkAt(i)) || float.IsInfinity(definition.WorkAt(i)) ||
                     float.IsNaN(definition.LoadAt(i)) || float.IsInfinity(definition.LoadAt(i)) ||
@@ -1434,9 +1447,9 @@ namespace Uptime.Connections
                     bool adjacent = false;
                     foreach (PhysicalLinkReference link in physicalLinks)
                         if (link?.View != null &&
-                            (link.View.NodeA == definition.TargetNode &&
+                            (link.View.NodeA == definition.DestinationAt(i) &&
                                 link.View.NodeB == destination ||
-                             link.View.NodeB == definition.TargetNode &&
+                             link.View.NodeB == definition.DestinationAt(i) &&
                                 link.View.NodeA == destination))
                         { adjacent = true; break; }
                     if (!definition.IsHostile || payloadDirector == null ||
