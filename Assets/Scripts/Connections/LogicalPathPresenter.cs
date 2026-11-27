@@ -49,7 +49,10 @@ namespace Uptime.Connections
         public float MaxLineWidth => Mathf.Max(0.1f, maxLineWidth);
         public float MinLineGap => Mathf.Max(0f, minLineGap);
         public float MinLineWidth => Mathf.Max(0.1f, minLineWidth);
-        public ConnectionIdentityPalette IdentityPalette => identityPalette;
+        public ConnectionIdentityPalette IdentityPalette
+        {
+            get { identityPalette.UseStyle(connectionDisplay != null ? connectionDisplay.style : null); return identityPalette; }
+        }
         public void RefreshLayouts() => UpdateLayouts();
 
         public void SetProbe(PhysicalLinkView link, bool fadeOut = false)
@@ -121,7 +124,7 @@ namespace Uptime.Connections
             ClearPhysicalPositions();
             warnedLinks.Clear();
             laneOrder.Clear();
-            identityPalette.Reset();
+            IdentityPalette.Reset();
             connections = states;
             foreach (LogicalConnectionState connection in connections)
             {

@@ -9091,6 +9091,7 @@ MonoBehaviour:
   cachedLoadMultiplier: 0.5
   serviceTimeoutsEnabled: 1
   serviceTimeoutTolerance: 1.5
+  importantFailureMultiplier: 3
   shiftEnabled: 1
   shiftWorkTarget: 1000
   businessFailureLimit: 10
@@ -10387,6 +10388,7 @@ MonoBehaviour:
         workRateMultiplier: 1
       logs: []
   legitimateWorkloadMultiplier: 2.5
+  importantConnectionChance: 0.15
   identityHopIntervalSeconds: 2
   ambientIdentityHopChance: 0.1
   ambientIdentityReactiveChance: 0.1

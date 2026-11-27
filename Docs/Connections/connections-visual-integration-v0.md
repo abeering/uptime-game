@@ -2,6 +2,8 @@
 
 Connections presentation only, November 25, 2026. The canonical Small and Advanced scenes adopt the accepted [Display Lab](connections-display-lab-v0.md) second pass. The lab remains the permanent synthetic development environment for the same connection visuals. Packet and historical experimental scene assets remain unchanged.
 
+**Business Importance V0 follow-up:** [IMPORTANT requests](connections-business-importance-v0.md) adopt the former synthetic Priority family and correct terminal identity consistency through the shared style and lifetime slot. Original integration descriptions below retain their phase provenance; gameplay is no longer always Ordinary, and the old independently colored inspection palette is retired. Current ordinary colors, heartbeat and danger semantics remain.
+
 ## Integrated prerequisite baseline
 
 The user explicitly authorized normal GitHub merges in order: #128 (`6620f882`), #129 (`52f9b771`), #130 (`8391df0a`). Both reliability design sections and both implementation records were preserved. Project Core was regenerated from reconciled source documents at each overlap, never manually merged.
@@ -102,5 +104,5 @@ Contraction to available space is immediate; expansion retains the existing rela
 
 ## Deferred design concerns — no implementation in this pass
 
-- **Ordinary identity palette:** the current muted hues may accidentally suggest mechanical traffic categories. A future visual pass may prefer a narrower family of tinted slate greys, reserving stronger blue/teal variation for priority traffic. This is a design concern to revisit, not an approved palette change; current colors and identity slots are unchanged by the socket refinement.
+- **Ordinary identity palette:** the current muted hues may accidentally suggest mechanical traffic categories. A future visual pass may prefer a narrower family of tinted slate greys, reserving stronger blue/teal variation for IMPORTANT traffic. This is a design concern to revisit, not an approved palette change; current colors and identity slots are unchanged by the socket refinement.
 - **Inspect deadline checkpoint:** retain the idea of a moving deadline checkpoint on the existing WORK progress bar, potentially replacing the two additional SERVICE diagnostic lines. Its semantics and operation-arc behavior still require design. No checkpoint or inspect-panel change is implemented here; existing service timing/explanations remain.

@@ -7,17 +7,20 @@ namespace Uptime.Connections
     // Immutable receipt, independent of recording and presentation aliases.
     public sealed class BusinessFailure
     {
-        internal BusinessFailure(LogicalConnectionState state, float time, int total)
+        internal BusinessFailure(LogicalConnectionState state, float time, int total, int totalUnits)
         { ConnectionId = state.ConnectionId; Resolution = state.Resolution.Value;
             Cause = state.TerminationCause; TimeSeconds = time; CumulativeTotal = total;
             OperationIndex = state.CurrentOperationIndex; CompletedWork = state.CompletedWork;
-            RequiredWork = state.TerminationRequiredWork; }
+            RequiredWork = state.TerminationRequiredWork; Importance = state.Importance;
+            Units = state.BusinessFailureCost; CumulativeUnits = totalUnits; }
         public string ConnectionId { get; }
         public ConnectionResolution Resolution { get; }
         public ConnectionTerminationCause Cause { get; }
         public float TimeSeconds { get; }
         public int CumulativeTotal { get; }
-        public int Units => 1;
+        public int Units { get; }
+        public BusinessImportance Importance { get; }
+        public int CumulativeUnits { get; }
         public int OperationIndex { get; }
         public float CompletedWork { get; }
         public float RequiredWork { get; }
@@ -28,6 +31,13 @@ namespace Uptime.Connections
         [Header("Connection service (canonical scenes)")]
         [SerializeField] private bool serviceTimeoutsEnabled;
         [SerializeField, Min(.01f)] private float serviceTimeoutTolerance = 1.5f;
+        [Header("Business importance")]
+        [SerializeField, Min(1)] private int importantFailureMultiplier = 3;
+        public int ImportantFailureMultiplier => importantFailureMultiplier;
+        public int BusinessFailureUnits
+        {
+            get { int total = 0; foreach (var failure in businessFailures) total += failure.Units; return total; }
+        }
         private readonly List<BusinessFailure> businessFailures = new List<BusinessFailure>();
         public bool ServiceTimeoutsEnabled => serviceTimeoutsEnabled;
         public float ServiceTimeoutTolerance => serviceTimeoutTolerance;
@@ -85,7 +95,7 @@ namespace Uptime.Connections
         {
             // Resolve has already claimed the canonical state exactly once, before callbacks.
             if (state.IsHostile || state.Resolution == ConnectionResolution.Completed) return;
-            var receipt = new BusinessFailure(state, simulationTimeSeconds, businessFailures.Count + 1);
+            var receipt = new BusinessFailure(state, simulationTimeSeconds, businessFailures.Count + 1, BusinessFailureUnits + state.BusinessFailureCost);
             businessFailures.Add(receipt);
             recorder?.RecordBusinessFailure(receipt);
         }

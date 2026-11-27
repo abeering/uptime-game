@@ -14915,6 +14915,7 @@ MonoBehaviour:
   cachedLoadMultiplier: 0.5
   serviceTimeoutsEnabled: 1
   serviceTimeoutTolerance: 1.5
+  importantFailureMultiplier: 3
   shiftEnabled: 1
   shiftWorkTarget: 1500
   businessFailureLimit: 10
@@ -16204,6 +16205,7 @@ MonoBehaviour:
         activity: storefront.page.serve
         result: OK
   legitimateWorkloadMultiplier: 2.5
+  importantConnectionChance: 0.15
   identityHopIntervalSeconds: 2
   ambientIdentityHopChance: 0.1
   ambientIdentityReactiveChance: 0.1

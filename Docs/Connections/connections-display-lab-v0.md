@@ -1,5 +1,7 @@
 # Connections — Connection Display Lab V0
 
+**Business Importance V0 follow-up:** The previous synthetic Priority family is now IMPORTANT, sharing the same authored style as real company importance in gameplay. The existing 26-sample layout adds comparable importance slowdown/danger examples and CONNECTING/REROUTING reveal phases; the interior/perimeter rack remains. See [current importance contract](connections-business-importance-v0.md) and [review captures](../Review/ConnectionsBusinessImportanceV0/README.md). Earlier phase descriptions below retain their provenance.
+
 **Current integration:** [Connection Visual Integration V0](connections-visual-integration-v0.md) now uses these same authored graphics, identity prefab, style and shader in both canonical gameplay scenes. The lab remains independent from simulation and is the permanent synthetic development environment.
 
 **Corrective visual pass:** Shared `DisplayStyle.asset` now supplies six tinted neutral ordinary identities and the previous blue/teal priority family, visible status-colored body fill and quieter activity. Existing samples carry stable synthetic slots; updated Play Mode palette plates compare all six colors in each family. Interior/perimeter racks remain. See [selected values and lifetime assignment](connections-visual-integration-v0.md#corrective-visual-pass--identity-ribbons). Earlier descriptions below preserve the original grey/blue exploration.

@@ -16,11 +16,11 @@ namespace Uptime.Connections
         private LogicalConnectionState state;
         private Color color;
 
-        public void Bind(LogicalConnectionState inspected, Color tint)
+        public void Bind(LogicalConnectionState inspected, Color tint, Color? identityAccent = null)
         {
             state = inspected;
             color = tint;
-            identityPill.Bind(state.ConnectionId, tint);
+            identityPill.Bind(state.ConnectionId, identityAccent ?? tint);
             connectionName.text = state.Definition.ClaimedPurpose ?? string.Empty;
             connectionName.color = tint;
             resolution.text = state.Resolution == ConnectionResolution.Completed ? "COMPLETE" :

@@ -22,7 +22,7 @@ namespace Uptime.Connections
     {
         public bool enabled;
         public float target, timeSeconds;
-        public int failureLimit, failures, completedJobs;
+        public int failureLimit, failures, failedJobs, completedJobs;
         public double credited, eligible, lost, unfinished;
         public string ending;
         public bool shiftSucceeded, runFailed;
@@ -73,7 +73,7 @@ namespace Uptime.Connections
             get
             {
                 var snapshot = new ShiftSnapshot { enabled = shiftEnabled, target = shiftWorkTarget,
-                    failureLimit = businessFailureLimit, failures = LegitimateFailureCount,
+                    failureLimit = businessFailureLimit, failures = BusinessFailureUnits, failedJobs = LegitimateFailureCount,
                     completedJobs = workCredits.Count, timeSeconds = simulationTimeSeconds,
                     credited = creditedWork, ending = runEnding.ToString(), shiftSucceeded = ShiftSucceeded, runFailed = RunFailed };
                 foreach (var state in history.Values)
@@ -96,13 +96,14 @@ namespace Uptime.Connections
             businessFailures.Clear(); LastWorkCredit = 0; WorkCreditRevision = 0;
             if (float.IsNaN(shiftWorkTarget) || float.IsInfinity(shiftWorkTarget) || shiftWorkTarget <= 0)
                 throw new InvalidOperationException("WORK target must be finite and positive.");
+            if (importantFailureMultiplier < 1) throw new InvalidOperationException("IMPORTANT failure multiplier must be positive.");
             if (businessFailureLimit < 1) throw new InvalidOperationException("Failure limit must be positive.");
         }
 
         private void CompleteShiftBoundary()
         {
             if (!shiftEnabled || RunEnded) return;
-            if (LegitimateFailureCount >= businessFailureLimit) FinishRun(RunEnding.Fired);
+            if (BusinessFailureUnits >= businessFailureLimit) FinishRun(RunEnding.Fired);
             else if (creditedWork >= shiftWorkTarget) FinishRun(RunEnding.ShiftComplete);
         }
 

@@ -1,0 +1,29 @@
+Unity 6000.3.11f1 isolated-copy batch Editor run
+Execute: BusinessImportanceWitness.PrepareAndRegressions
+Exit code 1: exactly three inherited broad regression failures, retained in regression-checks.txt
+BusinessImportanceWitness PASS: 314 assertions.
+RecorderPolicyEvidenceWitness PASS: 74 checks.
+RouteTransitionWitness PASS: 108 assertions.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-display-lab-v0/Logs/UptimeRuns/uptime_20261127_060724_seed-01701_b88ea41f.json
+ConnectionDisplayLabWitness PASS: 512 assertions; hierarchy=334; binding GC=-1
+OperationRoutingCacheWitness PASS: 221 assertions.
+ApiConfigurationWitness PASS: 131 assertions.
+FragilityWitness PASS: 126 assertions
+IndependentBusinessDemandWitness PASS: 47 assertions; bounded 120s comparisons at one seed, not balance calibration.
+LegitimateWorkloadWitness PASS: 456 focused assertions.
+IntegrityWitness PASS: 327 deterministic assertions.
+BehaviorWitness PASS: expected 2+3+5=10 LOAD; 10 then 5 then 2 requested LOAD, zero-allocation timer changes at 1s/2s, 8 accomplished WORK retained when requirement drops to 5; observed matching allocation, history, kill, replay, OVERLOAD, and SPIKING.
+RecorderWitness PASS: metadata, lifecycle, coherent LOAD/WORK, marker, JSON saves, autosave, kill, coverage evidence, distinct runs, authored mode, and enabled/disabled parity. /private/tmp/uptime-display-lab-v0/Logs/UptimeRuns/uptime_20261127_060833_seed-01701_a094ab70.json
+EscapeVideoCallWitness bindings PASS: Connections
+EscapeVideoCallWitness bindings PASS: ConnectionsAdvanced
+CanonicalSceneWitness PASS: 971 serialized/functional checks.
+DuelConcessionWitness PASS: Assets/Scenes/Connections.unity
+DuelConcessionWitness PASS: Assets/Scenes/ConnectionsAdvanced.unity
+InvalidOperationException: ResourceWitness failed: inspect header pill keeps authored large geometry and identity color
+Exception: OverclockWitness FAILED: ConnectionsAdvanced compact three-tool row
+Exception: Generated Identity Witness: Connections hostile activity weights and arrival interval unchanged
+Exception: CACHE regression failures; compare known inherited assertions in report.
+
+Final graphical Play Mode run: exit 0; 302 checks; 34 screenshots across canonical scenes + Lab, both supported resolutions.
+Final exact-scene Editor compilation/Lab witness: exit 0; 512 assertions; hierarchy 334.
+Project Core --check and git diff --check: pass.

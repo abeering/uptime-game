@@ -11,6 +11,8 @@ namespace Uptime.Connections.Display
         [Min(.1f)] public float duration = 4;
         public ConnectionDisplayState state;
         public bool advanceWork = true;
+        public bool traversing;
+        [Range(0, 1)] public float establishedPrefix;
         [Min(.1f)] public float nominalWorkSeconds = 24;
         [Range(-1, 1)] public float endSeverity = -1;
         public bool showServiceEstimates;
@@ -42,6 +44,10 @@ namespace Uptime.Connections.Display
                 state.workProgress = Mathf.Repeat(state.workProgress + local * state.productiveSpeed / p.nominalWorkSeconds, 1);
             if (state.resolution != DisplayResolution.Active) state.resolutionAge = local;
             Current = state; PhaseIndex = index;
+            float reveal = p.traversing ? Mathf.Lerp(p.establishedPrefix, 1, local / p.duration) : 1;
+            view.path.SetVisibility(reveal, !p.traversing);
+            view.pillPosition = Mathf.Min(.5f, reveal * .5f);
+            if (view.terminalMarker != null) view.terminalMarker.gameObject.SetActive(!p.traversing);
             view.Render(state, clock);
             diagnostic.SetText("LOAD {0:0.0}   RATE {1:0.00}x   WORK {2:0}%   SEV {3:0.00}", state.requestedLoad,
                 state.productiveSpeed, state.workProgress * 100, state.dangerSeverity);

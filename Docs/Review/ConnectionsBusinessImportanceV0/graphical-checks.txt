@@ -1,0 +1,302 @@
+PASS Assets/Scenes/Connections.unity authored tuning preserved + importance defaults
+PASS Connections-1920 native supported viewport
+PASS Connections-1920 actual REROUTING preserves designation and identity owner
+PASS Connections-1920 actual real-time mixed-route transition observed
+PASS Connections-1920 comparable ordinary/IMPORTANT slowed traffic
+PASS Connections-1920 shared identity o0 / IdentityOverlay
+PASS Connections-1920 shared identity i1 / IdentityOverlay
+PASS Connections-1920 shared identity o0 / FullContent
+PASS Connections-1920 shared identity i1 / IdentityOverlay
+PASS Connections-1920 shared identity o1 / IdentityOverlay
+PASS Connections-1920 shared identity o1 / IdentityOverlay
+PASS Connections-1920 shared identity i0 / FullContent
+PASS Connections-1920 shared identity i0 / IdentityOverlay
+PASS Connections-1920 shared identity o0 / IdentityOverlay
+PASS Connections-1920 shared identity i0 / IdentityOverlay
+PASS Connections-1920 meaningful identity-pill coverage
+PASS Connections-1920 LOAD shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1920 LOAD shared identity o0 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity i1 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1920 LOAD shared identity o0 / FullContent
+PASS Connections-1920 LOAD shared identity i1 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity o1 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity o0 / LoadRequestRow(Clone)
+PASS Connections-1920 LOAD shared identity o1 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity i0 / FullContent
+PASS Connections-1920 LOAD shared identity i0 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity o0 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity i0 / IdentityOverlay
+PASS Connections-1920 LOAD shared identity i0 / LoadRequestRow(Clone)
+PASS Connections-1920 LOAD meaningful identity-pill coverage
+PASS Connections-1920 WORK shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1920 WORK shared identity o0 / IdentityOverlay
+PASS Connections-1920 WORK shared identity i1 / IdentityOverlay
+PASS Connections-1920 WORK shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1920 WORK shared identity o0 / FullContent
+PASS Connections-1920 WORK shared identity o0 / LoadRequestRow(Clone)
+PASS Connections-1920 WORK shared identity i0 / FullContent
+PASS Connections-1920 WORK shared identity i0 / IdentityOverlay
+PASS Connections-1920 WORK shared identity i1 / WorkRequestRow(Clone)
+PASS Connections-1920 WORK shared identity o1 / WorkRequestRow(Clone)
+PASS Connections-1920 WORK shared identity i0 / WorkRequestRow(Clone)
+PASS Connections-1920 WORK shared identity i1 / IdentityOverlay
+PASS Connections-1920 WORK shared identity o1 / IdentityOverlay
+PASS Connections-1920 WORK shared identity o1 / IdentityOverlay
+PASS Connections-1920 WORK shared identity o0 / IdentityOverlay
+PASS Connections-1920 WORK shared identity i0 / IdentityOverlay
+PASS Connections-1920 WORK shared identity i0 / LoadRequestRow(Clone)
+PASS Connections-1920 WORK shared identity o0 / WorkRequestRow(Clone)
+PASS Connections-1920 WORK meaningful identity-pill coverage
+PASS Connections-1920 IMPORTANT remains marked in real service danger
+PASS Connections-1920 actual HUD source records two jobs / four failure units
+PASS Connections-1920 resolved history shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1920 resolved history shared identity i0 / ResolvedInspectRow
+PASS Connections-1920 resolved history shared identity i1 / IdentityOverlay
+PASS Connections-1920 resolved history shared identity i0 / ResolvedInspectRow
+PASS Connections-1920 resolved history shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1920 resolved history shared identity i1 / WorkRequestRow(Clone)
+PASS Connections-1920 resolved history shared identity o0 / ResolvedInspectRow
+PASS Connections-1920 resolved history shared identity o0 / ResolvedInspectRow
+PASS Connections-1920 resolved history shared identity o1 / WorkRequestRow(Clone)
+PASS Connections-1920 resolved history shared identity i1 / IdentityOverlay
+PASS Connections-1920 resolved history shared identity o1 / IdentityOverlay
+PASS Connections-1920 resolved history shared identity o1 / IdentityOverlay
+PASS Connections-1920 resolved history meaningful identity-pill coverage
+PASS Connections-1920 existing HUD displays four units
+PASS Connections-1920 ordinary gameplay recording saved
+PASS Assets/Scenes/Connections.unity authored tuning preserved + importance defaults
+PASS Connections-1280 native supported viewport
+PASS Connections-1280 actual REROUTING preserves designation and identity owner
+PASS Connections-1280 actual real-time mixed-route transition observed
+PASS Connections-1280 comparable ordinary/IMPORTANT slowed traffic
+PASS Connections-1280 shared identity i1 / IdentityOverlay
+PASS Connections-1280 shared identity o1 / IdentityOverlay
+PASS Connections-1280 shared identity o1 / IdentityOverlay
+PASS Connections-1280 shared identity i1 / IdentityOverlay
+PASS Connections-1280 shared identity i0 / IdentityOverlay
+PASS Connections-1280 shared identity i0 / IdentityOverlay
+PASS Connections-1280 shared identity o0 / IdentityOverlay
+PASS Connections-1280 shared identity i0 / FullContent
+PASS Connections-1280 shared identity o0 / FullContent
+PASS Connections-1280 shared identity o0 / IdentityOverlay
+PASS Connections-1280 meaningful identity-pill coverage
+PASS Connections-1280 LOAD shared identity i1 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity o1 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity o1 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity o0 / LoadRequestRow(Clone)
+PASS Connections-1280 LOAD shared identity i1 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity i0 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity i0 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity o0 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity i0 / FullContent
+PASS Connections-1280 LOAD shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1280 LOAD shared identity o0 / FullContent
+PASS Connections-1280 LOAD shared identity o0 / IdentityOverlay
+PASS Connections-1280 LOAD shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1280 LOAD shared identity i0 / LoadRequestRow(Clone)
+PASS Connections-1280 LOAD meaningful identity-pill coverage
+PASS Connections-1280 WORK shared identity i1 / IdentityOverlay
+PASS Connections-1280 WORK shared identity i1 / IdentityOverlay
+PASS Connections-1280 WORK shared identity o0 / WorkRequestRow(Clone)
+PASS Connections-1280 WORK shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1280 WORK shared identity o0 / IdentityOverlay
+PASS Connections-1280 WORK shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1280 WORK shared identity o1 / WorkRequestRow(Clone)
+PASS Connections-1280 WORK shared identity i0 / LoadRequestRow(Clone)
+PASS Connections-1280 WORK shared identity o1 / IdentityOverlay
+PASS Connections-1280 WORK shared identity o1 / IdentityOverlay
+PASS Connections-1280 WORK shared identity o0 / LoadRequestRow(Clone)
+PASS Connections-1280 WORK shared identity i0 / IdentityOverlay
+PASS Connections-1280 WORK shared identity i0 / IdentityOverlay
+PASS Connections-1280 WORK shared identity i1 / WorkRequestRow(Clone)
+PASS Connections-1280 WORK shared identity o0 / IdentityOverlay
+PASS Connections-1280 WORK shared identity i0 / FullContent
+PASS Connections-1280 WORK shared identity i0 / WorkRequestRow(Clone)
+PASS Connections-1280 WORK shared identity o0 / FullContent
+PASS Connections-1280 WORK meaningful identity-pill coverage
+PASS Connections-1280 IMPORTANT remains marked in real service danger
+PASS Connections-1280 actual HUD source records two jobs / four failure units
+PASS Connections-1280 resolved history shared identity i1 / IdentityOverlay
+PASS Connections-1280 resolved history shared identity i1 / IdentityOverlay
+PASS Connections-1280 resolved history shared identity i0 / ResolvedInspectRow
+PASS Connections-1280 resolved history shared identity o0 / ResolvedInspectRow
+PASS Connections-1280 resolved history shared identity i1 / LoadRequestRow(Clone)
+PASS Connections-1280 resolved history shared identity o1 / LoadRequestRow(Clone)
+PASS Connections-1280 resolved history shared identity o1 / WorkRequestRow(Clone)
+PASS Connections-1280 resolved history shared identity o1 / IdentityOverlay
+PASS Connections-1280 resolved history shared identity o1 / IdentityOverlay
+PASS Connections-1280 resolved history shared identity o0 / ResolvedInspectRow
+PASS Connections-1280 resolved history shared identity i0 / ResolvedInspectRow
+PASS Connections-1280 resolved history shared identity i1 / WorkRequestRow(Clone)
+PASS Connections-1280 resolved history meaningful identity-pill coverage
+PASS Connections-1280 existing HUD displays four units
+PASS Connections-1280 ordinary gameplay recording saved
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored tuning preserved + importance defaults
+PASS ConnectionsAdvanced-1920 native supported viewport
+PASS ConnectionsAdvanced-1920 actual REROUTING preserves designation and identity owner
+PASS ConnectionsAdvanced-1920 actual real-time mixed-route transition observed
+PASS ConnectionsAdvanced-1920 comparable ordinary/IMPORTANT slowed traffic
+PASS ConnectionsAdvanced-1920 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1920 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1920 meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1920 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1920 LOAD shared identity o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 LOAD shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1920 LOAD shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 LOAD meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1920 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 WORK shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1920 WORK shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 WORK meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1920 IMPORTANT remains marked in real service danger
+PASS ConnectionsAdvanced-1920 actual HUD source records two jobs / four failure units
+PASS ConnectionsAdvanced-1920 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 resolved history shared identity o0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1920 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity i0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1920 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1920 resolved history shared identity i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 resolved history shared identity o0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1920 resolved history shared identity o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 resolved history shared identity i0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1920 resolved history shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1920 resolved history meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1920 existing HUD displays four units
+PASS ConnectionsAdvanced-1920 ordinary gameplay recording saved
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored tuning preserved + importance defaults
+PASS ConnectionsAdvanced-1280 native supported viewport
+PASS ConnectionsAdvanced-1280 actual REROUTING preserves designation and identity owner
+PASS ConnectionsAdvanced-1280 actual real-time mixed-route transition observed
+PASS ConnectionsAdvanced-1280 comparable ordinary/IMPORTANT slowed traffic
+PASS ConnectionsAdvanced-1280 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1280 shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1280 shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1280 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 LOAD shared identity o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 LOAD shared identity i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1280 LOAD shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1280 LOAD shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 LOAD meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / FullContent
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity i0 / FullContent
+PASS ConnectionsAdvanced-1280 WORK shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK shared identity o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 WORK shared identity o0 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 WORK meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1280 IMPORTANT remains marked in real service danger
+PASS ConnectionsAdvanced-1280 actual HUD source records two jobs / four failure units
+PASS ConnectionsAdvanced-1280 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity i1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity o1 / LoadRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 resolved history shared identity i0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1280 resolved history shared identity o0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1280 resolved history shared identity i1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 resolved history shared identity i0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1280 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity o1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity o0 / ResolvedInspectRow
+PASS ConnectionsAdvanced-1280 resolved history shared identity i1 / IdentityOverlay
+PASS ConnectionsAdvanced-1280 resolved history shared identity o1 / WorkRequestRow(Clone)
+PASS ConnectionsAdvanced-1280 resolved history meaningful identity-pill coverage
+PASS ConnectionsAdvanced-1280 existing HUD displays four units
+PASS ConnectionsAdvanced-1280 ordinary gameplay recording saved
+PASS lab important nominal/slow/danger samples 1920 / 2
+PASS lab important nominal/slow/danger samples 1920 / 8
+PASS lab important nominal/slow/danger samples 1920 / 14
+PASS lab important nominal/slow/danger samples 1280 / 2
+PASS lab important nominal/slow/danger samples 1280 / 8
+PASS lab important nominal/slow/danger samples 1280 / 14

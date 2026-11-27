@@ -45,13 +45,15 @@ namespace Uptime.Connections.EditorTools
                     Check(sample.view.subdivision == 1 && sample.view.phaseBeats == 0, "coherent default phase/subdivision: " + sample.name);
                     Check(sample.view.progressTreatment == PillProgressTreatment.Interior, "primary animated interior fill: " + sample.name);
                 }
-                Check(lab.style.ordinaryIdentityColors.Length == 6 && lab.style.priorityIdentityColors.Length == 6,
+                Check(lab.style.ordinaryIdentityColors.Length == 6 && lab.style.importantIdentityColors.Length == 6,
                     "two shared six-slot identity families");
-                var oldPalette = new ConnectionIdentityPalette();
+                // Literal historical values from pre-redesign palette, not a second runtime palette.
+                Color[] oldPalette = { new(.36f,.87f,.91f), new(.35f,.91f,.76f), new(.43f,.82f,.92f),
+                    new(.43f,.89f,.79f), new(.31f,.85f,.84f), new(.49f,.87f,.75f) };
                 for (int slot = 0; slot < 6; slot++)
                 {
-                    Check(lab.style.IdentityColor(DisplayTrafficClass.Priority, slot) == oldPalette.ColorAt(slot),
-                        "priority slot " + slot + " restores previous blue/teal accent");
+                    Check(lab.style.IdentityColor(DisplayTrafficClass.Important, slot) == oldPalette[slot],
+                        "IMPORTANT slot " + slot + " restores previous blue/teal accent");
                     Check(lab.style.ordinaryIdentityColors.Distinct().Count() == 6 &&
                         lab.style.IdentityColor(DisplayTrafficClass.Ordinary, slot).grayscale > .6f,
                         "ordinary slot " + slot + " is differentiated and readable");

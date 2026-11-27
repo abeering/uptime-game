@@ -1,0 +1,314 @@
+PASS Assets/Scenes/Connections.unity authored importance defaults and preserved workload
+PASS ordinary kill one receipt / one unit
+PASS IMPORTANT kill one receipt / three units; job count separate
+PASS exact-once weighted receipt
+PASS save real weighted-failure run
+PASS disk JSON distinguishes designation/configured cost/incurred units/jobs
+PASS reset clears sole receipt ledger and objective totals
+PASS cross allowance with only two remaining; no clipping or extra job receipts
+PASS configurable failure cost frozen at admission
+PASS importance has no demand/work/rate/deadline/allocation/route effect
+PASS terminal palette delegates to same shared style/family/slot as network
+PASS successful IMPORTANT earns identical unscaled business WORK: expected 80, observed 80
+PASS two whole jobs credit exactly once without bonus
+PASS resolved/history identity survives live slot release
+PASS authored serialized importance field persists
+PASS copy/event/workload/identity retain authored importance and value
+PASS importance/color persist through identity copying, CACHE READ and real WRITE rerouting
+PASS rerouting resumes with independent live API priority and original deadline
+PASS mixed unfinished important arc one failure, no partial business WORK
+PASS IMPORTANT timeout uses same service budget and one weighted failure
+PASS BLACKOUT uses existing interruption and weighted accounting
+PASS seeded assignment threshold and copies / 0 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 1
+PASS seeded assignment threshold and copies / 0 / 2
+PASS seeded assignment threshold and copies / 0 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 4
+PASS seeded assignment threshold and copies / 0 / 5
+PASS seeded assignment threshold and copies / 0 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 7
+PASS seeded assignment threshold and copies / 0 / 8
+PASS seeded assignment threshold and copies / 0 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 10
+PASS seeded assignment threshold and copies / 0 / 11
+PASS seeded assignment threshold and copies / 0 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 13
+PASS seeded assignment threshold and copies / 0 / 14
+PASS seeded assignment threshold and copies / 0 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 16
+PASS seeded assignment threshold and copies / 0 / 17
+PASS seeded assignment threshold and copies / 0 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 19
+PASS seeded assignment threshold and copies / 0 / 20
+PASS seeded assignment threshold and copies / 0 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 22
+PASS seeded assignment threshold and copies / 0 / 23
+PASS seeded assignment threshold and copies / 0.15 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 1
+PASS seeded assignment threshold and copies / 0.15 / 2
+PASS seeded assignment threshold and copies / 0.15 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 4
+PASS seeded assignment threshold and copies / 0.15 / 5
+PASS seeded assignment threshold and copies / 0.15 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 7
+PASS seeded assignment threshold and copies / 0.15 / 8
+PASS seeded assignment threshold and copies / 0.15 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 10
+PASS seeded assignment threshold and copies / 0.15 / 11
+PASS seeded assignment threshold and copies / 0.15 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 13
+PASS seeded assignment threshold and copies / 0.15 / 14
+PASS seeded assignment threshold and copies / 0.15 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 16
+PASS seeded assignment threshold and copies / 0.15 / 17
+PASS seeded assignment threshold and copies / 0.15 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 19
+PASS seeded assignment threshold and copies / 0.15 / 20
+PASS seeded assignment threshold and copies / 0.15 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 22
+PASS seeded assignment threshold and copies / 0.15 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS provisional 15% produces both classes in fixed sample
+PASS seeded assignment threshold and copies / 0.15 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 1
+PASS seeded assignment threshold and copies / 0.15 / 2
+PASS seeded assignment threshold and copies / 0.15 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 4
+PASS seeded assignment threshold and copies / 0.15 / 5
+PASS seeded assignment threshold and copies / 0.15 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 7
+PASS seeded assignment threshold and copies / 0.15 / 8
+PASS seeded assignment threshold and copies / 0.15 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 10
+PASS seeded assignment threshold and copies / 0.15 / 11
+PASS seeded assignment threshold and copies / 0.15 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 13
+PASS seeded assignment threshold and copies / 0.15 / 14
+PASS seeded assignment threshold and copies / 0.15 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 16
+PASS seeded assignment threshold and copies / 0.15 / 17
+PASS seeded assignment threshold and copies / 0.15 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 19
+PASS seeded assignment threshold and copies / 0.15 / 20
+PASS seeded assignment threshold and copies / 0.15 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 22
+PASS seeded assignment threshold and copies / 0.15 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS provisional 15% produces both classes in fixed sample
+PASS reset deterministic importance replay
+PASS seeded assignment threshold and copies / 1 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS assignment recorded at concrete-plan queue time
+PASS seeded assignment threshold and copies / 1 / 1
+PASS seeded assignment threshold and copies / 1 / 2
+PASS seeded assignment threshold and copies / 1 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 4
+PASS seeded assignment threshold and copies / 1 / 5
+PASS seeded assignment threshold and copies / 1 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 7
+PASS seeded assignment threshold and copies / 1 / 8
+PASS seeded assignment threshold and copies / 1 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 10
+PASS seeded assignment threshold and copies / 1 / 11
+PASS seeded assignment threshold and copies / 1 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 13
+PASS seeded assignment threshold and copies / 1 / 14
+PASS seeded assignment threshold and copies / 1 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 16
+PASS seeded assignment threshold and copies / 1 / 17
+PASS seeded assignment threshold and copies / 1 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 19
+PASS seeded assignment threshold and copies / 1 / 20
+PASS seeded assignment threshold and copies / 1 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 22
+PASS seeded assignment threshold and copies / 1 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS explicit hostile IMPORTANT designation rejected
+PASS Assets/Scenes/ConnectionsAdvanced.unity authored importance defaults and preserved workload
+PASS ordinary kill one receipt / one unit
+PASS IMPORTANT kill one receipt / three units; job count separate
+PASS exact-once weighted receipt
+PASS save real weighted-failure run
+PASS disk JSON distinguishes designation/configured cost/incurred units/jobs
+PASS reset clears sole receipt ledger and objective totals
+PASS cross allowance with only two remaining; no clipping or extra job receipts
+PASS configurable failure cost frozen at admission
+PASS importance has no demand/work/rate/deadline/allocation/route effect
+PASS terminal palette delegates to same shared style/family/slot as network
+PASS successful IMPORTANT earns identical unscaled business WORK: expected 80, observed 80
+PASS two whole jobs credit exactly once without bonus
+PASS resolved/history identity survives live slot release
+PASS authored serialized importance field persists
+PASS copy/event/workload/identity retain authored importance and value
+PASS importance/color persist through identity copying, CACHE READ and real WRITE rerouting
+PASS rerouting resumes with independent live API priority and original deadline
+PASS mixed unfinished important arc one failure, no partial business WORK
+PASS IMPORTANT timeout uses same service budget and one weighted failure
+PASS BLACKOUT uses existing interruption and weighted accounting
+PASS seeded assignment threshold and copies / 0 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 1
+PASS seeded assignment threshold and copies / 0 / 2
+PASS seeded assignment threshold and copies / 0 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 4
+PASS seeded assignment threshold and copies / 0 / 5
+PASS seeded assignment threshold and copies / 0 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 7
+PASS seeded assignment threshold and copies / 0 / 8
+PASS seeded assignment threshold and copies / 0 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 10
+PASS seeded assignment threshold and copies / 0 / 11
+PASS seeded assignment threshold and copies / 0 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 13
+PASS seeded assignment threshold and copies / 0 / 14
+PASS seeded assignment threshold and copies / 0 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 16
+PASS seeded assignment threshold and copies / 0 / 17
+PASS seeded assignment threshold and copies / 0 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 19
+PASS seeded assignment threshold and copies / 0 / 20
+PASS seeded assignment threshold and copies / 0 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0 / 22
+PASS seeded assignment threshold and copies / 0 / 23
+PASS seeded assignment threshold and copies / 0.15 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 1
+PASS seeded assignment threshold and copies / 0.15 / 2
+PASS seeded assignment threshold and copies / 0.15 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 4
+PASS seeded assignment threshold and copies / 0.15 / 5
+PASS seeded assignment threshold and copies / 0.15 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 7
+PASS seeded assignment threshold and copies / 0.15 / 8
+PASS seeded assignment threshold and copies / 0.15 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 10
+PASS seeded assignment threshold and copies / 0.15 / 11
+PASS seeded assignment threshold and copies / 0.15 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 13
+PASS seeded assignment threshold and copies / 0.15 / 14
+PASS seeded assignment threshold and copies / 0.15 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 16
+PASS seeded assignment threshold and copies / 0.15 / 17
+PASS seeded assignment threshold and copies / 0.15 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 19
+PASS seeded assignment threshold and copies / 0.15 / 20
+PASS seeded assignment threshold and copies / 0.15 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 22
+PASS seeded assignment threshold and copies / 0.15 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS provisional 15% produces both classes in fixed sample
+PASS seeded assignment threshold and copies / 0.15 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 1
+PASS seeded assignment threshold and copies / 0.15 / 2
+PASS seeded assignment threshold and copies / 0.15 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 4
+PASS seeded assignment threshold and copies / 0.15 / 5
+PASS seeded assignment threshold and copies / 0.15 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 7
+PASS seeded assignment threshold and copies / 0.15 / 8
+PASS seeded assignment threshold and copies / 0.15 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 10
+PASS seeded assignment threshold and copies / 0.15 / 11
+PASS seeded assignment threshold and copies / 0.15 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 13
+PASS seeded assignment threshold and copies / 0.15 / 14
+PASS seeded assignment threshold and copies / 0.15 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 16
+PASS seeded assignment threshold and copies / 0.15 / 17
+PASS seeded assignment threshold and copies / 0.15 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 19
+PASS seeded assignment threshold and copies / 0.15 / 20
+PASS seeded assignment threshold and copies / 0.15 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 0.15 / 22
+PASS seeded assignment threshold and copies / 0.15 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS provisional 15% produces both classes in fixed sample
+PASS reset deterministic importance replay
+PASS seeded assignment threshold and copies / 1 / 0
+PASS hostile never assigned importance or draws importance RNG
+PASS assignment recorded at concrete-plan queue time
+PASS seeded assignment threshold and copies / 1 / 1
+PASS seeded assignment threshold and copies / 1 / 2
+PASS seeded assignment threshold and copies / 1 / 3
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 4
+PASS seeded assignment threshold and copies / 1 / 5
+PASS seeded assignment threshold and copies / 1 / 6
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 7
+PASS seeded assignment threshold and copies / 1 / 8
+PASS seeded assignment threshold and copies / 1 / 9
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 10
+PASS seeded assignment threshold and copies / 1 / 11
+PASS seeded assignment threshold and copies / 1 / 12
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 13
+PASS seeded assignment threshold and copies / 1 / 14
+PASS seeded assignment threshold and copies / 1 / 15
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 16
+PASS seeded assignment threshold and copies / 1 / 17
+PASS seeded assignment threshold and copies / 1 / 18
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 19
+PASS seeded assignment threshold and copies / 1 / 20
+PASS seeded assignment threshold and copies / 1 / 21
+PASS hostile never assigned importance or draws importance RNG
+PASS seeded assignment threshold and copies / 1 / 22
+PASS seeded assignment threshold and copies / 1 / 23
+PASS importance chance leaves concrete benign/hostile recipes and existing random streams unchanged
+PASS explicit hostile IMPORTANT designation rejected

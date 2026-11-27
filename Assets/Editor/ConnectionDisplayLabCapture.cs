@@ -104,7 +104,9 @@ namespace Uptime.Connections.EditorTools
                         Debug.Log("Unrendered path " + sample.name + " active=" + sample.view.path.isActiveAndEnabled +
                             " cull=" + sample.view.path.canvasRenderer.cull + " length=" + sample.view.path.PathLength +
                             " rect=" + sample.view.path.rectTransform.rect + " world=" + sample.view.path.transform.position);
-                    Check(sample.view.path.LastVertexCount > 0, size + " rail/activity mesh rendered: " + sample.name);
+                    bool hiddenEstablishment = sample.phases[sample.PhaseIndex].traversing && sample.phases[sample.PhaseIndex].establishedPrefix == 0;
+                    Check(hiddenEstablishment ? sample.view.path.LastVertexCount == 0 : sample.view.path.LastVertexCount > 0,
+                        size + " rail/activity mesh respects current route reveal: " + sample.name);
                 }
                 foreach (double t in new[] { 0.0, 8.2, 16.4 })
                 {

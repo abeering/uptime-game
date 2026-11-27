@@ -26,6 +26,8 @@ namespace Uptime.Connections
         public string apiConfigurationNodeId;
         public float apiAllocationWeight;
         public float legitimateWorkloadMultiplier;
+        public float importantConnectionChance;
+        public int importantFailureMultiplier;
         public bool shiftEnabled;
         public float shiftWorkTarget;
         public int businessFailureLimit;
@@ -190,6 +192,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public string importance;
+        public int businessFailureCost;
         public OperationRoutingRecord operationRouting;
         public ReroutingRecord rerouting;
         public string policyNodeId, previousPurposeId, favoredPurposeId;
@@ -201,7 +205,7 @@ namespace Uptime.Connections
         public double businessWork, creditedWork;
         public float serviceNominalDurationSeconds, serviceBudgetSeconds, serviceDeadlineSeconds;
         public float terminationRequiredWork;
-        public int completedOperationCount, legitimateFailureTotal, businessFailureUnits;
+        public int completedOperationCount, legitimateFailureTotal, businessFailureUnits, businessFailureTotalUnits;
         public IntegrityEvent integrity;
         public HackerOffensive hackerOffensive;
         public HackerTargetDecision hackerTarget;
@@ -413,6 +417,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionDefinitionRecord
     {
+        public string importance;
+        public float importanceSelectionRoll, importanceSelectionChance;
         public double businessWorkValue;
         public string profileId;
         public bool isHostile;
@@ -470,6 +476,7 @@ namespace Uptime.Connections
         public float timeSeconds;
         public int activeConnections;
         public int legitimateFailureTotal;
+        public int businessFailureTotalUnits;
         public int establishedBenign;
         public int establishedHostile;
         public int anticipatedBenign;
@@ -577,6 +584,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionSnapshot
     {
+        public string importance;
+        public int businessFailureCost;
         public OperationRoutingRecord operationRouting;
         public ReroutingRecord rerouting;
         public float allocationWeight;
@@ -686,6 +695,8 @@ namespace Uptime.Connections
             log.run.apiConfigurationNodeId = host.ApiConfigurationNode?.NodeId;
             log.run.apiAllocationWeight = host.ApiAllocationWeight;
             log.run.shiftEnabled = host.ShiftEnabled;
+            log.run.importantConnectionChance = trafficDirector != null ? trafficDirector.ImportantConnectionChance : 0;
+            log.run.importantFailureMultiplier = host.ImportantFailureMultiplier;
             log.run.legitimateWorkloadMultiplier = trafficDirector != null ? trafficDirector.LegitimateWorkloadMultiplier : 1f;
             log.run.shiftWorkTarget = host.ShiftWorkTarget;
             log.run.businessFailureLimit = host.BusinessFailureLimit;
@@ -1105,6 +1116,7 @@ namespace Uptime.Connections
         {
             if (!IsRecording) return;
             RunEvent entry = NewEvent("connection_spawned", time);
+            entry.importance = state.Importance.ToString(); entry.businessFailureCost = state.BusinessFailureCost;
             entry.connectionId = state.ConnectionId;
             entry.profileId = state.Definition.ProfileId;
             entry.definition = Definition(state.Definition);
@@ -1294,6 +1306,8 @@ namespace Uptime.Connections
             entry.terminationRequiredWork = state.TerminationRequiredWork;
             entry.completedOperationCount = state.CompletedOperationCount;
             entry.legitimateFailureTotal = host.LegitimateFailureCount;
+            entry.businessFailureTotalUnits = host.BusinessFailureUnits;
+            entry.importance = state.Importance.ToString(); entry.businessFailureCost = state.BusinessFailureCost;
             entry.resolutionCause = state.TerminationCause.ToString();
             entry.terminationPhase = state.TerminationPhase.ToString();
             entry.failureNodeId = state.FailureNodeId;
@@ -1319,6 +1333,8 @@ namespace Uptime.Connections
             entry.connectionId = failure.ConnectionId;
             entry.resolutionReason = failure.Resolution.ToString();
             entry.resolutionCause = failure.Cause.ToString();
+            entry.importance = failure.Importance.ToString(); entry.businessFailureCost = failure.Units;
+            entry.businessFailureTotalUnits = failure.CumulativeUnits;
             entry.businessFailureUnits = failure.Units;
             entry.legitimateFailureTotal = failure.CumulativeTotal;
             entry.operationIndex = failure.OperationIndex;
@@ -1621,7 +1637,7 @@ namespace Uptime.Connections
         {
             if (!IsRecording || host.RuntimeConnections == null) return -1;
             var snapshot = new NetworkSnapshot { timeSeconds = simulationTime,
-                legitimateFailureTotal = host.LegitimateFailureCount,
+                legitimateFailureTotal = host.LegitimateFailureCount, businessFailureTotalUnits = host.BusinessFailureUnits,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.shift = host.Shift;
             snapshot.cachePurposeId = host.CachePurposeId;
@@ -1737,7 +1753,7 @@ namespace Uptime.Connections
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId, operationRouting = Routing(state), rerouting = Rerouting(state),
                     allocationWeight = state.AllocationWeight, allocationPolicyNodeId = state.AllocationPolicyNodeId,
-                    businessWorkValue = state.BusinessWorkValue,
+                    businessWorkValue = state.BusinessWorkValue, importance = state.Importance.ToString(), businessFailureCost = state.BusinessFailureCost,
                     serviceDeadlineSeconds = state.ServiceDeadlineSeconds,
                     serviceRemainingSeconds = state.ServiceRemainingSeconds,
                     projectedServiceSeconds = float.IsPositiveInfinity(state.ProjectedServiceSeconds) ? -1f : state.ProjectedServiceSeconds,
@@ -1900,6 +1916,8 @@ namespace Uptime.Connections
         {
             var result = new ConnectionDefinitionRecord { profileId = definition.ProfileId,
                 businessWorkValue = definition.BusinessWorkValue ?? 0,
+                importance = definition.Importance.ToString(), importanceSelectionRoll = definition.ImportanceSelectionRoll,
+                importanceSelectionChance = definition.ImportanceSelectionChance,
                 isHostile = definition.IsHostile,
                 claimedPurpose = definition.ClaimedPurpose,
                 route = new string[definition.Route.Length],

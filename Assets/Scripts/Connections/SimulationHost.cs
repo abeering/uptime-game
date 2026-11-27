@@ -1511,7 +1511,7 @@ namespace Uptime.Connections
                 if (routeLinks[i] == null) throw new InvalidOperationException("Route has no physical link.");
             }
             var state = new LogicalConnectionState(definition, routeLinks,
-                nodeByView[definition.TargetNode]);
+                nodeByView[definition.TargetNode], importantFailureMultiplier);
             state.Behaviors.ModifierChanged += change =>
             {
                 recorder?.RecordModifierChange(state, change);

@@ -48,7 +48,7 @@ namespace Uptime.Connections.EditorTools
             var lab = canvasObject.AddComponent<ConnectionDisplayLab>();
             lab.heartbeat = canvasObject.AddComponent<ConnectionHeartbeat>(); lab.style = style;
             Label("Title", root, "CONNECTION DISPLAY LAB / V0", 30, new Vector2(1400, 42), new Vector2(42, -25), Text);
-            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal priority  /  shared gameplay assets", 17,
+            Label("Subtitle", root, "SYNTHETIC STATES  /  shared heartbeat  /  tinted ordinary + blue/teal important  /  shared gameplay assets", 17,
                 new Vector2(1750, 24), new Vector2(42, -72), Muted);
             lab.clockLabel = Label("Clock", root, "120 BPM", 16, new Vector2(550, 26), new Vector2(1085, -32), Muted);
             Button(root, "PauseResume", "PAUSE / RESUME", new Vector2(1560, -30), lab.TogglePause);
@@ -67,13 +67,19 @@ namespace Uptime.Connections.EditorTools
             Row(0, 1, "READ / HIGH LOAD", P("a2", OperationKind.Read, 8, 1));
             Row(0, 2, "WRITE / MEDIUM LOAD", P("a3", OperationKind.Write, 4, 1));
             Row(0, 3, "EXECUTE / LOCAL ACTIVITY", P("a4", OperationKind.Execute, 4, 1));
-            Row(0, 4, "PRIORITY / READ", P("a5", OperationKind.Read, 4, 1, priority: true));
-            Row(0, 5, "PRIORITY / WRITE", P("a6", OperationKind.Write, 4, 1, priority: true));
+            var establish = P("a5", OperationKind.Read, 4, 0, important: true, duration: 4, label: "CONNECTING / no productive activity");
+            establish.traversing = true; establish.advanceWork = false;
+            var reroute = P("a5", OperationKind.Read, 4, 0, important: true, duration: 4, label: "REROUTING / established prefix + new suffix");
+            reroute.traversing = true; reroute.establishedPrefix = .55f; reroute.advanceWork = false;
+            Row(0, 4, "IMPORTANT / READ + TRAVERSAL", establish,
+                P("a5", OperationKind.Read, 4, 1, important: true, duration: 8), reroute,
+                P("a5", OperationKind.Read, 4, 1, important: true, duration: 8));
+            Row(0, 5, "IMPORTANT / WRITE", P("a6", OperationKind.Write, 4, 1, important: true));
             Row(1, 0, "AT SPEED / SAFE", P("b1", OperationKind.Write, 6, 1));
             Row(1, 1, "MODERATE / SAFE", P("b2", OperationKind.Write, 6, .65f, label: "EVERY SECOND BEAT / long service budget"));
             Row(1, 2, "HEAVY SLOWDOWN / SAFE", P("b3", OperationKind.Write, 6, .22f, label: "EVERY FOURTH BEAT / density stays high"));
             Row(1, 3, "STALLED / SAFE FOR NOW", P("b4", OperationKind.Write, 6, 0, label: "NO MOVEMENT / synthetic long budget"));
-            Row(1, 4, "PRIORITY / SLOWED", P("b5", OperationKind.Write, 6, .65f, priority: true));
+            Row(1, 4, "IMPORTANT / SLOWED", P("b5", OperationKind.Write, 6, .65f, important: true));
             var bend = Row(1, 5, "BENT ROUTE / WIDTH 10 > 16 > 10", P("b6", OperationKind.Read, 6, 1, label: "3 joined segments / one arc-length activity phase"));
             bend.GetComponent<RectTransform>().sizeDelta = new Vector2(444, 170);
             bend.view.GetComponent<RectTransform>().anchoredPosition = new Vector2(222, -75);
@@ -93,7 +99,7 @@ namespace Uptime.Connections.EditorTools
             Row(2, 1, "AT SPEED / BEHIND, RECOVERABLE", Risk("c2", 1, .3f, 24, 20, 20));
             Row(2, 2, "AT SPEED / SEVERELY ENDANGERED", Risk("c3", 1, .8f, 20.5f, 20, 20));
             Row(2, 3, "SLOWED / BEHIND, RECOVERABLE", Risk("c4", .65f, .35f, 28, 31, 20));
-            Row(2, 4, "SLOWED / SEVERELY ENDANGERED", Risk("c5", .3f, .85f, 21, 67, 20));
+            Row(2, 4, "IMPORTANT / ENDANGERED", Risk("c5", 1, .8f, 20.5f, 20, 20, important: true));
             Row(2, 5, "STALLED / IMMINENT TIMEOUT", Risk("c6", 0, .98f, 2, -1, 20, true));
             Row(2, 6, "EXCEEDS NORMAL-RATE BUDGET", Risk("c7", 1, 1, 12, 20, 20, true));
             var healthy = P("d1", OperationKind.Write, 5, 1, duration: 6, progress: .1f, label: "HEALTHY");
@@ -134,13 +140,13 @@ namespace Uptime.Connections.EditorTools
             Debug.Log("Display lab authored: " + samples.Count + " path samples; ten pill comparisons; isolated synthetic driver.");
         }
         private static DisplayLabPhase P(string id, OperationKind op, float load, float speed, float severity = 0,
-            bool priority = false, float duration = 24, float progress = .25f, string label = "SHARED BEAT / current-operation WORK") => new()
+            bool important = false, float duration = 24, float progress = .25f, string label = "SHARED BEAT / current-operation WORK") => new()
         { label = label, duration = duration, state = new ConnectionDisplayState { identity = id, identitySlot = (id[id.Length - 1] - '1') % ConnectionIdentityPalette.SlotCount, operation = op,
             requestedLoad = load, productiveSpeed = speed, workProgress = progress, dangerSeverity = severity,
-            trafficClass = priority ? DisplayTrafficClass.Priority : DisplayTrafficClass.Ordinary } };
-        private static DisplayLabPhase Risk(string id, float speed, float severity, float remaining, float current, float normal, bool exceeds = false)
+            trafficClass = important ? DisplayTrafficClass.Important : DisplayTrafficClass.Ordinary } };
+        private static DisplayLabPhase Risk(string id, float speed, float severity, float remaining, float current, float normal, bool exceeds = false, bool important = false)
         {
-            var p = P(id, OperationKind.Read, 5, speed, severity);
+            var p = P(id, OperationKind.Read, 5, speed, severity, important: important);
             p.advanceWork = false; p.state.workProgress = .45f; p.state.exceedsNormalBudget = exceeds;
             p.showServiceEstimates = true;
             p.serviceRemaining = remaining; p.projectedCurrent = current; p.projectedNormal = normal;

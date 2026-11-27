@@ -9,13 +9,15 @@ namespace Uptime.Connections.Display
         public Color[] ordinaryIdentityColors = {
             new(.62f, .71f, .78f), new(.66f, .74f, .66f), new(.78f, .71f, .64f),
             new(.59f, .67f, .72f), new(.71f, .65f, .76f), new(.62f, .75f, .72f) };
-        // The previous six blue/teal connection accents; synthetic priority only.
-        public Color[] priorityIdentityColors = {
+        // Original blue/teal identity accents, now the business IMPORTANT family.
+        [UnityEngine.Serialization.FormerlySerializedAs("priorityIdentityColors")]
+        public Color[] importantIdentityColors = {
             new(.36f, .87f, .91f), new(.35f, .91f, .76f), new(.43f, .82f, .92f),
             new(.43f, .89f, .79f), new(.31f, .85f, .84f), new(.49f, .87f, .75f) };
         [Range(0, 1)] public float bodyFillOpacity = .34f;
         public Color ordinaryActivity = new(.68f, .74f, .77f);
-        public Color priorityActivity = new(.53f, .79f, .85f);
+        [UnityEngine.Serialization.FormerlySerializedAs("priorityActivity")]
+        public Color importantActivity = new(.53f, .79f, .85f);
         [Range(0, 1)] public float activityOpacity = .60f;
         [Range(0, 1)] public float stalledActivityOpacityMultiplier = .70f;
         [Header("Uniform rail warning pulse")]
@@ -48,14 +50,14 @@ namespace Uptime.Connections.Display
         public Color IdentityColor(ConnectionDisplayState s) => IdentityColor(s.trafficClass, s.identitySlot);
         public Color IdentityColor(DisplayTrafficClass traffic, int slot)
         {
-            Color[] family = traffic == DisplayTrafficClass.Priority ? priorityIdentityColors : ordinaryIdentityColors;
+            Color[] family = traffic == DisplayTrafficClass.Important ? importantIdentityColors : ordinaryIdentityColors;
             return family != null && family.Length > 0 ? family[Mathf.Max(0, slot) % family.Length] : Color.gray;
         }
         public Color Body(ConnectionDisplayState s, double beats)
         { Color c = Rail(s, beats); c.a *= bodyFillOpacity; return c; }
         public Color Activity(DisplayTrafficClass traffic, bool stalled = false)
         {
-            Color c = traffic == DisplayTrafficClass.Priority ? priorityActivity : ordinaryActivity;
+            Color c = traffic == DisplayTrafficClass.Important ? importantActivity : ordinaryActivity;
             c.a *= activityOpacity * (stalled ? stalledActivityOpacityMultiplier : 1); return c;
         }
         public Color Rail(ConnectionDisplayState s, double beats)

@@ -8,6 +8,8 @@ Uptime is one game being explored through two different gameplay prototypes. **P
 
 **Connections follow-up — CACHE:** Human-accepted API Configuration #136 merged normally at `6ecb3ce`. The next feature branch implements per-operation committed routing and one configurable CACHE READ-PURPOSE slot through shared `ssh` UI. CACHE is an ordinary attackable 10-LOAD pool with 0.25× WORK/0.5× LOAD efficiency; identity, original business value and service budget persist. PR #137’s refinement distinguishes REROUTING from initial CONNECTING, retaining the longest established prefix and charging only new-suffix traversal; obsolete-tail retraction stays cosmetic. Small now has 5 nodes/4 links and Advanced 9/8. Broader routing systems and SSH presentation proposals remain deferred. See [the operation-routing contract](Connections/connections-operation-routing-cache-v0.md).
 
+**Connections follow-up — Business Importance:** Human-accepted #137 merged normally at `f43b897`. The next focused branch adds trustworthy individual IMPORTANT requests (15% legitimate generation), one weighted three-unit failure receipt, independent processing preference and a shared network/terminal identity color source. Current tuning and ordinary WORK/deadline semantics remain. See [Business Importance V0](Connections/connections-business-importance-v0.md).
+
 ## Playable boundaries
 
 | Prototype | Scene and runtime | Current posture |
