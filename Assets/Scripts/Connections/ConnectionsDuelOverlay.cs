@@ -15,6 +15,7 @@ namespace Uptime.Connections
         [SerializeField] private EscapeCoordinator escapeCoordinator;
         [SerializeField] private ConnectionsWindowPlacement placement;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
+        [SerializeField] private ConnectionsSshOverlay sshOverlay;
         [SerializeField] private Terminal terminal;
         [SerializeField] private TMP_Text title;
         [SerializeField] private GameObject concedeHint;
@@ -72,6 +73,7 @@ namespace Uptime.Connections
             splashText.gameObject.SetActive(true);
             terminal?.SuspendKeyboard(true);
             cleanOverlay?.SuspendKeyboard(true);
+            sshOverlay?.SuspendKeyboard(true);
             placement.PlaceDuel(encounter.Target.View);
             transform.SetAsLastSibling();
             escapeCoordinator.Register(this);
@@ -206,8 +208,11 @@ namespace Uptime.Connections
             racing = false;
             gameObject.SetActive(false);
             cleanOverlay?.SuspendKeyboard(false, guardHeldKeys);
+            sshOverlay?.SuspendKeyboard(false, guardHeldKeys);
             terminal?.SuspendKeyboard(false, guardHeldKeys);
-            if (cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
+            if (sshOverlay != null && sshOverlay.IsOpen)
+                sshOverlay.RestoreKeyboardFocus();
+            else if (cleanOverlay != null && cleanOverlay.WantsKeyboardFocus)
                 cleanOverlay.RestoreKeyboardFocus();
             else terminal?.RestoreKeyboardFocus();
         }

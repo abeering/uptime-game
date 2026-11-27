@@ -6,6 +6,8 @@
 
 Slice 3A adds optional additive modifiers to an operation's authored WORK and requested LOAD. The current allocator consumes the **effective** values computed before each step's allocation. Phase 2 adds an independent effective WORK rate multiplier: productive WORK per second is allocated LOAD × effective factor, with 1× preserving all original figures below. Previously accomplished WORK is not reduced when effective required WORK falls. The original authored witness has no modifiers. See the [behavior foundation](connections-behavior-foundation-v0.md).
 
+**API Configuration V0 follow-up:** The original neutral formula below remains exact with an empty policy. [API PURPOSE priority](connections-api-configuration-v0.md) adds a capped weight to effective target requests, redistributing excess after unchanged baseline/infection/defense reservations. Routes containing API qualify; transit itself consumes no additional LOAD. Requested LOAD, processing WORK, capacity and service budgets are unchanged.
+
 ## Mechanical model
 
 - A route's final node is its current target. Earlier nodes and physical links remain visible route geometry and do not consume or constrain LOAD.

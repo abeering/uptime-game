@@ -26,6 +26,7 @@ namespace Uptime.Connections
         [SerializeField] private ConnectionsRunRecorder recorder;
         [SerializeField] private IdentityPresenter identityPresenter;
         [SerializeField] private ConnectionsCleanOverlay cleanOverlay;
+        [SerializeField] private ConnectionsSshOverlay sshOverlay;
         [SerializeField] private ConnectionsVideoCall videoCall;
         [SerializeField] private TextCommunicationDirector textCommunications;
         [SerializeField, Min(1)] private int maxEntries = 100;
@@ -435,6 +436,15 @@ namespace Uptime.Connections
                 case "k":
                     Kill(tokens, command);
                     break;
+                case "ssh":
+                    if (tokens.Length != 2) AppendText("USAGE  ssh <nodeId>", CommandFailureColor());
+                    else if (simulationHost?.ApiConfigurationNode == null ||
+                        !tokens[1].Equals(simulationHost.ApiConfigurationNode.NodeId, StringComparison.OrdinalIgnoreCase))
+                        AppendText("NODE CONFIGURATION UNAVAILABLE  " + tokens[1].ToUpperInvariant(), CommandFailureColor());
+                    else if (sshOverlay == null || !sshOverlay.Open(simulationHost, this))
+                        AppendText("SSH INTERFACE UNAVAILABLE", CommandFailureColor());
+                    else AppendText("SSH SESSION  " + simulationHost.ApiConfigurationNode.NodeId, normalColor);
+                    break;
                 case "clean":
                     Clean(tokens, command);
                     break;
@@ -786,6 +796,7 @@ namespace Uptime.Connections
                     else AppendText("USAGE  log save | dir | folder", CommandFailureColor());
                     break;
                 case "help":
+                    AppendText("ssh api  // configure one favored PURPOSE; shared capacity", mutedColor);
                     AppendText("COMMANDS  inspect|i [-v] <id> [id ...]  load <nodeId>  work <nodeId>", mutedColor);
                     AppendText("LOGS  logs <id>  logs -n <1..30> <id>", mutedColor);
                     AppendText("ACTION  kill|k <id> [id ...]", mutedColor);

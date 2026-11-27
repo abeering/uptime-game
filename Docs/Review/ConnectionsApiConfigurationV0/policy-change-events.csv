@@ -1,0 +1,9 @@
+scene,time,node,previous_purpose,favored_purpose,weight
+Connections,4,API,,product-lookup,2
+Connections,4.02,API,product-lookup,sales-export,2
+Connections,4.04,API,sales-export,,2
+Connections,4.06,API,,product-lookup,2
+ConnectionsAdvanced,4,API,,product-lookup,2
+ConnectionsAdvanced,4.02,API,product-lookup,sales-export,2
+ConnectionsAdvanced,4.04,API,sales-export,,2
+ConnectionsAdvanced,4.06,API,,product-lookup,2

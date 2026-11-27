@@ -1,0 +1,7 @@
+scene,policy,product_resolution,sales_resolution,credited_business_work,failures,ending
+Connections,,TimedOut,TimedOut,0,2,Fired
+Connections,product-lookup,Completed,TimedOut,32,1,None
+Connections,sales-export,TimedOut,Completed,32,1,None
+ConnectionsAdvanced,,TimedOut,TimedOut,0,2,Fired
+ConnectionsAdvanced,product-lookup,Completed,TimedOut,32,1,None
+ConnectionsAdvanced,sales-export,TimedOut,Completed,32,1,None

@@ -1,0 +1,21 @@
+PASS Connections legitimateWorkloadMultiplier: 2.5
+PASS Connections legitimateMeanArrivalSeconds: 23.225807
+PASS Connections hostileMeanIntervalSeconds: 54
+PASS Connections serviceTimeoutTolerance: 1.5
+PASS Connections shiftWorkTarget: 1000
+PASS Connections businessFailureLimit: 10
+PASS Connections loadCapacity: 10,10,10,10
+PASS Connections baselineLoad: 0,0,0,0
+PASS ConnectionsAdvanced legitimateWorkloadMultiplier: 2.5
+PRESERVED USER EDIT ConnectionsAdvanced legitimateMeanArrivalSeconds: 20
+PASS ConnectionsAdvanced hostileMeanIntervalSeconds: 30
+PASS ConnectionsAdvanced serviceTimeoutTolerance: 1.5
+PASS ConnectionsAdvanced shiftWorkTarget: 1500
+PASS ConnectionsAdvanced businessFailureLimit: 10
+PASS ConnectionsAdvanced loadCapacity: 10,10,10,10,10,10,10,10
+PASS ConnectionsAdvanced baselineLoad: 0,0,0,0,0,0,0,0
+PASS unchanged Assets/Scripts/Connections/ConnectionTrafficDirector.cs
+PASS unchanged Assets/Scripts/Connections/SimulationHost.Shift.cs
+PASS unchanged Assets/Scripts/Connections/SimulationHost.Service.cs
+PASS unchanged Assets/Scenes/GameScene.unity
+PASS unchanged Assets/Scenes/ABScene.unity

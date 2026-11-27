@@ -81,7 +81,7 @@ namespace Uptime.Connections.EditorTools
             Check(new SerializedObject(traffic).FindProperty("profiles").arraySize > 0 &&
                 traffic.Profiles.Count(p => p.purposeTemplate && traffic.EffectiveAmbientWeight(p.id) > 0) == (small ? 6 : 7), scene + " explicit legal canonical catalog");
             Check(traffic.AutoGenerationEnabled && traffic.HostileGenerationEnabled && traffic.RandomizeSeed == false &&
-                traffic.LegitimateMeanArrivalSeconds == (small ? 23.225807f : 18.947369f) && traffic.HostileMeanIntervalSeconds == (small ? 54 : 30), scene + " generated scenario pressure/goal retained (seed fixed only by witness)");
+                traffic.LegitimateMeanArrivalSeconds == (small ? 23.225807f : 20f) && traffic.HostileMeanIntervalSeconds == (small ? 54 : 30), scene + " generated scenario pressure/goal retained (seed fixed only by witness)");
             Check(new[] { activity.OrdinaryWeight, activity.ReconnaissanceWeight, activity.PayloadWeight, activity.WormWeight,
                 activity.PayloadLauncherWeight, activity.DirectDuelWeight, activity.ConnectionDuelWeight }.All(w => w > 0) &&
                 traffic.PayloadSpawnerWeight > 0 && traffic.BackdoorWeight > 0, scene + " every ambient activity/infection family enabled");

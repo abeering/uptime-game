@@ -21,6 +21,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunMetadata
     {
+        public string apiConfigurationNodeId;
+        public float apiAllocationWeight;
         public float legitimateWorkloadMultiplier;
         public bool shiftEnabled;
         public float shiftWorkTarget;
@@ -186,6 +188,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class RunEvent
     {
+        public string policyNodeId, previousPurposeId, favoredPurposeId;
+        public float priorityWeight;
         public int demandSequence;
         public double demandDueAtSeconds, demandIntervalSeconds, demandNextAtSeconds;
         public float demandMeanSeconds;
@@ -451,6 +455,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class NetworkSnapshot
     {
+        public string apiFavoredPurposeId;
+        public float apiAllocationWeight;
         public BusinessDemandSnapshot businessDemand;
         public ShiftSnapshot shift;
         public IntegritySnapshot integrity;
@@ -565,6 +571,8 @@ namespace Uptime.Connections
 
     [Serializable] public sealed class ConnectionSnapshot
     {
+        public float allocationWeight;
+        public string allocationPolicyNodeId;
         public double businessWorkValue;
         public string id;
         public string lifecycle;
@@ -646,6 +654,8 @@ namespace Uptime.Connections
                 log.run.hackerCommitmentSeconds = directives.CommitmentSeconds;
                 log.run.hackerPreferenceProbability = directives.PreferenceProbability;
             }
+            log.run.apiConfigurationNodeId = host.ApiConfigurationNode?.NodeId;
+            log.run.apiAllocationWeight = host.ApiAllocationWeight;
             log.run.shiftEnabled = host.ShiftEnabled;
             log.run.legitimateWorkloadMultiplier = trafficDirector != null ? trafficDirector.LegitimateWorkloadMultiplier : 1f;
             log.run.shiftWorkTarget = host.ShiftWorkTarget;
@@ -788,6 +798,14 @@ namespace Uptime.Connections
             entry.parentInfectionAppliedAtSeconds = plan.ParentInfectionAppliedAtSeconds;
             // A queued plan is complete evidence even if the connection never spawns.
             entry.definition = Definition(LogicalConnectionDefinition.FromPlan(plan));
+        }
+
+        public void RecordApiPolicyChange(string nodeId, string previous, string selected, float weight, float time)
+        {
+            if (!IsRecording) return;
+            var entry = NewEvent("api_policy_changed", time); entry.policyNodeId = nodeId;
+            entry.previousPurposeId = previous; entry.favoredPurposeId = selected; entry.priorityWeight = weight;
+            CaptureSnapshot(time);
         }
 
         public void RecordBusinessDemand(string type, int sequence, float observedAt, double dueAt,
@@ -1537,6 +1555,8 @@ namespace Uptime.Connections
                 legitimateFailureTotal = host.LegitimateFailureCount,
                 nodes = new NodeSnapshot[host.Nodes.Length] };
             snapshot.shift = host.Shift;
+            snapshot.apiFavoredPurposeId = host.ApiFavoredPurposeId;
+            snapshot.apiAllocationWeight = host.ApiAllocationWeight;
             snapshot.businessDemand = trafficDirector?.BusinessDemand;
             snapshot.integrity = host.Integrity?.Snapshot();
             var directives = host.GetComponent<HackerDirectives>();
@@ -1646,6 +1666,7 @@ namespace Uptime.Connections
                 }
                 else if (!state.IsHostile) snapshot.anticipatedBenign++;
                 active.Add(new ConnectionSnapshot { id = state.ConnectionId,
+                    allocationWeight = state.AllocationWeight, allocationPolicyNodeId = state.AllocationPolicyNodeId,
                     businessWorkValue = state.BusinessWorkValue,
                     serviceDeadlineSeconds = state.ServiceDeadlineSeconds,
                     serviceRemainingSeconds = state.ServiceRemainingSeconds,

@@ -1,0 +1,203 @@
+{
+    "apiFavoredPurposeId": "product-lookup",
+    "apiAllocationWeight": 2.0,
+    "businessDemand": {
+        "arrived": 0,
+        "admitted": 0,
+        "waiting": 0,
+        "unadmitted": 0,
+        "nextArrivalAtSeconds": 40.489770633971328
+    },
+    "shift": {
+        "enabled": true,
+        "target": 64.0,
+        "timeSeconds": 34.140098571777347,
+        "failureLimit": 2,
+        "failures": 1,
+        "completedJobs": 1,
+        "credited": 32.0,
+        "eligible": 64.0,
+        "lost": 32.0,
+        "unfinished": 0.0,
+        "ending": "None",
+        "shiftSucceeded": false,
+        "runFailed": false
+    },
+    "integrity": {
+        "nodes": [
+            {
+                "id": "API",
+                "external": false,
+                "critical": false,
+                "revealed": false,
+                "connected": false,
+                "overloaded": false,
+                "integrity": 2,
+                "overloadElapsed": 0.0,
+                "overloadRemaining": 0.0
+            },
+            {
+                "id": "AUTH",
+                "external": false,
+                "critical": true,
+                "revealed": false,
+                "connected": false,
+                "overloaded": false,
+                "integrity": 2,
+                "overloadElapsed": 0.0,
+                "overloadRemaining": 0.0
+            },
+            {
+                "id": "DB",
+                "external": false,
+                "critical": true,
+                "revealed": true,
+                "connected": false,
+                "overloaded": false,
+                "integrity": 1,
+                "overloadElapsed": 0.0,
+                "overloadRemaining": 0.0
+            },
+            {
+                "id": "EXT1",
+                "external": true,
+                "critical": false,
+                "revealed": false,
+                "connected": true,
+                "overloaded": false,
+                "integrity": -1,
+                "overloadElapsed": 0.0,
+                "overloadRemaining": 0.0
+            }
+        ],
+        "links": [
+            {
+                "id": "E1",
+                "nodeA": "EXT1",
+                "nodeB": "API",
+                "connected": false
+            },
+            {
+                "id": "E2",
+                "nodeA": "API",
+                "nodeB": "DB",
+                "connected": false
+            },
+            {
+                "id": "E3",
+                "nodeA": "API",
+                "nodeB": "AUTH",
+                "connected": false
+            }
+        ],
+        "connectedLinks": [],
+        "breach": {
+            "criticalNode": "",
+            "path": [],
+            "links": [],
+            "time": 0.0,
+            "trigger": {
+                "type": "",
+                "target": "",
+                "source": "",
+                "cause": "",
+                "time": 0.0,
+                "before": 0,
+                "after": 0,
+                "visible": false,
+                "revealed": false
+            }
+        },
+        "breached": false
+    },
+    "hackerDirective": {
+        "directive": "SPREAD",
+        "hasOffensive": false,
+        "offensive": {
+            "id": 0,
+            "directive": "",
+            "critical": "",
+            "reason": "",
+            "path": [],
+            "remainingCostAtSelection": 0,
+            "selectedAt": 0.0,
+            "expiresAt": 0.0
+        }
+    },
+    "timeSeconds": 34.140098571777347,
+    "activeConnections": 0,
+    "legitimateFailureTotal": 1,
+    "establishedBenign": 0,
+    "establishedHostile": 0,
+    "anticipatedBenign": 0,
+    "health": {
+        "value": 100.0,
+        "netRate": 0.0,
+        "recoveryRate": 0.0,
+        "degradationRate": 0.0,
+        "slowedCount": 0,
+        "overdueCount": 0,
+        "failed": false
+    },
+    "nodes": [
+        {
+            "id": "EXT1",
+            "loadCapacity": 10.0,
+            "baselineLoad": 0.0,
+            "infectionRequestedLoad": 0.0,
+            "infectionAllocatedLoad": 0.0,
+            "defensiveRequestedLoad": 0.0,
+            "defensiveAllocatedLoad": 0.0,
+            "connectionRequestedLoad": 0.0,
+            "connectionAllocatedLoad": 0.0,
+            "requestedLoad": 0.0,
+            "allocatedLoad": 0.0
+        },
+        {
+            "id": "API",
+            "loadCapacity": 10.0,
+            "baselineLoad": 0.0,
+            "infectionRequestedLoad": 0.0,
+            "infectionAllocatedLoad": 0.0,
+            "defensiveRequestedLoad": 0.0,
+            "defensiveAllocatedLoad": 0.0,
+            "connectionRequestedLoad": 0.0,
+            "connectionAllocatedLoad": 0.0,
+            "requestedLoad": 0.0,
+            "allocatedLoad": 0.0
+        },
+        {
+            "id": "DB",
+            "loadCapacity": 10.0,
+            "baselineLoad": 0.0,
+            "infectionRequestedLoad": 0.0,
+            "infectionAllocatedLoad": 0.0,
+            "defensiveRequestedLoad": 0.0,
+            "defensiveAllocatedLoad": 0.0,
+            "connectionRequestedLoad": 0.0,
+            "connectionAllocatedLoad": 0.0,
+            "requestedLoad": 0.0,
+            "allocatedLoad": 0.0
+        },
+        {
+            "id": "AUTH",
+            "loadCapacity": 10.0,
+            "baselineLoad": 0.0,
+            "infectionRequestedLoad": 0.0,
+            "infectionAllocatedLoad": 0.0,
+            "defensiveRequestedLoad": 0.0,
+            "defensiveAllocatedLoad": 0.0,
+            "connectionRequestedLoad": 0.0,
+            "connectionAllocatedLoad": 0.0,
+            "requestedLoad": 0.0,
+            "allocatedLoad": 0.0
+        }
+    ],
+    "infections": [],
+    "conditions": [],
+    "connections": [],
+    "payloads": [],
+    "interceptors": [],
+    "worms": [],
+    "isolations": []
+}

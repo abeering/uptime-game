@@ -4,6 +4,8 @@
 
 Uptime is one game being explored through two different gameplay prototypes. **Packet** models individual packets and discrete network traversal. **Connections** models persistent logical connections, operations, WORK, and shared LOAD. Both are retained. Connections is the current development focus and is promising, but no decision has been made to replace or abandon Packet. The broader game design is shared and can evolve as either prototype teaches us more.
 
+**Connections follow-up (2026-11-26):** Human-accepted Independent Business Demand #135 merged normally at `79e2d90`. API Configuration V0 adds the first persistent one-slot PURPOSE allocation policy on its feature branch, with shared authored `ssh api`, configurable 2× weight, capped redistribution, route eligibility and policy recording. Broader company importance and node systems remain deferred. The dated baseline below is retained for provenance; [Connections Current State](Connections/Current_State.md) describes later implementation.
+
 ## Playable boundaries
 
 | Prototype | Scene and runtime | Current posture |
